@@ -1,15 +1,15 @@
-#' Very good importance sampling log weights
+#' Very good importance sampling, log weights
 #' @export
 #' @param lw log weights.
 #' @param wcp percentage of samples used for the genearlized Pareto fit estimate.
 #' @param wtrunc for truncating very large weights to \code{n^wtrunc}. No
 #' trunction if \code{wtrunc=0}.
 #' @param cores number of cores to use for parallelization.
-#' @return a list with modified log waits and tail indices
+#' @return a list with modified log waits and tail indices.
 #'
 vgislw <- function(lw, wcp=20, wtrunc=3/4,
                    cores = parallel::detectCores()) {
-  loop_fn <- function(i) {
+  .loop_fn <- function(i) {
     x <- lw[,i]
 
     # divide log weights into body and right tail
@@ -55,11 +55,11 @@ vgislw <- function(lw, wcp=20, wtrunc=3/4,
   K <- ncol(lw)
   K2 <- 2*K
   if (.Platform$OS.type == "windows") {
-    out <- parallel::mclapply(1:K, loop_fn, mc.cores = cores)
+    out <- parallel::mclapply(1:K, .loop_fn, mc.cores = cores)
   } else {
     cl <- parallel::makePSOCKcluster(cores)
     on.exit(parallel::stopCluster(cl))
-    out <- parallel::parLapply(cl, X = 1:K, fun = loop_fn)
+    out <- parallel::parLapply(cl, X = 1:K, fun = .loop_fn)
   }
   ux <- unlist(out, recursive = FALSE, use.names = FALSE)
   lw <- do.call(cbind, ux[seq(1, K2, 2)])
