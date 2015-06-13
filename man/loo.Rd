@@ -4,12 +4,12 @@
 \name{loo}
 \alias{loo}
 \alias{loo-package}
-\title{Leave-one-out cross-validation and WAIC}
+\title{Efficient implementation of leave-one-out cross-validation and WAIC for
+evaluating fitted Bayesian models}
 \description{
 Leave-one-out cross-validation and WAIC
-}
-\section{1}{
- After fitting a Bayesian model we often want to measure its
+
+After fitting a Bayesian model we often want to measure its
 predictive accuracy, for its own sake or for purposes of model comparison,
 selection, or averaging (Geisser and Eddy, 1979, Hoeting et al., 1999,
 Vehtari and Lampinen, 2002, Ando and Tsay, 2010, Vehtari and Ojanen, 2012).
@@ -42,10 +42,8 @@ to parametrization and also works for singular models. WAIC is asymptotically
 equal to LOO, and can thus be used as an approximation of LOO. In the finite
 case, WAIC often gives similar estimates as LOO, but for influential
 observations WAIC underestimates the effect of leaving out one observation.
-}
 
-\section{2}{
- One advantage of AIC and DIC is their computational simplicity.
+One advantage of AIC and DIC is their computational simplicity.
 In the present paper, we quickly review LOO and WAIC and then present fast
 and stable computations that can be per- formed directly on posterior
 simulations, thus allowing these newer tools to enter routine statistical

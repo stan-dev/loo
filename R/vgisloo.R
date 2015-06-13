@@ -1,8 +1,19 @@
-#' Very good importance sampling
-#' 
+#' Very good importance sampling LOO log predictive densities
+#'
 #' @export
-#' @param log_lik, wcp, wtrunc arguments.
-#' @return a list.
+#' @param log_lik an \code{s} by \code{b} matrix, where \code{s} is the size of
+#' the posterior sample and \code{n} is the number of data points.
+#' @param wcp the percentage of samples used for the genearlized Pareto fit estimate
+#' @param wtrunc for truncating very large weights to \code{n^wtrunc}. No
+#' trunction if \code{wtrunc=0}.
+#' @param cores number of cores for parallelization.
+#'
+#' @return A list with components \itemize{
+#'  \item \code{loo} - the sum of the LOO log predictive densities
+#'  \item \code{loos} - the individual LOO log predictive densities
+#'  \item \code{ks} - the estimate of the tail indices
+#' }
+#'
 #' @details The distribution of the importance weights used in LOO may have a
 #'   long right tail. We use the empirical Bayes estimate of Zhang and Stephens
 #'   (2009) to fit a generalized Pareto distribution to the tail (20% largest
@@ -21,7 +32,7 @@
 #'   sampling is sensitive to one or few largest values. By fitting a
 #'   generalized Pareto distribution to the upper tail of the importance
 #'   weights, we smooth these values. The procedure goes as follows:
-#'   
+#'
 #'   \enumerate{
 #'   \item Fit the generalized Pareto distribution to the 20% largest importance
 #'   ratios \eqn{r_s} as computed in (6). (The computation is done separately for each
@@ -30,30 +41,31 @@
 #'   the specific cutoff value (for a consistent estimation the proportion of
 #'   the samples above the cutoff should get smaller when the number of draws
 #'   increases).
-#'   
-#'   \item Stabilize the importance ratios by replacing the \eqn{M} largest ratios 
+#'
+#'   \item Stabilize the importance ratios by replacing the \eqn{M} largest ratios
 #'   by the expected values of the order statistics of the fitted generalized
 #'   Pareto distribution \deqn{G((z - 0.5)/M), z = 1,...,M,}
 #'   where \eqn{M} is the number of simulation draws used to fit the Pareto (in this
 #'   case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the generalized
 #'   Pareto distribution.
-#'   
+#'
 #'   \item To guarantee finite variance of the estimate, truncate the smoothed
-#'   ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of 
+#'   ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of
 #'   the smoothed weights.
 #'   }
-#'   
-#'   The above steps must be performed for each data point \eqn{i}, thus 
-#'   resulting in a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each 
-#'   \eqn{i}, which in general should be better behaved than the raw importance 
+#'
+#'   The above steps must be performed for each data point \eqn{i}, thus
+#'   resulting in a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each
+#'   \eqn{i}, which in general should be better behaved than the raw importance
 #'   ratios \eqn{r_{i}^{s}} from which they were constructed.
-#'   
+#'
 #'   The results can then be combined to compute desired LOO estimates.
 #'
 
-vgisloo <- function(log_lik, wcp=20, wtrunc=3/4) {
+vgisloo <- function(log_lik, wcp=20, wtrunc=3/4,
+                    cores = parallel::detectCores()) {
   lw <- -log_lik
-  temp <- vgislw(lw, wcp, wtrunc)
+  temp <- vgislw(lw, wcp, wtrunc, cores)
   vglw <- temp$lw
   vgk <- temp$k
   loos <- sumlogs(log_lik + vglw)

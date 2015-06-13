@@ -2,18 +2,30 @@
 % Please edit documentation in R/vgisloo.R
 \name{vgisloo}
 \alias{vgisloo}
-\title{Very good importance sampling}
+\title{Very good importance sampling LOO log predictive densities}
 \usage{
-vgisloo(log_lik, wcp = 20, wtrunc = 3/4)
+vgisloo(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 }
 \arguments{
-\item{log_lik,}{wcp, wtrunc arguments.}
+\item{log_lik}{an \code{s} by \code{b} matrix, where \code{s} is the size of
+the posterior sample and \code{n} is the number of data points.}
+
+\item{wcp}{the percentage of samples used for the genearlized Pareto fit estimate}
+
+\item{wtrunc}{for truncating very large weights to \code{n^wtrunc}. No
+trunction if \code{wtrunc=0}.}
+
+\item{cores}{number of cores for parallelization.}
 }
 \value{
-a list.
+A list with components \itemize{
+ \item \code{loo} - the sum of the LOO log predictive densities
+ \item \code{loos} - the individual LOO log predictive densities
+ \item \code{ks} - the estimate of the tail indices
+}
 }
 \description{
-Very good importance sampling
+Very good importance sampling LOO log predictive densities
 }
 \details{
 The distribution of the importance weights used in LOO may have a

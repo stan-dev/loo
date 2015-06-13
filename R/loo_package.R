@@ -1,15 +1,16 @@
-#' Leave-one-out cross-validation and WAIC
+#' Efficient implementation of leave-one-out cross-validation and WAIC for
+#' evaluating fitted Bayesian models
 #'
 #' @description Leave-one-out cross-validation and WAIC
-#'   
-#' @section 1: After fitting a Bayesian model we often want to measure its
-#' predictive accuracy, for its own sake or for purposes of model comparison, 
-#' selection, or averaging (Geisser and Eddy, 1979, Hoeting et al., 1999, 
-#' Vehtari and Lampinen, 2002, Ando and Tsay, 2010, Vehtari and Ojanen, 2012). 
+#'
+#' After fitting a Bayesian model we often want to measure its
+#' predictive accuracy, for its own sake or for purposes of model comparison,
+#' selection, or averaging (Geisser and Eddy, 1979, Hoeting et al., 1999,
+#' Vehtari and Lampinen, 2002, Ando and Tsay, 2010, Vehtari and Ojanen, 2012).
 #' Cross- validation and information criteria are two approaches for estimating
 #' out-of-sample predictive accu- racy using within-sample fits (Akaike, 1973,
 #' Stone, 1977). In this article we consider computations using the
-#' log-likelihood evaluated at the usual posterior simulations of the 
+#' log-likelihood evaluated at the usual posterior simulations of the
 #' parameters. Computa- tion time for the predictive accuracy measures should be
 #' negligible compared to the cost of fitting the model and obtaining posterior
 #' draws in the first place. Exact cross-validation requires re-fitting the
@@ -29,14 +30,14 @@
 #' problems, arising in part from it not being fully Bayesian in that it is
 #' based on a point estimate (van der Linde, 2005, Plummer, 2008). For example,
 #' DIC can produce negative estimates of the effective number of parameters in a
-#' model and it is not defined for singular models. WAIC is fully Bayesian and 
+#' model and it is not defined for singular models. WAIC is fully Bayesian and
 #' closely approximates Bayesian cross-validation. Unlike DIC, WAIC is invariant
 #' to parametrization and also works for singular models. WAIC is asymptotically
 #' equal to LOO, and can thus be used as an approximation of LOO. In the finite
 #' case, WAIC often gives similar estimates as LOO, but for influential
 #' observations WAIC underestimates the effect of leaving out one observation.
-#' 
-#' @section 2: One advantage of AIC and DIC is their computational simplicity. 
+#'
+#' One advantage of AIC and DIC is their computational simplicity.
 #' In the present paper, we quickly review LOO and WAIC and then present fast
 #' and stable computations that can be per- formed directly on posterior
 #' simulations, thus allowing these newer tools to enter routine statistical
@@ -45,9 +46,9 @@
 #' a byproduct of our calculations, we also obtain approximate standard errors
 #' for estimated predictive errors and for comparing of predictive errors
 #' between two models.
-#'   
+#'
 #' @docType package
 #' @name loo
-#' 
+#'
 NULL
 

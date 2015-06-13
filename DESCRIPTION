@@ -1,6 +1,6 @@
 Package: loo
 Type: Package
-Title: Leave-one-out cross-validation, WAIC, very good importance sampling
+Title: Efficient implementation of leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models
 Version: 0.1
 Date: 2015-06-13
 Author: Aki Vehtari, Andrew Gelman, Jonah Gabry
@@ -10,4 +10,5 @@ License: What license is it under?
 LazyData: TRUE
 Imports: matrixStats,
     parallel
-Suggests: rstan
+Suggests: rstan,
+    testthat
