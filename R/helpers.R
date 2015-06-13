@@ -1,13 +1,3 @@
-# use matrixStats::colVars instead (much faster b/c written in C++)
-# colVars <- function(X) {
-#   # column variances
-#   N <- dim(X)[[1]]
-#   C <- dim(X)[[2]]
-#   Xbar <- matrix(.colMeans(X, N, C), N, C, byrow = TRUE)
-#   var <-  .colMeans((X - Xbar)^2, N, C) * N / (N - 1)
-#   var
-# }
-
 nlist <- function(...) {
   # named lists
   m <- match.call()
@@ -50,7 +40,7 @@ qgpd <- function(p, xi=1, mu=0, beta=1, lower.tail=TRUE){
 sumlogs <- function(x, dimen=1) {
   # log_sum_exp
   x_max <- max(x)
-  if (is.null(dim(x))) return(x_max + log(sum(exp(x-x_max)))) 
+  if (is.null(dim(x))) return(x_max + log(sum(exp(x-x_max))))
   if (dimen == 1) return(x_max + log(colSums(exp(x-x_max))))
   x_max + log(rowSums(exp(x-x_max)))
 }
@@ -61,7 +51,7 @@ escape_check <- function(x, escape_if_greater_than = 700) {
   x_sorted <- sort(x, method = "quick")[c(1:2, (L-1):L)]
   diffs <- vapply(c(1,3), function(i) abs(diff(x_sorted[i:(i+1)])), 0)
   if (any(diffs > escape_if_greater_than)) {
-    message(paste0("Failed. Difference between largest and second largest", 
+    message(paste0("Failed. Difference between largest and second largest",
                    "log-weights is more than ", escape_if_greater_than,"."))
     return(invisible(NULL))
   }
