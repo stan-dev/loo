@@ -34,7 +34,7 @@ loo_and_waic <- function(log_lik,
   p_waic <- matrixStats::colVars(log_lik)
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
-  nms <- names(pointwise <- nlist(elpd_loo, p_loo, elpd_waic, p_waic, looic, waic))
+  nms <- names(pointwise <- nlist(elpd_loo,p_loo,elpd_waic,p_waic,looic,waic))
   total <- unlist_lapply(pointwise, sum)
   se <- sqrt(N * unlist_lapply(pointwise, var))
   output <- as.list(c(total, se))
