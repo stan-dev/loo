@@ -2,7 +2,7 @@
 % Please edit documentation in R/gpdfit.R
 \name{gpdfit}
 \alias{gpdfit}
-\title{Estimates the parameters \eqn{k} and sigma of the generalized Pareto distribution,
+\title{Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
 given a sample \eqn{x}.}
 \usage{
 gpdfit(x)
@@ -14,7 +14,7 @@ gpdfit(x)
 a list of parameter estimates.
 }
 \description{
-Estimates the parameters \eqn{k} and sigma of the generalized Pareto distribution,
+Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
 given a sample \eqn{x}.
 }
 \note{

@@ -1,9 +1,9 @@
-#' Estimates the parameters \eqn{k} and sigma of the generalized Pareto distribution,
+#' Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
 #' given a sample \eqn{x}.
 #'
 #' @export
 #' @param x a numeric vector. The sample from which to estimate the parameters.
-#' @return a list of parameter estimates.
+#' @return a list. Estimates for \eqn{k} and \eqn{\sigma}.
 #' @note Here the parameter \eqn{k} is the negative of the \eqn{k} in the paper
 #' of Zhang & Stephens.
 #' @references Zhang & Stephens (2009)

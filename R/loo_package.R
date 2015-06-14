@@ -51,4 +51,3 @@
 #' @name loo
 #'
 NULL
-

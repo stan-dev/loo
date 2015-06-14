@@ -12,7 +12,7 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) 
     x <- lw[, i]
     # divide log weights into body and right tail
     n <- length(x)
-    cutoff <- quantile(x, 1 - wcp/100, names = FALSE)
+    cutoff <- quantile(x, 1 - wcp / 100, names = FALSE)
     x_gt_cut <- x > cutoff
     x1 <- x[!x_gt_cut]
     x2 <- x[x_gt_cut]
@@ -24,7 +24,7 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) 
     k <- fit$k
     sigma <- fit$sigma
     # compute ordered statistic for the fit
-    qq <- qgpd(seq_min_half(n2)/n2, xi = k, beta = sigma) + exp(cutoff)
+    qq <- qgpd(seq_min_half(n2) / n2, xi = k, beta = sigma) + exp(cutoff)
     # remap back to the original order
     slq <- rep.int(0, n2)
     slq[x2si] <- log(qq)

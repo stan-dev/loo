@@ -13,6 +13,9 @@ log_lik(stanfit, parameter_name = "log_lik")
 \item{parameter_name}{a character string naming the parameter (generated
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
+\value{
+a matrix of extracted draws.
+}
 \description{
 Convenience function for extracting log-likelihood from
 a \code{stanfit} object.
