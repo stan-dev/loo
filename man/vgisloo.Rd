@@ -15,7 +15,7 @@ the posterior sample and \eqn{n} is the number of data points.}
 \item{wtrunc}{for truncating very large weights to \eqn{n^}\code{wtrunc}. No
 trunction if \code{wtrunc=0}.}
 
-\item{cores}{number of cores for parallelization.}
+\item{cores}{number of cores to use for parallelization.}
 }
 \value{
 A list with components

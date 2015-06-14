@@ -11,7 +11,7 @@ gpdfit(x)
 \item{x}{a numeric vector. The sample from which to estimate the parameters.}
 }
 \value{
-a list of parameter estimates.
+a list. Estimates for \eqn{k} and \eqn{\sigma}.
 }
 \description{
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,

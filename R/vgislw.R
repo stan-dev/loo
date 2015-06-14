@@ -59,5 +59,5 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) 
   kss <- do.call(c, ux[seq(2, K2, 2)])
 
   # return log weights and tail indices k
-  list(lw = lw, k = kss)
+  nlist(lw, k = kss)
 }

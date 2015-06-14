@@ -1,5 +1,5 @@
-#' Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
-#' given a sample \eqn{x}.
+#' Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
+#' distribution, given a sample \eqn{x}.
 #'
 #' @export
 #' @param x a numeric vector. The sample from which to estimate the parameters.
@@ -11,7 +11,7 @@
 
 gpdfit <- function(x) {
   n <- length(x)
-  x <- sort.int(x, method = "quick")
+  x <- sort.int(x)
   prior <- 3
   m <- 80 + floor(sqrt(n))  # note: original paper used m <- 20+floor(sqrt(n))
   b <- 1/x[n] + (1 - sqrt(m/seq_min_half(m)))/prior/x[floor(n/4 + 0.5)]
