@@ -19,11 +19,11 @@
 #' approximate standard errors for estimated predictive errors and for comparing
 #' of pre- dictive errors between two models.
 #'
-loo_and_waic <- function(log_lik,
-                         cores = parallel::detectCores()) {
+loo_and_waic <- function(log_lik, cores = parallel::detectCores()) {
   # log_lik should be a matrix with nrow = nsims and ncol = nobs
 
-  if (!is.matrix(log_lik)) stop("'log_lik' should be a matrix")
+  if (!is.matrix(log_lik))
+    stop("'log_lik' should be a matrix")
   S <- nrow(log_lik)
   N <- ncol(log_lik)
   lpd <- log(colMeans(exp(log_lik)))
@@ -34,7 +34,7 @@ loo_and_waic <- function(log_lik,
   p_waic <- matrixStats::colVars(log_lik)
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
-  nms <- names(pointwise <- nlist(elpd_loo,p_loo,elpd_waic,p_waic,looic,waic))
+  nms <- names(pointwise <- nlist(elpd_loo, p_loo, elpd_waic, p_waic, looic, waic))
   total <- unlist_lapply(pointwise, sum)
   se <- sqrt(N * unlist_lapply(pointwise, var))
   output <- as.list(c(total, se))

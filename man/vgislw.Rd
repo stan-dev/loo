@@ -2,14 +2,14 @@
 % Please edit documentation in R/vgislw.R
 \name{vgislw}
 \alias{vgislw}
-\title{Very good importance sampling log weights}
+\title{Very good importance sampling, log weights}
 \usage{
 vgislw(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 }
 \arguments{
 \item{lw}{log weights.}
 
-\item{wcp}{percentage of samples used for the genearlized Pareto fit estimate.}
+\item{wcp}{percentage of samples used for the generalized Pareto fit estimate.}
 
 \item{wtrunc}{for truncating very large weights to \code{n^wtrunc}. No
 trunction if \code{wtrunc=0}.}
@@ -17,9 +17,9 @@ trunction if \code{wtrunc=0}.}
 \item{cores}{number of cores to use for parallelization.}
 }
 \value{
-a list with modified log waits and tail indices
+a list with modified log waits and tail indices.
 }
 \description{
-Very good importance sampling log weights
+Very good importance sampling, log weights
 }
 

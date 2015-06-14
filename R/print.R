@@ -8,13 +8,13 @@ print.loo <- function(x, ...) {
   dots <- list(...)
   digits <- 2
   if (length(dots) != 0 && "digits" %in% names(dots)) {
-    digts <- dots$digits
+    digits <- dots$digits
   }
-  lx <- length(x)
-  dims <- x[[lx]]
-  z <- x[-c(lx-2, lx-1, lx)]
+  L <- length(x)
+  dims <- x[[L]]
+  z <- x[-c(L - 2, L - 1, L)]
   uz <- unlist(z)
-  ord <- c(1,3,2,4,5,6)
+  ord <- c(1, 3, 2, 4, 5, 6)
   out <- cbind(total = uz[ord], se = uz[ord + length(ord)])
   printCoefmat(out, digits = digits)
   cat("-----\n")
@@ -29,7 +29,7 @@ print.compare.loo <- function(x, ...) {
   dots <- list(...)
   digits <- 2
   if (length(dots) != 0 && "digits" %in% names(dots)) {
-    digts <- dots$digits
+    digits <- dots$digits
   }
   ux <- unlist(x)
   print(round(ux, digits))

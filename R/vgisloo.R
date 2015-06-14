@@ -62,13 +62,12 @@
 #'   The results can then be combined to compute desired LOO estimates.
 #'
 
-vgisloo <- function(log_lik, wcp=20, wtrunc=3/4,
-                    cores = parallel::detectCores()) {
+vgisloo <- function(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) {
   lw <- -log_lik
   temp <- vgislw(lw, wcp, wtrunc, cores)
   vglw <- temp$lw
   vgk <- temp$k
   loos <- sumlogs(log_lik + vglw)
   loo <- sum(loos)
-  list(loo=loo, loos=loos, ks=vgk)
+  nlist(loo, loos, ks = vgk)
 }
