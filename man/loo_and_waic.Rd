@@ -8,7 +8,7 @@ loo_and_waic(log_lik, cores = parallel::detectCores())
 }
 \arguments{
 \item{log_lik}{an nsims by nobs matrix, typically (but not restricted to be)
-the object returned by \code{rstan::extract(stanfit, "log_lik")$log_lik}.}
+the object returned by \code{\link{log_lik}}.}
 
 \item{cores}{number of cores to use for parallization.}
 }

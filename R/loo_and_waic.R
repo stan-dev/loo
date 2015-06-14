@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param log_lik an nsims by nobs matrix, typically (but not restricted to be)
-#' the object returned by \code{rstan::extract(stanfit, "log_lik")$log_lik}.
+#' the object returned by \code{\link{log_lik}}.
 #' @param cores number of cores to use for parallization.
 #' @return a list of class \code{'loo'}.
 #'

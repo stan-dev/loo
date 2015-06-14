@@ -8,7 +8,7 @@ given a sample \eqn{x}.}
 gpdfit(x)
 }
 \arguments{
-\item{x}{the sample (a numeric vector).}
+\item{x}{a numeric vector. The sample from which to estimate the parameters.}
 }
 \value{
 a list of parameter estimates.
@@ -19,7 +19,7 @@ given a sample \eqn{x}.
 }
 \note{
 Here the parameter \eqn{k} is the negative of the \eqn{k} in the paper
-of Zhang & Stephens, because it is more common parametrization
+of Zhang & Stephens.
 }
 \references{
 Zhang & Stephens (2009)
