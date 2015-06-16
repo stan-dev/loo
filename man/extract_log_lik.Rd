@@ -8,12 +8,10 @@ object.}
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }
 \arguments{
-\item{object}{a \code{stanfit} (\pkg{rstan}) object.}
+\item{stanfit}{a \code{stanfit} (\pkg{rstan}) object.}
 
-\item{...}{other arguments. Currently only \code{parameter_name}, which
-defaults to \code{'log_lik'}, and should be a character string naming the
-parameter (generated quantity) in the Stan model corresponding to the
-log-likelihood.}
+\item{parameter_name}{a character string naming the parameter (generated
+quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
 a matrix of (post-warmup) extracted draws.

@@ -10,32 +10,31 @@
 #' @param cores number of cores to use for parallelization.
 #'
 #' @return A list with components
-#' \itemize{
-#'  \item \code{loo} - the sum of the LOO log predictive densities
-#'  \item \code{loos} - the individual LOO log predictive densities
-#'  \item \code{ks} - the estimate of the tail indices
+#' \describe{
+#'  \item{\code{loo}}{the sum of the LOO log predictive densities}
+#'  \item{\code{loos}}{the individual LOO log predictive densities}
+#'  \item{\code{ks}}{the estimate of the tail indices}
 #' }
 #'
 #' @details The distribution of the importance weights used in LOO may have a
-#'   long right tail. We use the empirical Bayes estimate of Zhang and Stephens
-#'   (2009) to fit a generalized Pareto distribution to the tail (20% largest
-#'   importance ratios). By examining the shape parameter k of the fitted Pareto
-#'   distribution, we are able to obtain sample based estimate of the existence
-#'   of the moments (Koopman et al, 2009). This extends the diagnostic approach
-#'   of Peruggia (1997) and Epifani et al. (2008) to be used routinely with
-#'   IS-LOO for any model with factorising likelihood. Epifani et al. (2008)
-#'   show that when estimating the leave-one-out predictive density, the central
-#'   limit theorem holds if the variance of the weight distribution is finite.
-#'   These results can be extended by using the generalized central limit
-#'   theorem for stable distributions. Thus, even if the variance of the
-#'   importance weight distribution is infinite, if the mean exists the
-#'   estimate’s accuracy improves when additional draws are obtained. When the
-#'   tail of the weight distribution is long, a direct use of importance
-#'   sampling is sensitive to one or few largest values. By fitting a
-#'   generalized Pareto distribution to the upper tail of the importance
-#'   weights, we smooth these values. The procedure goes as follows:
-#'
-#'   \enumerate{
+#' long right tail. We use the empirical Bayes estimate of Zhang and Stephens
+#' (2009) to fit a generalized Pareto distribution to the tail (20% largest
+#' importance ratios). By examining the shape parameter \eqn{k} of the fitted
+#' Pareto distribution, we are able to obtain a sample based estimate of the
+#' existance of the moments (Koopman et al, 2009). This extends the diagnostic
+#' approach of Peruggia (1997) and Epifani et al. (2008) to be used routinely
+#' with IS-LOO for any model with a factorizing likelihood. Epifani et al.
+#' (2008) show that when estimating the leave-one-out predictive density, the
+#' central limit theorem holds if the variance of the weight distribution is
+#' finite. These results can be extended using the generalized central limit
+#' theorem for stable distributions. Thus, even if the variance of the
+#' importance weight distribution is infinite, if the mean exists the
+#' estimate's accuracy improves when additional draws are obtained. When the
+#' tail of the weight distribution is long, a direct use of importance
+#' sampling is sensitive to the one (or several) largest value(s). By fitting
+#' a generalized Pareto distribution to the upper tail of the importance
+#' weights we smooth these values. The procedure goes as follows:
+#' \enumerate{
 #'   \item Fit the generalized Pareto distribution to the 20% largest importance
 #'   ratios \eqn{r_s} as computed in (6). (The computation is done separately for each
 #'   held-out data point \eqn{i}.) In simulation experiments with a thousands to tens
@@ -62,6 +61,7 @@
 #'   ratios \eqn{r_{i}^{s}} from which they were constructed.
 #'
 #'   The results can then be combined to compute desired LOO estimates.
+#'
 #'
 
 vgisloo <- function(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) {

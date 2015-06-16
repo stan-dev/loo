@@ -2,11 +2,9 @@
 #' object.
 #'
 #' @export
-#' @param object a \code{stanfit} (\pkg{rstan}) object.
-#' @param ... other arguments. Currently only \code{parameter_name}, which
-#'   defaults to \code{'log_lik'}, and should be a character string naming the
-#'   parameter (generated quantity) in the Stan model corresponding to the
-#'   log-likelihood.
+#' @param stanfit a \code{stanfit} (\pkg{rstan}) object.
+#' @param parameter_name a character string naming the parameter (generated
+#'   quantity) in the Stan model corresponding to the log-likelihood.
 #' @return a matrix of (post-warmup) extracted draws.
 #' @seealso \code{\link[rstan]{stanfit-class}}
 #' @examples
