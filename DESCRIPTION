@@ -1,13 +1,12 @@
 Package: loo
 Type: Package
-Title: Leave-one-out cross-validation, WAIC, very good importance sampling
+Title: Efficient implementation of leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models
 Version: 0.1
 Date: 2015-06-13
 Author: Aki Vehtari, Andrew Gelman, Jonah Gabry
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
 Description: We compute leave-one-out cross-validation (LOO) using very good importance sampling (VGIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing of predictive errors between two models.
-License: What license is it under?
+License: GPL (>=3)
 LazyData: TRUE
-Imports: matrixStats,
-    parallel
-Suggests: rstan
+Imports: matrixStats, parallel
+Suggests: rstan, testthat
