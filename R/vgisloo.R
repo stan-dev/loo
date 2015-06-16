@@ -3,9 +3,9 @@
 #' @export
 #' @param log_lik an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of
 #' the posterior sample and \eqn{n} is the number of data points
-#' (see \code{\link{log_lik}}).
+#' (see \code{\link{extract_log_lik}}).
 #' @param wcp the percentage of samples used for the genearlized Pareto fit estimate
-#' @param wtrunc for truncating very large weights to n^\code{wtrunc}. No
+#' @param wtrunc for truncating very large weights to \eqn{n}^\code{wtrunc}. No
 #' trunction if \code{wtrunc=0}.
 #' @param cores number of cores to use for parallelization.
 #'

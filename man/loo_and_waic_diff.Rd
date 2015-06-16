@@ -7,7 +7,7 @@
 loo_and_waic_diff(loo1, loo2)
 }
 \arguments{
-\item{loo1,loo2}{lists (\code{'loo'} objects) returned from
+\item{loo1,loo2}{lists of class \code{'loo'} returned from
 \code{\link{loo_and_waic}}.}
 }
 \description{

@@ -1,23 +1,25 @@
 #' LOO and WAIC
 #'
 #' @export
-#' @param log_lik an nsims by nobs matrix, typically (but not restricted to be)
-#' the object returned by \code{\link{log_lik}}.
+#' @param log_lik an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of the
+#'   posterior sample (the number of simulations) and \eqn{n} is the
+#'   number of data points. Typically (but not restricted to be) the object
+#'   returned by \code{\link{extract_log_lik}}.
 #' @param cores number of cores to use for parallization.
-#' @return a list of class \code{'loo'}.
+#' @return a named list. Returned for both loo and waic are the expected log
+#'   pointwise predictive density (elpd), the estimated effective number of
+#'   parameters, the information criteria on the deviance scale, and estimated
+#'   standard errors for each of these measures. Also returned are a matrix of
+#'   the pointwise contributions of each of the measures and a vector containing
+#'   the estimated shape parameter \eqn{k} for the Pareto fit to the importance
+#'   ratios for each leave-one-out distribution.
 #'
-#' @details Leave-one-out cross-validation (LOO) and the widely applicable
-#' information criterion (WAIC) are methods for estimating pointwise out-of-sample
-#' prediction accuracy from a fitted Bayesian model using the log-likelihood
-#' evaluated at the posterior simulations of the parameter values. LOO and WAIC
-#' have various advantages over simpler estimates of predictive error such as
-#' AIC and DIC but are less used in practice because they involve additional
-#' computational steps. Here we lay out fast and stable computations for LOO and
-#' WAIC that can be performed using existing simulation draws. We compute LOO
-#' using very good importance sampling (VGIS), a new procedure for regularizing
-#' importance weights. As a byproduct of our calculations, we also obtain
-#' approximate standard errors for estimated predictive errors and for comparing
-#' of pre- dictive errors between two models.
+#' @seealso \code{\link{loo}}
+#' @examples
+#' \dontrun{
+#' log_lik <- extract_log_lik(stanfit)
+#' loo <- loo_and_waic(log_lik)
+#' }
 #'
 loo_and_waic <- function(log_lik, cores = parallel::detectCores()) {
   # log_lik should be a matrix with nrow = nsims and ncol = nobs

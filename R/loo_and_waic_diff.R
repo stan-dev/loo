@@ -1,6 +1,6 @@
 #' Compare
 #' @export
-#' @param loo1,loo2 lists (\code{'loo'} objects) returned from
+#' @param loo1,loo2 lists of class \code{'loo'} returned from
 #' \code{\link{loo_and_waic}}.
 #'
 loo_and_waic_diff <- function(loo1, loo2) {

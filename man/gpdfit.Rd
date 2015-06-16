@@ -18,10 +18,7 @@ Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
 distribution, given a sample \eqn{x}.
 }
 \note{
-Here the parameter \eqn{k} is the negative of the \eqn{k} in the paper
-of Zhang & Stephens.
-}
-\references{
-Zhang & Stephens (2009)
+Here the parameter \eqn{k} is the negative of \eqn{k} in
+Zhang & Stephens (2009).
 }
 

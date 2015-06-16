@@ -9,7 +9,7 @@ vgisloo(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 \arguments{
 \item{log_lik}{an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of
 the posterior sample and \eqn{n} is the number of data points
-(see \code{\link{log_lik}}).}
+(see \code{\link{extract_log_lik}}).}
 
 \item{wcp}{the percentage of samples used for the genearlized Pareto fit estimate}
 
