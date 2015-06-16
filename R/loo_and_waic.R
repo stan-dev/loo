@@ -5,7 +5,8 @@
 #'   posterior sample (the number of simulations) and \eqn{n} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
-#' @param cores number of cores to use for parallization.
+#' @param cores number of cores to use for parallization (see
+#'   \code{\link[parallel]{detectCores}}).
 #' @return a named list. Returned for both LOO and WAIC are the expected log
 #'   pointwise predictive density (elpd), the estimated effective number of
 #'   parameters, the information criteria on the deviance scale, as well as the
@@ -14,11 +15,12 @@
 #'   containing the estimated shape parameter \eqn{k} for the Pareto fit to the
 #'   importance ratios for each leave-one-out distribution.
 #'
-#' @seealso \code{\link{loo}}
+#' @seealso \code{\link{loo_and_waic_diff}}
 #' @examples
 #' \dontrun{
 #' log_lik <- extract_log_lik(stanfit)
 #' loo <- loo_and_waic(log_lik)
+#' print(loo, digits = 3)
 #' }
 #'
 loo_and_waic <- function(log_lik, cores = parallel::detectCores()) {

@@ -11,6 +11,7 @@
 #' \dontrun{
 #' log_lik <- extract_log_lik(stanfit, "log_lik")
 #' }
+#'
 extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
   rstan_ok <- requireNamespace("rstan", quietly = TRUE)
   if (!rstan_ok) {

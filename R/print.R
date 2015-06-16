@@ -1,9 +1,5 @@
-#' Print method for \code{'loo'} objects
+#' @rdname loo_and_waic
 #' @export
-#' @param x a \code{'loo'} object returned by \code{\link{loo_and_waic}}.
-#' @param ... other arguments. Currently only \code{digits} is supported.
-#' @return Invisibly returns \code{x}.
-#'
 print.loo <- function(x, ...) {
   dots <- list(...)
   digits <- 2
@@ -22,9 +18,9 @@ print.loo <- function(x, ...) {
   invisible(x)
 }
 
+
+#' @rdname loo_and_waic_diff
 #' @export
-#' @rdname print.loo
-#'
 print.compare.loo <- function(x, ...) {
   dots <- list(...)
   digits <- 2

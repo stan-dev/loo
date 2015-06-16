@@ -17,9 +17,10 @@ trunction if \code{wtrunc} is \code{0}.}
 \item{cores}{number of cores to use for parallelization.}
 }
 \value{
-a list with modified log waits and tail indices.
+a list with modified log weights and tail indices.
 }
 \description{
 Very good importance sampling, log weights
 }
+\keyword{internal}
 

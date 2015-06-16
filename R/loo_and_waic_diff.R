@@ -1,7 +1,16 @@
 #' Compare models
 #' @export
-#' @param loo1,loo2 lists of class \code{'loo'} returned from
+#' @param loo1,loo2 lists of class \code{'loo'} returned by
 #' \code{\link{loo_and_waic}}.
+#' @return a named list with class \code{'compare.loo'}.
+#' @seealso \code{\link{loo_and_waic}}
+#' @examples
+#' \dontrun{
+#' loo1 <- loo_and_waic(log_lik1)
+#' loo2 <- loo_and_waic(log_lik2)
+#' diff <- loo_and_waic_diff(loo1, loo2)
+#' print(diff, digits = 1)
+#' }
 #'
 loo_and_waic_diff <- function(loo1, loo2) {
   N1 <- nrow(loo1$pointwise)
