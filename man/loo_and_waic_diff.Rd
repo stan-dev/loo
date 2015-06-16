@@ -2,7 +2,7 @@
 % Please edit documentation in R/loo_and_waic_diff.R
 \name{loo_and_waic_diff}
 \alias{loo_and_waic_diff}
-\title{Compare}
+\title{Compare models}
 \usage{
 loo_and_waic_diff(loo1, loo2)
 }
@@ -11,6 +11,6 @@ loo_and_waic_diff(loo1, loo2)
 \code{\link{loo_and_waic}}.}
 }
 \description{
-Compare
+Compare models
 }
 

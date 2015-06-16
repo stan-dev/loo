@@ -1,4 +1,4 @@
-#' Compare
+#' Compare models
 #' @export
 #' @param loo1,loo2 lists of class \code{'loo'} returned from
 #' \code{\link{loo_and_waic}}.

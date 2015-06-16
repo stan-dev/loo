@@ -8,20 +8,20 @@ loo_and_waic(log_lik, cores = parallel::detectCores())
 }
 \arguments{
 \item{log_lik}{an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of the
-posterior sample (the number of simulations) and \eqn{n} is the
-number of data points. Typically (but not restricted to be) the object
-returned by \code{\link{extract_log_lik}}.}
+posterior sample (the number of simulations) and \eqn{n} is the number of
+data points. Typically (but not restricted to be) the object returned by
+\code{\link{extract_log_lik}}.}
 
 \item{cores}{number of cores to use for parallization.}
 }
 \value{
-a named list. Returned for both loo and waic are the expected log
+a named list. Returned for both LOO and WAIC are the expected log
   pointwise predictive density (elpd), the estimated effective number of
-  parameters, the information criteria on the deviance scale, and estimated
-  standard errors for each of these measures. Also returned are a matrix of
-  the pointwise contributions of each of the measures and a vector containing
-  the estimated shape parameter \eqn{k} for the Pareto fit to the importance
-  ratios for each leave-one-out distribution.
+  parameters, the information criteria on the deviance scale, as well as the
+  estimated standard errors for each of these measures. Also returned are a
+  matrix of the pointwise contributions of each of the measures and a vector
+  containing the estimated shape parameter \eqn{k} for the Pareto fit to the
+  importance ratios for each leave-one-out distribution.
 }
 \description{
 LOO and WAIC
