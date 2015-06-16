@@ -11,8 +11,8 @@ vgislw(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 
 \item{wcp}{percentage of samples used for the generalized Pareto fit estimate.}
 
-\item{wtrunc}{for truncating very large weights to \code{n^wtrunc}. No
-trunction if \code{wtrunc=0}.}
+\item{wtrunc}{for truncating very large weights to n^\code{wtrunc}. No
+trunction if \code{wtrunc} is \code{0}.}
 
 \item{cores}{number of cores to use for parallelization.}
 }

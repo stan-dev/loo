@@ -14,7 +14,7 @@ log_lik(stanfit, parameter_name = "log_lik")
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
-a matrix of extracted draws.
+a matrix of (post-warmup) extracted draws.
 }
 \description{
 Convenience function for extracting log-likelihood from

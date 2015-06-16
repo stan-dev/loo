@@ -2,9 +2,10 @@
 #'
 #' @export
 #' @param log_lik an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of
-#' the posterior sample and \eqn{n} is the number of data points.
+#' the posterior sample and \eqn{n} is the number of data points
+#' (see \code{\link{log_lik}}).
 #' @param wcp the percentage of samples used for the genearlized Pareto fit estimate
-#' @param wtrunc for truncating very large weights to \eqn{n^}\code{wtrunc}. No
+#' @param wtrunc for truncating very large weights to n^\code{wtrunc}. No
 #' trunction if \code{wtrunc=0}.
 #' @param cores number of cores to use for parallelization.
 #'
@@ -64,11 +65,9 @@
 #'
 
 vgisloo <- function(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) {
-  lw <- -log_lik
-  temp <- vgislw(lw, wcp, wtrunc, cores)
-  vglw <- temp$lw
-  vgk <- temp$k
-  loos <- sumlogs(log_lik + vglw)
+  lw <- -1 * log_lik
+  vgis <- vgislw(lw, wcp, wtrunc, cores)
+  loos <- matrixStats::colLogSumExps(log_lik + vgis$lw)
   loo <- sum(loos)
-  nlist(loo, loos, ks = vgk)
+  nlist(loo, loos, ks = vgis$k)
 }

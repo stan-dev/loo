@@ -2,8 +2,8 @@
 % Please edit documentation in R/gpdfit.R
 \name{gpdfit}
 \alias{gpdfit}
-\title{Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
-given a sample \eqn{x}.}
+\title{Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
+distribution, given a sample \eqn{x}.}
 \usage{
 gpdfit(x)
 }
@@ -14,8 +14,8 @@ gpdfit(x)
 a list. Estimates for \eqn{k} and \eqn{\sigma}.
 }
 \description{
-Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto distribution,
-given a sample \eqn{x}.
+Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
+distribution, given a sample \eqn{x}.
 }
 \note{
 Here the parameter \eqn{k} is the negative of the \eqn{k} in the paper

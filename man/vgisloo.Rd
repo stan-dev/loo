@@ -8,11 +8,12 @@ vgisloo(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 }
 \arguments{
 \item{log_lik}{an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of
-the posterior sample and \eqn{n} is the number of data points.}
+the posterior sample and \eqn{n} is the number of data points
+(see \code{\link{log_lik}}).}
 
 \item{wcp}{the percentage of samples used for the genearlized Pareto fit estimate}
 
-\item{wtrunc}{for truncating very large weights to \eqn{n^}\code{wtrunc}. No
+\item{wtrunc}{for truncating very large weights to n^\code{wtrunc}. No
 trunction if \code{wtrunc=0}.}
 
 \item{cores}{number of cores to use for parallelization.}
