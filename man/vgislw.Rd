@@ -22,5 +22,4 @@ a list with modified log weights and tail indices.
 \description{
 Very good importance sampling, log weights
 }
-\keyword{internal}
 

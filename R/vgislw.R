@@ -1,5 +1,5 @@
 #' Very good importance sampling, log weights
-#' @keywords internal
+#' @export
 #' @param lw log weights.
 #' @param wcp percentage of samples used for the generalized Pareto fit estimate.
 #' @param wtrunc for truncating very large weights to n^\code{wtrunc}. No
