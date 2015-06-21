@@ -25,7 +25,7 @@
 #' \describe{
 #' \item{\code{loo}}{the sum of the LOO log predictive densities}
 #' \item{\code{loos}}{the individual LOO log predictive densities}
-#' \item{\code{ks}}{the estimate of the tail indices}.
+#' \item{\code{ks}}{the estimate of the tail indices.}
 #' }
 #'
 #' @seealso \code{\link{loo_and_waic}}, \code{\link{loo-package}}

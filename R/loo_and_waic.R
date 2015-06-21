@@ -1,4 +1,4 @@
-#' Efficient approximate LOO-CV and WAIC for Bayesian models
+#' Approximate LOO-CV and WAIC for Bayesian models
 #'
 #' @export
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
