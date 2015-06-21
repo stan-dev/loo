@@ -24,8 +24,6 @@
 #' }
 #'
 loo_and_waic <- function(log_lik, cores = parallel::detectCores()) {
-  # log_lik should be a matrix with nrow = nsims and ncol = nobs
-
   if (!is.matrix(log_lik))
     stop("'log_lik' should be a matrix")
   S <- nrow(log_lik)
