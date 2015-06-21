@@ -1,6 +1,6 @@
 Package: loo
 Type: Package
-Title: Efficient implementation of leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models
+Title: Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 Version: 0.1
 Date: 2015-06-13
 Author: Aki Vehtari, Andrew Gelman, Jonah Gabry

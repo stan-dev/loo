@@ -1,11 +1,15 @@
 #' Very good importance sampling, log weights
 #' @export
-#' @param lw log weights.
-#' @param wcp percentage of samples used for the generalized Pareto fit estimate.
-#' @param wtrunc for truncating very large weights to n^\code{wtrunc}. No
-#' trunction if \code{wtrunc} is \code{0}.
+#' @param lw An \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik}),
+#'   where \eqn{S} is the size of the posterior sample and \eqn{N} is the number
+#'   of data points (see \code{\link{extract_log_lik}}).
+#' @param wcp percentage of samples used for the generalized Pareto fit
+#'   estimate.
+#' @param wtrunc for truncating very large weights to N^\code{wtrunc}. No
+#'   trunction if \code{wtrunc} is \code{0}.
 #' @param cores number of cores to use for parallelization.
 #' @return a list with modified log weights and tail indices.
+#' @seealso \code{\link{vgisloo}}, which calls \code{vgislw}
 #'
 vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) {
   .loop_fn <- function(i) {

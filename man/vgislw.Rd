@@ -7,11 +7,14 @@
 vgislw(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
 }
 \arguments{
-\item{lw}{log weights.}
+\item{lw}{An \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik}),
+where \eqn{S} is the size of the posterior sample and \eqn{N} is the number
+of data points (see \code{\link{extract_log_lik}}).}
 
-\item{wcp}{percentage of samples used for the generalized Pareto fit estimate.}
+\item{wcp}{percentage of samples used for the generalized Pareto fit
+estimate.}
 
-\item{wtrunc}{for truncating very large weights to n^\code{wtrunc}. No
+\item{wtrunc}{for truncating very large weights to N^\code{wtrunc}. No
 trunction if \code{wtrunc} is \code{0}.}
 
 \item{cores}{number of cores to use for parallelization.}
@@ -21,5 +24,8 @@ a list with modified log weights and tail indices.
 }
 \description{
 Very good importance sampling, log weights
+}
+\seealso{
+\code{\link{vgisloo}}, which calls \code{vgislw}
 }
 

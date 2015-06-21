@@ -1,20 +1,116 @@
-#' Efficient implementation of leave-one-out cross-validation and WAIC for
-#' evaluating fitted Bayesian models
+#' Efficient LOO-CV and WAIC for Bayesian models
 #'
-#' @description Leave-one-out cross-validation and WAIC
+#' @description Efficient implementation of leave-one-out cross-validation and
+#' the widely applicable information criterion for evaluating fitted Bayesian
+#' models
 #'
-#' Leave-one-out cross-validation (LOO) and the widely applicable information
-#' criterion (WAIC) are methods for estimating pointwise out-of-sample
-#' prediction accuracy from a fitted Bayesian model using the log-likelihood
-#' evaluated at the posterior simulations of the parameter values. LOO and WAIC
-#' have various advantages over simpler estimates of predictive error such as
-#' AIC and DIC but are less used in practice because they involve additional
-#' computational steps. Here we lay out fast and stable computations for LOO and
-#' WAIC that can be performed using existing simulation draws. We compute LOO
-#' using very good importance sampling (VGIS), a new procedure for regularizing
-#' importance weights. As a byproduct of our calculations, we also obtain
-#' approximate standard errors for estimated predictive errors and for comparing
-#' of predictive errors between two models.
+#' @section Summary:
+#'
+#' Leave-one-out cross-validation (LOO) and the widely applicable
+#' information criterion (WAIC) are methods for estimating pointwise
+#' out-of-sample prediction accuracy from a fitted Bayesian model using the
+#' log-likelihood evaluated at the posterior simulations of the parameter
+#' values. LOO and WAIC have various advantages over simpler estimates of
+#' predictive error such as AIC and DIC but are less used in practice because
+#' they involve additional computational steps. Here we lay out fast and stable
+#' computations for LOO and WAIC that can be performed using existing simulation
+#' draws. We compute LOO using very good importance sampling (VGIS), a new
+#' procedure for regularizing importance weights. As a byproduct of our
+#' calculations, we also obtain approximate standard errors for estimated
+#' predictive errors and for comparing of predictive errors between two models.
+#'
+#' @section Details:
+#'
+#' Exact cross-validation requires re-fitting the model with di↵erent training
+#' sets. Approximate leave-one-out cross-validation (LOO) can be computed easily
+#' using importance sampling (Gelfand, Dey, and Chang, 1992, Gelfand, 1996) but
+#' the resulting estimate is noisy, as the variance of the importance weights
+#' can be large or even infinite (Peruggia, 1997, Epifani et al., 2008). Here we
+#' propose a novel approach that provides a more accurate and reliable estimate
+#' using importance weights that are smoothed using a Pareto distribution fit to
+#' the upper tail of the distribution of importance weights.
+#'
+#' The distribution of the importance weights used in LOO may have a
+#' long right tail. We use the empirical Bayes estimate of Zhang and Stephens
+#' (2009) to fit a generalized Pareto distribution to the tail (20% largest
+#' importance ratios). By examining the shape parameter \eqn{k} of the fitted
+#' Pareto distribution, we are able to obtain a sample based estimate of the
+#' existance of the moments (Koopman et al, 2009). This extends the diagnostic
+#' approach of Peruggia (1997) and Epifani et al. (2008) to be used routinely
+#' with IS-LOO for any model with a factorizing likelihood. Epifani et al.
+#' (2008) show that when estimating the leave-one-out predictive density, the
+#' central limit theorem holds if the variance of the weight distribution is
+#' finite. These results can be extended using the generalized central limit
+#' theorem for stable distributions. Thus, even if the variance of the
+#' importance weight distribution is infinite, if the mean exists the
+#' estimate's accuracy improves when additional draws are obtained. When the
+#' tail of the weight distribution is long, a direct use of importance
+#' sampling is sensitive to the one (or several) largest value(s). By fitting
+#' a generalized Pareto distribution to the upper tail of the importance
+#' weights we smooth these values. The procedure goes as follows:
+#' \enumerate{
+#'   \item Fit the generalized Pareto distribution to the 20% largest importance
+#'   ratios \eqn{r_s} as computed in (6). (The computation is done separately
+#'   for each held-out data point \eqn{i}.) In simulation experiments with a
+#'   thousands to tens of thousands of simulation draws, we have found the fit
+#'   is not sensitive to the specific cutoff value (for a consistent estimation
+#'   the proportion of the samples above the cutoff should get smaller when the
+#'   number of draws increases).
+#'
+#'   \item Stabilize the importance ratios by replacing the \eqn{M} largest
+#'   ratios by the expected values of the order statistics of the fitted
+#'   generalized Pareto distribution \deqn{G((z - 0.5)/M), z = 1,...,M,} where
+#'   \eqn{M} is the number of simulation draws used to fit the Pareto (in this
+#'   case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the generalized
+#'   Pareto distribution.
+#'
+#'   \item To guarantee finite variance of the estimate, truncate the smoothed
+#'   ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of
+#'   the smoothed weights.
+#'   }
+#'
+#'   The above steps must be performed for each data point \eqn{i}, thus
+#'   resulting in a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each
+#'   \eqn{i}, which in general should be better behaved than the raw importance
+#'   ratios \eqn{r_{i}^{s}} from which they were constructed.
+#'
+#'   The results are then be combined to compute the desired LOO estimates.
+#'
+#' @references
+#' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
+#' importance sampling estimators: Central limit theorems and related results.
+#' \emph{Electronic Journal of Statistics} \strong{2}, 774–806.
+#'
+#' Gelfand, A. E. (1996). Model determination using sampling-based methods. In
+#' \emph{Markov Chain Monte Carlo in Practice}, ed. W. R. Gilks, S. Richardson,
+#' D. J. Spiegelhalter, 145–162. London: Chapman and Hall.
+#'
+#' Gelfand, A. E., Dey, D. K., and Chang, H. (1992). Model determination using
+#' predictive distri- butions with implementation via sampling-based methods. In
+#' \emph{Bayesian Statistics 4}, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
+#' and A. F. M. Smith, 147–167. Oxford University Press.
+#'
+#' Koopman, S. J., Shephard, N., and Creal, D. (2009). Testing the assumptions
+#' behind importance sampling. \emph{Journal of Econometrics} \strong{149},
+#' 2–11.
+#'
+#' Peruggia, M. (1997). On the variability of case-deletion importance sampling
+#' weights in the Bayesian linear model. \emph{Journal of the American Statistical
+#' Association} \strong{92}, 199–207.
+#'
+#' Stan Development Team (2014a). Stan: A C++ library for probability and
+#' sampling, version 2.6. \url{mc-stan.org}.
+#'
+#' Stan Development Team (2014b). RStan, version 2.6.
+#' \url{mc-stan.org/rstan.html}.
+#'
+#' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
+#' widely applicable information criterion in singular learning theory.
+#' \emph{Journal of Machine Learning Research} \strong{11}, 3571–3594.
+#'
+#' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
+#' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
+#' 316–325.
 #'
 #' @docType package
 #' @name loo

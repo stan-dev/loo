@@ -1,3 +1,5 @@
+#' Generalized Pareto distribution
+#'
 #' Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
 #' distribution, given a sample \eqn{x}.
 #'
@@ -6,6 +8,10 @@
 #' @return a list. Estimates for \eqn{k} and \eqn{\sigma}.
 #' @note Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
+#' @references
+#' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
+#' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
+#' 316–325.
 #'
 
 gpdfit <- function(x) {

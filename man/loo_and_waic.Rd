@@ -3,15 +3,15 @@
 \name{loo_and_waic}
 \alias{loo_and_waic}
 \alias{print.loo}
-\title{LOO and WAIC}
+\title{LOO-CV and WAIC}
 \usage{
 loo_and_waic(log_lik, cores = parallel::detectCores())
 
 \method{print}{loo}(x, ...)
 }
 \arguments{
-\item{log_lik}{an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of the
-posterior sample (the number of simulations) and \eqn{n} is the number of
+\item{log_lik}{an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
+posterior sample (the number of simulations) and \eqn{N} is the number of
 data points. Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.}
 
@@ -28,7 +28,7 @@ a named list. Returned for both LOO and WAIC are the expected log
   importance ratios for each leave-one-out distribution.
 }
 \description{
-LOO and WAIC
+LOO-CV and WAIC
 }
 \examples{
 \dontrun{

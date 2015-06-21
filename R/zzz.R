@@ -1,5 +1,5 @@
 .onAttach <- function(...) {
   ver <- utils::packageVersion("loo")
-  msg <- paste("loo version", ver)
+  msg <- paste("This is loo version", ver)
   packageStartupMessage(msg)
 }

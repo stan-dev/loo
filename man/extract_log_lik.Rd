@@ -2,8 +2,8 @@
 % Please edit documentation in R/extract_log_lik.R
 \name{extract_log_lik}
 \alias{extract_log_lik}
-\title{Convenience function for extracting log-likelihood from a \code{stanfit}
-object.}
+\title{Convenience function for extracting the point-wise log-likelihood from a
+\code{stanfit} object}
 \usage{
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }
@@ -17,8 +17,17 @@ quantity) in the Stan model corresponding to the log-likelihood.}
 a matrix of (post-warmup) extracted draws.
 }
 \description{
-Convenience function for extracting log-likelihood from a \code{stanfit}
-object.
+Convenience function for extracting the point-wise log-likelihood from a
+\code{stanfit} object
+}
+\details{
+In the Stan program the point-wise log likelihood can either be
+  defined as a vector in the transformed parameters block (and then summed up
+  in the model block) or it can be coded entirely in the generated quantities
+  block using Stan's log probability density functions. The result after
+  running Stan will be an \eqn{S} by \eqn{N} matrix of point-wise
+  log-likelihood values, where \eqn{S} is the size of the posterior sample
+  (the number of draws/simulations) and \eqn{N} is the number of data points.
 }
 \examples{
 \dontrun{

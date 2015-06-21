@@ -1,8 +1,8 @@
-#' LOO and WAIC
+#' LOO-CV and WAIC
 #'
 #' @export
-#' @param log_lik an \eqn{s} by \eqn{n} matrix, where \eqn{s} is the size of the
-#'   posterior sample (the number of simulations) and \eqn{n} is the number of
+#' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
+#'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
 #' @param cores number of cores to use for parallization (see
