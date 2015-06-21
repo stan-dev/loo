@@ -1,4 +1,4 @@
-#' LOO-CV and WAIC
+#' Efficient approximate LOO-CV and WAIC for Bayesian models
 #'
 #' @export
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
@@ -8,14 +8,14 @@
 #' @param cores number of cores to use for parallization (see
 #'   \code{\link[parallel]{detectCores}}).
 #' @return a named list. Returned for both LOO and WAIC are the expected log
-#'   pointwise predictive density (elpd), the estimated effective number of
-#'   parameters, the information criteria on the deviance scale, as well as the
-#'   estimated standard errors for each of these measures. Also returned are a
-#'   matrix of the pointwise contributions of each of the measures and a vector
-#'   containing the estimated shape parameter \eqn{k} for the Pareto fit to the
-#'   importance ratios for each leave-one-out distribution.
+#'   pointwise predictive density (\code{elpd} ), the estimated effective number
+#'   of parameters (\code{p}), and the information criteria on the deviance scale
+#'   (e.g. \code{looic = -2*elpd_loo}). Also returned are the pointwise
+#'   contributions of each of these measures, standard errors, and the estimated
+#'   shape parameter \eqn{k} for the Pareto fit to the importance ratios for
+#'   each leave-one-out distribution.
 #'
-#' @seealso \code{\link{loo_and_waic_diff}}
+#' @seealso \code{\link{loo_and_waic_diff}}, \code{\link{loo-package}}
 #' @examples
 #' \dontrun{
 #' log_lik <- extract_log_lik(stanfit)

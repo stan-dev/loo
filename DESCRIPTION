@@ -9,4 +9,6 @@ Description: We compute leave-one-out cross-validation (LOO) using very good imp
 License: GPL (>=3)
 LazyData: TRUE
 Imports: matrixStats, parallel
-Suggests: rstan, testthat
+Suggests: rstan, testthat,
+    knitr
+VignetteBuilder: knitr

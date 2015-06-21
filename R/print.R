@@ -1,4 +1,6 @@
 #' @rdname loo_and_waic
+#' @param x a list of class \code{'loo'} returned by \code{loo_and_waic}.
+#' @param ... Other arguments. Currently only \code{digits} is supported.
 #' @export
 print.loo <- function(x, ...) {
   dots <- list(...)
@@ -20,6 +22,9 @@ print.loo <- function(x, ...) {
 
 
 #' @rdname loo_and_waic_diff
+#' @param x a list of class \code{'compare.loo'} returned by
+#'   \code{loo_and_waic_diff}.
+#' @param ... Other arguments. Currently only \code{digits} is supported.
 #' @export
 print.compare.loo <- function(x, ...) {
   dots <- list(...)

@@ -16,13 +16,21 @@ a list. Estimates for \eqn{k} and \eqn{\sigma}.
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
 distribution, given a sample \eqn{x}.
 }
-\note{
+\details{
 Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
   Stephens (2009).
+}
+\note{
+This function is primarily intended for internal use, but is exported
+  so that users can call it directly if desired. Users simply wishing to
+  compute LOO and WAIC should use the \code{\link{loo_and_waic}} function.
 }
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
-316–325.
+316-325.
+}
+\seealso{
+\code{vgisloo}, \code{\link{loo_and_waic}}, \code{\link{loo-package}}
 }
 

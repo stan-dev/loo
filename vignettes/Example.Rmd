@@ -1,0 +1,84 @@
+---
+title: "Example"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This example comes from a survey of residents of a small area in Bangladesh that
+was affected by arsenic in drinking water. Respondents with elevated arsenic
+levels in their wells were asked if they were interested in getting water from a
+neighbor’s well, and a series of logistic regressions were fit to predict this
+yes/no response given various information about the households (Gelman and Hill,
+2007). Here we shall illustrate with the logistic regression of the
+well-switching response given two predictors: the arsenic level of the water in
+the resident’s home, and the distance of the house to the nearest safe well.
+
+The sample size in this example is $N = 3020$ which is not huge but is large
+enough that it is important to have a computational method for LOO that does not
+take too long for each data point. On the plus side, with such a large dataset,
+the influence of any given observation is small, and so the computations should
+be stable.
+
+### Stan program 
+```
+'logistic.stan'
+
+data { 
+  int N; // number of data points
+  int K; // number of predictors (including intercept)
+  int<lower=0,upper=1> y[N]; // outcome
+  matrix[N,K] X; // predictors (including intercept)
+}
+parameters {
+  vector[K] b;
+}
+model {
+  y ~ bernoulli_logit(X * b);
+}
+generated quantities {
+  vector[N] log_lik;
+  for (n in 1:N)
+    log_lik[n] <- bernoulli_logit_log(y[n], X[n] * b);
+}
+```
+
+We have defined the log likelihood as a vector named `log_lik` in the generated
+quantities block so that the individual terms will be saved by Stan. After 
+running Stan `log_lik` can be extracted as $S \times N$ matrix, where $S$ is the
+number of simulations (posterior draws) and $N$ is the number of data points, as
+declared in the `data` block of the Stan program.
+
+### R code
+```{r, eval=FALSE}
+library("loo")
+library("rstan")
+
+# Prepare data for two models. The first model uses the arsenic variable,
+# whereas the second uses log(arsenic).
+wells <- read.csv("wells.csv")
+X <- with(wells, cbind(1, dist100, arsenic, log(arsenic)))
+data1 <- data2 <- list(N = nrow(wells), K = ncol(X) - 1, X = X[, -4], y = wells$y)
+data2$X <- X[, -3]
+
+# Fit both models with Stan
+fit1 <- stan("logistic.stan", data = data1, iter = 2000, chains = 4)
+fit2 <- stan("logistic.stan", data = data2, iter = 2000, chains = 4)
+
+# Use the loo package 
+log_lik1 <- extract_log_lik(fit1)
+log_lik2 <- extract_log_lik(fit2)
+loo1 <- loo_and_waic(log_lik1)
+loo2 <- loo_and_waic(log_lik2)
+print(loo1) 
+print(loo2)
+
+diff <- loo_and_waic_diff(loo1, loo2)
+print(diff, digits = 1)
+print(diff, digits = 5)
+```
+
+

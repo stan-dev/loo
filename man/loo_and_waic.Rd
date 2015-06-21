@@ -3,7 +3,7 @@
 \name{loo_and_waic}
 \alias{loo_and_waic}
 \alias{print.loo}
-\title{LOO-CV and WAIC}
+\title{Efficient approximate LOO-CV and WAIC for Bayesian models}
 \usage{
 loo_and_waic(log_lik, cores = parallel::detectCores())
 
@@ -17,18 +17,22 @@ data points. Typically (but not restricted to be) the object returned by
 
 \item{cores}{number of cores to use for parallization (see
 \code{\link[parallel]{detectCores}}).}
+
+\item{x}{a list of class \code{'loo'} returned by \code{loo_and_waic}.}
+
+\item{...}{Other arguments. Currently only \code{digits} is supported.}
 }
 \value{
 a named list. Returned for both LOO and WAIC are the expected log
-  pointwise predictive density (elpd), the estimated effective number of
-  parameters, the information criteria on the deviance scale, as well as the
-  estimated standard errors for each of these measures. Also returned are a
-  matrix of the pointwise contributions of each of the measures and a vector
-  containing the estimated shape parameter \eqn{k} for the Pareto fit to the
-  importance ratios for each leave-one-out distribution.
+  pointwise predictive density (\code{elpd} ), the estimated effective number
+  of parameters (\code{p}), and the information criteria on the deviance scale
+  (e.g. \code{looic = -2*elpd_loo}). Also returned are the pointwise
+  contributions of each of these measures, standard errors, and the estimated
+  shape parameter \eqn{k} for the Pareto fit to the importance ratios for
+  each leave-one-out distribution.
 }
 \description{
-LOO-CV and WAIC
+Efficient approximate LOO-CV and WAIC for Bayesian models
 }
 \examples{
 \dontrun{
@@ -38,6 +42,6 @@ print(loo, digits = 3)
 }
 }
 \seealso{
-\code{\link{loo_and_waic_diff}}
+\code{\link{loo_and_waic_diff}}, \code{\link{loo-package}}
 }
 

@@ -12,6 +12,11 @@ loo_and_waic_diff(loo1, loo2)
 \arguments{
 \item{loo1,loo2}{lists (of class \code{'loo'}) returned by
 \code{\link{loo_and_waic}}.}
+
+\item{x}{a list of class \code{'compare.loo'} returned by
+\code{loo_and_waic_diff}.}
+
+\item{...}{Other arguments. Currently only \code{digits} is supported.}
 }
 \value{
 a named list with class \code{'compare.loo'}.
