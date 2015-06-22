@@ -28,7 +28,8 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) 
     qx[x_cut] <- slq
     if (wtrunc > 0) {
       # truncate too large weights
-      lwtrunc <- wtrunc * log(n) - log(n) + matrixStats::logSumExp(qx)
+      logn <- log(n)
+      lwtrunc <- wtrunc * logn - logn + matrixStats::logSumExp(qx)
       qx[qx > lwtrunc] <- lwtrunc
     }
     # renormalize weights
