@@ -5,6 +5,12 @@ logColMeansExp <- function(x) {
   matrixStats::colLogSumExps(x) - log(S)
 }
 
+qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
+  #  inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
+  if (!lower.tail) p <- 1 - p
+  mu + beta * ((1 - p)^(-xi) - 1) / xi
+}
+
 nlist <- function(...) {
   # named lists
   m <- match.call()
@@ -38,12 +44,6 @@ vapply_seq <- function(L, FUN, ...) {
 lx <- function(a, x) {
   k <- mean.default(log(1 - a * x))
   log(-a / k) - k - 1
-}
-
-qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
-  # Generalized Pareto inverse-cdf (formula from Wikipedia)
-  if (!lower.tail) p <- 1 - p
-  mu + beta * ((1 - p)^(-xi) - 1) / xi
 }
 
 #' @importFrom matrixStats colMaxs
