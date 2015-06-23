@@ -14,7 +14,7 @@ computing LOO. See \code{\link{extract_log_lik}}).}
 \item{wcp}{the percentage of samples used for the generalized Pareto fit
 estimate.}
 
-\item{wtrunc}{for truncating very large weights to \eqn{N}^\code{wtrunc}. Set
+\item{wtrunc}{for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
 
 \item{fix_value}{if the largest value in any column of \code{lw} is greater

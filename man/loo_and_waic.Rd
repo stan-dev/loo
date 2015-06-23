@@ -19,10 +19,6 @@ arguments and their defaults are:
 Pareto fit estimate}
 \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 \eqn{N}^\code{wtrunc} (set to zero for no truncation)}
-\item{\code{fix_value = 100}}{if the largest value in any column of \code{lw
-= -log_lik} is greater than the second largest by at least \code{fix_value},
-then the second largest value will be set equal to the largest (set to zero
-to skip this step)}
 \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
      use for parallelization.}
 }}

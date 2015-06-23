@@ -5,7 +5,7 @@
 #'   computing LOO. See \code{\link{extract_log_lik}}).
 #' @param wcp the percentage of samples used for the generalized Pareto fit
 #'   estimate.
-#' @param wtrunc for truncating very large weights to \eqn{N}^\code{wtrunc}. Set
+#' @param wtrunc for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
 #' @param fix_value if the largest value in any column of \code{lw} is greater
 #'   than the second largest by at least \code{fix_value}, then the second
@@ -32,7 +32,7 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
   .vgis <- function(i) {
     x <- lw[, i]
     # divide log weights into body and right tail
-    n <- length(x)
+    S <- length(x)
     cutoff <- quantile(x, 1 - wcp / 100, names = FALSE)
     x_cut <- x > cutoff
     x1 <- x[!x_cut]
@@ -54,8 +54,8 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
     qx[x_cut] <- slq
     if (wtrunc > 0) {
       # truncate too large weights
-      logn <- log(n)
-      lwtrunc <- wtrunc * logn - logn + logSumExp(qx)
+      logS <- log(S)
+      lwtrunc <- wtrunc * logS - logS + logSumExp(qx)
       qx[qx > lwtrunc] <- lwtrunc
     }
     # renormalize weights

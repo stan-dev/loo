@@ -10,8 +10,8 @@ print.loo <- function(x, ...) {
   if (length(dots) != 0 && "digits" %in% names(dots)) {
     digits <- dots$digits
   }
+  dims <- attr(x, "log_lik_dim")
   L <- length(x)
-  dims <- x[[L]]
   z <- x[-c(L - 2, L - 1, L)]
   uz <- unlist(z)
   ord <- c(1, 3, 2, 4, 5, 6)
