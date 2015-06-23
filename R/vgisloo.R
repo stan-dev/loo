@@ -1,17 +1,16 @@
-#' Very good importance sampling
+#' vgisloo
+#' @noRd
 #'
 #' \code{vgislw} performs very good importance sampling. \code{vgisloo} calls
 #' \code{vgislw} and does useful post-processing for computing LOO and WAIC.
-#'
-#' @export
 #'
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 #'   posterior sample and \eqn{N} is the number of data points (see
 #'   \code{\link{extract_log_lik}}).
 #' @param ... optional arguments to pass to \code{vgislw}.
 #'
-#' @note These functions are primarily intended for internal use, but are
-#'   exported so that users can call them directly if desired. Users simply
+#' @note This function is primarily intended for internal use, but is
+#'   exported so that users can call it directly if desired. Users simply
 #'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
 #'   function.
 #'

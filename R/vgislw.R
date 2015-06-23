@@ -1,7 +1,8 @@
+#' VGIS: Very good importance sampling
+#'
 #' @export
-#' @rdname vgisloo
 #' @param lw an \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik} for
-#'   computing LOO).
+#'   computing LOO. See \code{\link{extract_log_lik}}).
 #' @param wcp the percentage of samples used for the generalized Pareto fit
 #'   estimate.
 #' @param wtrunc for truncating very large weights to \eqn{N}^\code{wtrunc}. Set
@@ -11,6 +12,17 @@
 #'   largest value will be set equal to the largest. Set to zero to skip this
 #'   step.
 #' @param cores the number of cores to use for parallelization.
+#'
+#' @return A named with list with components
+#' \describe{
+#' \item{\code{lw}}{modified log weights}
+#' \item{\code{k}}{tail indices for the Pareto \eqn{k} estimates}
+#' }
+#'
+#' @note This function is primarily intended for internal use, but is exported
+#'   so that users can call it directly for other purposes. Users simply
+#'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
+#'   function.
 #'
 vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
                    cores = parallel::detectCores()) {
