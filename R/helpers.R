@@ -1,3 +1,10 @@
+#' @importFrom matrixStats colLogSumExps
+logColMeansExp <- function(x) {
+  # should be more stable than log(colMeans(exp(x)))
+  S <- nrow(x)
+  matrixStats::colLogSumExps(x) - log(S)
+}
+
 nlist <- function(...) {
   # named lists
   m <- match.call()
@@ -19,10 +26,6 @@ nlist <- function(...) {
 unlist_lapply <- function(X, FUN, ...) {
   unlist(lapply(X, FUN, ...), use.names = FALSE)
 }
-# unlist_mclapply <- function(X, FUN, cores, ...) {
-#   unlist(parallel::mclapply(X, FUN, mc.cores = cores, ...),
-#          use.names = FALSE)
-# }
 
 seq_min_half <- function(L) {
   seq_len(L) - 0.5

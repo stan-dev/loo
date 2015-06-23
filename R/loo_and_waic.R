@@ -12,10 +12,6 @@
 #' Pareto fit estimate}
 #' \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 #' \eqn{N}^\code{wtrunc} (set to zero for no truncation)}
-#' \item{\code{fix_value = 100}}{if the largest value in any column of \code{lw
-#' = -log_lik} is greater than the second largest by at least \code{fix_value},
-#' then the second largest value will be set equal to the largest (set to zero
-#' to skip this step)}
 #'\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
 #'      use for parallelization.}
 #'}
@@ -42,11 +38,9 @@
 #'
 loo_and_waic <- function(log_lik, ...) {
   if (!is.matrix(log_lik))
-    stop("'log_lik' should be a matrix")
-  S <- nrow(log_lik)
-  N <- ncol(log_lik)
-  lpd <- log(colMeans(exp(log_lik)))
+    stop('log_lik should be a matrix')
   loo <- vgisloo(log_lik, ...)
+  lpd <- logColMeansExp(log_lik)
   elpd_loo <- loo$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
@@ -55,12 +49,12 @@ loo_and_waic <- function(log_lik, ...) {
   waic <- -2 * elpd_waic
   nms <- names(pointwise <- nlist(elpd_loo, p_loo, elpd_waic, p_waic, looic, waic))
   total <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
+  se <- sqrt(ncol(log_lik) * unlist_lapply(pointwise, var))
   output <- as.list(c(total, se))
   names(output) <- c(nms, paste0("se_", nms))
   output$pointwise <- do.call("cbind", pointwise)
   output$pareto_k <- loo$ks
-  output$info <- list(log_lik_nsims = S, log_lik_nobs = N)
+  attr(output, "log_lik_dim") <- dim(log_lik)
   class(output) <- "loo"
   output
 }
