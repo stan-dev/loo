@@ -9,6 +9,6 @@ env:
    - CRAN: http://cran.rstudio.com
 
 notifications:
-  email:
+  email: jgabry@gmail.com
     on_success: change
     on_failure: change
