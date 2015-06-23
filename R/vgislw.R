@@ -1,8 +1,19 @@
-#' @rdname vgisloo
 #' @export
-#' @param lw An \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik}).
+#' @rdname vgisloo
+#' @param lw an \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik} for
+#'   computing LOO).
+#' @param wcp the percentage of samples used for the generalized Pareto fit
+#'   estimate.
+#' @param wtrunc for truncating very large weights to \eqn{N}^\code{wtrunc}. Set
+#'   to zero for no truncation.
+#' @param fix_value if the largest value in any column of \code{lw} is greater
+#'   than the second largest by at least \code{fix_value}, then the second
+#'   largest value will be set equal to the largest. Set to zero to skip this
+#'   step.
+#' @param cores the number of cores to use for parallelization.
 #'
-vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) {
+vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
+                   cores = parallel::detectCores()) {
   .loop_fn <- function(i) {
     x <- lw[, i]
     # divide log weights into body and right tail
@@ -36,6 +47,10 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores()) 
     lwx <- qx - matrixStats::logSumExp(qx)
     # return log weights and tail index k
     list(lwx, fit$k)
+  }
+
+  if (fix_value > 0) {
+    lw <- fix_large_diffs(lw, fix_value = fix_value)
   }
 
   K <- ncol(lw)
