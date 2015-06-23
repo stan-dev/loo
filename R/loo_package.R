@@ -1,8 +1,8 @@
-#' Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
+#' Efficient leave-one-out cross-validation and WAIC
 #'
-#' @description Efficient implementation of leave-one-out cross-validation and
-#' the widely applicable information criterion for evaluating fitted Bayesian
-#' models
+#' @description This package implements the methods described in Vehtari,
+#'   Gelman, and Gabry (2015) for efficiently computing leave-one-out
+#'   cross-validation and WAIC for fitted Bayesian models.
 #'
 #' @section Summary:
 #'
@@ -174,6 +174,10 @@
 #'
 #' Stan Development Team (2014b). RStan, version 2.6.
 #' \url{mc-stan.org/rstan.html}.
+#'
+#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
+#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
+#' models.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.

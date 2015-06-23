@@ -3,40 +3,49 @@
 \name{vgisloo}
 \alias{vgisloo}
 \alias{vgislw}
-\title{VGIS-LOO}
+\title{Very good importance sampling}
 \usage{
-vgisloo(log_lik, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
+vgisloo(log_lik, ...)
 
-vgislw(lw, wcp = 20, wtrunc = 3/4, cores = parallel::detectCores())
+vgislw(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
+  cores = parallel::detectCores())
 }
 \arguments{
 \item{log_lik}{an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 posterior sample and \eqn{N} is the number of data points (see
 \code{\link{extract_log_lik}}).}
 
-\item{wcp}{the percentage of samples used for the genearlized Pareto fit
+\item{...}{optional arguments to pass to \code{vgislw}.}
+
+\item{lw}{an \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik} for
+computing LOO).}
+
+\item{wcp}{the percentage of samples used for the generalized Pareto fit
 estimate.}
 
-\item{wtrunc}{for truncating very large weights to \eqn{N}^\code{wtrunc}. No
-trunction if \code{wtrunc=0}.}
+\item{wtrunc}{for truncating very large weights to \eqn{N}^\code{wtrunc}. Set
+to zero for no truncation.}
 
-\item{cores}{number of cores to use for parallelization (passed to
-  \code{\link{vgislw}}).}
+\item{fix_value}{if the largest value in any column of \code{lw} is greater
+than the second largest by at least \code{fix_value}, then the second
+largest value will be set equal to the largest. Set to zero to skip this
+step.}
 
-\item{lw}{An \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik}).}
+\item{cores}{the number of cores to use for parallelization.}
 }
 \value{
-\code{vgisloo} calls \code{\link{vgislw}} and post-processes the
-  results (a list with modified log weights and tail indices), returning a
-  named list with components
+\code{vgislw} returns a list with modified log weights and tail
+  indices. \code{vgisloo} calls \code{vgislw(lw = -log_lik,...)},
+  post-processes the results, and returns a named list with components
 \describe{
 \item{\code{loo}}{the sum of the LOO log predictive densities}
 \item{\code{loos}}{the individual LOO log predictive densities}
-\item{\code{ks}}{the estimate of the tail indices}.
+\item{\code{ks}}{the estimate of the tail indices.}
 }
 }
 \description{
-Very good importance sampling, log predictive densities
+\code{vgislw} performs very good importance sampling. \code{vgisloo} calls
+\code{vgislw} and does useful post-processing for computing LOO and WAIC.
 }
 \note{
 These functions are primarily intended for internal use, but are
