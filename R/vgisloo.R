@@ -7,7 +7,7 @@
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 #'   posterior sample and \eqn{N} is the number of data points (see
 #'   \code{\link{extract_log_lik}}).
-#' @param ... optional arguments to pass to \code{vgislw}.
+#' @param ... optional arguments to pass to \code{\link{vgislw}}.
 #'
 #' @note This function is primarily intended for internal use, but is
 #'   exported so that users can call it directly if desired. Users simply
@@ -27,10 +27,12 @@
 #' @references
 #' Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
 #'
+#' @importFrom matrixStats colLogSumExps
+#'
 vgisloo <- function(log_lik, ...) {
   lw <- -1 * log_lik
   vgis <- vgislw(lw, ...)
-  loos <- matrixStats::colLogSumExps(log_lik + vgis$lw)
+  loos <- colLogSumExps(log_lik + vgis$lw)
   loo <- sum(loos)
   nlist(loo, loos, ks = vgis$k)
 }

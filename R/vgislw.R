@@ -24,9 +24,12 @@
 #'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
 #'   function.
 #'
+#' @importFrom matrixStats logSumExp
+#' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
+#'
 vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
                    cores = parallel::detectCores()) {
-  .loop_fn <- function(i) {
+  .vgis <- function(i) {
     x <- lw[, i]
     # divide log weights into body and right tail
     n <- length(x)
@@ -52,11 +55,11 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
     if (wtrunc > 0) {
       # truncate too large weights
       logn <- log(n)
-      lwtrunc <- wtrunc * logn - logn + matrixStats::logSumExp(qx)
+      lwtrunc <- wtrunc * logn - logn + logSumExp(qx)
       qx[qx > lwtrunc] <- lwtrunc
     }
     # renormalize weights
-    lwx <- qx - matrixStats::logSumExp(qx)
+    lwx <- qx - logSumExp(qx)
     # return log weights and tail index k
     list(lwx, fit$k)
   }
@@ -64,15 +67,14 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
   if (fix_value > 0) {
     lw <- fix_large_diffs(lw, fix_value = fix_value)
   }
-
   K <- ncol(lw)
   K2 <- 2 * K
   if (.Platform$OS.type != "windows") {
-    out <- parallel::mclapply(1:K, .loop_fn, mc.cores = cores)
+    out <- mclapply(X = 1:K, FUN = .vgis, mc.cores = cores)
   } else {
-    cl <- parallel::makePSOCKcluster(cores)
-    on.exit(parallel::stopCluster(cl))
-    out <- parallel::parLapply(cl, X = 1:K, fun = .loop_fn)
+    cl <- makePSOCKcluster(cores)
+    on.exit(stopCluster(cl))
+    out <- parLapply(cl, X = 1:K, fun = .vgis)
   }
   ux <- unlist(out, recursive = FALSE, use.names = FALSE)
   lw <- do.call(cbind, ux[seq(1, K2, 2)])

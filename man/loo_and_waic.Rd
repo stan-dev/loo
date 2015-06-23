@@ -12,8 +12,20 @@ posterior sample (the number of simulations) and \eqn{N} is the number of
 data points. Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.}
 
-\item{...}{optional arguments to pass to \code{\link{vgislw}} (via
-\code{\link{vgisloo}}). See \code{\link{vgislw}}.}
+\item{...}{optional arguments to pass to \code{\link{vgislw}}. Possible
+arguments and their defaults are:
+\describe{
+\item{\code{wcp = 20}}{the percentage of samples used for the generalized
+Pareto fit estimate}
+\item{\code{wtrunc = 3/4}}{for truncating very large weights to
+\eqn{N}^\code{wtrunc} (set to zero for no truncation)}
+\item{\code{fix_value = 100}}{if the largest value in any column of \code{lw
+= -log_lik} is greater than the second largest by at least \code{fix_value},
+then the second largest value will be set equal to the largest (set to zero
+to skip this step)}
+\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
+     use for parallelization.}
+}}
 }
 \value{
 a named list. Returned for both LOO and WAIC are the expected log
@@ -27,10 +39,6 @@ a named list. Returned for both LOO and WAIC are the expected log
 \description{
 Approximate LOO-CV and WAIC for Bayesian models
 }
-\details{
-The possible arguments that can be specified in \code{...} are
-wcp, wtrunc, fix_value, cores
-}
 \examples{
 \dontrun{
 log_lik <- extract_log_lik(stanfit)
@@ -39,6 +47,7 @@ print(loo, digits = 3)
 }
 }
 \seealso{
-\code{\link{loo_and_waic_diff}}, \code{\link{loo-package}}
+\code{\link{loo_and_waic_diff}}, \code{\link{loo-package}},
+  \code{link{vgislw}}
 }
 

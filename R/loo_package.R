@@ -1,5 +1,8 @@
 #' Efficient LOO and WAIC for Bayesian models
 #'
+#' @docType package
+#' @name loo
+#'
 #' @description This package implements the methods described in Vehtari,
 #'   Gelman, and Gabry (2015) for efficiently computing leave-one-out
 #'   cross-validation and WAIC for fitted Bayesian models.
@@ -187,7 +190,5 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-#' @docType package
-#' @name loo
 #'
 NULL
