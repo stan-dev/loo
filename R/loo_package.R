@@ -4,8 +4,8 @@
 #' @name loo
 #'
 #' @description This package implements the methods described in Vehtari,
-#'   Gelman, and Gabry (2015) for efficiently computing leave-one-out
-#'   cross-validation and WAIC for fitted Bayesian models.
+#'   Gelman, and Gabry (2015) for efficiently computing approximate
+#'   leave-one-out cross-validation and WAIC for fitted Bayesian models.
 #'
 #' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry
 #' @section Summary:
