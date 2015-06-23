@@ -10,7 +10,4 @@ env:
 
 notifications:
   email:
-      recipients:
-        - jgabry@gmail.com
-    on_success: change
-    on_failure: change
+    - jgabry@gmail.com
