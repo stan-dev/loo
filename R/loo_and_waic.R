@@ -26,7 +26,7 @@
 #' \eqn{k} for the Pareto fit to the importance ratios for each leave-one-out
 #' distribution.
 #'
-#' @seealso \code{\link{loo_and_waic_diff}},\code{\link{loo-package}},
+#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic_diff}},
 #' \code{\link{vgislw}}
 #'
 #' @examples

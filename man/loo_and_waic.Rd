@@ -45,7 +45,7 @@ print(loo, digits = 3)
 }
 }
 \seealso{
-\code{\link{loo_and_waic_diff}},\code{\link{loo-package}},
+\code{\link{loo-package}}, \code{\link{loo_and_waic_diff}},
 \code{\link{vgislw}}
 }
 

@@ -41,6 +41,6 @@ print(diff, digits = 1)
 }
 }
 \seealso{
-\code{\link{loo_and_waic}}
+\code{\link{loo_and_waic}}, \code{\link{loo-package}}
 }
 

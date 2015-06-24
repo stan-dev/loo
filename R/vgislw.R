@@ -21,6 +21,8 @@
 #'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
 #'   function.
 #'
+#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic}}
+#'
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
