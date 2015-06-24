@@ -1,0 +1,16 @@
+citHeader("To cite loo in publications use:")
+
+citEntry(entry = "Manual",
+         title        = "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models",
+         author       = personList(as.person("Aki Vehtari"),
+                                   as.person("Andrew Gelman"),
+                                   as.person("Jonah Gabry")),
+         year         = "2015",
+         note         = "R package version 0.1",
+         url          = "https://github.com/jgabry/loo",
+         textVersion  =
+           paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2015).",
+                 "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models.",
+                 "R package version 0.1.",
+                 "https://github.com/jgabry/loo")
+)
