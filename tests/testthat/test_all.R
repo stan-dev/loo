@@ -17,8 +17,7 @@ test_that("logColMeansExp(x) = log(colMeans(exp(x))", {
 context("loo_and_waic")
 set.seed(123)
 x <- matrix(rnorm(100), 20, 5)
-loo <- loo_and_waic(x, cores = 1)
-val <- loo[-grep("pointwise|pareto_k", names(loo))]
+
 ans <- structure(list(elpd_loo = -1.5894575381457, p_loo = 4.02790091225809,
                       elpd_waic = -1.74710271515681, p_waic = 4.1855460892692,
                       looic = 3.1789150762914, waic = 3.49420543031363, se_elpd_loo = 0.559871005470356,
@@ -29,12 +28,12 @@ ans <- structure(list(elpd_loo = -1.5894575381457, p_loo = 4.02790091225809,
                                                               "se_elpd_waic", "se_p_waic", "se_looic", "se_waic"))
 
 test_that("loo_and_waic returns correct result", {
+  Sys.setenv("R_TESTS" = "")
+  loo <- loo_and_waic(x, cores = 1)
+  val <- loo[-grep("pointwise|pareto_k", names(loo))]
   expect_equal(val, ans)
-})
 
-context("loo_and_waic_diff")
-loo_diff <- unlist(loo_and_waic_diff(loo, loo))
-test_that("loo_and_waic_diff returns correct result", {
+  loo_diff <- unlist(loo_and_waic_diff(loo, loo))
   expect_true(all(loo_diff == 0))
 })
 
