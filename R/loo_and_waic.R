@@ -5,8 +5,17 @@
 #'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
-#' @param cores number of cores to use for parallization (see
-#'   \code{\link[parallel]{detectCores}}).
+#' @param ... optional arguments to pass to \code{\link{vgislw}}. Possible
+#' arguments and their defaults are:
+#' \describe{
+#' \item{\code{wcp = 20}}{the percentage of samples used for the generalized
+#' Pareto fit estimate}
+#' \item{\code{wtrunc = 3/4}}{for truncating very large weights to
+#' \eqn{N}^\code{wtrunc} (set to zero for no truncation)}
+#'\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
+#'      use for parallelization.}
+#'}
+#'
 #' @return a named list. Returned for both LOO and WAIC are the expected log
 #'   pointwise predictive density (\code{elpd} ), the estimated effective number
 #'   of parameters (\code{p}), and the information criteria on the deviance scale
@@ -15,7 +24,9 @@
 #'   shape parameter \eqn{k} for the Pareto fit to the importance ratios for
 #'   each leave-one-out distribution.
 #'
-#' @seealso \code{\link{loo_and_waic_diff}}, \code{\link{loo-package}}
+#' @seealso \code{\link{loo_and_waic_diff}}, \code{\link{loo-package}},
+#'   \code{link{vgislw}}
+#'
 #' @examples
 #' \dontrun{
 #' log_lik <- extract_log_lik(stanfit)
@@ -23,27 +34,27 @@
 #' print(loo, digits = 3)
 #' }
 #'
-loo_and_waic <- function(log_lik, cores = parallel::detectCores()) {
+#' @importFrom matrixStats colVars
+#'
+loo_and_waic <- function(log_lik, ...) {
   if (!is.matrix(log_lik))
-    stop("'log_lik' should be a matrix")
-  S <- nrow(log_lik)
-  N <- ncol(log_lik)
-  lpd <- log(colMeans(exp(log_lik)))
-  loo <- vgisloo(log_lik, cores)
+    stop('log_lik should be a matrix')
+  loo <- vgisloo(log_lik, ...)
+  lpd <- logColMeansExp(log_lik)
   elpd_loo <- loo$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
-  p_waic <- matrixStats::colVars(log_lik)
+  p_waic <- colVars(log_lik)
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
   nms <- names(pointwise <- nlist(elpd_loo, p_loo, elpd_waic, p_waic, looic, waic))
   total <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
+  se <- sqrt(ncol(log_lik) * unlist_lapply(pointwise, var))
   output <- as.list(c(total, se))
   names(output) <- c(nms, paste0("se_", nms))
   output$pointwise <- do.call("cbind", pointwise)
   output$pareto_k <- loo$ks
-  output$info <- list(log_lik_nsims = S, log_lik_nobs = N)
+  attr(output, "log_lik_dim") <- dim(log_lik)
   class(output) <- "loo"
   output
 }

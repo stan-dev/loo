@@ -1,3 +1,16 @@
+#' @importFrom matrixStats colLogSumExps
+logColMeansExp <- function(x) {
+  # should be more stable than log(colMeans(exp(x)))
+  S <- nrow(x)
+  matrixStats::colLogSumExps(x) - log(S)
+}
+
+qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
+  #  inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
+  if (!lower.tail) p <- 1 - p
+  mu + beta * ((1 - p)^(-xi) - 1) / xi
+}
+
 nlist <- function(...) {
   # named lists
   m <- match.call()
@@ -19,10 +32,6 @@ nlist <- function(...) {
 unlist_lapply <- function(X, FUN, ...) {
   unlist(lapply(X, FUN, ...), use.names = FALSE)
 }
-unlist_mclapply <- function(X, FUN, cores, ...) {
-  unlist(parallel::mclapply(X, FUN, mc.cores = cores, ...),
-         use.names = FALSE)
-}
 
 seq_min_half <- function(L) {
   seq_len(L) - 0.5
@@ -37,8 +46,24 @@ lx <- function(a, x) {
   log(-a / k) - k - 1
 }
 
-qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
-  # Generalized Pareto inverse-cdf (formula from Wikipedia)
-  if (!lower.tail) p <- 1 - p
-  mu + beta * ((1 - p)^(-xi) - 1) / xi
+#' @importFrom matrixStats colMaxs
+fix_large_diffs <- function(x, fix_value = 100) {
+# looks for difference of at least fix_value between the largest and second
+# largest values in each column of x. If such a large difference is found in any
+# column then the second largest value in that column is set equal to the
+# largest value.
+  mx <- colMaxs(x)
+  rows <- apply(x, 2, which.max)
+  cols <- seq_len(ncol(x))
+  z <- x
+  z[cbind(rows, cols)] <- NA
+  mz <- colMaxs(z, na.rm = TRUE)
+  ok <- (mx - mz) < fix_value
+  if (all(ok)) {
+    return(x)
+  }
+  fix_cols <- which(!ok)
+  fix_rows <- apply(z[,fix_cols, drop=FALSE], 2, which.max)
+  x[cbind(fix_rows, fix_cols)] <- mx[fix_cols]
+  x
 }

@@ -4,27 +4,31 @@
 \name{loo}
 \alias{loo}
 \alias{loo-package}
-\title{Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models}
+\title{Efficient LOO and WAIC for Bayesian models}
 \description{
-Efficient implementation of leave-one-out cross-validation and
-the widely applicable information criterion for evaluating fitted Bayesian
-models
+This package implements the methods described in Vehtari,
+  Gelman, and Gabry (2015) for efficiently computing approximate
+  leave-one-out cross-validation and WAIC for fitted Bayesian models.
 }
+\section{Authors}{
+ Aki Vethari, Andrew Gelman, Jonah Gabry
+}
+
 \section{Summary}{
 
-
-Leave-one-out cross-validation (LOO) and the widely applicable
-information criterion (WAIC) are methods for estimating pointwise
-out-of-sample prediction accuracy from a fitted Bayesian model using the
-log-likelihood evaluated at the posterior simulations of the parameter
-values. LOO and WAIC have various advantages over simpler estimates of
-predictive error such as AIC and DIC but are less used in practice because
-they involve additional computational steps. Here we lay out fast and stable
-computations for LOO and WAIC that can be performed using existing simulation
-draws. We compute LOO using very good importance sampling (VGIS), a new
-procedure for regularizing importance weights. As a byproduct of our
-calculations, we also obtain approximate standard errors for estimated
-predictive errors and for comparing of predictive errors between two models.
+Leave-one-out cross-validation (LOO) and the widely applicable information
+criterion (WAIC) are methods for estimating pointwise out-of-sample
+prediction accuracy from a fitted Bayesian model using the log-likelihood
+evaluated at the posterior simulations of the parameter values. LOO and WAIC
+have various advantages over simpler estimates of predictive error such as
+AIC and DIC but are less used in practice because they involve additional
+computational steps. This package implements the fast and stable computations
+for LOO and WAIC laid out in Vehtari, Gelman, and Gabry (2015). From existing
+posterior simulation draws, we compute LOO using very good importance
+sampling (VGIS), a new procedure for regularizing importance weights. As a
+byproduct of our calculations, we also obtain approximate standard errors for
+estimated predictive errors and for comparing of predictive errors between
+two models.
 }
 
 \section{Details}{
@@ -78,7 +82,7 @@ importance weights. We briefly review the motivation and steps of VGIS here.
 
 The distribution of the importance weights used in LOO may have a long right
 tail. We use the empirical Bayes estimate of Zhang and Stephens (2009) to fit
-a generalized Pareto distribution to the tail (20% largest importance
+a generalized Pareto distribution to the tail (20\% largest importance
 ratios). By examining the shape parameter \eqn{k} of the fitted Pareto
 distribution, we are able to obtain a sample based estimate of the existance
 of the moments (Koopman et al, 2009). This extends the diagnostic approach of
@@ -96,20 +100,19 @@ generalized Pareto distribution to the upper tail of the importance weights
 we smooth these values. The procedure goes as follows:
 
 \enumerate{
-  \item Fit the generalized Pareto distribution to the 20% largest importance
-  ratios \eqn{r_s} as computed in (6). (The computation is done separately
-  for each held-out data point \eqn{i}.) In simulation experiments with a
-  thousands to tens of thousands of simulation draws, we have found the fit
-  is not sensitive to the specific cutoff value (for a consistent estimation
-  the proportion of the samples above the cutoff should get smaller when the
-  number of draws increases).
+  \item Fit the generalized Pareto distribution (gPd) to the 20\% largest
+  importance ratios \eqn{r_s}. (The computation is done separately for each
+  held-out data point \eqn{i}.) In simulation experiments with thousands and
+  tens of thousands of draws, we have found that the fit is not sensitive to
+  the specific cutoff value. For a consistent estimation, the proportion of
+  the samples above the cutoff should get smaller when the number of draws
+  increases.
 
   \item Stabilize the importance ratios by replacing the \eqn{M} largest
   ratios by the expected values of the order statistics of the fitted
-  generalized Pareto distribution \deqn{G((z - 0.5)/M), z = 1,...,M,} where
+  gPd \deqn{G((z - 0.5)/M), z = 1,...,M,} where
   \eqn{M} is the number of simulation draws used to fit the Pareto (in this
-  case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the generalized
-  Pareto distribution.
+  case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
 
   \item To guarantee finite variance of the estimate, truncate the smoothed
   ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of
@@ -141,16 +144,20 @@ shape parameter \eqn{k} of the generalized Pareto distribution.
   it may be large.
 }
 
-If the estimated tail shape parameter \eqn{k \geq 1/2}, the user should be
+If the estimated tail shape parameter \eqn{k \ge 1/2}, the user should be
 warned. Even if the VGIS estimate has a finite variance, the user should
-consider sampling directly from \eqn{p(\theta^s|y_{-i})} for the problematic
+consider sampling directly from \eqn{p(\theta^s | y_{-i})} for the problematic
 \eqn{i}, use \eqn{k}-fold cross-validation, or use a more robust model.
 
 Importance sampling is likely to work less well if the marginal posterior
-\eqn{p(\theta^s|y)} and LOO posterior \eqn{p(\theta^s|y_{-i})} are much
+\eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
 different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to
 highly influential observations.
+
+\strong{Source}: Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient
+implementation of leave-one-out cross-validation and WAIC for evaluating
+fitted Bayesian models.
 }
 \references{
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion

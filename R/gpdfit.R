@@ -32,6 +32,6 @@ gpdfit <- function(x) {
   w <- 1 / vapply_seq(m, function(i) sum(exp(L - L[i])))
   b <- sum(b * w)
   k <- mean.default(log(1 - b * x))
-  sigma <- -k/b
+  sigma <- -k / b
   nlist(k, sigma)
 }

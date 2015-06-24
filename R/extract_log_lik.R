@@ -12,11 +12,15 @@
 #'   program if it is to be extracted after fitting the model. In the Stan
 #'   program the pointwise log likelihood can either be defined as a vector in
 #'   the transformed parameters block (and then summed up in the model block) or
-#'   it can be coded entirely in the generated quantities block using Stan's log
-#'   probability density functions. The result after running Stan will be an
-#'   \eqn{S} by \eqn{N} matrix of pointwise log-likelihood values, where \eqn{S}
-#'   is the size of the posterior sample (the number of draws/simulations) and
-#'   \eqn{N} is the number of data points.
+#'   it can be coded entirely in the generated quantities block. All else equal,
+#'   we recommend using the generated quantities block so that the computations
+#'   are carried out only once per saved iteration rather than once per HMC
+#'   leapfrog step.
+#'
+#'   After running Stan, the output will contain an \eqn{S} by \eqn{N} matrix
+#'   of pointwise log-likelihood values, where \eqn{S} is the size of the
+#'   posterior sample (the number of saved draws) and \eqn{N} is the number of
+#'   data points.
 #'
 #' @note The \pkg{rstan} package is required in order to use this function
 #' @seealso \code{\link[rstan]{stanfit-class}}
