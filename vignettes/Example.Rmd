@@ -85,6 +85,9 @@ library("loo")
 # Extract log-likelihood and compute LOO, WAIC
 log_lik <- extract_log_lik(fit)
 loo <- loo_and_waic(log_lik)
+print(loo)
+# loo and waic are the same out to several decimal places for this model
+print(loo, digits = 4) 
 ```
 
 <br>

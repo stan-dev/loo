@@ -15,8 +15,10 @@ data points. Typically (but not restricted to be) the object returned by
 \item{...}{optional arguments to pass to \code{\link{vgislw}}. Possible
 arguments and their defaults are:
 \describe{
-\item{\code{wcp = 20}}{the percentage of samples used for the generalized
-Pareto fit estimate}
+\item{\code{wcp = 20}}{the percentage of importance weights to use for the
+generalized Pareto fit. The \code{wcp}\% largest weights are used as the
+sample from which to estimate the parameters of the generalized Pareto
+distribution.}
 \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 \eqn{N}^\code{wtrunc} (set to zero for no truncation)}
 \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
@@ -45,7 +47,7 @@ print(loo, digits = 3)
 }
 }
 \seealso{
-\code{\link{loo-package}}, \code{\link{loo_and_waic_diff}},
-\code{\link{vgislw}}
+\code{\link{loo-package}}, \code{\link{print.loo}},
+\code{\link{loo_and_waic_diff}}
 }
 

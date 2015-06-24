@@ -8,8 +8,10 @@
 #' @param ... optional arguments to pass to \code{\link{vgislw}}. Possible
 #' arguments and their defaults are:
 #' \describe{
-#' \item{\code{wcp = 20}}{the percentage of samples used for the generalized
-#' Pareto fit estimate}
+#' \item{\code{wcp = 20}}{the percentage of importance weights to use for the
+#' generalized Pareto fit. The \code{wcp}\% largest weights are used as the
+#' sample from which to estimate the parameters of the generalized Pareto
+#' distribution.}
 #' \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 #' \eqn{N}^\code{wtrunc} (set to zero for no truncation)}
 #'\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
@@ -26,8 +28,8 @@
 #' \eqn{k} for the Pareto fit to the importance ratios for each leave-one-out
 #' distribution.
 #'
-#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic_diff}},
-#' \code{\link{vgislw}}
+#' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
+#' \code{\link{loo_and_waic_diff}}
 #'
 #' @examples
 #' \dontrun{

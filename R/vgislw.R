@@ -1,20 +1,25 @@
 #' VGIS: Very good importance sampling
 #'
 #' @export
-#' @param lw an \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik} for
-#'   computing LOO. See \code{\link{extract_log_lik}}).
-#' @param wcp the percentage of samples used for the generalized Pareto fit
-#'   estimate.
+#' @param lw a matrix of log weights, For for computing LOO \code{lw = -log_lik}
+#'   (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N} matrix
+#'   where \eqn{S} is the number of simulations and \eqn{N} is the number of
+#'   data points.
+#' @param wcp the percentage of importance weights to use for the generalized
+#'   Pareto fit. The \code{wcp}\% largest weights are used as the sample from
+#'   which to estimate the parameters of the generalized Pareto distribution.
 #' @param wtrunc for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
-#' @param fix_value if the largest value in any column of \code{lw} is greater
-#'   than the second largest by at least \code{fix_value}, then the second
-#'   largest value will be set equal to the largest. Set to zero to skip this
-#'   step.
+#' @param fix_value if the largest weight in any column of \code{lw} is greater
+#'   than the second largest by at least \code{fix_value}, the second largest
+#'   will be set equal to the largest. Set to zero to skip this step.
 #' @param cores the number of cores to use for parallelization.
 #'
 #' @return A named with list with components \code{lw} (modified log weights)
 #' and \code{k} (tail indices for the Pareto \eqn{k} estimates).
+#'
+#'
+#' @details See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 #'
 #' @note This function is primarily intended for internal use, but is exported
 #'   so that users can call it directly for other purposes. Users simply
@@ -42,7 +47,7 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
     # fit generalized Pareto distribution to the right tail samples
     exp_cutoff <- exp(cutoff)
     fit <- gpdfit(exp(x2) - exp_cutoff)
-    # compute ordered statistic for the fit
+    # compute order statistics for the fit
     qq <- qgpd(seq_min_half(n2) / n2, xi = fit$k, beta = fit$sigma) + exp_cutoff
     # remap back to the original order
     slq <- rep.int(0, n2)

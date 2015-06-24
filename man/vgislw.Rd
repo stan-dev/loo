@@ -8,19 +8,21 @@ vgislw(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
   cores = parallel::detectCores())
 }
 \arguments{
-\item{lw}{an \eqn{S} by \eqn{N} matrix of log weights (\code{-log_lik} for
-computing LOO. See \code{\link{extract_log_lik}}).}
+\item{lw}{a matrix of log weights, For for computing LOO \code{lw = -log_lik}
+(see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N} matrix
+where \eqn{S} is the number of simulations and \eqn{N} is the number of
+data points.}
 
-\item{wcp}{the percentage of samples used for the generalized Pareto fit
-estimate.}
+\item{wcp}{the percentage of importance weights to use for the generalized
+Pareto fit. The \code{wcp}\% largest weights are used as the sample from
+which to estimate the parameters of the generalized Pareto distribution.}
 
 \item{wtrunc}{for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
 
-\item{fix_value}{if the largest value in any column of \code{lw} is greater
-than the second largest by at least \code{fix_value}, then the second
-largest value will be set equal to the largest. Set to zero to skip this
-step.}
+\item{fix_value}{if the largest weight in any column of \code{lw} is greater
+than the second largest by at least \code{fix_value}, the second largest
+will be set equal to the largest. Set to zero to skip this step.}
 
 \item{cores}{the number of cores to use for parallelization.}
 }
@@ -30,6 +32,9 @@ and \code{k} (tail indices for the Pareto \eqn{k} estimates).
 }
 \description{
 VGIS: Very good importance sampling
+}
+\details{
+See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 }
 \note{
 This function is primarily intended for internal use, but is exported

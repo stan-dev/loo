@@ -22,7 +22,7 @@
 #'   for Gaussian linear models or asymptotically and which only applies to
 #'   nested models in any case.
 #'
-#' @seealso \code{\link{loo_and_waic}}, \code{\link{loo-package}}
+#' @seealso \code{\link{loo_and_waic}}, \code{\link{print.compare.loo}}
 #' @examples
 #' \dontrun{
 #' loo1 <- loo_and_waic(log_lik1)

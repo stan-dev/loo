@@ -5,14 +5,15 @@ logColMeansExp <- function(x) {
   matrixStats::colLogSumExps(x) - log(S)
 }
 
+# Inverse-CDF of generalized Pareto distribution
+# (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
-  #  inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
   if (!lower.tail) p <- 1 - p
   mu + beta * ((1 - p)^(-xi) - 1) / xi
 }
 
+# named lists
 nlist <- function(...) {
-  # named lists
   m <- match.call()
   out <- list(...)
   no_names <- is.null(names(out))
@@ -46,12 +47,13 @@ lx <- function(a, x) {
   log(-a / k) - k - 1
 }
 
-#' @importFrom matrixStats colMaxs
-fix_large_diffs <- function(x, fix_value = 100) {
+
 # looks for difference of at least fix_value between the largest and second
 # largest values in each column of x. If such a large difference is found in any
 # column then the second largest value in that column is set equal to the
 # largest value.
+#' @importFrom matrixStats colMaxs
+fix_large_diffs <- function(x, fix_value = 100) {
   mx <- colMaxs(x)
   rows <- apply(x, 2, which.max)
   cols <- seq_len(ncol(x))
