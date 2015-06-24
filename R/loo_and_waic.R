@@ -16,16 +16,18 @@
 #'      use for parallelization.}
 #'}
 #'
-#' @return a named list. Returned for both LOO and WAIC are the expected log
-#'   pointwise predictive density (\code{elpd} ), the estimated effective number
-#'   of parameters (\code{p}), and the information criteria on the deviance scale
-#'   (e.g. \code{looic = -2*elpd_loo}). Also returned are the pointwise
-#'   contributions of each of these measures, standard errors, and the estimated
-#'   shape parameter \eqn{k} for the Pareto fit to the importance ratios for
-#'   each leave-one-out distribution.
+#' @return a named list with class \code{'loo'}.
 #'
-#' @seealso \code{\link{loo_and_waic_diff}}, \code{\link{loo-package}},
-#'   \code{link{vgislw}}
+#' Returned for both LOO and WAIC are the expected log pointwise predictive
+#' density (\code{elpd}), the estimated effective number of parameters
+#' (\code{p}), and the information criteria on the deviance scale (e.g.
+#' \code{looic = -2*elpd_loo}). Also returned are the pointwise contributions of
+#' each of these measures, standard errors, and the estimated shape parameter
+#' \eqn{k} for the Pareto fit to the importance ratios for each leave-one-out
+#' distribution.
+#'
+#' @seealso \code{\link{loo_and_waic_diff}},\code{\link{loo-package}},
+#' \code{\link{vgislw}}
 #'
 #' @examples
 #' \dontrun{

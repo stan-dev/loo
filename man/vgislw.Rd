@@ -25,11 +25,8 @@ step.}
 \item{cores}{the number of cores to use for parallelization.}
 }
 \value{
-A named with list with components
-\describe{
-\item{\code{lw}}{modified log weights}
-\item{\code{k}}{tail indices for the Pareto \eqn{k} estimates}
-}
+A named with list with components \code{lw} (modified log weights)
+and \code{k} (tail indices for the Pareto \eqn{k} estimates).
 }
 \description{
 VGIS: Very good importance sampling
