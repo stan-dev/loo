@@ -20,7 +20,7 @@ a matrix of (post-warmup) extracted draws.
 Convenience function for extracting the pointwise log-likelihood from a
 fitted Stan model
 }
-\details{
+\note{
 Stan does not automatically compute and store the pointwise
   log-likelihood, and so it is up to the user to incorporate it into the Stan
   program if it is to be extracted after fitting the model. In the Stan
@@ -31,13 +31,7 @@ Stan does not automatically compute and store the pointwise
   are carried out only once per saved iteration rather than once per HMC
   leapfrog step.
 
-  After running Stan, the output will contain an \eqn{S} by \eqn{N} matrix
-  of pointwise log-likelihood values, where \eqn{S} is the size of the
-  posterior sample (the number of saved draws) and \eqn{N} is the number of
-  data points.
-}
-\note{
-The \pkg{rstan} package is required in order to use this function
+  The \pkg{rstan} package is required in order to use this function.
 }
 \examples{
 \dontrun{

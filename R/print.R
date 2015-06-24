@@ -14,8 +14,8 @@ print.loo <- function(x, ...) {
   L <- length(x)
   z <- x[-c(L - 1, L)]
   uz <- unlist(z)
-  ord <- c(1, 3, 2, 4, 5, 6)
-  out <- cbind(total = uz[ord], se = uz[ord + length(ord)])
+  print_ord <- c(1, 3, 2, 4, 5, 6)
+  out <- cbind(total = uz[print_ord], se = uz[print_ord + length(print_ord)])
   printCoefmat(out, digits = digits)
   cat("-----\n")
   cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix"))

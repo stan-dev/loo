@@ -1,8 +1,10 @@
 #' vgisloo
-#' @noRd
 #'
 #' \code{vgislw} performs very good importance sampling. \code{vgisloo} calls
 #' \code{vgislw} and does useful post-processing for computing LOO and WAIC.
+#'
+#' @keywords internal
+#' @export
 #'
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 #'   posterior sample and \eqn{N} is the number of data points (see
@@ -23,9 +25,8 @@
 #' \item{\code{ks}}{the estimate of the tail indices.}
 #' }
 #'
-#' @seealso \code{\link{loo_and_waic}}, \code{\link{loo-package}}
-#' @references
-#' Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
+#' @seealso \code{\link{vgislw}}, \code{\link{loo_and_waic}},
+#' \code{\link{loo-package}}.
 #'
 #' @importFrom matrixStats colLogSumExps
 #'

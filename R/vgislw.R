@@ -13,11 +13,8 @@
 #'   step.
 #' @param cores the number of cores to use for parallelization.
 #'
-#' @return A named with list with components
-#' \describe{
-#' \item{\code{lw}}{modified log weights}
-#' \item{\code{k}}{tail indices for the Pareto \eqn{k} estimates}
-#' }
+#' @return A named with list with components \code{lw} (modified log weights)
+#' and \code{k} (tail indices for the Pareto \eqn{k} estimates).
 #'
 #' @note This function is primarily intended for internal use, but is exported
 #'   so that users can call it directly for other purposes. Users simply

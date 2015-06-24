@@ -1,13 +1,16 @@
 #' Efficient LOO and WAIC for Bayesian models
 #'
 #' @docType package
-#' @name loo
+#' @name loo-package
 #'
-#' @description This package implements the methods described in Vehtari,
-#'   Gelman, and Gabry (2015) for efficiently computing approximate
-#'   leave-one-out cross-validation and WAIC for fitted Bayesian models.
+#' @description This package implements the methods described in
 #'
-#' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry
+#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of leave-one-out
+#'   cross-validation and WAIC for evaluating fitted Bayesian models.
+#'
+#' The package documentation is largely based on the contents of the paper.
+#'
+#' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry.
 #' @section Summary:
 #' Leave-one-out cross-validation (LOO) and the widely applicable information
 #' criterion (WAIC) are methods for estimating pointwise out-of-sample
@@ -71,9 +74,8 @@
 #'
 #' The distribution of the importance weights used in LOO may have a long right
 #' tail. We use the empirical Bayes estimate of Zhang and Stephens (2009) to fit
-#' a generalized Pareto distribution to the tail (20\% largest importance
-#' ratios). By examining the shape parameter \eqn{k} of the fitted Pareto
-#' distribution, we are able to obtain a sample based estimate of the existance
+#' a generalized Pareto distribution (gPd) to the tail (20\% largest importance
+#' ratios). By examining the shape parameter \eqn{k} of the fitted gPd, we are able to obtain a sample based estimate of the existance
 #' of the moments (Koopman et al, 2009). This extends the diagnostic approach of
 #' Peruggia (1997) and Epifani et al. (2008) to be used routinely with
 #' (importance sampling) LOO for any model with a factorizing likelihood.
@@ -85,11 +87,11 @@
 #' estimate's accuracy improves when additional draws are obtained. When the
 #' tail of the weight distribution is long, a direct use of importance sampling
 #' is sensitive to the one (or several) largest value(s). By fitting a
-#' generalized Pareto distribution to the upper tail of the importance weights
-#' we smooth these values. The procedure goes as follows:
+#' gPd to the upper tail of the importance weights we smooth these values.
+#' The procedure goes as follows:
 #'
 #' \enumerate{
-#'   \item Fit the generalized Pareto distribution (gPd) to the 20\% largest
+#'   \item Fit the gPd to the 20\% largest
 #'   importance ratios \eqn{r_s}. (The computation is done separately for each
 #'   held-out data point \eqn{i}.) In simulation experiments with thousands and
 #'   tens of thousands of draws, we have found that the fit is not sensitive to
@@ -115,7 +117,7 @@
 #'
 #' The results are then combined to compute the desired LOO estimates. The
 #' reliability of the estimates can be assessed using the estimates for the
-#' shape parameter \eqn{k} of the generalized Pareto distribution.
+#' shape parameter \eqn{k} of the gPd.
 #'
 #' \itemize{
 #'   \item If \eqn{k < 1/2} the variance of the raw importance ratios
@@ -135,18 +137,15 @@
 #'
 #' If the estimated tail shape parameter \eqn{k \ge 1/2}, the user should be
 #' warned. Even if the VGIS estimate has a finite variance, the user should
-#' consider sampling directly from \eqn{p(\theta^s | y_{-i})} for the problematic
-#' \eqn{i}, use \eqn{k}-fold cross-validation, or use a more robust model.
+#' consider sampling directly from \eqn{p(\theta^s | y_{-i})} for the
+#' problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more robust
+#' model.
 #'
 #' Importance sampling is likely to work less well if the marginal posterior
 #' \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
 #' different, which is more likely to happen with a non-robust model and highly
-#' influential observations. A robust model may reduce the sensitivity to
-#' highly influential observations.
-#'
-#' \strong{Source}: Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient
-#' implementation of leave-one-out cross-validation and WAIC for evaluating
-#' fitted Bayesian models.
+#' influential observations. A robust model may reduce the sensitivity to highly
+#' influential observations.
 #'
 #'
 #' @references

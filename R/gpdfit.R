@@ -3,6 +3,7 @@
 #' Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
 #' distribution, given a sample \eqn{x}.
 #'
+#' @keywords internal
 #' @export
 #' @param x a numeric vector. The sample from which to estimate the parameters.
 #' @return a list. Estimates for \eqn{k} and \eqn{\sigma}.
@@ -14,7 +15,8 @@
 #'   so that users can call it directly if desired. Users simply wishing to
 #'   compute LOO and WAIC should use the \code{\link{loo_and_waic}} function.
 #'
-#' @seealso \code{vgisloo}, \code{\link{loo_and_waic}}, \code{\link{loo-package}}
+#' @seealso \code{\link{vgislw}}, \code{\link{loo_and_waic}},
+#' \code{\link{loo-package}}
 #'
 #' @references
 #' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
