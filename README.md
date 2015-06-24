@@ -1,4 +1,4 @@
-[![Travis-CI Build Status](https://travis-ci.org/jgabry/loo.svg?branch=master)](https://travis-ci.org/jgabry/loo)
+[![Travis-CI Build Status](https://travis-ci.org/jgabry/loo.svg?branch=develop)](https://travis-ci.org/jgabry/loo)
 
 **loo** R package
 
