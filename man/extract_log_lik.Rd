@@ -2,36 +2,46 @@
 % Please edit documentation in R/extract_log_lik.R
 \name{extract_log_lik}
 \alias{extract_log_lik}
-\title{Convenience function for extracting the pointwise log-likelihood from a
-fitted Stan model}
+\title{Extract log-likelihood from a Stan model}
 \usage{
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }
 \arguments{
 \item{stanfit}{a \code{stanfit} (\pkg{rstan}) object.}
 
-\item{parameter_name}{a character string naming the parameter (generated
+\item{parameter_name}{a character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
-a matrix of (post-warmup) extracted draws.
+an \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
+  \eqn{S} is the number of simulations and \eqn{N} is the number of data
+  points.
 }
 \description{
 Convenience function for extracting the pointwise log-likelihood from a
-fitted Stan model
+fitted Stan model.
+}
+\details{
+Stan does not automatically compute and store the log-likelihood. It
+  is up to the user to incorporate it into the Stan program if it is to be
+  extracted after fitting the model. In a Stan model, the pointwise log
+  likelihood can be coded as a vector in the transformed parameters block
+  (and then summed up in the model block) or it can be coded entirely in the
+  generated quantities block. We recommend using the generated quantities
+  block so that the computations are carried out only once per iteration
+  rather than once per HMC leapfrog step.
+
+  For example, the following is the \code{generated quantities} block for computing
+  and saving the log-likelihood for a linear regression model with \code{N}
+  data points, outcome \code{y}, predictor matrix \code{X}, coefficients
+  \code{beta}, and standard deviation \code{sigma}:
+
+ \code{vector[N] log_lik;}
+
+ \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
 }
 \note{
-Stan does not automatically compute and store the pointwise
-  log-likelihood, and so it is up to the user to incorporate it into the Stan
-  program if it is to be extracted after fitting the model. In the Stan
-  program the pointwise log likelihood can either be defined as a vector in
-  the transformed parameters block (and then summed up in the model block) or
-  it can be coded entirely in the generated quantities block. All else equal,
-  we recommend using the generated quantities block so that the computations
-  are carried out only once per saved iteration rather than once per HMC
-  leapfrog step.
-
-  The \pkg{rstan} package is required in order to use this function.
+The \pkg{rstan} package is required in order to use this function.
 }
 \examples{
 \dontrun{

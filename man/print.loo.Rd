@@ -5,18 +5,27 @@
 \alias{print.loo}
 \title{Print methods}
 \usage{
-\method{print}{loo}(x, ...)
+\method{print}{loo}(x, ..., digits = 1)
 
-\method{print}{compare.loo}(x, ...)
+\method{print}{compare.loo}(x, ..., digits = 1)
 }
 \arguments{
 \item{x}{a list of class \code{'loo'} (as returned by
 \code{\link{loo_and_waic}}) or of class \code{'compare.loo'} (as returned
 by \code{\link{loo_and_waic_diff}}).}
 
-\item{...}{Other arguments. Currently only \code{digits} is supported.}
+\item{...}{ignored.}
+
+\item{digits}{number of significant digits to display.}
+}
+\value{
+returns \code{x} invisibly.
 }
 \description{
 Print methods
+}
+\seealso{
+\code{\link{loo-package}}, \code{\link{loo_and_waic}},
+\code{\link{loo_and_waic_diff}}
 }
 

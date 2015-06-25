@@ -14,7 +14,7 @@ loo_and_waic_diff(loo1, loo2)
 a named list with class \code{'compare.loo'}.
 }
 \description{
-Compare two fitted models
+Compare two fitted models on LOO and WAIC
 }
 \details{
 When comparing two fitted models, we can estimate the difference in
@@ -41,6 +41,6 @@ print(diff, digits = 1)
 }
 }
 \seealso{
-\code{\link{loo_and_waic}}
+\code{\link{loo_and_waic}}, \code{\link{print.compare.loo}}
 }
 

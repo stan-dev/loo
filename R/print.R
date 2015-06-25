@@ -1,22 +1,24 @@
 #' Print methods
+#' @export
+#'
 #' @param x a list of class \code{'loo'} (as returned by
 #'   \code{\link{loo_and_waic}}) or of class \code{'compare.loo'} (as returned
 #'   by \code{\link{loo_and_waic_diff}}).
-#' @param ... Other arguments. Currently only \code{digits} is supported.
-#' @export
-print.loo <- function(x, ...) {
-  dots <- list(...)
-  digits <- 2
-  if (length(dots) != 0 && "digits" %in% names(dots)) {
-    digits <- dots$digits
-  }
+#' @param ... ignored.
+#' @param digits number of significant digits to display.
+#' @return returns \code{x} invisibly.
+#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic}},
+#' \code{\link{loo_and_waic_diff}}
+#'
+print.loo <- function(x, ..., digits = 1) {
   dims <- attr(x, "log_lik_dim")
-  L <- length(x)
-  z <- x[-c(L - 1, L)]
+  z <- x[-grep("pointwise|pareto_k", names(x))]
   uz <- unlist(z)
-  print_ord <- c(1, 3, 2, 4, 5, 6)
-  out <- cbind(total = uz[print_ord], se = uz[print_ord + length(print_ord)])
-  printCoefmat(out, digits = digits)
+  nms <- names(uz)
+  ses <- grepl("se", nms)
+  out <- cbind(Estimate = uz[!ses], StdError = uz[ses])
+  out <- format(round(out, digits), nsmall = digits)
+  print(out, quote = FALSE)
   cat("-----\n")
   cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix"))
   invisible(x)
@@ -25,13 +27,9 @@ print.loo <- function(x, ...) {
 
 #' @rdname print.loo
 #' @export
-print.compare.loo <- function(x, ...) {
-  dots <- list(...)
-  digits <- 2
-  if (length(dots) != 0 && "digits" %in% names(dots)) {
-    digits <- dots$digits
-  }
+print.compare.loo <- function(x, ..., digits = 1) {
   ux <- unlist(x)
-  print(round(ux, digits))
+  out <- format(round(ux, digits), nsmall = digits)
+  print(out, quote = FALSE)
   invisible(x)
 }

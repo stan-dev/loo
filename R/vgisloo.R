@@ -1,6 +1,6 @@
 #' vgisloo
 #'
-#' \code{vgislw} performs very good importance sampling. \code{vgisloo} calls
+#' \code{\link{vgislw}} performs very good importance sampling. \code{vgisloo} calls
 #' \code{vgislw} and does useful post-processing for computing LOO and WAIC.
 #'
 #' @keywords internal
@@ -22,8 +22,11 @@
 #' \describe{
 #' \item{\code{loo}}{the sum of the LOO log predictive densities}
 #' \item{\code{loos}}{the individual LOO log predictive densities}
-#' \item{\code{ks}}{the estimate of the tail indices.}
+#' \item{\code{pareto_k}}{shape parameter estimates for the generalized
+#' Pareto distribution.}
 #' }
+#'
+#' @details See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 #'
 #' @seealso \code{\link{vgislw}}, \code{\link{loo_and_waic}},
 #' \code{\link{loo-package}}.
@@ -33,7 +36,8 @@
 vgisloo <- function(log_lik, ...) {
   lw <- -1 * log_lik
   vgis <- vgislw(lw, ...)
-  loos <- colLogSumExps(log_lik + vgis$lw)
-  loo <- sum(loos)
-  nlist(loo, loos, ks = vgis$k)
+  loos <- colLogSumExps(log_lik + vgis$lw_smooth)
+#   loo <- sum(loos)
+#   nlist(loo, loos, pareto_k = vgis$pareto_k)
+  nlist(loos, pareto_k = vgis$pareto_k)
 }
