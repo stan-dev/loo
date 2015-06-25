@@ -32,20 +32,22 @@
 #' }
 #'
 loo_and_waic_diff <- function(loo1, loo2) {
-  N1 <- nrow(loo1$pointwise)
-  N2 <- nrow(loo2$pointwise)
+  p1 <- loo1$pointwise
+  p2 <- loo2$pointwise
+  N1 <- nrow(p1)
+  N2 <- nrow(p2)
   if (N1 != N2) {
-    stop(paste("Models being compared should have the same number of data points.",
-               "Found N1 =", N1, "and N2 =", N2))
+    msg <- "Models being compared should have the same number of data points."
+    stop(paste(msg, "Found N1 =", N1, "and N2 =", N2))
   }
   sqrtN <- sqrt(N1)
-  loo_diff <- loo2$pointwise[, "elpd_loo"] - loo1$pointwise[, "elpd_loo"]
-  waic_diff <- loo2$pointwise[, "elpd_waic"] - loo1$pointwise[, "elpd_waic"]
-
-  out <- list(elpd_loo_diff = sum(loo_diff),
-              lpd_loo_diff = sqrtN * sd(loo_diff),
-              elpd_waic_diff = sum(waic_diff),
-              lpd_waic_diff = sqrtN * sd(waic_diff))
-  class(out) <- "compare.loo"
-  out
+  loo_diff <- p2[, "elpd_loo"] - p1[, "elpd_loo"]
+  waic_diff <- p2[, "elpd_waic"] - p1[, "elpd_waic"]
+  diff <- list(elpd_loo_diff = sum(loo_diff),
+               lpd_loo_diff = sqrtN * sd(loo_diff),
+               elpd_waic_diff = sum(waic_diff),
+               lpd_waic_diff = sqrtN * sd(waic_diff))
+  class(diff) <- "compare.loo"
+  diff
 }
+

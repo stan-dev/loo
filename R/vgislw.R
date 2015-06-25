@@ -57,7 +57,7 @@ vgislw <- function(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
     qx[!x_cut] <- x1
     qx[x_cut] <- slq
     if (wtrunc > 0) {
-      # truncate too large weights
+      # truncate
       logS <- log(S)
       lwtrunc <- wtrunc * logS - logS + logSumExp(qx)
       qx[qx > lwtrunc] <- lwtrunc
