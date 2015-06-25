@@ -4,25 +4,30 @@
 \alias{vgislw}
 \title{VGIS: Very good importance sampling}
 \usage{
-vgislw(lw, wcp = 20, wtrunc = 3/4, fix_value = 100,
+vgislw(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   cores = parallel::detectCores())
 }
 \arguments{
-\item{lw}{a matrix of log weights, For for computing LOO \code{lw = -log_lik}
+\item{lw}{a matrix of log weights. For for computing LOO \code{lw = -log_lik}
 (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N} matrix
 where \eqn{S} is the number of simulations and \eqn{N} is the number of
-data points.}
+data points. If \code{lw} is a vector it will be coerced to a one-column
+matrix.}
 
-\item{wcp}{the percentage of importance weights to use for the generalized
-Pareto fit. The \code{wcp}\% largest weights are used as the sample from
-which to estimate the parameters of the generalized Pareto distribution.}
+\item{wcp}{the proportion of importance weights to use for the generalized
+Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
+from which to estimate the parameters of the generalized Pareto
+distribution.}
+
+\item{thresh}{When used for the generalized pareto fit, the largest
+\code{100*wcp}\% of the importance weights are modified according to
+\code{pmax(x, max(x) - thresh)} for numerical stability.}
+
+\item{kmax}{maximum allowed value for the generalized Pareto shape parameter
+\eqn{k}.}
 
 \item{wtrunc}{for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
-
-\item{fix_value}{if the largest weight in any column of \code{lw} is greater
-than the second largest by at least \code{fix_value}, the second largest
-will be set equal to the largest. Set to zero to skip this step.}
 
 \item{cores}{the number of cores to use for parallelization.}
 }

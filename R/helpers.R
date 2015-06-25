@@ -43,6 +43,11 @@ vapply_seq <- function(L, FUN, ...) {
   vapply(1:L, FUN, FUN.VALUE = 0, ...)
 }
 
+cbind_list <- function(x) {
+  stopifnot(is.list(x))
+  do.call(cbind, x)
+}
+
 lx <- function(a, x) {
   k <- mean.default(log(1 - a * x))
   log(-a / k) - k - 1
