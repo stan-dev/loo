@@ -1,19 +1,7 @@
 library(loo)
 
-
-# test helpers ------------------------------------------------------------
-context("logColMeansExp")
-set.seed(123)
-x <- matrix(rnorm(100), 20, 5)
-val <- logColMeansExp(x)
-ans <- log(colMeans(exp(x)))
-test_that("logColMeansExp(x) = log(colMeans(exp(x))", {
-  expect_equivalent(val, ans)
-})
-
-
-
 # test loo_and_waic -------------------------------------------------------
+
 context("loo_and_waic")
 set.seed(123)
 x <- matrix(rnorm(100), 20, 5)
@@ -33,6 +21,8 @@ test_that("loo_and_waic returns correct result", {
   loo <- loo_and_waic(x, cores = 1)
   val <- loo[-grep("pointwise|pareto_k", names(loo))]
   expect_equal(val, ans)
+
+  expect_error(loo_and_waic(1:10), 'log_lik should be a matrix')
 
   loo_diff <- unlist(loo_and_waic_diff(loo, loo))
   expect_true(all(loo_diff == 0))
