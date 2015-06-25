@@ -20,12 +20,16 @@ posterior sample and \eqn{N} is the number of data points (see
 \describe{
 \item{\code{loo}}{the sum of the LOO log predictive densities}
 \item{\code{loos}}{the individual LOO log predictive densities}
-\item{\code{ks}}{the estimate of the tail indices.}
+\item{\code{pareto_k}}{shape parameter estimates for the generalized
+Pareto distribution.}
 }
 }
 \description{
 \code{\link{vgislw}} performs very good importance sampling. \code{vgisloo} calls
 \code{vgislw} and does useful post-processing for computing LOO and WAIC.
+}
+\details{
+See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 }
 \note{
 This function is primarily intended for internal use, but is

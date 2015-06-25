@@ -8,18 +8,18 @@ vgislw(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   cores = parallel::detectCores())
 }
 \arguments{
-\item{lw}{a matrix of log weights. For for computing LOO \code{lw = -log_lik}
-(see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N} matrix
-where \eqn{S} is the number of simulations and \eqn{N} is the number of
-data points. If \code{lw} is a vector it will be coerced to a one-column
-matrix.}
+\item{lw}{a matrix or vector of log weights. For for computing LOO \code{lw =
+-log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
+matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
+of data points. (If \code{lw} is a vector it will be coerced to a
+one-column matrix.)}
 
 \item{wcp}{the proportion of importance weights to use for the generalized
 Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 from which to estimate the parameters of the generalized Pareto
 distribution.}
 
-\item{thresh}{When used for the generalized pareto fit, the largest
+\item{thresh}{when used for the generalized pareto fit, the largest
 \code{100*wcp}\% of the importance weights are modified according to
 \code{pmax(x, max(x) - thresh)} for numerical stability.}
 
@@ -32,8 +32,9 @@ to zero for no truncation.}
 \item{cores}{the number of cores to use for parallelization.}
 }
 \value{
-A named with list with components \code{lw} (modified log weights)
-and \code{k} (tail indices for the Pareto \eqn{k} estimates).
+A named with list with components \code{lw_smooth} (modified log
+  weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
+  \eqn{k}).
 }
 \description{
 VGIS: Very good importance sampling

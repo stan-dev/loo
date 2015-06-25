@@ -28,7 +28,10 @@ shape parameter \eqn{k}.}
 \eqn{N}^\code{wtrunc} (set to zero for no truncation).}
 \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
      use for parallelization.}
-}}
+}
+
+We recommend using the default values for the \code{vgislw} arguments unless
+there are problems (e.g. \code{NA} or \code{NaN} results).}
 }
 \value{
 a named list with class \code{'loo'}.

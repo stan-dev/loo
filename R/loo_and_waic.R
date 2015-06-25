@@ -23,6 +23,9 @@
 #'      use for parallelization.}
 #'}
 #'
+#' We recommend using the default values for the \code{vgislw} arguments unless
+#' there are problems (e.g. \code{NA} or \code{NaN} results).
+#'
 #' @return a named list with class \code{'loo'}.
 #'
 #' Returned for both LOO and WAIC are the expected log pointwise predictive
