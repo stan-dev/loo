@@ -1,6 +1,6 @@
 #' Model comparison
 #'
-#' Compare two fitted models
+#' Compare two fitted models on LOO and WAIC
 #'
 #' @export
 #' @param loo1,loo2 lists (of class \code{'loo'}) returned by
