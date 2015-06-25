@@ -25,7 +25,7 @@ largest \code{100*wcp}\% of the importance weights are modified according to
 \item{\code{kmax = 2}}{the maximum allowed value for the generalized Pareto
 shape parameter \eqn{k}.}
 \item{\code{wtrunc = 3/4}}{for truncating very large weights to
-\eqn{N}^\code{wtrunc} (set to zero for no truncation).}
+\eqn{S}^\code{wtrunc} (set to zero for no truncation).}
 \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
      use for parallelization.}
 }
