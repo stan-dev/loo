@@ -1,10 +1,14 @@
 #' Print methods
+#' @export
+#'
 #' @param x a list of class \code{'loo'} (as returned by
 #'   \code{\link{loo_and_waic}}) or of class \code{'compare.loo'} (as returned
 #'   by \code{\link{loo_and_waic_diff}}).
 #' @param ... ignored.
 #' @param digits number of significant digits to display.
-#' @export
+#' @return returns \code{x} invisibly.
+#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic}},
+#' \code{\link{loo_and_waic_diff}}
 #'
 print.loo <- function(x, ..., digits = 1) {
   dims <- attr(x, "log_lik_dim")

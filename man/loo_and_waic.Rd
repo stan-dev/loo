@@ -15,13 +15,23 @@ data points. Typically (but not restricted to be) the object returned by
 \item{...}{optional arguments to pass to \code{\link{vgislw}}. Possible
 arguments and their defaults are:
 \describe{
-\item{\code{wcp = 20}}{the percentage of samples used for the generalized
-Pareto fit estimate}
+\item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
+generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
+sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
+the generalized Pareto distribution.}
+\item{\code{thresh = 100}}{when used for the generalized Pareto fit, the
+largest \code{100*wcp}\% of the importance weights are modified according to
+\code{pmax(x, max(x) - thresh)} for numerical stability.}
+\item{\code{kmax = 2}}{the maximum allowed value for the generalized Pareto
+shape parameter \eqn{k}.}
 \item{\code{wtrunc = 3/4}}{for truncating very large weights to
-\eqn{N}^\code{wtrunc} (set to zero for no truncation)}
+\eqn{N}^\code{wtrunc} (set to zero for no truncation).}
 \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
      use for parallelization.}
-}}
+}
+
+We recommend using the default values for the \code{vgislw} arguments unless
+there are problems (e.g. \code{NA} or \code{NaN} results).}
 }
 \value{
 a named list with class \code{'loo'}.
@@ -45,7 +55,7 @@ print(loo, digits = 3)
 }
 }
 \seealso{
-\code{\link{loo_and_waic_diff}},\code{\link{loo-package}},
-\code{\link{vgislw}}
+\code{\link{loo-package}}, \code{\link{print.loo}},
+\code{\link{loo_and_waic_diff}}
 }
 

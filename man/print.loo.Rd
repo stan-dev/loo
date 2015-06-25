@@ -18,7 +18,14 @@ by \code{\link{loo_and_waic_diff}}).}
 
 \item{digits}{number of significant digits to display.}
 }
+\value{
+returns \code{x} invisibly.
+}
 \description{
 Print methods
+}
+\seealso{
+\code{\link{loo-package}}, \code{\link{loo_and_waic}},
+\code{\link{loo_and_waic_diff}}
 }
 
