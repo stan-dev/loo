@@ -3,7 +3,7 @@
 This is the first submission of this package.
 
 ## Test environments
-* local OS X install, R 3.2.0
+* local OS X install, R 3.2.1
 * win-builder (release and devel)
 * ubuntu 12.04 (on travis-ci)
 
