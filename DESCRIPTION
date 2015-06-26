@@ -1,6 +1,6 @@
 Package: loo
 Type: Package
-Title: Efficient Leave-One-Out Cross-validation and WAIC for Bayesian Models
+Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
 Version: 0.1.0
 Date: 2015-06-24
 Author: Aki Vehtari, Andrew Gelman, Jonah Gabry
@@ -21,6 +21,5 @@ Imports:
   parallel
 Suggests:
   knitr,
-  rstan,
   testthat
 VignetteBuilder: knitr
