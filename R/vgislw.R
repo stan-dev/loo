@@ -38,40 +38,53 @@
 #'
 vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
+
+  # minimal cutoff value. there must be at least 5 log-weights larger than this
+  # in order to fit the generalized Pareto distribution (gPd) to the tail
+  MIN_CUTOFF <- -700
+  MIN_TAIL_LENGTH <- 5
+
   .vgis <- function(i) {
     x <- lw[, i]
     S <- length(x)
     # split into body and right tail
     cutoff <- quantile(x, 1 - wcp, names = FALSE)
+    cutoff <- max(cutoff, MIN_CUTOFF)
     x_cut <- x > cutoff
     xbody <- x[!x_cut]
     xtail <- x[x_cut]
     tail_len <- length(xtail)
-    # store order of tail samples
-    tail_ord <- order(xtail)
-    # fit generalized Pareto distribution to the right tail samples
-    xtail <- pmax(xtail, max(xtail) - thresh)
-    exp_cutoff <- exp(cutoff)
-    fit <- gpdfit(exp(xtail) - exp_cutoff)
-    k <- min(fit$k, kmax)
-    # compute order statistics for the fit
-    qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
-    qq <- qq + exp_cutoff
-    # remap back to the original order
-    slq <- rep.int(0, tail_len)
-    slq[tail_ord] <- log(qq)
-    # join body and gPd smoothed tail
-    qx <- x
-    qx[!x_cut] <- xbody
-    qx[x_cut] <- slq
+    if (tail_len < MIN_TAIL_LENGTH) {
+      # too few tail samples to fit gPd
+      xnew <- x
+      k <- Inf
+    } else {
+      # store order of tail samples
+      tail_ord <- order(xtail)
+      # fit gPd to the right tail samples
+      xtail <- pmax(xtail, max(xtail) - thresh)
+      exp_cutoff <- exp(cutoff)
+      fit <- gpdfit(exp(xtail) - exp_cutoff)
+      k <- min(fit$k, kmax)
+      # compute order statistics for the fit
+      qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
+      qq <- qq + exp_cutoff
+      # remap back to the original order
+      smoothed_tail <- rep.int(0, tail_len)
+      smoothed_tail[tail_ord] <- log(qq)
+      # join body and gPd smoothed tail
+      xnew <- x
+      xnew[!x_cut] <- xbody
+      xnew[x_cut] <- smoothed_tail
+    }
     if (wtrunc > 0) {
       # truncate
       logS <- log(S)
-      lwtrunc <- wtrunc * logS - logS + logSumExp(qx)
-      qx[qx > lwtrunc] <- lwtrunc
+      lwtrunc <- wtrunc * logS - logS + logSumExp(xnew)
+      xnew[xnew > lwtrunc] <- lwtrunc
     }
     # renormalize weights
-    lwx <- qx - logSumExp(qx)
+    lwx <- xnew - logSumExp(xnew)
     # return log weights and tail index k
     list(lwx, k)
   }
