@@ -56,7 +56,7 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
     tail_len <- length(xtail)
     if (tail_len < MIN_TAIL_LENGTH) {
       warning("Not enough tail samples to fit generalized Pareto distribution")
-      qx <- x
+      xnew <- x
       k <- Inf
     } else {
       # store order of tail samples
@@ -70,21 +70,21 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
       qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
       qq <- qq + exp_cutoff
       # remap back to the original order
-      slq <- rep.int(0, tail_len)
-      slq[tail_ord] <- log(qq)
+      smoothed_tail <- rep.int(0, tail_len)
+      smoothed_tail[tail_ord] <- log(qq)
       # join body and gPd smoothed tail
-      qx <- x
-      qx[!x_cut] <- xbody
-      qx[x_cut] <- slq
+      xnew <- x
+      xnew[!x_cut] <- xbody
+      xnew[x_cut] <- smoothed_tail
     }
     if (wtrunc > 0) {
       # truncate
       logS <- log(S)
-      lwtrunc <- wtrunc * logS - logS + logSumExp(qx)
-      qx[qx > lwtrunc] <- lwtrunc
+      lwtrunc <- wtrunc * logS - logS + logSumExp(xnew)
+      xnew[xnew > lwtrunc] <- lwtrunc
     }
     # renormalize weights
-    lwx <- qx - logSumExp(qx)
+    lwx <- xnew - logSumExp(xnew)
     # return log weights and tail index k
     list(lwx, k)
   }
