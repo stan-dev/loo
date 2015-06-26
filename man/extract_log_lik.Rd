@@ -7,7 +7,7 @@
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }
 \arguments{
-\item{stanfit}{a \code{stanfit} (\pkg{rstan}) object.}
+\item{stanfit}{a \code{stanfit} object (\pkg{rstan} package).}
 
 \item{parameter_name}{a character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.}
@@ -40,15 +40,16 @@ Stan does not automatically compute and store the log-likelihood. It
 
  \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
 }
-\note{
-The \pkg{rstan} package is required in order to use this function.
-}
 \examples{
 \dontrun{
 log_lik <- extract_log_lik(stanfit, "log_lik")
 }
 }
-\seealso{
-\code{\link[rstan]{stanfit-class}}
+\references{
+Stan Development Team (2015). Stan: A C++ library for probability and
+sampling, version 2.6. \url{mc-stan.org}.
+
+Stan Development Team (2015). RStan, version 2.6.
+\url{mc-stan.org/rstan.html}.
 }
 
