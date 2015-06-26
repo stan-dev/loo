@@ -12,6 +12,7 @@
 #'
 print.loo <- function(x, ..., digits = 1) {
   dims <- attr(x, "log_lik_dim")
+  cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix\n\n"))
   z <- x[-grep("pointwise|pareto_k", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
@@ -19,15 +20,16 @@ print.loo <- function(x, ..., digits = 1) {
   out <- cbind(Estimate = uz[!ses], StdError = uz[ses])
   out <- format(round(out, digits), nsmall = digits)
   print(out, quote = FALSE)
-  cat("-----\n")
-  cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix"))
   invisible(x)
 }
-
 
 #' @rdname print.loo
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
+  dims <- attr(x, "log_lik_dim")
+  if (!is.null(dims)) {
+    cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix\n\n"))
+  }
   ux <- unlist(x)
   out <- format(round(ux, digits), nsmall = digits)
   print(out, quote = FALSE)
