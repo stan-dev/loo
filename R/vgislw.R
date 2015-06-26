@@ -40,7 +40,7 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
-  # in order to fit the Pareto distribution to the tail
+  # in order to fit the generalized Pareto distribution (gPd) to the tail
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
 
@@ -55,13 +55,13 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
     xtail <- x[x_cut]
     tail_len <- length(xtail)
     if (tail_len < MIN_TAIL_LENGTH) {
-      warning("Not enough tail samples to fit generalized Pareto distribution")
+      # too few tail samples to fit gPd
       xnew <- x
       k <- Inf
     } else {
       # store order of tail samples
       tail_ord <- order(xtail)
-      # fit generalized Pareto distribution to the right tail samples
+      # fit gPd to the right tail samples
       xtail <- pmax(xtail, max(xtail) - thresh)
       exp_cutoff <- exp(cutoff)
       fit <- gpdfit(exp(xtail) - exp_cutoff)
