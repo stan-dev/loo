@@ -4,7 +4,7 @@
 #' fitted Stan model.
 #'
 #' @export
-#' @param stanfit a \code{stanfit} (\pkg{rstan}) object.
+#' @param stanfit a \code{stanfit} object (\pkg{rstan} package).
 #' @param parameter_name a character string naming the parameter (or generated
 #'   quantity) in the Stan model corresponding to the log-likelihood.
 #' @return an \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
@@ -29,18 +29,28 @@
 #'
 #'  \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
 #'
-#' @note The \pkg{rstan} package is required in order to use this function.
+#' @references
+#' Stan Development Team (2015). Stan: A C++ library for probability and
+#' sampling, version 2.6. \url{mc-stan.org}.
 #'
-#' @seealso \code{\link[rstan]{stanfit-class}}
+#' Stan Development Team (2015). RStan, version 2.6.
+#' \url{mc-stan.org/rstan.html}.
+#'
 #' @examples
 #' \dontrun{
 #' log_lik <- extract_log_lik(stanfit, "log_lik")
 #' }
 #'
 extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
-  rstan_ok <- requireNamespace("rstan", quietly = TRUE)
-  if (!rstan_ok) {
-    stop("Please install the rstan package to use this function.")
-  }
-  rstan::extract(stanfit, parameter_name)[[parameter_name]]
+  if (!inherits(stanfit, "stanfit"))
+    stop("Not a stanfit object.")
+  if (stanfit@mode != 0)
+    stop("Stan model does not contain samples.")
+  posterior <- as.matrix(stanfit)
+  nms <- colnames(posterior)
+  pattern <- paste0("^",parameter_name,"\\[")
+  keep <- grep(pattern, nms)
+  log_lik <- posterior[, keep, drop = FALSE]
+  colnames(log_lik) <- NULL
+  log_lik
 }
