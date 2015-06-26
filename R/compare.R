@@ -1,12 +1,9 @@
 #' Model comparison
 #'
-#' Compare two fitted models on LOO and WAIC
+#' Compare two fitted models on LOO or WAIC
 #'
-#' @keywords internal
 #' @export
-#'
-#' @param loo1,loo2 lists (of class \code{'loo'}) returned by
-#' \code{\link{loo_and_waic}}.
+#' @param a,b objects returned by \code{\link{loo}} or \code{\link{waic}}.
 #' @return a named list with class \code{'compare.loo'}.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
@@ -24,35 +21,41 @@
 #'   for Gaussian linear models or asymptotically and which only applies to
 #'   nested models in any case.
 #'
-#' @seealso \code{\link{loo_and_waic}}, \code{\link{print.compare.loo}}
+#' @seealso \code{\link{loo}}, \code{\link{waic}},
+#'   \code{\link{print.compare.loo}}
 #' @examples
 #' \dontrun{
-#' loo1 <- loo_and_waic(log_lik1)
-#' loo2 <- loo_and_waic(log_lik2)
-#' diff <- loo_and_waic_diff(loo1, loo2)
+#' loo1 <- loo(log_lik1)
+#' loo2 <- loo(log_lik2)
+#' diff <- compare(loo1, loo2)
 #' print(diff, digits = 1)
+#'
+#' waic1 <- waic(log_lik1)
+#' waic2 <- waic(log_lik2)
+#' compare(waic1, waic2)
 #' }
 #'
-loo_and_waic_diff <- function(loo1, loo2) {
 
-  .Deprecated("compare")
+compare <- function(a, b) {
+  cls <- class(a)
+  if (!inherits(b, cls))
+    stop("'a' and 'b' should have the same class", call. = FALSE)
+  if (cls != "loo")
+    stop("'a' and 'b' should be of class 'loo'")
 
-  p1 <- loo1$pointwise
-  p2 <- loo2$pointwise
-  N1 <- nrow(p1)
-  N2 <- nrow(p2)
-  if (N1 != N2) {
+  pa <- a$pointwise
+  pb <- b$pointwise
+  Na <- nrow(pa)
+  Nb <- nrow(pb)
+  if (Na != Nb) {
     msg <- "Models being compared should have the same number of data points."
-    stop(paste(msg, "Found N1 =", N1, "and N2 =", N2))
+    stop(paste(msg, "Found N (model a) =", Na, "and N (model b) =", Nb))
   }
-  sqrtN <- sqrt(N1)
-  loo_diff <- p2[, "elpd_loo"] - p1[, "elpd_loo"]
-  waic_diff <- p2[, "elpd_waic"] - p1[, "elpd_waic"]
-  diff <- list(elpd_loo_diff = sum(loo_diff),
-               lpd_loo_diff = sqrtN * sd(loo_diff),
-               elpd_waic_diff = sum(waic_diff),
-               lpd_waic_diff = sqrtN * sd(waic_diff))
-  class(diff) <- "compare.loo"
-  diff
+  sqrtN <- sqrt(Na)
+  ind <- grep("^elpd", colnames(pa))
+  diff <- pb[, ind] - pa[, ind]
+  comp <- list(elpd_diff = sum(diff), se = sqrtN * sd(diff))
+  class(comp) <- "compare.loo"
+  attr(comp, "log_lik_dim") <- attr(a, "log_lik_dim")
+  comp
 }
-
