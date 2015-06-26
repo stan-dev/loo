@@ -38,32 +38,45 @@
 #'
 vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
+
+  # minimal cutoff value. there must be at least 5 log-weights larger than this
+  # in order to fit the Pareto distribution to the tail
+  MIN_CUTOFF <- -700
+  MIN_TAIL_LENGTH <- 5
+
   .vgis <- function(i) {
     x <- lw[, i]
     S <- length(x)
     # split into body and right tail
     cutoff <- quantile(x, 1 - wcp, names = FALSE)
+    cutoff <- max(cutoff, MIN_CUTOFF)
     x_cut <- x > cutoff
     xbody <- x[!x_cut]
     xtail <- x[x_cut]
     tail_len <- length(xtail)
-    # store order of tail samples
-    tail_ord <- order(xtail)
-    # fit generalized Pareto distribution to the right tail samples
-    xtail <- pmax(xtail, max(xtail) - thresh)
-    exp_cutoff <- exp(cutoff)
-    fit <- gpdfit(exp(xtail) - exp_cutoff)
-    k <- min(fit$k, kmax)
-    # compute order statistics for the fit
-    qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
-    qq <- qq + exp_cutoff
-    # remap back to the original order
-    slq <- rep.int(0, tail_len)
-    slq[tail_ord] <- log(qq)
-    # join body and gPd smoothed tail
-    qx <- x
-    qx[!x_cut] <- xbody
-    qx[x_cut] <- slq
+    if (tail_len < MIN_TAIL_LENGTH) {
+      warning("Not enough tail samples to fit generalized Pareto distribution")
+      qx <- x
+      k <- Inf
+    } else {
+      # store order of tail samples
+      tail_ord <- order(xtail)
+      # fit generalized Pareto distribution to the right tail samples
+      xtail <- pmax(xtail, max(xtail) - thresh)
+      exp_cutoff <- exp(cutoff)
+      fit <- gpdfit(exp(xtail) - exp_cutoff)
+      k <- min(fit$k, kmax)
+      # compute order statistics for the fit
+      qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
+      qq <- qq + exp_cutoff
+      # remap back to the original order
+      slq <- rep.int(0, tail_len)
+      slq[tail_ord] <- log(qq)
+      # join body and gPd smoothed tail
+      qx <- x
+      qx[!x_cut] <- xbody
+      qx[x_cut] <- slq
+    }
     if (wtrunc > 0) {
       # truncate
       logS <- log(S)
