@@ -2,7 +2,7 @@
 % Please edit documentation in R/vgislw.R
 \name{vgislw}
 \alias{vgislw}
-\title{VGIS: Very good importance sampling}
+\title{Very good importance sampling (VGIS)}
 \usage{
 vgislw(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   cores = parallel::detectCores())
@@ -37,7 +37,7 @@ A named with list with components \code{lw_smooth} (modified log
   \eqn{k}).
 }
 \description{
-VGIS: Very good importance sampling
+Very good importance sampling (VGIS)
 }
 \details{
 See the 'VGIS-LOO' section in \code{\link{loo-package}}.

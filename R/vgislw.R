@@ -1,4 +1,4 @@
-#' VGIS: Very good importance sampling
+#' Very good importance sampling (VGIS)
 #'
 #' @export
 #' @param lw a matrix or vector of log weights. For for computing LOO \code{lw =
