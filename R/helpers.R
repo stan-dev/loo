@@ -1,3 +1,30 @@
+#' @importFrom matrixStats colVars
+.pointwise_waic <- function(log_lik) {
+  lpd <- logColMeansExp(log_lik)
+  p_waic <- colVars(log_lik)
+  elpd_waic <- lpd - p_waic
+  waic <- .ic(elpd_waic)
+  nlist(elpd_waic, p_waic, waic)
+}
+.pointwise_loo <- function(log_lik, vgis) {
+  # vgis is output from vgisloo()
+  lpd <- logColMeansExp(log_lik)
+  elpd_loo <- vgis$loos
+  p_loo <- lpd - elpd_loo
+  looic <- .ic(elpd_loo)
+  nlist(elpd_loo, p_loo, looic)
+}
+.totals <- function(pointwise) {
+  N <- length(pointwise[[1L]])
+  total  <- unlist_lapply(pointwise, sum)
+  se <- sqrt(N * unlist_lapply(pointwise, var))
+  as.list(c(total, se))
+}
+.ic <- function(elpd) {
+  stopifnot(is.vector(elpd), is.numeric(elpd))
+  -2 * elpd
+}
+
 #' @importFrom matrixStats colLogSumExps
 logColMeansExp <- function(x) {
   # should be more stable than log(colMeans(exp(x)))
@@ -11,6 +38,11 @@ qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
   if (!lower.tail)
     p <- 1 - p
   mu + beta * ((1 - p)^(-xi) - 1) / xi
+}
+
+lx <- function(a, x) {
+  k <- mean.default(log1p(-a * x))
+  log(-a / k) - k - 1
 }
 
 # named lists
@@ -48,11 +80,19 @@ vapply_seq <- function(L, FUN, ...) {
 }
 
 cbind_list <- function(x) {
-  stopifnot(is.list(x))
   do.call(cbind, x)
 }
 
-lx <- function(a, x) {
-  k <- mean.default(log(1 - a * x))
-  log(-a / k) - k - 1
+c_list <- function(x) {
+  do.call(c, x)
+}
+
+# first n odd numbers
+odds <- function(n) {
+  seq(1, by = 2, len = n)
+}
+
+# first n even numbers
+evens <- function(n) {
+  seq(2, by = 2, len = n)
 }

@@ -32,8 +32,8 @@ gpdfit <- function(x) {
   b <- 1 / x[n] + (1 - sqrt(m / seq_min_half(m))) / prior / x[floor(n / 4 + 0.5)]
   L <- vapply_seq(m, function(i) n * lx(b[i], x))
   w <- 1 / vapply_seq(m, function(i) sum(exp(L - L[i])))
-  b <- sum(b * w)
-  k <- mean.default(log(1 - b * x))
-  sigma <- -k / b
+  bdotw <- sum(b * w)
+  k <- mean.default(log1p(-bdotw * x))
+  sigma <- -k / bdotw
   nlist(k, sigma)
 }

@@ -93,7 +93,6 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   if (!is.matrix(lw))
     lw <- as.matrix(lw)
   K <- ncol(lw)
-  K2 <- 2 * K
   if (.Platform$OS.type != "windows") {
     vgis_out <- mclapply(X = 1:K, FUN = .vgis, mc.cores = cores)
   } else {
@@ -103,7 +102,7 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   }
   # extract and return modified log weights and gPd shape param k estimates
   ux <- unlist(vgis_out, recursive = FALSE, use.names = FALSE)
-  lw_smooth <- cbind_list(ux[seq(1, K2, 2)])
-  pareto_k <- do.call(c, ux[seq(2, K2, 2)])
+  lw_smooth <- cbind_list(ux[odds(K)])
+  pareto_k <- c_list(ux[evens(K)])
   nlist(lw_smooth, pareto_k)
 }
