@@ -89,6 +89,7 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
     list(lwx, k)
   }
 
+  stopifnot(is.numeric(lw))
   if (!is.matrix(lw))
     lw <- as.matrix(lw)
   K <- ncol(lw)

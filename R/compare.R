@@ -37,11 +37,12 @@
 #'
 
 compare <- function(a, b) {
-  cls <- class(a)
-  if (!inherits(b, cls))
-    stop("'a' and 'b' should have the same class", call. = FALSE)
-  if (cls != "loo")
-    stop("'a' and 'b' should be of class 'loo'")
+  namea <- deparse(substitute(a))
+  nameb <- deparse(substitute(b))
+  if (!is.loo(a))
+    stop(paste(namea, "does not have class 'loo'"))
+  if (!is.loo(b))
+    stop(paste(nameb, "does not have class 'loo'"))
 
   pa <- a$pointwise
   pb <- b$pointwise
@@ -49,13 +50,13 @@ compare <- function(a, b) {
   Nb <- nrow(pb)
   if (Na != Nb) {
     msg <- "Models being compared should have the same number of data points."
-    stop(paste(msg, "Found N (model a) =", Na, "and N (model b) =", Nb))
+    msg <- paste(msg, "Found: for", namea, "N =", Na, "and for", nameb, "N =", Nb)
+    stop(msg)
   }
   sqrtN <- sqrt(Na)
   ind <- grep("^elpd", colnames(pa))
   diff <- pb[, ind] - pa[, ind]
   comp <- list(elpd_diff = sum(diff), se = sqrtN * sd(diff))
   class(comp) <- "compare.loo"
-  attr(comp, "log_lik_dim") <- attr(a, "log_lik_dim")
   comp
 }

@@ -31,6 +31,10 @@ nlist <- function(...) {
   out
 }
 
+is.loo <- function(x) {
+  inherits(x, "loo")
+}
+
 unlist_lapply <- function(X, FUN, ...) {
   unlist(lapply(X, FUN, ...), use.names = FALSE)
 }

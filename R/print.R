@@ -26,10 +26,6 @@ print.loo <- function(x, ..., digits = 1) {
 #' @rdname print.loo
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
-  dims <- attr(x, "log_lik_dim")
-  if (!is.null(dims)) {
-    cat(paste("Computed from", dims[1], "by", dims[2], "log-likelihood matrix\n\n"))
-  }
   ux <- unlist(x)
   out <- format(round(ux, digits), nsmall = digits)
   print(out, quote = FALSE)
