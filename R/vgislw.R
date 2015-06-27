@@ -100,9 +100,16 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
     on.exit(stopCluster(cl))
     vgis_out <- parLapply(cl, X = 1:K, fun = .vgis)
   }
-  # extract and return modified log weights and gPd shape param k estimates
+
+  # Extract and return modified log weights and gPd shape param k estimates.
+  # vgis_out is a list of length N=ncol(lw). each of the N elements of vgis_out
+  # is itself a list of length 2. the first element is a vector of length
+  # S=nrow(lw) containing the modified log weights and the second element is the
+  # estimate of the pareto shape parameter k.
   ux <- unlist(vgis_out, recursive = FALSE, use.names = FALSE)
-  lw_smooth <- cbind_list(ux[odds(K)])
-  pareto_k <- c_list(ux[evens(K)])
+  # ux is now a list of length 2*N. the odd elements contain the modified log
+  # weights and the even elements contain the pareto k estimates
+  lw_smooth <- cbind_list(ux[nodds(K)])
+  pareto_k <- unlist(ux[nevens(K)])
   nlist(lw_smooth, pareto_k)
 }

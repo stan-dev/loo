@@ -23,7 +23,7 @@ qgpd_ans <- c(0, 1/3, 1, 3, Inf)
 
 # odds and evens
 nn <- 20
-odds_evens_val <- list(odds(nn), evens(nn))
+odds_evens_val <- list(nodds(nn), nevens(nn))
 odds_evens_ans <- list(seq(from = 1, to = 2 * nn, by = 2),
                        seq(from = 2, to = 2 * nn, by = 2))
 

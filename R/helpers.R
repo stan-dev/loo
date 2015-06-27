@@ -80,19 +80,21 @@ vapply_seq <- function(L, FUN, ...) {
 }
 
 cbind_list <- function(x) {
+  # cbind together the elements of a list
   do.call(cbind, x)
 }
 
 c_list <- function(x) {
+  # concatenate elements of a list into a vector
   do.call(c, x)
 }
 
 # first n odd numbers
-odds <- function(n) {
+nodds <- function(n) {
   seq(1, by = 2, len = n)
 }
 
 # first n even numbers
-evens <- function(n) {
+nevens <- function(n) {
   seq(2, by = 2, len = n)
 }
