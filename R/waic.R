@@ -38,8 +38,8 @@
 waic <- function(log_lik) {
   if (!is.matrix(log_lik))
     stop('log_lik should be a matrix')
-  pointwise <- .pointwise_waic(log_lik)
-  out <- .totals(pointwise)
+  pointwise <- pointwise_waic(log_lik)
+  out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
   out$pointwise <- cbind_list(pointwise)

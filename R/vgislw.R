@@ -10,11 +10,6 @@
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
 #'   distribution.
-#' @param thresh when used for the generalized pareto fit, the largest
-#'   \code{100*wcp}\% of the importance weights are modified according to
-#'   \code{pmax(x, max(x) - thresh)} for numerical stability.
-#' @param kmax maximum allowed value for the generalized Pareto shape parameter
-#'   \eqn{k}.
 #' @param wtrunc for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
 #' @param cores the number of cores to use for parallelization.
@@ -36,7 +31,7 @@
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
+vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
@@ -44,72 +39,50 @@ vgislw <- function(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
 
-  .vgis <- function(i) {
-    x <- lw[, i]
-    S <- length(x)
+  .vgis <- function(n) {
+    x <- lw[, n]
     # split into body and right tail
-    cutoff <- quantile(x, 1 - wcp, names = FALSE)
-    cutoff <- max(cutoff, MIN_CUTOFF)
-    x_cut <- x > cutoff
-    xbody <- x[!x_cut]
-    xtail <- x[x_cut]
-    tail_len <- length(xtail)
+    cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
+    above_cut <- x > cutoff
+    x_body <- x[!above_cut]
+    x_tail <- x[above_cut]
+    tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH) {
       # too few tail samples to fit gPd
-      xnew <- x
+      x_new <- x
       k <- Inf
     } else {
-      # store order of tail samples
-      tail_ord <- order(xtail)
-      # fit gPd to the right tail samples
-      xtail <- pmax(xtail, max(xtail) - thresh)
+      # store order of tail samples, fit gPd to the right tail samples, compute
+      # order statistics for the fit, remap back to the original order, join
+      # body and gPd smoothed tail
+      tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
-      fit <- gpdfit(exp(xtail) - exp_cutoff)
-      k <- min(fit$k, kmax)
-      # compute order statistics for the fit
-      qq <- qgpd(seq_min_half(tail_len)/tail_len, xi = k, beta = fit$sigma)
-      qq <- qq + exp_cutoff
-      # remap back to the original order
+      fit <- gpdfit(exp(x_tail) - exp_cutoff)
+      k <- fit$k
+      prb <- seq_min_half(tail_len)/tail_len
+      qq <- qgpd(p = prb, xi = k, beta = fit$sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
-      # join body and gPd smoothed tail
-      xnew <- x
-      xnew[!x_cut] <- xbody
-      xnew[x_cut] <- smoothed_tail
+      x_new <- x
+      x_new[!above_cut] <- x_body
+      x_new[above_cut] <- smoothed_tail
     }
-    if (wtrunc > 0) {
-      # truncate
-      logS <- log(S)
-      lwtrunc <- wtrunc * logS - logS + logSumExp(xnew)
-      xnew[xnew > lwtrunc] <- lwtrunc
-    }
-    # renormalize weights
-    lwx <- xnew - logSumExp(xnew)
-    # return log weights and tail index k
-    list(lwx, k)
+    # truncate and renormalize log weights, and return log weights and pareto k
+    if (wtrunc > 0)
+      lw_new <- lw_truncate(x_new, wtrunc)
+    lw_new <- lw_normalize(lw_new)
+    list(lw_new, k)
   }
 
-  stopifnot(is.numeric(lw))
   if (!is.matrix(lw))
     lw <- as.matrix(lw)
-  K <- ncol(lw)
+  N <- ncol(lw)
   if (.Platform$OS.type != "windows") {
-    vgis_out <- mclapply(X = 1:K, FUN = .vgis, mc.cores = cores)
+    vgis <- mclapply(X = 1:N, FUN = .vgis, mc.cores = cores)
   } else {
     cl <- makePSOCKcluster(cores)
     on.exit(stopCluster(cl))
-    vgis_out <- parLapply(cl, X = 1:K, fun = .vgis)
+    vgis <- parLapply(cl, X = 1:N, fun = .vgis)
   }
-
-  # Extract and return modified log weights and gPd shape param k estimates.
-  # vgis_out is a list of length N=ncol(lw). each of the N elements of vgis_out
-  # is itself a list of length 2. the first element is a vector of length
-  # S=nrow(lw) containing the modified log weights and the second element is the
-  # estimate of the pareto shape parameter k.
-  ux <- unlist(vgis_out, recursive = FALSE, use.names = FALSE)
-  # ux is now a list of length 2*N. the odd elements contain the modified log
-  # weights and the even elements contain the pareto k estimates
-  lw_smooth <- cbind_list(ux[nodds(K)])
-  pareto_k <- unlist(ux[nevens(K)])
-  nlist(lw_smooth, pareto_k)
+  .vgis_out(vgis)
 }

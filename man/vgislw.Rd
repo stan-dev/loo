@@ -4,8 +4,7 @@
 \alias{vgislw}
 \title{Very good importance sampling (VGIS)}
 \usage{
-vgislw(lw, wcp = 0.2, thresh = 100, kmax = 2, wtrunc = 3/4,
-  cores = parallel::detectCores())
+vgislw(lw, wcp = 0.2, wtrunc = 3/4, cores = parallel::detectCores())
 }
 \arguments{
 \item{lw}{a matrix or vector of log weights. For for computing LOO \code{lw =
@@ -18,13 +17,6 @@ one-column matrix.)}
 Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 from which to estimate the parameters of the generalized Pareto
 distribution.}
-
-\item{thresh}{when used for the generalized pareto fit, the largest
-\code{100*wcp}\% of the importance weights are modified according to
-\code{pmax(x, max(x) - thresh)} for numerical stability.}
-
-\item{kmax}{maximum allowed value for the generalized Pareto shape parameter
-\eqn{k}.}
 
 \item{wtrunc}{for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}

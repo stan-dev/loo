@@ -1,30 +1,4 @@
-#' @importFrom matrixStats colVars
-.pointwise_waic <- function(log_lik) {
-  lpd <- logColMeansExp(log_lik)
-  p_waic <- colVars(log_lik)
-  elpd_waic <- lpd - p_waic
-  waic <- .ic(elpd_waic)
-  nlist(elpd_waic, p_waic, waic)
-}
-.pointwise_loo <- function(log_lik, vgis) {
-  # vgis is output from vgisloo()
-  lpd <- logColMeansExp(log_lik)
-  elpd_loo <- vgis$loos
-  p_loo <- lpd - elpd_loo
-  looic <- .ic(elpd_loo)
-  nlist(elpd_loo, p_loo, looic)
-}
-.totals <- function(pointwise) {
-  N <- length(pointwise[[1L]])
-  total  <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
-  as.list(c(total, se))
-}
-.ic <- function(elpd) {
-  stopifnot(is.vector(elpd), is.numeric(elpd))
-  -2 * elpd
-}
-
+# waic and loo helpers ----------------------------------------------------
 #' @importFrom matrixStats colLogSumExps
 logColMeansExp <- function(x) {
   # should be more stable than log(colMeans(exp(x)))
@@ -32,8 +6,33 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - log(S)
 }
 
-# Inverse-CDF of generalized Pareto distribution
-# (formula from Wikipedia)
+#' @importFrom matrixStats colVars
+pointwise_waic <- function(log_lik) {
+  lpd <- logColMeansExp(log_lik)
+  p_waic <- colVars(log_lik)
+  elpd_waic <- lpd - p_waic
+  waic <- -2 * elpd_waic
+  nlist(elpd_waic, p_waic, waic)
+}
+pointwise_loo <- function(log_lik, vgis) {
+  # vgis is output from vgisloo()
+  lpd <- logColMeansExp(log_lik)
+  elpd_loo <- vgis$loos
+  p_loo <- lpd - elpd_loo
+  looic <- -2 * elpd_loo
+  nlist(elpd_loo, p_loo, looic)
+}
+totals <- function(pointwise) {
+  N <- length(pointwise[[1L]])
+  total  <- unlist_lapply(pointwise, sum)
+  se <- sqrt(N * unlist_lapply(pointwise, var))
+  as.list(c(total, se))
+}
+
+
+# VGIS helpers ------------------------------------------------------------
+
+# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
   if (!lower.tail)
     p <- 1 - p
@@ -45,56 +44,33 @@ lx <- function(a, x) {
   log(-a / k) - k - 1
 }
 
-# named lists
-nlist <- function(...) {
-  m <- match.call()
-  out <- list(...)
-  no_names <- is.null(names(out))
-  has_name <- if (no_names)
-    FALSE else nzchar(names(out))
-  if (all(has_name))
-    return(out)
-  nms <- as.character(m)[-1]
-  if (no_names) {
-    names(out) <- nms
-  } else {
-    names(out)[!has_name] <- nms[!has_name]
-  }
-  out
+#' @importFrom matrixStats logSumExp
+lw_normalize <- function(y) {
+  y - logSumExp(y)
+}
+lw_truncate <- function(y, wtrunc) {
+  logS <- log(length(y))
+  lwtrunc <- wtrunc * logS - logS + logSumExp(y)
+  y[y > lwtrunc] <- lwtrunc
+  y
+}
+lw_cutpoint <- function(y, wcp, min_cut) {
+  cp <- quantile(y, 1 - wcp, names = FALSE)
+  max(cp, min_cut)
 }
 
-is.loo <- function(x) {
-  inherits(x, "loo")
-}
-
-unlist_lapply <- function(X, FUN, ...) {
-  unlist(lapply(X, FUN, ...), use.names = FALSE)
-}
-
-seq_min_half <- function(L) {
-  seq_len(L) - 0.5
-}
-
-vapply_seq <- function(L, FUN, ...) {
-  vapply(1:L, FUN, FUN.VALUE = 0, ...)
-}
-
-cbind_list <- function(x) {
-  # cbind together the elements of a list
-  do.call(cbind, x)
-}
-
-c_list <- function(x) {
-  # concatenate elements of a list into a vector
-  do.call(c, x)
-}
-
-# first n odd numbers
-nodds <- function(n) {
-  seq(1, by = 2, len = n)
-}
-
-# first n even numbers
-nevens <- function(n) {
-  seq(2, by = 2, len = n)
+# The parallelization functions mclapply and parLapply return a list of lists:
+# vgis is a list of length N=ncol(lw). Each of the N elements of vgis is itself
+# a list of length 2. In each of these N lists of length 2 the first component
+# is a vector of length S=nrow(lw) containing the modified log weights and the
+# second component is the estimate of the pareto shape parameter k. ux is now a
+# list of length 2*N. the odd elements contain the modified log weights and the
+# even elements contain the pareto k estimates. This function cbinds the log
+# weight vectors into a matrix and concatenates the k estimates into a vector.
+.vgis_out <- function(vgis) {
+  L <- length(vgis)
+  ux <- unlist(vgis, recursive = FALSE, use.names = FALSE)
+  lw_smooth <- cbind_list(ux[nodds(L)])
+  pareto_k <- unlist(ux[nevens(L)])
+  nlist(lw_smooth, pareto_k)
 }

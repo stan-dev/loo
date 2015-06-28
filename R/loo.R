@@ -14,11 +14,6 @@
 #' generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
 #' sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
 #' the generalized Pareto distribution.}
-#' \item{\code{thresh = 100}}{when used for the generalized Pareto fit, the
-#' largest \code{100*wcp}\% of the importance weights are modified according to
-#' \code{pmax(x, max(x) - thresh)} for numerical stability.}
-#' \item{\code{kmax = 2}}{the maximum allowed value for the generalized Pareto
-#' shape parameter \eqn{k}.}
 #' \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 #' \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
 #'\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
@@ -65,8 +60,8 @@ loo <- function(log_lik, ...) {
   if (!is.matrix(log_lik))
     stop('log_lik should be a matrix')
   vgis <- vgisloo(log_lik, ...)
-  pointwise <- .pointwise_loo(log_lik, vgis)
-  out <- .totals(pointwise)
+  pointwise <- pointwise_loo(log_lik, vgis)
+  out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
   out$pointwise <- cbind_list(pointwise)
