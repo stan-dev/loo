@@ -31,10 +31,10 @@ gpdfit <- function(x) {
   M <- 80 + floor(sqrt(N))  # note: original paper used  20 + floor(sqrt(n))
   mseq <- seq_len(M)
   sM <- 1 - sqrt(M / (mseq - 0.5))
-  nflr <- floor(N / 4 + 0.5)
-  b <- 1 / x[N] + sM / prior / x[nflr]
-  L <- N * lx(b[mseq], x)
-  w <- 1 / vapply(mseq, FUN = function(j) sum(exp(L - L[j])), FUN.VALUE = 0)
+  Nflr <- floor(N / 4 + 0.5)
+  b <- 1 / x[N] + sM / prior / x[Nflr]
+  l <- N * lx(b[mseq], x)
+  w <- 1 / vapply(mseq, FUN = function(j) sum(exp(l - l[j])), FUN.VALUE = 0)
   bdotw <- sum(b * w)
   k <- mean.default(log1p(-bdotw * x))
   sigma <- -k / bdotw
