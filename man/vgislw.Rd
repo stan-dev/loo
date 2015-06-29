@@ -37,10 +37,9 @@ See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 \note{
 This function is primarily intended for internal use, but is exported
   so that users can call it directly for other purposes. Users simply
-  wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
-  function.
+  wishing to compute LOO should use the \code{\link{loo}} function.
 }
 \seealso{
-\code{\link{loo-package}}, \code{\link{loo_and_waic}}
+\code{\link{loo-package}}, \code{\link{loo}}
 }
 

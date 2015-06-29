@@ -10,9 +10,9 @@
 \method{print}{compare.loo}(x, ..., digits = 1)
 }
 \arguments{
-\item{x}{a list of class \code{'loo'} (as returned by
-\code{\link{loo_and_waic}}) or of class \code{'compare.loo'} (as returned
-by \code{\link{loo_and_waic_diff}}).}
+\item{x}{a list of class \code{'loo'} (as returned by \code{\link{loo}} or
+\code{\link{waic}}) or of class \code{'compare.loo'} (as returned by
+\code{\link{compare}}).}
 
 \item{...}{ignored.}
 
@@ -23,9 +23,5 @@ returns \code{x} invisibly.
 }
 \description{
 Print methods
-}
-\seealso{
-\code{\link{loo-package}}, \code{\link{loo_and_waic}},
-\code{\link{loo_and_waic_diff}}
 }
 

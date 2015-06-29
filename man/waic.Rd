@@ -43,7 +43,7 @@ print(waic_diff, digits = 2)
 }
 }
 \seealso{
-\code{\link{loo-package}}, \code{\link{print.loo}},
-  \code{\link{compare}}
+\code{\link{compare}}, \code{\link{print.loo}},
+\code{\link{loo-package}}
 }
 

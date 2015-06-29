@@ -37,7 +37,5 @@ vgisloo <- function(log_lik, ...) {
   lw <- -1 * log_lik
   vgis <- vgislw(lw, ...)
   loos <- colLogSumExps(log_lik + vgis$lw_smooth)
-#   loo <- sum(loos)
-#   nlist(loo, loos, pareto_k = vgis$pareto_k)
   nlist(loos, pareto_k = vgis$pareto_k)
 }

@@ -5,9 +5,9 @@ context("gpdfit")
 set.seed(123)
 x <- rexp(100)
 gpdfit_val <- unlist(gpdfit(x))
-gpdfit_ans <- c(k = 0.02740303, sigma = 1.018298)
-gpdfit_diff <- gpdfit_val - gpdfit_ans
+gpdfit_ans <- structure(c(0.0274030348712631, 1.01829821712701),
+                        .Names = c("k", "sigma"))
 
 test_that("gpdfit returns correct result", {
-  expect_true(all(gpdfit_diff < 1e-6))
+  expect_equal(gpdfit_val, gpdfit_ans)
 })

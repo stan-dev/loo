@@ -39,9 +39,17 @@ qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
   mu + beta * ((1 - p)^(-xi) - 1) / xi
 }
 
+# lx <- function(a, x) {
+#   k <- mean.default(log1p(-a * x))
+#   log(-a / k) - k - 1
+# }
 lx <- function(a, x) {
-  k <- mean.default(log1p(-a * x))
-  log(-a / k) - k - 1
+  # vectorized version of old lx
+  b <- -a
+  bx <- outer(x, b)
+  d <- dim(bx)
+  k <- .colMeans(log1p(bx), d[1], d[2])
+  log(b / k) - k - 1
 }
 
 #' @importFrom matrixStats logSumExp
@@ -49,6 +57,8 @@ lw_normalize <- function(y) {
   y - logSumExp(y)
 }
 lw_truncate <- function(y, wtrunc) {
+  if (wtrunc == 0)
+    return(y)
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
   y[y > lwtrunc] <- lwtrunc

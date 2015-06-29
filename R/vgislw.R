@@ -23,22 +23,15 @@
 #'
 #' @note This function is primarily intended for internal use, but is exported
 #'   so that users can call it directly for other purposes. Users simply
-#'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
-#'   function.
+#'   wishing to compute LOO should use the \code{\link{loo}} function.
 #'
-#' @seealso \code{\link{loo-package}}, \code{\link{loo_and_waic}}
+#' @seealso \code{\link{loo-package}}, \code{\link{loo}}
 #'
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
-
-  # minimal cutoff value. there must be at least 5 log-weights larger than this
-  # in order to fit the generalized Pareto distribution (gPd) to the tail
-  MIN_CUTOFF <- -700
-  MIN_TAIL_LENGTH <- 5
-
   .vgis <- function(n) {
     x <- lw[, n]
     # split into body and right tail
@@ -59,7 +52,7 @@ vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       exp_cutoff <- exp(cutoff)
       fit <- gpdfit(exp(x_tail) - exp_cutoff)
       k <- fit$k
-      prb <- seq_min_half(tail_len)/tail_len
+      prb <- (seq_len(tail_len) - 0.5) / tail_len
       qq <- qgpd(p = prb, xi = k, beta = fit$sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
@@ -67,12 +60,17 @@ vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       x_new[!above_cut] <- x_body
       x_new[above_cut] <- smoothed_tail
     }
-    # truncate and renormalize log weights, and return log weights and pareto k
-    if (wtrunc > 0)
-      lw_new <- lw_truncate(x_new, wtrunc)
+    # truncate (if wtrunc>0) and renormalize log weights,
+    # return log weights and pareto k
+    lw_new <- lw_truncate(x_new, wtrunc)
     lw_new <- lw_normalize(lw_new)
     list(lw_new, k)
   }
+
+  # minimal cutoff value. there must be at least 5 log-weights larger than this
+  # in order to fit the generalized Pareto distribution (gPd) to the tail
+  MIN_CUTOFF <- -700
+  MIN_TAIL_LENGTH <- 5
 
   if (!is.matrix(lw))
     lw <- as.matrix(lw)

@@ -1,36 +1,5 @@
 # Convenience functions ---------------------------------------------------
 
-is.loo <- function(x) {
-  inherits(x, "loo")
-}
-
-unlist_lapply <- function(X, FUN, ...) {
-  unlist(lapply(X, FUN, ...), use.names = FALSE)
-}
-
-seq_min_half <- function(L) {
-  seq_len(L) - 0.5
-}
-
-vapply_seq <- function(L, FUN, ...) {
-  vapply(1:L, FUN, FUN.VALUE = 0, ...)
-}
-
-# cbind together the elements of a list
-cbind_list <- function(x) {
-  do.call(cbind, x)
-}
-
-# first n odd numbers
-nodds <- function(n) {
-  seq(1, by = 2, len = n)
-}
-
-# first n even numbers
-nevens <- function(n) {
-  seq(2, by = 2, len = n)
-}
-
 # named lists
 nlist <- function(...) {
   m <- match.call()
@@ -47,4 +16,27 @@ nlist <- function(...) {
     names(out)[!has_name] <- nms[!has_name]
   }
   out
+}
+
+is.loo <- function(x) {
+  inherits(x, "loo")
+}
+
+unlist_lapply <- function(X, FUN, ...) {
+  unlist(lapply(X, FUN, ...), use.names = FALSE)
+}
+
+# cbind together the elements of a list
+cbind_list <- function(x) {
+  do.call(cbind, x)
+}
+
+# first n odd numbers
+nodds <- function(n) {
+  seq(1, by = 2, len = n)
+}
+
+# first n even numbers
+nevens <- function(n) {
+  seq(2, by = 2, len = n)
 }

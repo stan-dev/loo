@@ -18,8 +18,9 @@
 #' measures}
 #' }
 #'
-#' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
-#'   \code{\link{compare}}
+#' @seealso \code{\link{compare}}, \code{\link{print.loo}},
+#' \code{\link{loo-package}}
+#'
 #'
 #' @examples
 #' \dontrun{
