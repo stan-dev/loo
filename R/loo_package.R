@@ -189,5 +189,5 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-#'
+#' @importFrom stats sd var quantile
 NULL
