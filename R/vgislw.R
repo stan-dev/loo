@@ -1,7 +1,7 @@
 #' Very good importance sampling (VGIS)
 #'
 #' @export
-#' @param lw a matrix or vector of log weights. For for computing LOO \code{lw =
+#' @param lw a matrix or vector of log weights. For computing LOO \code{lw =
 #'   -log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a

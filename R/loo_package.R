@@ -162,8 +162,9 @@
 #' \emph{Bayesian Statistics 4}, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
 #' and A. F. M. Smith, 147-167. Oxford University Press.
 #'
-#' Gelman, A., Hwang, J., and Vehtari, A. (2013). Understandarding predictive
-#' information criteria for Bayesian models. \emph{Statistics and Computing}.
+#' Gelman, A., Hwang, J., and Vehtari, A. (2014). Understandarding predictive
+#' information criteria for Bayesian models. \emph{Statistics and Computing} 
+#' \strong{24}, 997-1016.
 #'
 #' Ionides, E. L. (2008). Truncated importance sampling. \emph{Journal of
 #' Computational and Graphical Statistics} \strong{17}, 295-311.
@@ -180,6 +181,8 @@
 #'
 #' Stan Development Team (2014b). RStan, version 2.6.
 #' \url{mc-stan.org/rstan.html}.
+#'
+#' Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.
