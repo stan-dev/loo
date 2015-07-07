@@ -16,7 +16,7 @@
 #' the generalized Pareto distribution.}
 #' \item{\code{wtrunc = 3/4}}{for truncating very large weights to
 #' \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
-#'\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
+#' \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
 #'      use for parallelization.}
 #'}
 #'

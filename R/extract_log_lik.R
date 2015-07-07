@@ -20,10 +20,10 @@
 #'   block so that the computations are carried out only once per iteration
 #'   rather than once per HMC leapfrog step.
 #'
-#'   For example, the following is the \code{generated quantities} block for computing
-#'   and saving the log-likelihood for a linear regression model with \code{N}
-#'   data points, outcome \code{y}, predictor matrix \code{X}, coefficients
-#'   \code{beta}, and standard deviation \code{sigma}:
+#'   For example, the following is the \code{generated quantities} block for
+#'   computing and saving the log-likelihood for a linear regression model with
+#'   \code{N} data points, outcome \code{y}, predictor matrix \code{X},
+#'   coefficients \code{beta}, and standard deviation \code{sigma}:
 #'
 #'  \code{vector[N] log_lik;}
 #'
@@ -48,9 +48,10 @@ extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
     stop("Stan model does not contain samples.")
   posterior <- as.matrix(stanfit)
   nms <- colnames(posterior)
-  pattern <- paste0("^",parameter_name,"\\[")
+  pattern <- paste0("^", parameter_name, "\\[")
   keep <- grep(pattern, nms)
   log_lik <- posterior[, keep, drop = FALSE]
   colnames(log_lik) <- NULL
   log_lik
 }
+

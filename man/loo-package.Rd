@@ -10,7 +10,7 @@ This package implements the methods described in
 Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of leave-one-out
   cross-validation and WAIC for evaluating fitted Bayesian models.
 
-The package documentation is largely based on the contents of the paper.
+The package documentation is largely based on excerpts from the paper.
 }
 \section{Authors}{
  Aki Vethari, Andrew Gelman, Jonah Gabry.
@@ -46,8 +46,8 @@ using importance sampling (Gelfand, Dey, and Chang, 1992, Gelfand, 1996) but
 the resulting estimate is noisy, as the variance of the importance weights
 can be large or even infinite (Peruggia, 1997, Epifani et al., 2008). Here we
 propose a novel approach that provides a more accurate and reliable estimate
-using importance weights that are smoothed by fitting a Pareto distribution to
-the upper tail of the distribution of the importance weights.
+using importance weights that are smoothed by fitting a Pareto distribution
+to the upper tail of the distribution of the importance weights.
 
 WAIC (the widely applicable or Watanabe-Akaike information criterion;
 Watanabe, 2010) can be viewed as an improvement on the deviance information
@@ -155,6 +155,13 @@ Importance sampling is likely to work less well if the marginal posterior
 different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
+
+
+For more details and examples see:
+
+Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
+leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
+models.
 }
 \references{
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion

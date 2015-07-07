@@ -31,10 +31,10 @@ Stan does not automatically compute and store the log-likelihood. It
   block so that the computations are carried out only once per iteration
   rather than once per HMC leapfrog step.
 
-  For example, the following is the \code{generated quantities} block for computing
-  and saving the log-likelihood for a linear regression model with \code{N}
-  data points, outcome \code{y}, predictor matrix \code{X}, coefficients
-  \code{beta}, and standard deviation \code{sigma}:
+  For example, the following is the \code{generated quantities} block for
+  computing and saving the log-likelihood for a linear regression model with
+  \code{N} data points, outcome \code{y}, predictor matrix \code{X},
+  coefficients \code{beta}, and standard deviation \code{sigma}:
 
  \code{vector[N] log_lik;}
 

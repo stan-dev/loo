@@ -25,8 +25,9 @@ Pareto distribution.}
 }
 }
 \description{
-\code{\link{vgislw}} performs very good importance sampling. \code{vgisloo} calls
-\code{vgislw} and does useful post-processing for computing LOO and WAIC.
+\code{\link{vgislw}} performs very good importance sampling. \code{vgisloo}
+calls \code{vgislw} and does useful post-processing for computing LOO and
+WAIC.
 }
 \details{
 See the 'VGIS-LOO' section in \code{\link{loo-package}}.
