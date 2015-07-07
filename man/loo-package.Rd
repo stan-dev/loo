@@ -46,8 +46,8 @@ using importance sampling (Gelfand, Dey, and Chang, 1992, Gelfand, 1996) but
 the resulting estimate is noisy, as the variance of the importance weights
 can be large or even infinite (Peruggia, 1997, Epifani et al., 2008). Here we
 propose a novel approach that provides a more accurate and reliable estimate
-using importance weights that are smoothed using a Pareto distribution fit to
-the upper tail of the distribution of importance weights.
+using importance weights that are smoothed by fitting a Pareto distribution to
+the upper tail of the distribution of the importance weights.
 
 WAIC (the widely applicable or Watanabe-Akaike information criterion;
 Watanabe, 2010) can be viewed as an improvement on the deviance information
@@ -61,8 +61,8 @@ effective number of parameters in a model and it is not defined for singular
 models. WAIC is fully Bayesian and closely approximates Bayesian
 cross-validation. Unlike DIC, WAIC is invariant to parametrization and also
 works for singular models. WAIC is asymptotically equal to LOO, and can thus
-be used as an approximation of LOO. In the finite case, WAIC often gives
-similar estimates as LOO, but for influential observations WAIC
+be used as an approximation to LOO. In the finite case, WAIC and LOO often
+give very similar estimates, but for influential observations WAIC
 underestimates the effect of leaving out one observation.
 
 One advantage of AIC and DIC has been their computational simplicity. In this
@@ -72,7 +72,7 @@ to enter routine statistical practice. We compute LOO using very good
 importance sampling (VGIS), a new procedure for regularizing importance
 weights (Vehtari and Gelman, 2015). As a byproduct of our calculations, we
 also obtain approximate standard errors for estimated predictive errors and
-for comparing of predictive errors between two models.
+for the comparison of predictive errors between two models.
 }
 
 \section{VGIS-LOO}{
@@ -85,10 +85,12 @@ importance weights. We briefly review the motivation and steps of VGIS here.
 The distribution of the importance weights used in LOO may have a long right
 tail. We use the empirical Bayes estimate of Zhang and Stephens (2009) to fit
 a generalized Pareto distribution (gPd) to the tail (20\% largest importance
-ratios). By examining the shape parameter \eqn{k} of the fitted gPd, we are able to obtain a sample based estimate of the existance
-of the moments (Koopman et al, 2009). This extends the diagnostic approach of
-Peruggia (1997) and Epifani et al. (2008) to be used routinely with
-(importance sampling) LOO for any model with a factorizing likelihood.
+ratios). By examining the shape parameter \eqn{k} of the fitted gPd, we are
+able to obtain sample based estimates of the existance of the moments
+(Koopman et al, 2009). This extends the diagnostic approach of Peruggia
+(1997) and Epifani et al. (2008) to be used routinely with
+importance-sampling LOO for any model with a factorizing likelihood.
+
 Epifani et al. (2008) show that when estimating the leave-one-out predictive
 density, the central limit theorem holds if the variance of the weight
 distribution is finite. These results can be extended using the generalized
@@ -96,18 +98,17 @@ central limit theorem for stable distributions. Thus, even if the variance of
 the importance weight distribution is infinite, if the mean exists the
 estimate's accuracy improves when additional draws are obtained. When the
 tail of the weight distribution is long, a direct use of importance sampling
-is sensitive to the one (or several) largest value(s). By fitting a
-gPd to the upper tail of the importance weights we smooth these values.
-The procedure goes as follows:
+is sensitive to one or few largest values. By fitting a gPd to the upper tail
+of the importance weights we smooth these values. The procedure goes as
+follows:
 
 \enumerate{
-  \item Fit the gPd to the 20\% largest
-  importance ratios \eqn{r_s}. (The computation is done separately for each
-  held-out data point \eqn{i}.) In simulation experiments with thousands and
-  tens of thousands of draws, we have found that the fit is not sensitive to
-  the specific cutoff value. For a consistent estimation, the proportion of
-  the samples above the cutoff should get smaller when the number of draws
-  increases.
+  \item Fit the gPd to the 20\% largest importance ratios \eqn{r_s}. The
+  computation is done separately for each held-out data point \eqn{i}. In
+  simulation experiments with thousands and tens of thousands of draws, we
+  have found that the fit is not sensitive to the specific cutoff value (for
+  a consistent estimation the proportion of the samples above the cutoff
+  should get smaller when the number of draws increases).
 
   \item Stabilize the importance ratios by replacing the \eqn{M} largest
   ratios by the expected values of the order statistics of the fitted
@@ -120,8 +121,8 @@ The procedure goes as follows:
   the smoothed weights.
 }
 
-The above steps must be performed for each data point \eqn{i}, thus resulting
-in a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each \eqn{i}, which
+The above steps must be performed for each data point \eqn{i}. The result is
+a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each \eqn{i}, which
 in general should be better behaved than the raw importance ratios
 \eqn{r_{i}^{s}} from which they were constructed.
 
@@ -130,19 +131,17 @@ reliability of the estimates can be assessed using the estimates for the
 shape parameter \eqn{k} of the gPd.
 
 \itemize{
-  \item If \eqn{k < 1/2} the variance of the raw importance ratios
-  is finite, the central limit theorem holds, and the estimate converges
-  quickly.
+  \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
+  the central limit theorem holds, and the estimate converges quickly.
 
   \item If \eqn{k} is between 1/2 and 1 the variance of the raw importance
   ratios is infinite but the mean exists, the generalized central limit
   theorem for stable distributions holds, and the convergence of the estimate
-  is slower. The VGIS estimate has finite variance, but it may have large
-  variance.
+  is slower. The variance of the VGIS estimate is finite but may be large.
 
   \item If \eqn{k > 1} the variance and the mean of the raw ratios
   distribution do not exist. The variance of the VGIS estimate is finite but
-  it may be large.
+  may be large.
 }
 
 If the estimated tail shape parameter \eqn{k \ge 1/2}, the user should be
@@ -171,8 +170,9 @@ predictive distributions with implementation via sampling-based methods. In
 \emph{Bayesian Statistics 4}, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
 and A. F. M. Smith, 147-167. Oxford University Press.
 
-Gelman, A., Hwang, J., and Vehtari, A. (2013). Understandarding predictive
-information criteria for Bayesian models. \emph{Statistics and Computing}.
+Gelman, A., Hwang, J., and Vehtari, A. (2014). Understandarding predictive
+information criteria for Bayesian models. \emph{Statistics and Computing}
+\strong{24}, 997-1016.
 
 Ionides, E. L. (2008). Truncated importance sampling. \emph{Journal of
 Computational and Graphical Statistics} \strong{17}, 295-311.
@@ -189,6 +189,8 @@ sampling, version 2.6. \url{mc-stan.org}.
 
 Stan Development Team (2014b). RStan, version 2.6.
 \url{mc-stan.org/rstan.html}.
+
+Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.
