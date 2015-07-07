@@ -13,7 +13,7 @@ extract_log_lik(stanfit, parameter_name = "log_lik")
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
-an \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
+An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
   \eqn{S} is the number of simulations and \eqn{N} is the number of data
   points.
 }

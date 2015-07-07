@@ -7,14 +7,13 @@
 loo_and_waic_diff(loo1, loo2)
 }
 \arguments{
-\item{loo1,loo2}{lists (of class \code{'loo'}) returned by
-\code{\link{loo_and_waic}}.}
+\item{loo1,loo2}{lists (of class \code{'loo'}).}
 }
 \value{
 a named list with class \code{'compare.loo'}.
 }
 \description{
-Compare two fitted models on LOO and WAIC
+This function is deprecated. Please use \code{\link{compare}} instead.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in
@@ -31,17 +30,6 @@ When comparing two fitted models, we can estimate the difference in
   differences of deviances to a Chi-squared distribution, a practice derived
   for Gaussian linear models or asymptotically and which only applies to
   nested models in any case.
-}
-\examples{
-\dontrun{
-loo1 <- loo_and_waic(log_lik1)
-loo2 <- loo_and_waic(log_lik2)
-diff <- loo_and_waic_diff(loo1, loo2)
-print(diff, digits = 1)
-}
-}
-\seealso{
-\code{\link{loo_and_waic}}, \code{\link{print.compare.loo}}
 }
 \keyword{internal}
 

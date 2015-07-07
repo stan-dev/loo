@@ -52,13 +52,3 @@ unlist_lapply <- function(X, FUN, ...) {
 cbind_list <- function(x) {
   do.call(cbind, x)
 }
-
-# first n odd numbers
-nodds <- function(n) {
-  seq(1, by = 2, len = n)
-}
-
-# first n even numbers
-nevens <- function(n) {
-  seq(2, by = 2, len = n)
-}

@@ -45,18 +45,8 @@ each of these measures, standard errors, and the estimated shape parameter
 distribution.
 }
 \description{
-This function is deprecated. Please use \code{loo} or \code{waic} instead.
-}
-\examples{
-\dontrun{
-log_lik <- extract_log_lik(stanfit)
-loo <- loo_and_waic(log_lik)
-print(loo, digits = 3)
-}
-}
-\seealso{
-\code{\link{loo-package}}, \code{\link{print.loo}},
-\code{\link{loo_and_waic_diff}}
+This function is deprecated. Please use \code{\link{loo}} or
+\code{\link{waic}} instead.
 }
 \keyword{internal}
 

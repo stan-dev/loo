@@ -6,14 +6,15 @@
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
 #'
-#' @return a named list (of class \code{'loo'}) with components:
+#' @return A named list (of class \code{'loo'}) with components:
 #'
 #' \describe{
-#' \item{\code{elpd_waic}}{expected log pointwise predictive density}
-#' \item{\code{p_waic}}{estimated effective number of parameters}
-#' \item{\code{waic}}{\code{-2 * elpd_waic} (i.e., converted to the deviance
-#' scale)}
-#' \item{\code{se_elpd_waic, se_p_waic, se_waic}}{standard errors}
+#' \item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive
+#' density and standard error}
+#' \item{\code{p_waic, se_p_waic}}{estimated effective number of parameters and
+#' standard error}
+#' \item{\code{waic, se_waic}}{\code{-2 * elpd_waic} (i.e., converted to the
+#' deviance scale) and standard error}
 #' \item{\code{pointwise}}{the pointwise contributions of each of the above
 #' measures}
 #' }

@@ -23,14 +23,15 @@
 #' We recommend using the default values for the \code{vgislw} arguments unless
 #' there are problems (e.g. \code{NA} or \code{NaN} results).
 #'
-#' @return a named list (of class \code{'loo'}) with components:
+#' @return A named list (of class \code{'loo'}) with components:
 #'
 #' \describe{
-#' \item{\code{elpd_loo}}{expected log pointwise predictive density}
-#' \item{\code{p_loo}}{estimated effective number of parameters}
-#' \item{\code{looic}}{\code{-2 * elpd_loo} (i.e., converted to the deviance
-#' scale)}
-#' \item{\code{se_elpd_loo, se_p_loo, se_looic}}{standard errors}
+#' \item{\code{elpd_loo, se_elpd_loo}}{expected log pointwise predictive density
+#' and standard error}
+#' \item{\code{p_loo, se_p_loo}}{estimated effective number of parameters and
+#' standard error}
+#' \item{\code{looic, se_looic}}{\code{-2 * elpd_loo} (i.e., converted to the
+#' deviance scale) and standard error}
 #' \item{\code{pointwise}}{the pointwise contributions of each of the above
 #' measures}
 #' \item{\code{pareto_k}}{estimates of the shape parameter \eqn{k} for the

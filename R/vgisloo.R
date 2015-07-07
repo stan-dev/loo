@@ -14,8 +14,7 @@
 #'
 #' @note This function is primarily intended for internal use, but is
 #'   exported so that users can call it directly if desired. Users simply
-#'   wishing to compute LOO and WAIC should use the \code{\link{loo_and_waic}}
-#'   function.
+#'   wishing to compute LOO should use the \code{\link{loo}} function.
 #'
 #' @return \code{vgislw} returns a list with modified log weights and tail
 #'   indices. \code{vgisloo} calls \code{vgislw(lw = -log_lik,...)},
@@ -29,7 +28,7 @@
 #'
 #' @details See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 #'
-#' @seealso \code{\link{vgislw}}, \code{\link{loo_and_waic}},
+#' @seealso \code{\link{vgislw}}, \code{\link{loo}},
 #' \code{\link{loo-package}}.
 #'
 #' @importFrom matrixStats colLogSumExps

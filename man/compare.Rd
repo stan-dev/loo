@@ -10,7 +10,7 @@ compare(a, b)
 \item{a,b}{objects returned by \code{\link{loo}} or \code{\link{waic}}.}
 }
 \value{
-a named list with class \code{'compare.loo'}.
+A named list with class \code{'compare.loo'}.
 }
 \description{
 Compare two fitted models on LOO or WAIC

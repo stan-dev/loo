@@ -6,7 +6,7 @@
 #'   \code{\link{compare}}).
 #' @param ... ignored.
 #' @param digits number of significant digits to display.
-#' @return returns \code{x} invisibly.
+#' @return Returns \code{x} invisibly.
 #'
 print.loo <- function(x, ..., digits = 1) {
   dims <- attr(x, "log_lik_dim")
@@ -17,7 +17,7 @@ print.loo <- function(x, ..., digits = 1) {
   uz <- unlist(z)
   nms <- names(uz)
   ses <- grepl("se", nms)
-  out <- cbind(Estimate = uz[!ses], StdError = uz[ses])
+  out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
   out <- format(round(out, digits), nsmall = digits)
   print(out, quote = FALSE)
   invisible(x)
@@ -27,7 +27,7 @@ print.loo <- function(x, ..., digits = 1) {
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
   ux <- unlist(x)
-  names(ux) <- c("elpd_diff", "StdError")
+  names(ux) <- c("elpd_diff", "SE")
   out <- format(round(ux, digits), nsmall = digits)
   print(out, quote = FALSE)
   invisible(x)

@@ -19,7 +19,7 @@
 \item{digits}{number of significant digits to display.}
 }
 \value{
-returns \code{x} invisibly.
+Returns \code{x} invisibly.
 }
 \description{
 Print methods

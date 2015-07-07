@@ -1,6 +1,7 @@
 #' Approximate LOO-CV and WAIC for Bayesian models
 #'
-#' This function is deprecated. Please use \code{loo} or \code{waic} instead.
+#' This function is deprecated. Please use \code{\link{loo}} or
+#' \code{\link{waic}} instead.
 #'
 #' @keywords internal
 #' @export
@@ -39,16 +40,6 @@
 #' each of these measures, standard errors, and the estimated shape parameter
 #' \eqn{k} for the Pareto fit to the importance ratios for each leave-one-out
 #' distribution.
-#'
-#' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
-#' \code{\link{loo_and_waic_diff}}
-#'
-#' @examples
-#' \dontrun{
-#' log_lik <- extract_log_lik(stanfit)
-#' loo <- loo_and_waic(log_lik)
-#' print(loo, digits = 3)
-#' }
 #'
 #' @importFrom matrixStats colVars
 #'

@@ -64,7 +64,7 @@ vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     # return log weights and pareto k
     lw_new <- lw_truncate(x_new, wtrunc)
     lw_new <- lw_normalize(lw_new)
-    list(lw_new, k)
+    nlist(lw_new, k)
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this

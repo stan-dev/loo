@@ -4,7 +4,7 @@
 #'
 #' @export
 #' @param a,b objects returned by \code{\link{loo}} or \code{\link{waic}}.
-#' @return a named list with class \code{'compare.loo'}.
+#' @return A named list with class \code{'compare.loo'}.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
 #'   their expected predictive accuracy by the difference in \code{elpd_waic} or

@@ -73,14 +73,13 @@ lw_cutpoint <- function(y, wcp, min_cut) {
 # vgis is a list of length N=ncol(lw). Each of the N elements of vgis is itself
 # a list of length 2. In each of these N lists of length 2 the first component
 # is a vector of length S=nrow(lw) containing the modified log weights and the
-# second component is the estimate of the pareto shape parameter k. ux is now a
-# list of length 2*N. the odd elements contain the modified log weights and the
-# even elements contain the pareto k estimates. This function cbinds the log
-# weight vectors into a matrix and concatenates the k estimates into a vector.
+# second component is the estimate of the pareto shape parameter k. This
+# function cbinds the log weight vectors into a matrix and combines the k
+# estimates into a vector.
 .vgis_out <- function(vgis) {
-  L <- length(vgis)
-  ux <- unlist(vgis, recursive = FALSE, use.names = FALSE)
-  lw_smooth <- cbind_list(ux[nodds(L)])
-  pareto_k <- unlist(ux[nevens(L)])
+  ux <- unlist(vgis, recursive = FALSE)
+  lws <- grepl("lw", names(ux))
+  lw_smooth <- cbind_list(ux[lws])
+  pareto_k <- unlist(ux[!lws])
   nlist(lw_smooth, pareto_k)
 }
