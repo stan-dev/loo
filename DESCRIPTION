@@ -15,7 +15,7 @@ Description: We efficiently approximate leave-one-out cross-validation (LOO)
   widely applicable information criterion (WAIC).
 License: GPL (>=3)
 LazyData: TRUE
-Depends: R (>= 3.2.0)
+Depends: R (>= 3.1.2)
 Imports:
   matrixStats (>= 0.14.1),
   parallel,
