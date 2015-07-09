@@ -98,11 +98,11 @@ lw_cutpoint <- function(y, wcp, min_cut) {
     cat("\nAll Pareto k estimates OK (k < 0.5)")
   } else {
     if (count[2] != 0) {
-      txt2 <- "%) of Pareto k estimates between 0.5 and 1"
+      txt2 <- "%) Pareto k estimates between 0.5 and 1"
       .warn(paste0(count[2], " (", .fr(100 * prop[2], digits), txt2))
     }
     if (count[3] != 0) {
-      txt3 <- "%) of Pareto k estimates greater than 1"
+      txt3 <- "%) Pareto k estimates greater than 1"
       .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
     }
     .warn("See VGIS-LOO description (?'loo-package') for more information")
