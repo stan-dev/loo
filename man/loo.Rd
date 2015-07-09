@@ -38,11 +38,16 @@ and standard error}
 standard error}
 \item{\code{looic, se_looic}}{\code{-2 * elpd_loo} (i.e., converted to the
 deviance scale) and standard error}
-\item{\code{pointwise}}{the pointwise contributions of each of the above
-measures}
-\item{\code{pareto_k}}{estimates of the shape parameter \eqn{k} for the
-generaelized Pareto fit to the importance ratios for each leave-one-out
-distribution}
+\item{\code{pointwise}}{a matrix containing the pointwise contributions of each
+of the above measures}
+\item{\code{pareto_k}}{a vector containing the estimates of the shape
+parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
+for each leave-one-out distribution. See VGIS-LOO section in
+\code{\link{loo-package}} for details about interpreting \eqn{k}. (Also, by
+default, the print method for \code{'loo'} objects will provide warnings
+about problematic values of \eqn{k}. It is also possible to plot the values
+of \eqn{k} by setting the optional argument \code{plot_k} to \code{TRUE} (the
+default is not to plot). See \code{\link{print.loo}}.)}
 }
 }
 \description{
