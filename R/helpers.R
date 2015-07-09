@@ -1,4 +1,5 @@
 # waic and loo helpers ----------------------------------------------------
+
 #' @importFrom matrixStats colLogSumExps
 logColMeansExp <- function(x) {
   # should be more stable than log(colMeans(exp(x)))
@@ -82,4 +83,29 @@ lw_cutpoint <- function(y, wcp, min_cut) {
   lw_smooth <- cbind_list(ux[lws])
   pareto_k <- unlist(ux[!lws])
   nlist(lw_smooth, pareto_k)
+}
+
+
+# print helpers -----------------------------------------------------------
+fr <- function(x, digits) format(round(x, digits), nsmall = digits)
+warn <- function(..., call. = FALSE) warning(..., call. = call.)
+k_messages <- function(k, digits = 1) {
+  brks <- c(-Inf, 0.5, 1, Inf)
+  kcut <- cut(k, breaks = brks, right = FALSE)
+  count <- table(kcut)
+  prop <- prop.table(count)
+  if (sum(count[2:3]) == 0) {
+    cat("\nAll Pareto k estimates OK (k < 0.5)")
+  } else {
+    if (count[2] != 0) {
+      txt2 <- "%) of Pareto k estimates between 0.5 and 1"
+      warn(paste0(count[2], " (", fr(100 * prop[2], digits), txt2))
+    }
+    if (count[3] != 0) {
+      txt3 <- "%) of Pareto k estimates greater than 1"
+      warn(paste0(count[3], " (", fr(100 * prop[3], digits), txt3))
+    }
+    warn("See VGIS-LOO description in help('loo-package') for more information")
+  }
+  invisible(NULL)
 }

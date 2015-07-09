@@ -177,7 +177,7 @@ predictive distributions with implementation via sampling-based methods. In
 \emph{Bayesian Statistics 4}, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
 and A. F. M. Smith, 147-167. Oxford University Press.
 
-Gelman, A., Hwang, J., and Vehtari, A. (2014). Understandarding predictive
+Gelman, A., Hwang, J., and Vehtari, A. (2014). Understanding predictive
 information criteria for Bayesian models. \emph{Statistics and Computing}
 \strong{24}, 997-1016.
 

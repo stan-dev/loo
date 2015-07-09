@@ -5,7 +5,7 @@
 \alias{print.loo}
 \title{Print methods}
 \usage{
-\method{print}{loo}(x, ..., digits = 1)
+\method{print}{loo}(x, ..., digits = 1, warn = TRUE)
 
 \method{print}{compare.loo}(x, ..., digits = 1)
 }
@@ -16,7 +16,11 @@
 
 \item{...}{ignored.}
 
-\item{digits}{number of significant digits to display.}
+\item{digits}{passed to \code{\link[base]{round}}.}
+
+\item{warn}{logical. If \code{TRUE} (the default), a warning message will be
+  printed if any estimates for the Pareto shape parameter \eqn{k} are
+  problematic. See section VGIS-LOO in \code{\link{loo-package}}.}
 }
 \value{
 Returns \code{x} invisibly.

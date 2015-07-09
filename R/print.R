@@ -5,14 +5,16 @@
 #'   \code{\link{waic}}) or of class \code{'compare.loo'} (as returned by
 #'   \code{\link{compare}}).
 #' @param ... ignored.
-#' @param digits number of significant digits to display.
+#' @param digits passed to \code{\link[base]{round}}.
+#' @param warn logical. If \code{TRUE} (the default), a warning message will be
+#'   printed if any estimates for the Pareto shape parameter \eqn{k} are
+#'   problematic. See section VGIS-LOO in \code{\link{loo-package}}.
+#'
 #' @return Returns \code{x} invisibly.
 #'
-print.loo <- function(x, ..., digits = 1) {
-  dims <- attr(x, "log_lik_dim")
-  msg <- paste("Computed from", dims[1], "by", dims[2],
-               "log-likelihood matrix\n\n")
-  cat(msg)
+print.loo <- function(x, ..., digits = 1, warn = TRUE) {
+  lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
+  cat("Computed from", lldims, "log-likelihood matrix\n\n")
   z <- x[-grep("pointwise|pareto_k", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
@@ -20,6 +22,8 @@ print.loo <- function(x, ..., digits = 1) {
   out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
   out <- format(round(out, digits), nsmall = digits)
   print(out, quote = FALSE)
+  if ("pareto_k" %in% names(x))
+    k_messages(x$pareto_k, digits)
   invisible(x)
 }
 
