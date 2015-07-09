@@ -5,7 +5,7 @@
 \alias{print.loo}
 \title{Print methods}
 \usage{
-\method{print}{loo}(x, ..., digits = 1, warn = TRUE)
+\method{print}{loo}(x, ..., digits = 1, warn = TRUE, plot_k = FALSE)
 
 \method{print}{compare.loo}(x, ..., digits = 1)
 }
@@ -19,8 +19,10 @@
 \item{digits}{passed to \code{\link[base]{round}}.}
 
 \item{warn}{logical. If \code{TRUE} (the default), a warning message will be
-  printed if any estimates for the Pareto shape parameter \eqn{k} are
-  problematic. See section VGIS-LOO in \code{\link{loo-package}}.}
+printed if any estimates for the Pareto shape parameter \eqn{k} are
+problematic. See section VGIS-LOO in \code{\link{loo-package}}.}
+
+\item{plot_k}{logical. If \code{TRUE} the estimates of \eqn{k} are plotted.}
 }
 \value{
 Returns \code{x} invisibly.

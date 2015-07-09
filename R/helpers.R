@@ -87,9 +87,9 @@ lw_cutpoint <- function(y, wcp, min_cut) {
 
 
 # print helpers -----------------------------------------------------------
-fr <- function(x, digits) format(round(x, digits), nsmall = digits)
-warn <- function(..., call. = FALSE) warning(..., call. = call.)
-k_messages <- function(k, digits = 1) {
+.fr <- function(x, digits) format(round(x, digits), nsmall = digits)
+.warn <- function(..., call. = FALSE) warning(..., call. = call.)
+.k_warnings <- function(k, digits = 1) {
   brks <- c(-Inf, 0.5, 1, Inf)
   kcut <- cut(k, breaks = brks, right = FALSE)
   count <- table(kcut)
@@ -99,13 +99,35 @@ k_messages <- function(k, digits = 1) {
   } else {
     if (count[2] != 0) {
       txt2 <- "%) of Pareto k estimates between 0.5 and 1"
-      warn(paste0(count[2], " (", fr(100 * prop[2], digits), txt2))
+      .warn(paste0(count[2], " (", .fr(100 * prop[2], digits), txt2))
     }
     if (count[3] != 0) {
       txt3 <- "%) of Pareto k estimates greater than 1"
-      warn(paste0(count[3], " (", fr(100 * prop[3], digits), txt3))
+      .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
     }
-    warn("See VGIS-LOO description in help('loo-package') for more information")
+    .warn("See VGIS-LOO description (?'loo-package') for more information")
   }
   invisible(NULL)
 }
+
+.plot_k <- function(k) {
+  yl <- expression(paste("Shape parameter ", italic(k)))
+  xl <- expression(paste("Data ", italic(i)))
+  plot(k, xlab = xl, ylab = yl, type = "n", bty = "l", yaxt = "n")
+  axis(side = 2, las = 1)
+#   rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4],
+#        col = "gray95", border = NA)
+  inrange <- function(a, rr) a >= rr[1] & a <= rr[2]
+  krange <- range(k)
+  for (val in c(0, 0.5, 1)) {
+    if (inrange(val, krange))
+      abline(h = val, col = "#b17e64", lty = 2, lwd = 0.75)
+  }
+  hex_clrs <- c("#6497b1", "#005b96", "#03396c")
+  brks <- c(-Inf, 0.5, 1)
+  clrs <- ifelse(inrange(k, brks[1:2]), hex_clrs[1],
+                 ifelse(inrange(k, brks[2:3]), hex_clrs[2], hex_clrs[3]))
+  points(k, col = clrs, pch = 3, cex = .6)
+}
+
+

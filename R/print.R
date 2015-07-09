@@ -9,10 +9,11 @@
 #' @param warn logical. If \code{TRUE} (the default), a warning message will be
 #'   printed if any estimates for the Pareto shape parameter \eqn{k} are
 #'   problematic. See section VGIS-LOO in \code{\link{loo-package}}.
+#' @param plot_k logical. If \code{TRUE} the estimates of \eqn{k} are plotted.
 #'
 #' @return Returns \code{x} invisibly.
 #'
-print.loo <- function(x, ..., digits = 1, warn = TRUE) {
+print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
   lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
   cat("Computed from", lldims, "log-likelihood matrix\n\n")
   z <- x[-grep("pointwise|pareto_k", names(x))]
@@ -23,7 +24,9 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE) {
   out <- format(round(out, digits), nsmall = digits)
   print(out, quote = FALSE)
   if ("pareto_k" %in% names(x))
-    k_messages(x$pareto_k, digits)
+    .k_warnings(x$pareto_k, digits)
+  if (plot_k)
+    .plot_k(x$pareto_k)
   invisible(x)
 }
 
