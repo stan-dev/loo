@@ -48,7 +48,6 @@ unlist_lapply <- function(X, FUN, ...) {
   unlist(lapply(X, FUN, ...), use.names = FALSE)
 }
 
-# cbind together the elements of a list
 cbind_list <- function(x) {
   do.call(cbind, x)
 }

@@ -20,7 +20,6 @@
 #'   indices. \code{vgisloo} calls \code{vgislw(lw = -log_lik,...)},
 #'   post-processes the results, and returns a named list with components
 #' \describe{
-#' \item{\code{loo}}{the sum of the LOO log predictive densities}
 #' \item{\code{loos}}{the individual LOO log predictive densities}
 #' \item{\code{pareto_k}}{shape parameter estimates for the generalized
 #' Pareto distribution.}

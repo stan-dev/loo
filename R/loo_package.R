@@ -5,12 +5,14 @@
 #'
 #' @description This package implements the methods described in
 #'
-#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of leave-one-out
-#'   cross-validation and WAIC for evaluating fitted Bayesian models.
+#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
+#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
+#' models.
 #'
 #' The package documentation is largely based on excerpts from the paper.
 #'
 #' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry.
+#'
 #' @section Summary:
 #' Leave-one-out cross-validation (LOO) and the widely applicable information
 #' criterion (WAIC) are methods for estimating pointwise out-of-sample
@@ -187,7 +189,8 @@
 #' Stan Development Team (2014b). RStan, version 2.6.
 #' \url{mc-stan.org/rstan.html}.
 #'
-#' Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
+#' Vehtari, A., and Gelman, A. (2015).  Very good importance sampling.
+#' arXiv:1507.02646.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.

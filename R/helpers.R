@@ -45,7 +45,7 @@ qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
 #   log(-a / k) - k - 1
 # }
 lx <- function(a, x) {
-  # vectorized version of old lx
+  # vectorized version
   b <- -a
   bx <- outer(x, b)
   d <- dim(bx)
@@ -111,13 +111,11 @@ lw_cutpoint <- function(y, wcp, min_cut) {
 }
 
 .plot_k <- function(k) {
+  inrange <- function(a, rr) a >= rr[1] & a <= rr[2]
   yl <- expression(paste("Shape parameter ", italic(k)))
   xl <- expression(paste("Data ", italic(i)))
   plot(k, xlab = xl, ylab = yl, type = "n", bty = "l", yaxt = "n")
   axis(side = 2, las = 1)
-#   rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4],
-#        col = "gray95", border = NA)
-  inrange <- function(a, rr) a >= rr[1] & a <= rr[2]
   krange <- range(k)
   for (val in c(0, 0.5, 1)) {
     if (inrange(val, krange))

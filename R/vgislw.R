@@ -18,7 +18,6 @@
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
 #'   \eqn{k}).
 #'
-#'
 #' @details See the 'VGIS-LOO' section in \code{\link{loo-package}}.
 #'
 #' @note This function is primarily intended for internal use, but is exported
@@ -60,15 +59,14 @@ vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       x_new[!above_cut] <- x_body
       x_new[above_cut] <- smoothed_tail
     }
-    # truncate (if wtrunc>0) and renormalize log weights,
-    # return log weights and pareto k
+    # truncate (if wtrunc > 0) and renormalize, return log weights and pareto k
     lw_new <- lw_truncate(x_new, wtrunc)
     lw_new <- lw_normalize(lw_new)
     nlist(lw_new, k)
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
-  # in order to fit the generalized Pareto distribution (gPd) to the tail
+  # in order to fit the gPd to the tail
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
 

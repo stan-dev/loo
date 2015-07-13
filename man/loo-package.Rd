@@ -197,7 +197,8 @@ sampling, version 2.6. \url{mc-stan.org}.
 Stan Development Team (2014b). RStan, version 2.6.
 \url{mc-stan.org/rstan.html}.
 
-Vehtari, A., and Gelman, A. (2015). Very good importance sampling.
+Vehtari, A., and Gelman, A. (2015).  Very good importance sampling.
+arXiv:1507.02646.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.
