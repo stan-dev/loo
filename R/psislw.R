@@ -1,4 +1,4 @@
-#' Very good importance sampling (VGIS)
+#' Pareto smoothed importance sampling (PSIS)
 #'
 #' @export
 #' @param lw a matrix or vector of log weights. For computing LOO \code{lw =
@@ -18,7 +18,7 @@
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
 #'   \eqn{k}).
 #'
-#' @details See the 'VGIS-LOO' section in \code{\link{loo-package}}.
+#' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 #'
 #' @note This function is primarily intended for internal use, but is exported
 #'   so that users can call it directly for other purposes. Users simply
@@ -29,9 +29,9 @@
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
+psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
-  .vgis <- function(n) {
+  .psis <- function(n) {
     x <- lw[, n]
     # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
@@ -74,11 +74,11 @@ vgislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     lw <- as.matrix(lw)
   N <- ncol(lw)
   if (.Platform$OS.type != "windows") {
-    vgis <- mclapply(X = 1:N, FUN = .vgis, mc.cores = cores)
+    psis <- mclapply(X = 1:N, FUN = .psis, mc.cores = cores)
   } else {
     cl <- makePSOCKcluster(cores)
     on.exit(stopCluster(cl))
-    vgis <- parLapply(cl, X = 1:N, fun = .vgis)
+    psis <- parLapply(cl, X = 1:N, fun = .psis)
   }
-  .vgis_out(vgis)
+  .psis_out(psis)
 }

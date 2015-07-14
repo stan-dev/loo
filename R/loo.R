@@ -7,7 +7,7 @@
 #'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
-#' @param ... optional arguments to pass to \code{\link{vgislw}}. Possible
+#' @param ... optional arguments to pass to \code{\link{psislw}}. Possible
 #' arguments and their defaults are:
 #' \describe{
 #' \item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
@@ -20,7 +20,7 @@
 #'      use for parallelization.}
 #'}
 #'
-#' We recommend using the default values for the \code{vgislw} arguments unless
+#' We recommend using the default values for the \code{psislw} arguments unless
 #' there are problems (e.g. \code{NA} or \code{NaN} results).
 #'
 #' @return A named list (of class \code{'loo'}) with components:
@@ -36,7 +36,7 @@
 #' of the above measures}
 #' \item{\code{pareto_k}}{a vector containing the estimates of the shape
 #' parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
-#' for each leave-one-out distribution. See VGIS-LOO section in
+#' for each leave-one-out distribution. See PSIS-LOO section in
 #' \code{\link{loo-package}} for details about interpreting \eqn{k}. (Also, by
 #' default, the print method for \code{'loo'} objects will provide warnings
 #' about problematic values of \eqn{k}. It is also possible to plot the values
@@ -65,13 +65,13 @@
 loo <- function(log_lik, ...) {
   if (!is.matrix(log_lik))
     stop('log_lik should be a matrix')
-  vgis <- vgisloo(log_lik, ...)
-  pointwise <- pointwise_loo(log_lik, vgis)
+  psis <- psisloo(log_lik, ...)
+  pointwise <- pointwise_loo(log_lik, psis)
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
   out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- vgis$pareto_k
+  out$pareto_k <- psis$pareto_k
   attr(out, "log_lik_dim") <- dim(log_lik)
   class(out) <- "loo"
   out

@@ -31,7 +31,7 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
 \seealso{
-\code{\link{vgislw}}, \code{\link{loo}},
+\code{\link{psislw}}, \code{\link{loo}},
 \code{\link{loo-package}}
 }
 \keyword{internal}

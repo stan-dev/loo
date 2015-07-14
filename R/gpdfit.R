@@ -15,7 +15,7 @@
 #'   so that users can call it directly if desired. Users simply wishing to
 #'   compute LOO should use the \code{\link{loo}} function.
 #'
-#' @seealso \code{\link{vgislw}}, \code{\link{loo}},
+#' @seealso \code{\link{psislw}}, \code{\link{loo}},
 #' \code{\link{loo-package}}
 #'
 #' @references

@@ -10,7 +10,7 @@
 #'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
-#' @param ... optional arguments to pass to \code{\link{vgislw}}. Possible
+#' @param ... optional arguments to pass to \code{\link{psislw}}. Possible
 #' arguments and their defaults are:
 #' \describe{
 #' \item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
@@ -28,7 +28,7 @@
 #'      use for parallelization.}
 #'}
 #'
-#' We recommend using the default values for the \code{vgislw} arguments unless
+#' We recommend using the default values for the \code{psislw} arguments unless
 #' there are problems (e.g. \code{NA} or \code{NaN} results).
 #'
 #' @return a named list with class \code{'loo'}.
@@ -49,7 +49,7 @@ loo_and_waic <- function(log_lik, ...) {
 
   if (!is.matrix(log_lik))
     stop('log_lik should be a matrix')
-  loo <- vgisloo(log_lik, ...)
+  loo <- psisloo(log_lik, ...)
   lpd <- logColMeansExp(log_lik)
   elpd_loo <- loo$loos
   p_loo <- lpd - elpd_loo

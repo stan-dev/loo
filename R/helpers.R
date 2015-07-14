@@ -15,10 +15,10 @@ pointwise_waic <- function(log_lik) {
   waic <- -2 * elpd_waic
   nlist(elpd_waic, p_waic, waic)
 }
-pointwise_loo <- function(log_lik, vgis) {
-  # vgis is output from vgisloo()
+pointwise_loo <- function(log_lik, psis) {
+  # psis is output from psisloo()
   lpd <- logColMeansExp(log_lik)
-  elpd_loo <- vgis$loos
+  elpd_loo <- psis$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
   nlist(elpd_loo, p_loo, looic)
@@ -31,7 +31,7 @@ totals <- function(pointwise) {
 }
 
 
-# VGIS helpers ------------------------------------------------------------
+# psis helpers ------------------------------------------------------------
 
 # inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
@@ -71,14 +71,14 @@ lw_cutpoint <- function(y, wcp, min_cut) {
 }
 
 # The parallelization functions mclapply and parLapply return a list of lists:
-# vgis is a list of length N=ncol(lw). Each of the N elements of vgis is itself
+# psis is a list of length N=ncol(lw). Each of the N elements of psis is itself
 # a list of length 2. In each of these N lists of length 2 the first component
 # is a vector of length S=nrow(lw) containing the modified log weights and the
 # second component is the estimate of the pareto shape parameter k. This
 # function cbinds the log weight vectors into a matrix and combines the k
 # estimates into a vector.
-.vgis_out <- function(vgis) {
-  ux <- unlist(vgis, recursive = FALSE)
+.psis_out <- function(psis) {
+  ux <- unlist(psis, recursive = FALSE)
   lws <- grepl("lw", names(ux))
   lw_smooth <- cbind_list(ux[lws])
   pareto_k <- unlist(ux[!lws])
@@ -105,7 +105,7 @@ lw_cutpoint <- function(y, wcp, min_cut) {
       txt3 <- "%) Pareto k estimates greater than 1"
       .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
     }
-    .warn("See VGIS-LOO description (?'loo-package') for more information")
+    .warn("See PSIS-LOO description (?'loo-package') for more information")
   }
   invisible(NULL)
 }
