@@ -33,6 +33,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
   .psis <- function(n) {
     x <- lw[, n]
+    x <- x - max(x)
     # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
     above_cut <- x > cutoff
@@ -52,7 +53,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       fit <- gpdfit(exp(x_tail) - exp_cutoff)
       k <- fit$k
       prb <- (seq_len(tail_len) - 0.5) / tail_len
-      qq <- qgpd(p = prb, xi = k, beta = fit$sigma) + exp_cutoff
+      qq <- qgpd(p = prb, xi = k, sigma = fit$sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
       x_new <- x

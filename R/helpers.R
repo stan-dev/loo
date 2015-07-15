@@ -34,10 +34,11 @@ totals <- function(pointwise) {
 # psis helpers ------------------------------------------------------------
 
 # inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <- function(p, xi = 1, mu = 0, beta = 1, lower.tail = TRUE) {
+qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
+  if (sigma <= 0) return(rep(NaN, length(p)))
   if (!lower.tail)
     p <- 1 - p
-  mu + beta * ((1 - p)^(-xi) - 1) / xi
+  mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
 # lx <- function(a, x) {
@@ -53,9 +54,11 @@ lx <- function(a, x) {
   log(b / k) - k - 1
 }
 
-#' @importFrom matrixStats logSumExp
-lw_normalize <- function(y) {
-  y - logSumExp(y)
+lw_cutpoint <- function(y, wcp, min_cut) {
+  if (min_cut < log(.Machine$double.xmin))
+    min_cut <- -700
+  cp <- quantile(y, 1 - wcp, names = FALSE)
+  max(cp, min_cut)
 }
 lw_truncate <- function(y, wtrunc) {
   if (wtrunc == 0)
@@ -65,10 +68,11 @@ lw_truncate <- function(y, wtrunc) {
   y[y > lwtrunc] <- lwtrunc
   y
 }
-lw_cutpoint <- function(y, wcp, min_cut) {
-  cp <- quantile(y, 1 - wcp, names = FALSE)
-  max(cp, min_cut)
+#' @importFrom matrixStats logSumExp
+lw_normalize <- function(y) {
+  y - logSumExp(y)
 }
+
 
 # The parallelization functions mclapply and parLapply return a list of lists:
 # psis is a list of length N=ncol(lw). Each of the N elements of psis is itself
