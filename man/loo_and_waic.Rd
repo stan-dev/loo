@@ -12,7 +12,7 @@ posterior sample (the number of simulations) and \eqn{N} is the number of
 data points. Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.}
 
-\item{...}{optional arguments to pass to \code{\link{vgislw}}. Possible
+\item{...}{optional arguments to pass to \code{\link{psislw}}. Possible
 arguments and their defaults are:
 \describe{
 \item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
@@ -30,7 +30,7 @@ shape parameter \eqn{k}.}
      use for parallelization.}
 }
 
-We recommend using the default values for the \code{vgislw} arguments unless
+We recommend using the default values for the \code{psislw} arguments unless
 there are problems (e.g. \code{NA} or \code{NaN} results).}
 }
 \value{
@@ -45,17 +45,8 @@ each of these measures, standard errors, and the estimated shape parameter
 distribution.
 }
 \description{
-Approximate LOO-CV and WAIC for Bayesian models
+This function is deprecated. Please use \code{\link{loo}} or
+\code{\link{waic}} instead.
 }
-\examples{
-\dontrun{
-log_lik <- extract_log_lik(stanfit)
-loo <- loo_and_waic(log_lik)
-print(loo, digits = 3)
-}
-}
-\seealso{
-\code{\link{loo-package}}, \code{\link{print.loo}},
-\code{\link{loo_and_waic_diff}}
-}
+\keyword{internal}
 
