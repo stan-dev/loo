@@ -13,5 +13,3 @@ loo.Rproj
 vignettes/*.html
 vignettes/*.pdf
 inst/doc
-^cran-comments.md$
-^cran-comments\.md$
