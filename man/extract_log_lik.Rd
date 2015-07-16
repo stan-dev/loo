@@ -13,7 +13,7 @@ extract_log_lik(stanfit, parameter_name = "log_lik")
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
-an \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
+An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
   \eqn{S} is the number of simulations and \eqn{N} is the number of data
   points.
 }
@@ -31,10 +31,10 @@ Stan does not automatically compute and store the log-likelihood. It
   block so that the computations are carried out only once per iteration
   rather than once per HMC leapfrog step.
 
-  For example, the following is the \code{generated quantities} block for computing
-  and saving the log-likelihood for a linear regression model with \code{N}
-  data points, outcome \code{y}, predictor matrix \code{X}, coefficients
-  \code{beta}, and standard deviation \code{sigma}:
+  For example, the following is the \code{generated quantities} block for
+  computing and saving the log-likelihood for a linear regression model with
+  \code{N} data points, outcome \code{y}, predictor matrix \code{X},
+  coefficients \code{beta}, and standard deviation \code{sigma}:
 
  \code{vector[N] log_lik;}
 

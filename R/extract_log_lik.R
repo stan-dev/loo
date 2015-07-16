@@ -7,7 +7,7 @@
 #' @param stanfit a \code{stanfit} object (\pkg{rstan} package).
 #' @param parameter_name a character string naming the parameter (or generated
 #'   quantity) in the Stan model corresponding to the log-likelihood.
-#' @return an \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
+#' @return An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
 #'   \eqn{S} is the number of simulations and \eqn{N} is the number of data
 #'   points.
 #'
@@ -20,10 +20,10 @@
 #'   block so that the computations are carried out only once per iteration
 #'   rather than once per HMC leapfrog step.
 #'
-#'   For example, the following is the \code{generated quantities} block for computing
-#'   and saving the log-likelihood for a linear regression model with \code{N}
-#'   data points, outcome \code{y}, predictor matrix \code{X}, coefficients
-#'   \code{beta}, and standard deviation \code{sigma}:
+#'   For example, the following is the \code{generated quantities} block for
+#'   computing and saving the log-likelihood for a linear regression model with
+#'   \code{N} data points, outcome \code{y}, predictor matrix \code{X},
+#'   coefficients \code{beta}, and standard deviation \code{sigma}:
 #'
 #'  \code{vector[N] log_lik;}
 #'
@@ -48,9 +48,10 @@ extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
     stop("Stan model does not contain samples.")
   posterior <- as.matrix(stanfit)
   nms <- colnames(posterior)
-  pattern <- paste0("^",parameter_name,"\\[")
+  pattern <- paste0("^", parameter_name, "\\[")
   keep <- grep(pattern, nms)
   log_lik <- posterior[, keep, drop = FALSE]
   colnames(log_lik) <- NULL
   log_lik
 }
+

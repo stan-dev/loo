@@ -1,11 +1,16 @@
 #' Approximate LOO-CV and WAIC for Bayesian models
 #'
+#' This function is deprecated. Please use \code{\link{loo}} or
+#' \code{\link{waic}} instead.
+#'
+#' @keywords internal
 #' @export
+#'
 #' @param log_lik an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 #'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
-#' @param ... optional arguments to pass to \code{\link{vgislw}}. Possible
+#' @param ... optional arguments to pass to \code{\link{psislw}}. Possible
 #' arguments and their defaults are:
 #' \describe{
 #' \item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
@@ -23,7 +28,7 @@
 #'      use for parallelization.}
 #'}
 #'
-#' We recommend using the default values for the \code{vgislw} arguments unless
+#' We recommend using the default values for the \code{psislw} arguments unless
 #' there are problems (e.g. \code{NA} or \code{NaN} results).
 #'
 #' @return a named list with class \code{'loo'}.
@@ -36,22 +41,15 @@
 #' \eqn{k} for the Pareto fit to the importance ratios for each leave-one-out
 #' distribution.
 #'
-#' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
-#' \code{\link{loo_and_waic_diff}}
-#'
-#' @examples
-#' \dontrun{
-#' log_lik <- extract_log_lik(stanfit)
-#' loo <- loo_and_waic(log_lik)
-#' print(loo, digits = 3)
-#' }
-#'
 #' @importFrom matrixStats colVars
 #'
 loo_and_waic <- function(log_lik, ...) {
+
+  .Deprecated("loo() or waic()")
+
   if (!is.matrix(log_lik))
     stop('log_lik should be a matrix')
-  loo <- vgisloo(log_lik, ...)
+  loo <- psisloo(log_lik, ...)
   lpd <- logColMeansExp(log_lik)
   elpd_loo <- loo$loos
   p_loo <- lpd - elpd_loo
@@ -70,3 +68,55 @@ loo_and_waic <- function(log_lik, ...) {
   class(output) <- "loo"
   output
 }
+
+
+#' Model comparison
+#'
+#' This function is deprecated. Please use \code{\link{compare}} instead.
+#'
+#' @keywords internal
+#' @export
+#'
+#' @param loo1,loo2 lists (of class \code{'loo'}).
+#' @return a named list with class \code{'compare.loo'}.
+#'
+#' @details When comparing two fitted models, we can estimate the difference in
+#'   their expected predictive accuracy by the difference in \code{elpd_waic} or
+#'   \code{elpd_loo} (multiplied by -2, if desired, to be on the deviance
+#'   scale). To compute the standard error of this difference we can use a
+#'   paired estimate to take advantage of the fact that the same set of \eqn{N}
+#'   data points is being used to fit both models. We would think that these
+#'   calculations would be most useful when \eqn{N} is large, because then
+#'   non-normality of the distribution is not such an issue when estimating the
+#'   uncertainty of these sums. In any case, we suspect that these standard
+#'   errors, for all their flaws, should give a better sense of uncertainty than
+#'   what is obtained using the current standard approach of comparing
+#'   differences of deviances to a Chi-squared distribution, a practice derived
+#'   for Gaussian linear models or asymptotically and which only applies to
+#'   nested models in any case.
+#'
+#'
+loo_and_waic_diff <- function(loo1, loo2) {
+
+  .Deprecated("compare()")
+
+  p1 <- loo1$pointwise
+  p2 <- loo2$pointwise
+  N1 <- nrow(p1)
+  N2 <- nrow(p2)
+  if (N1 != N2) {
+    msg <- paste("Models should have the same number of data points.",
+                 "Found N1 =", N1, "and N2 =", N2)
+    stop(msg)
+  }
+  sqrtN <- sqrt(N1)
+  loo_diff <- p2[, "elpd_loo"] - p1[, "elpd_loo"]
+  waic_diff <- p2[, "elpd_waic"] - p1[, "elpd_waic"]
+  diff <- list(elpd_loo_diff = sum(loo_diff),
+               lpd_loo_diff = sqrtN * sd(loo_diff),
+               elpd_waic_diff = sum(waic_diff),
+               lpd_waic_diff = sqrtN * sd(waic_diff))
+  class(diff) <- "compare.loo"
+  diff
+}
+

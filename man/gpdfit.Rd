@@ -10,7 +10,7 @@ gpdfit(x)
 \item{x}{a numeric vector. The sample from which to estimate the parameters.}
 }
 \value{
-a list. Estimates for \eqn{k} and \eqn{\sigma}.
+a named list with components \code{k} and \code{sigma}.
 }
 \description{
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
@@ -23,7 +23,7 @@ Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 \note{
 This function is primarily intended for internal use, but is exported
   so that users can call it directly if desired. Users simply wishing to
-  compute LOO and WAIC should use the \code{\link{loo_and_waic}} function.
+  compute LOO should use the \code{\link{loo}} function.
 }
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
@@ -31,7 +31,7 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
 \seealso{
-\code{\link{vgislw}}, \code{\link{loo_and_waic}},
+\code{\link{psislw}}, \code{\link{loo}},
 \code{\link{loo-package}}
 }
 \keyword{internal}
