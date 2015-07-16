@@ -27,9 +27,9 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
   print(out, quote = FALSE)
   if ("pareto_k" %in% names(x)) {
     if (warn)
-      .k_warnings(x$pareto_k, digits)
+      k_warnings(x$pareto_k, digits)
     if (plot_k)
-      .plot_k(x$pareto_k)
+      plot_k(x$pareto_k)
   }
   invisible(x)
 }

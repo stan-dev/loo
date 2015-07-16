@@ -83,9 +83,9 @@ lw_normalize <- function(y) {
 # estimates into a vector.
 .psis_out <- function(psis) {
   ux <- unlist(psis, recursive = FALSE)
-  lws <- grepl("lw", names(ux))
-  lw_smooth <- cbind_list(ux[lws])
-  pareto_k <- unlist(ux[!lws])
+  lwid <- grepl("lw", names(ux))
+  lw_smooth <- cbind_list(ux[lwid])
+  pareto_k <- unlist(ux[!lwid])
   nlist(lw_smooth, pareto_k)
 }
 
@@ -93,7 +93,7 @@ lw_normalize <- function(y) {
 # print helpers -----------------------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
-.k_warnings <- function(k, digits = 1) {
+k_warnings <- function(k, digits = 1) {
   brks <- c(-Inf, 0.5, 1, Inf)
   kcut <- cut(k, breaks = brks, right = FALSE)
   count <- table(kcut)
@@ -114,7 +114,7 @@ lw_normalize <- function(y) {
   invisible(NULL)
 }
 
-.plot_k <- function(k) {
+plot_k <- function(k) {
   inrange <- function(a, rr) a >= rr[1] & a <= rr[2]
   yl <- expression(paste("Shape parameter ", italic(k)))
   xl <- expression(paste("Data ", italic(i)))

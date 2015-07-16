@@ -40,22 +40,20 @@ compare <- function(a, b) {
   namea <- deparse(substitute(a))
   nameb <- deparse(substitute(b))
   if (!is.loo(a))
-    stop(paste(namea, "does not have class 'loo'"))
+    stop(paste(namea, "does not have class 'loo'"), call. = FALSE)
   if (!is.loo(b))
-    stop(paste(nameb, "does not have class 'loo'"))
+    stop(paste(nameb, "does not have class 'loo'"), call. = FALSE)
 
   pa <- a$pointwise
   pb <- b$pointwise
   Na <- nrow(pa)
   Nb <- nrow(pb)
-  if (Na != Nb) {
-    msg <- "Models being compared should have the same number of data points."
-    msg <- paste(msg, "Found: for", namea, "N =", Na, "and for", nameb, "N =", Nb)
-    stop(msg)
-  }
+  if (Na != Nb)
+    stop(paste("Models a and b should have the same number of data points.",
+               "\nFound N_a =", Na, "and N_b =", Nb), call. = FALSE)
   sqrtN <- sqrt(Na)
-  ind <- grep("^elpd", colnames(pa))
-  diff <- pb[, ind] - pa[, ind]
+  elpd <- grep("^elpd", colnames(pa))
+  diff <- pb[, elpd] - pa[, elpd]
   comp <- list(elpd_diff = sum(diff), se = sqrtN * sd(diff))
   class(comp) <- "compare.loo"
   comp
