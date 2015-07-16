@@ -4,6 +4,13 @@
 
 Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
+### Install
+
+If you don't have the devtools package first run `install.packages("devtools")`. 
+Then install the **loo** package:
+
+    devtools::install_github("jgabry/loo")
+
 ### About 
 
 Leave-one-out cross-validation (LOO) and the widely applicable information
