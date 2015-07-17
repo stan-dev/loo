@@ -1,3 +1,5 @@
+# loo 0.1.2.9000
+
 # loo 0.1.2 
 * Updates names in package to reflect name changes in the accompanying 
 paper.
