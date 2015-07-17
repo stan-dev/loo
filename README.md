@@ -1,6 +1,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/jgabry/loo.svg?branch=master)](https://travis-ci.org/jgabry/loo)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo)](http://cran.r-project.org/web/packages/loo)
 
-**loo** R package
+### **loo** R package
 
 Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
@@ -22,8 +23,8 @@ AIC and DIC but are less used in practice because they involve additional
 computational steps. 
 
 This package implements the fast and stable computations
-for LOO and WAIC laid out in the forthcoming paper 
-[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://www.stat.columbia.edu/~gelman/research/unpublished/loo_stan.pdf). 
+for LOO and WAIC from
+[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/abs/1507.04544). 
 From existing posterior simulation draws, we compute LOO using Pareto smoothed importance
 sampling (PSIS), a new procedure for regularizing importance weights. As a
 byproduct of our calculations, we also obtain approximate standard errors for
