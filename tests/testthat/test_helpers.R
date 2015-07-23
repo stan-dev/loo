@@ -27,8 +27,7 @@ nlist_val <- list(nlist(a, b, c), nlist(a, b, c = "tornado"))
 nlist_ans <- list(list(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = "tornado"))
 
 # totals
-xlist <- list()
-for (i in 1:ncol(x)) xlist[[i]] <- x[,i]
+xlist <- as.list(as.data.frame(x))
 totals_val <- unlist(totals(xlist))
 totals_ans <- c(2.83247604949197, -1.02514322943742, 2.12970459700787,
                 -2.39834129191402, 7.50189473847225, 4.34989153078281,
