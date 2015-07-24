@@ -23,7 +23,7 @@ computational steps.
 
 This package implements the fast and stable computations
 for LOO and WAIC from
-[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/abs/1507.04544). 
+[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/pdf/1507.04544v1.pdf). 
 From existing posterior simulation draws, we compute LOO using Pareto smoothed importance
 sampling (PSIS), a new procedure for regularizing importance weights. As a
 byproduct of our calculations, we also obtain approximate standard errors for
@@ -34,5 +34,5 @@ two models.
 Aki Vehtari, Andrew Gelman, Jonah Gabry
 
 ### MATLAB Code
-Corresponding MATLAB can be found at https://github.com/avehtari/MatlabPSIS 
+Corresponding MATLAB code can be found at https://github.com/avehtari/MatlabPSIS 
 
