@@ -7,7 +7,9 @@ Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
 ### Install
 
-`install.packages("loo")`
+* **CRAN** `install.packages("loo")`
+
+* **GitHub** `devtools::install_github("jgabry/loo")` 
 
 ### About 
 
@@ -30,3 +32,7 @@ two models.
 
 ### Authors
 Aki Vehtari, Andrew Gelman, Jonah Gabry
+
+### MATLAB Code
+Corresponding MATLAB can be found at https://github.com/avehtari/MatlabPSIS 
+
