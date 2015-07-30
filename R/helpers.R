@@ -96,7 +96,7 @@ lw_normalize <- function(y) {
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
   brks <- c(-Inf, 0.5, 1, Inf)
-  kcut <- cut(k, breaks = brks, right = FALSE)
+  kcut <- cut(k, breaks = brks)
   count <- table(kcut)
   prop <- prop.table(count)
   if (sum(count[2:3]) == 0) {
