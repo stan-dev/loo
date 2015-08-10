@@ -1,5 +1,6 @@
 [![Travis-CI Build Status](https://travis-ci.org/jgabry/loo.svg?branch=master)](https://travis-ci.org/jgabry/loo)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo)](http://cran.r-project.org/web/packages/loo)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
+[![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 
 ### **loo** R package
 
