@@ -65,7 +65,8 @@ psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
     lw_new <- lw_normalize(lw_new)
     nlist(lw_new, k)
   }
-  .psis2 <- function(i) {
+
+  .psis_loop <- function(i) {
     if (LL_FUN) {
       ll_i <- ll_list$fun(i = i, data = ll_list$data, draws = ll_list$draws)
       lw_i <- -1 * ll_i
@@ -97,11 +98,11 @@ psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
   }
 
   if (.Platform$OS.type != "windows") {
-    out <- mclapply(X = 1:N, FUN = .psis2, mc.cores = cores)
+    out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
   } else {
     cl <- makePSOCKcluster(cores)
     on.exit(stopCluster(cl))
-    out <- parLapply(cl, X = 1:N, fun = .psis2)
+    out <- parLapply(cl, X = 1:N, fun = .psis_loop)
   }
   .psis_out(out)
 }
