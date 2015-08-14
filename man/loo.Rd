@@ -4,13 +4,15 @@
 \alias{loo}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
-loo(log_lik, ...)
+loo(log_lik, ll_list = NULL, ...)
 }
 \arguments{
 \item{log_lik}{an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
 posterior sample (the number of simulations) and \eqn{N} is the number of
 data points. Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.}
+
+\item{ll_list}{an alternative to specifying \code{log_lik}. See Details.}
 
 \item{...}{optional arguments to pass to \code{\link{psislw}}. Possible
 arguments and their defaults are:
@@ -52,6 +54,17 @@ default is not to plot). See \code{\link{print.loo}}.)}
 }
 \description{
 Efficient approximate leave-one-out cross-validation
+}
+\details{
+If \code{ll_list} is specified instead of \code{log_lik} it should
+  be a list with the following named components:
+\describe{
+\item{\code{data}}{an object containing any data needed to compute the pointwise log-likelihood}
+\item{\code{draws}}{an object containing the posterior draws for any parameters needed to compute the pointwise log-likelihood}
+\item{\code{fun}}{a function of \code{i}, \code{data}, and \code{draws} that returns a vector containing the log-likelihood for the \eqn{i}th observation evaluated at each posterior draw.}
+\item{\code{N}}{the number of observations}
+\item{\code{S}}{the number of posterior draws}
+}
 }
 \examples{
 \dontrun{

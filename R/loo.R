@@ -7,6 +7,7 @@
 #'   posterior sample (the number of simulations) and \eqn{N} is the number of
 #'   data points. Typically (but not restricted to be) the object returned by
 #'   \code{\link{extract_log_lik}}.
+#' @param ll_list an alternative to specifying \code{log_lik}. See Details.
 #' @param ... optional arguments to pass to \code{\link{psislw}}. Possible
 #' arguments and their defaults are:
 #' \describe{
@@ -44,6 +45,16 @@
 #' default is not to plot). See \code{\link{print.loo}}.)}
 #' }
 #'
+#' @details If \code{ll_list} is specified instead of \code{log_lik} it should
+#'   be a list with the following named components:
+#' \describe{
+#' \item{\code{data}}{an object containing any data needed to compute the pointwise log-likelihood}
+#' \item{\code{draws}}{an object containing the posterior draws for any parameters needed to compute the pointwise log-likelihood}
+#' \item{\code{fun}}{a function of \code{i}, \code{data}, and \code{draws} that returns a vector containing the log-likelihood for the \eqn{i}th observation evaluated at each posterior draw.}
+#' \item{\code{N}}{the number of observations}
+#' \item{\code{S}}{the number of posterior draws}
+#' }
+#'
 #' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
 #' \code{\link{compare}}
 #'
@@ -62,17 +73,25 @@
 #' print(loo_diff, digits = 5)
 #' }
 #'
-loo <- function(log_lik, ...) {
-  if (!is.matrix(log_lik))
-    stop('log_lik should be a matrix')
-  psis <- psisloo(log_lik, ...)
-  pointwise <- pointwise_loo(log_lik, psis)
+loo <- function(log_lik, ll_list = NULL, ...) {
+  if (!missing(log_lik)) {
+    if (!is.matrix(log_lik))
+      stop('log_lik should be a matrix')
+    psis <- psislw(log_lik = log_lik, ...)
+    pointwise <- pointwise_loo(log_lik, psis)
+  } else {
+    if (is.null(ll_list))
+      stop("Either log_lik or ll_list must be specified")
+    psis <- psislw(ll_list = ll_list, ...)
+    pointwise <- pointwise_loo(ll_list = ll_list, psis = psis)
+  }
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
   out$pointwise <- cbind_list(pointwise)
   out$pareto_k <- psis$pareto_k
-  attr(out, "log_lik_dim") <- dim(log_lik)
+  attr(out, "log_lik_dim") <- if (!missing(log_lik))
+    dim(log_lik) else with(ll_list, c(S,N))
   class(out) <- "loo"
   out
 }

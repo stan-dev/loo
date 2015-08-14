@@ -6,6 +6,7 @@
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a
 #'   one-column matrix.)
+#' @param ll_list see \code{\link{loo}}.
 #' @param wcp the proportion of importance weights to use for the generalized
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
@@ -29,11 +30,10 @@
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
+psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
-  .psis <- function(n) {
-    x <- lw[, n]
-    x <- x - max(x)
+  .psis <- function(lw_i) {
+    x <- lw_i - max(lw_i)
     # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
     above_cut <- x > cutoff
@@ -65,21 +65,43 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     lw_new <- lw_normalize(lw_new)
     nlist(lw_new, k)
   }
+  .psis2 <- function(i) {
+    if (LL_FUN) {
+      ll_i <- ll_list$fun(i = i, data = ll_list$data, draws = ll_list$draws)
+      lw_i <- -1 * ll_i
+    }
+    else{
+      lw_i <- lw[, i]
+      ll_i <- -1 * lw_i
+    }
+    psis <- .psis(lw_i)
+    lse <- logSumExp(ll_i + psis$lw_new)
+    nlist(lse, k = psis$k)
+  }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
   # in order to fit the gPd to the tail
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
 
-  if (!is.matrix(lw))
-    lw <- as.matrix(lw)
-  N <- ncol(lw)
+  if (!missing(lw)) {
+    if (!is.matrix(lw))
+      lw <- as.matrix(lw)
+    N <- ncol(lw)
+    LL_FUN <- FALSE
+  } else {
+    if (is.null(ll_list))
+      stop("Either lw or ll_list must be specified.")
+    N <- ll_list$N
+    LL_FUN <- TRUE
+  }
+
   if (.Platform$OS.type != "windows") {
-    psis <- mclapply(X = 1:N, FUN = .psis, mc.cores = cores)
+    out <- mclapply(X = 1:N, FUN = .psis2, mc.cores = cores)
   } else {
     cl <- makePSOCKcluster(cores)
     on.exit(stopCluster(cl))
-    psis <- parLapply(cl, X = 1:N, fun = .psis)
+    out <- parLapply(cl, X = 1:N, fun = .psis2)
   }
-  .psis_out(psis)
+  .psis_out(out)
 }

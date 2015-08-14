@@ -7,6 +7,15 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - log(S)
 }
 
+logColMeansExp_ll <- function(x) {
+  # should be more stable than log(colMeans(exp(x)))
+  logS <- log(x$S)
+  clse <- vapply(1:(x$N), FUN = function(i) {
+    logSumExp(x$fun(i = i, data = x$data, draws = x$draws))
+  }, FUN.VALUE = 0, USE.NAMES = FALSE)
+  clse - logS
+}
+
 #' @importFrom matrixStats colVars
 pointwise_waic <- function(log_lik) {
   lpd <- logColMeansExp(log_lik)
@@ -15,9 +24,14 @@ pointwise_waic <- function(log_lik) {
   waic <- -2 * elpd_waic
   nlist(elpd_waic, p_waic, waic)
 }
-pointwise_loo <- function(log_lik, psis) {
+pointwise_loo <- function(log_lik, psis, ll_list = NULL) {
+  if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
+  else {
+    if (is.null(ll_list))
+      stop("Either log_lik or ll_list must be specified")
+    lpd <- logColMeansExp_ll(ll_list)
+  }
   # psis is output from psisloo()
-  lpd <- logColMeansExp(log_lik)
   elpd_loo <- psis$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
@@ -81,12 +95,10 @@ lw_normalize <- function(y) {
 # second component is the estimate of the pareto shape parameter k. This
 # function cbinds the log weight vectors into a matrix and combines the k
 # estimates into a vector.
-.psis_out <- function(psis) {
-  ux <- unlist(psis, recursive = FALSE)
-  lwid <- grepl("lw", names(ux))
-  lw_smooth <- cbind_list(ux[lwid])
-  pareto_k <- unlist(ux[!lwid])
-  nlist(lw_smooth, pareto_k)
+.psis_out <- function(X) {
+  loos <- sapply(X, "[[", 1L)
+  pareto_k <- sapply(X, "[[", 2L)
+  nlist(loos, pareto_k)
 }
 
 
