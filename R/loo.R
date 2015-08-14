@@ -77,7 +77,7 @@ loo <- function(log_lik, ll_list = NULL, ...) {
   if (!missing(log_lik)) {
     if (!is.matrix(log_lik))
       stop('log_lik should be a matrix')
-    psis <- psislw(log_lik = log_lik, ...)
+    psis <- psislw(lw = -1 * log_lik, ...)
     pointwise <- pointwise_loo(log_lik, psis)
   } else {
     if (is.null(ll_list))
