@@ -6,7 +6,7 @@
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a
 #'   one-column matrix.)
-#' @param ll_list see \code{\link{loo}}.
+#' @param llfun,llargs see \code{\link{loo}}.
 #' @param wcp the proportion of importance weights to use for the generalized
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
@@ -30,7 +30,7 @@
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
+psislw <- function(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
                    cores = parallel::detectCores()) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
@@ -68,7 +68,7 @@ psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
 
   .psis_loop <- function(i) {
     if (LL_FUN) {
-      ll_i <- ll_list$fun(i = i, data = ll_list$data, draws = ll_list$draws)
+      ll_i <- llfun(i = i, data = llargs$data, draws = llargs$draws)
       lw_i <- -1 * ll_i
     }
     else{
@@ -91,9 +91,9 @@ psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
     N <- ncol(lw)
     LL_FUN <- FALSE
   } else {
-    if (is.null(ll_list))
-      stop("Either lw or ll_list must be specified.")
-    N <- ll_list$N
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either lw or llfun and llargs must be specified.")
+    N <- llargs$N
     LL_FUN <- TRUE
   }
 
@@ -104,5 +104,7 @@ psislw <- function(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
     on.exit(stopCluster(cl))
     out <- parLapply(cl, X = 1:N, fun = .psis_loop)
   }
-  .psis_out(out)
+  loos <- sapply(out, "[[", 1L)
+  pareto_k <- sapply(out, "[[", 2L)
+  nlist(loos, pareto_k)
 }

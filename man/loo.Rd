@@ -4,7 +4,7 @@
 \alias{loo}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
-loo(log_lik, ll_list = NULL, ...)
+loo(log_lik, llfun = NULL, llargs = NULL, ...)
 }
 \arguments{
 \item{log_lik}{an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
@@ -12,59 +12,66 @@ posterior sample (the number of simulations) and \eqn{N} is the number of
 data points. Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.}
 
-\item{ll_list}{an alternative to specifying \code{log_lik}. See Details.}
+\item{llfun,llargs}{a function and a list that can be specified together as
+an alternative to \code{log_lik}. See Details.}
 
 \item{...}{optional arguments to pass to \code{\link{psislw}}. Possible
-arguments and their defaults are:
+  arguments and their defaults are:
 \describe{
-\item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
-generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
-sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
-the generalized Pareto distribution.}
-\item{\code{wtrunc = 3/4}}{for truncating very large weights to
-\eqn{S}^\code{wtrunc} (set to zero for no truncation).}
-\item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
-     use for parallelization.}
+ \item{\code{wcp = 0.2}}{the proportion of importance weights to use for the
+   generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
+   sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
+   the generalized Pareto distribution.}
+ \item{\code{wtrunc = 3/4}}{for truncating very large weights to
+   \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
+ \item{\code{cores = \link[parallel]{detectCores}()}}{the number of cores to
+   use for parallelization.}
 }
 
-We recommend using the default values for the \code{psislw} arguments unless
-there are problems (e.g. \code{NA} or \code{NaN} results).}
+ We recommend using the default values for the \code{psislw} arguments unless
+ there are problems (e.g. \code{NA} or \code{NaN} results).}
 }
 \value{
-A named list (of class \code{'loo'}) with components:
+A named list with class \code{'loo'} and components:
 
 \describe{
-\item{\code{elpd_loo, se_elpd_loo}}{expected log pointwise predictive density
-and standard error}
-\item{\code{p_loo, se_p_loo}}{estimated effective number of parameters and
-standard error}
-\item{\code{looic, se_looic}}{\code{-2 * elpd_loo} (i.e., converted to the
-deviance scale) and standard error}
-\item{\code{pointwise}}{a matrix containing the pointwise contributions of each
-of the above measures}
-\item{\code{pareto_k}}{a vector containing the estimates of the shape
-parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
-for each leave-one-out distribution. See PSIS-LOO section in
-\code{\link{loo-package}} for details about interpreting \eqn{k}. (Also, by
-default, the print method for \code{'loo'} objects will provide warnings
-about problematic values of \eqn{k}. It is also possible to plot the values
-of \eqn{k} by setting the optional argument \code{plot_k} to \code{TRUE} (the
-default is not to plot). See \code{\link{print.loo}}.)}
+ \item{\code{elpd_loo, se_elpd_loo}}{expected log pointwise predictive density
+   and standard error}
+ \item{\code{p_loo, se_p_loo}}{estimated effective number of parameters and
+   standard error}
+ \item{\code{looic, se_looic}}{\code{-2 * elpd_loo} (i.e., converted to the
+   deviance scale) and standard error}
+ \item{\code{pointwise}}{a matrix containing the pointwise contributions of each
+   of the above measures}
+ \item{\code{pareto_k}}{a vector containing the estimates of the shape
+   parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
+   for each leave-one-out distribution. See PSIS-LOO section in
+   \code{\link{loo-package}} for details about interpreting \eqn{k}. (Also, by
+   default, the print method for \code{'loo'} objects will provide warnings
+   about problematic values of \eqn{k}. It is also possible to plot the values
+   of \eqn{k} by setting the optional argument \code{plot_k} to \code{TRUE} (the
+   default is not to plot). See \code{\link{print.loo}}.)}
 }
 }
 \description{
 Efficient approximate leave-one-out cross-validation
 }
 \details{
-If \code{ll_list} is specified instead of \code{log_lik} it should
-  be a list with the following named components:
-\describe{
-\item{\code{data}}{an object containing any data needed to compute the pointwise log-likelihood}
-\item{\code{draws}}{an object containing the posterior draws for any parameters needed to compute the pointwise log-likelihood}
-\item{\code{fun}}{a function of \code{i}, \code{data}, and \code{draws} that returns a vector containing the log-likelihood for the \eqn{i}th observation evaluated at each posterior draw.}
-\item{\code{N}}{the number of observations}
-\item{\code{S}}{the number of posterior draws}
-}
+If \code{llfun} and \code{llargs} are specified instead of
+ \code{log_lik} then \code{llargs} should be a named list with the following
+ components:
+ \describe{
+   \item{\code{draws}}{an object containing the posterior draws for any
+   parameters needed to compute the pointwise log-likelihood}
+   \item{\code{data}}{an object containing any data (e.g. observed outcome
+   and predictors) needed to compute the pointwise log-likelihood}
+   \item{\code{N}}{the number of observations}
+   \item{\code{S}}{the size of the posterior sample}
+ }
+ and \code{llfun} should be a function that takes arguments \code{i},
+ \code{data}, and \code{draws} and returns a vector containing the
+ log-likelihood for the \code{i}th observation evaluated at each posterior
+ draw.
 }
 \examples{
 \dontrun{

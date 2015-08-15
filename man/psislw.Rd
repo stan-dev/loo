@@ -4,7 +4,7 @@
 \alias{psislw}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
-psislw(lw, ll_list = NULL, wcp = 0.2, wtrunc = 3/4,
+psislw(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
   cores = parallel::detectCores())
 }
 \arguments{
@@ -14,7 +14,7 @@ matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 of data points. (If \code{lw} is a vector it will be coerced to a
 one-column matrix.)}
 
-\item{ll_list}{see \code{\link{loo}}.}
+\item{llfun,llargs}{see \code{\link{loo}}.}
 
 \item{wcp}{the proportion of importance weights to use for the generalized
 Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
