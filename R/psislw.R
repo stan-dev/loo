@@ -61,8 +61,7 @@ psislw <- function(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
       x_new[above_cut] <- smoothed_tail
     }
     # truncate (if wtrunc > 0) and renormalize, return log weights and pareto k
-    lw_new <- lw_truncate(x_new, wtrunc)
-    lw_new <- lw_normalize(lw_new)
+    lw_new <- lw_normalize(lw_truncate(x_new, wtrunc))
     nlist(lw_new, k)
   }
 
@@ -70,8 +69,7 @@ psislw <- function(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
     if (LL_FUN) {
       ll_i <- llfun(i = i, data = llargs$data, draws = llargs$draws)
       lw_i <- -1 * ll_i
-    }
-    else{
+    } else {
       lw_i <- lw[, i]
       ll_i <- -1 * lw_i
     }
@@ -104,7 +102,7 @@ psislw <- function(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
     on.exit(stopCluster(cl))
     out <- parLapply(cl, X = 1:N, fun = .psis_loop)
   }
-  loos <- sapply(out, "[[", 1L)
-  pareto_k <- sapply(out, "[[", 2L)
+  loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
+  pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
   nlist(loos, pareto_k)
 }

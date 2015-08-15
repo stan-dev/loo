@@ -12,7 +12,7 @@ logColMeansExp_ll <- function(fun, args) {
   logS <- log(args$S)
   clse <- vapply(1:(args$N), FUN = function(i) {
     logSumExp(fun(i = i, data = args$data, draws = args$draws))
-  }, FUN.VALUE = 0, USE.NAMES = FALSE)
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
 
