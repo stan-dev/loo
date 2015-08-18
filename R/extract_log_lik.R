@@ -4,8 +4,8 @@
 #' fitted Stan model.
 #'
 #' @export
-#' @param stanfit a \code{stanfit} object (\pkg{rstan} package).
-#' @param parameter_name a character string naming the parameter (or generated
+#' @param stanfit A \code{stanfit} object (\pkg{rstan} package).
+#' @param parameter_name A character string naming the parameter (or generated
 #'   quantity) in the Stan model corresponding to the log-likelihood.
 #' @return An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
 #'   \eqn{S} is the number of simulations and \eqn{N} is the number of data

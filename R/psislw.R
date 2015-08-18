@@ -1,18 +1,19 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
 #' @export
-#' @param lw a matrix or vector of log weights. For computing LOO \code{lw =
+#' @param lw A matrix or vector of log weights. For computing LOO \code{lw =
 #'   -log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a
 #'   one-column matrix.)
-#' @param wcp the proportion of importance weights to use for the generalized
+#' @param wcp The proportion of importance weights to use for the generalized
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
 #'   distribution.
-#' @param wtrunc for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
+#' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
-#' @param cores the number of cores to use for parallelization.
+#' @param cores The number of cores to use for parallelization.
+#' @param llfun,llargs See \code{\link{loo.function}}.
 #'
 #' @return A named with list with components \code{lw_smooth} (modified log
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
@@ -30,10 +31,10 @@
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
-                   cores = parallel::detectCores()) {
-  .psis <- function(n) {
-    x <- lw[, n]
-    x <- x - max(x)
+                   cores = parallel::detectCores(),
+                   llfun = NULL, llargs = NULL) {
+  .psis <- function(lw_i) {
+    x <- lw_i - max(lw_i)
     # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
     above_cut <- x > cutoff
@@ -61,9 +62,21 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       x_new[above_cut] <- smoothed_tail
     }
     # truncate (if wtrunc > 0) and renormalize, return log weights and pareto k
-    lw_new <- lw_truncate(x_new, wtrunc)
-    lw_new <- lw_normalize(lw_new)
+    lw_new <- lw_normalize(lw_truncate(x_new, wtrunc))
     nlist(lw_new, k)
+  }
+
+  .psis_loop <- function(i) {
+    if (LL_FUN) {
+      ll_i <- llfun(i = i, data = llargs$data, draws = llargs$draws)
+      lw_i <- -1 * ll_i
+    } else {
+      lw_i <- lw[, i]
+      ll_i <- -1 * lw_i
+    }
+    psis <- .psis(lw_i)
+    lse <- logSumExp(ll_i + psis$lw_new)
+    nlist(lse, k = psis$k)
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
@@ -71,15 +84,26 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
 
-  if (!is.matrix(lw))
-    lw <- as.matrix(lw)
-  N <- ncol(lw)
+  if (!missing(lw)) {
+    if (!is.matrix(lw))
+      lw <- as.matrix(lw)
+    N <- ncol(lw)
+    LL_FUN <- FALSE
+  } else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either lw or llfun and llargs must be specified.")
+    N <- llargs$N
+    LL_FUN <- TRUE
+  }
+
   if (.Platform$OS.type != "windows") {
-    psis <- mclapply(X = 1:N, FUN = .psis, mc.cores = cores)
+    out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
   } else {
     cl <- makePSOCKcluster(cores)
     on.exit(stopCluster(cl))
-    psis <- parLapply(cl, X = 1:N, fun = .psis)
+    out <- parLapply(cl, X = 1:N, fun = .psis_loop)
   }
-  .psis_out(psis)
+  loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
+  pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
+  nlist(loos, pareto_k)
 }

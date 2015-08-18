@@ -7,10 +7,10 @@
 gpdfit(x)
 }
 \arguments{
-\item{x}{a numeric vector. The sample from which to estimate the parameters.}
+\item{x}{A numeric vector. The sample from which to estimate the parameters.}
 }
 \value{
-a named list with components \code{k} and \code{sigma}.
+A named list with components \code{k} and \code{sigma}.
 }
 \description{
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto

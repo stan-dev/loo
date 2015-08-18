@@ -7,6 +7,15 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - log(S)
 }
 
+logColMeansExp_ll <- function(fun, args) {
+  # should be more stable than log(colMeans(exp(x)))
+  logS <- log(args$S)
+  clse <- vapply(1:(args$N), FUN = function(i) {
+    logSumExp(fun(i = i, data = args$data, draws = args$draws))
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+  clse - logS
+}
+
 #' @importFrom matrixStats colVars
 pointwise_waic <- function(log_lik) {
   lpd <- logColMeansExp(log_lik)
@@ -15,9 +24,13 @@ pointwise_waic <- function(log_lik) {
   waic <- -2 * elpd_waic
   nlist(elpd_waic, p_waic, waic)
 }
-pointwise_loo <- function(log_lik, psis) {
-  # psis is output from psisloo()
-  lpd <- logColMeansExp(log_lik)
+pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
+  if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
+  else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either log_lik or llfun and llargs must be specified")
+    lpd <- logColMeansExp_ll(llfun, llargs)
+  }
   elpd_loo <- psis$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
@@ -73,25 +86,8 @@ lw_normalize <- function(y) {
   y - logSumExp(y)
 }
 
-
-# The parallelization functions mclapply and parLapply return a list of lists:
-# psis is a list of length N=ncol(lw). Each of the N elements of psis is itself
-# a list of length 2. In each of these N lists of length 2 the first component
-# is a vector of length S=nrow(lw) containing the modified log weights and the
-# second component is the estimate of the pareto shape parameter k. This
-# function cbinds the log weight vectors into a matrix and combines the k
-# estimates into a vector.
-.psis_out <- function(psis) {
-  ux <- unlist(psis, recursive = FALSE)
-  lwid <- grepl("lw", names(ux))
-  lw_smooth <- cbind_list(ux[lwid])
-  pareto_k <- unlist(ux[!lwid])
-  nlist(lw_smooth, pareto_k)
-}
-
-
 # print helpers -----------------------------------------------------------
-#' @importFrom graphics abline axis plot points
+#' @importFrom graphics abline axis plot points text
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
