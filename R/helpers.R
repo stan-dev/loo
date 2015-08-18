@@ -10,19 +10,43 @@ logColMeansExp <- function(x) {
 logColMeansExp_ll <- function(fun, args) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(args$S)
-  clse <- vapply(1:(args$N), FUN = function(i) {
+  clse <- vapply(seq_len(args$N), FUN = function(i) {
     logSumExp(fun(i = i, data = args$data, draws = args$draws))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
+colVars_ll <- function(fun, args) {
+  vapply(seq_len(args$N), FUN = function(i) {
+    var(as.vector(fun(i = i, data = args$data, draws = args$draws)))
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+}
+
+totals <- function(pointwise) {
+  N <- length(pointwise[[1L]])
+  total  <- unlist_lapply(pointwise, sum)
+  se <- sqrt(N * unlist_lapply(pointwise, var))
+  as.list(c(total, se))
+}
 
 #' @importFrom matrixStats colVars
-pointwise_waic <- function(log_lik) {
-  lpd <- logColMeansExp(log_lik)
-  p_waic <- colVars(log_lik)
+pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
+  if (!missing(log_lik)) {
+    lpd <- logColMeansExp(log_lik)
+    p_waic <- colVars(log_lik)
+  } else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either log_lik or llfun and llargs must be specified")
+    lpd <- logColMeansExp_ll(llfun, llargs)
+    p_waic <- colVars_ll(llfun, llargs)
+  }
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
-  nlist(elpd_waic, p_waic, waic)
+  pointwise <- nlist(elpd_waic, p_waic, waic)
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out
 }
 pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
@@ -34,15 +58,14 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   elpd_loo <- psis$loos
   p_loo <- lpd - elpd_loo
   looic <- -2 * elpd_loo
-  nlist(elpd_loo, p_loo, looic)
+  pointwise <- nlist(elpd_loo, p_loo, looic)
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out$pareto_k <- psis$pareto_k
+  out
 }
-totals <- function(pointwise) {
-  N <- length(pointwise[[1L]])
-  total  <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
-  as.list(c(total, se))
-}
-
 
 # psis helpers ------------------------------------------------------------
 

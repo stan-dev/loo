@@ -33,7 +33,7 @@ test_that("loo and waic return expected results", {
   vec <- 1:10
   arr <- array(1:100, dim = c(2,5,10))
   expect_error(loo(vec))
-  expect_error(waic(arr), 'log_lik should be a matrix')
+  expect_error(waic(arr))
 
   expect_equivalent(pareto_k_val, pareto_k_ans)
 })

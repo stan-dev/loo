@@ -75,14 +75,11 @@ loo <- function(x, ...) {
 #' Typically (but not restricted to be) the object returned by
 #' \code{\link{extract_log_lik}}.
 #'
+#' @export
+#'
 loo.matrix <- function(x, ...) {
   psis <- psislw(lw = -1 * x, ...)
-  pointwise <- pointwise_loo(psis, x)
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- psis$pareto_k
+  out <- pointwise_loo(psis, x)
   structure(out, log_lik_dim = dim(x), class = "loo")
 }
 
@@ -103,15 +100,12 @@ loo.matrix <- function(x, ...) {
 #'    \item \code{S}: The size of the posterior sample.
 #'  }
 #'
+#' @export
+#'
 loo.function <- function(x, ..., args) {
   if (missing(args)) stop("args must be specified", call. = FALSE)
-  psis <- psislw(llfun = x, llargs = args, ...)
-  pointwise <- pointwise_loo(psis = psis, llfun = x, llargs = args)
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- psis$pareto_k
+  psis <- psislw(..., llfun = x, llargs = args)
+  out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = "loo")
 }
 
