@@ -6,15 +6,15 @@
 \alias{loo.matrix}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
-loo(log_lik, ...)
+loo(x, ...)
 
-\method{loo}{matrix}(log_lik, ...)
+\method{loo}{matrix}(x, ...)
 
-\method{loo}{function}(log_lik, ..., args)
+\method{loo}{function}(x, ..., args)
 }
 \arguments{
-\item{log_lik}{A matrix or function. See the \strong{Methods (by class)}
-section below for a detailed description.}
+\item{x}{A log-likelihood matrix or function. See the \strong{Methods (by
+class)} section below for a detailed description.}
 
 \item{...}{Optional arguments to pass to \code{\link{psislw}}. Possible
   arguments and their defaults are:
@@ -32,8 +32,8 @@ section below for a detailed description.}
  We recommend using the default values for the \code{psislw} arguments unless
  there are problems (e.g. \code{NA} or \code{NaN} results).}
 
-\item{args}{Only required if \code{log_lik} is a function. A list containing
-the data required to specify the arguments to \code{log_lik}. See the
+\item{args}{Only required if \code{x} is a function. A list containing
+the data required to specify the arguments to the function. See the
 \strong{Methods (by class)} section below for how \code{args} should be
 specified.}
 }
@@ -73,7 +73,7 @@ Typically (but not restricted to be) the object returned by
  returns a vector containing the log-likelihood for the \code{i}th
  observation evaluated at each posterior draw.
 
- If \code{log_lik} is a function then the \code{args} argument must also be
+ If \code{x} is a function then the \code{args} argument must also be
  specified and should be a named list with the following components:
  \itemize{
    \item \code{draws}: An object containing the posterior draws for any

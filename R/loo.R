@@ -3,10 +3,10 @@
 #' Efficient approximate leave-one-out cross-validation
 #'
 #' @export
-#' @param log_lik A matrix or function. See the \strong{Methods (by class)}
-#'   section below for a detailed description.
-#' @param args Only required if \code{log_lik} is a function. A list containing
-#'   the data required to specify the arguments to \code{log_lik}. See the
+#' @param x A log-likelihood matrix or function. See the \strong{Methods (by
+#'   class)} section below for a detailed description.
+#' @param args Only required if \code{x} is a function. A list containing
+#'   the data required to specify the arguments to the function. See the
 #'   \strong{Methods (by class)} section below for how \code{args} should be
 #'   specified.
 #' @param ... Optional arguments to pass to \code{\link{psislw}}. Possible
@@ -64,7 +64,7 @@
 #' print(loo_diff, digits = 5)
 #' }
 #'
-loo <- function(log_lik, ...) {
+loo <- function(x, ...) {
   UseMethod("loo")
 }
 
@@ -73,15 +73,15 @@ loo <- function(log_lik, ...) {
 #' sample (the number of simulations) and \eqn{N} is the number of data points.
 #' Typically (but not restricted to be) the object returned by
 #' \code{\link{extract_log_lik}}.
-loo.matrix <- function(log_lik, ...) {
-  psis <- psislw(lw = -1 * log_lik, ...)
-  pointwise <- pointwise_loo(psis, log_lik)
+loo.matrix <- function(x, ...) {
+  psis <- psislw(lw = -1 * x, ...)
+  pointwise <- pointwise_loo(psis, x)
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
   out$pointwise <- cbind_list(pointwise)
   out$pareto_k <- psis$pareto_k
-  structure(out, log_lik_dim = dim(log_lik), class = "loo")
+  structure(out, log_lik_dim = dim(x), class = "loo")
 }
 
 #' @describeIn loo
@@ -89,7 +89,7 @@ loo.matrix <- function(log_lik, ...) {
 #'  returns a vector containing the log-likelihood for the \code{i}th
 #'  observation evaluated at each posterior draw.
 #'
-#'  If \code{log_lik} is a function then the \code{args} argument must also be
+#'  If \code{x} is a function then the \code{args} argument must also be
 #'  specified and should be a named list with the following components:
 #'  \itemize{
 #'    \item \code{draws}: An object containing the posterior draws for any
@@ -100,10 +100,10 @@ loo.matrix <- function(log_lik, ...) {
 #'    \item \code{S}: The size of the posterior sample.
 #'  }
 #'
-loo.function <- function(log_lik, ..., args) {
+loo.function <- function(x, ..., args) {
   if (missing(args)) stop("args must be specified", call. = FALSE)
-  psis <- psislw(llfun = log_lik, llargs = args, ...)
-  pointwise <- pointwise_loo(psis = psis, llfun = log_lik, llargs = args)
+  psis <- psislw(llfun = x, llargs = args, ...)
+  pointwise <- pointwise_loo(psis = psis, llfun = x, llargs = args)
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
