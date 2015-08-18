@@ -87,7 +87,7 @@ lw_normalize <- function(y) {
 }
 
 # print helpers -----------------------------------------------------------
-#' @importFrom graphics abline axis plot points
+#' @importFrom graphics abline axis plot points text
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {

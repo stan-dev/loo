@@ -2,7 +2,7 @@
 #'
 #' Efficient approximate leave-one-out cross-validation
 #'
-#' @export
+#' @export loo loo.matrix loo.function
 #' @param x A log-likelihood matrix or function. See the \strong{Methods (by
 #'   class)} section below for a detailed description.
 #' @param args Only required if \code{x} is a function. A list containing
@@ -69,10 +69,12 @@ loo <- function(x, ...) {
 }
 
 #' @describeIn loo
+#'
 #' An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
 #' sample (the number of simulations) and \eqn{N} is the number of data points.
 #' Typically (but not restricted to be) the object returned by
 #' \code{\link{extract_log_lik}}.
+#'
 loo.matrix <- function(x, ...) {
   psis <- psislw(lw = -1 * x, ...)
   pointwise <- pointwise_loo(psis, x)
@@ -85,6 +87,7 @@ loo.matrix <- function(x, ...) {
 }
 
 #' @describeIn loo
+#'
 #'  A function that takes arguments \code{i}, \code{data}, and \code{draws} and
 #'  returns a vector containing the log-likelihood for the \code{i}th
 #'  observation evaluated at each posterior draw.
