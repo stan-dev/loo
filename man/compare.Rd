@@ -7,7 +7,7 @@
 compare(a, b)
 }
 \arguments{
-\item{a,b}{objects returned by \code{\link{loo}} or \code{\link{waic}}.}
+\item{a,b}{Objects returned by \code{\link{loo}} or \code{\link{waic}}.}
 }
 \value{
 A named list with class \code{'compare.loo'}.

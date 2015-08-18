@@ -1,19 +1,19 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
 #' @export
-#' @param lw a matrix or vector of log weights. For computing LOO \code{lw =
+#' @param lw A matrix or vector of log weights. For computing LOO \code{lw =
 #'   -log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a
 #'   one-column matrix.)
-#' @param llfun,llargs see \code{\link{loo}}.
-#' @param wcp the proportion of importance weights to use for the generalized
+#' @param wcp The proportion of importance weights to use for the generalized
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
 #'   distribution.
-#' @param wtrunc for truncating very large weights to \eqn{S}^\code{wtrunc}. Set
+#' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
-#' @param cores the number of cores to use for parallelization.
+#' @param cores The number of cores to use for parallelization.
+#' @param llfun,llargs See \code{\link{loo.function}}.
 #'
 #' @return A named with list with components \code{lw_smooth} (modified log
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
@@ -30,8 +30,9 @@
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-psislw <- function(lw, llfun = NULL, llargs = NULL, wcp = 0.2, wtrunc = 3/4,
-                   cores = parallel::detectCores()) {
+psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
+                   cores = parallel::detectCores(),
+                   llfun = NULL, llargs = NULL) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
     # split into body and right tail
