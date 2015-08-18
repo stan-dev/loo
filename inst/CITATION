@@ -6,11 +6,11 @@ citEntry(entry = "Manual",
                                    as.person("Andrew Gelman"),
                                    as.person("Jonah Gabry")),
          year         = "2015",
-         note         = "R package version 0.1",
+         note         = "R package version 0.1.3",
          url          = "https://github.com/jgabry/loo",
          textVersion  =
            paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2015).",
                  "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models.",
-                 "R package version 0.1.",
+                 "R package version 0.1.3.",
                  "https://github.com/jgabry/loo")
 )

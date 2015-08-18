@@ -1,4 +1,6 @@
-# loo 0.1.2.9000
+# loo 0.1.3
+* As an alternative to providing a log-likelihood matrix, a log-likelihood function
+and any needed data may be provided.
 
 # loo 0.1.2 
 * Updates names in package to reflect name changes in the accompanying 
