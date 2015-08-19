@@ -2,15 +2,26 @@
 % Please edit documentation in R/waic.R
 \name{waic}
 \alias{waic}
+\alias{waic.function}
+\alias{waic.matrix}
 \title{Widely applicable information criterion (WAIC)}
 \usage{
-waic(log_lik)
+waic(x, ...)
+
+\method{waic}{matrix}(x, ...)
+
+\method{waic}{function}(x, ..., args)
 }
 \arguments{
-\item{log_lik}{an \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the
-  posterior sample (the number of simulations) and \eqn{N} is the number of
-  data points. Typically (but not restricted to be) the object returned by
-  \code{\link{extract_log_lik}}.}
+\item{x}{A log-likelihood matrix or function. See the \strong{Methods (by
+class)} section below for a detailed description.}
+
+\item{...}{Other arguments. Currently ignored.}
+
+\item{args}{Only required if \code{x} is a function. A list containing
+the data required to specify the arguments to the function. See the
+\strong{Methods (by class)} section below for how \code{args} should be
+specified.}
 }
 \value{
 A named list (of class \code{'loo'}) with components:
@@ -29,6 +40,28 @@ measures}
 \description{
 Widely applicable information criterion (WAIC)
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
+sample (the number of simulations) and \eqn{N} is the number of data points.
+Typically (but not restricted to be) the object returned by
+\code{\link{extract_log_lik}}.
+
+\item \code{function}: A function that takes arguments \code{i}, \code{data}, and \code{draws} and
+ returns a vector containing the log-likelihood for the \code{i}th
+ observation evaluated at each posterior draw.
+
+ If \code{x} is a function then the \code{args} argument must also be
+ specified and should be a named list with the following components:
+ \itemize{
+   \item \code{draws}: An object containing the posterior draws for any
+   parameters needed to compute the pointwise log-likelihood.
+   \item \code{data}: An object containing any data (e.g. observed outcome
+   and predictors) needed to compute the pointwise log-likelihood.
+   \item \code{N}: The number of observations.
+   \item \code{S}: The size of the posterior sample.
+ }
+}}
 \examples{
 \dontrun{
 log_lik1 <- extract_log_lik(stanfit1)

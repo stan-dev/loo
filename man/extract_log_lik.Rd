@@ -7,9 +7,9 @@
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }
 \arguments{
-\item{stanfit}{a \code{stanfit} object (\pkg{rstan} package).}
+\item{stanfit}{A \code{stanfit} object (\pkg{rstan} package).}
 
-\item{parameter_name}{a character string naming the parameter (or generated
+\item{parameter_name}{A character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{

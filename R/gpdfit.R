@@ -5,8 +5,8 @@
 #'
 #' @keywords internal
 #' @export
-#' @param x a numeric vector. The sample from which to estimate the parameters.
-#' @return a named list with components \code{k} and \code{sigma}.
+#' @param x A numeric vector. The sample from which to estimate the parameters.
+#' @return A named list with components \code{k} and \code{sigma}.
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).

@@ -7,22 +7,20 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - log(S)
 }
 
-#' @importFrom matrixStats colVars
-pointwise_waic <- function(log_lik) {
-  lpd <- logColMeansExp(log_lik)
-  p_waic <- colVars(log_lik)
-  elpd_waic <- lpd - p_waic
-  waic <- -2 * elpd_waic
-  nlist(elpd_waic, p_waic, waic)
+logColMeansExp_ll <- function(fun, args) {
+  # should be more stable than log(colMeans(exp(x)))
+  logS <- log(args$S)
+  clse <- vapply(seq_len(args$N), FUN = function(i) {
+    logSumExp(fun(i = i, data = args$data, draws = args$draws))
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+  clse - logS
 }
-pointwise_loo <- function(log_lik, psis) {
-  # psis is output from psisloo()
-  lpd <- logColMeansExp(log_lik)
-  elpd_loo <- psis$loos
-  p_loo <- lpd - elpd_loo
-  looic <- -2 * elpd_loo
-  nlist(elpd_loo, p_loo, looic)
+colVars_ll <- function(fun, args) {
+  vapply(seq_len(args$N), FUN = function(i) {
+    var(as.vector(fun(i = i, data = args$data, draws = args$draws)))
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 }
+
 totals <- function(pointwise) {
   N <- length(pointwise[[1L]])
   total  <- unlist_lapply(pointwise, sum)
@@ -30,6 +28,44 @@ totals <- function(pointwise) {
   as.list(c(total, se))
 }
 
+#' @importFrom matrixStats colVars
+pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
+  if (!missing(log_lik)) {
+    lpd <- logColMeansExp(log_lik)
+    p_waic <- colVars(log_lik)
+  } else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either log_lik or llfun and llargs must be specified")
+    lpd <- logColMeansExp_ll(llfun, llargs)
+    p_waic <- colVars_ll(llfun, llargs)
+  }
+  elpd_waic <- lpd - p_waic
+  waic <- -2 * elpd_waic
+  pointwise <- nlist(elpd_waic, p_waic, waic)
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out
+}
+pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
+  if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
+  else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either log_lik or llfun and llargs must be specified")
+    lpd <- logColMeansExp_ll(llfun, llargs)
+  }
+  elpd_loo <- psis$loos
+  p_loo <- lpd - elpd_loo
+  looic <- -2 * elpd_loo
+  pointwise <- nlist(elpd_loo, p_loo, looic)
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out$pareto_k <- psis$pareto_k
+  out
+}
 
 # psis helpers ------------------------------------------------------------
 
@@ -73,30 +109,13 @@ lw_normalize <- function(y) {
   y - logSumExp(y)
 }
 
-
-# The parallelization functions mclapply and parLapply return a list of lists:
-# psis is a list of length N=ncol(lw). Each of the N elements of psis is itself
-# a list of length 2. In each of these N lists of length 2 the first component
-# is a vector of length S=nrow(lw) containing the modified log weights and the
-# second component is the estimate of the pareto shape parameter k. This
-# function cbinds the log weight vectors into a matrix and combines the k
-# estimates into a vector.
-.psis_out <- function(psis) {
-  ux <- unlist(psis, recursive = FALSE)
-  lwid <- grepl("lw", names(ux))
-  lw_smooth <- cbind_list(ux[lwid])
-  pareto_k <- unlist(ux[!lwid])
-  nlist(lw_smooth, pareto_k)
-}
-
-
 # print helpers -----------------------------------------------------------
-#' @importFrom graphics abline axis plot points
+#' @importFrom graphics abline axis plot points text
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
   brks <- c(-Inf, 0.5, 1, Inf)
-  kcut <- cut(k, breaks = brks, right = FALSE)
+  kcut <- cut(k, breaks = brks)
   count <- table(kcut)
   prop <- prop.table(count)
   if (sum(count[2:3]) == 0) {
@@ -115,8 +134,8 @@ k_warnings <- function(k, digits = 1) {
   invisible(NULL)
 }
 
-plot_k <- function(k) {
-  inrange <- function(a, rr) a >= rr[1] & a <= rr[2]
+plot_k <- function(k, ..., label_points = FALSE) {
+  inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
   yl <- expression(paste("Shape parameter ", italic(k)))
   xl <- expression(paste("Data ", italic(i)))
   plot(k, xlab = xl, ylab = yl, type = "n", bty = "l", yaxt = "n")
@@ -124,13 +143,27 @@ plot_k <- function(k) {
   krange <- range(k)
   for (val in c(0, 0.5, 1)) {
     if (inrange(val, krange))
-      abline(h = val, col = "#b17e64", lty = 2, lwd = 0.75)
+      abline(h = val, col = "#b17e64", lty = 2, lwd = 1)
   }
   hex_clrs <- c("#6497b1", "#005b96", "#03396c")
   brks <- c(-Inf, 0.5, 1)
   clrs <- ifelse(inrange(k, brks[1:2]), hex_clrs[1],
-                 ifelse(inrange(k, brks[2:3]), hex_clrs[2], hex_clrs[3]))
-  points(k, col = clrs, pch = 3, cex = .6)
+                 ifelse(inrange(k, brks[2:3]), hex_clrs[2L], hex_clrs[3L]))
+  if (all(k < 0.5) || !label_points) {
+    points(k, col = clrs, pch = 3, cex = .6)
+    return(invisible())
+  } else {
+    points(k[k < 0.5], col = clrs[k < 0.5], pch = 3, cex = .6)
+    sel <- !inrange(k, brks[1:2])
+    dots <- list(...)
+    txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
+                       labels = seq_along(k)[sel]),
+                  if (length(dots) > 0) dots)
+    if (!("adj" %in% names(txt_args))) txt_args$adj <- 2/3
+    if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
+    if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
+    do.call("text", txt_args)
+  }
 }
 
 

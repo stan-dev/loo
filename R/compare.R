@@ -3,7 +3,7 @@
 #' Compare two fitted models on LOO or WAIC
 #'
 #' @export
-#' @param a,b objects returned by \code{\link{loo}} or \code{\link{waic}}.
+#' @param a,b Objects returned by \code{\link{loo}} or \code{\link{waic}}.
 #' @return A named list with class \code{'compare.loo'}.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
