@@ -47,7 +47,7 @@ sample (the number of simulations) and \eqn{N} is the number of data points.
 Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.
 
-\item \code{function}: A function \code{f} that takes arguments \code{i}, \code{data},
+\item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
  and \code{draws} and returns a vector containing the log-likelihood for
  the \code{i}th observation evaluated at each posterior draw.
 
@@ -56,10 +56,11 @@ Typically (but not restricted to be) the object returned by
  \itemize{
    \item \code{draws}: An object containing the posterior draws for any
    parameters needed to compute the pointwise log-likelihood.
-   \item \code{data}: A matrix of data (e.g. observed outcome and predictors)
-   needed to compute the pointwise log-likelihood and in the appropriate form
-   so that \code{f(i=i, data=data[i,,drop=FALSE], draws=draws)} returns the
-   vector of log-likelihods for the \code{i}th observation.
+   \item \code{data}: An object containing data (e.g. observed outcome and
+   predictors) needed to compute the pointwise log-likelihood. \code{data}
+   should be in an appropriate form so that \eqn{f}\code{(i=i,
+   data=data[i,,drop=FALSE], draws=draws)} returns the \code{S}-vector of
+   log-likelihoods for the \code{i}th observation.
    \item \code{N}: The number of observations.
    \item \code{S}: The size of the posterior sample.
  }
