@@ -96,7 +96,7 @@ loo.matrix <- function(x, ...) {
 #'  \itemize{
 #'    \item \code{draws}: An object containing the posterior draws for any
 #'    parameters needed to compute the pointwise log-likelihood.
-#'    \item \code{data}: A matrix of data (e.g. observed outcome and predictors)
+#'    \item \code{data}: An object containing ata (e.g. observed outcome and predictors)
 #'    needed to compute the pointwise log-likelihood and in the appropriate form
 #'    so that \code{f(i=i, data=data[i,,drop=FALSE], draws=draws)} returns the
 #'    vector of log-likelihods for the \code{i}th observation.
