@@ -69,17 +69,19 @@ sample (the number of simulations) and \eqn{N} is the number of data points.
 Typically (but not restricted to be) the object returned by
 \code{\link{extract_log_lik}}.
 
-\item \code{function}: A function that takes arguments \code{i}, \code{data}, and \code{draws} and
- returns a vector containing the log-likelihood for the \code{i}th
- observation evaluated at each posterior draw.
+\item \code{function}: A function \code{f} that takes arguments \code{i}, \code{data},
+ and \code{draws} and returns a vector containing the log-likelihood for
+ the \code{i}th observation evaluated at each posterior draw.
 
- If \code{x} is a function then the \code{args} argument must also be
- specified and should be a named list with the following components:
+ The \code{args} argument must also be specified and should be a named list
+ with the following components:
  \itemize{
    \item \code{draws}: An object containing the posterior draws for any
    parameters needed to compute the pointwise log-likelihood.
-   \item \code{data}: An object containing any data (e.g. observed outcome
-   and predictors) needed to compute the pointwise log-likelihood.
+   \item \code{data}: A matrix of data (e.g. observed outcome and predictors)
+   needed to compute the pointwise log-likelihood and in the appropriate form
+   so that \code{f(i=i, data=data[i,,drop=FALSE], draws=draws)} returns the
+   vector of log-likelihods for the \code{i}th observation.
    \item \code{N}: The number of observations.
    \item \code{S}: The size of the posterior sample.
  }
@@ -98,24 +100,6 @@ loo_diff <- compare(loo1, loo2)
 loo_diff
 print(loo_diff, digits = 5)
 }
-
-# Example using log-likelihood function instead of matrix
-set.seed(0420)
-N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
-p <- rbeta(1, a0, b0)
-y <- rbinom(N, size = K, prob = p)
-a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-draws <- rbeta(S, a, b)
-data <- list(y = y, K = K)
-log_lik_fn <- function(i, data, draws) {
- dbinom(data$y[i], size = data$K, prob = draws, log = TRUE)
-}
-loo_with_fn <- loo(log_lik_fn, args = nlist(data, draws, N, S), cores = 1)
-
-# Check that we get same answer if using log-likelihood matrix
-log_lik_mat <- sapply(1:N, function(i) log_lik_fn(i, data, draws))
-loo_with_mat <- loo(log_lik_mat, cores = 1)
-all.equal(loo_with_mat, loo_with_fn)
 }
 \seealso{
 \code{\link{loo-package}}, \code{\link{print.loo}},

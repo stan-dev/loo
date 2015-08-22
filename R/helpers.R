@@ -11,13 +11,13 @@ logColMeansExp_ll <- function(fun, args) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(args$S)
   clse <- vapply(seq_len(args$N), FUN = function(i) {
-    logSumExp(fun(i = i, data = args$data, draws = args$draws))
+    logSumExp(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
 colVars_ll <- function(fun, args) {
   vapply(seq_len(args$N), FUN = function(i) {
-    var(as.vector(fun(i = i, data = args$data, draws = args$draws)))
+    var(as.vector(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 }
 
