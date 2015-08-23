@@ -11,13 +11,13 @@ logColMeansExp_ll <- function(fun, args) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(args$S)
   clse <- vapply(seq_len(args$N), FUN = function(i) {
-    logSumExp(fun(i = i, data = args$data, draws = args$draws))
+    logSumExp(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
 colVars_ll <- function(fun, args) {
   vapply(seq_len(args$N), FUN = function(i) {
-    var(as.vector(fun(i = i, data = args$data, draws = args$draws)))
+    var(as.vector(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 }
 
@@ -77,17 +77,10 @@ qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
   mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
-# lx <- function(a, x) {
-#   k <- mean.default(log1p(-a * x))
-#   log(-a / k) - k - 1
-# }
-lx <- function(a, x) {
-  # vectorized version
-  b <- -a
-  bx <- outer(x, b)
-  d <- dim(bx)
-  k <- .colMeans(log1p(bx), d[1], d[2])
-  log(b / k) - k - 1
+lx <- function(a,x) {
+  a <- -a
+  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
+  log(a/k) - k - 1
 }
 
 lw_cutpoint <- function(y, wcp, min_cut) {

@@ -1,14 +1,15 @@
 library(loo)
+options(loo.cores = 1)
 
 # test loo and waic -------------------------------------------------------
-context("loo and waic")
+context("loo and waic: correct results")
 test_that("loo and waic return expected results", {
 
   set.seed(123)
   x <- matrix(rnorm(5000), 100, 50)
   ww <- waic(x)
   wnms <- names(ww)
-  ll <- loo(x, cores = 1)
+  ll <- loo(x)
   lnms <- names(ll)
   waic_val <- unlist(ww[-grep("pointwise", wnms)])
   loo_val <- unlist(ll[-grep("pointwise|pareto_k", lnms)])
@@ -36,4 +37,26 @@ test_that("loo and waic return expected results", {
   expect_error(waic(arr))
 
   expect_equivalent(pareto_k_val, pareto_k_ans)
+})
+
+context("loo and waic: function vs matrix")
+test_that("function and matrix methods return same result", {
+  set.seed(024)
+
+  # fake data and posterior draws
+  N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
+  p <- rbeta(1, a0, b0)
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  draws <- rbeta(S, a, b)
+  data <- data.frame(y,K)
+  llfun <- function(i, data, draws) {
+    dbinom(data$y, size = data$K, prob = draws, log = TRUE)
+  }
+  loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S))
+
+  # Check that we get same answer if using log-likelihood matrix
+  log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
+  loo_with_mat <- loo(log_lik_mat)
+  expect_equivalent(loo_with_mat, loo_with_fn)
 })
