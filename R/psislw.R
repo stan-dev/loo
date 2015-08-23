@@ -12,7 +12,9 @@
 #'   distribution.
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
-#' @param cores The number of cores to use for parallelization.
+#' @param cores The number of cores to use for parallelization. This can be set
+#'   for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
+#'   \code{\link[parallel]{detectCores}}().
 #' @param llfun,llargs See \code{\link{loo.function}}.
 #'
 #' @return A named with list with components \code{lw_smooth} (modified log
@@ -31,7 +33,7 @@
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
-                   cores = parallel::detectCores(),
+                   cores = getOption("loo.cores", parallel::detectCores()),
                    llfun = NULL, llargs = NULL) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)

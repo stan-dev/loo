@@ -25,8 +25,10 @@ class)} section below for a detailed description.}
    the generalized Pareto distribution.}
  \item{\code{wtrunc = 3/4}}{For truncating very large weights to
    \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
- \item{\code{cores = \link[parallel]{detectCores}()}}{The number of cores to
-   use for parallelization.}
+ \item{\code{cores = getOption("loo.cores", parallel::detectCores())}}{The
+ number of cores to use for parallelization. This can be set for an entire R
+ session by \code{options(loo.cores = NUMBER)}. The default is
+ \code{\link[parallel]{detectCores}}().}
 }
 
  We recommend using the default values for the \code{psislw} arguments unless

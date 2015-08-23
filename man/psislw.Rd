@@ -4,8 +4,8 @@
 \alias{psislw}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
-psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = parallel::detectCores(),
-  llfun = NULL, llargs = NULL)
+psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("loo.cores",
+  parallel::detectCores()), llfun = NULL, llargs = NULL)
 }
 \arguments{
 \item{lw}{A matrix or vector of log weights. For computing LOO \code{lw =
@@ -22,7 +22,9 @@ distribution.}
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
 
-\item{cores}{The number of cores to use for parallelization.}
+\item{cores}{The number of cores to use for parallelization. This can be set
+for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
+\code{\link[parallel]{detectCores}}().}
 
 \item{llfun,llargs}{See \code{\link{loo.function}}.}
 }
