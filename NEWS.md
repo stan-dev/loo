@@ -1,7 +1,6 @@
 # loo 0.1.3
 This update makes it easier to incorporate **loo**'s functionality into other packages
-and also provides a new means of specifying the pointwise log-likelihood that uses
-less memory:
+and also incorporates several changes that reduce memory usage.
 
 * Add Ben Goodrich as contributor
 * S3 generics and `matrix` and `function` methods for both `loo` and `waic`. 
@@ -9,8 +8,8 @@ The matrix methods provide the same functionality as previous versions of
 **loo** and take a log-likelihood matrix as the input. The function method 
 allows the user to provide a function for computing the log-likelihood from 
 the data and posterior draws (which are also provided by the user). The function
-method saves a lot of memory and so should make it possible to use **loo** for 
-models fit to large amounts of data.
+method is less memory intensive and should make it possible to use **loo** for 
+models fit to larger amounts of data than before.
 * Separate `plot` and `print` methods. `plot` also provides `label_points` argument,
 which, if `TRUE`, will label any Pareto k points greater than 1/2 by the index number
 of the corresponding observation.
