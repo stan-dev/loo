@@ -77,17 +77,10 @@ qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
   mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
-# lx <- function(a, x) {
-#   k <- mean.default(log1p(-a * x))
-#   log(-a / k) - k - 1
-# }
-lx <- function(a, x) {
-  # vectorized version
-  b <- -a
-  bx <- outer(x, b)
-  d <- dim(bx)
-  k <- .colMeans(log1p(bx), d[1], d[2])
-  log(b / k) - k - 1
+lx <- function(a,x) {
+  a <- -a
+  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
+  log(a/k) - k - 1
 }
 
 lw_cutpoint <- function(y, wcp, min_cut) {
