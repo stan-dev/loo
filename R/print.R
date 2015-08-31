@@ -47,16 +47,7 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
 #' @rdname print.loo
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
-  if (is.list(x)) {
-    ux <- unlist(x)
-    names(ux) <- c("elpd_diff", "SE")
-    out <- format(round(ux, digits), nsmall = digits)
-    print(out, quote = FALSE)
-    return(invisible(x))
-  } else {
-    stopifnot(is.matrix(x))
-    print(format(round(x, digits), nsmall = digits), quote = FALSE)
-  }
+  print(format(round(x, digits), nsmall = digits), quote = FALSE)
 }
 
 #' @rdname print.loo

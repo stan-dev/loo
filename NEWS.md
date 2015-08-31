@@ -13,6 +13,7 @@ models fit to larger amounts of data than before.
 * Separate `plot` and `print` methods. `plot` also provides `label_points` argument,
 which, if `TRUE`, will label any Pareto k points greater than 1/2 by the index number
 of the corresponding observation.
+* `compare` now returns model weights.
 * Allow setting number of cores using `options(loo.cores = NUMBER)`. 
 
 # loo 0.1.2 

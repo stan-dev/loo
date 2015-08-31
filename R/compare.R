@@ -1,10 +1,17 @@
 #' Model comparison
 #'
-#' Compare two fitted models on LOO or WAIC
+#' Compare fitted models on LOO or WAIC
 #'
 #' @export
-#' @param a,b Objects returned by \code{\link{loo}} or \code{\link{waic}}.
-#' @return A named list with class \code{'compare.loo'}.
+#' @param ... At least two objects returned by \code{\link{loo}} or
+#'   \code{\link{waic}}.
+#' @return A vector or matrix with class \code{'compare.loo'}. If \code{...} has
+#'   more than two objects then a matrix is returned. This matrix summarizes the
+#'   objects and also reports model weights (the posterior probability that each
+#'   model has the best expected out-of-sample predictive accuracy). If
+#'   \code{...} contains exactly two objects then the difference in expected
+#'   predictive accuracy and the standard error of the difference are returned
+#'   (see Details) in addition to model weights.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
 #'   their expected predictive accuracy by the difference in \code{elpd_waic} or
@@ -42,7 +49,7 @@ compare <- function(...) {
   if (!all(sapply(dots, is.loo)))
     stop("All inputs should have class 'loo'", call. = FALSE)
 
-  if (length(dots) <= 1)
+  if (length(dots) <= 1L)
     stop("'compare' requires at least two models.", call. = FALSE)
   else if (length(dots) == 2L) {
     a <- dots[[1L]]
@@ -57,7 +64,11 @@ compare <- function(...) {
     sqrtN <- sqrt(Na)
     elpd <- grep("^elpd", colnames(pa))
     diff <- pb[, elpd] - pa[, elpd]
-    comp <- list(elpd_diff = sum(diff), se = sqrtN * sd(diff))
+    uwts <- c(sum(pa[, elpd]), sum(pb[, elpd]))
+    uwts <- exp(uwts - min(uwts))
+    wts <- uwts / sum(uwts)
+    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff),
+              weight1 = wts[1L], weight2 = wts[2L])
     class(comp) <- "compare.loo"
     comp
   }
@@ -69,8 +80,8 @@ compare <- function(...) {
     x <- sapply(dots, function(x) unlist(x[sel]))
     colnames(x) <- nms
     rnms <- rownames(x)
-    ic <- x[grep("^waic$|^looic$", rnms), ]
-    uwts <- exp(-0.5 * (ic - min(ic)))
+    uwts <- x[grep("^elpd", rnms), ]
+    uwts <- exp(uwts - min(uwts))
     comp <- rbind(x, weights = uwts / sum(uwts))
     col_ord <- order(uwts, decreasing = TRUE)
 
