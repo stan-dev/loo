@@ -47,11 +47,7 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
 #' @rdname print.loo
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
-  ux <- unlist(x)
-  names(ux) <- c("elpd_diff", "SE")
-  out <- format(round(ux, digits), nsmall = digits)
-  print(out, quote = FALSE)
-  invisible(x)
+  print(format(round(x, digits), nsmall = digits), quote = FALSE)
 }
 
 #' @rdname print.loo

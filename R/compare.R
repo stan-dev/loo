@@ -1,10 +1,17 @@
 #' Model comparison
 #'
-#' Compare two fitted models on LOO or WAIC
+#' Compare fitted models on LOO or WAIC
 #'
 #' @export
-#' @param a,b Objects returned by \code{\link{loo}} or \code{\link{waic}}.
-#' @return A named list with class \code{'compare.loo'}.
+#' @param ... At least two objects returned by \code{\link{loo}} or
+#'   \code{\link{waic}}.
+#' @return A vector or matrix with class \code{'compare.loo'}. If \code{...} has
+#'   more than two objects then a matrix is returned. This matrix summarizes the
+#'   objects and also reports model weights (the posterior probability that each
+#'   model has the best expected out-of-sample predictive accuracy). If
+#'   \code{...} contains exactly two objects then the difference in expected
+#'   predictive accuracy and the standard error of the difference are returned
+#'   (see Details) in addition to model weights.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
 #'   their expected predictive accuracy by the difference in \code{elpd_waic} or
@@ -36,25 +43,53 @@
 #' }
 #'
 
-compare <- function(a, b) {
-  namea <- deparse(substitute(a))
-  nameb <- deparse(substitute(b))
-  if (!is.loo(a))
-    stop(paste(namea, "does not have class 'loo'"), call. = FALSE)
-  if (!is.loo(b))
-    stop(paste(nameb, "does not have class 'loo'"), call. = FALSE)
+compare <- function(...) {
+  dots <- list(...)
+  nms <- as.character(match.call())[-1L]
+  if (!all(sapply(dots, is.loo)))
+    stop("All inputs should have class 'loo'", call. = FALSE)
 
-  pa <- a$pointwise
-  pb <- b$pointwise
-  Na <- nrow(pa)
-  Nb <- nrow(pb)
-  if (Na != Nb)
-    stop(paste("Models a and b should have the same number of data points.",
-               "\nFound N_a =", Na, "and N_b =", Nb), call. = FALSE)
-  sqrtN <- sqrt(Na)
-  elpd <- grep("^elpd", colnames(pa))
-  diff <- pb[, elpd] - pa[, elpd]
-  comp <- list(elpd_diff = sum(diff), se = sqrtN * sd(diff))
-  class(comp) <- "compare.loo"
-  comp
+  if (length(dots) <= 1L)
+    stop("'compare' requires at least two models.", call. = FALSE)
+  else if (length(dots) == 2L) {
+    a <- dots[[1L]]
+    b <- dots[[2L]]
+    pa <- a$pointwise
+    pb <- b$pointwise
+    Na <- nrow(pa)
+    Nb <- nrow(pb)
+    if (Na != Nb)
+      stop(paste("Models a and b should have the same number of data points.",
+                 "\nFound N_a =", Na, "and N_b =", Nb), call. = FALSE)
+    sqrtN <- sqrt(Na)
+    elpd <- grep("^elpd", colnames(pa))
+    diff <- pb[, elpd] - pa[, elpd]
+    uwts <- c(sum(pa[, elpd]), sum(pb[, elpd]))
+    uwts <- exp(uwts - min(uwts))
+    wts <- uwts / sum(uwts)
+    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff),
+              weight1 = wts[1L], weight2 = wts[2L])
+    class(comp) <- "compare.loo"
+    comp
+  }
+  else {
+    Ns <- sapply(dots, function(x) nrow(x$pointwise))
+    if (!all(Ns == Ns[1L]))
+      stop("Not all models have the same number of data points.", call. = FALSE)
+    sel <- grep("pointwise|pareto_k", names(dots[[1L]]), invert = TRUE)
+    x <- sapply(dots, function(x) unlist(x[sel]))
+    colnames(x) <- nms
+    rnms <- rownames(x)
+    uwts <- x[grep("^elpd", rnms), ]
+    uwts <- exp(uwts - min(uwts))
+    comp <- rbind(x, weights = uwts / sum(uwts))
+    col_ord <- order(uwts, decreasing = TRUE)
+
+    patts <- c("^waic$|^looic$", "^se_waic$|^se_looic$", "elpd", "p_", "weights")
+    row_ord <- unlist(sapply(patts, function(p) grep(p, rownames(comp))),
+                      use.names = FALSE)
+    comp <- t(comp[row_ord, col_ord])
+    class(comp) <- c("compare.loo", class(comp))
+    comp
+  }
 }

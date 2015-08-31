@@ -4,16 +4,23 @@
 \alias{compare}
 \title{Model comparison}
 \usage{
-compare(a, b)
+compare(...)
 }
 \arguments{
-\item{a,b}{Objects returned by \code{\link{loo}} or \code{\link{waic}}.}
+\item{...}{At least two objects returned by \code{\link{loo}} or
+\code{\link{waic}}.}
 }
 \value{
-A named list with class \code{'compare.loo'}.
+A vector or matrix with class \code{'compare.loo'}. If \code{...} has
+  more than two objects then a matrix is returned. This matrix summarizes the
+  objects and also reports model weights (the posterior probability that each
+  model has the best expected out-of-sample predictive accuracy). If
+  \code{...} contains exactly two objects then the difference in expected
+  predictive accuracy and the standard error of the difference are returned
+  (see Details) in addition to model weights.
 }
 \description{
-Compare two fitted models on LOO or WAIC
+Compare fitted models on LOO or WAIC
 }
 \details{
 When comparing two fitted models, we can estimate the difference in
