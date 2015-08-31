@@ -60,5 +60,10 @@ print.compare.loo <- function(x, ..., digits = 1) {
 plot.loo <- function(x, ..., label_points = FALSE) {
   if (!("pareto_k" %in% names(x)))
     stop("No Pareto k values found.", call. = FALSE)
-  plot_k(x$pareto_k, ..., label_points = label_points)
+  k <- x$pareto_k
+  if (any(is.infinite(k))) {
+    pct <- 100 * sum(is.infinite(k)) / length(k)
+    warning(signif(pct, 1), "% of k estimates are infinite and not plotted.")
+  }
+  plot_k(k, ..., label_points = label_points)
 }
