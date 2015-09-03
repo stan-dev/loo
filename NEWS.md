@@ -17,7 +17,7 @@ argument, which, if `TRUE`, will label any Pareto `k` points greater than
 1/2 by the index number of the corresponding observation. The plot method 
 also now warns about `Inf`/`NA`/`NaN` values of `k` that are not shown in 
 the plot. 
-* `compare` now returns model weights.
+* `compare` now returns model weights and accepts more than two inputs.
 * Allow setting number of cores using `options(loo.cores = NUMBER)`. 
 
 # loo 0.1.2 
