@@ -65,7 +65,7 @@ compare <- function(...) {
     elpd <- grep("^elpd", colnames(pa))
     diff <- pb[, elpd] - pa[, elpd]
     uwts <- c(sum(pa[, elpd]), sum(pb[, elpd]))
-    uwts <- exp(uwts - min(uwts))
+    uwts <- exp(uwts - max(uwts))
     wts <- uwts / sum(uwts)
     comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff),
               weight1 = wts[1L], weight2 = wts[2L])
@@ -81,7 +81,7 @@ compare <- function(...) {
     colnames(x) <- nms
     rnms <- rownames(x)
     uwts <- x[grep("^elpd", rnms), ]
-    uwts <- exp(uwts - min(uwts))
+    uwts <- exp(uwts - max(uwts))
     comp <- rbind(x, weights = uwts / sum(uwts))
     col_ord <- order(uwts, decreasing = TRUE)
 
