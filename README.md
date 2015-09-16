@@ -22,14 +22,13 @@ have various advantages over simpler estimates of predictive error such as
 AIC and DIC but are less used in practice because they involve additional
 computational steps. 
 
-This package implements the fast and stable computations
-for LOO and WAIC from
-[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/pdf/1507.04544v1.pdf). 
-From existing posterior simulation draws, we compute LOO using Pareto smoothed importance
-sampling (PSIS), a new procedure for regularizing importance weights. As a
-byproduct of our calculations, we also obtain approximate standard errors for
-estimated predictive errors and for comparing predictive errors between
-two models.
+This package implements the fast and stable computations for LOO and WAIC from
+[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/abs/1507.04544). 
+From existing posterior simulation draws, we compute LOO using Pareto smoothed
+importance sampling (PSIS), a new procedure for regularizing importance weights.
+As a byproduct of our calculations, we also obtain approximate standard errors
+for estimated predictive errors and for comparing predictive errors between two
+models.
 
 ### Authors
 Aki Vehtari, Andrew Gelman, Jonah Gabry
