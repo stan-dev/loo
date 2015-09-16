@@ -5,7 +5,7 @@
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
 psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("loo.cores",
-  parallel::detectCores()), llfun = NULL, llargs = NULL)
+  parallel::detectCores()), llfun = NULL, llargs = NULL, ...)
 }
 \arguments{
 \item{lw}{A matrix or vector of log weights. For computing LOO \code{lw =
@@ -27,6 +27,10 @@ for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
 \code{\link[parallel]{detectCores}}().}
 
 \item{llfun,llargs}{See \code{\link{loo.function}}.}
+
+\item{...}{Ignored when \code{psislw} is called directly. The \code{...} is
+  only used internally when \code{psislw} is called by the \code{\link{loo}}
+  function.}
 }
 \value{
 A named with list with components \code{lw_smooth} (modified log

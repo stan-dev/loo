@@ -16,6 +16,9 @@
 #'   for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
 #'   \code{\link[parallel]{detectCores}}().
 #' @param llfun,llargs See \code{\link{loo.function}}.
+#' @param ... Ignored when \code{psislw} is called directly. The \code{...} is
+#'   only used internally when \code{psislw} is called by the \code{\link{loo}}
+#'   function.
 #'
 #' @return A named with list with components \code{lw_smooth} (modified log
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
@@ -34,7 +37,8 @@
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("loo.cores", parallel::detectCores()),
-                   llfun = NULL, llargs = NULL) {
+                   llfun = NULL, llargs = NULL,
+                   ...) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
     # split into body and right tail
@@ -77,14 +81,20 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       ll_i <- -1 * lw_i
     }
     psis <- .psis(lw_i)
-    lse <- logSumExp(ll_i + psis$lw_new)
-    nlist(lse, k = psis$k)
+    if (FROM_LOO) {
+      lse <- logSumExp(ll_i + psis$lw_new)
+      nlist(lse, k = psis$k)
+    }
+    else list(lw_new = psis$lw_new, k = psis$k)
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
   # in order to fit the gPd to the tail
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
+  dots <- list(...)
+  FROM_LOO <- if ("COMPUTE_LOOS" %in% names(dots))
+    dots$COMPUTE_LOOS else FALSE
 
   if (!missing(lw)) {
     if (!is.matrix(lw))
@@ -105,7 +115,13 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     on.exit(stopCluster(cl))
     out <- parLapply(cl, X = 1:N, fun = .psis_loop)
   }
-  loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
-  nlist(loos, pareto_k)
+  if (FROM_LOO) {
+    nlist(loos = vapply(out, "[[", 1L, FUN.VALUE = numeric(1)),
+          pareto_k)
+  } else {
+    funval <- if (LL_FUN) llargs$S else nrow(lw)
+    nlist(lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval)),
+          pareto_k)
+  }
 }
