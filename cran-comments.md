@@ -13,4 +13,4 @@ and allows the package to be used with models fit to larger datasets.
 No ERRORs, WARNINGs, or NOTEs
 
 ## Downstream dependencies
-No issues.
+No issues when running reverse dependencies checks.

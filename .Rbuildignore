@@ -6,3 +6,4 @@
 ^NEWS\.md$
 ^README\.md$
 man-roxygen/*
+^revdep$
