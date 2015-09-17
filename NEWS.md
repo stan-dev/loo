@@ -6,8 +6,8 @@ it easier to to incorporate **loo**'s functionality into other packages.
 
 * Add Ben Goodrich as contributor
 * S3 generics and `matrix` and `function` methods for both `loo` and `waic`. 
-The matrix methods provide the same functionality as previous versions of 
-**loo** and take a log-likelihood matrix as the input. The function method 
+The matrix method provide the same functionality as in previous versions of 
+**loo** (taking a log-likelihood matrix as the input). The function method 
 allows the user to provide a function for computing the log-likelihood from 
 the data and posterior draws (which are also provided by the user). The function
 method is less memory intensive and should make it possible to use **loo** for 
@@ -21,8 +21,7 @@ the plot.
 * Allow setting number of cores using `options(loo.cores = NUMBER)`. 
 
 # loo 0.1.2 
-* Updates names in package to reflect name changes in the accompanying 
-paper.
+* Updates names in package to reflect name changes in the accompanying paper.
 
 # loo 0.1.1
 * Better handling of special cases

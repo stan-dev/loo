@@ -155,6 +155,10 @@
 #' importance sampling estimators: Central limit theorems and related results.
 #' \emph{Electronic Journal of Statistics} \strong{2}, 774-806.
 #'
+#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
+#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
+#' models. \url{http://arxiv.org/abs/1507.04544}.
+#'
 #' Gelfand, A. E. (1996). Model determination using sampling-based methods. In
 #' \emph{Markov Chain Monte Carlo in Practice}, ed. W. R. Gilks, S. Richardson,
 #' D. J. Spiegelhalter, 145-162. London: Chapman and Hall.
