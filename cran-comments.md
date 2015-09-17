@@ -1,3 +1,7 @@
+## Resubmission
+
+* Fixed broken url in vignette (Example.html)
+
 ## Submission summary
 
 This update provides several important improvements, most notably an alternative
