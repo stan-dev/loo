@@ -64,11 +64,13 @@ iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
   coef_lg[[1L]] <- coef(lm(start$log_p ~ start$log_g))[2L]
   skeleton <- get_inits(stanfit)[[1L]]
 
-  if (control$verbose == TRUE) {
-    if (control$smooth_weights == FALSE) message("smooth_weights = FALSE, using raw weights")
+  if (control$verbose) {
+    if (control$smooth_weights)
+      message("smooth_weights = FALSE, using raw weights")
     .khat_msg(khat[[1]], iter = 1)
   }
-  if (control$plot == TRUE) .initialize_khat_plot(khat[[1]], max_iter = control$max_iter)
+  if (control$plot)
+    .initialize_khat_plot(khat[[1]], max_iter = control$max_iter)
 
   # Begin iterations
   for (n in 2:control$max_iter) {
@@ -83,23 +85,20 @@ iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
       mvtnorm::dmvnorm(u, mu[[n-1]], Sigma[[n-1]], log = TRUE)
     })
     psis_n <- psislw(lw = log_p - log_g, ...)
-    lw <- if (control$smooth_weights == TRUE)
+    lw <- if (control$smooth_weights)
       psis_n$lw_smooth else lw_normalize(log_p - log_g)
 
     next_mu_sigma <- weighted_mean_and_var(mvn_draws, lw = lw)
     mu[[n]] <- next_mu_sigma$mean
     Sigma[[n]] <- next_mu_sigma$var
     coef_lg[[n]] <- coef(lm(log_p ~ log_g))["log_g"]
-    khat[[n]] <- k_n <- psis_n$pareto_k
+    khat[[n]] <- psis_n$pareto_k
 
-    if (control$plot == TRUE) {
-      clr <- .khat_clr(k_n)
-      segments(x0 = n-1, y0 = khat[[n-1]], x1 = n, y1 = k_n)
-      points(n, k_n, col = clr, pch = 19)
-    }
-    if (control$verbose == TRUE)
-      .khat_msg(k_n, iter = n)
-    if (k_n < 0.5) {
+    if (control$plot)
+      .add_khat_point(iter = n, k1 = khat[[n]], k0 = khat[[n-1]])
+    if (control$verbose)
+      .khat_msg(khat[[n]], iter = n)
+    if (khat[[n]] < 0.5) {
       if (control$verbose == TRUE)
         message("Stopping... khat below 0.5 after ", n, " iterations.")
       break
@@ -108,7 +107,6 @@ iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
   if (n == control$max_iter)
     warning("Stopping... max_iter reached. khat is still above 0.5 after ",
             control$max_iter, " iterations.")
-
   nlist(mu, Sigma, khat, coef_lg)
 }
 
@@ -141,19 +139,30 @@ KLdivergence <- function(mu_approx, Sigma_approx, mu_true, Sigma_true) {
                    S2 = Sigma_true)
 }
 
-.initialize_khat_plot <- function(k1, max_iter) {
-  plot(1, k1, xlab = "Iteration", ylab = "khat",
-       xlim = c(1, max_iter), ylim = c(0, 1.5),
-       col = .khat_clr(k1), pch = 19)
-  abline(h = c(0.5, 1), lty = 2, col = "darkgray")
-}
-
 .khat_msg <- function(k, iter, digits = 3) {
   message("iteration: 1, khat = ", round(k, digits))
 }
 .khat_clr <- function(k, clrs = c("blue", "purple", "red")) {
   ifelse(k < 0.5, clrs[1], ifelse(k < 1, clrs[2], clrs[3]))
 }
+.khat_pch <- function(k, ymax) {
+  ifelse(k > ymax, 4, 19)
+}
+
+.initialize_khat_plot <- function(k1, max_iter, ymax = 1.5) {
+  plot(1, min(k1, ymax), xlab = "Iteration", ylab = "khat",
+       xlim = c(1, max_iter), ylim = c(0, ymax),
+       col = .khat_clr(k1), pch = .khat_pch(k1, ymax))
+  abline(h = c(0.5, 1), lty = 2, col = "darkgray")
+}
+.add_khat_point <- function(iter, k1, k0, ymax = 1.5) {
+  segments(x0 = iter-1, y0 = k0,
+           x1 = iter, y1 = k1)
+  points(c(iter-1, iter), pmin(c(k0, k1), ymax), col = .khat_clr(c(k0,k1)),
+         pch = .khat_pch(c(k0,k1), ymax))
+}
+
+
 
 exp_norm <- function(lw) {
   exp(lw - max(lw))
