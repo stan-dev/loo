@@ -3,7 +3,7 @@
 \name{iterate_psis}
 \alias{iter_control}
 \alias{iterate_psis}
-\title{Iterative Pareto smoothed importance sampling (PSIS)}
+\title{Iterative Pareto smoothed importance sampling}
 \usage{
 iterate_psis(start, stanfit, smooth_weights = TRUE, ...,
   control = iter_control())
@@ -12,25 +12,55 @@ iter_control(max_iter = 20, ndraws = 4000, verbose = TRUE,
   plot = interactive())
 }
 \arguments{
-\item{start}{Named list with components \code{log_p}, \code{log_g}, \code{draws}.}
+\item{start}{Named list with components \code{log_p}, \code{log_g},
+\code{draws}.}
 
-\item{stanfit}{\code{\link[=stanfit-class]{stanfit}} object from which to obtain \code{log_prob()} and \code{unconstrain_pars()} functions.}
+\item{stanfit}{\code{\link[=stanfit-class]{stanfit}} object from which to
+obtain \code{log_prob()} and \code{unconstrain_pars()} functions.}
 
-\item{smooth_weights}{If \code{TRUE} (the default) \code{\link[psislw]{PSIS}} is used to smooth the raw weights. If FALSE the raw weights are used.}
+\item{smooth_weights}{If \code{TRUE} (the default) \code{\link[psislw]{PSIS}}
+is used to smooth the raw weights. If \code{FALSE} the raw weights are
+used.}
 
 \item{...}{Optional PSIS tuning parameters passed to \code{\link{psislw}}.}
 
 \item{control}{Parameters controlling the iterative process.}
 
-\item{max_iter}{The maximum allowed number of iterations.}
+\item{max_iter}{The maximum allowed number of iterations. The algorithm will
+stop after \code{max_iter} iterations even if \eqn{k > 1/2}.}
+
+\item{verbose}{Should status updates be printed?}
 
 \item{plot}{Should pareto k estimates be plotted as each iteration finishes?}
 
-\item{The}{number of multivariate normal draws to use at each iteration.}
-
-\item{Should}{status updates be printed?}
+\item{The}{size of the multivariate normal sample to generate at each iteration.}
+}
+\value{
+A named list with components
+\itemize{
+\item \code{mu} Mean vectors
+\item \code{Sigma} Covariance matrices
+\item \code{khat} Pareto shape estimates
+\item \code{coef_lg} Slopes from regression of log_p on log_g
+}
+Each component is a list of length equal to the number of iterations.
 }
 \description{
-Iterate until Pareto \eqn{k} estimate is below 0.5.
+Iterative importance weighting using Pareto Smoothed Importance Sampling  (PSIS).
+The number of iterations is a random variable and is determined by the
+shape parameter \eqn{k} of a generalized Pareto distribution. The algorithm
+stops once \eqn{k < 1/2} (see Details).
+}
+\details{
+\itemize{
+\item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
+ the central limit theorem holds, and the estimate converges quickly.
+\item If \eqn{k} is between 1/2 and 1 the variance of the raw importance
+ ratios is infinite but the mean exists, the generalized central limit theorem
+ for stable distributions holds, and the convergence of the estimate is
+ slower. The variance of the PSIS estimate is finite but may be large.
+\item If \eqn{k > 1} the variance and the mean of the raw ratios distribution
+ do not exist. The variance of the PSIS estimate is finite but may be large.
+}
 }
 
