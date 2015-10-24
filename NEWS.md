@@ -1,3 +1,8 @@
+# loo 0.1.3.9000
+* Don't call functions from **parallel** package if `cores=1` (This should make
+it easier for other package authors using **loo** to write tests that run the
+loo function.)
+
 # loo 0.1.3
 This update provides several important improvements, most notably an alternative
 method for specifying the pointwise log-likelihood that reduces memory usage 
