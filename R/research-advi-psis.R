@@ -39,7 +39,7 @@
 #' \subsection{Stopping rule}{
 #' The iterative algorithm will stop once the estimate of the Pareto shape
 #' parameter \eqn{k} (estimated during PSIS smoothing) is below \eqn{1/2} or
-#' when \code{max_iter} is reached.
+#' when \code{max_iter} is reached. About \eqn{k}:
 #'
 #'\itemize{
 #' \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
@@ -56,7 +56,9 @@
 iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
   mu <- Sigma <- coef_lg <- khat <- list()
   psis1 <- psislw(start$log_p - start$log_g, ...)
-  starting_mean_and_var <- weighted_mean_and_var(start$draws, lw = psis1$lw_smooth)
+  lw_start <- if (control$smooth_weights)
+    psis1$lw_smooth else lw_normalize(start$log_p - start$log_g)
+  starting_mean_and_var <- weighted_mean_and_var(start$draws, lw = lw_start)
 
   mu[[1L]] <- starting_mean_and_var$mean
   Sigma[[1L]] <- starting_mean_and_var$var
@@ -129,7 +131,8 @@ iter_control <- function(smooth_weights = TRUE, max_iter = 20, ndraws = 4000,
 
 #' @rdname iterate_psis
 #' @param mu_approx,Sigma_approx,mu_true,Sigma_true Mean and covariance matrices
-#'   for approximating distribution and comparison (true) distribution.
+#'   for approximating distribution and comparison (true) distribution. KL
+#'   divergence is then computed using \code{\link[monomvn]{kl.norm}}.
 #'
 #' @importFrom monomvn kl.norm
 KLdivergence <- function(mu_approx, Sigma_approx, mu_true, Sigma_true) {
@@ -151,7 +154,7 @@ KLdivergence <- function(mu_approx, Sigma_approx, mu_true, Sigma_true) {
 
 .initialize_khat_plot <- function(k1, max_iter, ymax = 1.5) {
   plot(1, min(k1, ymax), xlab = "Iteration", ylab = "khat",
-       xlim = c(1, max_iter), ylim = c(0, ymax),
+       xlim = c(1, max_iter), ylim = c(-.5, ymax),
        col = .khat_clr(k1), pch = .khat_pch(k1, ymax))
   abline(h = c(0.5, 1), lty = 2, col = "darkgray")
 }

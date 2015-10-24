@@ -39,7 +39,8 @@ iteration.}
 \item{plot}{Should pareto k estimates be plotted as each iteration finishes?}
 
 \item{mu_approx,Sigma_approx,mu_true,Sigma_true}{Mean and covariance matrices
-  for approximating distribution and comparison (true) distribution.}
+  for approximating distribution and comparison (true) distribution. KL
+  divergence is then computed using \code{\link[monomvn]{kl.norm}}.}
 }
 \value{
 A named list with components
