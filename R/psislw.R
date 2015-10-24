@@ -108,12 +108,18 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     LL_FUN <- TRUE
   }
 
-  if (.Platform$OS.type != "windows") {
-    out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
+  if (cores == 1) {
+    # Don't call functions from parallel package if cores=1
+    out <- lapply(X = 1:N, FUN = .psis_loop)
   } else {
-    cl <- makePSOCKcluster(cores)
-    on.exit(stopCluster(cl))
-    out <- parLapply(cl, X = 1:N, fun = .psis_loop)
+    # Parallelize
+    if (.Platform$OS.type != "windows") {
+      out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
+    } else {
+      cl <- makePSOCKcluster(cores)
+      on.exit(stopCluster(cl))
+      out <- parLapply(cl, X = 1:N, fun = .psis_loop)
+    }
   }
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
   if (FROM_LOO) {
