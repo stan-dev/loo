@@ -9,7 +9,7 @@ This package implements the methods described in
 
 Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
 leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-models.
+models. arXiv preprint: \url{http://arxiv.org/abs/1507.04544}.
 
 The package documentation is largely based on excerpts from the paper.
 }
@@ -151,13 +151,6 @@ Importance sampling is likely to work less well if the marginal posterior
 different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
-
-
-For more details and examples see:
-
-Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
-leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-models.
 }
 \references{
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
