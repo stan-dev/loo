@@ -1,9 +1,9 @@
 #' Iterative Pareto smoothed importance sampling
 #'
-#' Iterative importance weighting using Pareto Smoothed Importance Sampling  (PSIS).
-#' The number of iterations is a random variable and is determined by the
-#' shape parameter \eqn{k} of a generalized Pareto distribution. The algorithm
-#' stops once \eqn{k < 1/2} (see Details).
+#' Iterative importance weighting using Pareto Smoothed Importance Sampling
+#' (PSIS). The number of iterations is a random variable and is determined by
+#' the shape parameter \eqn{k} of a generalized Pareto distribution. The
+#' algorithm stops once \eqn{k < 1/2} (see Details).
 #'
 #' @export
 #' @param start Named list with components \code{log_p} (target), \code{log_g}
@@ -22,8 +22,7 @@
 #' }
 #' Each component is a list of length equal to the number of iterations.
 #'
-#' @details
-#' We start by computing log weights from \code{start$log_p} and
+#' @details We start by computing log weights from \code{start$log_p} and
 #' \code{start$log_g}, smoothing them with PSIS, and computing the weighted mean
 #' vector and covariance matrix using the smoothed weights and
 #' \code{start$draws}. We then take this first weighted mean vector and
@@ -31,7 +30,7 @@
 #'
 #' \enumerate{
 #' \item Draw from multivariate normal approximation.
-#' \item Evaluate log_p and log_g.
+#' \item Compute log_p and log_g.
 #' \item Apply PSIS to smooth log weights (if \code{smooth_weights} = TRUE).
 #' \item Calculate weighted mean vector and covariance matrix.
 #' }
@@ -56,6 +55,12 @@
 iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
   mu <- Sigma <- coef_lg <- khat <- list()
   psis1 <- psislw(start$log_p - start$log_g, ...)
+  if (psis1$pareto_k > 2) {
+    lw_temp <- psis1$lw_smooth
+    lw_id <- order(lw_temp, decreasing = TRUE)
+    lw_temp[lw_id[1:400]] <- lw_temp[lw_id[400]]
+    psis1$lw_smooth <- lw_normalize(lw_temp)
+  }
   lw_start <- if (control$smooth_weights)
     psis1$lw_smooth else lw_normalize(start$log_p - start$log_g)
   starting_mean_and_var <- weighted_mean_and_var(start$draws, lw = lw_start)
@@ -67,7 +72,7 @@ iterate_psis <- function(start, stanfit, control = iter_control(), ...) {
   skeleton <- get_inits(stanfit)[[1L]]
 
   if (control$verbose) {
-    if (control$smooth_weights)
+    if (!control$smooth_weights)
       message("smooth_weights = FALSE, using raw weights")
     .khat_msg(khat[[1]], iter = 1)
   }
