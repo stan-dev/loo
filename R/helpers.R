@@ -112,7 +112,7 @@ k_warnings <- function(k, digits = 1) {
   count <- table(kcut)
   prop <- prop.table(count)
   if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)")
+    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
   } else {
     if (count[2] != 0) {
       txt2 <- "%) Pareto k estimates between 0.5 and 1"
