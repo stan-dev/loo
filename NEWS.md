@@ -2,6 +2,9 @@
 * Don't call functions from **parallel** package if `cores=1` (This should make
 it easier for other package authors using **loo** to write tests that run the
 loo function.)
+* Fix bug causing `psislw` to return summary statistic rather than smoothed
+weights vector. This bug only occurred if `psislw` was called directly and was
+not a problem when `psislw` was used internally to compute LOO.
 
 # loo 0.1.3
 This update provides several important improvements, most notably an alternative
