@@ -1,8 +1,7 @@
 ## Submission summary
 
-This update provides several important improvements, most notably an alternative
-method for specifying the pointwise log-likelihood that reduces memory usage 
-and allows the package to be used with models fit to larger datasets. 
+This update should make it easier for other package authors using loo to 
+write tests that involve running the loo function. It also includes a few bug fixes.
 
 ## Test environments
 * local OS X install, R 3.2.2

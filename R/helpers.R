@@ -112,7 +112,7 @@ k_warnings <- function(k, digits = 1) {
   count <- table(kcut)
   prop <- prop.table(count)
   if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)")
+    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
   } else {
     if (count[2] != 0) {
       txt2 <- "%) Pareto k estimates between 0.5 and 1"
@@ -129,14 +129,14 @@ k_warnings <- function(k, digits = 1) {
 
 plot_k <- function(k, ..., label_points = FALSE) {
   inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
-  yl <- expression(paste("Shape parameter ", italic(k)))
-  xl <- expression(paste("Data ", italic(i)))
-  plot(k, xlab = xl, ylab = yl, type = "n", bty = "l", yaxt = "n")
+  plot(k, xlab = "Data point", ylab = "Shape parameter k",
+       type = "n", bty = "l", yaxt = "n")
   axis(side = 2, las = 1)
   krange <- range(k)
   for (val in c(0, 0.5, 1)) {
     if (inrange(val, krange))
-      abline(h = val, col = "#b17e64", lty = 2, lwd = 1)
+      abline(h = val, col = ifelse(val == 0, "darkgray", "#b17e64"),
+             lty = 2, lwd = 1)
   }
   hex_clrs <- c("#6497b1", "#005b96", "#03396c")
   brks <- c(-Inf, 0.5, 1)
@@ -151,12 +151,10 @@ plot_k <- function(k, ..., label_points = FALSE) {
     dots <- list(...)
     txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
                        labels = seq_along(k)[sel]),
-                  if (length(dots) > 0) dots)
+                  if (length(dots)) dots)
     if (!("adj" %in% names(txt_args))) txt_args$adj <- 2/3
     if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
     if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
     do.call("text", txt_args)
   }
 }
-
-
