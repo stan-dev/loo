@@ -39,18 +39,18 @@ waic <- function(x, ...) {
   UseMethod("waic")
 }
 
+#' @export
 #' @templateVar fn waic
 #' @template matrix
-#' @export
 #'
 waic.matrix <- function(x, ...) {
   out <- pointwise_waic(log_lik = x)
   structure(out, log_lik_dim = dim(x), class = "loo")
 }
 
+#' @export
 #' @templateVar fn waic
 #' @template function
-#' @export
 #'
 waic.function <- function(x, ..., args) {
   out <- pointwise_waic(llfun = x, llargs = args)

@@ -1,7 +1,6 @@
 #' Print and plot methods
 #'
 #' @export
-#'
 #' @param x A list with class \code{'loo'} (as returned by the \code{\link{loo}}
 #'   function or, for \code{print} only, the \code{\link{waic}} function). For
 #'   \code{print}, \code{x} can also have class \code{'compare.loo'} (as
@@ -52,7 +51,6 @@ print.compare.loo <- function(x, ..., digits = 1) {
 
 #' @rdname print.loo
 #' @export
-#'
 plot.loo <- function(x, ..., label_points = FALSE) {
   if (!("pareto_k" %in% names(x)))
     stop("No Pareto k values found.", call. = FALSE)

@@ -90,9 +90,9 @@ loo <- function(x, ...) {
   UseMethod("loo")
 }
 
+#' @export
 #' @templateVar fn loo
 #' @template matrix
-#' @export
 #'
 loo.matrix <- function(x, ...) {
   if (any(is.na(x)))
@@ -102,9 +102,9 @@ loo.matrix <- function(x, ...) {
   structure(out, log_lik_dim = dim(x), class = "loo")
 }
 
+#' @export
 #' @templateVar fn loo
 #' @template function
-#' @export
 #'
 loo.function <- function(x, ..., args) {
   if (missing(args)) stop("args must be specified", call. = FALSE)

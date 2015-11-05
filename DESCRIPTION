@@ -12,20 +12,22 @@ Maintainer: Jonah Gabry <jsg2201@columbia.edu>
 URL: https://github.com/jgabry/loo
 BugReports: https://github.com/jgabry/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
-  using Pareto smoothed importance sampling (PSIS), a new procedure for
-  regularizing importance weights. As a byproduct of the calculations, we also
-  obtain approximate standard errors for estimated predictive errors, and for
-  the comparison of predictive errors between models. We also compute the
-  widely applicable information criterion (WAIC).
+    using Pareto smoothed importance sampling (PSIS), a new procedure for
+    regularizing importance weights. As a byproduct of the calculations, we also
+    obtain approximate standard errors for estimated predictive errors, and for
+    the comparison of predictive errors between models. We also compute the
+    widely applicable information criterion (WAIC).
 License: GPL (>=3)
 LazyData: TRUE
-Depends: R (>= 3.1.2)
+Depends:
+    R (>= 3.1.2)
 Imports:
-  graphics,
-  matrixStats (>= 0.14.1),
-  parallel,
-  stats
+    graphics,
+    matrixStats (>= 0.14.1),
+    parallel,
+    stats
 Suggests:
-  knitr,
-  testthat
+    knitr,
+    testthat
 VignetteBuilder: knitr
+RoxygenNote: 5.0.0
