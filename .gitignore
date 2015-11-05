@@ -15,3 +15,5 @@ vignettes/*.pdf
 inst/doc
 
 iterative_psis.R
+
+iterative_psis2.R

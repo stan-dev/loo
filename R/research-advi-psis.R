@@ -135,6 +135,7 @@ iter_control <- function(smooth_weights = TRUE, max_iter = 20, ndraws = 4000,
 }
 
 #' @rdname iterate_psis
+#' @export
 #' @param mu_approx,Sigma_approx,mu_true,Sigma_true Mean and covariance matrices
 #'   for approximating distribution and comparison (true) distribution. KL
 #'   divergence is then computed using \code{\link[monomvn]{kl.norm}}.
