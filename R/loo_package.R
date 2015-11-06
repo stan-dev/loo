@@ -144,13 +144,13 @@
 #' influential observations.
 #'
 #' @references
-#' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
-#' importance sampling estimators: Central limit theorems and related results.
-#' \emph{Electronic Journal of Statistics} \strong{2}, 774-806.
-#'
 #' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
 #' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
 #' models. \url{http://arxiv.org/abs/1507.04544}.
+#'
+#' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
+#' importance sampling estimators: Central limit theorems and related results.
+#' \emph{Electronic Journal of Statistics} \strong{2}, 774-806.
 #'
 #' Gelfand, A. E. (1996). Model determination using sampling-based methods. In
 #' \emph{Markov Chain Monte Carlo in Practice}, ed. W. R. Gilks, S. Richardson,
