@@ -74,7 +74,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
 
   .psis_loop <- function(i) {
     if (LL_FUN) {
-      ll_i <- llfun(i = i, data = llargs$data[i,,drop=FALSE], draws = llargs$draws)
+      ll_i <- llfun(i = i, data = llargs$data[i,, drop=FALSE],
+                    draws = llargs$draws)
       lw_i <- -1 * ll_i
     } else {
       lw_i <- lw[, i]

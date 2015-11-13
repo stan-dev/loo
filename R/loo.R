@@ -53,6 +53,7 @@
 #'
 #' @examples
 #' \dontrun{
+#' ### Usage with stanfit objects
 #' log_lik1 <- extract_log_lik(stanfit1)
 #' loo1 <- loo(log_lik1)
 #' print(loo1, digits = 3)
@@ -66,7 +67,7 @@
 #' print(loo_diff, digits = 5)
 #' }
 #'
-#' ### Example using log-likelihood function instead of matrix
+#' ### Using log-likelihood function instead of matrix
 #' set.seed(024)
 #'
 #' # fake data and posterior draws
