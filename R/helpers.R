@@ -71,9 +71,8 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
 
 # inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (sigma <= 0) return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
+  if (is.nan(sigma) || sigma <= 0) return(rep(NaN, length(p)))
+  if (!lower.tail) p <- 1 - p
   mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
