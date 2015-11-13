@@ -22,8 +22,8 @@ Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 }
 \note{
 This function is primarily intended for internal use, but is exported
-  so that users can call it directly if desired. Users simply wishing to
-  compute LOO should use the \code{\link{loo}} function.
+  so that users can call it directly if interested in PSIS for purposes other
+  than \code{\link[=loo]{LOO-CV}}.
 }
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method

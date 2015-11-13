@@ -1,6 +1,6 @@
 #' Leave-one-out cross-validation (LOO)
 #'
-#' Efficient approximate leave-one-out cross-validation
+#' Efficient approximate leave-one-out cross-validation for Bayesian models.
 #'
 #' @export loo loo.matrix loo.function
 #' @param x A log-likelihood matrix or function. See the \strong{Methods (by
@@ -30,22 +30,21 @@
 #' @return A named list with class \code{'loo'} and components:
 #'
 #' \describe{
-#'  \item{\code{elpd_loo, se_elpd_loo}}{expected log pointwise predictive density
-#'    and standard error}
-#'  \item{\code{p_loo, se_p_loo}}{estimated effective number of parameters and
-#'    standard error}
-#'  \item{\code{looic, se_looic}}{\code{-2 * elpd_loo} (i.e., converted to the
-#'    deviance scale) and standard error}
-#'  \item{\code{pointwise}}{a matrix containing the pointwise contributions of each
-#'    of the above measures}
-#'  \item{\code{pareto_k}}{a vector containing the estimates of the shape
+#'  \item{\code{elpd_loo, se_elpd_loo}}{Expected log pointwise predictive density
+#'    and standard error.}
+#'  \item{\code{p_loo, se_p_loo}}{Estimated effective number of parameters and
+#'    standard error.}
+#'  \item{\code{looic, se_looic}}{The LOO information criterion
+#'    (\code{-2*elpd_loo}, i.e., converted to deviance scale) and standard
+#'    error.}
+#'  \item{\code{pointwise}}{A matrix containing the pointwise contributions of each
+#'    of the above measures.}
+#'  \item{\code{pareto_k}}{A vector containing the estimates of the shape
 #'    parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
 #'    for each leave-one-out distribution. See PSIS-LOO section in
-#'    \code{\link{loo-package}} for details about interpreting \eqn{k}. (Also, by
-#'    default, the print method for \code{'loo'} objects will provide warnings
-#'    about problematic values of \eqn{k}. It is also possible to plot the values
-#'    of \eqn{k} by setting the optional argument \code{plot_k} to \code{TRUE} (the
-#'    default is not to plot). See \code{\link{print.loo}}.)}
+#'    \code{\link{loo-package}} for details about interpreting \eqn{k}.
+#'    (By default, the \code{\link[=print.loo]{print}} method for \code{'loo'}
+#'    objects will also provide warnings about problematic values of \eqn{k}.)}
 #' }
 #'
 #' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
@@ -70,13 +69,14 @@
 #' ### Using log-likelihood function instead of matrix
 #' set.seed(024)
 #'
-#' # fake data and posterior draws
+#' # Simulate data and draw from posterior
 #' N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
 #' p <- rbeta(1, a0, b0)
 #' y <- rbinom(N, size = K, prob = p)
 #' a <- a0 + sum(y); b <- b0 + N * K - sum(y)
 #' draws <- rbeta(S, a, b)
 #' data <- data.frame(y,K)
+#'
 #' llfun <- function(i, data, draws) {
 #'   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
 #' }

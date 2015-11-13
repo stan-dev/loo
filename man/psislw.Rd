@@ -33,7 +33,7 @@ only used internally when \code{psislw} is called by the \code{\link{loo}}
 function.}
 }
 \value{
-A named with list with components \code{lw_smooth} (modified log
+A named list with components \code{lw_smooth} (modified log
   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
   \eqn{k}).
 }
@@ -45,8 +45,8 @@ See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 }
 \note{
 This function is primarily intended for internal use, but is exported
-  so that users can call it directly for other purposes. Users simply
-  wishing to compute LOO should use the \code{\link{loo}} function.
+  so that users can call it directly if interested in PSIS for purposes other
+  than \code{\link[=loo]{LOO-CV}}.
 }
 \seealso{
 \code{\link{loo-package}}, \code{\link{loo}}

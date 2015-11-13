@@ -20,15 +20,13 @@
 #'   only used internally when \code{psislw} is called by the \code{\link{loo}}
 #'   function.
 #'
-#' @return A named with list with components \code{lw_smooth} (modified log
+#' @return A named list with components \code{lw_smooth} (modified log
 #'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
 #'   \eqn{k}).
 #'
 #' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 #'
-#' @note This function is primarily intended for internal use, but is exported
-#'   so that users can call it directly for other purposes. Users simply
-#'   wishing to compute LOO should use the \code{\link{loo}} function.
+#' @template internal-function-note
 #'
 #' @seealso \code{\link{loo-package}}, \code{\link{loo}}
 #'
@@ -49,8 +47,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH) {
       # too few tail samples to fit gPd
-      warning("Skipped fitting the generalized Pareto distribution ",
-              "(insufficient number of tail samples).")
+      warning("Too few tail samples to fit generalized Pareto distribution.",
+              "\nWeights are truncated and normalized but not smoothed.")
       x_new <- x
       k <- Inf
     } else {
