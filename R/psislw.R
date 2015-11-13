@@ -49,6 +49,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH) {
       # too few tail samples to fit gPd
+      warning("Skipped fitting the generalized Pareto distribution ",
+              "(insufficient number of tail samples).")
       x_new <- x
       k <- Inf
     } else {
