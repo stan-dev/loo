@@ -33,6 +33,6 @@ models.
 ### Authors
 Aki Vehtari, Andrew Gelman, Jonah Gabry
 
-### MATLAB Code
-Corresponding MATLAB code can be found at https://github.com/avehtari/MatlabPSIS 
+### Python and Matlab/Octave Code
+Corresponding Python and Matlab/Octave code can be found at https://github.com/avehtari/PSIS
 
