@@ -91,17 +91,13 @@ Typically (but not restricted to be) the object returned by
 \examples{
 \dontrun{
 ### Usage with stanfit objects
-log_lik1 <- extract_log_lik(stanfit1)
+log_lik1 <- extract_log_lik(stanfit1) # see ?extract_log_lik
 loo1 <- loo(log_lik1)
 print(loo1, digits = 3)
 
 log_lik2 <- extract_log_lik(stanfit2)
-loo2 <- loo(log_lik2)
-loo2
-
-loo_diff <- compare(loo1, loo2)
-loo_diff
-print(loo_diff, digits = 5)
+(loo2 <- loo(log_lik2))
+compare(loo1, loo2)
 }
 
 ### Using log-likelihood function instead of matrix

@@ -13,8 +13,8 @@
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
 #' @param cores The number of cores to use for parallelization. This can be set
-#'   for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
-#'   \code{\link[parallel]{detectCores}}().
+#'   for an entire R session by \code{options(loo.cores = NUMBER)}. The default
+#'   is \code{\link[parallel]{detectCores}}().
 #' @param llfun,llargs See \code{\link{loo.function}}.
 #' @param ... Ignored when \code{psislw} is called directly. The \code{...} is
 #'   only used internally when \code{psislw} is called by the \code{\link{loo}}
@@ -82,11 +82,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       ll_i <- -1 * lw_i
     }
     psis <- .psis(lw_i)
-    if (FROM_LOO) {
-      lse <- logSumExp(ll_i + psis$lw_new)
-      nlist(lse, k = psis$k)
-    }
-    else list(lw_new = psis$lw_new, k = psis$k)
+    if (!FROM_LOO) psis
+    else nlist(lse = logSumExp(ll_i + psis$lw_new), k = psis$k)
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
@@ -98,22 +95,20 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     dots$COMPUTE_LOOS else FALSE
 
   if (!missing(lw)) {
-    if (!is.matrix(lw))
-      lw <- as.matrix(lw)
+    if (!is.matrix(lw)) lw <- as.matrix(lw)
     N <- ncol(lw)
     LL_FUN <- FALSE
   } else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either lw or llfun and llargs must be specified.")
+      stop("Either 'lw' or 'llfun' and 'llargs' must be specified.")
     N <- llargs$N
     LL_FUN <- TRUE
   }
-
   if (cores == 1) {
-    # Don't call functions from parallel package if cores=1
+    # don't call functions from parallel package if cores=1
     out <- lapply(X = 1:N, FUN = .psis_loop)
   } else {
-    # Parallelize
+    # parallelize
     if (.Platform$OS.type != "windows") {
       out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
     } else {

@@ -53,17 +53,13 @@
 #' @examples
 #' \dontrun{
 #' ### Usage with stanfit objects
-#' log_lik1 <- extract_log_lik(stanfit1)
+#' log_lik1 <- extract_log_lik(stanfit1) # see ?extract_log_lik
 #' loo1 <- loo(log_lik1)
 #' print(loo1, digits = 3)
 #'
 #' log_lik2 <- extract_log_lik(stanfit2)
-#' loo2 <- loo(log_lik2)
-#' loo2
-#'
-#' loo_diff <- compare(loo1, loo2)
-#' loo_diff
-#' print(loo_diff, digits = 5)
+#' (loo2 <- loo(log_lik2))
+#' compare(loo1, loo2)
 #' }
 #'
 #' ### Using log-likelihood function instead of matrix
@@ -96,8 +92,7 @@ loo <- function(x, ...) {
 #' @template matrix
 #'
 loo.matrix <- function(x, ...) {
-  if (any(is.na(x)))
-    stop("NA log-likelihood values found.", call. = FALSE)
+  if (any(is.na(x))) stop("NA log-likelihood values found.")
   psis <- psislw(lw = -1 * x, ..., COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis, x)
   structure(out, log_lik_dim = dim(x), class = "loo")
@@ -108,7 +103,7 @@ loo.matrix <- function(x, ...) {
 #' @template function
 #'
 loo.function <- function(x, ..., args) {
-  if (missing(args)) stop("args must be specified", call. = FALSE)
+  if (missing(args)) stop("'args' must be specified.")
   psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = "loo")

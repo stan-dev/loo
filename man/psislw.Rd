@@ -23,8 +23,8 @@ distribution.}
 to zero for no truncation.}
 
 \item{cores}{The number of cores to use for parallelization. This can be set
-for an entire R session by \code{options(loo.cores = NUMBER)}. The default is
-\code{\link[parallel]{detectCores}}().}
+for an entire R session by \code{options(loo.cores = NUMBER)}. The default
+is \code{\link[parallel]{detectCores}}().}
 
 \item{llfun, llargs}{See \code{\link{loo.function}}.}
 
