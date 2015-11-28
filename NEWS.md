@@ -1,4 +1,4 @@
-# loo 0.1.3.9000
+# loo 0.1.4
 * Don't call functions from **parallel** package if `cores=1` (This should make
 it easier for other package authors using **loo** to write tests that run the
 loo function.)
