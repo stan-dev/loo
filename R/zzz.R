@@ -1,7 +1,6 @@
 .onAttach <- function(...) {
   ver <- utils::packageVersion("loo")
-  msg <- paste("This is loo version", ver)
-  packageStartupMessage(msg)
+  packageStartupMessage("This is loo version ", ver)
 }
 
 .onLoad <- function(libname, pkgname) {

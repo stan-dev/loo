@@ -21,7 +21,6 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-
 gpdfit <- function(x) {
   N <- length(x)
   x <- sort.int(x, method = "quick")
