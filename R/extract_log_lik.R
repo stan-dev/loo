@@ -8,8 +8,8 @@
 #' @param parameter_name A character string naming the parameter (or generated
 #'   quantity) in the Stan model corresponding to the log-likelihood.
 #' @return An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
-#'   \eqn{S} is the number of simulations and \eqn{N} is the number of data
-#'   points.
+#'   \eqn{S} is the size of the posterior sample and \eqn{N} is the number of
+#'   data points.
 #'
 #' @details Stan does not automatically compute and store the log-likelihood. It
 #'   is up to the user to incorporate it into the Stan program if it is to be
@@ -36,22 +36,14 @@
 #' Stan Development Team (2015). RStan, version 2.6.
 #' \url{mc-stan.org/rstan.html}.
 #'
-#' @examples
-#' \dontrun{
-#' log_lik <- extract_log_lik(stanfit, "log_lik")
-#' }
-#'
 extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
   if (!inherits(stanfit, "stanfit"))
     stop("Not a stanfit object.")
   if (stanfit@mode != 0)
-    stop("Stan model does not contain samples.")
-  posterior <- as.matrix(stanfit)
-  nms <- colnames(posterior)
-  pattern <- paste0("^", parameter_name, "\\[")
-  keep <- grep(pattern, nms)
-  log_lik <- posterior[, keep, drop = FALSE]
+    stop("Stan model does not contain posterior draws.")
+  log_lik <- try(as.matrix(stanfit, pars = parameter_name), silent = TRUE)
+  if (inherits(log_lik, "try-error"))
+    stop("Please load the 'rstan' package.")
   colnames(log_lik) <- NULL
   log_lik
 }
-

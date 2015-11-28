@@ -15,7 +15,7 @@ test_that("plot.loo throws appropriate errors", {
   x2$pareto_k <- runif(50, 0, .5)
   expect_output(print(x2), regexp = "All Pareto k estimates OK")
   x2$pareto_k[1] <- 0.51
-  expect_warning(print(x2))
+  expect_warning(print(x2), regexp = "between 0.5 and 1")
   x2$pareto_k[1] <- 1.1
-  expect_warning(print(x2))
+  expect_warning(print(x2), regexp = "greater than 1")
 })

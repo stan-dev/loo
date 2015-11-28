@@ -15,6 +15,7 @@ logColMeansExp_ll <- function(fun, args) {
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
+
 colVars_ll <- function(fun, args) {
   vapply(seq_len(args$N), FUN = function(i) {
     var(as.vector(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)))
@@ -35,7 +36,7 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
     p_waic <- colVars(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either log_lik or llfun and llargs must be specified")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
     lpd <- logColMeansExp_ll(llfun, llargs)
     p_waic <- colVars_ll(llfun, llargs)
   }
@@ -52,7 +53,7 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
   else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either log_lik or llfun and llargs must be specified")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
     lpd <- logColMeansExp_ll(llfun, llargs)
   }
   elpd_loo <- psis$loos
@@ -79,23 +80,23 @@ qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
 lx <- function(a,x) {
   a <- -a
   k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
-  log(a/k) - k - 1
+  log(a / k) - k - 1
 }
 
 lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin))
-    min_cut <- -700
+  if (min_cut < log(.Machine$double.xmin)) min_cut <- -700
   cp <- quantile(y, 1 - wcp, names = FALSE)
   max(cp, min_cut)
 }
+
 lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0)
-    return(y)
+  if (wtrunc == 0) return(y)
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
   y[y > lwtrunc] <- lwtrunc
   y
 }
+
 #' @importFrom matrixStats logSumExp
 lw_normalize <- function(y) {
   y - logSumExp(y)
@@ -165,11 +166,9 @@ plot_k <- function(k, ..., label_points = FALSE) {
 is.loo <- function(x) {
   inherits(x, "loo")
 }
-
 unlist_lapply <- function(X, FUN, ...) {
   unlist(lapply(X, FUN, ...), use.names = FALSE)
 }
-
 cbind_list <- function(x) {
   do.call(cbind, x)
 }
