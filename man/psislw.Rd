@@ -33,8 +33,8 @@ only used internally when \code{psislw} is called by the \code{\link{loo}}
 function.}
 }
 \value{
-A named list with components \code{lw_smooth} (modified log
-  weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
+A named list with components \code{lw_smooth} (modified log weights)
+  and \code{pareto_k} (estimated generalized Pareto shape parameter(s)
   \eqn{k}).
 }
 \description{
@@ -48,7 +48,9 @@ This function is primarily intended for internal use, but is exported
   so that users can call it directly if interested in PSIS for purposes other
   than \code{\link[=loo]{LOO-CV}}.
 }
-\seealso{
-\code{\link{loo-package}}, \code{\link{loo}}
+\references{
+Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient
+implementation of leave-one-out cross-validation and WAIC for evaluating
+fitted Bayesian models. \url{http://arxiv.org/abs/1507.04544/} (preprint)
 }
 

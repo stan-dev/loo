@@ -153,9 +153,9 @@ influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
-leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-models. \url{http://arxiv.org/abs/1507.04544}.
+Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient
+implementation of leave-one-out cross-validation and WAIC for evaluating
+fitted Bayesian models. \url{http://arxiv.org/abs/1507.04544/} (preprint)
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.

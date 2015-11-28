@@ -1,7 +1,7 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
 #' @export
-#' @param lw A matrix or vector of log weights. For computing LOO \code{lw =
+#' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
 #'   -log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
 #'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
 #'   of data points. (If \code{lw} is a vector it will be coerced to a
@@ -20,15 +20,14 @@
 #'   only used internally when \code{psislw} is called by the \code{\link{loo}}
 #'   function.
 #'
-#' @return A named list with components \code{lw_smooth} (modified log
-#'   weights) and \code{pareto_k} (estimated generalized Pareto shape parameters
+#' @return A named list with components \code{lw_smooth} (modified log weights)
+#'   and \code{pareto_k} (estimated generalized Pareto shape parameter(s)
 #'   \eqn{k}).
 #'
 #' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 #'
 #' @template internal-function-note
-#'
-#' @seealso \code{\link{loo-package}}, \code{\link{loo}}
+#' @template loo-paper-reference
 #'
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply

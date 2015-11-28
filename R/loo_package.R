@@ -3,6 +3,8 @@
 #' @docType package
 #' @name loo-package
 #'
+#' @importFrom stats sd var quantile
+#'
 #' @description This package implements the methods described in
 #'
 #' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
@@ -143,11 +145,8 @@
 #' influential observations. A robust model may reduce the sensitivity to highly
 #' influential observations.
 #'
+#' @template loo-paper-reference
 #' @references
-#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
-#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-#' models. \url{http://arxiv.org/abs/1507.04544}.
-#'
 #' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 #' importance sampling estimators: Central limit theorems and related results.
 #' \emph{Electronic Journal of Statistics} \strong{2}, 774-806.
@@ -192,5 +191,4 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-#' @importFrom stats sd var quantile
 NULL
