@@ -46,8 +46,9 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH) {
       # too few tail samples to fit gPd
-      warning("Too few tail samples to fit generalized Pareto distribution.",
-              "\nWeights are truncated and normalized but not smoothed.")
+      warning("Too few tail samples to fit generalized Pareto distribution.\n",
+              "Weights are truncated and normalized but not smoothed.",
+              call. = FALSE)
       x_new <- x
       k <- Inf
     } else {

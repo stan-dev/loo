@@ -1,11 +1,10 @@
 library(loo)
 options(loo.cores = 1)
+set.seed(123)
+x <- matrix(rnorm(5000), 100, 50)
 
-# test loo and waic -------------------------------------------------------
-context("loo, waic, psislw")
-test_that("loo, waic, and psislw return expected results", {
-  set.seed(123)
-  x <- matrix(rnorm(5000), 100, 50)
+context("loo and waic")
+test_that("loo and waic return expected results", {
   ww <- waic(x)
   wnms <- names(ww)
   ll <- loo(x)
@@ -29,12 +28,9 @@ test_that("loo, waic, and psislw return expected results", {
   pareto_k_ans <- list(mean = 0.273775211941035,
                        range = c(-0.245572962408798, 0.859988648019406))
   expect_equal(pareto_k_val, pareto_k_ans)
+})
 
-  psis <- psislw(x[, 1])
-  expect_equal(nrow(psis$lw_smooth), nrow(x))
-  expect_equal(psis$pareto_k, 0.17364505906017813075)
-
-
+test_that("loo and waic throw appropriate errors", {
   x[1,1] <- NaN
   expect_error(loo(x), regexp = "NA log-likelihood")
   expect_error(waic(x), regexp = "NA log-likelihood")

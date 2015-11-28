@@ -1,7 +1,6 @@
 library(loo)
 options(loo.cores = 1)
 
-# test loo and waic -------------------------------------------------------
 context("compare")
 test_that("compare throws appropriate errors", {
   set.seed(123)

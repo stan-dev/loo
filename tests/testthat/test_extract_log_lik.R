@@ -1,6 +1,5 @@
 library(loo)
 
-# test loo and waic -------------------------------------------------------
 context("extract_log_lik")
 test_that("extract_log_lik throws appropriate errors", {
   x1 <- rnorm(100)

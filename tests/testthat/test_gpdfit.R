@@ -1,6 +1,5 @@
 library(loo)
 
-# test gpdfit -------------------------------------------------------------
 context("gpdfit")
 test_that("gpdfit returns correct result", {
   set.seed(123)

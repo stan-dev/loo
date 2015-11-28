@@ -1,6 +1,5 @@
 library(loo)
 
-# test helpers ------------------------------------------------------------
 context("helper functions")
 test_that("helpers and utils return correct values", {
   set.seed(123)
