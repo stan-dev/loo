@@ -102,7 +102,6 @@ lw_normalize <- function(y) {
 }
 
 # print helpers -----------------------------------------------------------
-#' @importFrom graphics abline axis plot points text
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
@@ -126,6 +125,9 @@ k_warnings <- function(k, digits = 1) {
   invisible(NULL)
 }
 
+
+# plot pareto k estimates -------------------------------------------------
+#' @importFrom graphics abline axis plot points text
 plot_k <- function(k, ..., label_points = FALSE) {
   inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
   plot(k, xlab = "Data point", ylab = "Shape parameter k",
