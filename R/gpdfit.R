@@ -11,9 +11,7 @@
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
 #'
-#' @note This function is primarily intended for internal use, but is exported
-#'   so that users can call it directly if desired. Users simply wishing to
-#'   compute LOO should use the \code{\link{loo}} function.
+#' @template internal-function-note
 #'
 #' @seealso \code{\link{psislw}}, \code{\link{loo}},
 #' \code{\link{loo-package}}
@@ -23,7 +21,6 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-
 gpdfit <- function(x) {
   N <- length(x)
   x <- sort.int(x, method = "quick")

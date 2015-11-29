@@ -15,6 +15,7 @@ logColMeansExp_ll <- function(fun, args) {
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
   clse - logS
 }
+
 colVars_ll <- function(fun, args) {
   vapply(seq_len(args$N), FUN = function(i) {
     var(as.vector(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)))
@@ -35,7 +36,7 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
     p_waic <- colVars(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either log_lik or llfun and llargs must be specified")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
     lpd <- logColMeansExp_ll(llfun, llargs)
     p_waic <- colVars_ll(llfun, llargs)
   }
@@ -52,7 +53,7 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
   else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either log_lik or llfun and llargs must be specified")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
     lpd <- logColMeansExp_ll(llfun, llargs)
   }
   elpd_loo <- psis$loos
@@ -71,39 +72,37 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
 
 # inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (sigma <= 0) return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
+  if (is.nan(sigma) || sigma <= 0) return(rep(NaN, length(p)))
+  if (!lower.tail) p <- 1 - p
   mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
 lx <- function(a,x) {
   a <- -a
   k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
-  log(a/k) - k - 1
+  log(a / k) - k - 1
 }
 
 lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin))
-    min_cut <- -700
+  if (min_cut < log(.Machine$double.xmin)) min_cut <- -700
   cp <- quantile(y, 1 - wcp, names = FALSE)
   max(cp, min_cut)
 }
+
 lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0)
-    return(y)
+  if (wtrunc == 0) return(y)
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
   y[y > lwtrunc] <- lwtrunc
   y
 }
+
 #' @importFrom matrixStats logSumExp
 lw_normalize <- function(y) {
   y - logSumExp(y)
 }
 
 # print helpers -----------------------------------------------------------
-#' @importFrom graphics abline axis plot points text
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
@@ -112,7 +111,7 @@ k_warnings <- function(k, digits = 1) {
   count <- table(kcut)
   prop <- prop.table(count)
   if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)")
+    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
   } else {
     if (count[2] != 0) {
       txt2 <- "%) Pareto k estimates between 0.5 and 1"
@@ -127,16 +126,19 @@ k_warnings <- function(k, digits = 1) {
   invisible(NULL)
 }
 
+
+# plot pareto k estimates -------------------------------------------------
+#' @importFrom graphics abline axis plot points text
 plot_k <- function(k, ..., label_points = FALSE) {
   inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
-  yl <- expression(paste("Shape parameter ", italic(k)))
-  xl <- expression(paste("Data ", italic(i)))
-  plot(k, xlab = xl, ylab = yl, type = "n", bty = "l", yaxt = "n")
+  plot(k, xlab = "Data point", ylab = "Shape parameter k",
+       type = "n", bty = "l", yaxt = "n")
   axis(side = 2, las = 1)
   krange <- range(k)
   for (val in c(0, 0.5, 1)) {
     if (inrange(val, krange))
-      abline(h = val, col = "#b17e64", lty = 2, lwd = 1)
+      abline(h = val, col = ifelse(val == 0, "darkgray", "#b17e64"),
+             lty = 2, lwd = 1)
   }
   hex_clrs <- c("#6497b1", "#005b96", "#03396c")
   brks <- c(-Inf, 0.5, 1)
@@ -151,7 +153,7 @@ plot_k <- function(k, ..., label_points = FALSE) {
     dots <- list(...)
     txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
                        labels = seq_along(k)[sel]),
-                  if (length(dots) > 0) dots)
+                  if (length(dots)) dots)
     if (!("adj" %in% names(txt_args))) txt_args$adj <- 2/3
     if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
     if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
@@ -160,3 +162,53 @@ plot_k <- function(k, ..., label_points = FALSE) {
 }
 
 
+# convenience functions ---------------------------------------------------
+is.loo <- function(x) {
+  inherits(x, "loo")
+}
+unlist_lapply <- function(X, FUN, ...) {
+  unlist(lapply(X, FUN, ...), use.names = FALSE)
+}
+cbind_list <- function(x) {
+  do.call(cbind, x)
+}
+
+#' Named lists
+#'
+#' Create a named list using specified names or, if names are omitted, using the
+#' names of the objects in the list. The code \code{list(a = a, b = b)} becomes
+#' \code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b =
+#' 2)}, etc.
+#'
+#' @keywords internal
+#' @export
+#' @param ... Objects to include in the list.
+#' @return A named list.
+#'
+#' @seealso \code{\link[base]{list}}
+#' @examples
+#'
+#' # All variables already defined
+#' a <- rnorm(100)
+#' b <- mat.or.vec(10, 3)
+#' nlist(a,b)
+#'
+#' # Define some variables in the call and take the rest from the environment
+#' nlist(a, b, veggies = c("lettuce", "spinach"), fruits = c("banana", "papaya"))
+#'
+nlist <- function(...) {
+  out <- list(...)
+  onms <- names(out)
+  no_names <- is.null(onms)
+  has_name <- if (no_names)
+    FALSE else nzchar(onms)
+  if (all(has_name))
+    return(out)
+  mc <- match.call(expand.dots = TRUE)
+  nms <- as.character(mc)[-1L]
+  if (no_names)
+    names(out) <- nms
+  else
+    names(out)[!has_name] <- nms[!has_name]
+  out
+}

@@ -24,35 +24,32 @@
 #' @examples
 #' \dontrun{
 #' log_lik1 <- extract_log_lik(stanfit1)
-#' waic1 <- waic(log_lik1)
-#' waic1
-#'
 #' log_lik2 <- extract_log_lik(stanfit2)
-#' waic2 <- waic(log_lik2)
-#' print(waic2, digits = 4)
-#'
-#' waic_diff <- compare(waic1, waic2)
-#' print(waic_diff, digits = 2)
+#' (waic1 <- waic(log_lik1))
+#' (waic2 <- waic(log_lik2))
+#' print(compare(waic1, waic2), digits = 2)
 #' }
 #'
 waic <- function(x, ...) {
   UseMethod("waic")
 }
 
+#' @export
 #' @templateVar fn waic
 #' @template matrix
-#' @export
 #'
 waic.matrix <- function(x, ...) {
+  if (any(is.na(x))) stop("NA log-likelihood values found.")
   out <- pointwise_waic(log_lik = x)
   structure(out, log_lik_dim = dim(x), class = "loo")
 }
 
+#' @export
 #' @templateVar fn waic
 #' @template function
-#' @export
 #'
 waic.function <- function(x, ..., args) {
+  if (missing(args)) stop("'args' must be specified.")
   out <- pointwise_waic(llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = "loo")
 }
