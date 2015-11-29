@@ -16,6 +16,7 @@ test_that("helpers and utils return correct values", {
   # qgpd
   probs <- seq(from = 0, to = 1, by = 0.25)
   expect_equal(qgpd(probs), c(0, 1/3, 1, 3, Inf))
+  expect_true(all(is.nan(qgpd(probs, sigma = 0))))
 
   # nlist
   a <- 1; b <- 2; c <- 3;
