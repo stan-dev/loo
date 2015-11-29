@@ -1,8 +1,8 @@
 ## Submission summary
 
 This update should make it easier for other package authors using loo to write
-tests that involve running the loo function. It also includes a few minor bug
-fixes.
+tests that involve running the loo function. It also includes minor bug
+fixes and additional tests.
 
 ## Test environments
 * local OS X install, R 3.2.2
