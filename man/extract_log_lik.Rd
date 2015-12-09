@@ -14,8 +14,8 @@ quantity) in the Stan model corresponding to the log-likelihood.}
 }
 \value{
 An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
-  \eqn{S} is the number of simulations and \eqn{N} is the number of data
-  points.
+  \eqn{S} is the size of the posterior sample and \eqn{N} is the number of
+  data points.
 }
 \description{
 Convenience function for extracting the pointwise log-likelihood from a
@@ -39,12 +39,6 @@ Stan does not automatically compute and store the log-likelihood. It
  \code{vector[N] log_lik;}
 
  \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
-}
-\examples{
-\dontrun{
-log_lik <- extract_log_lik(stanfit, "log_lik")
-}
-
 }
 \references{
 Stan Development Team (2015). Stan: A C++ library for probability and
