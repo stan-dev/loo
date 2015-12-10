@@ -1,7 +1,3 @@
-## Resubmission
-
-* Fixed broken url in vignette (Example.html)
-
 ## Submission summary
 
 This update makes it easier for other package authors using loo to write
