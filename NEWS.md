@@ -1,24 +1,25 @@
 # loo 0.1.4
-* Don't call functions from **parallel** package if `cores=1` (This should make
-it easier for other package authors using **loo** to write tests that run the
-loo function.)
-* Fix bug causing `psislw` to return summary statistic rather than smoothed
-weights vector. This bug only occurred if `psislw` was called directly and was
-not a problem when `psislw` was used internally to compute LOO.
+This update makes it easier for other package authors using __loo__ to write
+tests that involve running the `loo` function. It also includes minor bug
+fixes and additional unit tests. Highlights:
+
+* Don't call functions from __parallel__ package if `cores=1`.
+* Return entire vector/matrix of smoothed weights rather than a summary statistic when `psislw` function is called in an interactive session.
+* [Test coverage > 80%](https://codecov.io/github/jgabry/loo?branch=master)
 
 # loo 0.1.3
 This update provides several important improvements, most notably an alternative
 method for specifying the pointwise log-likelihood that reduces memory usage 
-and allows for **loo** to be used with larger datasets. This update also makes
-it easier to to incorporate **loo**'s functionality into other packages.
+and allows for __loo__ to be used with larger datasets. This update also makes
+it easier to to incorporate __loo__'s functionality into other packages.
 
 * Add Ben Goodrich as contributor
 * S3 generics and `matrix` and `function` methods for both `loo` and `waic`. 
 The matrix method provide the same functionality as in previous versions of 
-**loo** (taking a log-likelihood matrix as the input). The function method 
+__loo__ (taking a log-likelihood matrix as the input). The function method 
 allows the user to provide a function for computing the log-likelihood from 
 the data and posterior draws (which are also provided by the user). The function
-method is less memory intensive and should make it possible to use **loo** for 
+method is less memory intensive and should make it possible to use __loo__ for 
 models fit to larger amounts of data than before.
 * Separate `plot` and `print` methods. `plot` also provides `label_points` 
 argument, which, if `TRUE`, will label any Pareto `k` points greater than 
