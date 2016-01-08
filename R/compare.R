@@ -43,9 +43,11 @@
 #'
 compare <- function(...) {
   dots <- list(...)
-  nms <- as.character(match.call())[-1L]
-  if (!all(sapply(dots, is.loo))) stop("All inputs should have class 'loo'.")
-  if (length(dots) <= 1L) stop("'compare' requires at least two models.")
+  nms <- as.character(match.call(expand.dots = TRUE))[-1L]
+  if (!all(sapply(dots, is.loo)))
+    stop("All inputs should have class 'loo'.", call. = FALSE)
+  if (length(dots) <= 1L)
+    stop("'compare' requires at least two models.", call. = FALSE)
   else if (length(dots) == 2L) {
     a <- dots[[1L]]
     b <- dots[[2L]]
@@ -69,7 +71,7 @@ compare <- function(...) {
   else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
     if (!all(Ns == Ns[1L]))
-      stop("Not all models have the same number of data points.")
+      stop("Not all models have the same number of data points.", call. = FALSE)
     sel <- grep("pointwise|pareto_k", names(dots[[1L]]), invert = TRUE)
     x <- sapply(dots, function(x) unlist(x[sel]))
     colnames(x) <- nms
