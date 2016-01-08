@@ -1,3 +1,6 @@
+# loo 0.1.4.9000
+* Add warnings if any p_waic estimates are greather than 0.4.
+
 # loo 0.1.4
 This update makes it easier for other package authors using __loo__ to write
 tests that involve running the `loo` function. It also includes minor bug

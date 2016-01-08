@@ -36,7 +36,8 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
     p_waic <- colVars(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
+           call. = FALSE)
     lpd <- logColMeansExp_ll(llfun, llargs)
     p_waic <- colVars_ll(llfun, llargs)
   }
@@ -53,7 +54,8 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
   else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
+           call. = FALSE)
     lpd <- logColMeansExp_ll(llfun, llargs)
   }
   elpd_loo <- psis$loos
@@ -122,6 +124,18 @@ k_warnings <- function(k, digits = 1) {
       .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
     }
     .warn("See PSIS-LOO description (?'loo-package') for more information")
+  }
+  invisible(NULL)
+}
+
+pwaic_warnings <- function(p, digits = 1) {
+  badp <- p > 0.4
+  if (any(badp)) {
+    count <- sum(badp)
+    prop <- count / length(badp)
+    .warn(paste0(count, " (", .fr(100 * prop, digits),
+                 "%) p_waic estimates greater than 0.4."),
+          "\nWe recommend trying loo() instead.")
   }
   invisible(NULL)
 }
