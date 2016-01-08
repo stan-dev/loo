@@ -7,3 +7,4 @@
 ^README\.md$
 man-roxygen/*
 ^revdep$
+tests/testthat/Rplots\.pdf

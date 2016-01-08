@@ -10,6 +10,14 @@ context("print and plot")
 test_that("plot.loo throws appropriate errors", {
   expect_error(plot(x1), regexp = "No Pareto k values")
 })
+test_that("plot.loo doesn't error", {
+  # this doesn't actually check that plots are the same, but just serves
+  # to check that they don't throw errors
+  expect_equal(plot(x2), loo:::plot_k(x2$pareto_k))
+  expect_equal(plot(x2), loo:::plot_k(x2$pareto_k))
+  expect_equal(plot(x2, label_points = TRUE),
+               loo:::plot_k(x2$pareto_k, label_points = TRUE))
+})
 test_that("print.loo issues appropriate warnings for waic",{
   llmsg <- "Computed from 100 by 50 log-likelihood matrix"
   if (any(x1$pointwise[, "p_waic"] > 0.4)) expect_warning(print(x1))
