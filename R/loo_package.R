@@ -174,11 +174,11 @@
 #' weights in the Bayesian linear model. \emph{Journal of the American
 #' Statistical Association} \strong{92}, 199-207.
 #'
-#' Stan Development Team (2014a). Stan: A C++ library for probability and
-#' sampling, version 2.6. \url{mc-stan.org}.
+#' Stan Development Team (2016). Stan: A C++ library for probability and
+#' sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
 #'
-#' Stan Development Team (2014b). RStan, version 2.6.
-#' \url{mc-stan.org/rstan.html}.
+#' Stan Development Team (2016). RStan, version 2.9.
+#' \url{http://mc-stan.org/interfaces/rstan.html}.
 #'
 #' Vehtari, A., and Gelman, A. (2015).  Pareto smoothed importance sampling.
 #' arXiv:1507.02646.

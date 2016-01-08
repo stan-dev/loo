@@ -18,6 +18,7 @@ test_that("compare throws appropriate errors", {
                regexp = "same number of data points")
   expect_silent(loo::compare(x1, x4))
   expect_silent(comp <- loo::compare(x1, x4, x4))
+  expect_output(print(loo::compare(x1, x4)), regexp = "elpd_diff")
   expect_equal(comp[2, ], comp[3, ])
 })
 test_that("compare returns expected result", {
