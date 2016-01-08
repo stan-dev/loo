@@ -111,11 +111,11 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     # parallelize
     if (.Platform$OS.type != "windows") {
       out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
-    } else {
+    } else { # nocov start
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
       out <- parLapply(cl, X = 1:N, fun = .psis_loop)
-    }
+    } # nocov end
   }
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
   if (FROM_LOO) {
