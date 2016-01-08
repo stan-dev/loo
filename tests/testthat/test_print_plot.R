@@ -17,6 +17,9 @@ test_that("plot.loo doesn't error", {
   expect_equal(plot(x2), loo:::plot_k(x2$pareto_k))
   expect_equal(plot(x2, label_points = TRUE),
                loo:::plot_k(x2$pareto_k, label_points = TRUE))
+  x3 <- x2
+  x3$pareto_k[1:5] <- Inf
+  expect_warning(plot(x3), regexp = "estimates are Inf/NA/NaN and not plotted.")
 })
 test_that("print.loo issues appropriate warnings for waic",{
   llmsg <- "Computed from 100 by 50 log-likelihood matrix"
