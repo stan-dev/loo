@@ -229,10 +229,9 @@ nlist <- function(...) {
 
 
 # release reminders (for devtools)
-release_questions <- function() {
+release_questions <- function() { # nocov start
   c(
-    "Have you updated version numbers in inst/CITATION?",
-    "Have you updated references to the loo paper?"
+    "Have you updated all references to the LOO paper?",
+    "Have you updated R code in vignette to match the code in the paper?"
   )
-}
-
+} # nocov end
