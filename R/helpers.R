@@ -226,3 +226,13 @@ nlist <- function(...) {
     names(out)[!has_name] <- nms[!has_name]
   out
 }
+
+
+# release reminders (for devtools)
+release_questions <- function() {
+  c(
+    "Have you updated version numbers in inst/CITATION?",
+    "Have you updated references to the loo paper?"
+  )
+}
+
