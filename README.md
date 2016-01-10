@@ -9,9 +9,18 @@ Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
 ### Install
 
-* **CRAN** `install.packages("loo")`
+* **CRAN** 
 
-* **GitHub** `devtools::install_github("jgabry/loo")` 
+```{r}
+install.packages("loo")
+```
+
+* **GitHub** 
+
+```{r}
+if (!require(devtools)) install.packages("devtools")
+devtools::install_github("jgabry/loo", build_vignettes = TRUE)
+```
 
 ### About 
 
@@ -24,7 +33,7 @@ AIC and DIC but are less used in practice because they involve additional
 computational steps. 
 
 This package implements the fast and stable computations for LOO and WAIC from
-[*Efficient leave-one-out cross-validation and WAIC for evaluating fitted Bayesian models*](http://arxiv.org/abs/1507.04544). 
+[*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544). 
 From existing posterior simulation draws, we compute LOO using Pareto smoothed
 importance sampling (PSIS), a new procedure for regularizing importance weights.
 As a byproduct of our calculations, we also obtain approximate standard errors
@@ -35,5 +44,5 @@ models.
 Aki Vehtari, Andrew Gelman, Jonah Gabry
 
 ### Python and Matlab/Octave Code
-Corresponding Python and Matlab/Octave code can be found at https://github.com/avehtari/PSIS
-
+Corresponding Python and Matlab/Octave code can be found at the
+[avehtari/PSIS](https://github.com/avehtari/PSIS) repository.
