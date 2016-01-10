@@ -1,0 +1,31 @@
+citHeader("To cite the loo R package and/or paper in publications use:")
+
+citEntry(entry = "Manual",
+         title        = "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models",
+         author       = personList(as.person("Aki Vehtari"),
+                                   as.person("Andrew Gelman"),
+                                   as.person("Jonah Gabry")),
+         year         = "2016",
+         note         = "R package version 0.1.5",
+         url          = "https://github.com/jgabry/loo",
+         textVersion  =
+           paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2016).",
+                 "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models.",
+                 "R package version 0.1.5.",
+                 "https://github.com/jgabry/loo")
+)
+
+citEntry(entry = "Article",
+         title = "Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC",
+         author = c(person(given = "Aki", family = "Vehtari"),
+                    person(given = "Andrew", family = "Gelman"),
+                    person(given = "Jonah", family = "Gabry")),
+         year = "2016",
+         url = "http://arxiv.org/abs/1507.04544",
+         journal = "arXiv (preprint)",
+         textVersion =
+           paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2016).",
+                 "Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC.",
+                 "http://arxiv.org/abs/1507.04544 (preprint)")
+)
+
