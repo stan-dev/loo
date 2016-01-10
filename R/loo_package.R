@@ -7,9 +7,9 @@
 #'
 #' @description This package implements the methods described in
 #'
-#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
-#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-#' models. arXiv preprint: \url{http://arxiv.org/abs/1507.04544}.
+#' Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
+#' evaluation using leave-one-out cross-validation and WAIC. arXiv preprint:
+#' \url{http://arxiv.org/abs/1507.04544}.
 #'
 #' The package documentation is largely based on excerpts from the paper.
 #'
