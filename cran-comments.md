@@ -1,11 +1,10 @@
 ## Submission summary
 
-This update makes it easier for other package authors using loo to write
-tests that involve running the loo function. It also includes minor bug
-fixes and additional unit tests.
+This update adds additional unit tests. There are also minor improvements to 
+the package documentation and to messages issued by the waic function.
 
 ## Test environments
-* local OS X install, R 3.2.2
+* local OS X install, R 3.2.3
 * win-builder (release and devel)
 * ubuntu 12.04 (on travis-ci)
 
