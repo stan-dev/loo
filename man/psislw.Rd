@@ -49,8 +49,8 @@ This function is primarily intended for internal use, but is exported
   than \code{\link[=loo]{LOO-CV}}.
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient
-implementation of leave-one-out cross-validation and WAIC for evaluating
-fitted Bayesian models. \url{http://arxiv.org/abs/1507.04544/} (preprint)
+Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\url{http://arxiv.org/abs/1507.04544/} (preprint)
 }
 

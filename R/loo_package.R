@@ -13,8 +13,6 @@
 #'
 #' The package documentation is largely based on excerpts from the paper.
 #'
-#' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry.
-#'
 #' @section Summary: Leave-one-out cross-validation (LOO) and the widely
 #'   applicable information criterion (WAIC) are methods for estimating
 #'   pointwise out-of-sample prediction accuracy from a fitted Bayesian model

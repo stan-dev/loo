@@ -194,12 +194,13 @@ cbind_list <- function(x) {
 #' \code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b =
 #' 2)}, etc.
 #'
-#' @keywords internal
 #' @export
+#' @keywords internal
 #' @param ... Objects to include in the list.
 #' @return A named list.
 #'
 #' @seealso \code{\link[base]{list}}
+#' @author Jonah Gabry
 #' @examples
 #'
 #' # All variables already defined
@@ -211,20 +212,20 @@ cbind_list <- function(x) {
 #' nlist(a, b, veggies = c("lettuce", "spinach"), fruits = c("banana", "papaya"))
 #'
 nlist <- function(...) {
+  m <- match.call()
   out <- list(...)
-  onms <- names(out)
-  no_names <- is.null(onms)
-  has_name <- if (no_names)
-    FALSE else nzchar(onms)
+  no_names <- is.null(names(out))
+  has_name <- if (no_names) FALSE else nzchar(names(out))
   if (all(has_name))
     return(out)
-  mc <- match.call(expand.dots = TRUE)
-  nms <- as.character(mc)[-1L]
-  if (no_names)
+  nms <- as.character(m)[-1L]
+  if (no_names) {
     names(out) <- nms
-  else
+  } else {
     names(out)[!has_name] <- nms[!has_name]
-  out
+  }
+
+  return(out)
 }
 
 

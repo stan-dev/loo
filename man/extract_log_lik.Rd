@@ -41,10 +41,10 @@ Stan does not automatically compute and store the log-likelihood. It
  \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
 }
 \references{
-Stan Development Team (2015). Stan: A C++ library for probability and
-sampling, version 2.6. \url{mc-stan.org}.
+Stan Development Team (2016). Stan: A C++ library for probability and
+sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
 
-Stan Development Team (2015). RStan, version 2.6.
-\url{mc-stan.org/rstan.html}.
+Stan Development Team (2016). RStan, version 2.9.
+\url{http://mc-stan.org/interfaces/rstan.html}.
 }
 
