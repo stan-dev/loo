@@ -12,10 +12,11 @@ compare(...)
 }
 \value{
 A vector or matrix with class \code{'compare.loo'}. If \code{...}
-  contains more than two objects then a matrix is returned. If \code{...}
-  contains exactly two objects then the difference in expected predictive
-  accuracy and the standard error of the difference are returned (see
-  Details).
+  contains more than two objects then a matrix of summary information is
+  returned. If \code{...} contains exactly two objects then the difference in
+  expected predictive accuracy and the standard error of the difference are
+  returned (see Details). The difference will be positive if the expected
+  predictive accuracy for the second model is higher.
 }
 \description{
 Compare fitted models on LOO or WAIC
