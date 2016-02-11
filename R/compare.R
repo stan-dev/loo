@@ -6,12 +6,10 @@
 #' @param ... At least two objects returned by \code{\link{loo}} or
 #'   \code{\link{waic}}.
 #' @return A vector or matrix with class \code{'compare.loo'}. If \code{...}
-#'   contains more than two objects then a matrix is returned. This matrix
-#'   summarizes the objects and also reports model weights (the posterior
-#'   probability that each model has the best expected out-of-sample predictive
-#'   accuracy). If \code{...} contains exactly two objects then the difference
-#'   in expected predictive accuracy and the standard error of the difference
-#'   are returned (see Details) in addition to model weights.
+#'   contains more than two objects then a matrix is returned. If \code{...}
+#'   contains exactly two objects then the difference in expected predictive
+#'   accuracy and the standard error of the difference are returned (see
+#'   Details).
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
 #'   their expected predictive accuracy by the difference in \code{elpd_waic} or
@@ -26,6 +24,12 @@
 #'   approach of comparing differences of deviances to a Chi-squared
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
+#'
+#' @note In previous versions of \pkg{loo} model weights were also reported by
+#'   \code{compare}. We have removed the weights because they were based only on
+#'   the point estimate of the elpd values ignoring the uncertainty. Something
+#'   similar to these weights that also accounts for uncertainty will be
+#'   included in future versions of \pkg{loo}.
 #'
 #' @template loo-paper-reference
 #'
@@ -61,11 +65,7 @@ compare <- function(...) {
     sqrtN <- sqrt(Na)
     elpd <- grep("^elpd", colnames(pa))
     diff <- pb[, elpd] - pa[, elpd]
-    uwts <- c(sum(pa[, elpd]), sum(pb[, elpd]))
-    uwts <- exp(uwts - max(uwts))
-    wts <- uwts / sum(uwts)
-    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff),
-              weight1 = wts[1L], weight2 = wts[2L])
+    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff))
     structure(comp, class = "compare.loo")
   }
   else {
@@ -76,13 +76,11 @@ compare <- function(...) {
     x <- sapply(dots, function(x) unlist(x[sel]))
     colnames(x) <- nms
     rnms <- rownames(x)
-    uwts <- x[grep("^elpd", rnms), ]
-    uwts <- exp(uwts - max(uwts))
-    comp <- rbind(x, weights = uwts / sum(uwts))
-    col_ord <- order(uwts, decreasing = TRUE)
-    patts <- c("^waic$|^looic$", "^se_waic$|^se_looic$", "elpd", "p_", "weights")
+    comp <- x
+    patts <- c("^waic$|^looic$", "^se_waic$|^se_looic$", "elpd", "p_")
     row_ord <- unlist(sapply(patts, function(p) grep(p, rownames(comp))),
                       use.names = FALSE)
+    col_ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
     comp <- t(comp[row_ord, col_ord])
     class(comp) <- c("compare.loo", class(comp))
     comp
