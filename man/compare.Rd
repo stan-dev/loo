@@ -12,12 +12,10 @@ compare(...)
 }
 \value{
 A vector or matrix with class \code{'compare.loo'}. If \code{...}
-  contains more than two objects then a matrix is returned. This matrix
-  summarizes the objects and also reports model weights (the posterior
-  probability that each model has the best expected out-of-sample predictive
-  accuracy). If \code{...} contains exactly two objects then the difference
-  in expected predictive accuracy and the standard error of the difference
-  are returned (see Details) in addition to model weights.
+  contains more than two objects then a matrix is returned. If \code{...}
+  contains exactly two objects then the difference in expected predictive
+  accuracy and the standard error of the difference are returned (see
+  Details).
 }
 \description{
 Compare fitted models on LOO or WAIC
@@ -36,6 +34,13 @@ When comparing two fitted models, we can estimate the difference in
   approach of comparing differences of deviances to a Chi-squared
   distribution, a practice derived for Gaussian linear models or
   asymptotically, and which only applies to nested models in any case.
+}
+\note{
+In previous versions of \pkg{loo} model weights were also reported by
+  \code{compare}. We have removed the weights because they were based only on
+  the point estimate of the elpd values ignoring the uncertainty. Something
+  similar to these weights that also accounts for uncertainty will be
+  included in future versions of \pkg{loo}.
 }
 \examples{
 \dontrun{

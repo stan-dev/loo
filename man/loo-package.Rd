@@ -13,10 +13,6 @@ evaluation using leave-one-out cross-validation and WAIC. arXiv preprint:
 
 The package documentation is largely based on excerpts from the paper.
 }
-\section{Authors}{
- Aki Vethari, Andrew Gelman, Jonah Gabry.
-}
-
 \section{Summary}{
  Leave-one-out cross-validation (LOO) and the widely
   applicable information criterion (WAIC) are methods for estimating
