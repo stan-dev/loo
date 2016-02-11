@@ -38,9 +38,9 @@ When comparing two fitted models, we can estimate the difference in
 \note{
 In previous versions of \pkg{loo} model weights were also reported by
   \code{compare}. We have removed the weights because they were based only on
-  the point estimate of the elpd values ignoring the uncertainty. Something
-  similar to these weights that also accounts for uncertainty will be
-  included in future versions of \pkg{loo}.
+  the point estimate of the elpd values ignoring the uncertainty. We are
+  currently working on something similar to these weights that also accounts
+  for uncertainty, which will be included in future versions of \pkg{loo}.
 }
 \examples{
 \dontrun{
