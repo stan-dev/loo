@@ -13,4 +13,6 @@ the package documentation and messages issued by the waic function.
 No ERRORs, WARNINGs, or NOTEs
 
 ## Downstream dependencies
-No issues when running reverse dependencies checks.
+One very minor test fails in the brms package. I have discussed this with the 
+author of brms and he will make the necessary fix, but the functionality of brms
+is not affected by this loo update.
