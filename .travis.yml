@@ -1,7 +1,5 @@
 language: r
-
-r_binary_packages:
-  - covr
+cache: packages
 
 after_success:
   - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'

@@ -27,6 +27,7 @@ Imports:
     parallel,
     stats
 Suggests:
+    covr,
     knitr,
     testthat
 VignetteBuilder: knitr
