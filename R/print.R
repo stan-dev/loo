@@ -41,13 +41,13 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
   nms <- names(uz)
   ses <- grepl("se", nms)
   out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
-  out <- format(round(out, digits), nsmall = digits)
-  print(out, quote = FALSE)
+  print(.fr(out, digits), quote = FALSE)
   if ("pareto_k" %in% names(x)) {
-    if (warn)
-      k_warnings(x$pareto_k, digits)
-    if (plot_k)
-      plot(x, ...)
+    if (warn) k_warnings(x$pareto_k, digits)
+    if (plot_k) plot(x, ...)
+  }
+  if (warn && "p_waic" %in% colnames(x[["pointwise"]])) {
+   pwaic_warnings(x$pointwise[, "p_waic"], digits)
   }
   invisible(x)
 }
@@ -55,7 +55,7 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
 #' @rdname print.loo
 #' @export
 print.compare.loo <- function(x, ..., digits = 1) {
-  print(format(round(x, digits), nsmall = digits), quote = FALSE)
+  print(.fr(x, digits), quote = FALSE)
   invisible(x)
 }
 

@@ -4,6 +4,10 @@ set.seed(123)
 x <- matrix(rnorm(5000), 100, 50)
 
 context("loo and waic")
+test_that("loo ok with > 1 core", {
+  expect_silent(suppressWarnings(loo(x, cores = 2)))
+})
+
 test_that("loo and waic return expected results", {
   ww <- waic(x)
   wnms <- names(ww)

@@ -13,3 +13,5 @@ loo.Rproj
 vignettes/*.html
 vignettes/*.pdf
 inst/doc
+
+tests/testthat/Rplots.pdf

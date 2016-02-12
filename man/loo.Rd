@@ -63,6 +63,19 @@ A named list with class \code{'loo'} and components:
 \description{
 Efficient approximate leave-one-out cross-validation for Bayesian models.
 }
+\details{
+\subsection{PSIS-LOO}{
+We approximate LOO using Pareto Smoothed Importance Sampling (PSIS). See
+\code{\link{loo-package}} for details.
+}
+\subsection{Memory}{
+For models fit to very large datasets we recommend the \code{loo.function}
+method, which is much more memory efficient than the \code{loo.matrix}
+method. However, the \code{loo.matrix} method is typically more convenient,
+so it is usually worth trying \code{loo.matrix} and then switching to
+\code{loo.function} if memory is an issue.
+}
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
@@ -123,7 +136,12 @@ all.equal(loo_with_mat, loo_with_fn)
 
 }
 \seealso{
-\code{\link{loo-package}}, \code{\link{print.loo}},
-\code{\link{compare}}
+\code{\link{loo-package}} for details on the Pareto Smoothed Importance
+Sampling (PSIS) procedure used for approximating LOO.
+
+\code{\link{print.loo}} for the \code{print} and \code{plot} methods for
+\code{'loo'} objects.
+
+\code{\link{compare}} for model comparison.
 }
 

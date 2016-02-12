@@ -47,8 +47,27 @@
 #'    objects will also provide warnings about problematic values of \eqn{k}.)}
 #' }
 #'
-#' @seealso \code{\link{loo-package}}, \code{\link{print.loo}},
-#' \code{\link{compare}}
+#' @details
+#' \subsection{PSIS-LOO}{
+#' We approximate LOO using Pareto Smoothed Importance Sampling (PSIS). See
+#' \code{\link{loo-package}} for details.
+#' }
+#' \subsection{Memory}{
+#' For models fit to very large datasets we recommend the \code{loo.function}
+#' method, which is much more memory efficient than the \code{loo.matrix}
+#' method. However, the \code{loo.matrix} method is typically more convenient,
+#' so it is usually worth trying \code{loo.matrix} and then switching to
+#' \code{loo.function} if memory is an issue.
+#' }
+#'
+#' @seealso
+#' \code{\link{loo-package}} for details on the Pareto Smoothed Importance
+#' Sampling (PSIS) procedure used for approximating LOO.
+#'
+#' \code{\link{print.loo}} for the \code{print} and \code{plot} methods for
+#' \code{'loo'} objects.
+#'
+#' \code{\link{compare}} for model comparison.
 #'
 #' @examples
 #' \dontrun{

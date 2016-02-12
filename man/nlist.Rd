@@ -29,6 +29,9 @@ nlist(a,b)
 nlist(a, b, veggies = c("lettuce", "spinach"), fruits = c("banana", "papaya"))
 
 }
+\author{
+Jonah Gabry
+}
 \seealso{
 \code{\link[base]{list}}
 }

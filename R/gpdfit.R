@@ -25,7 +25,7 @@ gpdfit <- function(x) {
   N <- length(x)
   x <- sort.int(x, method = "quick")
   prior <- 3
-  M <- 80 + floor(sqrt(N))  # note: original paper used  20 + floor(sqrt(n))
+  M <- 80 + floor(sqrt(N))
   mseq <- seq_len(M)
   sM <- 1 - sqrt(M / (mseq - 0.5))
   Nflr <- floor(N / 4 + 0.5)

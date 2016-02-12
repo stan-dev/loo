@@ -1,3 +1,15 @@
+# loo 0.1.5
+* Add warnings if any p_waic estimates are greather than 0.4
+* Improve line coverage of tests to 100%
+* Update references in documentation
+* Remove model weights from `compare`. <br>
+    In previous versions of __loo__ model
+weights were also reported by `compare`. We have removed the weights because
+they were based only on the point estimate of the elpd values ignoring the
+uncertainty. We are currently working on something similar to these weights that
+also accounts for uncertainty, which will be included in future versions of
+__loo__.
+
 # loo 0.1.4
 This update makes it easier for other package authors using __loo__ to write
 tests that involve running the `loo` function. It also includes minor bug

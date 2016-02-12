@@ -36,7 +36,8 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
     p_waic <- colVars(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
+           call. = FALSE)
     lpd <- logColMeansExp_ll(llfun, llargs)
     p_waic <- colVars_ll(llfun, llargs)
   }
@@ -53,7 +54,8 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
   else {
     if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.")
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
+           call. = FALSE)
     lpd <- logColMeansExp_ll(llfun, llargs)
   }
   elpd_loo <- psis$loos
@@ -126,6 +128,18 @@ k_warnings <- function(k, digits = 1) {
   invisible(NULL)
 }
 
+pwaic_warnings <- function(p, digits = 1) {
+  badp <- p > 0.4
+  if (any(badp)) {
+    count <- sum(badp)
+    prop <- count / length(badp)
+    .warn(paste0(count, " (", .fr(100 * prop, digits),
+                 "%) p_waic estimates greater than 0.4."),
+          "\nWe recommend trying loo() instead.")
+  }
+  invisible(NULL)
+}
+
 
 # plot pareto k estimates -------------------------------------------------
 #' @importFrom graphics abline axis plot points text
@@ -180,12 +194,13 @@ cbind_list <- function(x) {
 #' \code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b =
 #' 2)}, etc.
 #'
-#' @keywords internal
 #' @export
+#' @keywords internal
 #' @param ... Objects to include in the list.
 #' @return A named list.
 #'
 #' @seealso \code{\link[base]{list}}
+#' @author Jonah Gabry
 #' @examples
 #'
 #' # All variables already defined
@@ -197,18 +212,27 @@ cbind_list <- function(x) {
 #' nlist(a, b, veggies = c("lettuce", "spinach"), fruits = c("banana", "papaya"))
 #'
 nlist <- function(...) {
+  m <- match.call()
   out <- list(...)
-  onms <- names(out)
-  no_names <- is.null(onms)
-  has_name <- if (no_names)
-    FALSE else nzchar(onms)
+  no_names <- is.null(names(out))
+  has_name <- if (no_names) FALSE else nzchar(names(out))
   if (all(has_name))
     return(out)
-  mc <- match.call(expand.dots = TRUE)
-  nms <- as.character(mc)[-1L]
-  if (no_names)
+  nms <- as.character(m)[-1L]
+  if (no_names) {
     names(out) <- nms
-  else
+  } else {
     names(out)[!has_name] <- nms[!has_name]
-  out
+  }
+
+  return(out)
 }
+
+
+# release reminders (for devtools)
+release_questions <- function() { # nocov start
+  c(
+    "Have you updated all references to the LOO paper?",
+    "Have you updated R code in vignette to match the code in the paper?"
+  )
+} # nocov end

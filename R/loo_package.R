@@ -7,13 +7,11 @@
 #'
 #' @description This package implements the methods described in
 #'
-#' Vehtari, A., Gelman, A., and Gabry, J. (2015). Efficient implementation of
-#' leave-one-out cross-validation and WAIC for evaluating fitted Bayesian
-#' models. arXiv preprint: \url{http://arxiv.org/abs/1507.04544}.
+#' Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
+#' evaluation using leave-one-out cross-validation and WAIC. arXiv preprint:
+#' \url{http://arxiv.org/abs/1507.04544}.
 #'
 #' The package documentation is largely based on excerpts from the paper.
-#'
-#' @section Authors: Aki Vethari, Andrew Gelman, Jonah Gabry.
 #'
 #' @section Summary: Leave-one-out cross-validation (LOO) and the widely
 #'   applicable information criterion (WAIC) are methods for estimating
@@ -174,11 +172,11 @@
 #' weights in the Bayesian linear model. \emph{Journal of the American
 #' Statistical Association} \strong{92}, 199-207.
 #'
-#' Stan Development Team (2014a). Stan: A C++ library for probability and
-#' sampling, version 2.6. \url{mc-stan.org}.
+#' Stan Development Team (2016). Stan: A C++ library for probability and
+#' sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
 #'
-#' Stan Development Team (2014b). RStan, version 2.6.
-#' \url{mc-stan.org/rstan.html}.
+#' Stan Development Team (2016). RStan, version 2.9.
+#' \url{http://mc-stan.org/interfaces/rstan.html}.
 #'
 #' Vehtari, A., and Gelman, A. (2015).  Pareto smoothed importance sampling.
 #' arXiv:1507.02646.
