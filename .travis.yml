@@ -1,13 +1,5 @@
 language: r
-sudo: required
-warnings_are_errors: true
-
-r_binary_packages:
-  - covr
-  - matrixStats
-  - knitr
-  - testthat
-  - rmarkdown
+cache: packages
 
 after_success:
   - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'
