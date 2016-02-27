@@ -175,9 +175,13 @@ plot_k <- function(k, ..., label_points = FALSE) {
     txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
                        labels = seq_along(k)[sel]),
                   if (length(dots)) dots)
-    if (!("adj" %in% names(txt_args))) txt_args$adj <- 2/3
-    if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
-    if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
+    if (!("adj" %in% names(txt_args)))
+      txt_args$adj <- 2/3
+    if (!("cex" %in% names(txt_args)))
+      txt_args$cex <- 0.75
+    if (!("col" %in% names(txt_args)))
+      txt_args$col <- clrs[sel]
+
     do.call("text", txt_args)
   }
 }

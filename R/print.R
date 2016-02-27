@@ -43,12 +43,14 @@ print.loo <- function(x, ..., digits = 1, warn = TRUE, plot_k = FALSE) {
   out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
   print(.fr(out, digits), quote = FALSE)
   if ("pareto_k" %in% names(x)) {
-    if (warn) k_warnings(x$pareto_k, digits)
-    if (plot_k) plot(x, ...)
+    if (warn)
+      k_warnings(x$pareto_k, digits)
+    if (plot_k)
+      plot(x, ...)
   }
-  if (warn && "p_waic" %in% colnames(x[["pointwise"]])) {
-   pwaic_warnings(x$pointwise[, "p_waic"], digits)
-  }
+  if (warn && "p_waic" %in% colnames(x[["pointwise"]]))
+    pwaic_warnings(x$pointwise[, "p_waic"], digits)
+
   invisible(x)
 }
 
@@ -62,7 +64,8 @@ print.compare.loo <- function(x, ..., digits = 1) {
 #' @rdname print.loo
 #' @export
 plot.loo <- function(x, ..., label_points = FALSE) {
-  if (is.null(x$pareto_k)) stop("No Pareto k values found.")
+  if (is.null(x$pareto_k))
+    stop("No Pareto k values found.")
   k <- x$pareto_k
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
