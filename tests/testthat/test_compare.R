@@ -27,7 +27,7 @@ test_that("compare returns expected result (2 models)", {
   x2 <- loo(matrix(rnorm(5000), 100, 50))
   diff_val <- compare(x1, x2)
   diff_ans <- structure(c(-0.49758869857943333059, 1.22288821000758018975),
-                        .Names = c("elpd_diff", "se"),
+                        .Names = c("elpd_diff", "SE"),
                         class = "compare.loo")
   expect_equal(diff_val, diff_ans)
 })

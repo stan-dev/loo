@@ -51,9 +51,9 @@ compare <- function(...) {
   nms <- as.character(match.call(expand.dots = TRUE))[-1L]
   if (!all(sapply(dots, is.loo)))
     stop("All inputs should have class 'loo'.", call. = FALSE)
-  if (length(dots) <= 1L)
+  if (length(dots) <= 1L) {
     stop("'compare' requires at least two models.", call. = FALSE)
-  else if (length(dots) == 2L) {
+  } else if (length(dots) == 2L) {
     a <- dots[[1L]]
     b <- dots[[2L]]
     pa <- a$pointwise
@@ -66,10 +66,9 @@ compare <- function(...) {
     sqrtN <- sqrt(Na)
     elpd <- grep("^elpd", colnames(pa))
     diff <- pb[, elpd] - pa[, elpd]
-    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff))
+    comp <- c(elpd_diff = sum(diff), SE = sqrtN * sd(diff))
     structure(comp, class = "compare.loo")
-  }
-  else {
+  } else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
     if (!all(Ns == Ns[1L]))
       stop("Not all models have the same number of data points.", call. = FALSE)
