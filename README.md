@@ -1,5 +1,5 @@
-[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=master)](https://travis-ci.org/jgabry/loo)
-[![codecov.io](https://codecov.io/github/stan-dev/loo/coverage.svg?branch=master)](https://codecov.io/github/jgabry/loo?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=master)](https://travis-ci.org/stan-dev/loo)
+[![codecov.io](https://codecov.io/github/stan-dev/loo/coverage.svg?branch=master)](https://codecov.io/github/stan-dev/loo?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 [![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 
