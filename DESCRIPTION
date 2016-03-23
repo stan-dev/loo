@@ -14,7 +14,7 @@ BugReports: https://github.com/jgabry/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
     using Pareto smoothed importance sampling (PSIS), a new procedure for
     regularizing importance weights. As a byproduct of the calculations, we also
-    obtain approximate standard errors for estimated predictive errors, and for
+    obtain approximate standard errors for estimated predictive errors and for
     the comparison of predictive errors between models. We also compute the
     widely applicable information criterion (WAIC).
 License: GPL (>=3)
