@@ -19,7 +19,7 @@ install.packages("loo")
 
 ```{r}
 if (!require(devtools)) install.packages("devtools")
-devtools::install_github("jgabry/loo", build_vignettes = TRUE)
+devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
 ```
 
 ### About 
