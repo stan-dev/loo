@@ -1,4 +1,4 @@
-[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=develop)](https://travis-ci.org/jgabry/loo)
+[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=develop)](https://travis-ci.org/stan-dev/loo)
 [![codecov.io](https://codecov.io/github/stan-dev/loo/coverage.svg?branch=develop)](https://codecov.io/github/stan-dev/loo?branch=develop)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 [![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
@@ -9,20 +9,20 @@ Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
 ### Install
 
-* **CRAN** 
+* **CRAN**
 
 ```{r}
 install.packages("loo")
 ```
 
-* **GitHub** 
+* **GitHub**
 
 ```{r}
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
 ```
 
-### About 
+### About
 
 Leave-one-out cross-validation (LOO) and the widely applicable information
 criterion (WAIC) are methods for estimating pointwise out-of-sample
@@ -30,10 +30,10 @@ prediction accuracy from a fitted Bayesian model using the log-likelihood
 evaluated at the posterior simulations of the parameter values. LOO and WAIC
 have various advantages over simpler estimates of predictive error such as
 AIC and DIC but are less used in practice because they involve additional
-computational steps. 
+computational steps.
 
 This package implements the fast and stable computations for LOO and WAIC from
-[*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544). 
+[*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544).
 From existing posterior simulation draws, we compute LOO using Pareto smoothed
 importance sampling (PSIS), a new procedure for regularizing importance weights.
 As a byproduct of our calculations, we also obtain approximate standard errors
