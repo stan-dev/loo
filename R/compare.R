@@ -66,7 +66,7 @@ compare <- function(...) {
     sqrtN <- sqrt(Na)
     elpd <- grep("^elpd", colnames(pa))
     diff <- pb[, elpd] - pa[, elpd]
-    comp <- c(elpd_diff = sum(diff), SE = sqrtN * sd(diff))
+    comp <- c(elpd_diff = sum(diff), se = sqrtN * sd(diff))
     structure(comp, class = "compare.loo")
   } else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
