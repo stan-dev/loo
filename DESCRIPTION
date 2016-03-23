@@ -9,8 +9,8 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Juho", "Piironen", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
-URL: https://github.com/jgabry/loo
-BugReports: https://github.com/jgabry/loo/issues
+URL: https://github.com/stan-dev/loo
+BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
     using Pareto smoothed importance sampling (PSIS), a new procedure for
     regularizing importance weights. As a byproduct of the calculations, we also
