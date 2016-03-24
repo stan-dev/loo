@@ -39,7 +39,8 @@ waic <- function(x, ...) {
 #' @template matrix
 #'
 waic.matrix <- function(x, ...) {
-  if (any(is.na(x))) stop("NA log-likelihood values found.")
+  if (any(is.na(x)))
+    stop("NA log-likelihood values found.")
   out <- pointwise_waic(log_lik = x)
   structure(out, log_lik_dim = dim(x), class = "loo")
 }
@@ -49,7 +50,8 @@ waic.matrix <- function(x, ...) {
 #' @template function
 #'
 waic.function <- function(x, ..., args) {
-  if (missing(args)) stop("'args' must be specified.")
+  if (missing(args))
+    stop("'args' must be specified.")
   out <- pointwise_waic(llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = "loo")
 }

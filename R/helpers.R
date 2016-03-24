@@ -18,7 +18,8 @@ logColMeansExp_ll <- function(fun, args) {
 
 colVars_ll <- function(fun, args) {
   vapply(seq_len(args$N), FUN = function(i) {
-    var(as.vector(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)))
+    x <- fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)
+    var(as.vector(x))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 }
 
@@ -51,8 +52,9 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
-  if (!missing(log_lik)) lpd <- logColMeansExp(log_lik)
-  else {
+  if (!missing(log_lik)) {
+    lpd <- logColMeansExp(log_lik)
+  } else {
     if (is.null(llfun) || is.null(llargs))
       stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
            call. = FALSE)
@@ -74,8 +76,11 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
 
 # inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
 qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (is.nan(sigma) || sigma <= 0) return(rep(NaN, length(p)))
-  if (!lower.tail) p <- 1 - p
+  if (is.nan(sigma) || sigma <= 0)
+    return(rep(NaN, length(p)))
+  if (!lower.tail)
+    p <- 1 - p
+
   mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
@@ -86,13 +91,15 @@ lx <- function(a,x) {
 }
 
 lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin)) min_cut <- -700
+  if (min_cut < log(.Machine$double.xmin))
+    min_cut <- -700
   cp <- quantile(y, 1 - wcp, names = FALSE)
   max(cp, min_cut)
 }
 
 lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0) return(y)
+  if (wtrunc == 0)
+    return(y)
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
   y[y > lwtrunc] <- lwtrunc
@@ -168,9 +175,13 @@ plot_k <- function(k, ..., label_points = FALSE) {
     txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
                        labels = seq_along(k)[sel]),
                   if (length(dots)) dots)
-    if (!("adj" %in% names(txt_args))) txt_args$adj <- 2/3
-    if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
-    if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
+    if (!("adj" %in% names(txt_args)))
+      txt_args$adj <- 2/3
+    if (!("cex" %in% names(txt_args)))
+      txt_args$cex <- 0.75
+    if (!("col" %in% names(txt_args)))
+      txt_args$col <- clrs[sel]
+
     do.call("text", txt_args)
   }
 }

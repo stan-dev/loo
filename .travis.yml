@@ -3,7 +3,3 @@ cache: packages
 
 after_success:
   - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'
-
-notifications:
-  email:
-    - jgabry@gmail.com

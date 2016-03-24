@@ -1,3 +1,8 @@
+# loo 0.1.6
+* GitHub repository moved from @jgabry to @stan-dev
+* Better error messages from `extract_log_lik`
+* Fix example code in vignette (thanks to GitHub user @krz)
+
 # loo 0.1.5
 * Add warnings if any p_waic estimates are greather than 0.4
 * Improve line coverage of tests to 100%

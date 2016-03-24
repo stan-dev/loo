@@ -82,8 +82,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       ll_i <- -1 * lw_i
     }
     psis <- .psis(lw_i)
-    if (!FROM_LOO) psis
-    else nlist(lse = logSumExp(ll_i + psis$lw_new), k = psis$k)
+    if (FROM_LOO)
+      nlist(lse = logSumExp(ll_i + psis$lw_new), k = psis$k)
+    else
+      psis
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
@@ -95,7 +97,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     dots$COMPUTE_LOOS else FALSE
 
   if (!missing(lw)) {
-    if (!is.matrix(lw)) lw <- as.matrix(lw)
+    if (!is.matrix(lw))
+      lw <- as.matrix(lw)
     N <- ncol(lw)
     LL_FUN <- FALSE
   } else {
