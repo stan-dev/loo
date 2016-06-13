@@ -37,3 +37,9 @@ gpdfit <- function(x) {
   sigma <- -k / bdotw
   nlist(k, sigma)
 }
+
+lx <- function(a,x) {
+  a <- -a
+  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
+  log(a / k) - k - 1
+}

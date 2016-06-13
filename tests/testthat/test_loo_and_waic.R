@@ -68,3 +68,13 @@ test_that("function and matrix methods return same result", {
   expect_equal(loo_with_mat, loo_with_fn)
   expect_equal(waic_with_mat, waic_with_fn)
 })
+
+
+# pareto_k_ids ------------------------------------------------------------
+test_that("pareto_k_ids identifies correct observations", {
+  ll <- loo(x)
+  expect_identical(pareto_k_ids(ll, threshold = 0.5),
+                   which(ll$pareto_k > 0.5))
+  expect_identical(pareto_k_ids(ll, threshold = 1),
+                   which(ll$pareto_k > 1))
+})

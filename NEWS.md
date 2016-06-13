@@ -1,3 +1,8 @@
+# loo 0.1.6.9999
+* `pareto_k_ids` convenience function for quickly identifying problematic
+observations
+* 
+
 # loo 0.1.6
 * GitHub repository moved from @jgabry to @stan-dev
 * Better error messages from `extract_log_lik`

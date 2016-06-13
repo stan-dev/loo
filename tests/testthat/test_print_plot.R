@@ -5,7 +5,6 @@ set.seed(123)
 x1 <- waic(matrix(rnorm(5000), 100, 50))
 x2 <- loo(matrix(rnorm(5000), 100, 50))
 
-# test loo and waic -------------------------------------------------------
 context("print and plot")
 test_that("plot.loo throws appropriate errors", {
   expect_error(plot(x1), regexp = "No Pareto k values")

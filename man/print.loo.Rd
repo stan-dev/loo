@@ -52,4 +52,8 @@ The \code{print} methods return \code{x} invisibly. The \code{plot}
 \code{print} and \code{plot} methods for objects of class \code{'loo'} and
 \code{print} method for objects of class \code{'compare.loo'}.
 }
+\seealso{
+\code{\link{pareto_k_ids}} for a quick way to identify for which
+  observations the Pareto \eqn{k} estimate is problematic.
+}
 
