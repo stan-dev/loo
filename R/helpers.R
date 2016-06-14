@@ -109,13 +109,10 @@ lw_normalize <- function(y) {
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 k_warnings <- function(k, digits = 1) {
-  brks <- c(-Inf, 0.5, 1, Inf)
-  kcut <- cut(k, breaks = brks)
+  kcut <- cut(k, breaks = c(-Inf, 0.5, 1, Inf))
   count <- table(kcut)
   prop <- prop.table(count)
-  if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
-  } else {
+  if (sum(count[2:3]) != 0) {
     if (count[2] != 0) {
       txt2 <- "%) Pareto k estimates between 0.5 and 1"
       .warn(paste0(count[2], " (", .fr(100 * prop[2], digits), txt2))
@@ -126,7 +123,26 @@ k_warnings <- function(k, digits = 1) {
     }
     .warn("See PSIS-LOO description (?'loo-package') for more information")
   }
-  invisible(NULL)
+}
+
+k_table <- function(k, digits = 1) {
+  kcut <- cut(k, breaks = c(-Inf, 0.5, 1, Inf),
+              labels = c("(-Inf, 0.5]", "(0.5, 1]", "(1, Inf]"))
+  count <- table(kcut)
+
+  if (sum(count[2:3]) == 0) {
+    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
+  } else {
+    prop <- prop.table(count)
+    tab <- cbind(
+      " " = c("", "", ""),
+      "Count" = .fr(count, 0),
+      " Pct" = paste0(.fr(100 * prop, digits), "%")
+    )
+    tab2 <- rbind(tab[1,, drop=FALSE], c("", "---", "---"), tab[2:3, ])
+    cat("\nPareto k table:\n")
+    print(tab2, quote = FALSE)
+  }
 }
 
 pwaic_warnings <- function(p, digits = 1) {

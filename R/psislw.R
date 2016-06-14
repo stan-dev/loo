@@ -120,7 +120,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       out <- parLapply(cl, X = 1:N, fun = .psis_loop)
     } # nocov end
   }
+
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
+  k_warnings(pareto_k)
+
   if (FROM_LOO) {
     nlist(loos = vapply(out, "[[", 1L, FUN.VALUE = numeric(1)),
           pareto_k)
