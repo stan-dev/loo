@@ -5,14 +5,16 @@ x <- matrix(rnorm(5000), 100, 50)
 
 context("loo and waic")
 test_that("loo ok with > 1 core", {
-  expect_silent(suppressWarnings(loo(x, cores = 2)))
+  expect_warning(loo(x, cores = 2), "Pareto k estimates")
 })
 
 test_that("loo and waic return expected results", {
-  ww <- waic(x)
+  expect_warning(ww <- waic(x), "p_waic")
   wnms <- names(ww)
-  ll <- loo(x)
+
+  expect_warning(ll <- loo(x), "Pareto k")
   lnms <- names(ll)
+
   waic_val <- unlist(ww[grep("pointwise", wnms, invert = TRUE)])
   loo_val <- unlist(ll[grep("pointwise|pareto_k", lnms, invert = TRUE)])
 
@@ -72,7 +74,7 @@ test_that("function and matrix methods return same result", {
 
 # pareto_k_ids ------------------------------------------------------------
 test_that("pareto_k_ids identifies correct observations", {
-  ll <- loo(x)
+  ll <- suppressWarnings(loo(x))
   expect_identical(pareto_k_ids(ll, threshold = 0.5),
                    which(ll$pareto_k > 0.5))
   expect_identical(pareto_k_ids(ll, threshold = 1),
