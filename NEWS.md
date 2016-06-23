@@ -1,7 +1,8 @@
 # loo 0.1.6.9999
 * `pareto_k_ids` convenience function for quickly identifying problematic
 observations
-* 
+* warning messages about pareto k values are now issued by `psislw` instead of
+`print.loo`
 
 # loo 0.1.6
 * GitHub repository moved from @jgabry to @stan-dev
