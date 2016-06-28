@@ -8,7 +8,8 @@ vignette: >
 
 # Using the **loo** package
 
-*The following is excerpted (with minor edits) from our paper*   
+*The following is excerpted (with minor edits) from the appendix of the 
+preprint of our paper:*  
 Vehtari, A., Gelman, A., and Gabry, J. (2016).   
 [*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544).
 
@@ -30,17 +31,16 @@ of any given observation is small, and so the computations should be stable.
 
 ### Stan and R code 
 
-Here is the Stan code for fitting the logistic regression model:
+Here is the Stan code for fitting the logistic regression model, which 
+we save in a file called `logistic.stan`:
 
-```{r, eval=FALSE}
-'logistic.stan'
-
+```
 data {
-  int<lower=0> N; # number of data points
-  int<lower=0> P; # number of predictors (including intercept)
-  int<lower=0,upper=1> y[N]; # binary outcome
-  matrix[N,P] x; # predictors (including intercept)
-  real a;
+  int<lower=0> N;             // number of data points
+  int<lower=0> P;             // number of predictors
+  int<lower=0,upper=1> y[N];  // binary outcome
+  matrix[N,P] x;              // predictors
+  real a;                     // prior mean of beta0
 }
 parameters {
   real beta0;
@@ -53,8 +53,10 @@ model {
 }
 generated quantities {
   vector[N] log_lik;
-  for (n in 1:N)
-    log_lik[n] <- bernoulli_logit_log(y[n], beta0 + x[n] * beta);
+  for (n in 1:N) {
+    // new Stan syntax supported as of 2.10.0
+    log_lik[n] = bernoulli_logit_lpmf(y[n] | beta0 + x[n] * beta);
+  }
 }
 ```
 
@@ -114,6 +116,6 @@ diff <- compare(loo1, loo2)
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
-Stan Development Team (2015a). Stan: A C++ library for probability and sampling, version 2.6. http://mc-stan.org
+Stan Development Team (2016). _The Stan C++ Library, Version 2.10.0._   http://mc-stan.org
 
-Stan Development Team (2015b). RStan, version 2.6. http://mc-stan.org/interfaces/rstan.html
+Stan Development Team (2016) _RStan: the R interface to Stan, Version 2.9.0._   http://mc-stan.org
