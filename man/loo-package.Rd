@@ -136,11 +136,12 @@ shape parameter \eqn{k} of the gPd.
   may be large.
 }
 
-If the estimated tail shape parameter \eqn{k \ge 1/2}, the user should be
-warned. Even if the PSIS estimate has a finite variance, the user should
-consider sampling directly from \eqn{p(\theta^s | y_{-i})} for the
-problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more robust
-model.
+If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+should be warned, although in practice we have observed good performance for
+values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite variance,
+the user should consider sampling directly from \eqn{p(\theta^s | y_{-i})}
+for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more
+robust model.
 
 Importance sampling is likely to work less well if the marginal posterior
 \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
@@ -180,10 +181,10 @@ Peruggia, M. (1997). On the variability of case-deletion importance sampling
 weights in the Bayesian linear model. \emph{Journal of the American
 Statistical Association} \strong{92}, 199-207.
 
-Stan Development Team (2016). Stan: A C++ library for probability and
-sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
+Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
+\url{http://mc-stan.org/documentation/}.
 
-Stan Development Team (2016). RStan, version 2.9.
+Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1
 \url{http://mc-stan.org/interfaces/rstan.html}.
 
 Vehtari, A., and Gelman, A. (2015).  Pareto smoothed importance sampling.
