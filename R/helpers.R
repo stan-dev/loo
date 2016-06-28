@@ -105,43 +105,65 @@ lw_normalize <- function(y) {
   y - logSumExp(y)
 }
 
-# print helpers -----------------------------------------------------------
+# print and warning helpers -----------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
+.k_help <- function() c("See PSIS-LOO description (?'loo-package') for more information")
+.k_cut <- function(k) {
+  cut(
+    k,
+    breaks = c(-Inf, 0.5, 0.7, 1, Inf),
+    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf]")
+  )
+}
+
 k_warnings <- function(k, digits = 1) {
-  kcut <- cut(k, breaks = c(-Inf, 0.5, 1, Inf))
+  kcut <- .k_cut(k)
   count <- table(kcut)
   prop <- prop.table(count)
-  if (sum(count[2:3]) != 0) {
-    if (count[2] != 0) {
-      txt2 <- "%) Pareto k estimates between 0.5 and 1"
-      .warn(paste0(count[2], " (", .fr(100 * prop[2], digits), txt2))
+  msg <- character(0)
+  if (sum(count[2:4]) != 0) {
+    if (count[2] != 0)
+      msg <- c(msg, paste0(count[2], " (", .fr(100 * prop[2], digits),
+                    "%) Pareto k estimates between 0.5 and 0.7 \n"))
+    if (count[3] != 0)
+      msg <- c(msg, paste0(count[3], " (", .fr(100 * prop[3], digits),
+                           "%) Pareto k estimates between 0.7 and 1\n"))
+    if (count[4] != 0)
+      msg <- c(msg, paste0(count[4], " (", .fr(100 * prop[4], digits),
+                           "%) Pareto k estimates greater than 1\n"))
+
+    if (length(msg)) {
+      msg <- paste(c(msg, .k_help()), collapse = "")
+      .warn(msg)
     }
-    if (count[3] != 0) {
-      txt3 <- "%) Pareto k estimates greater than 1"
-      .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
-    }
-    .warn("See PSIS-LOO description (?'loo-package') for more information")
   }
 }
 
 k_table <- function(k, digits = 1) {
-  kcut <- cut(k, breaks = c(-Inf, 0.5, 1, Inf),
-              labels = c("(-Inf, 0.5]", "(0.5, 1]", "(1, Inf]"))
+  kcut <- .k_cut(k)
   count <- table(kcut)
 
-  if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
+  cat("\n----------------")
+  if (sum(count[2:4]) == 0) {
+    cat("\nAll Pareto k estimates are good (k < 0.5)\n")
   } else {
     prop <- prop.table(count)
     tab <- cbind(
-      " " = c("", "", ""),
+      # " " = rep("", 4),
+      " " = c("(good)", "(ok)", "(bad)", "(very bad)"),
       "Count" = .fr(count, 0),
       " Pct" = paste0(.fr(100 * prop, digits), "%")
     )
-    tab2 <- rbind(tab[1,, drop=FALSE], c("", "---", "---"), tab[2:3, ])
+    tab2 <- rbind(tab)
     cat("\nPareto k table:\n")
+    rownames(tab2) <- format(rownames(tab2), justify = "right")
     print(tab2, quote = FALSE)
+
+    if (sum(count[3:4]) == 0)
+      cat("\nAll Pareto k estimates are ok (k < 0.7)\n")
+
+    cat(.k_help())
   }
 }
 
@@ -166,21 +188,26 @@ plot_k <- function(k, ..., label_points = FALSE) {
        type = "n", bty = "l", yaxt = "n")
   axis(side = 2, las = 1)
   krange <- range(k)
-  for (val in c(0, 0.5, 1)) {
+  breaks <- c(0, 0.5, 0.7, 1)
+  hex_clrs <- c("#C79999", "#A25050", "#7C0000")
+  ltys <- c(3, 4, 2, 1)
+  for (j in seq_along(breaks)) {
+    val <- breaks[j]
     if (inrange(val, krange))
-      abline(h = val, col = ifelse(val == 0, "darkgray", "#b17e64"),
-             lty = 2, lwd = 1)
+      abline(h = val, col = ifelse(val == 0, "darkgray", hex_clrs[j-1]),
+             lty = ltys[j], lwd = 1)
   }
+
+  breaks <- c(-Inf, 0.5, 1)
   hex_clrs <- c("#6497b1", "#005b96", "#03396c")
-  brks <- c(-Inf, 0.5, 1)
-  clrs <- ifelse(inrange(k, brks[1:2]), hex_clrs[1],
-                 ifelse(inrange(k, brks[2:3]), hex_clrs[2L], hex_clrs[3L]))
+  clrs <- ifelse(inrange(k, breaks[1:2]), hex_clrs[1],
+                 ifelse(inrange(k, breaks[2:3]), hex_clrs[2], hex_clrs[3]))
   if (all(k < 0.5) || !label_points) {
     points(k, col = clrs, pch = 3, cex = .6)
     return(invisible())
   } else {
     points(k[k < 0.5], col = clrs[k < 0.5], pch = 3, cex = .6)
-    sel <- !inrange(k, brks[1:2])
+    sel <- !inrange(k, breaks[1:2])
     dots <- list(...)
     txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
                        labels = seq_along(k)[sel]),

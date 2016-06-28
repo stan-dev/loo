@@ -33,14 +33,16 @@ test_that("print.loo issues appropriate warnings for waic",{
   expect_warning(print(x1), regexp = "p_waic estimates greater than 0.4")
 })
 test_that("print.loo issues appropriate warnings for loo",{
-  if (any(x2$pareto_k > 0.5))
+  if (any(x2$pareto_k > 0.7))
     expect_output(print(x2), "Pareto k table")
+  else if (any(x2$pareto_k > 0.5))
+    expect_output(print(x2), regexp = "All Pareto k estimates are ok")
   else
-    expect_output(print(x2), regexp = "All Pareto k estimates OK")
+    expect_output(print(x2), regexp = "All Pareto k estimates are good")
 
-  x2$pareto_k <- runif(50, 0, .5)
-  expect_output(print(x2), regexp = "All Pareto k estimates OK")
-  x2$pareto_k[1] <- 0.51
+  x2$pareto_k <- runif(50, 0, .49)
+  expect_output(print(x2), regexp = "All Pareto k estimates are good")
+  x2$pareto_k[1] <- 0.71
   expect_output(print(x2), regexp = "Pareto k table")
   x2$pareto_k[1] <- 1.1
   expect_output(print(x2), regexp = "Pareto k table")
