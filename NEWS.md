@@ -1,8 +1,11 @@
-# loo 0.1.6.9999
+# loo 0.1.7
 * `pareto_k_ids` convenience function for quickly identifying problematic
 observations
 * warning messages about pareto k values are now issued by `psislw` instead of
 `print.loo`
+* pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
+`(1, Inf)` (didn't used to include 0.7)
+* `print.loo` shows a table of pareto k estimates (if any k > 0.7)
 
 # loo 0.1.6
 * GitHub repository moved from @jgabry to @stan-dev
