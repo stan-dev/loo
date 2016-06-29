@@ -23,7 +23,7 @@ Depends:
     R (>= 3.1.2)
 Imports:
     graphics,
-    matrixStats (>= 0.14.1),
+    matrixStats (>= 0.50.0),
     parallel,
     stats
 Suggests:
