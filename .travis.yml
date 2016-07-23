@@ -6,5 +6,7 @@ r:
 
 cache: packages
 
+r_github_packages:
+  - HenrikBengtsson/matrixStats@develop
 after_success:
   - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'
