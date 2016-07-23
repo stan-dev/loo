@@ -27,7 +27,6 @@ Imports:
     parallel,
     stats
 Suggests:
-    covr,
     knitr,
     rmarkdown,
     testthat
