@@ -6,6 +6,7 @@ observations
 * pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
 `(1, Inf)` (didn't used to include 0.7)
 * `print.loo` shows a table of pareto k estimates (if any k > 0.7)
+* Add argument to `compare` to allows loo objects to be provided in a list
 
 # loo 0.1.6
 * GitHub repository moved from @jgabry to @stan-dev
