@@ -41,7 +41,7 @@ print.loo <- function(x, ..., digits = 1, plot_k = FALSE) {
   out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
   print(.fr(out, digits), quote = FALSE)
   if ("pareto_k" %in% names(x)) {
-    k_table(x$pareto_k, digits)
+    print(pareto_k_table(x), digits = digits)
     if (plot_k)
       plot(x, ...)
   }

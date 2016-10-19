@@ -5,14 +5,14 @@ x <- matrix(rnorm(5000), 100, 50)
 
 context("loo and waic")
 test_that("loo ok with > 1 core", {
-  expect_warning(loo(x, cores = 2), "Pareto k estimates")
+  expect_warning(loo(x, cores = 2), "Some Pareto k diagnostic values are too high")
 })
 
 test_that("loo and waic return expected results", {
   expect_warning(ww <- waic(x), "p_waic")
   wnms <- names(ww)
 
-  expect_warning(ll <- loo(x), "Pareto k")
+  expect_warning(ll <- loo(x), "Some Pareto k diagnostic values are too high")
   lnms <- names(ll)
 
   waic_val <- unlist(ww[grep("pointwise", wnms, invert = TRUE)])

@@ -18,7 +18,9 @@ test_that("psislw returns expected results", {
 
 test_that("psislw handles special cases, throws appropriate errors/warnings", {
   expect_warning(psis <- psislw(x[, 1], wcp = 0.01),
-                 regexp = "Too few tail samples")
+                 regexp = "All tail values are the same. Weights are truncated but not smoothed")
+  expect_warning(psislw(x[, 1], wcp = 0.01),
+                 regexp = "Some Pareto k diagnostic values are too high. Call 'pareto_k_table' on the returned object for details")
   expect_true(is.infinite(psis$pareto_k))
   expect_error(psislw(wcp = 0.2),
                regexp = "'lw' or 'llfun' and 'llargs' must be specified")

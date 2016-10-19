@@ -38,17 +38,26 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    ...) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
-    # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
     above_cut <- x > cutoff
     x_body <- x[!above_cut]
     x_tail <- x[above_cut]
+
     tail_len <- length(x_tail)
-    if (tail_len < MIN_TAIL_LENGTH) {
-      # too few tail samples to fit gPd
-      warning("Too few tail samples to fit generalized Pareto distribution.\n",
-              "Weights are truncated and normalized but not smoothed.",
-              call. = FALSE)
+    if (tail_len < MIN_TAIL_LENGTH || all(x_tail == x_tail[1])) {
+      if (all(x_tail == x_tail[1]))
+        warning(
+          "All tail values are the same. ",
+          "Weights are truncated but not smoothed.",
+          call. = FALSE
+        )
+      else if (tail_len < MIN_TAIL_LENGTH)
+        warning(
+          "Too few tail samples to fit generalized Pareto distribution.\n",
+          "Weights are truncated but not smoothed.",
+          call. = FALSE
+        )
+
       x_new <- x
       k <- Inf
     } else {
@@ -67,14 +76,16 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       x_new[!above_cut] <- x_body
       x_new[above_cut] <- smoothed_tail
     }
-    # truncate (if wtrunc > 0) and renormalize, return log weights and pareto k
+    # truncate (if wtrunc > 0) and renormalize,
+    # return log weights and pareto k
     lw_new <- lw_normalize(lw_truncate(x_new, wtrunc))
     nlist(lw_new, k)
   }
 
   .psis_loop <- function(i) {
     if (LL_FUN) {
-      ll_i <- llfun(i = i, data = llargs$data[i,, drop=FALSE],
+      ll_i <- llfun(i = i,
+                    data = llargs$data[i,, drop=FALSE],
                     draws = llargs$draws)
       lw_i <- -1 * ll_i
     } else {
@@ -113,23 +124,37 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
   } else {
     # parallelize
     if (.Platform$OS.type != "windows") {
-      out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
-    } else { # nocov start
+      out <- mclapply(X = 1:N,
+                      FUN = .psis_loop,
+                      mc.cores = cores)
+    } else {
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
       out <- parLapply(cl, X = 1:N, fun = .psis_loop)
-    } # nocov end
+    }
   }
 
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
-  k_warnings(pareto_k)
+  if (any(pareto_k > 0.7)) {
+    warning(
+      "Some Pareto k diagnostic values are too high. ",
+      "Call 'pareto_k_table' on the returned object for details.",
+      call. = FALSE
+    )
+  } else if (any(pareto_k > 0.5)) {
+    warning(
+      "Some Pareto k diagnostic values are slightly high. ",
+      "Call 'pareto_k_table' on the returned object for details.",
+      call. = FALSE
+    )
+  }
 
   if (FROM_LOO) {
-    nlist(loos = vapply(out, "[[", 1L, FUN.VALUE = numeric(1)),
-          pareto_k)
+    loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
+    nlist(loos, pareto_k)
   } else {
     funval <- if (LL_FUN) llargs$S else nrow(lw)
-    nlist(lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval)),
-          pareto_k)
+    lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
+    nlist(lw_smooth, pareto_k)
   }
 }

@@ -113,11 +113,11 @@ lw_normalize <- function(y) {
   cut(
     k,
     breaks = c(-Inf, 0.5, 0.7, 1, Inf),
-    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf]")
+    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
   )
 }
 
-k_warnings <- function(k, digits = 1) {
+pareto_k_warnings <- function(k, digits = 1) {
   kcut <- .k_cut(k)
   count <- table(kcut)
   prop <- prop.table(count)
@@ -137,33 +137,6 @@ k_warnings <- function(k, digits = 1) {
       msg <- paste(c(msg, .k_help()), collapse = "")
       .warn(msg)
     }
-  }
-}
-
-k_table <- function(k, digits = 1) {
-  kcut <- .k_cut(k)
-  count <- table(kcut)
-
-  cat("\n----------------")
-  if (sum(count[2:4]) == 0) {
-    cat("\nAll Pareto k estimates are good (k < 0.5)\n")
-  } else {
-    prop <- prop.table(count)
-    tab <- cbind(
-      # " " = rep("", 4),
-      " " = c("(good)", "(ok)", "(bad)", "(very bad)"),
-      "Count" = .fr(count, 0),
-      " Pct" = paste0(.fr(100 * prop, digits), "%")
-    )
-    tab2 <- rbind(tab)
-    cat("\nPareto k table:\n")
-    rownames(tab2) <- format(rownames(tab2), justify = "right")
-    print(tab2, quote = FALSE)
-
-    if (sum(count[3:4]) == 0)
-      cat("\nAll Pareto k estimates are ok (k < 0.7)\n")
-
-    cat(.k_help())
   }
 }
 
