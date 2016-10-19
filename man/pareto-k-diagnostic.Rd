@@ -5,7 +5,7 @@
 \alias{pareto_k_ids}
 \alias{pareto_k_table}
 \alias{plot.loo}
-\title{Diagnostics for Pareto Smoothed Importance Samplin}
+\title{Diagnostics for Pareto Smoothed Importance Sampling}
 \usage{
 pareto_k_table(x)
 
@@ -77,6 +77,16 @@ The reliability of PSIS estimates can be assessed using the
   \eqn{p(\theta^s | y_{-i})} are much different, which is more likely to
   happen with a non-robust model and highly influential observations. A
   robust model may reduce the sensitivity to highly influential observations.
+}
+\references{
+Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  \emph{Statistics and Computing}. Advance online publication.
+  doi:10.1007/s11222-016-9696-4. arXiv preprint:
+  \url{http://arxiv.org/abs/1507.04544/}
+
+Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
+  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
 \code{\link{loo-package}}.

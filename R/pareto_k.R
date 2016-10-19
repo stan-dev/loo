@@ -1,4 +1,4 @@
-#' Diagnostics for Pareto Smoothed Importance Samplin
+#' Diagnostics for Pareto Smoothed Importance Sampling
 #'
 #' Print a diagnostic table summarizing the estimated Pareto shape parameters,
 #' find the indexes of observations for which the estimated Pareto shape
@@ -42,6 +42,8 @@
 #'   robust model may reduce the sensitivity to highly influential observations.
 #'
 #' @seealso \code{\link{loo-package}}.
+#'
+#' @template loo-and-psis-references
 #'
 NULL
 
