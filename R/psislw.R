@@ -26,8 +26,10 @@
 #'
 #' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 #'
+#' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+#'
 #' @template internal-function-note
-#' @template loo-paper-reference
+#' @template loo-and-psis-references
 #'
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
@@ -135,19 +137,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
   }
 
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
-  if (any(pareto_k > 0.7)) {
-    warning(
-      "Some Pareto k diagnostic values are too high. ",
-      "Call 'pareto_k_table' on the returned object for details.",
-      call. = FALSE
-    )
-  } else if (any(pareto_k > 0.5)) {
-    warning(
-      "Some Pareto k diagnostic values are slightly high. ",
-      "Call 'pareto_k_table' on the returned object for details.",
-      call. = FALSE
-    )
-  }
+  psislw_warnings(pareto_k)
 
   if (FROM_LOO) {
     loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
@@ -156,5 +146,54 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     funval <- if (LL_FUN) llargs$S else nrow(lw)
     lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
     nlist(lw_smooth, pareto_k)
+  }
+}
+
+
+# internal ----------------------------------------------------------------
+lw_cutpoint <- function(y, wcp, min_cut) {
+  if (min_cut < log(.Machine$double.xmin))
+    min_cut <- -700
+  cp <- quantile(y, 1 - wcp, names = FALSE)
+  max(cp, min_cut)
+}
+
+lw_truncate <- function(y, wtrunc) {
+  if (wtrunc == 0)
+    return(y)
+  logS <- log(length(y))
+  lwtrunc <- wtrunc * logS - logS + logSumExp(y)
+  y[y > lwtrunc] <- lwtrunc
+  y
+}
+
+#' @importFrom matrixStats logSumExp
+lw_normalize <- function(y) {
+  y - logSumExp(y)
+}
+
+# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
+qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
+  if (is.nan(sigma) || sigma <= 0)
+    return(rep(NaN, length(p)))
+  if (!lower.tail)
+    p <- 1 - p
+
+  mu + sigma * ((1 - p)^(-xi) - 1) / xi
+}
+
+
+# warnings about pareto k values ------------------------------------------
+psislw_warnings <- function(k) {
+  if (any(k > 0.7)) {
+    .warn(
+      "Some Pareto k diagnostic values are too high. ",
+      .k_help()
+    )
+  } else if (any(k > 0.5)) {
+    .warn(
+      "Some Pareto k diagnostic values are slightly high. ",
+      .k_help()
+    )
   }
 }

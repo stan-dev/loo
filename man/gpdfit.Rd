@@ -31,8 +31,8 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
 \seealso{
-\code{\link{psislw}}, \code{\link{loo}},
-\code{\link{loo-package}}
+\code{\link{psislw}}, \code{\link{pareto-k-diagnostic}},
+  \code{\link{loo-package}}
 }
 \keyword{internal}
 

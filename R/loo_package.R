@@ -5,13 +5,9 @@
 #'
 #' @importFrom stats sd var quantile
 #'
-#' @description This package implements the methods described in
-#'
-#' Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
-#' evaluation using leave-one-out cross-validation and WAIC. arXiv preprint:
-#' \url{http://arxiv.org/abs/1507.04544}.
-#'
-#' The package documentation is largely based on excerpts from the paper.
+#'@description This package implements the methods described in Vehtari, Gelman,
+#'  and Gabry (2016a). The package documentation is largely based on excerpts
+#'  from the paper.
 #'
 #' @section Summary: Leave-one-out cross-validation (LOO) and the widely
 #'   applicable information criterion (WAIC) are methods for estimating
@@ -21,12 +17,12 @@
 #'   estimates of predictive error such as AIC and DIC but are less used in
 #'   practice because they involve additional computational steps. This package
 #'   implements the fast and stable computations for LOO and WAIC laid out in
-#'   Vehtari, Gelman, and Gabry (2015). From existing posterior simulation
+#'   Vehtari, Gelman, and Gabry (2016a). From existing posterior simulation
 #'   draws, we compute LOO using Pareto Smoothed Importance Sampling (PSIS;
-#'   Vehtari and Gelman, 2015), a new procedure for regularizing importance
-#'   weights. As a byproduct of our calculations, we also obtain approximate
-#'   standard errors for estimated predictive errors and for comparing of
-#'   predictive errors between two models.
+#'   Vehtari, Gelman, and Gabry, 2016b), a new procedure for regularizing
+#'   importance weights. As a byproduct of our calculations, we also obtain
+#'   approximate standard errors for estimated predictive errors and for
+#'   comparing of predictive errors between two models.
 #'
 #' @section Details: After fitting a Bayesian model we often want to measure its
 #'   predictive accuracy, for its own sake or for purposes of model comparison,
@@ -144,7 +140,7 @@
 #' influential observations. A robust model may reduce the sensitivity to highly
 #' influential observations.
 #'
-#' @template loo-paper-reference
+#' @template loo-and-psis-references
 #' @references
 #' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 #' importance sampling estimators: Central limit theorems and related results.
@@ -178,9 +174,6 @@
 #'
 #' Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1
 #' \url{http://mc-stan.org/interfaces/rstan.html}.
-#'
-#' Vehtari, A., and Gelman, A. (2015).  Pareto smoothed importance sampling.
-#' arXiv:1507.02646.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.

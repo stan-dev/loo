@@ -64,10 +64,14 @@
 #' \code{\link{loo-package}} for details on the Pareto Smoothed Importance
 #' Sampling (PSIS) procedure used for approximating LOO.
 #'
-#' \code{\link{print.loo}} for the \code{print} and \code{plot} methods for
-#' \code{'loo'} objects.
-#'
 #' \code{\link{compare}} for model comparison.
+#'
+#' \code{\link{pareto-k-diagnostic}} for convenience functions for looking at
+#' diagnostics.
+#'
+#' \code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
+#'
+#' @template loo-and-psis-references
 #'
 #' @examples
 #' \dontrun{

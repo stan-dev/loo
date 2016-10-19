@@ -72,43 +72,11 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 
-# psis helpers ------------------------------------------------------------
-
-# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (is.nan(sigma) || sigma <= 0)
-    return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
-
-  mu + sigma * ((1 - p)^(-xi) - 1) / xi
-}
-
-lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin))
-    min_cut <- -700
-  cp <- quantile(y, 1 - wcp, names = FALSE)
-  max(cp, min_cut)
-}
-
-lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0)
-    return(y)
-  logS <- log(length(y))
-  lwtrunc <- wtrunc * logS - logS + logSumExp(y)
-  y[y > lwtrunc] <- lwtrunc
-  y
-}
-
-#' @importFrom matrixStats logSumExp
-lw_normalize <- function(y) {
-  y - logSumExp(y)
-}
 
 # print and warning helpers -----------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
-.k_help <- function() c("See PSIS-LOO description (?'loo-package') for more information")
+.k_help <- function() "See help('pareto-k-diagnostic') for details."
 .k_cut <- function(k) {
   cut(
     k,
@@ -152,49 +120,6 @@ pwaic_warnings <- function(p, digits = 1) {
   invisible(NULL)
 }
 
-
-# plot pareto k estimates -------------------------------------------------
-#' @importFrom graphics abline axis plot points text
-plot_k <- function(k, ..., label_points = FALSE) {
-  inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
-  plot(k, xlab = "Data point", ylab = "Shape parameter k",
-       type = "n", bty = "l", yaxt = "n")
-  axis(side = 2, las = 1)
-  krange <- range(k)
-  breaks <- c(0, 0.5, 0.7, 1)
-  hex_clrs <- c("#C79999", "#A25050", "#7C0000")
-  ltys <- c(3, 4, 2, 1)
-  for (j in seq_along(breaks)) {
-    val <- breaks[j]
-    if (inrange(val, krange))
-      abline(h = val, col = ifelse(val == 0, "darkgray", hex_clrs[j-1]),
-             lty = ltys[j], lwd = 1)
-  }
-
-  breaks <- c(-Inf, 0.5, 1)
-  hex_clrs <- c("#6497b1", "#005b96", "#03396c")
-  clrs <- ifelse(inrange(k, breaks[1:2]), hex_clrs[1],
-                 ifelse(inrange(k, breaks[2:3]), hex_clrs[2], hex_clrs[3]))
-  if (all(k < 0.5) || !label_points) {
-    points(k, col = clrs, pch = 3, cex = .6)
-    return(invisible())
-  } else {
-    points(k[k < 0.5], col = clrs[k < 0.5], pch = 3, cex = .6)
-    sel <- !inrange(k, breaks[1:2])
-    dots <- list(...)
-    txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
-                       labels = seq_along(k)[sel]),
-                  if (length(dots)) dots)
-    if (!("adj" %in% names(txt_args)))
-      txt_args$adj <- 2/3
-    if (!("cex" %in% names(txt_args)))
-      txt_args$cex <- 0.75
-    if (!("col" %in% names(txt_args)))
-      txt_args$col <- clrs[sel]
-
-    do.call("text", txt_args)
-  }
-}
 
 
 # convenience functions ---------------------------------------------------

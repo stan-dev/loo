@@ -7,7 +7,7 @@ x2 <- loo(matrix(rnorm(5000), 100, 50))
 
 context("print and plot")
 test_that("plot.loo throws appropriate errors", {
-  expect_error(plot(x1), regexp = "No Pareto k values")
+  expect_error(plot(x1), regexp = "No Pareto k estimates found")
 })
 test_that("plot.loo doesn't error", {
   # this doesn't actually check that plots are the same, but just serves
