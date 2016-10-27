@@ -126,9 +126,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
   } else {
     # parallelize
     if (.Platform$OS.type != "windows") {
-      out <- mclapply(X = 1:N,
-                      FUN = .psis_loop,
-                      mc.cores = cores)
+      out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
     } else {
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
@@ -154,6 +152,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
 lw_cutpoint <- function(y, wcp, min_cut) {
   if (min_cut < log(.Machine$double.xmin))
     min_cut <- -700
+
   cp <- quantile(y, 1 - wcp, names = FALSE)
   max(cp, min_cut)
 }
@@ -161,6 +160,7 @@ lw_cutpoint <- function(y, wcp, min_cut) {
 lw_truncate <- function(y, wtrunc) {
   if (wtrunc == 0)
     return(y)
+
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
   y[y > lwtrunc] <- lwtrunc

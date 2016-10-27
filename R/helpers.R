@@ -85,28 +85,28 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   )
 }
 
-pareto_k_warnings <- function(k, digits = 1) {
-  kcut <- .k_cut(k)
-  count <- table(kcut)
-  prop <- prop.table(count)
-  msg <- character(0)
-  if (sum(count[2:4]) != 0) {
-    if (count[2] != 0)
-      msg <- c(msg, paste0(count[2], " (", .fr(100 * prop[2], digits),
-                    "%) Pareto k estimates between 0.5 and 0.7 \n"))
-    if (count[3] != 0)
-      msg <- c(msg, paste0(count[3], " (", .fr(100 * prop[3], digits),
-                           "%) Pareto k estimates between 0.7 and 1\n"))
-    if (count[4] != 0)
-      msg <- c(msg, paste0(count[4], " (", .fr(100 * prop[4], digits),
-                           "%) Pareto k estimates greater than 1\n"))
-
-    if (length(msg)) {
-      msg <- paste(c(msg, .k_help()), collapse = "")
-      .warn(msg)
-    }
-  }
-}
+# pareto_k_warnings <- function(k, digits = 1) {
+#   kcut <- .k_cut(k)
+#   count <- table(kcut)
+#   prop <- prop.table(count)
+#   msg <- character(0)
+#   if (sum(count[2:4]) != 0) {
+#     if (count[2] != 0)
+#       msg <- c(msg, paste0(count[2], " (", .fr(100 * prop[2], digits),
+#                     "%) Pareto k estimates between 0.5 and 0.7 \n"))
+#     if (count[3] != 0)
+#       msg <- c(msg, paste0(count[3], " (", .fr(100 * prop[3], digits),
+#                            "%) Pareto k estimates between 0.7 and 1\n"))
+#     if (count[4] != 0)
+#       msg <- c(msg, paste0(count[4], " (", .fr(100 * prop[4], digits),
+#                            "%) Pareto k estimates greater than 1\n"))
+#
+#     if (length(msg)) {
+#       msg <- paste(c(msg, .k_help()), collapse = "")
+#       .warn(msg)
+#     }
+#   }
+# }
 
 pwaic_warnings <- function(p, digits = 1) {
   badp <- p > 0.4
