@@ -33,7 +33,9 @@ AIC and DIC but are less used in practice because they involve additional
 computational steps.
 
 This package implements the fast and stable computations for LOO and WAIC from
-[*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544).
+*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC* 
+([preprint](http://arxiv.org/abs/1507.04544), 
+[published](http://link.springer.com/article/10.1007%2Fs11222-016-9696-4)).
 From existing posterior simulation draws, we compute LOO using Pareto smoothed
 importance sampling (PSIS), a new procedure for regularizing importance weights.
 As a byproduct of our calculations, we also obtain approximate standard errors
