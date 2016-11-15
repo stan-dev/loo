@@ -77,7 +77,7 @@ wells <- read.table(url)
 wells$dist100 <- wells$dist / 100 # rescale 
 y <- wells$switch
 a <- qlogis(mean(y)) # i.e., a = logit(Pr(y = 1))
-x <- scale(model.matrix(~ 0 + dist + arsenic, wells))
+x <- scale(model.matrix(~ 0 + dist100 + arsenic, wells))
 data <- list(N = nrow(x), P = ncol(x), a = a, x = x, y = y)
 
 # Fit model
