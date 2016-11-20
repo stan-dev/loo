@@ -5,9 +5,15 @@
 #'
 #' @importFrom stats sd var quantile
 #'
-#'@description This package implements the methods described in Vehtari, Gelman,
-#'  and Gabry (2016a). The package documentation is largely based on excerpts
-#'  from the paper.
+#' @description
+#' \if{html}{
+#'   \figure{stanlogo.png}{options: width="50px" alt="mc-stan.org"}
+#'   \emph{Stan Development Team}
+#' }
+#'
+#' This package implements the methods described in Vehtari, Gelman,
+#' and Gabry (2016a). The package documentation is largely based on excerpts
+#' from the paper.
 #'
 #' @section Summary: Leave-one-out cross-validation (LOO) and the widely
 #'   applicable information criterion (WAIC) are methods for estimating
