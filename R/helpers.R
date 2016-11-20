@@ -72,7 +72,6 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 
-
 # print and warning helpers -----------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
@@ -119,7 +118,6 @@ pwaic_warnings <- function(p, digits = 1) {
   }
   invisible(NULL)
 }
-
 
 
 # convenience functions ---------------------------------------------------
@@ -174,11 +172,13 @@ nlist <- function(...) {
   return(out)
 }
 
-
+# nocov start
 # release reminders (for devtools)
-release_questions <- function() { # nocov start
+release_questions <- function() {
   c(
     "Have you updated all references to the LOO paper?",
+    "Have you updated inst/CITATION?",
     "Have you updated R code in vignette to match the code in the paper?"
   )
-} # nocov end
+}
+# nocov end

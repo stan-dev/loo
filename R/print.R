@@ -32,6 +32,5 @@ print.loo <- function(x, digits = 1, plot_k = FALSE, ...) {
     if (plot_k)
       plot(x, ...)
   }
-
   invisible(x)
 }
