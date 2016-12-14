@@ -13,4 +13,4 @@ the user.
 No ERRORs, WARNINGs, or NOTEs
 
 ## Downstream dependencies
-No issues found when running revdep checks
+No issues related to this package found when running revdep checks
