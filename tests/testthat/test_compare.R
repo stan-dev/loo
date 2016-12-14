@@ -32,6 +32,9 @@ test_that("compare returns expected result (2 models)", {
                         .Names = c("elpd_diff", "se"),
                         class = "compare.loo")
   expect_equal(diff_val, diff_ans)
+
+  # specifying objects via ... and via arg x gives equal results
+  expect_equivalent(compare(x1, x2), compare(x = list(x1, x2)))
 })
 
 test_that("compare returns expected result (3 models)", {
@@ -53,4 +56,7 @@ test_that("compare returns expected result (3 models)", {
               .Dimnames = list(c("x1", "x3", "x2"), nms),
               class = c("compare.loo", "matrix"))
   expect_equal(diff_val, diff_ans)
+
+  # specifying objects via ... and via arg x gives equal results
+  expect_equivalent(compare(x1, x2, x3), compare(x = list(x1, x2, x3)))
 })

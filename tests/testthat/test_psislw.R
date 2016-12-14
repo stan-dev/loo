@@ -26,3 +26,12 @@ test_that("psislw handles special cases, throws appropriate errors/warnings", {
   expect_error(psislw(wcp = 0.2),
                regexp = "'lw' or 'llfun' and 'llargs' must be specified")
 })
+
+test_that("psislw_warnings helper works properly", {
+  k <- c(0, 0.1, 0.55, 0.75)
+  expect_silent(psislw_warnings(k[1:2]))
+  expect_warning(psislw_warnings(k[1:3]),
+                 "Some Pareto k diagnostic values are slightly high")
+  expect_warning(psislw_warnings(k),
+                 "Some Pareto k diagnostic values are too high")
+})
