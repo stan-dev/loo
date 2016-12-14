@@ -3,7 +3,6 @@
 ^\.travis\.yml$
 ^cran-comments.md$
 ^cran-comments\.md$
-^NEWS\.md$
 ^README\.md$
 LICENSE
 man-roxygen/*
