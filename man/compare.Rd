@@ -4,19 +4,24 @@
 \alias{compare}
 \title{Model comparison}
 \usage{
-compare(...)
+compare(..., x)
 }
 \arguments{
 \item{...}{At least two objects returned by \code{\link{loo}} or
 \code{\link{waic}}.}
+
+\item{x}{A list of at least two objects returned by \code{\link{loo}} or
+\code{\link{waic}}. This argument can be used as an alternative to
+specifying the models in \code{...}.}
 }
 \value{
-A vector or matrix with class \code{'compare.loo'}. If \code{...}
-  contains more than two objects then a matrix of summary information is
-  returned. If \code{...} contains exactly two objects then the difference in
-  expected predictive accuracy and the standard error of the difference are
-  returned (see Details). \emph{The difference will be positive if the
-  expected predictive accuracy for the second model is higher.}
+A vector or matrix with class \code{'compare.loo'} that has its own
+  print method. If exactly two objects are provided in \code{...} or
+  \code{x}, then the difference in expected predictive accuracy and the
+  standard error of the difference are returned (see Details). \emph{The
+  difference will be positive if the expected predictive accuracy for the
+  second model is higher.} If more than two objects are provided then a
+  matrix of summary information is returned.
 }
 \description{
 Compare fitted models on LOO or WAIC
@@ -56,11 +61,13 @@ compare(waic1, waic2)
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-\url{http://arxiv.org/abs/1507.04544/} (preprint)
-}
-\seealso{
-\code{\link{print.compare.loo}}
+Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  \emph{Statistics and Computing}. Advance online publication.
+  doi:10.1007/s11222-016-9696-4. arXiv preprint:
+  \url{http://arxiv.org/abs/1507.04544/}
+
+Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
+  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 

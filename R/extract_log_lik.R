@@ -27,14 +27,14 @@
 #'
 #'  \code{vector[N] log_lik;}
 #'
-#'  \code{for (n in 1:N) log_lik[n] <- normal_log(y[n], X[n] * beta, sigma);}
+#'  \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n] * beta, sigma);}
 #'
 #' @references
-#' Stan Development Team (2016). Stan: A C++ library for probability and
-#' sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
+#' Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
+#' \url{http://mc-stan.org/documentation/}
 #'
-#' Stan Development Team (2016). RStan, version 2.9.
-#' \url{http://mc-stan.org/interfaces/rstan.html}.
+#' Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
+#' \url{http://mc-stan.org/interfaces/rstan.html}
 #'
 extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
   if (!inherits(stanfit, "stanfit"))

@@ -5,12 +5,17 @@
 #' @export
 #' @param ... At least two objects returned by \code{\link{loo}} or
 #'   \code{\link{waic}}.
-#' @return A vector or matrix with class \code{'compare.loo'}. If \code{...}
-#'   contains more than two objects then a matrix of summary information is
-#'   returned. If \code{...} contains exactly two objects then the difference in
-#'   expected predictive accuracy and the standard error of the difference are
-#'   returned (see Details). \emph{The difference will be positive if the
-#'   expected predictive accuracy for the second model is higher.}
+#' @param x A list of at least two objects returned by \code{\link{loo}} or
+#'   \code{\link{waic}}. This argument can be used as an alternative to
+#'   specifying the models in \code{...}.
+#'
+#' @return A vector or matrix with class \code{'compare.loo'} that has its own
+#'   print method. If exactly two objects are provided in \code{...} or
+#'   \code{x}, then the difference in expected predictive accuracy and the
+#'   standard error of the difference are returned (see Details). \emph{The
+#'   difference will be positive if the expected predictive accuracy for the
+#'   second model is higher.} If more than two objects are provided then a
+#'   matrix of summary information is returned.
 #'
 #' @details When comparing two fitted models, we can estimate the difference in
 #'   their expected predictive accuracy by the difference in \code{elpd_waic} or
@@ -32,9 +37,8 @@
 #'   currently working on something similar to these weights that also accounts
 #'   for uncertainty, which will be included in future versions of \pkg{loo}.
 #'
-#' @template loo-paper-reference
+#' @template loo-and-psis-references
 #'
-#' @seealso \code{\link{print.compare.loo}}
 #' @examples
 #' \dontrun{
 #' loo1 <- loo(log_lik1)
@@ -46,13 +50,24 @@
 #' compare(waic1, waic2)
 #' }
 #'
-compare <- function(...) {
+compare <- function(..., x) {
   dots <- list(...)
-  nms <- as.character(match.call(expand.dots = TRUE))[-1L]
+  if (length(dots)) {
+    if (!missing(x))
+      stop("If 'x' is specified then '...' should not be specified.")
+    nms <- as.character(match.call(expand.dots = TRUE))[-1L]
+  } else {
+    if (!is.list(x) || !length(x))
+      stop("'x' must be a list.")
+    dots <- x
+    nms <- names(dots)
+    if (!length(nms))
+      nms <- paste0("model", seq_along(dots))
+  }
   if (!all(sapply(dots, is.loo)))
-    stop("All inputs should have class 'loo'.", call. = FALSE)
+    stop("All inputs should have class 'loo'.")
   if (length(dots) <= 1L) {
-    stop("'compare' requires at least two models.", call. = FALSE)
+    stop("'compare' requires at least two models.")
   } else if (length(dots) == 2L) {
     a <- dots[[1L]]
     b <- dots[[2L]]
@@ -85,4 +100,10 @@ compare <- function(...) {
     class(comp) <- c("compare.loo", class(comp))
     comp
   }
+}
+
+#' @export
+print.compare.loo <- function(x, ..., digits = 1) {
+  print(.fr(x, digits), quote = FALSE)
+  invisible(x)
 }

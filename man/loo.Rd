@@ -135,13 +135,25 @@ loo_with_mat <- loo(log_lik_mat, cores = 1)
 all.equal(loo_with_mat, loo_with_fn)
 
 }
+\references{
+Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  \emph{Statistics and Computing}. Advance online publication.
+  doi:10.1007/s11222-016-9696-4. arXiv preprint:
+  \url{http://arxiv.org/abs/1507.04544/}
+
+Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
+  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+}
 \seealso{
 \code{\link{loo-package}} for details on the Pareto Smoothed Importance
 Sampling (PSIS) procedure used for approximating LOO.
 
-\code{\link{print.loo}} for the \code{print} and \code{plot} methods for
-\code{'loo'} objects.
-
 \code{\link{compare}} for model comparison.
+
+\code{\link{pareto-k-diagnostic}} for convenience functions for looking at
+diagnostics.
+
+\code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
 }
 

@@ -1,15 +1,15 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 0.1.6
-Date: 2016-03-23
+Version: 1.0.0
+Date: 2016-12-13
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Andrew", "Gelman", email = "gelman@stat.columbia.edu", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
              person("Juho", "Piironen", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
-URL: https://github.com/stan-dev/loo
+URL: http://mc-stan.org/, https://groups.google.com/forum/#!forum/stan-users
 BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
     using Pareto smoothed importance sampling (PSIS), a new procedure for
@@ -23,11 +23,10 @@ Depends:
     R (>= 3.1.2)
 Imports:
     graphics,
-    matrixStats (>= 0.14.1),
+    matrixStats (>= 0.50.0),
     parallel,
     stats
 Suggests:
-    covr,
     knitr,
     rmarkdown,
     testthat

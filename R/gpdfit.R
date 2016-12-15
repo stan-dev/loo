@@ -13,8 +13,8 @@
 #'
 #' @template internal-function-note
 #'
-#' @seealso \code{\link{psislw}}, \code{\link{loo}},
-#' \code{\link{loo-package}}
+#' @seealso \code{\link{psislw}}, \code{\link{pareto-k-diagnostic}},
+#'   \code{\link{loo-package}}
 #'
 #' @references
 #' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
@@ -36,4 +36,12 @@ gpdfit <- function(x) {
   k <- mean.default(log1p(-bdotw * x))
   sigma <- -k / bdotw
   nlist(k, sigma)
+}
+
+
+# internal ----------------------------------------------------------------
+lx <- function(a,x) {
+  a <- -a
+  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
+  log(a / k) - k - 1
 }

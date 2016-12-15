@@ -1,3 +1,11 @@
+# loo 1.0.0
+* `pareto_k_table` and `pareto_k_ids` convenience functions for quickly identifying problematic observations
+* pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
+`(1, Inf)` (didn't used to include 0.7)
+* warning messages are now issued by `psislw` instead of `print.loo`
+* `print.loo` shows a table of pareto k estimates (if any k > 0.7)
+* Add argument to `compare` to allow loo objects to be provided in a list rather than in '...'
+
 # loo 0.1.6
 * GitHub repository moved from @jgabry to @stan-dev
 * Better error messages from `extract_log_lik`

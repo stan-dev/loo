@@ -72,68 +72,40 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 
-# psis helpers ------------------------------------------------------------
-
-# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (is.nan(sigma) || sigma <= 0)
-    return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
-
-  mu + sigma * ((1 - p)^(-xi) - 1) / xi
-}
-
-lx <- function(a,x) {
-  a <- -a
-  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
-  log(a / k) - k - 1
-}
-
-lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin))
-    min_cut <- -700
-  cp <- quantile(y, 1 - wcp, names = FALSE)
-  max(cp, min_cut)
-}
-
-lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0)
-    return(y)
-  logS <- log(length(y))
-  lwtrunc <- wtrunc * logS - logS + logSumExp(y)
-  y[y > lwtrunc] <- lwtrunc
-  y
-}
-
-#' @importFrom matrixStats logSumExp
-lw_normalize <- function(y) {
-  y - logSumExp(y)
-}
-
-# print helpers -----------------------------------------------------------
+# print and warning helpers -----------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
-k_warnings <- function(k, digits = 1) {
-  brks <- c(-Inf, 0.5, 1, Inf)
-  kcut <- cut(k, breaks = brks)
-  count <- table(kcut)
-  prop <- prop.table(count)
-  if (sum(count[2:3]) == 0) {
-    cat("\nAll Pareto k estimates OK (k < 0.5)\n")
-  } else {
-    if (count[2] != 0) {
-      txt2 <- "%) Pareto k estimates between 0.5 and 1"
-      .warn(paste0(count[2], " (", .fr(100 * prop[2], digits), txt2))
-    }
-    if (count[3] != 0) {
-      txt3 <- "%) Pareto k estimates greater than 1"
-      .warn(paste0(count[3], " (", .fr(100 * prop[3], digits), txt3))
-    }
-    .warn("See PSIS-LOO description (?'loo-package') for more information")
-  }
-  invisible(NULL)
+.k_help <- function() "See help('pareto-k-diagnostic') for details."
+.k_cut <- function(k) {
+  cut(
+    k,
+    breaks = c(-Inf, 0.5, 0.7, 1, Inf),
+    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
+  )
 }
+
+# pareto_k_warnings <- function(k, digits = 1) {
+#   kcut <- .k_cut(k)
+#   count <- table(kcut)
+#   prop <- prop.table(count)
+#   msg <- character(0)
+#   if (sum(count[2:4]) != 0) {
+#     if (count[2] != 0)
+#       msg <- c(msg, paste0(count[2], " (", .fr(100 * prop[2], digits),
+#                     "%) Pareto k estimates between 0.5 and 0.7 \n"))
+#     if (count[3] != 0)
+#       msg <- c(msg, paste0(count[3], " (", .fr(100 * prop[3], digits),
+#                            "%) Pareto k estimates between 0.7 and 1\n"))
+#     if (count[4] != 0)
+#       msg <- c(msg, paste0(count[4], " (", .fr(100 * prop[4], digits),
+#                            "%) Pareto k estimates greater than 1\n"))
+#
+#     if (length(msg)) {
+#       msg <- paste(c(msg, .k_help()), collapse = "")
+#       .warn(msg)
+#     }
+#   }
+# }
 
 pwaic_warnings <- function(p, digits = 1) {
   badp <- p > 0.4
@@ -145,45 +117,6 @@ pwaic_warnings <- function(p, digits = 1) {
           "\nWe recommend trying loo() instead.")
   }
   invisible(NULL)
-}
-
-
-# plot pareto k estimates -------------------------------------------------
-#' @importFrom graphics abline axis plot points text
-plot_k <- function(k, ..., label_points = FALSE) {
-  inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
-  plot(k, xlab = "Data point", ylab = "Shape parameter k",
-       type = "n", bty = "l", yaxt = "n")
-  axis(side = 2, las = 1)
-  krange <- range(k)
-  for (val in c(0, 0.5, 1)) {
-    if (inrange(val, krange))
-      abline(h = val, col = ifelse(val == 0, "darkgray", "#b17e64"),
-             lty = 2, lwd = 1)
-  }
-  hex_clrs <- c("#6497b1", "#005b96", "#03396c")
-  brks <- c(-Inf, 0.5, 1)
-  clrs <- ifelse(inrange(k, brks[1:2]), hex_clrs[1],
-                 ifelse(inrange(k, brks[2:3]), hex_clrs[2L], hex_clrs[3L]))
-  if (all(k < 0.5) || !label_points) {
-    points(k, col = clrs, pch = 3, cex = .6)
-    return(invisible())
-  } else {
-    points(k[k < 0.5], col = clrs[k < 0.5], pch = 3, cex = .6)
-    sel <- !inrange(k, brks[1:2])
-    dots <- list(...)
-    txt_args <- c(list(x = seq_along(k)[sel], y = k[sel],
-                       labels = seq_along(k)[sel]),
-                  if (length(dots)) dots)
-    if (!("adj" %in% names(txt_args)))
-      txt_args$adj <- 2/3
-    if (!("cex" %in% names(txt_args)))
-      txt_args$cex <- 0.75
-    if (!("col" %in% names(txt_args)))
-      txt_args$col <- clrs[sel]
-
-    do.call("text", txt_args)
-  }
 }
 
 
@@ -239,11 +172,13 @@ nlist <- function(...) {
   return(out)
 }
 
-
+# nocov start
 # release reminders (for devtools)
-release_questions <- function() { # nocov start
+release_questions <- function() {
   c(
     "Have you updated all references to the LOO paper?",
+    "Have you updated inst/CITATION?",
     "Have you updated R code in vignette to match the code in the paper?"
   )
-} # nocov end
+}
+# nocov end

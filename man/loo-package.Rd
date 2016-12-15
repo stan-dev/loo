@@ -5,13 +5,14 @@
 \alias{loo-package}
 \title{Efficient LOO and WAIC for Bayesian models}
 \description{
-This package implements the methods described in
+\if{html}{
+  \figure{stanlogo.png}{options: width="50px" alt="mc-stan.org"}
+  \emph{Stan Development Team}
+}
 
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC. arXiv preprint:
-\url{http://arxiv.org/abs/1507.04544}.
-
-The package documentation is largely based on excerpts from the paper.
+This package implements the methods described in Vehtari, Gelman,
+and Gabry (2016a). The package documentation is largely based on excerpts
+from the paper.
 }
 \section{Summary}{
  Leave-one-out cross-validation (LOO) and the widely
@@ -22,12 +23,12 @@ The package documentation is largely based on excerpts from the paper.
   estimates of predictive error such as AIC and DIC but are less used in
   practice because they involve additional computational steps. This package
   implements the fast and stable computations for LOO and WAIC laid out in
-  Vehtari, Gelman, and Gabry (2015). From existing posterior simulation
+  Vehtari, Gelman, and Gabry (2016a). From existing posterior simulation
   draws, we compute LOO using Pareto Smoothed Importance Sampling (PSIS;
-  Vehtari and Gelman, 2015), a new procedure for regularizing importance
-  weights. As a byproduct of our calculations, we also obtain approximate
-  standard errors for estimated predictive errors and for comparing of
-  predictive errors between two models.
+  Vehtari, Gelman, and Gabry, 2016b), a new procedure for regularizing
+  importance weights. As a byproduct of our calculations, we also obtain
+  approximate standard errors for estimated predictive errors and for
+  comparing of predictive errors between two models.
 }
 
 \section{Details}{
@@ -136,11 +137,12 @@ shape parameter \eqn{k} of the gPd.
   may be large.
 }
 
-If the estimated tail shape parameter \eqn{k \ge 1/2}, the user should be
-warned. Even if the PSIS estimate has a finite variance, the user should
-consider sampling directly from \eqn{p(\theta^s | y_{-i})} for the
-problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more robust
-model.
+If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+should be warned, although in practice we have observed good performance for
+values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite variance,
+the user should consider sampling directly from \eqn{p(\theta^s | y_{-i})}
+for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more
+robust model.
 
 Importance sampling is likely to work less well if the marginal posterior
 \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
@@ -149,9 +151,14 @@ influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-\url{http://arxiv.org/abs/1507.04544/} (preprint)
+Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  \emph{Statistics and Computing}. Advance online publication.
+  doi:10.1007/s11222-016-9696-4. arXiv preprint:
+  \url{http://arxiv.org/abs/1507.04544/}
+
+Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
+  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
@@ -180,14 +187,11 @@ Peruggia, M. (1997). On the variability of case-deletion importance sampling
 weights in the Bayesian linear model. \emph{Journal of the American
 Statistical Association} \strong{92}, 199-207.
 
-Stan Development Team (2016). Stan: A C++ library for probability and
-sampling, version 2.9. \url{http://mc-stan.org/documentation/}.
+Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
+\url{http://mc-stan.org/documentation/}.
 
-Stan Development Team (2016). RStan, version 2.9.
+Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1
 \url{http://mc-stan.org/interfaces/rstan.html}.
-
-Vehtari, A., and Gelman, A. (2015).  Pareto smoothed importance sampling.
-arXiv:1507.02646.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.

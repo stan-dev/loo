@@ -26,8 +26,10 @@
 #'
 #' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
 #'
+#' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+#'
 #' @template internal-function-note
-#' @template loo-paper-reference
+#' @template loo-and-psis-references
 #'
 #' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
@@ -38,17 +40,26 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    ...) {
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
-    # split into body and right tail
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
     above_cut <- x > cutoff
     x_body <- x[!above_cut]
     x_tail <- x[above_cut]
+
     tail_len <- length(x_tail)
-    if (tail_len < MIN_TAIL_LENGTH) {
-      # too few tail samples to fit gPd
-      warning("Too few tail samples to fit generalized Pareto distribution.\n",
-              "Weights are truncated and normalized but not smoothed.",
-              call. = FALSE)
+    if (tail_len < MIN_TAIL_LENGTH || all(x_tail == x_tail[1])) {
+      if (all(x_tail == x_tail[1]))
+        warning(
+          "All tail values are the same. ",
+          "Weights are truncated but not smoothed.",
+          call. = FALSE
+        )
+      else if (tail_len < MIN_TAIL_LENGTH)
+        warning(
+          "Too few tail samples to fit generalized Pareto distribution.\n",
+          "Weights are truncated but not smoothed.",
+          call. = FALSE
+        )
+
       x_new <- x
       k <- Inf
     } else {
@@ -67,14 +78,16 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       x_new[!above_cut] <- x_body
       x_new[above_cut] <- smoothed_tail
     }
-    # truncate (if wtrunc > 0) and renormalize, return log weights and pareto k
+    # truncate (if wtrunc > 0) and renormalize,
+    # return log weights and pareto k
     lw_new <- lw_normalize(lw_truncate(x_new, wtrunc))
     nlist(lw_new, k)
   }
 
   .psis_loop <- function(i) {
     if (LL_FUN) {
-      ll_i <- llfun(i = i, data = llargs$data[i,, drop=FALSE],
+      ll_i <- llfun(i = i,
+                    data = llargs$data[i,, drop=FALSE],
                     draws = llargs$draws)
       lw_i <- -1 * ll_i
     } else {
@@ -114,19 +127,75 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     # parallelize
     if (.Platform$OS.type != "windows") {
       out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
-    } else { # nocov start
+    } else {
+      # nocov start
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
       out <- parLapply(cl, X = 1:N, fun = .psis_loop)
-    } # nocov end
+      # nocov end
+    }
   }
+
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
+  psislw_warnings(pareto_k)
+
   if (FROM_LOO) {
-    nlist(loos = vapply(out, "[[", 1L, FUN.VALUE = numeric(1)),
-          pareto_k)
+    loos <- vapply(out, "[[", 1L, FUN.VALUE = numeric(1))
+    nlist(loos, pareto_k)
   } else {
     funval <- if (LL_FUN) llargs$S else nrow(lw)
-    nlist(lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval)),
-          pareto_k)
+    lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
+    nlist(lw_smooth, pareto_k)
+  }
+}
+
+
+# internal ----------------------------------------------------------------
+lw_cutpoint <- function(y, wcp, min_cut) {
+  if (min_cut < log(.Machine$double.xmin))
+    min_cut <- -700
+
+  cp <- quantile(y, 1 - wcp, names = FALSE)
+  max(cp, min_cut)
+}
+
+lw_truncate <- function(y, wtrunc) {
+  if (wtrunc == 0)
+    return(y)
+
+  logS <- log(length(y))
+  lwtrunc <- wtrunc * logS - logS + logSumExp(y)
+  y[y > lwtrunc] <- lwtrunc
+  y
+}
+
+#' @importFrom matrixStats logSumExp
+lw_normalize <- function(y) {
+  y - logSumExp(y)
+}
+
+# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
+qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
+  if (is.nan(sigma) || sigma <= 0)
+    return(rep(NaN, length(p)))
+  if (!lower.tail)
+    p <- 1 - p
+
+  mu + sigma * ((1 - p)^(-xi) - 1) / xi
+}
+
+
+# warnings about pareto k values ------------------------------------------
+psislw_warnings <- function(k) {
+  if (any(k > 0.7)) {
+    .warn(
+      "Some Pareto k diagnostic values are too high. ",
+      .k_help()
+    )
+  } else if (any(k > 0.5)) {
+    .warn(
+      "Some Pareto k diagnostic values are slightly high. ",
+      .k_help()
+    )
   }
 }
