@@ -21,7 +21,6 @@ citEntry(entry = "Article",
                     person(given = "Andrew", family = "Gelman"),
                     person(given = "Jonah", family = "Gabry")),
          year = "2016",
-         url = "http://arxiv.org/abs/1507.04544",
          journal = "Statistics and Computing",
          textVersion =
            paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2016).",
