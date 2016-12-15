@@ -4,7 +4,7 @@
 `(1, Inf)` (didn't used to include 0.7)
 * warning messages are now issued by `psislw` instead of `print.loo`
 * `print.loo` shows a table of pareto k estimates (if any k > 0.7)
-* Add argument to `compare` to allow loo objects to be provided in a list rather than in '...'
+* Add argument to `compare` to allow loo objects to be provided in a list rather than in `'...'`
 * Update references to point to published paper
 
 # loo 0.1.6
