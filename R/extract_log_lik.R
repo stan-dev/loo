@@ -42,7 +42,7 @@ extract_log_lik <- function(stanfit, parameter_name = "log_lik") {
   if (stanfit@mode != 0)
     stop("Stan model does not contain posterior draws.")
   # nocov start
-  if (!exists("rstan_options", mode = "function"))
+  if (!requireNamespace("rstan", quietly = TRUE))
     stop("Please load the 'rstan' package.")
   log_lik <- as.matrix(stanfit, pars = parameter_name)
   colnames(log_lik) <- NULL
