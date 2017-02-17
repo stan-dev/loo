@@ -61,4 +61,3 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
 \seealso{
 \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
 }
-

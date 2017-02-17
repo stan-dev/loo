@@ -1,7 +1,11 @@
 #' Model averaging via stacking and loo weighting
 #'
+#' @param N number of sample points.
+#' @param model_list list of stan fit for different models. FIXME (make this list
+#'   of log lik instead of stanfit)
+#' @param BB_sample Number of samples for the Bayesian bootstrap.
 #' @export
-model_average=function(N, model_list,   BB_sample=1000)  ### N: number of sample points. model_list: list of stan fit for different models
+model_average=function(N, model_list,   BB_sample=1000)
 {
   requireNamespace("Rsolnp")
   K=length(model_list)

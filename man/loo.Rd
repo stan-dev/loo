@@ -2,8 +2,8 @@
 % Please edit documentation in R/loo.R
 \name{loo}
 \alias{loo}
-\alias{loo.function}
 \alias{loo.matrix}
+\alias{loo.function}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
@@ -101,6 +101,7 @@ Typically (but not restricted to be) the object returned by
    \item \code{S}: The size of the posterior sample.
  }
 }}
+
 \examples{
 \dontrun{
 ### Usage with stanfit objects
@@ -156,4 +157,3 @@ diagnostics.
 
 \code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
 }
-
