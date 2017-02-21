@@ -21,7 +21,7 @@
 #' w2=combine(list(log_lik1, log_lik2),method="loo",BB=T)
 #' }
 #'
-Combine <-function(log_lik_list, method, BB="Ture",BB_n=1000, alpha=1, seed=NULL)
+Combine <-function(log_lik_list, method, BB=T,BB_n=1000, alpha=1, seed=NULL)
 {
   if (!method %in%c("stacking","loo") )
     stop("Must specify a method in stacking or loo.")
@@ -45,7 +45,7 @@ Combine <-function(log_lik_list, method, BB="Ture",BB_n=1000, alpha=1, seed=NULL
   if (method =="stacking"){
     w_stacking <- stacking_weight(lpd_point)
     cat("The stacking weights are:\n")
-    print(w_stacking)
+    print(rbind(paste("Model"  ,c(1:K) ), round(w_stacking*100 )/100))
     return(w_stacking)
   }
   else
@@ -55,13 +55,13 @@ Combine <-function(log_lik_list, method, BB="Ture",BB_n=1000, alpha=1, seed=NULL
       w_loo1 <- uwts / sum(uwts)
       if(BB==F){
         cat("The LOO weights are:\n")
-        print(w_loo1)
+        print(rbind(paste("Model"  ,c(1:K) ),  round(w_loo1*100 )/100))
         return(w_loo1)
       }
       if(BB==T){
         w_loo2  <- bb_weight(lpd_point, BB_n,alpha, seed)   #3) loo withs using BB sample
         cat("The LOO weights using BB sample are:\n")
-        print(w_loo2)
+        print(rbind(paste("Model"  ,c(1:K) ),  round(w_loo2*100 )/100))
         return (w_loo2 )
       }
     }

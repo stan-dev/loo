@@ -4,7 +4,7 @@
 \alias{Combine}
 \title{Model averaging via stacking and loo weighting}
 \usage{
-Combine(log_lik_list, method, BB = "Ture", BB_n = 1000, alpha = 1,
+Combine(log_lik_list, method, BB = T, BB_n = 1000, alpha = 1,
   seed = NULL)
 }
 \arguments{
