@@ -10,7 +10,7 @@ stacking_weight(lpd_point)
 \item{lpd_point}{A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.}
 }
 \value{
-A vector of best weights that minimize the levae-one-out log score.
+A vector of best model weights that minimize the levae-one-out log score.
 }
 \description{
 stacking on log score
@@ -27,5 +27,6 @@ stacking_weight(cbind(loo1, loo2))
 }
 \seealso{
 \code{\link{loo}} for details on leave-one-out elpd estimation.
+
 \code{\link{bb-weight}} for model weighting by Leave-one-out and Bayesian bootstrap adjustment.
 }

@@ -4,7 +4,8 @@
 \alias{Select}
 \title{Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.}
 \usage{
-Select(log_lik_list, BB = "Ture", BB_n = 1000, visualise = "Ture")
+Select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
+  visualise = T)
 }
 \arguments{
 \item{log_lik_list}{A list of pointwise log likelihood simlation matrixs. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood evaluted using a simulated paramter.}
@@ -13,16 +14,20 @@ Select(log_lik_list, BB = "Ture", BB_n = 1000, visualise = "Ture")
 
 \item{BB_n}{A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{Ture}. The  default number is 1000.}
 
+\item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap.}
+
+\item{seed}{An integer; optional. If specified, it fix the random seed when dong Bayesian Bootstrap.}
+
 \item{visualise}{Logical, whether to visualise the selection probability.}
 }
 \value{
-When\code{BB}=\code{False}, it returns nn integer indicating the  index of the best model.  When\code{BB}=\code{True}, it return a vector indicating the probability of each model   being selected to be the best model.
+When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
 }
 \description{
 Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.
 }
 \details{
-\code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{Combine}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is high, then it is better to do model averaging rather than model selection.
+\code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{Combine}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
 }
 \examples{
 \dontrun{
@@ -34,5 +39,8 @@ k=Select(list(log_lik1,log_lik2),BB=T)
 }
 \seealso{
 \code{\link{Combine}} for model combination.
+
 \code{\link{compare}} for two-model comparison.
+
+\code{\link{bb_weight}} for details on Bayesian Bootstrap adjustment.
 }
