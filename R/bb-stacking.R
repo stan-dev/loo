@@ -173,7 +173,7 @@ stacking_weight<-function( lpd_point, BB=T,  BB_n=1000,alpha=1, seed=NULL){
       set.seed(seed)
     BB_weighting <- dirichlet_rng(BB_n, rep(alpha,N))
     stacking_weight_bb<-matrix(NA, BB_n, K)
-    for( bb in 1:1000){
+    for( bb in 1:BB_n){
     bb_w<- BB_weighting[bb,]
     negative_log_score_loo<-function(w)  #objective function: log score
     {
