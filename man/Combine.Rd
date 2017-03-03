@@ -2,7 +2,7 @@
 % Please edit documentation in R/bb-stacking.R
 \name{Combine}
 \alias{Combine}
-\title{Model averaging via stacking and loo weighting}
+\title{Model averaging via stacking and loo weighting with Bayesian Bootstrap regularization.}
 \usage{
 Combine(log_lik_list, method, BB = T, BB_n = 1000, alpha = 1,
   seed = NULL)
@@ -12,28 +12,28 @@ Combine(log_lik_list, method, BB = T, BB_n = 1000, alpha = 1,
 
 \item{method}{One of  \code{"stacking"} or \code{"loo"} indicating which method is to use in obtaining the optimal weights.}
 
-\item{BB}{Logicals used in method \code{"loo"}. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator. It helps regularize the weight away from 0 and 1, so as to reduce the variance.}
+\item{BB}{Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator. It helps regularize the weight away from 0 and 1, so as to reduce the variance for either stacking or loo weighting.}
 
-\item{BB_n}{A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary when \code{method}=\code{"loo"} and \code{BB}=\code{Ture}. The  default number is 1000.}
+\item{BB_n}{A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The  default number is 1000.}
 
-\item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap.}
+\item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap. The default is \eqn{1}.}
 
-\item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.}
+\item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap sampling.}
 }
 \value{
 A vector of optimal model weights.
 }
 \description{
-Model averaging via stacking and loo weighting
+Model averaging via stacking and loo weighting with Bayesian Bootstrap regularization.
 }
 \details{
-This function implements  \code{stacking} and \code{loo} weighting  for combining multiple predictive distributions. In either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{stacking}  finds the optimal linear weight in combining elpd. \code{loo} finds the relative weights proportional to elpd. However, this estimation doesn’t take into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution. By Bayesian bootstrap, we can take into account the uncertainty and regularize the weights making them go further away from 0 and 1.
+This function implements  \code{stacking} and \code{loo} weighting  for combining multiple predictive distributions. In either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{stacking}  finds the optimal linear weight in combining elpd. \code{loo} finds the relative weights proportional to elpd. Furthermore, the LOO estimation doesn’t take into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution. By Bayesian bootstrap, we can take into account the uncertainty and regularize the weights making them go further away from 0 and 1.
 }
 \examples{
 \dontrun{
 log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
-w1=combine(list(log_lik1, log_lik2),method="stacking")
+w1=combine(list(log_lik1, log_lik2),method="stacking", BB=T)
 w2=combine(list(log_lik1, log_lik2),method="loo",BB=T)
 }
 
@@ -41,5 +41,7 @@ w2=combine(list(log_lik1, log_lik2),method="loo",BB=T)
 \seealso{
 \code{\link{Select}} for single-model selection.
 
-\code{\link{bb_weight}} for details on Bayesian Bootstrap adjustment.
+\code{\link{loo_weight}} for details on LOO weighting.
+
+\code{\link{stacking_weight}} for details on LOO weighting.
 }

@@ -4,10 +4,18 @@
 \alias{stacking_weight}
 \title{stacking on log score}
 \usage{
-stacking_weight(lpd_point)
+stacking_weight(lpd_point, BB = T, BB_n = 1000, alpha = 1, seed = NULL)
 }
 \arguments{
 \item{lpd_point}{A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.}
+
+\item{BB}{Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to regulairze the LOO estimation, which helps reduce the variance of the stacking weights.}
+
+\item{BB_n}{A positivs integer indicating the number of samples in Bayesian Bootstrap. Default is 1000.}
+
+\item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bayesian Bootstrap.}
+
+\item{seed}{An integer; optional. If specified, it fixes the random seed when dong Bayesian Bootstrap.}
 }
 \value{
 A vector of best model weights that minimize the levae-one-out log score.
@@ -16,7 +24,7 @@ A vector of best model weights that minimize the levae-one-out log score.
 stacking on log score
 }
 \details{
-\code{lpd_point} is a matrix of pointwise log leave-one-out likelihood, which can be calculeted from  \code{\link{loo}}. It should be a \eqn{N} by \eqn{K}  matrix when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is an approach that finds the optimal linear combining weight so as to minimize the leave-one-out log score.
+\code{lpd_point} is a matrix of pointwise log leave-one-out likelihood, which can be calculeted from  \code{\link{loo}}. It should be a \eqn{N} by \eqn{K}  matrix when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is an approach that finds the optimal linear combining weight so as to minimize the leave-one-out log score. To reduce the variance in small sample, we can further sample a Bayesian Bootstrap weights (each data weight is between 0 and 1) for each data point and solve the weighted version of the optimazation. Finally, we take average over all Bayesian Bootstrap samples and obtain the final model weights.
 }
 \examples{
 \dontrun{
@@ -28,5 +36,5 @@ stacking_weight(cbind(loo1, loo2))
 \seealso{
 \code{\link{loo}} for details on leave-one-out elpd estimation.
 
-\code{\link{bb-weight}} for model weighting by Leave-one-out and Bayesian bootstrap adjustment.
+\code{\link{loo_weight}} for model weighting by Leave-one-out and Bayesian bootstrap adjustment.
 }

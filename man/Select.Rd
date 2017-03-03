@@ -16,7 +16,7 @@ Select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
 
 \item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap.}
 
-\item{seed}{An integer; optional. If specified, it fix the random seed when dong Bayesian Bootstrap.}
+\item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.}
 
 \item{visualise}{Logical, whether to visualise the selection probability.}
 }
@@ -32,6 +32,7 @@ Model selection via Leave-one-out log predictive density estimation and Bayesian
 \examples{
 \dontrun{
 ### Usage with stanfit objects
+library(rstan)
 log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
 k=Select(list(log_lik1,log_lik2),BB=T)
@@ -42,5 +43,5 @@ k=Select(list(log_lik1,log_lik2),BB=T)
 
 \code{\link{compare}} for two-model comparison.
 
-\code{\link{bb_weight}} for details on Bayesian Bootstrap adjustment.
+\code{\link{loo_weight}} for details on LOO weighting.
 }
