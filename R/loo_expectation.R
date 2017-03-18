@@ -12,6 +12,38 @@
 #' @param ... For the generic function, arguments passed to the
 #'   individual methods.
 #'
+#' @return The matrix method returns a vector with \code{ncol(x)} elements, with
+#'   one exception: when \code{type} is \code{"quantile"} and multiple values
+#'   are specified in \code{probs} the returned object is a \code{length(probs)}
+#'   by \code{ncol(x)} matrix.
+#'
+#'   The default/vector method returns a scalar, with one exception: when
+#'   \code{type} is \code{"quantile"} and multiple values are specified in
+#'   \code{probs} the returned object is a vector with \code{length(probs)}
+#'   elements.
+#'
+#' @examples
+#' \donttest{
+#' library("rstanarm")
+#' # data from help("lm")
+#' ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+#' trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
+#' d <- data.frame(
+#'   weight = c(ctl, trt),
+#'   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
+#' )
+#' fit <- stan_glm(weight ~ group, data = d)
+#' yrep <- posterior_predict(fit)
+#' dim(yrep)
+#'
+#' lw <- psislw(-log_lik(fit), cores = 2)$lw_smooth
+#' dim(lw)
+#'
+#' loo_expectation(yrep, lw, type = "mean")
+#' loo_expectation(yrep, lw, type = "var")
+#' loo_expectation(yrep, lw, type = "quantile", probs = c(0.1, 0.9))
+#' }
+#'
 loo_expectation <- function(x, lw, ...) {
   UseMethod("loo_expectation")
 }
@@ -42,8 +74,12 @@ loo_expectation.matrix <-
     stopifnot(is.numeric(x), is.numeric(lw), identical(dim(x), dim(lw)))
     type <- match.arg(type)
     E_loo <- .E_loo(type)
-    fun_val <- if (type == "quantile")
-      numeric(length(probs)) else numeric(1)
+    if (type == "quantile") {
+      stopifnot(is.numeric(probs), length(probs) >= 1)
+      fun_val <- numeric(length(probs))
+    } else {
+      fun_val <- numeric(1)
+    }
 
     w <- exp(lw)
     vapply(seq_len(ncol(x)), function(k) {
@@ -80,7 +116,7 @@ loo_expectation.matrix <-
   sum(w * r)
 }
 .wquant <- function(x, w, probs) {
-  stopifnot(all(probs > 0 | probs < 1))
+  stopifnot(all(probs > 0 & probs < 1))
   x <- sort(x)
   ww <- cumsum(w)
   ww <- ww / ww[length(ww)]
