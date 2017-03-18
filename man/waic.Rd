@@ -2,8 +2,8 @@
 % Please edit documentation in R/waic.R
 \name{waic}
 \alias{waic}
-\alias{waic.function}
 \alias{waic.matrix}
+\alias{waic.function}
 \title{Widely applicable information criterion (WAIC)}
 \usage{
 waic(x, ...)
@@ -65,6 +65,7 @@ Typically (but not restricted to be) the object returned by
    \item \code{S}: The size of the posterior sample.
  }
 }}
+
 \examples{
 \dontrun{
 log_lik1 <- extract_log_lik(stanfit1)
@@ -79,4 +80,3 @@ print(compare(waic1, waic2), digits = 2)
 \code{\link{compare}}, \code{\link{print.loo}},
 \code{\link{loo-package}}
 }
-

@@ -70,4 +70,3 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
 Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
-

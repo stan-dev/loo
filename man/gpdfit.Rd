@@ -35,4 +35,3 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
   \code{\link{loo-package}}
 }
 \keyword{internal}
-

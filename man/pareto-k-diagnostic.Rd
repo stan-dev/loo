@@ -2,8 +2,8 @@
 % Please edit documentation in R/pareto_k.R
 \name{pareto-k-diagnostic}
 \alias{pareto-k-diagnostic}
-\alias{pareto_k_ids}
 \alias{pareto_k_table}
+\alias{pareto_k_ids}
 \alias{plot.loo}
 \title{Diagnostics for Pareto Smoothed Importance Sampling}
 \usage{
@@ -91,4 +91,3 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
 \seealso{
 \code{\link{loo-package}}.
 }
-

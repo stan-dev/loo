@@ -150,6 +150,7 @@ different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
 }
+
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
@@ -201,4 +202,3 @@ Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
-
