@@ -47,4 +47,3 @@ Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
 Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
 \url{http://mc-stan.org/interfaces/rstan.html}
 }
-

@@ -150,12 +150,14 @@ different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
 }
+
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. Advance online publication.
-  doi:10.1007/s11222-016-9696-4. arXiv preprint:
-  \url{http://arxiv.org/abs/1507.04544/}
+  doi:10.1007/s11222-016-9696-4.
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
+  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
@@ -201,4 +203,3 @@ Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
-

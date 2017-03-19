@@ -29,4 +29,3 @@ Print method for 'loo' objects
 \seealso{
 \code{\link{pareto-k-diagnostic}}
 }
-

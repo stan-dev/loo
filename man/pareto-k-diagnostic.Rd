@@ -2,8 +2,8 @@
 % Please edit documentation in R/pareto_k.R
 \name{pareto-k-diagnostic}
 \alias{pareto-k-diagnostic}
-\alias{pareto_k_ids}
 \alias{pareto_k_table}
+\alias{pareto_k_ids}
 \alias{plot.loo}
 \title{Diagnostics for Pareto Smoothed Importance Sampling}
 \usage{
@@ -82,8 +82,9 @@ The reliability of PSIS estimates can be assessed using the
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. Advance online publication.
-  doi:10.1007/s11222-016-9696-4. arXiv preprint:
-  \url{http://arxiv.org/abs/1507.04544/}
+  doi:10.1007/s11222-016-9696-4.
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
+  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
@@ -91,4 +92,3 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
 \seealso{
 \code{\link{loo-package}}.
 }
-

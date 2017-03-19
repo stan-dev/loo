@@ -1,7 +1,7 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 1.0.0
+Version: 1.0.0.9000
 Date: 2016-12-15
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Andrew", "Gelman", email = "gelman@stat.columbia.edu", role = c("aut")),
@@ -33,4 +33,4 @@ Suggests:
     rstanarm,
     testthat
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
