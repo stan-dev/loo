@@ -1,31 +1,24 @@
-citHeader("To cite the loo R package and/or paper in publications use:")
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
 
-citEntry(entry = "Manual",
-         title        = "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models",
-         author       = personList(as.person("Aki Vehtari"),
-                                   as.person("Andrew Gelman"),
-                                   as.person("Jonah Gabry")),
-         year         = "2016",
-         note         = "R package version 1.0.0",
-         url          = "https://github.com/stan-dev/loo",
-         textVersion  =
-           paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2016).",
-                 "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models.",
-                 "R package version 1.0.0.",
-                 "https://github.com/stan-dev/loo")
+bibentry(bibtype = "Misc",
+         title = "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models",
+         author = c(person("Aki", "Vehtari"),
+                    person("Andrew", "Gelman"),
+                    person("Jonah", "Gabry")),
+         year = year,
+         note = note,
+         url = "https://CRAN.R-project.org/package=loo",
+         header = "To cite the loo R package:"
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title = "Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC",
-         author = c(person(given = "Aki", family = "Vehtari"),
-                    person(given = "Andrew", family = "Gelman"),
-                    person(given = "Jonah", family = "Gabry")),
+         author = c(person("Aki", "Vehtari"),
+                    person("Andrew", "Gelman"),
+                    person("Jonah", "Gabry")),
          year = "2016",
          journal = "Statistics and Computing",
-         textVersion =
-           paste("Aki Vehtari, Andrew Gelman, and Jonah Gabry. (2016).",
-           "Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC.",
-           "Statistics and Computing.",
-           "doi:10.1007/s11222-016-9696-4")
+         doi = "10.1007/s11222-016-9696-4",
+         header = "To cite the loo paper:"
 )
-
