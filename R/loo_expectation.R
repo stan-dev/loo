@@ -39,33 +39,33 @@
 #' lw <- psislw(-log_lik(fit), cores = 2)$lw_smooth
 #' dim(lw)
 #'
-#' loo_expectation(yrep, lw, type = "mean")
-#' loo_expectation(yrep, lw, type = "var")
-#' loo_expectation(yrep, lw, type = "quantile", probs = c(0.1, 0.9))
+#' E_loo(yrep, lw, type = "mean")
+#' E_loo(yrep, lw, type = "var")
+#' E_loo(yrep, lw, type = "quantile", probs = c(0.1, 0.9))
 #' }
 #'
-loo_expectation <- function(x, lw, ...) {
-  UseMethod("loo_expectation")
+E_loo <- function(x, lw, ...) {
+  UseMethod("E_loo")
 }
 
-#' @rdname loo_expectation
+#' @rdname E_loo
 #' @export
-loo_expectation.default <-
+E_loo.default <-
   function(x,
            lw,
            ...,
            type = c("mean", "var", "quantile"),
            probs) {
     stopifnot(is.numeric(x), is.numeric(lw), length(lw) == length(x))
-    E_loo <- .E_loo(type)
+    E_fun <- .E_fun(type)
     x <- as.vector(x)
     w <- exp(as.vector(lw))
-    E_loo(x, w, probs)
+    E_fun(x, w, probs)
   }
 
-#' @rdname loo_expectation
+#' @rdname E_loo
 #' @export
-loo_expectation.matrix <-
+E_loo.matrix <-
   function(x,
            lw,
            ...,
@@ -73,7 +73,7 @@ loo_expectation.matrix <-
            probs) {
     stopifnot(is.numeric(x), is.numeric(lw), identical(dim(x), dim(lw)))
     type <- match.arg(type)
-    E_loo <- .E_loo(type)
+    E_fun <- .E_fun(type)
     if (type == "quantile") {
       stopifnot(is.numeric(probs), length(probs) >= 1)
       fun_val <- numeric(length(probs))
@@ -83,7 +83,7 @@ loo_expectation.matrix <-
 
     w <- exp(lw)
     vapply(seq_len(ncol(x)), function(k) {
-      E_loo(x[, k], w[, k], probs)
+      E_fun(x[, k], w[, k], probs)
     }, FUN.VALUE = fun_val)
   }
 
@@ -91,7 +91,7 @@ loo_expectation.matrix <-
 
 # @param type user's 'type' argument
 # @return the function for computing the expectation specified by 'type'
-.E_loo <- function(type = c("mean", "var", "quantile")) {
+.E_fun <- function(type = c("mean", "var", "quantile")) {
   switch(
     match.arg(type),
     "mean" = .wmean,
@@ -103,10 +103,10 @@ loo_expectation.matrix <-
 # loo-weighted mean, variance, and quantiles
 #
 # @param x,w vectors of the same length. this should be checked inside
-#   loo_expectation() before calling these functions.
+#   E_loo() before calling these functions.
 # @param probs vector of probabilities.
 # @param ... ignored. having ... allows 'probs' to be passed to .wmean and .wvar
-#   in loo_expectation() without resulting in an error.
+#   in E_loo() without resulting in an error.
 #
 .wmean <- function(x, w, ...) {
   sum(w * x)
@@ -135,3 +135,4 @@ loo_expectation.matrix <-
   }
   return(y)
 }
+# }
