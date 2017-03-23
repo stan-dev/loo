@@ -117,7 +117,12 @@ E_loo.matrix <-
 }
 .wquant <- function(x, w, probs) {
   stopifnot(all(probs > 0 & probs < 1))
-  x <- sort(x)
+  if (all(w == w[1]))
+    return(quantile(x, probs = probs, names = FALSE))
+
+  ord <- order(x)
+  x <- x[ord]
+  w <- w[ord]
   ww <- cumsum(w)
   ww <- ww / ww[length(ww)]
 
@@ -135,4 +140,3 @@ E_loo.matrix <-
   }
   return(y)
 }
-# }

@@ -94,3 +94,45 @@ test_that("E_loo throws correct errors", {
   )
 })
 
+
+
+
+.wquant_rapprox <- function(x, w, probs) {
+  stopifnot(all(probs > 0 & probs < 1))
+  ord <- order(x)
+  d <- x[ord]
+  ww <- w[ord]
+  p <- cumsum(ww) / sum(ww)
+  stats::approx(p, d, probs, rule = 2)$y
+}
+.wquant_sim <- function(x, w, probs, n_sims) {
+  xx <- sample(x, size = n_sims, replace = TRUE, prob = w / sum(w))
+  quantile(xx, probs, names = FALSE)
+}
+
+
+test_that("weighted quantiles work", {
+  set.seed(123)
+  pr <- seq(0.025, 0.975, 0.025)
+
+  x1 <- rnorm(100)
+  w1 <- rlnorm(100)
+  expect_equal(
+    .wquant(x1, w1, pr),
+    .wquant_rapprox(x1, w1, pr)
+  )
+
+  x1 <- rnorm(1e4)
+  w1 <- rlnorm(1e4)
+  expect_equal(
+    .wquant(x1, w1, pr),
+    .wquant_sim(x1, w1, pr, n_sim = 2e6),
+    tol = 0.001
+  )
+
+  expect_equal(
+    .wquant(x1, rep(1, length(x1)), pr),
+    quantile(x1, probs = pr, names = FALSE)
+  )
+})
+
