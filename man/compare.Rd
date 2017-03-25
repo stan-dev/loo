@@ -7,11 +7,11 @@
 compare(..., x)
 }
 \arguments{
-\item{...}{At least two objects returned by \code{\link{loo}} or
-\code{\link{waic}}.}
+\item{...}{At least two objects returned by \code{\link{loo}} (or
+\code{\link{waic}}).}
 
-\item{x}{A list of at least two objects returned by \code{\link{loo}} or
-\code{\link{waic}}. This argument can be used as an alternative to
+\item{x}{A list of at least two objects returned by \code{\link{loo}} (or
+\code{\link{waic}}). This argument can be used as an alternative to
 specifying the models in \code{...}.}
 }
 \value{
@@ -28,25 +28,18 @@ Compare fitted models on LOO or WAIC
 }
 \details{
 When comparing two fitted models, we can estimate the difference in
-  their expected predictive accuracy by the difference in \code{elpd_waic} or
-  \code{elpd_loo} (multiplied by \eqn{-2}, if desired, to be on the deviance
+  their expected predictive accuracy by the difference in \code{elpd_loo} or
+  \code{elpd_waic} (multiplied by \eqn{-2}, if desired, to be on the deviance
   scale). To compute the standard error of this difference we can use a
   paired estimate to take advantage of the fact that the same set of \eqn{N}
-  data points was used to fit both models. We think these calculations will
-  be most useful when \eqn{N} is large, because then non-normality of the
+  data points was used to fit both models. These calculations should be most
+  useful when \eqn{N} is large, because then non-normality of the
   distribution is not such an issue when estimating the uncertainty in these
   sums. These standard errors, for all their flaws, should give a better
   sense of uncertainty than what is obtained using the current standard
   approach of comparing differences of deviances to a Chi-squared
   distribution, a practice derived for Gaussian linear models or
   asymptotically, and which only applies to nested models in any case.
-}
-\note{
-In previous versions of \pkg{loo} model weights were also reported by
-  \code{compare}. We have removed the weights because they were based only on
-  the point estimate of the elpd values ignoring the uncertainty. We are
-  currently working on something similar to these weights that also accounts
-  for uncertainty, which will be included in future versions of \pkg{loo}.
 }
 \examples{
 \dontrun{

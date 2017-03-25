@@ -12,8 +12,9 @@
 #'
 #' @details The reliability of PSIS estimates can be assessed using the
 #'   estimates of the shape parameter \eqn{k} of the generalized Pareto
-#'   distribution. See \code{\link{loo-package}} for background on the PSIS
-#'   procedure. Here we focus on the interpretation of \eqn{k}:
+#'   distribution. See \code{\link{loo-package}} and Vehtari, Gelman and Gabry
+#'   (2016a, 2016b) for background on the PSIS procedure. Here we focus on the
+#'   interpretation of \eqn{k}:
 #'
 #'   \itemize{
 #'   \item If \eqn{k < 1/2} the variance of the raw importance ratios

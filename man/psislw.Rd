@@ -9,10 +9,8 @@ psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("loo.cores",
 }
 \arguments{
 \item{lw}{A matrix or vector of log weights. For computing LOO, \code{lw =
--log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
-matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
-of data points. (If \code{lw} is a vector it will be coerced to a
-one-column matrix.)}
+-log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
+points) pointwise log-likelihood matrix.}
 
 \item{wcp}{The proportion of importance weights to use for the generalized
 Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
@@ -34,19 +32,17 @@ function.}
 }
 \value{
 A named list with components \code{lw_smooth} (modified log weights)
-  and \code{pareto_k} (estimated generalized Pareto shape parameter(s)
-  \eqn{k}).
+  and \code{pareto_k} (estimated generalized
+  Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 }
 \description{
-Pareto smoothed importance sampling (PSIS)
+Implementation of Pareto smoothed importance sampling,
+a method for stabilizing importance weights. For details about the
+algorithm see Vehtari, Gelman and Gabry (2016a, 2016b).
 }
 \details{
-See the 'PSIS-LOO' section in \code{\link{loo-package}}.
-}
-\note{
-This function is primarily intended for internal use, but is exported
-  so that users can call it directly if interested in PSIS for purposes other
-  than \code{\link[=loo]{LOO-CV}}.
+See the 'PSIS-LOO' section in \code{\link{loo-package}}
+and Vehtari, Gelman and Gabry (2016a, 2016b).
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical

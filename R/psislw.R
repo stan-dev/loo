@@ -1,11 +1,13 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
+#' Implementation of Pareto smoothed importance sampling,
+#' a method for stabilizing importance weights. For details about the
+#' algorithm see Vehtari, Gelman and Gabry (2016a, 2016b).
+#'
 #' @export
 #' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
-#'   -log_lik} (see \code{\link{extract_log_lik}}) and is an \eqn{S} by \eqn{N}
-#'   matrix where \eqn{S} is the number of simulations and \eqn{N} is the number
-#'   of data points. (If \code{lw} is a vector it will be coerced to a
-#'   one-column matrix.)
+#'   -log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
+#'   points) pointwise log-likelihood matrix.
 #' @param wcp The proportion of importance weights to use for the generalized
 #'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
@@ -21,14 +23,14 @@
 #'   function.
 #'
 #' @return A named list with components \code{lw_smooth} (modified log weights)
-#'   and \code{pareto_k} (estimated generalized Pareto shape parameter(s)
-#'   \eqn{k}).
+#'   and \code{pareto_k} (estimated generalized
+#'   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 #'
-#' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}.
+#' @details See the 'PSIS-LOO' section in \code{\link{loo-package}}
+#' and Vehtari, Gelman and Gabry (2016a, 2016b).
 #'
 #' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
 #'
-#' @template internal-function-note
 #' @template loo-and-psis-references
 #'
 #' @importFrom matrixStats logSumExp
