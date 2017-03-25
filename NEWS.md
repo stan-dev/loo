@@ -1,6 +1,5 @@
 # loo 1.1.0
-* Compute weighted expectations (means, variances, quantiles) using the new
-`E_loo` function.
+* Introduce the `E_loo` function for computing weighted expectations (means, variances, quantiles).
 
 # loo 1.0.0
 * `pareto_k_table` and `pareto_k_ids` convenience functions for quickly identifying problematic observations

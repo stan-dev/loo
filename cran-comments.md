@@ -1,11 +1,5 @@
-## Submission summary
-
-This update adds some useful convenience functions, updates 
-references, and improves how warning messages are issued to 
-the user.
-
 ## Test environments
-* local OS X install, R 3.3.2
+* local OS X install, R 3.3.3
 * ubuntu 12.04 (on travis-ci), R 3.3.2
 * win-builder (devel and release)
 
