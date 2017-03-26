@@ -1,4 +1,4 @@
-#' Extract log-likelihood from a Stan model
+#' Extract pointwise log-likelihood matrix from a Stan model
 #'
 #' Convenience function for extracting the pointwise log-likelihood from a
 #' fitted Stan model.

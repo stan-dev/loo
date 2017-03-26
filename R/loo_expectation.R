@@ -1,5 +1,14 @@
 #' Compute weighted expectations
 #'
+#' The \code{E_loo} function computes weighted expectations (means, variances,
+#' quantiles) using the smoothed importance weights obtained from the
+#' \link[=psislw]{PSIS} procedure. The expectations estimated by the
+#' \code{E_loo} function assume that the PSIS approximation is working well.
+#' \strong{A small \link[=pareto-k-diagnostic]{Pareto k} estimate is necessary,
+#' but not sufficient, for \code{E_loo} to give reliable estimates.} Additional
+#' diagnostic checks for gauging the reliability of the estimates are in
+#' development and will be added in a future release.
+#'
 #' @export
 #' @param x A numeric matrix or vector.
 #' @param lw A numeric matrix (or vector) of smoothed log-weights with the same
@@ -24,7 +33,10 @@
 #'
 #' @examples
 #' \donttest{
+#' # Use rstanarm package to quickly fit a model and get both a log-likelihood
+#' # matrix and draws from the posterior predictive # distribution
 #' library("rstanarm")
+#'
 #' # data from help("lm")
 #' ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
 #' trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
@@ -36,11 +48,13 @@
 #' yrep <- posterior_predict(fit)
 #' dim(yrep)
 #'
-#' lw <- psislw(-log_lik(fit), cores = 2)$lw_smooth
+#' ll <- log_lik(fit)
+#' lw <- psislw(-ll, cores = 2)$lw_smooth
 #' dim(lw)
 #'
 #' E_loo(yrep, lw, type = "mean")
 #' E_loo(yrep, lw, type = "var")
+#' E_loo(yrep, lw, type = "quantile", probs = 0.5) # median
 #' E_loo(yrep, lw, type = "quantile", probs = c(0.1, 0.9))
 #' }
 #'
@@ -82,8 +96,8 @@ E_loo.matrix <-
     }
 
     w <- exp(lw)
-    vapply(seq_len(ncol(x)), function(k) {
-      E_fun(x[, k], w[, k], probs)
+    vapply(seq_len(ncol(x)), function(i) {
+      E_fun(x[, i], w[, i], probs)
     }, FUN.VALUE = fun_val)
   }
 
@@ -126,17 +140,17 @@ E_loo.matrix <-
   ww <- cumsum(w)
   ww <- ww / ww[length(ww)]
 
-  y <- numeric(length(probs))
+  qq <- numeric(length(probs))
   for (j in seq_along(probs)) {
     ids <- which(ww >= probs[j])
     wi <- min(ids)
     if (wi == 1) {
-      y[j] <- x[1]
+      qq[j] <- x[1]
     } else {
       w1 <- ww[wi - 1]
       x1 <- x[wi - 1]
-      y[j] <- x1 + (x[wi] - x1) * (probs[j] - w1) / (ww[wi] - w1)
+      qq[j] <- x1 + (x[wi] - x1) * (probs[j] - w1) / (ww[wi] - w1)
     }
   }
-  return(y)
+  return(qq)
 }

@@ -93,7 +93,8 @@ from the paper.
   When the tail of the weight distribution is long, a direct use of
   importance sampling is sensitive to one or few largest values. By fitting a
   gPd to the upper tail of the importance weights we smooth these values. The
-  procedure goes as follows:
+  procedure (implemented in the \code{\link{psislw}} function) goes as
+  follows:
 
 \enumerate{
   \item Fit the gPd to the 20\% largest importance ratios \eqn{r_s}. The
@@ -119,9 +120,13 @@ a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each \eqn{i}, which in
 general should be better behaved than the raw importance ratios
 \eqn{r_{i}^{s}} from which they were constructed.
 
-The results are then combined to compute the desired LOO estimates. The
-reliability of the estimates can be assessed using the estimates for the
-shape parameter \eqn{k} of the gPd.
+The results can be then combined to compute the desired LOO estimates.
+}
+
+\section{Pareto k diagnostic}{
+ The reliability of the PSIS-based estimates can
+  be assessed using the estimates for the shape parameter \eqn{k} of the
+  generalized Pareto distribution.
 
 \itemize{
   \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
