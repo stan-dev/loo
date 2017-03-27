@@ -53,7 +53,7 @@ development and will be added in a future release.
 \examples{
 \donttest{
 # Use rstanarm package to quickly fit a model and get both a log-likelihood
-# matrix and draws from the posterior predictive # distribution
+# matrix and draws from the posterior predictive distribution
 library("rstanarm")
 
 # data from help("lm")
