@@ -1,35 +1,37 @@
-#' Model averaging via stacking and loo weighting with Bayesian Bootstrap regularization.
+#' Model averaging via stacking or peudo-BMA weighting.
 #' @export
 #' @param log_lik_list   A list of pointwise log likelihood simlation matrixs. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood evaluted using a simulated paramter.
-#' @param method    One of  \code{"stacking"} or \code{"loo"} indicating which method is to use in obtaining the optimal weights.
-#' @param BB    Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator. It helps regularize the weight away from 0 and 1, so as to reduce the variance for either stacking or loo weighting.
+#' @param method    One of  \code{"stacking"} or \code{"pseudobma"} indicating which method is to use for obtaining the optimal weights. \code{"stacking"}  refers to stacking of predictive distributions and  \code{"pseudobma"} refers to pseudo-BMA weighting or pseudo-BMA+ weighting (by setting \code{"BB"=T}).
+#' @param BB    Logicals used when \code{"method"}=\code{"pseudobma"}. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps regularize the weight away from 0 and 1, so as to reduce the variance for either stacking or loo weighting.
 #' @param BB_n    A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The  default number is 1000.
 #' @param alpha A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap. The default is \eqn{1}.
 #' @param  seed An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap sampling.
+#' @param  optim_method	The optimization methoded to be used in stacking. It can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".
+#'
 #' @return A vector of optimal model weights.
-#' @details This function implements  \code{stacking} and \code{loo} weighting  for combining multiple predictive distributions. In either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{stacking}  finds the optimal linear weight in combining elpd. \code{loo} finds the relative weights proportional to elpd. Furthermore, the LOO estimation doesn’t take into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution. By Bayesian bootstrap, we can take into account the uncertainty and regularize the weights making them go further away from 0 and 1.
+#' @details This function implements   stacking of predictive distributions, pseudo-BMA and pseudo-BMA+ weighting for combining multiple predictive distributions. For either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{Stacking}  finds the optimal linear weight in combining elpd. \code{Pseudo-BMA} finds the relative weights proportional to elpd. \code{Pseudo-BMA+} takes into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution through Bayesian bootstrap (set \code{"BB=T"}), which will keep weights further away from 0 and 1.
 #' @seealso
-#' \code{\link{Select}} for single-model selection.
+#' \code{\link{model_select}} for single-model selection.
 #'
-#' \code{\link{loo_weight}} for details on LOO weighting.
+#' \code{\link{pseudobma_weight}} for details on pseudo-BMA and pseudo-BMA+ weights.
 #'
-#' \code{\link{stacking_weight}} for details on LOO weighting.
-
+#' \code{\link{stacking_weight}} for details on stacking weighs.
+#'
+#' \code{\link{optim}} for the choice of optimization methods.
+#'
 #' @examples
 #' \dontrun{
 ### Usage with stanfit objects
 #' log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 #' log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
-#' w1=combine(list(log_lik1, log_lik2),method="stacking", BB=T)
-#' w2=combine(list(log_lik1, log_lik2),method="loo",BB=T)
+#' w1=model_weights(list(log_lik1, log_lik2),method="stacking")
+#' w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=T)
 #' }
 #'
-Combine <-function(log_lik_list, method, BB=T,BB_n=1000, alpha=1, seed=NULL)
+model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1, seed=NULL, optim_method="BFGS")
 {
-  if (!method %in%c("stacking","loo") )
-    stop("Must specify a method in stacking or loo.")
-  if ( method =="loo" & !is.logical(BB))
-    stop("BB must be logical.")
+  if (!method %in%c("stacking","pseudobma") )
+    stop("Must specify a method in stacking or pseudobma .")
   K<-length(log_lik_list)                #number of models
   if (K==1)
     stop("Only one model is fould.")
@@ -46,24 +48,23 @@ Combine <-function(log_lik_list, method, BB=T,BB_n=1000, alpha=1, seed=NULL)
   }
   ## 1) stacking on log score
   if (method =="stacking"){
-    w_stacking <- stacking_weight(lpd_point,BB,BB_n,alpha, seed)
+    w_stacking <- stacking_weight(lpd_point, optim_method=optim_method)
     cat("The stacking weights are:\n")
     print(rbind(paste("Model"  ,c(1:K) ), round(w_stacking*100 )/100))
     return(w_stacking)
   }
   else
-    if (method =="loo"){
-      ## 2) loo weights w/o BB sample
+    if (method =="pseudobma"){
       uwts <- exp( elpd_loo - max( elpd_loo))
       w_loo1 <- uwts / sum(uwts)
       if(BB==F){
-        cat("The LOO weights are:\n")
+        cat("The Pseudo-BMA weights are:\n")
         print(rbind(paste("Model"  ,c(1:K) ),  round(w_loo1*100 )/100))
         return(w_loo1)
       }
       if(BB==T){
-        w_loo2  <- loo_weight(lpd_point, BB_n,alpha, seed)   #3) loo withs using BB sample
-        cat("The LOO weights using BB sample are:\n")
+        w_loo2  <- pseudobma_weight(lpd_point, BB_n,alpha, seed)   #3) loo withs using BB sample
+        cat("The Pseudo-BMA+ weights using Bayesian Bootstrap  are:\n ")
         print(rbind(paste("Model",c(1:K) ),  round(w_loo2*100 )/100))
         return (w_loo2 )
       }
@@ -73,13 +74,13 @@ Combine <-function(log_lik_list, method, BB=T,BB_n=1000, alpha=1, seed=NULL)
 #' Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.
 #' @export
 #' @param log_lik_list A list of pointwise log likelihood simlation matrixs. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood evaluted using a simulated paramter.
-#' @param BB Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator. It helps regularize the weight away from 0 and 1, so as to reduce the variance.
+#' @param BB Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator.
 #' @param BB_n A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{Ture}. The  default number is 1000.
 #' @param alpha A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap.
 #' @param seed An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.
 #'@param visualise Logical, whether to visualise the selection probability.
 #' @return   When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
-#' @details \code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{Combine}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
+#' @details \code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
 #' @seealso
 #' \code{\link{Combine}} for model combination.
 #'
@@ -94,10 +95,10 @@ Combine <-function(log_lik_list, method, BB=T,BB_n=1000, alpha=1, seed=NULL)
 #' library(rstan)
 #' log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 #' log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
-#' k=Select(list(log_lik1,log_lik2),BB=T)
+#' k=model_select(list(log_lik1,log_lik2),BB=T)
 #' }
 
-Select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualise=T)
+model_select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualise=T)
 {
   if (!is.logical(BB))
     stop("BB must be logical.")
@@ -135,76 +136,40 @@ Select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualise=T)
     cat("The probability of each model being selected to be best model are :\n")
     print( prob_order)
     if(max(prob)<=0.5)
-    warning("The highest probability of any single model being the best one is smaller than 0.5. It is better to do model averaging rather than model selection")
+      warning("The highest probability of any single model being the best one is smaller than 0.5. It is better to do model averaging rather than model selection")
     if(visualise)
-    barplot(as.numeric(prob_order[,2]), main="The probability of each single model being the best", names.arg=prob_order[,1], ylim=c(0,1) )
+      barplot(as.numeric(prob_order[,2]), main="The probability of each single model being the best", names.arg=prob_order[,1], ylim=c(0,1) )
     return(prob_order)
-   }
+  }
 }
 
-#' stacking on log score
+#' Stacking of predictive distributions
 #' @export
 #' @param lpd_point A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.
-#'@param BB Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to regulairze the LOO estimation, which helps reduce the variance of the stacking weights.
-#' @param  BB_n  A positivs integer indicating the number of samples in Bayesian Bootstrap. Default is 1000.
-#' @param alpha A postive scaler; the shape paramter in the Dirichlet distribution when doing Bayesian Bootstrap.
-#' @param  seed An integer; optional. If specified, it fixes the random seed when dong Bayesian Bootstrap.
+#' @param  optim_method	The optimization methoded to be used in stacking; it can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default one is "BFGS".
+#'
 #' @return A vector of best model weights that minimize the levae-one-out log score.
 #' @details \code{lpd_point} is a matrix of pointwise log leave-one-out likelihood, which can be calculeted from  \code{\link{loo}}. It should be a \eqn{N} by \eqn{K}  matrix when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is an approach that finds the optimal linear combining weight so as to minimize the leave-one-out log score. To reduce the variance in small sample, we can further sample a Bayesian Bootstrap weights (each data weight is between 0 and 1) for each data point and solve the weighted version of the optimazation. Finally, we take average over all Bayesian Bootstrap samples and obtain the final model weights.
 #'@seealso
 #' \code{\link{loo}} for details on leave-one-out elpd estimation.
 #'
-#' \code{\link{loo_weight}} for model weighting by Leave-one-out and Bayesian bootstrap adjustment.
+#' \code{\link{peudobma_weight}} for model weighting by peudo-BMA and Bayesian bootstrap adjustment.
+#'
+#' \code{\link{optim}} for the choice of optimization methods.
+#'
+
 #'@examples
 #' \dontrun{
 #' loo1 <- loo(log_lik1)$pointwise[,1]
 #' loo2 <- loo(log_lik2)$pointwise[,1]
 #' stacking_weight(cbind(loo1, loo2))
 #' }
-stacking_weight<-function( lpd_point, BB=T,  BB_n=1000,alpha=1, seed=NULL){
+stacking_weight<-function( lpd_point, optim_method="BFGS"){
   K<-ncol(lpd_point)                #number of models
   if (K==1)
     stop("Only one model is fould.")
   N<-nrow(lpd_point)
   exp_lpd_point<-exp(lpd_point)
-  if (BB==T)
-  {
-    if(!is.null(seed))
-      set.seed(seed)
-    BB_weighting <- dirichlet_rng(BB_n, rep(alpha,N))
-    stacking_weight_bb<-matrix(NA, BB_n, K)
-    for( bb in 1:BB_n){
-    bb_w<- BB_weighting[bb,]
-    negative_log_score_loo<-function(w)  #objective function: log score
-    {
-      if(length(w)!=K-1)
-        break
-      w_full<-c(w, 1-sum(w))
-      sum<-0
-      for(i in 1:N)
-        sum<-sum+log(exp_lpd_point[i,]%*%w_full)*bb_w[i]
-      return(-as.numeric(sum))
-    }
-    gradient<-function(w)  #gradient of the objective function
-    {
-      if(length(w)!=K-1)
-        break
-      w_full<-c(w, 1-sum(w))
-      grad<-rep(0,K-1)
-      for(k in 1:(K-1))
-        for(i in 1:N)
-          grad[k]<-grad[k]+ (exp_lpd_point[i,k] -exp_lpd_point[i,K]) /( exp_lpd_point[i,]  %*%w_full)*bb_w[i]
-      return(-grad)
-    }
-    ui<-rbind(rep(-1,K-1),diag(K-1))  # K-1 simplex constraint matrix
-    ci<-c(-1,rep(0,K-1))
-    w<-constrOptim (theta =rep(1/K,K-1),f=negative_log_score_loo,
-                    grad=gradient, ui=ui, ci=ci  )$par   # constrOptim: optimization function from {base}.
-    stacking_weight_bb[bb,]<- c(w, 1-sum(w))
-    }
-    return( colMeans(stacking_weight_bb) )
-    }
-  if (BB==F){
   negative_log_score_loo<-function(w)  #objective function: log score
   {
     if(length(w)!=K-1)
@@ -222,20 +187,19 @@ stacking_weight<-function( lpd_point, BB=T,  BB_n=1000,alpha=1, seed=NULL){
     w_full<-c(w, 1-sum(w))
     grad<-rep(0,K-1)
     for(k in 1:(K-1))
-     for(i in 1:N)
-       grad[k]<-grad[k]+ (exp_lpd_point[i,k] -exp_lpd_point[i,K]) /( exp_lpd_point[i,]  %*%w_full)
-     return(-grad)
+      for(i in 1:N)
+        grad[k]<-grad[k]+ (exp_lpd_point[i,k] -exp_lpd_point[i,K]) /( exp_lpd_point[i,]  %*%w_full)
+    return(-grad)
   }
   ui<-rbind(rep(-1,K-1),diag(K-1))  # K-1 simplex constraint matrix
   ci<-c(-1,rep(0,K-1))
   w<-constrOptim (theta =rep(1/K,K-1),f=negative_log_score_loo,
-                       grad=gradient, ui=ui, ci=ci  )$par   # constrOptim: function from {base}.
+                  grad=gradient, ui=ui, ci=ci, method=optim_method )$par   # constrOptim: function from {base}.
   return (c(w, 1-sum(w)))
-    }
 }
 
 
-#' LOO weighting using Bayesian bootstrap samples adjustment
+#' Peudo-BMA weighting using Bayesian bootstrap samples adjustment
 #' @export
 #' @param lpd_point A matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.
 #' @param  BB_n  A positivs integer indicating the number of samples in Bayesian Bootstrap. Default is 1000.
@@ -253,10 +217,10 @@ stacking_weight<-function( lpd_point, BB=T,  BB_n=1000,alpha=1, seed=NULL){
 #' \dontrun{
 #' loo1 <- loo(log_lik1)$pointwise[,1]
 #' loo2 <- loo(log_lik2)$pointwise[,1]
-#' loo_weight(cbind(loo1, loo2))
+#' peudobma_weight(cbind(loo1, loo2))
 #' }
 #'
-loo_weight <- function(lpd_point, BB_n=1000,alpha=1, seed=NULL) {
+pseudobma_weight<-function(lpd_point, BB_n=1000,alpha=1, seed=NULL) {
   K<-ncol(lpd_point)                #number of models
   if (K==1)
     stop("Only one model is fould.")
