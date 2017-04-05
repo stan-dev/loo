@@ -46,16 +46,14 @@ find the indexes of observations for which the estimated Pareto shape
 parameter \eqn{k} is larger than some \code{threshold} value, or plot
 observation indexes vs \eqn{k} estimates.
 }
-\details{
-The reliability of PSIS estimates can be assessed using the
-  estimates of the shape parameter \eqn{k} of the generalized Pareto
-  distribution. See \code{\link{loo-package}} for background on the PSIS
-  procedure. Here we focus on the interpretation of \eqn{k}:
+\section{Pareto k diagnostic}{
+ The reliability of the PSIS-based estimates can
+  be assessed using the estimates for the shape parameter \eqn{k} of the
+  generalized Pareto distribution.
 
-  \itemize{
-  \item If \eqn{k < 1/2} the variance of the raw importance ratios
-  is finite, the central limit theorem holds, and the estimate converges
-  quickly.
+\itemize{
+  \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
+  the central limit theorem holds, and the estimate converges quickly.
 
   \item If \eqn{k} is between 1/2 and 1 the variance of the raw importance
   ratios is infinite but the mean exists, the generalized central limit
@@ -65,29 +63,33 @@ The reliability of PSIS estimates can be assessed using the
   \item If \eqn{k > 1} the variance and the mean of the raw ratios
   distribution do not exist. The variance of the PSIS estimate is finite but
   may be large.
-  }
-
-  If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-  should be warned, although in practice we have observed good performance
-  for values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite
-  variance, the user should consider sampling directly from \eqn{p(\theta^s |
-  y_{-i})} for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or
-  use a more robust model. Importance sampling is likely to work less well if
-  the marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
-  \eqn{p(\theta^s | y_{-i})} are much different, which is more likely to
-  happen with a non-robust model and highly influential observations. A
-  robust model may reduce the sensitivity to highly influential observations.
 }
+
+If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+should be warned, although in practice we have observed good performance for
+values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite variance,
+the user should consider sampling directly from \eqn{p(\theta^s | y_{-i})}
+for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more
+robust model.
+
+Importance sampling is likely to work less well if the marginal posterior
+\eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
+different, which is more likely to happen with a non-robust model and highly
+influential observations. A robust model may reduce the sensitivity to highly
+influential observations.
+}
+
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. Advance online publication.
-  doi:10.1007/s11222-016-9696-4. arXiv preprint:
-  \url{http://arxiv.org/abs/1507.04544/}
+  doi:10.1007/s11222-016-9696-4.
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
+  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{loo-package}}.
+\code{\link{psislw}} for the implementation of the PSIS algorithm.
 }

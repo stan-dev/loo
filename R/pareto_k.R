@@ -10,38 +10,9 @@
 #'   by \code{\link{loo}} or \code{\link{psislw}}. For \code{plot}, an object
 #'   created by \code{\link{loo}}.
 #'
-#' @details The reliability of PSIS estimates can be assessed using the
-#'   estimates of the shape parameter \eqn{k} of the generalized Pareto
-#'   distribution. See \code{\link{loo-package}} for background on the PSIS
-#'   procedure. Here we focus on the interpretation of \eqn{k}:
+#' @inheritSection loo-package Pareto k diagnostic
 #'
-#'   \itemize{
-#'   \item If \eqn{k < 1/2} the variance of the raw importance ratios
-#'   is finite, the central limit theorem holds, and the estimate converges
-#'   quickly.
-#'
-#'   \item If \eqn{k} is between 1/2 and 1 the variance of the raw importance
-#'   ratios is infinite but the mean exists, the generalized central limit
-#'   theorem for stable distributions holds, and the convergence of the estimate
-#'   is slower. The variance of the PSIS estimate is finite but may be large.
-#'
-#'   \item If \eqn{k > 1} the variance and the mean of the raw ratios
-#'   distribution do not exist. The variance of the PSIS estimate is finite but
-#'   may be large.
-#'   }
-#'
-#'   If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-#'   should be warned, although in practice we have observed good performance
-#'   for values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite
-#'   variance, the user should consider sampling directly from \eqn{p(\theta^s |
-#'   y_{-i})} for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or
-#'   use a more robust model. Importance sampling is likely to work less well if
-#'   the marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
-#'   \eqn{p(\theta^s | y_{-i})} are much different, which is more likely to
-#'   happen with a non-robust model and highly influential observations. A
-#'   robust model may reduce the sensitivity to highly influential observations.
-#'
-#' @seealso \code{\link{loo-package}}.
+#' @seealso \code{\link{psislw}} for the implementation of the PSIS algorithm.
 #'
 #' @template loo-and-psis-references
 #'

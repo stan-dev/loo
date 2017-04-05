@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_log_lik.R
 \name{extract_log_lik}
 \alias{extract_log_lik}
-\title{Extract log-likelihood from a Stan model}
+\title{Extract pointwise log-likelihood matrix from a Stan model}
 \usage{
 extract_log_lik(stanfit, parameter_name = "log_lik")
 }

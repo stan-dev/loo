@@ -61,27 +61,16 @@ A named list with class \code{'loo'} and components:
 }
 }
 \description{
-Efficient approximate leave-one-out cross-validation for Bayesian models.
-}
-\details{
-\subsection{PSIS-LOO}{
-We approximate LOO using Pareto Smoothed Importance Sampling (PSIS). See
-\code{\link{loo-package}} for details.
-}
-\subsection{Memory}{
-For models fit to very large datasets we recommend the \code{loo.function}
-method, which is much more memory efficient than the \code{loo.matrix}
-method. However, the \code{loo.matrix} method is typically more convenient,
-so it is usually worth trying \code{loo.matrix} and then switching to
-\code{loo.function} if memory is an issue.
-}
+Efficient approximate leave-one-out cross-validation for Bayesian models. See
+\link{loo-package} and Vehtari, Gelman, and Gabry (2016a, 2016b) for
+background.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
 sample (the number of simulations) and \eqn{N} is the number of data points.
-Typically (but not restricted to be) the object returned by
-\code{\link{extract_log_lik}}.
+For example, the object returned by
+\code{\link{extract_log_lik}} can be used.
 
 \item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
  and \code{draws} and returns a vector containing the log-likelihood for
@@ -102,6 +91,16 @@ Typically (but not restricted to be) the object returned by
  }
 }}
 
+<<<<<<< HEAD
+=======
+\note{
+For models fit to very large datasets we recommend the
+  \code{loo.function} method, which is much more memory efficient than the
+  \code{loo.matrix} method. However, the \code{loo.matrix} method is
+  typically more convenient, so it is usually worth trying \code{loo.matrix}
+  and then switching to \code{loo.function} if memory is an issue.
+}
+>>>>>>> master
 \examples{
 \dontrun{
 ### Usage with stanfit objects
@@ -140,20 +139,21 @@ all.equal(loo_with_mat, loo_with_fn)
 Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. Advance online publication.
-  doi:10.1007/s11222-016-9696-4. arXiv preprint:
-  \url{http://arxiv.org/abs/1507.04544/}
+  doi:10.1007/s11222-016-9696-4.
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
+  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{loo-package}} for details on the Pareto Smoothed Importance
-Sampling (PSIS) procedure used for approximating LOO.
-
-\code{\link{compare}} for model comparison.
+\code{\link{psislw}} for the underlying Pareto Smoothed Importance Sampling
+(PSIS) procedure used for approximating LOO.
 
 \code{\link{pareto-k-diagnostic}} for convenience functions for looking at
 diagnostics.
+
+\code{\link{compare}} for model comparison.
 
 \code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
 }

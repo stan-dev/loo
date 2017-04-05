@@ -1,6 +1,8 @@
 #' Leave-one-out cross-validation (LOO)
 #'
-#' Efficient approximate leave-one-out cross-validation for Bayesian models.
+#' Efficient approximate leave-one-out cross-validation for Bayesian models. See
+#' \link{loo-package} and Vehtari, Gelman, and Gabry (2016a, 2016b) for
+#' background.
 #'
 #' @export loo loo.matrix loo.function
 #' @param x A log-likelihood matrix or function. See the \strong{Methods (by
@@ -47,27 +49,20 @@
 #'    objects will also provide warnings about problematic values of \eqn{k}.)}
 #' }
 #'
-#' @details
-#' \subsection{PSIS-LOO}{
-#' We approximate LOO using Pareto Smoothed Importance Sampling (PSIS). See
-#' \code{\link{loo-package}} for details.
-#' }
-#' \subsection{Memory}{
-#' For models fit to very large datasets we recommend the \code{loo.function}
-#' method, which is much more memory efficient than the \code{loo.matrix}
-#' method. However, the \code{loo.matrix} method is typically more convenient,
-#' so it is usually worth trying \code{loo.matrix} and then switching to
-#' \code{loo.function} if memory is an issue.
-#' }
+#' @note For models fit to very large datasets we recommend the
+#'   \code{loo.function} method, which is much more memory efficient than the
+#'   \code{loo.matrix} method. However, the \code{loo.matrix} method is
+#'   typically more convenient, so it is usually worth trying \code{loo.matrix}
+#'   and then switching to \code{loo.function} if memory is an issue.
 #'
 #' @seealso
-#' \code{\link{loo-package}} for details on the Pareto Smoothed Importance
-#' Sampling (PSIS) procedure used for approximating LOO.
-#'
-#' \code{\link{compare}} for model comparison.
+#' \code{\link{psislw}} for the underlying Pareto Smoothed Importance Sampling
+#' (PSIS) procedure used for approximating LOO.
 #'
 #' \code{\link{pareto-k-diagnostic}} for convenience functions for looking at
 #' diagnostics.
+#'
+#' \code{\link{compare}} for model comparison.
 #'
 #' \code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
 #'
