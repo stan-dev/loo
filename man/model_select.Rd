@@ -14,7 +14,7 @@ model_select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
 
 \item{BB_n}{A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number is 1000.}
 
-\item{alpha}{A positive scaler; the shape parameter in the Dirichlet distribution when doing Bootstrap.}
+\item{alpha}{A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap.}
 
 \item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.}
 

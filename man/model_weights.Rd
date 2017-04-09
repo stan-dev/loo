@@ -2,7 +2,7 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_weights}
 \alias{model_weights}
-\title{Model averaging via stacking or pseudo-BMA weighting.}
+\title{Model averaging via stacking or Pseudo-BMA weighting.}
 \usage{
 model_weights(log_lik_list, method = "stacking", BB = T, BB_n = 1000,
   alpha = 1, seed = NULL, optim_method = "BFGS")
@@ -10,13 +10,13 @@ model_weights(log_lik_list, method = "stacking", BB = T, BB_n = 1000,
 \arguments{
 \item{log_lik_list}{A list of pointwise log likelihood simulation matrixes. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter}
 
-\item{method}{One of  \code{"stacking"} or \code{"pseudobma"}, indicating which method is to use for obtaining the optimal weights. \code{"stacking"}  refers to stacking of predictive distributions and  \code{"pseudobma"} refers to pseudo-BMA weighting (by setting \code{"BB"=F}) or pseudo-BMA+ weighting (by setting \code{"BB"=T}).}
+\item{method}{One of  \code{"stacking"} or \code{"pseudobma"}, indicating which method is to use for obtaining the optimal weights. \code{"stacking"}  refers to stacking of predictive distributions and  \code{"pseudobma"} refers to Pseudo-BMA weighting (by setting \code{"BB"=F}) or Pseudo-BMA+ weighting (by setting \code{"BB"=T}).}
 
-\item{BB}{Logicals used when \code{"method"}=\code{"pseudobma"}. If \code{True}(default), Bayesian Bootstrap will be used to adjust the pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps regularize the weight away from 0 and 1, so as to reduce the variance.}
+\item{BB}{Logicals used when \code{"method"}=\code{"pseudobma"}. If \code{True}(default), Bayesian Bootstrap will be used to adjust the Pseudo-BMA weighting, which is called Pseudo-BMA+ weighting. It helps regularize the weight away from 0 and 1, so as to reduce the variance.}
 
 \item{BB_n}{A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The  default number is 1000.}
 
-\item{alpha}{A positive scaler; the shape parameter in the Dirichlet distribution when doing Bootstrap. The default is \eqn{1}.}
+\item{alpha}{A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap. The default is \eqn{1}.}
 
 \item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap sampling.}
 
@@ -26,10 +26,10 @@ model_weights(log_lik_list, method = "stacking", BB = T, BB_n = 1000,
 A vector of optimal model weights.
 }
 \description{
-Model averaging via stacking or pseudo-BMA weighting.
+Model averaging via stacking or Pseudo-BMA weighting.
 }
 \details{
-This function implements  stacking of predictive distributions, pseudo-BMA and pseudo-BMA+ weighting for combining multiple predictive distributions.
+This function implements  stacking of predictive distributions, Pseudo-BMA and Pseudo-BMA+ weighting for combining multiple predictive distributions.
 
 For either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{Stacking} combines all model by maximizing the leave-one-out predictive density of the combination distribution. \code{Pseudo-BMA} finds the relative weights proportional to elpd of each model. \code{Pseudo-BMA+} takes into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution through Bayesian bootstrap (set \code{"BB=T"}), which will keep weights further away from 0 and 1.
 
@@ -47,7 +47,7 @@ w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=T)
 \seealso{
 \code{\link{model_select}} for single-model selection.
 
-\code{\link{pseudobma_weight}} for details on pseudo-BMA and pseudo-BMA+ weights.
+\code{\link{pseudobma_weight}} for details on Pseudo-BMA and Pseudo-BMA+ weights.
 
 \code{\link{stacking_weight}} for details on stacking weighs.
 

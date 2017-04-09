@@ -11,7 +11,7 @@ pseudobma_weight(lpd_point, BB_n = 1000, alpha = 1, seed = NULL)
 
 \item{BB_n}{A positive integer indicating the number of samples in Bayesian Bootstrap. Default is 1000.}
 
-\item{alpha}{A postive scaler; the shape parameter in the Dirichlet distribution when doing Bayesian Bootstrap. Default is 1.}
+\item{alpha}{A positive scalar; the shape parameter in the Dirichlet distribution when doing Bayesian Bootstrap. Default is 1.}
 
 \item{seed}{An integer; optional. If specified, it fixes the random seed when dong Bayesian Bootstrap.}
 }

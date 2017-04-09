@@ -30,7 +30,7 @@ stacking_weight(cbind(loo1, loo2))
 \seealso{
 \code{\link{loo}} for details on leave-one-out elpd estimation.
 
-\code{\link{pseudobma_weight}} for model weighting by pseudo-BMA and Bayesian bootstrap adjustment.
+\code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
 
 \code{\link{optim}} for the choice of optimization methods.
 }
