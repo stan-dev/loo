@@ -8,13 +8,13 @@ model_select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
   visualise = T)
 }
 \arguments{
-\item{log_lik_list}{A list of pointwise log likelihood simlation matrixs. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood evaluted using a simulated paramter.}
+\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter.}
 
-\item{BB}{Logicals. If \code{Ture}(defalt), Bayesian Bootstrap will be used to adjust the LOO estimator.}
+\item{BB}{Logicals. If \code{True}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.}
 
-\item{BB_n}{A positivs integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{Ture}. The  default number is 1000.}
+\item{BB_n}{A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number is 1000.}
 
-\item{alpha}{A postive scaler; the shape paramter in the Dirichlet distribution when doing Bootstrap.}
+\item{alpha}{A positive scaler; the shape parameter in the Dirichlet distribution when doing Bootstrap.}
 
 \item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.}
 

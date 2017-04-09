@@ -91,8 +91,6 @@ For example, the object returned by
  }
 }}
 
-<<<<<<< HEAD
-=======
 \note{
 For models fit to very large datasets we recommend the
   \code{loo.function} method, which is much more memory efficient than the
@@ -100,7 +98,6 @@ For models fit to very large datasets we recommend the
   typically more convenient, so it is usually worth trying \code{loo.matrix}
   and then switching to \code{loo.function} if memory is an issue.
 }
->>>>>>> master
 \examples{
 \dontrun{
 ### Usage with stanfit objects
