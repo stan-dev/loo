@@ -228,7 +228,7 @@ stacking_weight<-function( lpd_point, optim_method="BFGS"){
 pseudobma_weight<-function(lpd_point, BB_n=1000, alpha=1, seed=NULL) {
   K<-ncol(lpd_point)                #number of models
   if (K==1)
-    stop("Only one model is fould.")
+    stop("Only one model is found.")
   temp<-matrix(NA,BB_n, K)
   N <- nrow(lpd_point)
   if(!is.null(seed))
