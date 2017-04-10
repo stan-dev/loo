@@ -39,9 +39,9 @@ k=model_select(list(log_lik1,log_lik2),BB=T)
 }
 }
 \seealso{
-\code{\link{Combine}} for model combination.
+\code{\link{model_weights}} for model combination.
 
 \code{\link{compare}} for two-model comparison.
 
-\code{\link{loo_weight}} for details on LOO weighting.
+\code{\link{pseudobma_weight}} for details on Pseudo-BMA weighting.
 }

@@ -51,5 +51,5 @@ w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=T)
 
 \code{\link{stacking_weight}} for details on stacking weighs.
 
-\code{\link{optim}} for the choice of optimization methods.
+\code{\link{constrOptim}} for the choice of optimization methods.
 }

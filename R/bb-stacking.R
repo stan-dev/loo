@@ -21,7 +21,7 @@
 #'
 #' \code{\link{stacking_weight}} for details on stacking weighs.
 #'
-#' \code{\link{optim}} for the choice of optimization methods.
+#' \code{\link{constrOptim}} for the choice of optimization methods.
 #'
 #' @examples
 #' \dontrun{
@@ -76,6 +76,7 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
 }
 
 #' Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.
+#' @importFrom graphics barplot
 #' @export
 #' @param log_lik_list A list of pointwise log likelihood simulation matrixes The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter.
 #' @param BB Logicals. If \code{True}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.
@@ -86,11 +87,11 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
 #' @return   When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
 #' @details \code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
 #' @seealso
-#' \code{\link{Combine}} for model combination.
+#' \code{\link{model_weights}} for model combination.
 #'
 #' \code{\link{compare}} for two-model comparison.
 #'
-#' \code{\link{loo_weight}} for details on LOO weighting.
+#' \code{\link{pseudobma_weight}} for details on Pseudo-BMA weighting.
 #'
 
 #' @examples
@@ -148,6 +149,8 @@ model_select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualis
 }
 
 #' Stacking of predictive distributions
+#' @importFrom stats constrOptim
+
 #' @export
 #' @param lpd_point A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.
 #' @param  optim_method	The optimization method to be used in stacking; it can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default one is "BFGS".
@@ -243,6 +246,8 @@ pseudobma_weight<-function(lpd_point, BB_n=1000, alpha=1, seed=NULL) {
 }
 
 #  generate dirichlet simulations, rewritten version
+#' @importFrom stats rgamma
+
 dirichlet_rng <- function(n, alpha) {
   K <- length(alpha)
   gamma_sim<-matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
