@@ -8,10 +8,13 @@ vignette: >
 
 # Using the **loo** package
 
-*The following is excerpted (with minor edits) from the preprint of our paper:*
+*The following is excerpted (with minor edits) from our paper:*
 
 Vehtari, A., Gelman, A., and Gabry, J. (2016).   
-[*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC*](http://arxiv.org/abs/1507.04544).
+Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. 
+_Statistics and Computing_. Advance online publication. doi:10.1007/s11222-016-9696-4. 
+Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | 
+[arXiv preprint](http://arxiv.org/abs/1507.04544).
 
 <br>
 
@@ -115,7 +118,7 @@ looic      3936.7 31.2
 All Pareto k estimates are good (k < 0.5)
 ```
 
-The printed output from teh `loo` function shows the estimates
+The printed output from the `loo` function shows the estimates
 $\widehat{\mbox{elpd}}_{\rm loo}$ (expected log predictive density),
 $\widehat{p}_{\rm loo}$ (effective number of parameters), and ${\rm looic} =-2\,
 \widehat{\mbox{elpd}}_{\rm loo}$ (the LOO information criterion).
