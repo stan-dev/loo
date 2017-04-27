@@ -15,7 +15,7 @@
 #'
 #' @seealso \code{\link{pareto-k-diagnostic}}
 #'
-print.loo <- function(x, digits = 1, plot_k = FALSE, ...) {
+print.loo <- function(x, digits = 1, ...) {
   lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
   cat("Computed from", lldims, "log-likelihood matrix\n\n")
   z <- x[-grep("pointwise|pareto_k", names(x))]
@@ -24,13 +24,24 @@ print.loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   ses <- grepl("se", nms)
   out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
   print(.fr(out, digits), quote = FALSE)
-  if ("p_waic" %in% colnames(x[["pointwise"]])) {
-    pwaic_warnings(x$pointwise[, "p_waic"], digits)
-  } else if ("pareto_k" %in% names(x)) {
-    print(pareto_k_table(x), digits = digits)
-    cat(.k_help())
-    if (plot_k)
-      plot(x, ...)
-  }
+  invisible(x)
+}
+
+#' @export
+#' @rdname print.loo
+print.waic <- function(x, digits = 1, ...) {
+  print.loo(x, digits = digits, ...)
+  pwaic_warnings(x$pointwise[, "p_waic"], digits = digits)
+  invisible(x)
+}
+
+#' @export
+#' @rdname print.loo
+print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.loo(x, digits = digits, ...)
+  print(pareto_k_table(x), digits = digits)
+  cat(.k_help())
+  if (plot_k)
+    plot(x, ...)
   invisible(x)
 }
