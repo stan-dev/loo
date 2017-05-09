@@ -2,7 +2,7 @@
 #'
 #' Implementation of Pareto smoothed importance sampling, a method for
 #' stabilizing importance weights. For full details about the algorithm see
-#' Vehtari, Gelman and Gabry (2016a, 2016b). For diagnostics see the
+#' Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export

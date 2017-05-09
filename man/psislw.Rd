@@ -38,7 +38,7 @@ A named list with components \code{lw_smooth} (modified log weights)
 \description{
 Implementation of Pareto smoothed importance sampling, a method for
 stabilizing importance weights. For full details about the algorithm see
-Vehtari, Gelman and Gabry (2016a, 2016b). For diagnostics see the
+Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
 \link{pareto-k-diagnostic} page.
 }
 \section{PSIS-LOO}{
@@ -91,14 +91,14 @@ The results can be then combined to compute the desired LOO estimates.
 }
 
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2016a). Practical
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. Advance online publication.
+  \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
   version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2016b). Pareto smoothed
+Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{

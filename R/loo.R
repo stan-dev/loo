@@ -1,7 +1,7 @@
 #' Leave-one-out cross-validation (LOO)
 #'
 #' Efficient approximate leave-one-out cross-validation for Bayesian models. See
-#' \link{loo-package} and Vehtari, Gelman, and Gabry (2016a, 2016b) for
+#' \link{loo-package} and Vehtari, Gelman, and Gabry (2016, 2017) for
 #' background.
 #'
 #' @export loo loo.matrix loo.function

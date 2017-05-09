@@ -12,7 +12,7 @@
 #' }
 #'
 #' This package implements the methods described in Vehtari, Gelman,
-#' and Gabry (2016a). The package documentation is largely based on excerpts
+#' and Gabry (2017). The package documentation is largely based on excerpts
 #' from the paper.
 #'
 #' @section Summary: Leave-one-out cross-validation (LOO) and the widely
@@ -23,9 +23,9 @@
 #'   estimates of predictive error such as AIC and DIC but are less used in
 #'   practice because they involve additional computational steps. This package
 #'   implements the fast and stable computations for LOO and WAIC laid out in
-#'   Vehtari, Gelman, and Gabry (2016a). From existing posterior simulation
+#'   Vehtari, Gelman, and Gabry (2017). From existing posterior simulation
 #'   draws, we compute LOO using Pareto Smoothed Importance Sampling (PSIS;
-#'   Vehtari, Gelman, and Gabry, 2016b), a new procedure for regularizing
+#'   Vehtari, Gelman, and Gabry, 2016), a new procedure for regularizing
 #'   importance weights. As a byproduct of our calculations, we also obtain
 #'   approximate standard errors for estimated predictive errors and for
 #'   comparing of predictive errors between two models.
