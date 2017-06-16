@@ -8,3 +8,5 @@ LICENSE
 man-roxygen/*
 ^revdep$
 tests/testthat/Rplots\.pdf
+^docs$
+^_pkgdown\.yml$
