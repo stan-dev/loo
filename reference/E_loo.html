@@ -94,7 +94,7 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/stan-dev/rstanarm">
+  <a href="https://github.com/stan-dev/loo">
     <span class="fa fa-github"></span>
      
   </a>
@@ -203,9 +203,9 @@ individual methods.</p></td>
 #&gt; Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 #&gt; Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt;  Elapsed Time: 0.034536 seconds (Warm-up)
-#&gt;                0.041687 seconds (Sampling)
-#&gt;                0.076223 seconds (Total)
+#&gt;  Elapsed Time: 0.041066 seconds (Warm-up)
+#&gt;                0.044294 seconds (Sampling)
+#&gt;                0.08536 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
@@ -222,9 +222,9 @@ individual methods.</p></td>
 #&gt; Chain 2, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 #&gt; Chain 2, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 2, Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt;  Elapsed Time: 0.036694 seconds (Warm-up)
-#&gt;                0.038533 seconds (Sampling)
-#&gt;                0.075227 seconds (Total)
+#&gt;  Elapsed Time: 0.041984 seconds (Warm-up)
+#&gt;                0.045472 seconds (Sampling)
+#&gt;                0.087456 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
@@ -241,9 +241,9 @@ individual methods.</p></td>
 #&gt; Chain 3, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 #&gt; Chain 3, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 3, Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt;  Elapsed Time: 0.03942 seconds (Warm-up)
-#&gt;                0.040074 seconds (Sampling)
-#&gt;                0.079494 seconds (Total)
+#&gt;  Elapsed Time: 0.039963 seconds (Warm-up)
+#&gt;                0.041651 seconds (Sampling)
+#&gt;                0.081614 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
@@ -260,9 +260,9 @@ individual methods.</p></td>
 #&gt; Chain 4, Iteration: 1600 / 2000 [ 80%]  (Sampling)
 #&gt; Chain 4, Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Chain 4, Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt;  Elapsed Time: 0.047375 seconds (Warm-up)
-#&gt;                0.040055 seconds (Sampling)
-#&gt;                0.08743 seconds (Total)
+#&gt;  Elapsed Time: 0.040788 seconds (Warm-up)
+#&gt;                0.038706 seconds (Sampling)
+#&gt;                0.079494 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'>posterior_predict</span>(<span class='no'>fit</span>)
 <span class='fu'>dim</span>(<span class='no'>yrep</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
 <span class='no'>ll</span> <span class='kw'>&lt;-</span> <span class='fu'>log_lik</span>(<span class='no'>fit</span>)

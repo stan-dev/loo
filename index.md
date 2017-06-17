@@ -3,11 +3,15 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 [![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
 
+<br>
+
 <div style="text-align:center">
 <a href="http://mc-stan.org">
 <img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=200 alt="Stan Logo"/>
 </a>
 </div>
+
+<br>
 
 **loo** is an R package that allows users to perform efficient leave-one-out cross-validation and WAIC for fitted Bayesian models.
 Leave-one-out cross-validation (LOO) and the widely applicable information
@@ -28,24 +32,24 @@ As a byproduct of our calculations, we also obtain approximate standard errors
 for estimated predictive errors and for comparing predictive errors between two
 models.
 
-<br><br/>
+<br>
 
 ## Installation
 
 **CRAN**
 
-```{r eval=FALSE}
+```{r}
 install.packages("loo")
 ```
 
 **GitHub**
 
-```{r eval=FALSE}
+```{r}
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
 ```
 
-<br><br/>
+<br>
 
 ## Python and Matlab/Octave Code
 

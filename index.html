@@ -15,7 +15,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -70,7 +70,7 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/stan-dev/rstanarm">
+  <a href="https://github.com/stan-dev/loo">
     <span class="fa fa-github"></span>
      
   </a>
@@ -85,40 +85,38 @@
 
       
       </header><div class="row">
-  <div class="col-md-9">
+  <div class="contents col-md-9">
     
 
-    
-    
-<div class="contents">
-
+<p><br></p>
 <div style="text-align:center">
-<p><a href="http://mc-stan.org"> <img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width="200" alt="Stan Logo"></a></p>
+<a href="http://mc-stan.org">
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width="200" alt="Stan Logo"></a>
 </div>
+<p><br></p>
 <p><strong>loo</strong> is an R package that allows users to perform efficient leave-one-out cross-validation and WAIC for fitted Bayesian models. Leave-one-out cross-validation (LOO) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps.</p>
 <p>This package implements the fast and stable computations for LOO and WAIC from <em>Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC</em> (<a href="http://arxiv.org/abs/1507.04544">preprint</a>, <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">published</a>). From existing posterior simulation draws, we compute LOO using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models.</p>
-<p><br><br></p>
+<p><br></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p><strong>CRAN</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"loo"</span>)</code></pre></div>
+<pre class="{r}"><code>install.packages("loo")</code></pre>
 <p><strong>GitHub</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if (!<span class="kw">require</span>(devtools)) <span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
-devtools::<span class="kw">install_github</span>(<span class="st">"stan-dev/loo"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><br><br></p>
+<pre class="{r}"><code>if (!require(devtools)) install.packages("devtools")
+devtools::install_github("stan-dev/loo", build_vignettes = TRUE)</code></pre>
+<p><br></p>
 </div>
 <div id="python-and-matlaboctave-code" class="section level2">
 <h2 class="hasAnchor">
 <a href="#python-and-matlaboctave-code" class="anchor"></a>Python and Matlab/Octave Code</h2>
 <p>Corresponding Python and Matlab/Octave code can be found at the <a href="https://github.com/avehtari/PSIS">avehtari/PSIS</a> repository.</p>
 </div>
-</div>
+
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2 class="hasAnchor">
-<a href="#sidebar" class="anchor"></a>Links</h2>
+  <div class="col-md-3" id="sidebar">
+    <h2>Links</h2>
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cran.r-project.org/package=loo">https://​cran.r-project.org/​package=loo</a>
 </li>
@@ -146,7 +144,6 @@ devtools::<span class="kw">install_github</span>(<span class="st">"stan-dev/loo"
 <li><a href="http://cran.r-project.org/web/packages/loo"><img src="http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
 </ul>
 </div>
-
 </div>
 
 
