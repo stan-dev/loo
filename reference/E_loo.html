@@ -94,7 +94,7 @@
   </a>
 </li>
 <li>
-  <a href="https://github.com/stan-dev/rstanarm">
+  <a href="https://github.com/stan-dev/loo">
     <span class="fa fa-github"></span>
      
   </a>
@@ -185,7 +185,8 @@ individual methods.</p></td>
     <pre class="examples"><div class='input'>
 <span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
 <span class='co'># matrix and draws from the posterior predictive distribution</span>
-<span class='fu'>library</span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>rstanarm (Version 2.15.4, packaged: )</span></div><div class='output co'>#&gt; <span class='message'>- Do not expect the default priors to remain the same in future rstanarm versions.</span></div><div class='output co'>#&gt; <span class='message'>Thus, R scripts should specify priors explicitly, even if they are just the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>options(mc.cores = parallel::detectCores())</span></div><div class='input'>
+<span class='fu'>library</span>(<span class='st'>"rstanarm"</span>)
+
 <span class='co'># data from help("lm")</span>
 <span class='no'>ctl</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='fl'>4.17</span>,<span class='fl'>5.58</span>,<span class='fl'>5.18</span>,<span class='fl'>6.11</span>,<span class='fl'>4.50</span>,<span class='fl'>4.61</span>,<span class='fl'>5.17</span>,<span class='fl'>4.53</span>,<span class='fl'>5.33</span>,<span class='fl'>5.14</span>)
 <span class='no'>trt</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='fl'>4.81</span>,<span class='fl'>4.17</span>,<span class='fl'>4.41</span>,<span class='fl'>3.59</span>,<span class='fl'>5.87</span>,<span class='fl'>3.83</span>,<span class='fl'>6.03</span>,<span class='fl'>4.89</span>,<span class='fl'>4.32</span>,<span class='fl'>4.69</span>)
@@ -196,8 +197,8 @@ individual methods.</p></td>
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>stan_glm</span>(<span class='no'>weight</span> ~ <span class='no'>group</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>)</div><div class='output co'>#&gt; <span class='message'>trying deprecated constructor; please alert package maintainer</span></div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 #&gt; 
-#&gt; Gradient evaluation took 9.5e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.95 seconds.
+#&gt; Gradient evaluation took 2.5e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.25 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -214,15 +215,15 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.046721 seconds (Warm-up)
-#&gt;                0.047573 seconds (Sampling)
-#&gt;                0.094294 seconds (Total)
+#&gt;  Elapsed Time: 0.045101 seconds (Warm-up)
+#&gt;                0.046464 seconds (Sampling)
+#&gt;                0.091565 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
 #&gt; 
-#&gt; Gradient evaluation took 1.4e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+#&gt; Gradient evaluation took 3.1e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.31 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -239,15 +240,15 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.046621 seconds (Warm-up)
-#&gt;                0.049525 seconds (Sampling)
-#&gt;                0.096146 seconds (Total)
+#&gt;  Elapsed Time: 0.044581 seconds (Warm-up)
+#&gt;                0.044181 seconds (Sampling)
+#&gt;                0.088762 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 #&gt; 
-#&gt; Gradient evaluation took 2.4e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.24 seconds.
+#&gt; Gradient evaluation took 2e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -264,15 +265,15 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.05043 seconds (Warm-up)
-#&gt;                0.045889 seconds (Sampling)
-#&gt;                0.096319 seconds (Total)
+#&gt;  Elapsed Time: 0.048517 seconds (Warm-up)
+#&gt;                0.044183 seconds (Sampling)
+#&gt;                0.0927 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 #&gt; 
-#&gt; Gradient evaluation took 1.4e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+#&gt; Gradient evaluation took 1.1e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -289,9 +290,9 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.057034 seconds (Warm-up)
-#&gt;                0.071673 seconds (Sampling)
-#&gt;                0.128707 seconds (Total)
+#&gt;  Elapsed Time: 0.044552 seconds (Warm-up)
+#&gt;                0.044468 seconds (Sampling)
+#&gt;                0.08902 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'>posterior_predict</span>(<span class='no'>fit</span>)
 <span class='fu'>dim</span>(<span class='no'>yrep</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
 <span class='no'>ll</span> <span class='kw'>&lt;-</span> <span class='fu'>log_lik</span>(<span class='no'>fit</span>)
