@@ -11,13 +11,13 @@ Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
 * **CRAN**
 
-```{r}
+```r
 install.packages("loo")
 ```
 
 * **GitHub**
 
-```{r}
+```r
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
 ```
