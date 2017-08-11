@@ -114,7 +114,7 @@ loo.matrix <- function(x, ...) {
     stop("NA log-likelihood values found.")
   psis <- psislw(lw = -1 * x, ..., COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis, x)
-  structure(out, log_lik_dim = dim(x), class = "loo")
+  structure(out, log_lik_dim = dim(x), class = c("psis_loo", "loo"))
 }
 
 #' @export
@@ -126,6 +126,6 @@ loo.function <- function(x, ..., args) {
     stop("'args' must be specified.")
   psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
-  structure(out, log_lik_dim = with(args, c(S,N)), class = "loo")
+  structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
 }
 
