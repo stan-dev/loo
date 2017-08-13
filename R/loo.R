@@ -110,7 +110,7 @@ loo <- function(x, ...) {
 #' @template matrix
 #'
 loo.matrix <- function(x, ...) {
-  if (any(is.na(x)))
+  if (anyNA(x))
     stop("NA log-likelihood values found.")
   psis <- psislw(lw = -1 * x, ..., COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis, x)

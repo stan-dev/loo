@@ -146,8 +146,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     nlist(loos, pareto_k)
   } else {
     funval <- if (LL_FUN) llargs$S else nrow(lw)
-    lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
-    nlist(lw_smooth, pareto_k)
+    lw_smooth <- vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
+    out <- nlist(lw_smooth, pareto_k)
+    class(out) <- c("psis", "list")
+    return(out)
   }
 }
 
