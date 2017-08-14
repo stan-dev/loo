@@ -27,6 +27,14 @@ psis(x, ...)
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
 (by class)} section below for a detailed description.}
 
+\item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
+where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
+no truncation.}
+
+\item{cores}{The number of cores to use for parallelization. This can be set
+for an entire R session by \code{options(loo.cores = NUMBER)}.
+\strong{The default is 1 core}.}
+
 \item{args}{Only required if \code{x} is a function. A list containing
 the data required to specify the arguments to the function. See the
 \strong{Methods (by class)} section below for how \code{args} should be
@@ -45,8 +53,9 @@ normalized? Defaults to \code{TRUE}.}
 \code{psis} returns a named list of class "psis" with components
   \code{lw_smooth} (smoothed but \emph{unnormalized} log weights) and
   \code{pareto_k} (estimated generalized Pareto
-  \link[=pareto-k-diagnostic]{shape parameter(s) k}). To get normalized log
-  weights use the \code{weights} method for objects of class "psis".
+  \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{neff} (PSIS
+  effective sample size estimate). To get normalized log weights use the
+  \code{weights} method for objects of class "psis".
 
 The \code{weights} method returns a matrix, which by default is a
   matrix of normalized log weights.

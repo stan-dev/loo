@@ -8,6 +8,12 @@
 #' @export
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
 #'   (by class)} section below for a detailed description.
+#' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
+#'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
+#'   no truncation.
+#' @param cores The number of cores to use for parallelization. This can be set
+#'   for an entire R session by \code{options(loo.cores = NUMBER)}.
+#'   \strong{The default is 1 core}.
 #'
 #' @param args Only required if \code{x} is a function. A list containing
 #'   the data required to specify the arguments to the function. See the
@@ -17,8 +23,9 @@
 #' @return \code{psis} returns a named list of class "psis" with components
 #'   \code{lw_smooth} (smoothed but \emph{unnormalized} log weights) and
 #'   \code{pareto_k} (estimated generalized Pareto
-#'   \link[=pareto-k-diagnostic]{shape parameter(s) k}). To get normalized log
-#'   weights use the \code{weights} method for objects of class "psis".
+#'   \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{neff} (PSIS
+#'   effective sample size estimate). To get normalized log weights use the
+#'   \code{weights} method for objects of class "psis".
 #'
 #' @inheritSection loo-package PSIS-LOO
 #'
@@ -35,58 +42,70 @@ psis <- function(x, ...) UseMethod("psis")
 #' @describeIn psis
 #' An iterations by chains by observations array.
 #'
-psis.array <- function(x, ..., wtrunc = 3/4, cores = getOption("loo.cores", 1)) {
-  stopifnot(length(dim(x)) == 3, !anyNA(x))
-  rel_neff <- relative_neff(exp(x))
+psis.array <-
+  function(x,
+           ...,
+           wtrunc = 3 / 4,
+           cores = getOption("loo.cores", 1)) {
+    stopifnot(length(dim(x)) == 3,!anyNA(x))
+    rel_neff <- relative_neff(exp(x))
 
-  xdim <- dim(x)
-  dim(x) <- c(xdim[1] * xdim[2], xdim[3])
-  x <- unname(x)
-  n_tail <- n_pareto(rel_neff, S = nrow(x))
-  do_psis(
-    lw = -x,
-    tail_len = n_tail,
-    wtrunc = wtrunc,
-    cores = cores
-  )
-}
+    xdim <- dim(x)
+    dim(x) <- c(xdim[1] * xdim[2], xdim[3])
+    x <- unname(x)
+    do_psis(
+      lw = -x,
+      rel_neff = rel_neff,
+      wtrunc = wtrunc,
+      cores = cores
+    )
+  }
 
 #' @export
 #' @describeIn psis
 #' An iterations by observations matrix.
 #'
-psis.matrix <- function(x, chain_id = NULL, ..., wtrunc = 3/4, cores = getOption("loo.cores", 1)) {
-  stopifnot(!anyNA(x))
-  rel_neff <- relative_neff(exp(x), chain_id)
-  n_tail <- n_pareto(rel_neff, S = nrow(x))
-  do_psis(
-    lw = -x,
-    tail_len = n_tail,
-    wtrunc = wtrunc,
-    cores = cores
-  )
-}
+psis.matrix <-
+  function(x,
+           chain_id = NULL,
+           ...,
+           wtrunc = 3 / 4,
+           cores = getOption("loo.cores", 1)) {
+    stopifnot(!anyNA(x))
+    rel_neff <- relative_neff(exp(x), chain_id)
+    do_psis(
+      lw = -x,
+      rel_neff = rel_neff,
+      wtrunc = wtrunc,
+      cores = cores
+    )
+  }
 
 #' @export
 #' @describeIn psis
 #' A vector.
-psis.vector <- function(x, chain_id = NULL, ..., wtrunc = 3/4) {
-  stopifnot(!anyNA(x))
-  dim(x) <- c(length(x), 1)
-  psis.matrix(x,
-              chain_id = chain_id,
-              wtrunc = wtrunc,
-              cores = 1)
-}
+psis.vector <-
+  function(x,
+           chain_id = NULL,
+           ...,
+           wtrunc = 3 / 4) {
+    stopifnot(!anyNA(x))
+    dim(x) <- c(length(x), 1)
+    psis.matrix(x,
+                chain_id = chain_id,
+                wtrunc = wtrunc,
+                cores = 1)
+  }
 
 #' @export
 #' @templateVar fn psis
 #' @template function
 #'
-psis.function <- function(x, args, ..., wtrunc = 3/4) {
-  if (missing(args))
-    stop("'args' must be specified.")
-}
+psis.function <-
+  function(x, args, ..., wtrunc = 3 / 4) {
+    if (missing(args))
+      stop("'args' must be specified.")
+  }
 
 
 # internal ----------------------------------------------------------------
@@ -94,13 +113,15 @@ psis.function <- function(x, args, ..., wtrunc = 3/4) {
 # Do PSIS given matrix of log weights
 #
 # @param lw matrix of log weights (-loglik)
-# @param vector of tail lengths
-# @param user's scalar wtrunc parameter
+# @param rel_neff vector of relative effective sample sizes
+# @param wtrunc user's scalar wtrunc parameter
+# @param cores user's cores parameter
 #
-do_psis <- function(lw, tail_len, wtrunc, cores) {
-  stopifnot(is.matrix(lw), length(tail_len) == ncol(lw))
-  S <- nrow(lw)
+do_psis <- function(lw, rel_neff, wtrunc, cores) {
+  stopifnot(is.matrix(lw), length(rel_neff) == ncol(lw))
   N <- ncol(lw)
+  S <- nrow(lw)
+  tail_len <- n_pareto(rel_neff, S)
 
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
@@ -133,13 +154,17 @@ do_psis <- function(lw, tail_len, wtrunc, cores) {
   pareto_k <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
   throw_psis_warnings(pareto_k)
 
-  structure(
+  out <- structure(
     nlist(lw_smooth, pareto_k),
     const = matrixStats::colLogSumExps(lw_smooth),
     tail_len = tail_len,
     wtrunc = wtrunc,
     class = c("psis", "list")
   )
+
+  w <- weights(out, normalize = TRUE, log = FALSE)
+  out[["neff"]] <- psis_neff(w, rel_neff)
+  return(out)
 }
 
 # PSIS (without truncation and normalization) on a single vector
