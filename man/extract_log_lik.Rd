@@ -4,18 +4,24 @@
 \alias{extract_log_lik}
 \title{Extract pointwise log-likelihood matrix from a Stan model}
 \usage{
-extract_log_lik(stanfit, parameter_name = "log_lik")
+extract_log_lik(stanfit, parameter_name = "log_lik", merge_chains = TRUE)
 }
 \arguments{
 \item{stanfit}{A \code{stanfit} object (\pkg{rstan} package).}
 
 \item{parameter_name}{A character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.}
+
+\item{merge_chains}{If \code{TRUE} (the default), all Markov chains are
+merged together (i.e., stacked) and a matrix is returned. If \code{FALSE}
+they are kept separate and an array is returned.}
 }
 \value{
-An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
-  \eqn{S} is the size of the posterior sample and \eqn{N} is the number of
-  data points.
+If \code{merge_chains=TRUE}, an \eqn{S} by \eqn{N} matrix of
+  (post-warmup) extracted draws, where \eqn{S} is the size of the posterior
+  sample and \eqn{N} is the number of data points. If
+  \code{merge_chains=FALSE}, an \eqn{I} by \eqn{C} by \eqn{N} array, where
+  \eqn{I \times C = S}.
 }
 \description{
 Convenience function for extracting the pointwise log-likelihood from a

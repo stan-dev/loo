@@ -41,18 +41,18 @@ psis_neff.matrix <- function(w, rel_neff = NULL, ...) {
 # @return A scalar if x is a vector, or a vector if x is a matrix or 3-D array.
 #
 relative_neff <- function(x, ...) {
-  UseMethod("rel_neff")
+  UseMethod("relative_neff")
 }
 
 relative_neff.default <- function(x, chain_id, ...) {
   dim(x) <- c(length(x), 1)
   class(x) <- "matrix"
-  rel_neff.matrix(x, chain_id)
+  relative_neff.matrix(x, chain_id)
 }
 
 relative_neff.matrix <- function(x, chain_id, ...) {
   x <- .llmat_to_array(x, chain_id)
-  rel_neff.array(x)
+  relative_neff.array(x)
 }
 
 relative_neff.array <- function(x, ...) {
@@ -63,8 +63,14 @@ relative_neff.array <- function(x, ...) {
 }
 
 
-# convert (iter * chain) by param matrix to iter by chain by param array
+# Convert (iter * chain) by obs matrix to iter by chain by obs array
+#
+# @param x matrix to convert.
+# @param chain_id vector of chain ids.
+# @return iter by chain by obs array
+#
 .llmat_to_array <- function(x, chain_id) {
+  stopifnot(is.matrix(x))
   stopifnot(all(chain_id == as.integer(chain_id)))
   n_chain <- length(unique(chain_id))
   lldim <- dim(x)
