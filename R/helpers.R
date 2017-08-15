@@ -1,10 +1,8 @@
 # waic and loo helpers ----------------------------------------------------
-
-#' @importFrom matrixStats colLogSumExps
 logColMeansExp <- function(x) {
   # should be more stable than log(colMeans(exp(x)))
-  S <- nrow(x)
-  colLogSumExps(x) - log(S)
+  logS <- log(nrow(x))
+  matrixStats::colLogSumExps(x) - logS
 }
 
 logColMeansExp_ll <- function(fun, args) {

@@ -21,7 +21,7 @@ If \code{merge_chains=TRUE}, an \eqn{S} by \eqn{N} matrix of
   (post-warmup) extracted draws, where \eqn{S} is the size of the posterior
   sample and \eqn{N} is the number of data points. If
   \code{merge_chains=FALSE}, an \eqn{I} by \eqn{C} by \eqn{N} array, where
-  \eqn{I \times C = S}.
+  \eqn{I \times C = S}{I * C = S}.
 }
 \description{
 Convenience function for extracting the pointwise log-likelihood from a

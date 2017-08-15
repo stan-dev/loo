@@ -4,7 +4,7 @@
 #' @inheritParams loo
 #' @param ... Other arguments. Currently ignored.
 #'
-#' @return A named list (of class \code{'loo'}) with components:
+#' @return A named list (of class \code{c("waic", "loo")}) with components:
 #'
 #' \describe{
 #' \item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive

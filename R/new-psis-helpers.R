@@ -36,7 +36,7 @@ psis_neff.matrix <- function(w, rel_neff = NULL, ...) {
 #
 # @param x A vector, matrix, or 3-D array. In the case of the loo package, this
 #   will be _exponentiated_ log-likelihood values.
-# @param chain_id If x is not a 3-D array, a vector give chain indexes for each
+# @param chain_id If x is not a 3-D array, a vector giving chain indexes for each
 #   value in x (if x is a vector) or each row of x (if x is a matrix).
 # @return A scalar if x is a vector, or a vector if x is a matrix or 3-D array.
 #
@@ -51,7 +51,7 @@ relative_neff.default <- function(x, chain_id, ...) {
 }
 
 relative_neff.matrix <- function(x, chain_id, ...) {
-  x <- .llmat_to_array(x, chain_id)
+  x <- llmatrix_to_array(x, chain_id)
   relative_neff.array(x)
 }
 
@@ -63,15 +63,26 @@ relative_neff.array <- function(x, ...) {
 }
 
 
+# Convert iter by chain by obs array to (iter * chain) by obs matrix
+#
+# @param x array to convert.
+# @return (iter * chain) by obs matrix
+#
+llarray_to_matrix <- function(x) {
+  stopifnot(is.array(x), length(dim(x)) == 3)
+  xdim <- dim(x)
+  dim(x) <- c(prod(xdim[1:2]), xdim[3])
+  unname(x)
+}
+
 # Convert (iter * chain) by obs matrix to iter by chain by obs array
 #
 # @param x matrix to convert.
 # @param chain_id vector of chain ids.
 # @return iter by chain by obs array
 #
-.llmat_to_array <- function(x, chain_id) {
-  stopifnot(is.matrix(x))
-  stopifnot(all(chain_id == as.integer(chain_id)))
+llmatrix_to_array <- function(x, chain_id) {
+  stopifnot(is.matrix(x), all(chain_id == as.integer(chain_id)))
   n_chain <- length(unique(chain_id))
   lldim <- dim(x)
   if (lldim[1] %% n_chain != 0) {
@@ -82,15 +93,7 @@ relative_neff.array <- function(x, ...) {
   n_iter <- lldim[1] / n_chain
   n_obs <- lldim[2]
 
-  a <- array(
-    data = NA,
-    dim = c(n_iter, n_chain, n_obs),
-    dimnames = list(
-      Iteration = NULL,
-      Chain = NULL,
-      Observation = NULL
-    )
-  )
+  a <- array(data = NA, dim = c(n_iter, n_chain, n_obs))
   for (c in seq_len(n_chain)) {
     a[, c, ] <- x[chain_id == c, , drop = FALSE]
   }

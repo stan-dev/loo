@@ -4,32 +4,28 @@
 #' \link{loo-package} and Vehtari, Gelman, and Gabry (2016, 2017) for
 #' background.
 #'
-#' @export loo loo.matrix loo.function
-#' @param x A log-likelihood matrix or function. See the \strong{Methods (by
-#'   class)} section below for a detailed description.
+#' @export loo loo.array loo.matrix loo.function
+#' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
+#'   (by class)} section below for a detailed description.
 #' @param args Only required if \code{x} is a function. A list containing
 #'   the data required to specify the arguments to the function. See the
 #'   \strong{Methods (by class)} section below for how \code{args} should be
 #'   specified.
-#' @param ... Optional arguments to pass to \code{\link{psislw}}. Possible
+#' @param ... Optional arguments to pass to \code{\link{psis}}. Possible
 #'   arguments and their defaults are:
 #' \describe{
-#'  \item{\code{wcp = 0.2}}{The proportion of importance weights to use for the
-#'    generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
-#'    sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
-#'    the generalized Pareto distribution.}
 #'  \item{\code{wtrunc = 3/4}}{For truncating very large weights to
-#'    \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
-#'  \item{\code{cores = getOption("loo.cores", parallel::detectCores())}}{The
-#'  number of cores to use for parallelization. This can be set for an entire R
-#'  session by \code{options(loo.cores = NUMBER)}. The default is
-#'  \code{\link[parallel]{detectCores}}().}
+#'    \eqn{S}^\code{wtrunc} (set to zero for no truncation).
+#'    We recommend the default value unless there are problems.}
+#'  \item{\code{cores = getOption("loo.cores", 1)}}{
+#'   The number of cores to use for parallelization. The default for
+#'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
+#'   of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
+#'   recommend using as many (or close to as many) cores as possible.
+#'  }
 #'}
 #'
-#'  We recommend using the default values for the \code{psislw} arguments unless
-#'  there are problems (e.g. \code{NA} or \code{NaN} results).
-#'
-#' @return A named list with class \code{'loo'} and components:
+#' @return A named list with class \code{c("psis_loo", "loo")} and components:
 #'
 #' \describe{
 #'  \item{\code{elpd_loo, se_elpd_loo}}{Expected log pointwise predictive density
@@ -51,12 +47,12 @@
 #'
 #' @note For models fit to very large datasets we recommend the
 #'   \code{loo.function} method, which is much more memory efficient than the
-#'   \code{loo.matrix} method. However, the \code{loo.matrix} method is
-#'   typically more convenient, so it is usually worth trying \code{loo.matrix}
-#'   and then switching to \code{loo.function} if memory is an issue.
+#'   array and matrix methods. However, the array and matrix methods are
+#'   typically more convenient, so it is usually worth trying them and then
+#'   switching to \code{loo.function} if memory is an issue.
 #'
 #' @seealso
-#' \code{\link{psislw}} for the underlying Pareto Smoothed Importance Sampling
+#' \code{\link{psis}} for the underlying Pareto Smoothed Importance Sampling
 #' (PSIS) procedure used for approximating LOO.
 #'
 #' \code{\link{pareto-k-diagnostic}} for convenience functions for looking at
@@ -71,11 +67,12 @@
 #' @examples
 #' \dontrun{
 #' ### Usage with stanfit objects
-#' log_lik1 <- extract_log_lik(stanfit1) # see ?extract_log_lik
+#' # see ?extract_log_lik
+#' log_lik1 <- extract_log_lik(stanfit1, merge_chains = FALSE)
 #' loo1 <- loo(log_lik1)
 #' print(loo1, digits = 3)
 #'
-#' log_lik2 <- extract_log_lik(stanfit2)
+#' log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 #' (loo2 <- loo(log_lik2))
 #' compare(loo1, loo2)
 #' }
@@ -107,23 +104,68 @@ loo <- function(x, ...) {
 
 #' @export
 #' @templateVar fn loo
-#' @template matrix
+#' @template array
 #'
-loo.matrix <- function(x, ...) {
-  if (anyNA(x))
-    stop("NA log-likelihood values found.")
-  psis <- psislw(lw = -1 * x, ..., COMPUTE_LOOS = TRUE)
-  out <- pointwise_loo(psis, x)
-  structure(out, log_lik_dim = dim(x), class = c("psis_loo", "loo"))
+loo.array <- function(x, ...) {
+  psis_out <- psis.array(x, ...)
+  ll <- llarray_to_matrix(x)
+  lldim <- dim(ll)
+  lpd <- logColMeansExp(ll)
+  ll_plus_lw <- ll + weights(psis_out, normalize = TRUE, log = TRUE)
+
+  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
+  looic <- -2 * elpd_loo
+  p_loo <- lpd - elpd_loo
+  pointwise <- nlist(elpd_loo, p_loo, looic)
+
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out$pareto_k <- psis_out$pareto_k
+  structure(
+    out,
+    log_lik_dim = lldim,
+    psis_neff = psis_out$neff,
+    class = c("psis_loo", "loo")
+  )
+}
+
+#' @export
+#' @templateVar fn loo
+#' @template matrix
+#' @template chain_id
+#'
+loo.matrix <- function(x, chain_id, ...) {
+  psis_out <- psis.matrix(x, chain_id, ...)
+  ll <- x
+  lldim <- dim(ll)
+  lpd <- logColMeansExp(ll)
+  ll_plus_lw <- ll + weights(psis_out, normalize = TRUE, log = TRUE)
+
+  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
+  looic <- -2 * elpd_loo
+  p_loo <- lpd - elpd_loo
+  pointwise <- nlist(elpd_loo, p_loo, looic)
+
+  out <- totals(pointwise)
+  nms <- names(pointwise)
+  names(out) <- c(nms, paste0("se_", nms))
+  out$pointwise <- cbind_list(pointwise)
+  out$pareto_k <- psis_out$pareto_k
+  structure(
+  out,
+    log_lik_dim = lldim,
+    psis_neff = psis_out$neff,
+    class = c("psis_loo", "loo")
+  )
 }
 
 #' @export
 #' @templateVar fn loo
 #' @template function
 #'
-loo.function <- function(x, ..., args) {
-  if (missing(args))
-    stop("'args' must be specified.")
+loo.function <- function(x, args, ...) {
   psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))

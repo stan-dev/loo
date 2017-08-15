@@ -14,10 +14,10 @@ psis(x, ...)
 \method{psis}{array}(x, ..., wtrunc = 3/4, cores = getOption("loo.cores",
   1))
 
-\method{psis}{matrix}(x, chain_id = NULL, ..., wtrunc = 3/4,
+\method{psis}{matrix}(x, chain_id, ..., wtrunc = 3/4,
   cores = getOption("loo.cores", 1))
 
-\method{psis}{vector}(x, chain_id = NULL, ..., wtrunc = 3/4)
+\method{psis}{vector}(x, chain_id, ..., wtrunc = 3/4)
 
 \method{psis}{function}(x, args, ..., wtrunc = 3/4)
 
@@ -29,11 +29,18 @@ psis(x, ...)
 
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
 where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
-no truncation.}
+no truncation. The default is \code{0.75}.}
 
-\item{cores}{The number of cores to use for parallelization. This can be set
-for an entire R session by \code{options(loo.cores = NUMBER)}.
-\strong{The default is 1 core}.}
+\item{cores}{The number of cores to use for parallelization. The default for
+an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
+of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
+recommend using as many (or close to as many) cores as possible.}
+
+\item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
+indexes for each each row of \code{x} (if a matrix) or each value in
+\code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
+array. If there are \code{C} chains then valid chain indexes are values
+in \code{1:C}.}
 
 \item{args}{Only required if \code{x} is a function. A list containing
 the data required to specify the arguments to the function. See the
@@ -68,15 +75,22 @@ Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An iterations by chains by observations array.
+\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points. For example, the object
+returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
 
-\item \code{matrix}: An iterations by observations matrix.
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+of the posterior sample (with all chains merged) and \eqn{N} is the number
+of data points. For example, the object returned by
+\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
-\item \code{vector}: A vector.
+\item \code{vector}: A vector of length \eqn{S} (posterior sample size).
 
-\item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
- and \code{draws} and returns a vector containing the log-likelihood for
- the \code{i}th observation evaluated at each posterior draw.
+\item \code{function}: A function \eqn{f} that takes arguments \code{i},
+  \code{data}, and \code{draws} and returns a vector containing the
+  log-likelihood for the \code{i}th observation evaluated at each posterior
+  draw.
 
  The \code{args} argument must also be specified and should be a named list
  with the following components:

@@ -2,37 +2,42 @@
 % Please edit documentation in R/loo.R
 \name{loo}
 \alias{loo}
+\alias{loo.array}
 \alias{loo.matrix}
 \alias{loo.function}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
 
-\method{loo}{matrix}(x, ...)
+\method{loo}{array}(x, ...)
 
-\method{loo}{function}(x, ..., args)
+\method{loo}{matrix}(x, chain_id, ...)
+
+\method{loo}{function}(x, args, ...)
 }
 \arguments{
-\item{x}{A log-likelihood matrix or function. See the \strong{Methods (by
-class)} section below for a detailed description.}
+\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
+(by class)} section below for a detailed description.}
 
-\item{...}{Optional arguments to pass to \code{\link{psislw}}. Possible
+\item{...}{Optional arguments to pass to \code{\link{psis}}. Possible
   arguments and their defaults are:
 \describe{
- \item{\code{wcp = 0.2}}{The proportion of importance weights to use for the
-   generalized Pareto fit. The \code{100*wcp}\% largest weights are used as the
-   sample from which to estimate the parameters \eqn{k} and \eqn{\sigma} of
-   the generalized Pareto distribution.}
  \item{\code{wtrunc = 3/4}}{For truncating very large weights to
-   \eqn{S}^\code{wtrunc} (set to zero for no truncation).}
- \item{\code{cores = getOption("loo.cores", parallel::detectCores())}}{The
- number of cores to use for parallelization. This can be set for an entire R
- session by \code{options(loo.cores = NUMBER)}. The default is
- \code{\link[parallel]{detectCores}}().}
-}
+   \eqn{S}^\code{wtrunc} (set to zero for no truncation).
+   We recommend the default value unless there are problems.}
+ \item{\code{cores = getOption("loo.cores", 1)}}{
+  The number of cores to use for parallelization. The default for
+  an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
+  of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
+  recommend using as many (or close to as many) cores as possible.
+ }
+}}
 
- We recommend using the default values for the \code{psislw} arguments unless
- there are problems (e.g. \code{NA} or \code{NaN} results).}
+\item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
+indexes for each each row of \code{x} (if a matrix) or each value in
+\code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
+array. If there are \code{C} chains then valid chain indexes are values
+in \code{1:C}.}
 
 \item{args}{Only required if \code{x} is a function. A list containing
 the data required to specify the arguments to the function. See the
@@ -40,7 +45,7 @@ the data required to specify the arguments to the function. See the
 specified.}
 }
 \value{
-A named list with class \code{'loo'} and components:
+A named list with class \code{c("psis_loo", "loo")} and components:
 
 \describe{
  \item{\code{elpd_loo, se_elpd_loo}}{Expected log pointwise predictive density
@@ -67,14 +72,20 @@ background.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
-sample (the number of simulations) and \eqn{N} is the number of data points.
-For example, the object returned by
-\code{\link{extract_log_lik}} can be used.
+\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points. For example, the object
+returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
 
-\item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
- and \code{draws} and returns a vector containing the log-likelihood for
- the \code{i}th observation evaluated at each posterior draw.
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+of the posterior sample (with all chains merged) and \eqn{N} is the number
+of data points. For example, the object returned by
+\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
+
+\item \code{function}: A function \eqn{f} that takes arguments \code{i},
+  \code{data}, and \code{draws} and returns a vector containing the
+  log-likelihood for the \code{i}th observation evaluated at each posterior
+  draw.
 
  The \code{args} argument must also be specified and should be a named list
  with the following components:
@@ -94,18 +105,19 @@ For example, the object returned by
 \note{
 For models fit to very large datasets we recommend the
   \code{loo.function} method, which is much more memory efficient than the
-  \code{loo.matrix} method. However, the \code{loo.matrix} method is
-  typically more convenient, so it is usually worth trying \code{loo.matrix}
-  and then switching to \code{loo.function} if memory is an issue.
+  array and matrix methods. However, the array and matrix methods are
+  typically more convenient, so it is usually worth trying them and then
+  switching to \code{loo.function} if memory is an issue.
 }
 \examples{
 \dontrun{
 ### Usage with stanfit objects
-log_lik1 <- extract_log_lik(stanfit1) # see ?extract_log_lik
+# see ?extract_log_lik
+log_lik1 <- extract_log_lik(stanfit1, merge_chains = FALSE)
 loo1 <- loo(log_lik1)
 print(loo1, digits = 3)
 
-log_lik2 <- extract_log_lik(stanfit2)
+log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 (loo2 <- loo(log_lik2))
 compare(loo1, loo2)
 }
@@ -144,7 +156,7 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{psislw}} for the underlying Pareto Smoothed Importance Sampling
+\code{\link{psis}} for the underlying Pareto Smoothed Importance Sampling
 (PSIS) procedure used for approximating LOO.
 
 \code{\link{pareto-k-diagnostic}} for convenience functions for looking at

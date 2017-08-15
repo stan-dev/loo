@@ -1,8 +1,7 @@
-#' @describeIn <%= fn %>
-#'
-#'  A function \eqn{f} that takes arguments \code{i}, \code{data},
-#'  and \code{draws} and returns a vector containing the log-likelihood for
-#'  the \code{i}th observation evaluated at each posterior draw.
+#' @describeIn <%= fn %> A function \eqn{f} that takes arguments \code{i},
+#'   \code{data}, and \code{draws} and returns a vector containing the
+#'   log-likelihood for the \code{i}th observation evaluated at each posterior
+#'   draw.
 #'
 #'  The \code{args} argument must also be specified and should be a named list
 #'  with the following components:

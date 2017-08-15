@@ -13,8 +13,8 @@ waic(x, ...)
 \method{waic}{function}(x, ..., args)
 }
 \arguments{
-\item{x}{A log-likelihood matrix or function. See the \strong{Methods (by
-class)} section below for a detailed description.}
+\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
+(by class)} section below for a detailed description.}
 
 \item{...}{Other arguments. Currently ignored.}
 
@@ -24,7 +24,7 @@ the data required to specify the arguments to the function. See the
 specified.}
 }
 \value{
-A named list (of class \code{'loo'}) with components:
+A named list (of class \code{c("waic", "loo")}) with components:
 
 \describe{
 \item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive
@@ -42,14 +42,15 @@ Widely applicable information criterion (WAIC)
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
-sample (the number of simulations) and \eqn{N} is the number of data points.
-For example, the object returned by
-\code{\link{extract_log_lik}} can be used.
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+of the posterior sample (with all chains merged) and \eqn{N} is the number
+of data points. For example, the object returned by
+\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
-\item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
- and \code{draws} and returns a vector containing the log-likelihood for
- the \code{i}th observation evaluated at each posterior draw.
+\item \code{function}: A function \eqn{f} that takes arguments \code{i},
+  \code{data}, and \code{draws} and returns a vector containing the
+  log-likelihood for the \code{i}th observation evaluated at each posterior
+  draw.
 
  The \code{args} argument must also be specified and should be a named list
  with the following components:
