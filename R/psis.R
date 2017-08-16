@@ -165,6 +165,7 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
     nlist(lw_smooth, pareto_k),
     norm_const_log = matrixStats::colLogSumExps(lw_smooth),
     tail_len = tail_len,
+    rel_n_eff = rel_n_eff,
     wtrunc = wtrunc,
     log_lik_dim = c(S, N),
     class = c("psis", "list")
