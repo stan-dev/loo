@@ -12,6 +12,15 @@ is.waic <- function(x) {
   inherits(x, "waic") && is.loo(x)
 }
 
+# check for NAs and non-finite values in log-lik array/matrix/vector
+# @param x log-lik array/matrix/vector
+# @return x if no error is thrown.
+#
+validate_ll <- function(x) {
+  stopifnot(!is.list(x), !anyNA(x), all(is.finite(x)))
+  invisible(x)
+}
+
 
 # more stable version of log(colMeans(exp(x)))
 # @param x matrix
@@ -61,6 +70,7 @@ old_pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 
+
 # print and warning helpers -----------------------------------------------
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
@@ -72,6 +82,7 @@ old_pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
     labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
   )
 }
+
 
 
 #' Named lists

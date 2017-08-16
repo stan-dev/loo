@@ -4,6 +4,7 @@
 \alias{print.loo}
 \alias{print.waic}
 \alias{print.psis_loo}
+\alias{print.psis}
 \title{Print method for 'loo' objects}
 \usage{
 \method{print}{loo}(x, digits = 1, ...)
@@ -11,6 +12,8 @@
 \method{print}{waic}(x, digits = 1, ...)
 
 \method{print}{psis_loo}(x, digits = 1, plot_k = FALSE, ...)
+
+\method{print}{psis}(x, digits = 1, plot_k = FALSE, ...)
 }
 \arguments{
 \item{x}{A list with class \code{'loo'} (as returned by \code{\link{loo}} or

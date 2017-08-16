@@ -230,9 +230,12 @@ psis_smooth_tail <- function(x) {
   tail_len <- length(x)
   exp_cutoff <- exp(x[1])
   fit <- gpdfit(exp(x) - exp_cutoff)
+  k <- fit$k
+  sigma <- fit$sigma
+
   prb <- (seq_len(tail_len) - 0.5) / tail_len
-  qq <- qgpd(p = prb, xi = fit$k, sigma = fit$sigma) + exp_cutoff
-  list(tail = log(qq), k = fit$k)
+  qq <- qgpd(p = prb, xi = k, sigma = sigma) + exp_cutoff
+  list(tail = log(qq), k = k)
 }
 
 # Truncate (log) weights
@@ -276,14 +279,6 @@ throw_psis_warnings <- function(k) {
   }
 }
 
-# Check for NAs and non-finite values in log-lik array/matrix/vector
-# @param x log-lik array/matrix/vector
-# @return x if no error is thrown.
-#
-validate_ll <- function(x) {
-  stopifnot(!is.list(x), !anyNA(x), all(is.finite(x)))
-  invisible(x)
-}
 
 #' @rdname psis
 #' @export

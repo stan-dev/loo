@@ -6,9 +6,7 @@
 #' observation indexes vs \eqn{k} estimates.
 #'
 #' @name pareto-k-diagnostic
-#' @param x For \code{pareto_k_ids} and \code{pareto_k_table}, an object created
-#'   by \code{\link{loo}} or \code{\link{psislw}}. For \code{plot}, an object
-#'   created by \code{\link{loo}}.
+#' @param x An object created by \code{\link{loo}} or \code{\link{psis}}.
 #'
 #' @inheritSection loo-package Pareto k diagnostic
 #'
@@ -46,7 +44,7 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
       " Pct" = paste0(.fr(100 * prop, digits), "%")
     )
     tab2 <- rbind(tab)
-    cat("\nPareto k diagnostic values:\n")
+    cat("Pareto k diagnostic values:\n")
     rownames(tab2) <- format(rownames(tab2), justify = "right")
     print(tab2, quote = FALSE)
 
@@ -90,6 +88,11 @@ plot.loo <- function(x, ..., label_points = FALSE) {
             "% of Pareto k estimates are Inf/NA/NaN and not plotted.")
   }
   plot_k(k, ..., label_points = label_points)
+}
+
+#' @export
+plot.psis <- function(x, ..., label_points = FALSE) {
+  plot.loo(x, ..., label_points = label_points)
 }
 
 

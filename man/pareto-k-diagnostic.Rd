@@ -14,9 +14,7 @@ pareto_k_ids(x, threshold = 0.5)
 \method{plot}{loo}(x, ..., label_points = FALSE)
 }
 \arguments{
-\item{x}{For \code{pareto_k_ids} and \code{pareto_k_table}, an object created
-by \code{\link{loo}} or \code{\link{psislw}}. For \code{plot}, an object
-created by \code{\link{loo}}.}
+\item{x}{An object created by \code{\link{loo}} or \code{\link{psis}}.}
 
 \item{threshold}{The threshold value for \eqn{k}.}
 

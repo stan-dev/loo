@@ -16,8 +16,7 @@
 #' @seealso \code{\link{pareto-k-diagnostic}}
 #'
 print.loo <- function(x, digits = 1, ...) {
-  lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
-  cat("Computed from", lldims, "log-likelihood matrix\n\n")
+  print_log_lik_dim(x)
   z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
@@ -39,9 +38,30 @@ print.waic <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
+  cat("\n")
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k)
     plot(x, ...)
   invisible(x)
 }
+
+
+#' @export
+#' @rdname print.loo
+print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print_log_lik_dim(x)
+  print(pareto_k_table(x), digits = digits)
+  cat(.k_help())
+  if (plot_k)
+    plot(x, ...)
+  invisible(x)
+}
+
+
+# internal ----------------------------------------------------------------
+print_log_lik_dim <- function(x) {
+  lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
+  cat("Computed from", lldims, "log-likelihood matrix\n\n")
+}
+
