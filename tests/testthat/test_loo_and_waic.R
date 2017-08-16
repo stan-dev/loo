@@ -38,13 +38,12 @@ test_that("loo and waic return expected results", {
 
 test_that("loo and waic throw appropriate errors", {
   x[1,1] <- NaN
-  expect_error(loo(x), regexp = "NA log-likelihood")
-  expect_error(waic(x), regexp = "NA log-likelihood")
+  expect_error(loo(x), regexp = "!anyNA(x) is not TRUE", fixed = TRUE)
+  expect_error(waic(x), regexp = "!anyNA(x) is not TRUE", fixed = TRUE)
 
-  vec <- 1:10
-  arr <- array(1:100, dim = c(2,5,10))
+  vec <- rnorm(10)
   expect_error(loo(vec), regexp = "no applicable method")
-  expect_error(waic(arr), regexp = "no applicable method")
+  expect_error(waic(vec), regexp = "no applicable method")
 })
 
 test_that("function and matrix methods return same result", {

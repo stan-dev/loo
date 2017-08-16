@@ -13,13 +13,14 @@ is.waic <- function(x) {
 }
 
 
+# more stable version of log(colMeans(exp(x)))
+# @param x matrix
 logColMeansExp <- function(x) {
-  # should be more stable than log(colMeans(exp(x)))
   logS <- log(nrow(x))
   matrixStats::colLogSumExps(x) - logS
 }
 
-logColMeansExp_ll <- function(fun, args) {
+logColMeansExp_llfun <- function(fun, args) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(args$S)
   colLSEs <- vapply(seq_len(args$N), FUN = function(i) {
@@ -28,48 +29,25 @@ logColMeansExp_ll <- function(fun, args) {
   colLSEs - logS
 }
 
-colVars_ll <- function(fun, args) {
-  vapply(seq_len(args$N), FUN = function(i) {
-    x <- fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)
-    var(as.vector(x))
-  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
-}
 
+# @param pointwise list of vectors
+# @return a named list of estimates and standard errors
 totals <- function(pointwise) {
   N <- length(pointwise[[1L]])
-  total  <- unlist(lapply(pointwise, sum), use.names = FALSE)
-  se <- sqrt(N * unlist(lapply(pointwise, var), use.names = FALSE))
-  as.list(c(total, se))
+  ests <- lapply(pointwise, sum)
+  ses <- sapply(pointwise, function(x) sqrt(N * var(x)))
+  names(ses) <- paste0("se_", names(ests))
+  c(ests, ses)
 }
 
-pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
-  if (!missing(log_lik)) {
-    lpd <- logColMeansExp(log_lik)
-    p_waic <- matrixStats::colVars(log_lik)
-  } else {
-    if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
-           call. = FALSE)
-    lpd <- logColMeansExp_ll(llfun, llargs)
-    p_waic <- colVars_ll(llfun, llargs)
-  }
-  elpd_waic <- lpd - p_waic
-  waic <- -2 * elpd_waic
-  pointwise <- nlist(elpd_waic, p_waic, waic)
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- do.call(cbind, pointwise)
-  out
-}
-pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
+old_pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) {
     lpd <- logColMeansExp(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
       stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
            call. = FALSE)
-    lpd <- logColMeansExp_ll(llfun, llargs)
+    lpd <- logColMeansExp_llfun(llfun, llargs)
   }
   elpd_loo <- psis$loos
   p_loo <- lpd - elpd_loo

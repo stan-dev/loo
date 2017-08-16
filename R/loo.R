@@ -108,13 +108,12 @@ loo <- function(x, ...) {
 #'
 loo.array <- function(x, ...) {
   psis_out <- psis.array(x, ...)
-  pointwise <- pointwise_loo_calcs(llarray_to_matrix(x), psis_out)
-  nms <- c(names(pointwise), paste0("se_", names(pointwise)))
+  ll <- llarray_to_matrix(x)
+  pointwise <- pointwise_loo_calcs(ll, psis_out)
   psis_loo_object(
-    stats = setNames(totals(pointwise), nms),
     pointwise = pointwise,
     diagnostics = psis_out[c("pareto_k", "n_eff")],
-    lldim = attr(psis_out, "log_lik_dim")
+    log_lik_dim = attr(psis_out, "log_lik_dim")
   )
 }
 
@@ -126,12 +125,10 @@ loo.array <- function(x, ...) {
 loo.matrix <- function(x, chain_id, ...) {
   psis_out <- psis.matrix(x, chain_id, ...)
   pointwise <- pointwise_loo_calcs(x, psis_out)
-  nms <- c(names(pointwise), paste0("se_", names(pointwise)))
   psis_loo_object(
-    stats = setNames(totals(pointwise), nms),
     pointwise = pointwise,
     diagnostics = psis_out[c("pareto_k", "n_eff")],
-    lldim = attr(psis_out, "log_lik_dim")
+    log_lik_dim = attr(psis_out, "log_lik_dim")
   )
 }
 
@@ -141,7 +138,7 @@ loo.matrix <- function(x, chain_id, ...) {
 #'
 loo.function <- function(x, args, ...) {
   psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
-  out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
+  out <- old_pointwise_loo(psis = psis, llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
 }
 
@@ -162,17 +159,18 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 }
 
 # structure the object returned by the loo methods
-# @param stats named list containing scalar values elpd_loo, p_loo, looic,
-#   se_elpd_loo, se_p_loo, se_looic
+#
 # @param pointwise named list containing vectors elpd_loo, p_loo, looic
 # @param diagnostics named list containing vector pareto_k and vector n_eff
+# @param log_lik_dim log likelihood matrix dimensions (attribute of psis object)
 #
-psis_loo_object <- function(stats, pointwise, diagnostics, lldim) {
+psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
+  stats <- totals(pointwise)
   out <- c(stats, diagnostics)
   out$pointwise <- do.call(cbind, pointwise)
   structure(
     out,
-    log_lik_dim = lldim,
+    log_lik_dim = log_lik_dim,
     class = c("psis_loo", "loo")
   )
 }

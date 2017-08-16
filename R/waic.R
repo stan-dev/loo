@@ -92,3 +92,30 @@ throw_pwaic_warnings <- function(p, digits = 1) {
   invisible(NULL)
 }
 
+
+pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
+  if (!missing(log_lik)) {
+    lpd <- logColMeansExp(log_lik)
+    p_waic <- matrixStats::colVars(log_lik)
+  } else {
+    if (is.null(llfun) || is.null(llargs))
+      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
+           call. = FALSE)
+    lpd <- logColMeansExp_llfun(llfun, llargs)
+    p_waic <- colVars_llfun(llfun, llargs)
+  }
+  elpd_waic <- lpd - p_waic
+  waic <- -2 * elpd_waic
+  pointwise <- nlist(elpd_waic, p_waic, waic)
+  out <- totals(pointwise)
+  out$pointwise <- do.call(cbind, pointwise)
+  out
+}
+
+colVars_llfun <- function(fun, args) {
+  vapply(seq_len(args$N), FUN = function(i) {
+    x <- fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)
+    var(as.vector(x))
+  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+}
+
