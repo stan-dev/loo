@@ -1,4 +1,18 @@
 # waic and loo helpers ----------------------------------------------------
+is.psis <- function(x) {
+  inherits(x, "psis") && is.list(x)
+}
+is.loo <- function(x) {
+  inherits(x, "loo")
+}
+is.psis_loo <- function(x) {
+  inherits(x, "psis_loo") && is.loo(x)
+}
+is.waic <- function(x) {
+  inherits(x, "waic") && is.loo(x)
+}
+
+
 logColMeansExp <- function(x) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(nrow(x))
@@ -8,10 +22,10 @@ logColMeansExp <- function(x) {
 logColMeansExp_ll <- function(fun, args) {
   # should be more stable than log(colMeans(exp(x)))
   logS <- log(args$S)
-  clse <- vapply(seq_len(args$N), FUN = function(i) {
+  colLSEs <- vapply(seq_len(args$N), FUN = function(i) {
     logSumExp(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws))
   }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
-  clse - logS
+  colLSEs - logS
 }
 
 colVars_ll <- function(fun, args) {
@@ -23,16 +37,15 @@ colVars_ll <- function(fun, args) {
 
 totals <- function(pointwise) {
   N <- length(pointwise[[1L]])
-  total  <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
+  total  <- unlist(lapply(pointwise, sum), use.names = FALSE)
+  se <- sqrt(N * unlist(lapply(pointwise, var), use.names = FALSE))
   as.list(c(total, se))
 }
 
-#' @importFrom matrixStats colVars
 pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
   if (!missing(log_lik)) {
     lpd <- logColMeansExp(log_lik)
-    p_waic <- colVars(log_lik)
+    p_waic <- matrixStats::colVars(log_lik)
   } else {
     if (is.null(llfun) || is.null(llargs))
       stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
@@ -46,7 +59,7 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
+  out$pointwise <- do.call(cbind, pointwise)
   out
 }
 pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
@@ -65,7 +78,7 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out <- totals(pointwise)
   nms <- names(pointwise)
   names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
+  out$pointwise <- do.call(cbind, pointwise)
   out$pareto_k <- psis$pareto_k
   out
 }
@@ -82,29 +95,6 @@ pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   )
 }
 
-pwaic_warnings <- function(p, digits = 1) {
-  badp <- p > 0.4
-  if (any(badp)) {
-    count <- sum(badp)
-    prop <- count / length(badp)
-    .warn(paste0(count, " (", .fr(100 * prop, digits),
-                 "%) p_waic estimates greater than 0.4."),
-          "\nWe recommend trying loo() instead.")
-  }
-  invisible(NULL)
-}
-
-
-# convenience functions ---------------------------------------------------
-is.loo <- function(x) {
-  inherits(x, "loo")
-}
-unlist_lapply <- function(X, FUN, ...) {
-  unlist(lapply(X, FUN, ...), use.names = FALSE)
-}
-cbind_list <- function(x) {
-  do.call(cbind, x)
-}
 
 #' Named lists
 #'

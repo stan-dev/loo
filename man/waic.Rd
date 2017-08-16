@@ -2,15 +2,18 @@
 % Please edit documentation in R/waic.R
 \name{waic}
 \alias{waic}
+\alias{waic.array}
 \alias{waic.matrix}
 \alias{waic.function}
 \title{Widely applicable information criterion (WAIC)}
 \usage{
 waic(x, ...)
 
+\method{waic}{array}(x, ...)
+
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{function}(x, ..., args)
+\method{waic}{function}(x, args, ...)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -42,6 +45,11 @@ Widely applicable information criterion (WAIC)
 }
 \section{Methods (by class)}{
 \itemize{
+\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points. For example, the object
+returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
+
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points. For example, the object returned by

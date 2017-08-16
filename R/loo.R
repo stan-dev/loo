@@ -108,26 +108,13 @@ loo <- function(x, ...) {
 #'
 loo.array <- function(x, ...) {
   psis_out <- psis.array(x, ...)
-  ll <- llarray_to_matrix(x)
-  lldim <- dim(ll)
-  lpd <- logColMeansExp(ll)
-  ll_plus_lw <- ll + weights(psis_out, normalize = TRUE, log = TRUE)
-
-  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
-  looic <- -2 * elpd_loo
-  p_loo <- lpd - elpd_loo
-  pointwise <- nlist(elpd_loo, p_loo, looic)
-
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- psis_out$pareto_k
-  structure(
-    out,
-    log_lik_dim = lldim,
-    psis_neff = psis_out$neff,
-    class = c("psis_loo", "loo")
+  pointwise <- pointwise_loo_calcs(llarray_to_matrix(x), psis_out)
+  nms <- c(names(pointwise), paste0("se_", names(pointwise)))
+  psis_loo_object(
+    stats = setNames(totals(pointwise), nms),
+    pointwise = pointwise,
+    diagnostics = psis_out[c("pareto_k", "n_eff")],
+    lldim = attr(psis_out, "log_lik_dim")
   )
 }
 
@@ -138,26 +125,13 @@ loo.array <- function(x, ...) {
 #'
 loo.matrix <- function(x, chain_id, ...) {
   psis_out <- psis.matrix(x, chain_id, ...)
-  ll <- x
-  lldim <- dim(ll)
-  lpd <- logColMeansExp(ll)
-  ll_plus_lw <- ll + weights(psis_out, normalize = TRUE, log = TRUE)
-
-  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
-  looic <- -2 * elpd_loo
-  p_loo <- lpd - elpd_loo
-  pointwise <- nlist(elpd_loo, p_loo, looic)
-
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- psis_out$pareto_k
-  structure(
-  out,
-    log_lik_dim = lldim,
-    psis_neff = psis_out$neff,
-    class = c("psis_loo", "loo")
+  pointwise <- pointwise_loo_calcs(x, psis_out)
+  nms <- c(names(pointwise), paste0("se_", names(pointwise)))
+  psis_loo_object(
+    stats = setNames(totals(pointwise), nms),
+    pointwise = pointwise,
+    diagnostics = psis_out[c("pareto_k", "n_eff")],
+    lldim = attr(psis_out, "log_lik_dim")
   )
 }
 
@@ -169,5 +143,37 @@ loo.function <- function(x, args, ...) {
   psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
   out <- pointwise_loo(psis = psis, llfun = x, llargs = args)
   structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
+}
+
+
+
+# internal ----------------------------------------------------------------
+
+# compute elpd_loo from log lik matrix and psis log weights
+# @param ll log-likelihood matrix
+# @param psis_object object returned by psis
+pointwise_loo_calcs <- function(ll, psis_object) {
+  lpd <- logColMeansExp(ll)
+  ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
+  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
+  looic <- -2 * elpd_loo
+  p_loo <- lpd - elpd_loo
+  nlist(elpd_loo, p_loo, looic)
+}
+
+# structure the object returned by the loo methods
+# @param stats named list containing scalar values elpd_loo, p_loo, looic,
+#   se_elpd_loo, se_p_loo, se_looic
+# @param pointwise named list containing vectors elpd_loo, p_loo, looic
+# @param diagnostics named list containing vector pareto_k and vector n_eff
+#
+psis_loo_object <- function(stats, pointwise, diagnostics, lldim) {
+  out <- c(stats, diagnostics)
+  out$pointwise <- do.call(cbind, pointwise)
+  structure(
+    out,
+    log_lik_dim = lldim,
+    class = c("psis_loo", "loo")
+  )
 }
 

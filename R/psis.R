@@ -24,7 +24,7 @@
 #' @return \code{psis} returns a named list of class "psis" with components
 #'   \code{lw_smooth} (smoothed but \emph{unnormalized} log weights) and
 #'   \code{pareto_k} (estimated generalized Pareto
-#'   \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{neff} (PSIS
+#'   \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{n_eff} (PSIS
 #'   effective sample size estimate). To get normalized log weights use the
 #'   \code{weights} method for objects of class "psis".
 #'
@@ -50,12 +50,12 @@ psis.array <-
            cores = getOption("loo.cores", 1)) {
     stopifnot(length(dim(x)) == 3)
     ll <- validate_ll(x)
-    rel_neff <- relative_neff(exp(ll))
+    rel_n_eff <- relative_n_eff(exp(ll))
 
     ll <- llarray_to_matrix(ll)
     do_psis(
       lw = -ll,
-      rel_neff = rel_neff,
+      rel_n_eff = rel_n_eff,
       wtrunc = wtrunc,
       cores = cores
     )
@@ -73,10 +73,10 @@ psis.matrix <-
            wtrunc = 3/4,
            cores = getOption("loo.cores", 1)) {
     ll <- validate_ll(x)
-    rel_neff <- relative_neff(exp(ll), chain_id)
+    rel_n_eff <- relative_n_eff(exp(ll), chain_id)
     do_psis(
       lw = -ll,
-      rel_neff = rel_neff,
+      rel_n_eff = rel_n_eff,
       wtrunc = wtrunc,
       cores = cores
     )
@@ -117,18 +117,18 @@ psis.function <-
 # Do PSIS given matrix of log weights
 #
 # @param lw matrix of log weights (-loglik)
-# @param rel_neff vector of relative effective sample sizes
+# @param rel_n_eff vector of relative effective sample sizes
 # @param wtrunc user's scalar wtrunc parameter
 # @param cores user's cores parameter
 #
-do_psis <- function(lw, rel_neff, wtrunc, cores) {
+do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
   stopifnot(
-    length(rel_neff) == ncol(lw),
+    length(rel_n_eff) == ncol(lw),
     cores == as.integer(cores)
   )
   N <- ncol(lw)
   S <- nrow(lw)
-  tail_len <- n_pareto(rel_neff, S)
+  tail_len <- n_pareto(rel_n_eff, S)
 
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
@@ -166,11 +166,12 @@ do_psis <- function(lw, rel_neff, wtrunc, cores) {
     norm_const_log = matrixStats::colLogSumExps(lw_smooth),
     tail_len = tail_len,
     wtrunc = wtrunc,
+    log_lik_dim = c(S, N),
     class = c("psis", "list")
   )
 
   w <- weights(out, normalize = TRUE, log = FALSE)
-  out[["neff"]] <- psis_neff(w, rel_neff)
+  out[["n_eff"]] <- psis_n_eff(w, rel_n_eff)
   return(out)
 }
 
@@ -220,8 +221,8 @@ do_psis <- function(lw, rel_neff, wtrunc, cores) {
 }
 
 # calculate tail length for PSIS
-n_pareto <- function(rel_neff, S) {
-  ceiling(pmin(0.2 * S, 3 * sqrt(S) / rel_neff))
+n_pareto <- function(rel_n_eff, S) {
+  ceiling(pmin(0.2 * S, 3 * sqrt(S) / rel_n_eff))
 }
 
 # @param x Vector of sorted tail elements

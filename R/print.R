@@ -18,7 +18,7 @@
 print.loo <- function(x, digits = 1, ...) {
   lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
   cat("Computed from", lldims, "log-likelihood matrix\n\n")
-  z <- x[-grep("pointwise|pareto_k", names(x))]
+  z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
   ses <- grepl("se", nms)
@@ -31,7 +31,7 @@ print.loo <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.waic <- function(x, digits = 1, ...) {
   print.loo(x, digits = digits, ...)
-  pwaic_warnings(x$pointwise[, "p_waic"], digits = digits)
+  throw_pwaic_warnings(x$pointwise[, "p_waic"], digits = digits)
   invisible(x)
 }
 

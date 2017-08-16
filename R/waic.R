@@ -1,6 +1,6 @@
 #' Widely applicable information criterion (WAIC)
 #'
-#' @export waic waic.matrix waic.function
+#' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
 #' @param ... Other arguments. Currently ignored.
 #'
@@ -36,24 +36,59 @@ waic <- function(x, ...) {
 
 #' @export
 #' @templateVar fn waic
+#' @template array
+#'
+waic.array <- function(x, ...) {
+  waic.matrix(llarray_to_matrix(x), ...)
+}
+
+#' @export
+#' @templateVar fn waic
 #' @template matrix
 #'
 waic.matrix <- function(x, ...) {
-  if (any(is.na(x)))
-    stop("NA log-likelihood values found.")
-  out <- pointwise_waic(log_lik = x)
-  pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
-  structure(out, log_lik_dim = dim(x), class = c("waic", "loo"))
+  ll <- validate_ll(x)
+  lldim <- dim(ll)
+  out <- pointwise_waic(log_lik = ll)
+  throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
+  waic_object(out, lldim)
 }
 
 #' @export
 #' @templateVar fn waic
 #' @template function
 #'
-waic.function <- function(x, ..., args) {
-  if (missing(args))
-    stop("'args' must be specified.")
+waic.function <- function(x, args, ...) {
+  lldim <- with(args, c(S, N))
   out <- pointwise_waic(llfun = x, llargs = args)
-  pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
-  structure(out, log_lik_dim = with(args, c(S,N)), class = c("waic", "loo"))
+  throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
+  waic_object(out, lldim)
 }
+
+
+
+# internal ----------------------------------------------------------------
+
+# structure the object returned by the waic methods
+waic_object <- function(object, log_lik_dim) {
+  structure(
+    object,
+    log_lik_dim = log_lik_dim,
+    class = c("waic", "loo")
+  )
+}
+
+# waic warnings
+# @param p 'p_waic' estimates
+throw_pwaic_warnings <- function(p, digits = 1) {
+  badp <- p > 0.4
+  if (any(badp)) {
+    count <- sum(badp)
+    prop <- count / length(badp)
+    .warn(paste0(count, " (", .fr(100 * prop, digits),
+                 "%) p_waic estimates greater than 0.4."),
+          "\nWe recommend trying loo() instead.")
+  }
+  invisible(NULL)
+}
+

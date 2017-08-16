@@ -60,7 +60,7 @@ normalized? Defaults to \code{TRUE}.}
 \code{psis} returns a named list of class "psis" with components
   \code{lw_smooth} (smoothed but \emph{unnormalized} log weights) and
   \code{pareto_k} (estimated generalized Pareto
-  \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{neff} (PSIS
+  \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{n_eff} (PSIS
   effective sample size estimate). To get normalized log weights use the
   \code{weights} method for objects of class "psis".
 

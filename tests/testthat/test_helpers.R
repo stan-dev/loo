@@ -8,13 +8,6 @@ test_that("logColMeansExp ok ", {
   expect_equal(logColMeansExp(x), log(colMeans(exp(x))))
 })
 
-test_that("cbind_list ok ", {
-  xlist <- list()
-  for (i in 1:ncol(x))
-    xlist[[i]] <- x[,i]
-  expect_identical(cbind_list(xlist), x)
-})
-
 test_that("qgpd ok ", {
   probs <- seq(from = 0, to = 1, by = 0.25)
   expect_equal(qgpd(probs), c(0, 1/3, 1, 3, Inf))
