@@ -9,6 +9,8 @@
 #' @keywords internal
 #' @export
 #' @param x A numeric vector. The sample from which to estimate the parameters.
+#' @param wip Logical indicating whether to adjust \eqn{k} based on a weakly
+#'   informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.
 #' @return A named list with components \code{k} and \code{sigma}.
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
@@ -24,7 +26,7 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-gpdfit <- function(x) {
+gpdfit <- function(x, wip = TRUE) {
   N <- length(x)
   x <- sort.int(x, method = "quick")
   prior <- 3
@@ -38,7 +40,8 @@ gpdfit <- function(x) {
   bdotw <- sum(b * w)
   k <- mean.default(log1p(-bdotw * x))
   sigma <- -k / bdotw
-  k <- adjust_k(k, n = N)
+  if (wip)
+    k <- adjust_k_wip(k, n = N)
   nlist(k, sigma)
 }
 
@@ -51,12 +54,12 @@ lx <- function(a,x) {
   log(a / k) - k - 1
 }
 
-# Adjust k based on weakly informative Gaussian prior centered on 0.5. This will
-# stabilize estimates for very small Monte Carlo sample sizes and low neff
+# Adjust k based on weakly informative prior, Gaussian centered on 0.5. This
+# will stabilize estimates for very small Monte Carlo sample sizes and low neff
 # cases.
 # @param k khat estimate
 # @param n number of tail samples used to fit GPD
-adjust_k <- function(k, n) {
+adjust_k_wip <- function(k, n) {
   a <- 10
   nplusa <- n + a
   k * n / nplusa + a * 0.5 / nplusa

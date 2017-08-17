@@ -48,7 +48,7 @@ the data required to specify the arguments to the function. See the
 specified.}
 
 \item{object}{For the \code{weights} method, an object returned by
-\code{psis}, which is a list with class "psis".}
+\code{psis} (a list with class \code{"psis"}).}
 
 \item{log}{For the \code{weights} method, should the weights be returned on
 the log scale? Defaults to \code{TRUE}.}
@@ -57,12 +57,41 @@ the log scale? Defaults to \code{TRUE}.}
 normalized? Defaults to \code{TRUE}.}
 }
 \value{
-\code{psis} returns a named list of class "psis" with components
-  \code{lw_smooth} (smoothed but \emph{unnormalized} log weights) and
-  \code{pareto_k} (estimated generalized Pareto
-  \link[=pareto-k-diagnostic]{shape parameter(s) k}) and \code{n_eff} (PSIS
-  effective sample size estimate). To get normalized log weights use the
-  \code{weights} method for objects of class "psis".
+\code{psis} returns an object of class "psis", which is a named list
+  with the following components:
+\describe{
+  \item{\code{lw_smooth}}{
+    Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
+    normalized weights use the \code{weights} method provided for objects
+    of class \code{"psis"}.
+  }
+  \item{\code{pareto_k}}{
+    Vector of estimated \link[=pareto-k-diagnostic]{shape parameter(s) k} of
+    the generalized Pareto distribution.
+  }
+  \item{\code{n_eff}}{
+    Vector of estimated PSIS effective sample size(s).
+   }
+}
+
+The returned object also has the following \code{\link{attributes}}:
+\describe{
+  \item{\code{norm_const_log}}{
+    Vector of precomputed values of \code{colLogSumExps(lw_smooth)} that are
+    used internally by the \code{weights} method to normalize the log weights.
+  }
+  \item{\code{tail_len}}{
+    Vector of tail lengths used for fitting the generalized Pareto
+    distribution.
+  }
+  \item{\code{rel_n_eff}} Vector of relative effective sample size estimates
+   of the exponentiated log-likelihood.
+}
+
+The \code{weights} method returns an object with the same dimensions as the
+\code{lw_smooth} component of the \code{"psis"} object. The \code{normalize}
+and \code{log} arguments control whether the returned weights are normalized
+and whether or not to return them on the log scale.
 
 The \code{weights} method returns a matrix, which by default is a
   matrix of normalized log weights.
