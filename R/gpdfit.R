@@ -42,6 +42,7 @@ gpdfit <- function(x, wip = TRUE) {
   sigma <- -k / bdotw
   if (wip)
     k <- adjust_k_wip(k, n = N)
+
   nlist(k, sigma)
 }
 
@@ -63,4 +64,20 @@ adjust_k_wip <- function(k, n) {
   a <- 10
   nplusa <- n + a
   k * n / nplusa + a * 0.5 / nplusa
+}
+
+
+# inverse CDF of generalized pareto distribution
+# (assuming location parameter is 0)
+#
+# @param p vector of probabilities
+# @param k scalar shape parameter
+# @param sigma scalar scale parameter
+# @return vector of quantiles
+#
+qgpd <- function(p, k, sigma) {
+  if (is.nan(sigma) || sigma <= 0)
+    return(rep(NaN, length(p)))
+
+  sigma * expm1(-k * log1p(-p)) / k
 }

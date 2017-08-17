@@ -72,8 +72,9 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       exp_cutoff <- exp(cutoff)
       fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE)
       k <- fit$k
+      sigma <- fit$sigma
       prb <- (seq_len(tail_len) - 0.5) / tail_len
-      qq <- qgpd(p = prb, xi = k, sigma = fit$sigma) + exp_cutoff
+      qq <- qgpd(prb, k, sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
       x_new <- x
@@ -176,16 +177,6 @@ lw_truncate <- function(y, wtrunc) {
 #' @importFrom matrixStats logSumExp
 lw_normalize <- function(y) {
   y - logSumExp(y)
-}
-
-# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (is.nan(sigma) || sigma <= 0)
-    return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
-
-  mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
 

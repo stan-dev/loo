@@ -8,19 +8,6 @@ test_that("logColMeansExp ok ", {
   expect_equal(logColMeansExp(x), log(colMeans(exp(x))))
 })
 
-test_that("qgpd ok ", {
-  probs <- seq(from = 0, to = 1, by = 0.25)
-  expect_equal(qgpd(probs), c(0, 1/3, 1, 3, Inf))
-  expect_true(all(is.nan(qgpd(probs, sigma = 0))))
-})
-
-test_that("nlist ok", {
-  a <- 1; b <- 2; c <- 3;
-  nlist_val <- list(nlist(a, b, c), nlist(a, b, c = "tornado"))
-  nlist_ans <- list(list(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = "tornado"))
-  expect_equal(nlist_val, nlist_ans)
-})
-
 test_that("totals ok", {
   xlist <- as.list(as.data.frame(x))
   totals_val <- unlist(totals(xlist))
@@ -29,4 +16,11 @@ test_that("totals ok", {
                   3.71159858705083, 4.28135710233064, 4.3518632175463,
                   3.70738038006634)
   expect_equal(totals_val, totals_ans)
+})
+
+test_that("nlist ok", {
+  a <- 1; b <- 2; c <- 3;
+  nlist_val <- list(nlist(a, b, c), nlist(a, b, c = "tornado"))
+  nlist_ans <- list(list(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = "tornado"))
+  expect_equal(nlist_val, nlist_ans)
 })

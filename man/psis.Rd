@@ -57,8 +57,8 @@ the log scale? Defaults to \code{TRUE}.}
 normalized? Defaults to \code{TRUE}.}
 }
 \value{
-\code{psis} returns an object of class "psis", which is a named list
-  with the following components:
+The \code{psis} methods return an object of class \code{"psis"},
+  which is a named list with the following components:
 \describe{
   \item{\code{lw_smooth}}{
     Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
@@ -74,7 +74,8 @@ normalized? Defaults to \code{TRUE}.}
    }
 }
 
-The returned object also has the following \code{\link{attributes}}:
+Objects of class \code{"psis"} also have the following
+\code{\link{attributes}}:
 \describe{
   \item{\code{norm_const_log}}{
     Vector of precomputed values of \code{colLogSumExps(lw_smooth)} that are
@@ -84,17 +85,20 @@ The returned object also has the following \code{\link{attributes}}:
     Vector of tail lengths used for fitting the generalized Pareto
     distribution.
   }
-  \item{\code{rel_n_eff}} Vector of relative effective sample size estimates
-   of the exponentiated log-likelihood.
+  \item{\code{rel_n_eff}}{
+    Vector of relative effective sample size estimates of the exponentiated
+    log-likelihood.
+  }
+  \item{\code{log_lik_dim}}{
+    Integer vector of length 2 containing \code{S} (posterior sample size)
+    and \code{N} (number of observations).
+  }
 }
 
-The \code{weights} method returns an object with the same dimensions as the
-\code{lw_smooth} component of the \code{"psis"} object. The \code{normalize}
-and \code{log} arguments control whether the returned weights are normalized
-and whether or not to return them on the log scale.
-
-The \code{weights} method returns a matrix, which by default is a
-  matrix of normalized log weights.
+The \code{weights} method returns an object with the same dimensions
+  as the \code{lw_smooth} component of the \code{"psis"} object. The
+  \code{normalize} and \code{log} arguments control whether the returned
+  weights are normalized and whether or not to return them on the log scale.
 }
 \description{
 Implementation of Pareto smoothed importance sampling, a method for

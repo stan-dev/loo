@@ -21,8 +21,8 @@
 #'   \strong{Methods (by class)} section below for how \code{args} should be
 #'   specified.
 #'
-#' @return \code{psis} returns an object of class "psis", which is a named list
-#'   with the following components:
+#' @return The \code{psis} methods return an object of class \code{"psis"},
+#'   which is a named list with the following components:
 #' \describe{
 #'   \item{\code{lw_smooth}}{
 #'     Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
@@ -38,7 +38,8 @@
 #'    }
 #' }
 #'
-#' The returned object also has the following \code{\link{attributes}}:
+#' Objects of class \code{"psis"} also have the following
+#' \code{\link{attributes}}:
 #' \describe{
 #'   \item{\code{norm_const_log}}{
 #'     Vector of precomputed values of \code{colLogSumExps(lw_smooth)} that are
@@ -51,6 +52,10 @@
 #'   \item{\code{rel_n_eff}}{
 #'     Vector of relative effective sample size estimates of the exponentiated
 #'     log-likelihood.
+#'   }
+#'   \item{\code{log_lik_dim}}{
+#'     Integer vector of length 2 containing \code{S} (posterior sample size)
+#'     and \code{N} (number of observations).
 #'   }
 #' }
 #'
@@ -144,26 +149,28 @@ psis.function <-
 #
 # @param lw matrix of log weights (-loglik)
 # @param rel_n_eff vector of relative effective sample sizes
-# @param wtrunc user's scalar wtrunc parameter
-# @param cores user's cores parameter
+# @param wtrunc user's scalar wtrunc argument
+# @param cores user's integer cores argument
+# @return A list with class "psis" and structure described in the main doc at
+#   the top of this file.
 #
 do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
-  stopifnot(
-    length(rel_n_eff) == ncol(lw),
-    cores == as.integer(cores)
-  )
+  stopifnot(length(rel_n_eff) == ncol(lw),
+            cores == as.integer(cores),
+            wtrunc >= 0)
   N <- ncol(lw)
   S <- nrow(lw)
   tail_len <- n_pareto(rel_n_eff, S)
 
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
-      .psis_i(lw[, i], tail_len[i]))
+      do_psis_i(lw[, i], tail_len[i]))
   } else {
     if (.Platform$OS.type != "windows") {
       lw_list <- mclapply(
         X = seq_len(N),
-        FUN = function(i) .psis_i(lw[, i], tail_len[i]),
+        FUN = function(i)
+          do_psis_i(lw[, i], tail_len[i]),
         mc.cores = cores
       )
     } else {
@@ -173,34 +180,78 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
         parLapply(
           cl = cl,
           X = seq_len(N),
-          fun = function(i) .psis_i(lw[, i], tail_len[i])
+          fun = function(i)
+            do_psis_i(lw[, i], tail_len[i])
         )
     }
   }
 
+  k_hats <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
+  throw_psis_warnings(k_hats)
+
   lw_smooth <- vapply(lw_list, "[[", "lw", FUN.VALUE = numeric(S))
   if (wtrunc > 0) {
-    lw_smooth <- apply(lw_smooth, 2, "truncate_lw",
-                       logS = log(S), wtrunc = wtrunc)
+    lw_smooth <- apply(
+      lw_smooth,
+      MARGIN = 2,
+      FUN = truncate_lw,
+      logS = log(S),
+      wtrunc = wtrunc
+    )
   }
 
-  pareto_k <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
-  throw_psis_warnings(pareto_k)
-
-  out <- structure(
-    nlist(lw_smooth, pareto_k),
-    norm_const_log = matrixStats::colLogSumExps(lw_smooth),
+  psis_object(
+    unnormalized_log_weights = lw_smooth,
+    pareto_k = k_hats,
     tail_len = tail_len,
     rel_n_eff = rel_n_eff,
-    wtrunc = wtrunc,
-    log_lik_dim = c(S, N),
-    class = c("psis", "list")
+    wtrunc = wtrunc
   )
-
-  w <- weights(out, normalize = TRUE, log = FALSE)
-  out[["n_eff"]] <- psis_n_eff(w, rel_n_eff)
-  return(out)
 }
+
+# Structure the object returned by the psis methods
+#
+# @param unnormalized_log_weights Smoothed and possibly truncated log weights,
+#   but unnormalized.
+# @param pareto_k Vector of GPD k estimates.
+# @param tail_len Vector of tail lengths used to fit GPD.
+# @param rel_n_eff Vector of relative MCMC n_eff for exp(log lik)
+# @param wtrunc User's wtrunc argument.
+# @return A list of class "psis" with structure described in the main doc at the
+#   top of this file.
+#
+psis_object <-
+  function(unnormalized_log_weights,
+           pareto_k,
+           tail_len,
+           rel_n_eff,
+           wtrunc) {
+    stopifnot(is.matrix(unnormalized_log_weights))
+
+    lldim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
+    norm_const_log <-
+      matrixStats::colLogSumExps(unnormalized_log_weights)
+
+    out <- structure(
+      list(
+        lw_smooth = unnormalized_log_weights,
+        pareto_k = pareto_k
+      ),
+      # attributes
+      norm_const_log = norm_const_log,
+      tail_len = tail_len,
+      rel_n_eff = rel_n_eff,
+      wtrunc = wtrunc,
+      log_lik_dim = lldim,
+      class = c("psis", "list")
+    )
+
+    # need weights (normalized and not log weights) to compute psis_n_eff
+    w <- weights(out, normalize = TRUE, log = FALSE)
+    out[["n_eff"]] <- psis_n_eff(w, rel_n_eff)
+    return(out)
+  }
+
 
 # PSIS (without truncation and normalization) on a single vector
 #
@@ -209,7 +260,7 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
 # @return list containing lw (vector of untruncated and unnormalized log
 #   weights), and pareto_k ('khat' estimate).
 #
-.psis_i <- function(lw_i, tail_len_i) {
+do_psis_i <- function(lw_i, tail_len_i) {
   S <- length(lw_i)
   lw_i <- lw_i - max(lw_i)
 
@@ -247,62 +298,87 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
   )
 }
 
-# calculate tail length for PSIS
-n_pareto <- function(rel_n_eff, S) {
-  ceiling(pmin(0.2 * S, 3 * sqrt(S) / rel_n_eff))
-}
 
-# @param x Vector of sorted tail elements
+# PSIS tail smoothing for a single vector
+#
+# @param x Vector of tail elements already sorted in ascending order.
+# @return List with components 'tail' (vector same size as x) and 'k' (scalar
+#   shape parameter estimate).
+# The 'tail' component contains the logs of the order statistics of the GPD.
+#
 psis_smooth_tail <- function(x) {
-  tail_len <- length(x)
+  len <- length(x)
   exp_cutoff <- exp(x[1])
   fit <- gpdfit(exp(x) - exp_cutoff)
   k <- fit$k
   sigma <- fit$sigma
 
-  prb <- (seq_len(tail_len) - 0.5) / tail_len
-  qq <- qgpd(p = prb, xi = k, sigma = sigma) + exp_cutoff
+  p <- (seq_len(len) - 0.5) / len
+  qq <- qgpd(p, k, sigma) + exp_cutoff
   list(tail = log(qq), k = k)
 }
 
-# Truncate (log) weights
+
+# Calculate tail lengths to use for fitting the GPD
 #
-# @param x vector of log weights
-# @param logS precomputed log(length(x))
-# @param wtrunc user's wtrunc parameter
+# The number of weights (i.e., tail length) used to fit the generalized Pareto
+# distribution is now decreasing with the number of posterior draws S, and is
+# also adjusted based on the relative MCMC neff for exp(log_lik). This will
+# answer the questions about the asymptotic properties, works better for thick
+# tailed proposal distributions, and is adjusted based on dependent Markov chain
+# samples. Specifically, the tail length is now 3*sqrt(S)/rel_neff but capped at
+# 20% of the total number of weights.
+#
+# @param rel_n_eff A N-vector of relative MCMC effective sample sizes of
+#   exp(log-lik matrix).
+# @param S The (integer) size of posterior sample.
+# @return An N-vector of tail lengths.
+#
+n_pareto <- function(rel_n_eff, S) {
+  n <- pmin(0.2 * S, 3 * sqrt(S) / rel_n_eff)
+  ceiling(n)
+}
+
+# Check for enough tail samples to fit GPD
+#
+# @param tail_len Integer tail length.
+# @param min_len The minimum allowed tail length.
+# @return TRUE or FALSE
+#
+enough_tail_samples <- function(tail_len, min_len = 5) {
+  tail_len >= min_len
+}
+
+
+# Truncate a vector of (log) weights
+#
+# @param x A vector of log weights.
+# @param logS Precomputed scalar log(length(x)).
+# @param wtrunc User's scalar wtrunc parameter.
+# @return x, but modified so all values above the truncation value are set equal
+#   to the truncation value.
+#
 truncate_lw <- function(x, logS, wtrunc) {
   lwtrunc <- wtrunc * logS - logS + logSumExp(x)
   x[x > lwtrunc] <- lwtrunc
   return(x)
 }
 
-# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <-
-  function(p,
-           xi = 1,
-           mu = 0,
-           sigma = 1,
-           lower.tail = TRUE) {
-    if (is.nan(sigma) || sigma <= 0)
-      return(rep(NaN, length(p)))
-    if (!lower.tail)
-      p <- 1 - p
 
-    return(mu + sigma * ((1 - p)^(-xi) - 1) / xi)
-  }
-
-# check if enough tail samples to fit generalized pareto distribution
-enough_tail_samples <- function(tail_len, min_len = 5) {
-  tail_len >= min_len
-}
-
-
-# warnings about pareto k values ------------------------------------------
-throw_psis_warnings <- function(k) {
-  if (any(k > 0.7)) {
-    .warn("Some Pareto k diagnostic values are too high. ", .k_help())
-  } else if (any(k > 0.5)) {
-    .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
+# Throw warnings about pareto k estimates
+#
+# @param k A vector of pareto k estimates.
+# @param high The value at which to warn about slighly high estimates.
+# @param too_high The value at which to warn about very high estimates.
+# @return Nothing, just possibly throws warnings.
+#
+throw_psis_warnings <- function(k, high = 0.5, too_high = 0.7) {
+  if (any(k > too_high)) {
+    .warn("Some Pareto k diagnostic values are too high. ",
+          .k_help())
+  } else if (any(k > high)) {
+    .warn("Some Pareto k diagnostic values are slightly high. ",
+          .k_help())
   }
 }
 
