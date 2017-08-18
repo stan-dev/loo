@@ -59,8 +59,9 @@ normalized? Defaults to \code{TRUE}.}
 \value{
 The \code{psis} methods return an object of class \code{"psis"},
   which is a named list with the following components:
+
 \describe{
-  \item{\code{lw_smooth}}{
+  \item{\code{log_weights}}{
     Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
     normalized weights use the \code{weights} method provided for objects
     of class \code{"psis"}.
@@ -71,14 +72,14 @@ The \code{psis} methods return an object of class \code{"psis"},
   }
   \item{\code{n_eff}}{
     Vector of estimated PSIS effective sample size(s).
-   }
+  }
 }
 
 Objects of class \code{"psis"} also have the following
 \code{\link{attributes}}:
 \describe{
   \item{\code{norm_const_log}}{
-    Vector of precomputed values of \code{colLogSumExps(lw_smooth)} that are
+    Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
     used internally by the \code{weights} method to normalize the log weights.
   }
   \item{\code{tail_len}}{
@@ -96,7 +97,7 @@ Objects of class \code{"psis"} also have the following
 }
 
 The \code{weights} method returns an object with the same dimensions
-  as the \code{lw_smooth} component of the \code{"psis"} object. The
+  as the \code{log_weights} component of the \code{"psis"} object. The
   \code{normalize} and \code{log} arguments control whether the returned
   weights are normalized and whether or not to return them on the log scale.
 }

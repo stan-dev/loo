@@ -23,8 +23,9 @@
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:
+#'
 #' \describe{
-#'   \item{\code{lw_smooth}}{
+#'   \item{\code{log_weights}}{
 #'     Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
 #'     normalized weights use the \code{weights} method provided for objects
 #'     of class \code{"psis"}.
@@ -35,14 +36,14 @@
 #'   }
 #'   \item{\code{n_eff}}{
 #'     Vector of estimated PSIS effective sample size(s).
-#'    }
+#'   }
 #' }
 #'
 #' Objects of class \code{"psis"} also have the following
 #' \code{\link{attributes}}:
 #' \describe{
 #'   \item{\code{norm_const_log}}{
-#'     Vector of precomputed values of \code{colLogSumExps(lw_smooth)} that are
+#'     Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
 #'     used internally by the \code{weights} method to normalize the log weights.
 #'   }
 #'   \item{\code{tail_len}}{
@@ -143,6 +144,37 @@ psis.function <-
   }
 
 
+#' @rdname psis
+#' @export
+#' @method weights psis
+#' @param object For the \code{weights} method, an object returned by
+#'   \code{psis} (a list with class \code{"psis"}).
+#' @param log For the \code{weights} method, should the weights be returned on
+#'   the log scale? Defaults to \code{TRUE}.
+#' @param normalize For the \code{weights} method, should the weights be
+#'   normalized? Defaults to \code{TRUE}.
+#'
+#' @return The \code{weights} method returns an object with the same dimensions
+#'   as the \code{log_weights} component of the \code{"psis"} object. The
+#'   \code{normalize} and \code{log} arguments control whether the returned
+#'   weights are normalized and whether or not to return them on the log scale.
+#'
+weights.psis <-
+  function(object,
+           ...,
+           log = TRUE,
+           normalize = TRUE) {
+    out <- object[["log_weights"]]  # smoothed but unnormalized log weights
+    const <- attr(object, "norm_const_log")  # precomputed colLogSumExp(log_weights)
+    if (normalize)
+      out <- sweep(out, 2, const)
+    if (!log)
+      out <- exp(out)
+
+    return(out)
+  }
+
+
 # internal ----------------------------------------------------------------
 
 # Do PSIS given matrix of log weights
@@ -186,13 +218,13 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
     }
   }
 
-  k_hats <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
-  throw_psis_warnings(k_hats)
+  pareto_k <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
+  throw_psis_warnings(pareto_k)
 
-  lw_smooth <- vapply(lw_list, "[[", "lw", FUN.VALUE = numeric(S))
+  log_weights <- vapply(lw_list, "[[", "log_weights", FUN.VALUE = numeric(S))
   if (wtrunc > 0) {
-    lw_smooth <- apply(
-      lw_smooth,
+    log_weights <- apply(
+      log_weights,
       MARGIN = 2,
       FUN = truncate_lw,
       logS = log(S),
@@ -201,8 +233,8 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
   }
 
   psis_object(
-    unnormalized_log_weights = lw_smooth,
-    pareto_k = k_hats,
+    unnormalized_log_weights = log_weights,
+    pareto_k = pareto_k,
     tail_len = tail_len,
     rel_n_eff = rel_n_eff,
     wtrunc = wtrunc
@@ -234,7 +266,7 @@ psis_object <-
 
     out <- structure(
       list(
-        lw_smooth = unnormalized_log_weights,
+        log_weights = unnormalized_log_weights,
         pareto_k = pareto_k
       ),
       # attributes
@@ -255,7 +287,7 @@ psis_object <-
 
 # PSIS (without truncation and normalization) on a single vector
 #
-# @param lw_i A vector of log weights.
+# @param lw_i A vector of log weights (negative log likelihood).
 # @param tail_len_i An integer tail length.
 # @return list containing lw (vector of untruncated and unnormalized log
 #   weights), and pareto_k ('khat' estimate).
@@ -263,39 +295,32 @@ psis_object <-
 do_psis_i <- function(lw_i, tail_len_i) {
   S <- length(lw_i)
   lw_i <- lw_i - max(lw_i)
+  khat <- Inf
 
   if (!enough_tail_samples(tail_len_i)) {
     warning(
-      "Too few tail samples to fit generalized Pareto distribution.\n",
-      "Weights will be truncated but not smoothed.",
+      "Too few tail samples to fit generalized Pareto distribution. ",
+      "Weights will be truncated (if wtrunc > 0) but not smoothed.",
       call. = FALSE
     )
-    lw_new <- lw_i
-    k <- Inf
   } else {
     tail_ids <- seq(S - tail_len_i + 1, S)
     ord <- sort.int(lw_i, index.return = TRUE)
     lw_tail <- ord$x[tail_ids]
     if (all(lw_tail == lw_tail[1])) {
       warning(
-        "All tail values are the same.\n",
-        "Weights are truncated but not smoothed.",
+        "All tail values are the same. ",
+        "Weights will be truncated (if wtrunc > 0) but not smoothed.",
         call. = FALSE
       )
-      lw_new <- lw_i
-      k <- Inf
     } else {
       smoothed <- psis_smooth_tail(lw_tail)
       ord$x[tail_ids] <- smoothed$tail
-      k <- smoothed$k
-      lw_new <- ord$x[ord$ix]
+      khat <- smoothed$k
+      lw_i <- ord$x[ord$ix]
     }
   }
-
-  structure(
-    list(lw = lw_new, pareto_k = k),
-    class = c("psis_i", "list")
-  )
+  list(log_weights = lw_i, pareto_k = khat)
 }
 
 
@@ -382,33 +407,3 @@ throw_psis_warnings <- function(k, high = 0.5, too_high = 0.7) {
   }
 }
 
-
-#' @rdname psis
-#' @export
-#' @method weights psis
-#' @param object For the \code{weights} method, an object returned by
-#'   \code{psis} (a list with class \code{"psis"}).
-#' @param log For the \code{weights} method, should the weights be returned on
-#'   the log scale? Defaults to \code{TRUE}.
-#' @param normalize For the \code{weights} method, should the weights be
-#'   normalized? Defaults to \code{TRUE}.
-#'
-#' @return The \code{weights} method returns an object with the same dimensions
-#'   as the \code{lw_smooth} component of the \code{"psis"} object. The
-#'   \code{normalize} and \code{log} arguments control whether the returned
-#'   weights are normalized and whether or not to return them on the log scale.
-#'
-weights.psis <-
-  function(object,
-           ...,
-           log = TRUE,
-           normalize = TRUE) {
-    out <- object[["lw_smooth"]] # smoothed but unnormalized log weights
-    const <- attr(object, "norm_const_log") # precomputed colLogSumExp(lw_smooth)
-    if (normalize)
-      out <- sweep(out, 2, const)
-    if (!log)
-      out <- exp(out)
-
-    return(out)
-  }
