@@ -1,4 +1,4 @@
-#' Print method for 'loo' objects
+#' Print methods
 #'
 #' @export
 #' @param x A list with class \code{'loo'} (as returned by \code{\link{loo}} or

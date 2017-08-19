@@ -17,20 +17,22 @@ loo(x, ...)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description of how to specify
-\code{x}.}
+(by class)} section below for a detailed description of how to specify the
+inputs for each method.}
 
-\item{...}{Optional arguments to pass to \code{\link{psis}}. Possible
+\item{...}{Optional arguments passed on to \code{\link{psis}}. Possible
   arguments and their defaults are:
 \describe{
- \item{\code{wtrunc = 3/4}}{For truncating very large weights to
-   \eqn{S}^\code{wtrunc} (set to zero for no truncation).
-   We recommend the default value unless there are problems.}
+ \item{\code{wtrunc = 3/4}}{
+  For truncating very large weights to \eqn{S}^\code{wtrunc} (set to zero
+  for no truncation). We recommend the default value unless there are
+  problems.
+ }
  \item{\code{cores = getOption("loo.cores", 1)}}{
-  The number of cores to use for parallelization. The default for
-  an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-  of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
-  recommend using as many (or close to as many) cores as possible.
+  The number of cores to use for parallelization. The default for an entire R
+  session can be set with \code{options(loo.cores = NUMBER)}. As of \pkg{loo}
+  version \code{2.0.0}, \strong{the default is 1 core}, but we recommend
+  using as many (or close to as many) cores as possible.
  }
 }}
 
@@ -49,17 +51,17 @@ specified.}
 A named list with class \code{c("psis_loo", "loo")} and components:
 \describe{
  \item{\code{estimates}}{
- A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
- (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
- estimates and standard errors of the expected log pointwise predictive
- density (\code{elpd_loo}), the effective number of parameters (\code{p_loo})
- and the LOO information criterion \code{looic} (which is just \code{-2 *
- elpd_loo}, i.e., converted to deviance scale).
+  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
+  (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
+  estimates and standard errors of the expected log pointwise predictive
+  density (\code{elpd_loo}), the effective number of parameters
+  (\code{p_loo}) and the LOO information criterion \code{looic} (which is
+  just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
  }
  \item{\code{pointwise}}{
- A matrix with three columns (and number of rows equal to the number of
- observations) containing the pointwise contributions of each of the above
- measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
+  A matrix with three columns (and number of rows equal to the number of
+  observations) containing the pointwise contributions of each of the above
+  measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
  }
  \item{\code{diagnostics}}{
  A named list containing two vectors:
@@ -163,13 +165,12 @@ Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{psis}} for the underlying Pareto Smoothed Importance Sampling
-(PSIS) procedure used for approximating LOO.
-
-\code{\link{pareto-k-diagnostic}} for convenience functions for looking at
-diagnostics.
-
-\code{\link{compare}} for model comparison.
-
-\code{\link{print.loo}} for the \code{print} method for \code{'loo'} objects.
+\itemize{
+ \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
+ Sampling (PSIS) procedure used in the LOO-CV approximation.
+ \item \link{pareto-k-diagnostic} for convenience functions for looking at
+ diagnostics.
+ \item \code{\link{compare}} for model comparison.
+ \item \code{\link{print.loo}} for info on the \code{print} method.
+}
 }

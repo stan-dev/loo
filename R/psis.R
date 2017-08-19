@@ -7,14 +7,15 @@
 #'
 #' @export
 #' @param x A log-likelihood array, matrix, vector, or function. See the
-#'   \strong{Methods (by class)} section below for a detailed description.
+#'   \strong{Methods (by class)} section below for a detailed description of how
+#'   to specify the inputs for each method.
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
 #'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
 #'   no truncation. The default is \code{0.75}.
 #' @param cores The number of cores to use for parallelization. The default for
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-#'   of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
-#'   recommend using as many (or close to as many) cores as possible.
+#'   of \pkg{loo} version \code{2.0.0} the \strong{default is now 1 core}, but
+#'   we recommend using as many (or close to as many) cores as possible.
 #'
 #' @param args Only required if \code{x} is a function. A list containing
 #'   the data required to specify the arguments to the function. See the
@@ -66,8 +67,6 @@
 #'
 #' @template loo-and-psis-references
 #'
-#' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
-#'
 psis <- function(x, ...) UseMethod("psis")
 
 #' @export
@@ -117,7 +116,7 @@ psis.matrix <-
 #' @describeIn psis
 #' A vector of length \eqn{S} (posterior sample size).
 #'
-psis.numeric <-
+psis.default <-
   function(x,
            chain_id,
            ...,
@@ -141,6 +140,7 @@ psis.function <-
            ...,
            wtrunc = 3/4) {
     stop("TODO: implement psis.function")
+    # psislw(..., llfun = x, llargs = args)
   }
 
 
@@ -199,17 +199,17 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
       do_psis_i(lw[, i], tail_len[i]))
   } else {
     if (.Platform$OS.type != "windows") {
-      lw_list <- mclapply(
+      lw_list <- parallel::mclapply(
         X = seq_len(N),
         FUN = function(i)
           do_psis_i(lw[, i], tail_len[i]),
         mc.cores = cores
       )
     } else {
-      cl <- makePSOCKcluster(cores)
-      on.exit(stopCluster(cl))
+      cl <- parallel::makePSOCKcluster(cores)
+      on.exit(parallel::stopCluster(cl))
       lw_list <-
-        parLapply(
+        parallel::parLapply(
           cl = cl,
           X = seq_len(N),
           fun = function(i)

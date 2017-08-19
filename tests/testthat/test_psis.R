@@ -41,7 +41,7 @@ test_that("psis throws correct errors", {
   )
 })
 
-test_that("function and matrix methods return same result", {
+test_that("old psislw function and matrix methods return same result", {
   set.seed(024)
 
   # fake data and posterior draws
@@ -54,11 +54,11 @@ test_that("function and matrix methods return same result", {
   llfun <- function(i, data, draws) {
     dbinom(data$y, size = data$K, prob = draws, log = TRUE)
   }
-  psis_with_fn <- psis(llfun, args = nlist(data, draws, N, S))
+  psislw_with_fn <- psislw(llfun = llfun, llargs = nlist(data, draws, N, S))
 
   # Check that we get same answer if using log-likelihood matrix
   log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-  psis_with_mat <- loo(log_lik_mat)
-  expect_equal(psis_with_mat, psis_with_fn)
+  psislw_with_mat <- psislw(-log_lik_mat)
+  expect_equal(psislw_with_fn, psislw_with_mat)
 })
 

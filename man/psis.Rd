@@ -4,7 +4,7 @@
 \alias{psis}
 \alias{psis.array}
 \alias{psis.matrix}
-\alias{psis.numeric}
+\alias{psis.default}
 \alias{psis.function}
 \alias{weights.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
@@ -17,7 +17,7 @@ psis(x, ...)
 \method{psis}{matrix}(x, chain_id, ..., wtrunc = 3/4,
   cores = getOption("loo.cores", 1))
 
-\method{psis}{numeric}(x, chain_id, ..., wtrunc = 3/4)
+\method{psis}{default}(x, chain_id, ..., wtrunc = 3/4)
 
 \method{psis}{function}(x, args, ..., wtrunc = 3/4)
 
@@ -25,7 +25,8 @@ psis(x, ...)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, vector, or function. See the
-\strong{Methods (by class)} section below for a detailed description.}
+\strong{Methods (by class)} section below for a detailed description of how
+to specify the inputs for each method.}
 
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
 where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
@@ -33,8 +34,8 @@ no truncation. The default is \code{0.75}.}
 
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-of \pkg{loo} version \code{2.0.0}, \strong{the default is 1 core}, but we
-recommend using as many (or close to as many) cores as possible.}
+of \pkg{loo} version \code{2.0.0} the \strong{default is now 1 core}, but
+we recommend using as many (or close to as many) cores as possible.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in
@@ -119,7 +120,7 @@ of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points. For example, the object returned by
 \code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
-\item \code{numeric}: A vector of length \eqn{S} (posterior sample size).
+\item \code{default}: A vector of length \eqn{S} (posterior sample size).
 
 \item \code{function}: A function \eqn{f} that takes arguments \code{i},
   \code{data}, and \code{draws} and returns a vector containing the

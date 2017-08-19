@@ -39,14 +39,14 @@ test_that("function and matrix methods return same result", {
   llfun <- function(i, data, draws) {
     dbinom(data$y, size = data$K, prob = draws, log = TRUE)
   }
-  loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S))
+  # loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S))
   waic_with_fn <- waic(llfun, args = nlist(data, draws, N, S))
 
   # Check that we get same answer if using log-likelihood matrix
   log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-  loo_with_mat <- loo(log_lik_mat)
+  # loo_with_mat <- loo(log_lik_mat)
   waic_with_mat <- waic(log_lik_mat)
-  expect_equal(loo_with_mat, loo_with_fn)
+  # expect_equal(loo_with_mat, loo_with_fn)
   expect_equal(waic_with_mat, waic_with_fn)
 })
 

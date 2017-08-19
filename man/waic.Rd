@@ -17,8 +17,8 @@ waic(x, ...)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description of how to specify
-\code{x}.}
+(by class)} section below for a detailed description of how to specify the
+inputs for each method.}
 
 \item{...}{Currently ignored.}
 
