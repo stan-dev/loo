@@ -17,7 +17,8 @@ loo(x, ...)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description.}
+(by class)} section below for a detailed description of how to specify
+\code{x}.}
 
 \item{...}{Optional arguments to pass to \code{\link{psis}}. Possible
   arguments and their defaults are:

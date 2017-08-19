@@ -4,7 +4,7 @@
 \alias{psis}
 \alias{psis.array}
 \alias{psis.matrix}
-\alias{psis.vector}
+\alias{psis.numeric}
 \alias{psis.function}
 \alias{weights.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
@@ -17,15 +17,15 @@ psis(x, ...)
 \method{psis}{matrix}(x, chain_id, ..., wtrunc = 3/4,
   cores = getOption("loo.cores", 1))
 
-\method{psis}{vector}(x, chain_id, ..., wtrunc = 3/4)
+\method{psis}{numeric}(x, chain_id, ..., wtrunc = 3/4)
 
 \method{psis}{function}(x, args, ..., wtrunc = 3/4)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description.}
+\item{x}{A log-likelihood array, matrix, vector, or function. See the
+\strong{Methods (by class)} section below for a detailed description.}
 
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
 where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
@@ -119,7 +119,7 @@ of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points. For example, the object returned by
 \code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
-\item \code{vector}: A vector of length \eqn{S} (posterior sample size).
+\item \code{numeric}: A vector of length \eqn{S} (posterior sample size).
 
 \item \code{function}: A function \eqn{f} that takes arguments \code{i},
   \code{data}, and \code{draws} and returns a vector containing the

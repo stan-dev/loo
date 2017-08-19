@@ -6,8 +6,8 @@
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export
-#' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
-#'   (by class)} section below for a detailed description.
+#' @param x A log-likelihood array, matrix, vector, or function. See the
+#'   \strong{Methods (by class)} section below for a detailed description.
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
 #'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
 #'   no truncation. The default is \code{0.75}.
@@ -117,11 +117,12 @@ psis.matrix <-
 #' @describeIn psis
 #' A vector of length \eqn{S} (posterior sample size).
 #'
-psis.vector <-
+psis.numeric <-
   function(x,
            chain_id,
            ...,
            wtrunc = 3/4) {
+    stopifnot(is.null(dim(x)) || length(dim(x)) == 1)
     ll <- validate_ll(x)
     dim(ll) <- c(length(ll), 1)
     psis.matrix(x = ll,
@@ -382,8 +383,8 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #   to the truncation value.
 #
 truncate_lw <- function(x, logS, wtrunc) {
-  lwtrunc <- wtrunc * logS - logS + logSumExp(x)
-  x[x > lwtrunc] <- lwtrunc
+  val <- wtrunc * logS - logS + logSumExp(x)
+  x[x > val] <- val
   return(x)
 }
 

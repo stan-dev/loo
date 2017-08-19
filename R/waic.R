@@ -55,7 +55,7 @@ waic.matrix <- function(x, ...) {
   ll <- validate_ll(x)
   lldim <- dim(ll)
   pointwise <- pointwise_waic(log_lik = ll)
-  throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
+  throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
   waic_object(pointwise, lldim)
 }
 
@@ -66,7 +66,7 @@ waic.matrix <- function(x, ...) {
 waic.function <- function(x, args, ...) {
   lldim <- with(args, c(S, N))
   pointwise <- pointwise_waic(llfun = x, llargs = args)
-  throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
+  throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
   waic_object(pointwise, lldim)
 }
 
@@ -92,8 +92,8 @@ throw_pwaic_warnings <- function(p, digits = 1) {
     count <- sum(badp)
     prop <- count / length(badp)
     .warn(paste0(count, " (", .fr(100 * prop, digits),
-                 "%) p_waic estimates greater than 0.4."),
-          "\nWe recommend trying loo() instead.")
+                 "%) p_waic estimates greater than 0.4. "),
+          "We recommend trying loo instead.")
   }
   invisible(NULL)
 }

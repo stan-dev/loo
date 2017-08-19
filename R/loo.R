@@ -6,7 +6,8 @@
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
-#'   (by class)} section below for a detailed description.
+#'   (by class)} section below for a detailed description of how to specify
+#'   \code{x}.
 #' @param args Only required if \code{x} is a function. A list containing
 #'   the data required to specify the arguments to the function. See the
 #'   \strong{Methods (by class)} section below for how \code{args} should be
