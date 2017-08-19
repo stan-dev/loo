@@ -46,23 +46,29 @@ specified.}
 }
 \value{
 A named list with class \code{c("psis_loo", "loo")} and components:
-
 \describe{
- \item{\code{elpd_loo, se_elpd_loo}}{Expected log pointwise predictive density
-   and standard error.}
- \item{\code{p_loo, se_p_loo}}{Estimated effective number of parameters and
-   standard error.}
- \item{\code{looic, se_looic}}{The LOO information criterion
-   (\code{-2*elpd_loo}, i.e., converted to deviance scale) and standard
-   error.}
- \item{\code{pointwise}}{A matrix containing the pointwise contributions of each
-   of the above measures.}
- \item{\code{pareto_k}}{A vector containing the estimates of the shape
-   parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
-   for each leave-one-out distribution. See PSIS-LOO section in
-   \code{\link{loo-package}} for details about interpreting \eqn{k}.
-   (By default, the \code{\link[=print.loo]{print}} method for \code{'loo'}
-   objects will also provide warnings about problematic values of \eqn{k}.)}
+ \item{\code{estimates}}{
+ A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
+ (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
+ estimates and standard errors of the expected log pointwise predictive
+ density (\code{elpd_loo}), the effective number of parameters (\code{p_loo})
+ and the LOO information criterion \code{looic} (which is just \code{-2 *
+ elpd_loo}, i.e., converted to deviance scale).
+ }
+ \item{\code{pointwise}}{
+ A matrix with three columns (and number of rows equal to the number of
+ observations) containing the pointwise contributions of each of the above
+ measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
+ }
+ \item{\code{diagnostics}}{
+ A named list containing two vectors:
+  \itemize{
+   \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+   generaelized Pareto fit to the importance ratios for each leave-one-out
+   distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
+   \item \code{n_eff}: PSIS effective sample size estimates.
+  }
+ }
 }
 }
 \description{

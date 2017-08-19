@@ -19,7 +19,7 @@ waic(x, ...)
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
 (by class)} section below for a detailed description.}
 
-\item{...}{Other arguments. Currently ignored.}
+\item{...}{Currently ignored.}
 
 \item{args}{Only required if \code{x} is a function. A list containing
 the data required to specify the arguments to the function. See the
@@ -30,14 +30,19 @@ specified.}
 A named list (of class \code{c("waic", "loo")}) with components:
 
 \describe{
-\item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive
-density and standard error}
-\item{\code{p_waic, se_p_waic}}{estimated effective number of parameters and
-standard error}
-\item{\code{waic, se_waic}}{\code{-2 * elpd_waic} (i.e., converted to the
-deviance scale) and standard error}
-\item{\code{pointwise}}{the pointwise contributions of each of the above
-measures}
+ \item{\code{estimates}}{
+ A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
+ rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+ point estimates and standard errors of the expected log pointwise predictive
+ density (\code{elpd_waic}), the effective number of parameters
+ (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
+ \code{-2 * elpd_waic}, i.e., converted to deviance scale).
+ }
+ \item{\code{pointwise}}{
+ A matrix with three columns (and number of rows equal to the number of
+ observations) containing the pointwise contributions of each of the above
+ measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+ }
 }
 }
 \description{

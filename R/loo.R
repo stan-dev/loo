@@ -26,23 +26,29 @@
 #'}
 #'
 #' @return A named list with class \code{c("psis_loo", "loo")} and components:
-#'
 #' \describe{
-#'  \item{\code{elpd_loo, se_elpd_loo}}{Expected log pointwise predictive density
-#'    and standard error.}
-#'  \item{\code{p_loo, se_p_loo}}{Estimated effective number of parameters and
-#'    standard error.}
-#'  \item{\code{looic, se_looic}}{The LOO information criterion
-#'    (\code{-2*elpd_loo}, i.e., converted to deviance scale) and standard
-#'    error.}
-#'  \item{\code{pointwise}}{A matrix containing the pointwise contributions of each
-#'    of the above measures.}
-#'  \item{\code{pareto_k}}{A vector containing the estimates of the shape
-#'    parameter \eqn{k} for the generaelized Pareto fit to the importance ratios
-#'    for each leave-one-out distribution. See PSIS-LOO section in
-#'    \code{\link{loo-package}} for details about interpreting \eqn{k}.
-#'    (By default, the \code{\link[=print.loo]{print}} method for \code{'loo'}
-#'    objects will also provide warnings about problematic values of \eqn{k}.)}
+#'  \item{\code{estimates}}{
+#'  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
+#'  (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
+#'  estimates and standard errors of the expected log pointwise predictive
+#'  density (\code{elpd_loo}), the effective number of parameters (\code{p_loo})
+#'  and the LOO information criterion \code{looic} (which is just \code{-2 *
+#'  elpd_loo}, i.e., converted to deviance scale).
+#'  }
+#'  \item{\code{pointwise}}{
+#'  A matrix with three columns (and number of rows equal to the number of
+#'  observations) containing the pointwise contributions of each of the above
+#'  measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
+#'  }
+#'  \item{\code{diagnostics}}{
+#'  A named list containing two vectors:
+#'   \itemize{
+#'    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+#'    generaelized Pareto fit to the importance ratios for each leave-one-out
+#'    distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
+#'    \item \code{n_eff}: PSIS effective sample size estimates.
+#'   }
+#'  }
 #' }
 #'
 #' @note For models fit to very large datasets we recommend the
@@ -146,32 +152,34 @@ loo.function <- function(x, args, ...) {
 
 # internal ----------------------------------------------------------------
 
-# compute elpd_loo from log lik matrix and psis log weights
-# @param ll log-likelihood matrix
-# @param psis_object object returned by psis
+# Compute pointwise elpd_loo, p_loo, looic from log lik matrix and
+# psis log weights
+#
+# @param ll Log-likelihood matrix.
+# @param psis_object The object returned by psis.
+# @return Named list with pointwise elpd_loo, p_loo, and looic.
+#
 pointwise_loo_calcs <- function(ll, psis_object) {
   lpd <- logColMeansExp(ll)
   ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- matrixStats::colLogSumExps(ll_plus_lw)
+  elpd_loo <- colLogSumExps(ll_plus_lw)
   looic <- -2 * elpd_loo
   p_loo <- lpd - elpd_loo
-  nlist(elpd_loo, p_loo, looic)
+  cbind(elpd_loo, p_loo, looic)
 }
 
 # structure the object returned by the loo methods
 #
-# @param pointwise named list containing vectors elpd_loo, p_loo, looic
-# @param diagnostics named list containing vector pareto_k and vector n_eff
-# @param log_lik_dim log likelihood matrix dimensions (attribute of psis object)
+# @param pointwise Matrix containing columns elpd_loo, p_loo, looic
+# @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
+# @param log_lik_dim Log likelihood matrix dimensions (attribute of psis object)
 #
 psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
-  stats <- totals(pointwise)
-  out <- c(stats, diagnostics)
-  out$pointwise <- do.call(cbind, pointwise)
+  stopifnot(is.matrix(pointwise), is.list(diagnostics))
+  estimates <- table_of_estimates(pointwise)
   structure(
-    out,
+    nlist(estimates, pointwise, diagnostics),
     log_lik_dim = log_lik_dim,
     class = c("psis_loo", "loo")
   )
 }
-

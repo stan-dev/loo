@@ -81,8 +81,10 @@ compare <- function(..., x) {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
     if (!all(Ns == Ns[1L]))
       stop("Not all models have the same number of data points.", call. = FALSE)
-    sel <- grep("pointwise|pareto_k", names(dots[[1L]]), invert = TRUE)
-    x <- sapply(dots, function(x) unlist(x[sel]))
+    x <- sapply(dots, function(x) {
+      est <- x$estimates
+      setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
+    })
     colnames(x) <- nms
     rnms <- rownames(x)
     comp <- x

@@ -17,13 +17,12 @@
 #'
 print.loo <- function(x, digits = 1, ...) {
   print_log_lik_dim(x)
-  z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
-  uz <- unlist(z)
-  nms <- names(uz)
-  ses <- grepl("se", nms)
-  out <- data.frame(Estimate = uz[!ses], SE = uz[ses])
-  print(.fr(out, digits), quote = FALSE)
-  invisible(x)
+  if (!("estimates" %in% names(x))) {
+    x <- convert_old_object(x)
+  }
+
+  print(.fr(as.data.frame(x$estimates), digits), quote = FALSE)
+  return(invisible(x))
 }
 
 #' @export
@@ -76,5 +75,14 @@ print_log_lik_dim <- function(x) {
     breaks = c(-Inf, 0.5, 0.7, 1, Inf),
     labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
   )
+}
+
+# compatibility with old loo objects
+convert_old_object <- function(x, digits = 1, ...) {
+  z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
+  uz <- unlist(z)
+  nms <- names(uz)
+  ses <- grepl("se", nms)
+  list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
 }
 

@@ -33,7 +33,6 @@
 #'
 #' @template loo-and-psis-references
 #'
-#' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
@@ -174,7 +173,6 @@ lw_truncate <- function(y, wtrunc) {
   y
 }
 
-#' @importFrom matrixStats logSumExp
 lw_normalize <- function(y) {
   y - logSumExp(y)
 }

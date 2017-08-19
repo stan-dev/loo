@@ -4,12 +4,15 @@
 \alias{pareto-k-diagnostic}
 \alias{pareto_k_table}
 \alias{pareto_k_ids}
+\alias{pareto_k_values}
 \alias{plot.loo}
 \title{Diagnostics for Pareto Smoothed Importance Sampling}
 \usage{
 pareto_k_table(x)
 
 pareto_k_ids(x, threshold = 0.5)
+
+pareto_k_values(x)
 
 \method{plot}{loo}(x, ..., label_points = FALSE)
 }
@@ -31,6 +34,9 @@ to control the appearance of the labels.}
 
 \code{pareto_k_ids} returns an integer vector indicating which
 observations have Pareto \eqn{k} estimates above \code{threshold}.
+
+\code{pareto_k_values} returns a vector of the estimated Pareto
+  \eqn{k} parameters.
 
 The \code{plot} method is called for its side effect and does not
   return anything. If \code{x} is the result of a call to \code{\link{loo}},

@@ -66,7 +66,6 @@
 #'
 #' @template loo-and-psis-references
 #'
-#' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 psis <- function(x, ...) UseMethod("psis")
@@ -261,8 +260,7 @@ psis_object <-
     stopifnot(is.matrix(unnormalized_log_weights))
 
     lldim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
-    norm_const_log <-
-      matrixStats::colLogSumExps(unnormalized_log_weights)
+    norm_const_log <- colLogSumExps(unnormalized_log_weights)
 
     out <- structure(
       list(

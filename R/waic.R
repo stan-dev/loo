@@ -2,19 +2,24 @@
 #'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
-#' @param ... Other arguments. Currently ignored.
+#' @param ... Currently ignored.
 #'
 #' @return A named list (of class \code{c("waic", "loo")}) with components:
 #'
 #' \describe{
-#' \item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive
-#' density and standard error}
-#' \item{\code{p_waic, se_p_waic}}{estimated effective number of parameters and
-#' standard error}
-#' \item{\code{waic, se_waic}}{\code{-2 * elpd_waic} (i.e., converted to the
-#' deviance scale) and standard error}
-#' \item{\code{pointwise}}{the pointwise contributions of each of the above
-#' measures}
+#'  \item{\code{estimates}}{
+#'  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
+#'  rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+#'  point estimates and standard errors of the expected log pointwise predictive
+#'  density (\code{elpd_waic}), the effective number of parameters
+#'  (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
+#'  \code{-2 * elpd_waic}, i.e., converted to deviance scale).
+#'  }
+#'  \item{\code{pointwise}}{
+#'  A matrix with three columns (and number of rows equal to the number of
+#'  observations) containing the pointwise contributions of each of the above
+#'  measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+#'  }
 #' }
 #'
 #' @seealso \code{\link{compare}}, \code{\link{print.loo}},
@@ -49,9 +54,9 @@ waic.array <- function(x, ...) {
 waic.matrix <- function(x, ...) {
   ll <- validate_ll(x)
   lldim <- dim(ll)
-  out <- pointwise_waic(log_lik = ll)
+  pointwise <- pointwise_waic(log_lik = ll)
   throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
-  waic_object(out, lldim)
+  waic_object(pointwise, lldim)
 }
 
 #' @export
@@ -60,9 +65,9 @@ waic.matrix <- function(x, ...) {
 #'
 waic.function <- function(x, args, ...) {
   lldim <- with(args, c(S, N))
-  out <- pointwise_waic(llfun = x, llargs = args)
+  pointwise <- pointwise_waic(llfun = x, llargs = args)
   throw_pwaic_warnings(out$pointwise[, "p_waic"], digits = 1)
-  waic_object(out, lldim)
+  waic_object(pointwise, lldim)
 }
 
 
@@ -70,9 +75,10 @@ waic.function <- function(x, args, ...) {
 # internal ----------------------------------------------------------------
 
 # structure the object returned by the waic methods
-waic_object <- function(object, log_lik_dim) {
+waic_object <- function(pointwise, log_lik_dim) {
+  estimates <- table_of_estimates(pointwise)
   structure(
-    object,
+    nlist(estimates, pointwise),
     log_lik_dim = log_lik_dim,
     class = c("waic", "loo")
   )
@@ -106,10 +112,7 @@ pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
   }
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
-  pointwise <- nlist(elpd_waic, p_waic, waic)
-  out <- totals(pointwise)
-  out$pointwise <- do.call(cbind, pointwise)
-  out
+  cbind(elpd_waic, p_waic, waic)
 }
 
 colVars_llfun <- function(fun, args) {

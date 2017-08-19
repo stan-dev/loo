@@ -22,7 +22,7 @@ NULL
 #'   \code{"pareto_k_table"}, which is a matrix with columns \code{"Count"} and
 #'   \code{"Proportion"} and has its own print method.
 pareto_k_table <- function(x) {
-  k <- get_pareto_k(x)
+  k <- pareto_k_values(x)
   kcut <- .k_cut(k)
   count <- table(kcut)
   out <- cbind(Count = count, Proportion = prop.table(count))
@@ -62,8 +62,24 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
 #' observations have Pareto \eqn{k} estimates above \code{threshold}.
 #'
 pareto_k_ids <- function(x, threshold = 0.5) {
-  k <- get_pareto_k(x)
+  k <- pareto_k_values(x)
   which(k > threshold)
+}
+
+#' @rdname pareto-k-diagnostic
+#' @export
+#' @return \code{pareto_k_values} returns a vector of the estimated Pareto
+#'   \eqn{k} parameters.
+pareto_k_values <- function(x) {
+  if (is.psis_loo(x)) {
+    k <- x$diagnostics[["pareto_k"]]
+  } else {
+    k <- x[["pareto_k"]]
+  }
+  if (is.null(k))
+    stop("No Pareto k estimates found.", call. = FALSE)
+
+  return(k)
 }
 
 #' @rdname pareto-k-diagnostic
@@ -81,7 +97,7 @@ pareto_k_ids <- function(x, threshold = 0.5) {
 #'   a call to \code{\link{waic}}.
 #'
 plot.loo <- function(x, ..., label_points = FALSE) {
-  k <- get_pareto_k(x)
+  k <- pareto_k_values(x)
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
     warning(signif(100 * mean(k_inf), 2),
@@ -98,11 +114,6 @@ plot.psis <- function(x, ..., label_points = FALSE) {
 
 
 # internal ----------------------------------------------------------------
-get_pareto_k <- function(x) {
-  if (is.null(x[["pareto_k"]]))
-    stop("No Pareto k estimates found.", call. = FALSE)
-  x[["pareto_k"]]
-}
 
 #' @importFrom graphics abline axis plot points text
 plot_k <- function(k, ..., label_points = FALSE) {

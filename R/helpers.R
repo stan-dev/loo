@@ -1,22 +1,25 @@
+#' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars
+
 # more stable version of log(colMeans(exp(x)))
 # @param x matrix
 logColMeansExp <- function(x) {
   logS <- log(nrow(x))
-  matrixStats::colLogSumExps(x) - logS
+  colLogSumExps(x) - logS
 }
 
-# Compute estimates from pointwise vectors
+# Compute point estimates and standard errors from pointwise vectors
 #
-# @param pointwise A list of vectors.
-# @return A named list of estimates and standard errors.
+# @param x A matrix.
+# @return An ncol(pointwise) by 2 matrix with columns 'Estimate' and 'SE'
+#   and rownames equal to colnames(pointwise).
 #
-totals <- function(pointwise) {
-  N <- length(pointwise[[1L]])
-  ests <- lapply(pointwise, sum)
-  ses <- sapply(pointwise, function(x) sqrt(N * var(x)))
-  names(ses) <- paste0("se_", names(ests))
-  browser()
-  c(ests, ses)
+table_of_estimates <- function(x) {
+  out <- cbind(
+    Estimate = colSums2(x),
+    SE = sqrt(nrow(x) * colVars(x))
+  )
+  rownames(out) <- colnames(x)
+  return(out)
 }
 
 
@@ -64,7 +67,6 @@ var_epd.matrix <- function(w, w_un, rel_n_eff) {
 psis_n_eff <- function(w, ...) {
   UseMethod("psis_n_eff")
 }
-
 psis_n_eff.default <- function(w, rel_n_eff = NULL, ...) {
   ss <- sum(w^2)
   if (is.null(rel_n_eff)) {
@@ -74,7 +76,6 @@ psis_n_eff.default <- function(w, rel_n_eff = NULL, ...) {
   stopifnot(length(rel_n_eff) == 1)
   1 / ss * rel_n_eff
 }
-
 psis_n_eff.matrix <- function(w, rel_n_eff = NULL, ...) {
   ss <- colSums(w^2)
   if (is.null(rel_n_eff)) {
@@ -98,18 +99,15 @@ psis_n_eff.matrix <- function(w, rel_n_eff = NULL, ...) {
 relative_n_eff <- function(x, ...) {
   UseMethod("relative_n_eff")
 }
-
 relative_n_eff.default <- function(x, chain_id, ...) {
   dim(x) <- c(length(x), 1)
   class(x) <- "matrix"
   relative_n_eff.matrix(x, chain_id)
 }
-
 relative_n_eff.matrix <- function(x, chain_id, ...) {
   x <- llmatrix_to_array(x, chain_id)
   relative_n_eff.array(x)
 }
-
 relative_n_eff.array <- function(x, ...) {
   stopifnot(length(dim(x)) == 3)
   n_eff_vec <- apply(x, 3, mcmc_n_eff)
@@ -231,6 +229,7 @@ llmatrix_to_array <- function(x, chain_id) {
   }
   return(a)
 }
+
 
 
 #' Named lists
