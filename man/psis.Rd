@@ -28,6 +28,8 @@ psis(x, ...)
 \strong{Methods (by class)} section below for a detailed description of how
 to specify the inputs for each method.}
 
+\item{...}{Currently ignored.}
+
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
 where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
 no truncation. The default is \code{0.75}.}

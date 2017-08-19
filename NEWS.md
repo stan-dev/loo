@@ -1,3 +1,11 @@
+# loo 2.0.0
+* TODO: move the items from github issue here 
+* Deprecated `psislw`. Use __`psis`__ instead. Methods for log likelihood arrays,
+matrices, vectors, and functions are provided.
+* Deprecated `compare`. Use __`compare_models`__ instead. An S3 generic and
+default method are provided.
+
+
 # loo 1.1.0
 * Introduce the `E_loo` function for computing weighted expectations (means, variances, quantiles).
 

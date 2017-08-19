@@ -3,7 +3,7 @@
 #' @docType package
 #' @name loo-package
 #'
-#' @importFrom stats sd var quantile
+#' @importFrom stats sd var quantile setNames weights
 #'
 #' @description
 #' \if{html}{

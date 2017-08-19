@@ -129,7 +129,6 @@ print(loo1, digits = 3)
 log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 (loo2 <- loo(log_lik2))
 compare(loo1, loo2)
-}
 
 ### Using log-likelihood function instead of matrix
 set.seed(024)
@@ -145,12 +144,13 @@ data <- data.frame(y,K)
 llfun <- function(i, data, draws) {
   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
 }
-loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S), cores = 1)
+loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
 
 # Check that we get same answer if using log-likelihood matrix
 log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-loo_with_mat <- loo(log_lik_mat, cores = 1)
+loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
 all.equal(loo_with_mat, loo_with_fn)
+}
 
 }
 \references{

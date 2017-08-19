@@ -9,6 +9,7 @@
 #' @param x A log-likelihood array, matrix, vector, or function. See the
 #'   \strong{Methods (by class)} section below for a detailed description of how
 #'   to specify the inputs for each method.
+#' @param ... Currently ignored.
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
 #'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
 #'   no truncation. The default is \code{0.75}.

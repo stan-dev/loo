@@ -9,10 +9,11 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Juho", "Piironen", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
-URL: http://mc-stan.org/, https://groups.google.com/forum/#!forum/stan-users
+URL: http://mc-stan.org/, http://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
-    using Pareto smoothed importance sampling (PSIS), a new procedure for
+    for Bayesian models fit using Markov chain Monte Carlo. The approximation
+    uses Pareto smoothed importance sampling (PSIS), a new procedure for
     regularizing importance weights. As a byproduct of the calculations, we also
     obtain approximate standard errors for estimated predictive errors and for
     the comparison of predictive errors between models. We also compute the
@@ -23,7 +24,7 @@ Depends:
     R (>= 3.1.2)
 Imports:
     graphics,
-    matrixStats (>= 0.50.0),
+    matrixStats (>= 0.52),
     parallel,
     stats
 Suggests:

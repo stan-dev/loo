@@ -79,7 +79,6 @@
 #' log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 #' (loo2 <- loo(log_lik2))
 #' compare(loo1, loo2)
-#' }
 #'
 #' ### Using log-likelihood function instead of matrix
 #' set.seed(024)
@@ -95,12 +94,13 @@
 #' llfun <- function(i, data, draws) {
 #'   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
 #' }
-#' loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S), cores = 1)
+#' loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
 #'
 #' # Check that we get same answer if using log-likelihood matrix
 #' log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-#' loo_with_mat <- loo(log_lik_mat, cores = 1)
+#' loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
 #' all.equal(loo_with_mat, loo_with_fn)
+#' }
 #'
 loo <- function(x, ...) {
   UseMethod("loo")
@@ -141,9 +141,13 @@ loo.matrix <- function(x, chain_id, ...) {
 #' @template function
 #'
 loo.function <- function(x, args, ...) {
-  psis <- psislw(..., llfun = x, llargs = args, COMPUTE_LOOS = TRUE)
-  out <- old_pointwise_loo(psis = psis, llfun = x, llargs = args)
-  structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
+  # TODO actually implement this when psis.function is ready. For now just
+  # convert to matrix.
+  ll <- sapply(1:args$N, function(i) x(i, args$data[i,, drop=FALSE], args$draws))
+  return(loo.matrix(ll, ...))
+
+  # out <- old_pointwise_loo(psis = psis, llfun = x, llargs = args)
+  # structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
 }
 
 
