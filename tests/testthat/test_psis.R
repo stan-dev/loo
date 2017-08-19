@@ -62,3 +62,18 @@ test_that("old psislw function and matrix methods return same result", {
   expect_equal(psislw_with_fn, psislw_with_mat)
 })
 
+
+test_that("weights method returns correct output", {
+  # default arguments
+  expect_identical(weights(psis1), weights(psis1, normalize = TRUE, log = TRUE))
+
+  # unnormalized log-weights same as in psis object
+  expect_equal(psis1$log_weights, weights(psis1, normalize = FALSE))
+
+  # normalized weights sum to 1
+  expect_equal(
+    colSums(weights(psis1, normalize = TRUE, log = FALSE)),
+    rep(1, ncol(psis1$log_weights))
+  )
+})
+
