@@ -39,6 +39,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("loo.cores", parallel::detectCores()),
                    llfun = NULL, llargs = NULL,
                    ...) {
+  .Deprecated("psis")
+
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)

@@ -9,7 +9,7 @@ test_that("gpdfit returns correct result", {
   expect_equal_to_reference(gpdfit_val_old, "gpdfit_old.rds")
 
   gpdfit_val_wip <- unlist(gpdfit(x, wip=TRUE))
-  expect_equal_to_reference(gpdfit_val_wip, "gpdfit_wip.rds")
+  expect_equal_to_reference(gpdfit_val_wip, "gpdfit.rds")
 })
 
 test_that("qgpd returns the correct result ", {

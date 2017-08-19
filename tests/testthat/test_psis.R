@@ -41,27 +41,6 @@ test_that("psis throws correct errors", {
   )
 })
 
-test_that("old psislw function and matrix methods return same result", {
-  set.seed(024)
-
-  # fake data and posterior draws
-  N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
-  p <- rbeta(1, a0, b0)
-  y <- rbinom(N, size = K, prob = p)
-  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-  draws <- rbeta(S, a, b)
-  data <- data.frame(y,K)
-  llfun <- function(i, data, draws) {
-    dbinom(data$y, size = data$K, prob = draws, log = TRUE)
-  }
-  psislw_with_fn <- psislw(llfun = llfun, llargs = nlist(data, draws, N, S))
-
-  # Check that we get same answer if using log-likelihood matrix
-  log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-  psislw_with_mat <- psislw(-log_lik_mat)
-  expect_equal(psislw_with_fn, psislw_with_mat)
-})
-
 
 test_that("weights method returns correct output", {
   # default arguments
