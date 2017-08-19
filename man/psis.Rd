@@ -26,7 +26,9 @@ psis(x, ...)
 \arguments{
 \item{x}{A log-likelihood array, matrix, vector, or function. See the
 \strong{Methods (by class)} section below for a detailed description of how
-to specify the inputs for each method.}
+to specify the inputs for each method. \strong{NOTE:} \code{x} is the
+\emph{negative} of the \code{lw} used by the now deprecated
+\code{\link{psislw}} function.}
 
 \item{...}{Currently ignored.}
 
@@ -163,7 +165,7 @@ of data points. For example, the object returned by
   When the tail of the weight distribution is long, a direct use of
   importance sampling is sensitive to one or few largest values. By fitting a
   gPd to the upper tail of the importance weights we smooth these values. The
-  procedure (implemented in the \code{\link{psislw}} function) goes as
+  procedure (implemented in the \code{\link{psis}} function) goes as
   follows:
 
 \enumerate{
@@ -178,17 +180,17 @@ of data points. For example, the object returned by
   ratios by the expected values of the order statistics of the fitted
   gPd \deqn{G((z - 0.5)/M), z = 1,...,M,} where
   \eqn{M} is the number of simulation draws used to fit the Pareto (in this
-  case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
+  case, \eqn{M = 0.2S}{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
 
   \item To guarantee finite variance of the estimate, truncate the smoothed
-  ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of
-  the smoothed weights.
+  ratios with \deqn{S^{3/4}\bar{w},}{S^{3/4} * w_bar,} where \eqn{\bar{w}}{w_bar}
+  is the average of the smoothed weights.
 }
 
 The above steps must be performed for each data point \eqn{i}. The result is
-a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each \eqn{i}, which in
+a vector of weights \eqn{w_i^s, s = 1,...,S}, for each \eqn{i}, which in
 general should be better behaved than the raw importance ratios
-\eqn{r_{i}^{s}} from which they were constructed.
+\eqn{r_i^s} from which they were constructed.
 
 The results can be then combined to compute the desired LOO estimates.
 }

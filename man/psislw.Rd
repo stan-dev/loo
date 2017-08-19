@@ -60,7 +60,7 @@ Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
   When the tail of the weight distribution is long, a direct use of
   importance sampling is sensitive to one or few largest values. By fitting a
   gPd to the upper tail of the importance weights we smooth these values. The
-  procedure (implemented in the \code{\link{psislw}} function) goes as
+  procedure (implemented in the \code{\link{psis}} function) goes as
   follows:
 
 \enumerate{
@@ -75,17 +75,17 @@ Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
   ratios by the expected values of the order statistics of the fitted
   gPd \deqn{G((z - 0.5)/M), z = 1,...,M,} where
   \eqn{M} is the number of simulation draws used to fit the Pareto (in this
-  case, \eqn{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
+  case, \eqn{M = 0.2S}{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
 
   \item To guarantee finite variance of the estimate, truncate the smoothed
-  ratios with \deqn{S^{3/4}\bar{w},} where \eqn{\bar{w}} is the average of
-  the smoothed weights.
+  ratios with \deqn{S^{3/4}\bar{w},}{S^{3/4} * w_bar,} where \eqn{\bar{w}}{w_bar}
+  is the average of the smoothed weights.
 }
 
 The above steps must be performed for each data point \eqn{i}. The result is
-a vector of weights \eqn{w_{i}^{s}, s = 1,...,S}, for each \eqn{i}, which in
+a vector of weights \eqn{w_i^s, s = 1,...,S}, for each \eqn{i}, which in
 general should be better behaved than the raw importance ratios
-\eqn{r_{i}^{s}} from which they were constructed.
+\eqn{r_i^s} from which they were constructed.
 
 The results can be then combined to compute the desired LOO estimates.
 }
