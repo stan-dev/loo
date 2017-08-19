@@ -36,10 +36,8 @@ A named list with components \code{lw_smooth} (modified log weights)
   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 }
 \description{
-Implementation of Pareto smoothed importance sampling, a method for
-stabilizing importance weights. For full details about the algorithm see
-Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
-\link{pareto-k-diagnostic} page.
+As of version \code{2.0.0} this function is deprecated. Please use
+\code{\link{psis}} instead.
 }
 \section{PSIS-LOO}{
  The distribution of the importance weights used in LOO may

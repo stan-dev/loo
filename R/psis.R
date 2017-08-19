@@ -17,8 +17,8 @@
 #'   no truncation. The default is \code{0.75}.
 #' @param cores The number of cores to use for parallelization. The default for
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-#'   of \pkg{loo} version \code{2.0.0} the \strong{default is now 1 core}, but
-#'   we recommend using as many (or close to as many) cores as possible.
+#'   of version \code{2.0.0} the \strong{default is now 1 core}, but we
+#'   recommend using as many (or close to as many) cores as possible.
 #'
 #' @param args Only required if \code{x} is a function. A list containing
 #'   the data required to specify the arguments to the function. See the

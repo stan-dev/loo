@@ -1,9 +1,7 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
-#' Implementation of Pareto smoothed importance sampling, a method for
-#' stabilizing importance weights. For full details about the algorithm see
-#' Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
-#' \link{pareto-k-diagnostic} page.
+#' As of version \code{2.0.0} this function is deprecated. Please use
+#' \code{\link{psis}} instead.
 #'
 #' @export
 #' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
