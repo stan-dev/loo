@@ -10,8 +10,11 @@ psis1 <- suppressWarnings(psis(LLarr))
 
 
 test_that("plot methods don't error", {
-  plot(loo1, label_points = TRUE)
+  plot(loo1, label_points = FALSE)
   plot(psis1, label_points = TRUE)
+
+  loo1$diagnostics$pareto_k[1] <- 10
+  plot(loo1, label_points = TRUE)
 })
 
 test_that("plot methods throw appropriate errors/warnings", {

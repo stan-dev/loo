@@ -39,6 +39,7 @@ test_that("compare_models throws appropriate errors", {
 
 test_that("compare_models returns expected result (2 models)", {
   comp1 <- compare_models(w1, w1)
+  expect_output(print(comp1), "elpd_diff")
   expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
 
   comp2 <- compare_models(w1, w2)

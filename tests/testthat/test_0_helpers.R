@@ -25,8 +25,11 @@ test_that("reshaping functions result in correct dimensions", {
 })
 
 test_that("reshaping functions throw correct errors", {
+  expect_error(llmatrix_to_array(LLmat, chain_id = rep(1:2, times = c(400, 600))),
+               regexp = "Not all chains have same number of iterations",
+               fixed = TRUE)
   expect_error(llmatrix_to_array(LLmat, chain_id = rep(1:2, each = 400)),
-               regexp = "length(chain_id) == nrow(x) is not TRUE",
+               regexp = "Number of rows in matrix not equal to length(chain_id)",
                fixed = TRUE)
   expect_error(llmatrix_to_array(LLmat, chain_id = rep(2:3, each = 500)),
                regexp = "max(chain_id) not equal to the number of chains",

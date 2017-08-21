@@ -29,16 +29,3 @@ old_pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
   out
 }
 
-# Compute estimates from pointwise vectors
-#
-# @param pointwise A list of vectors.
-# @return A named list of estimates and standard errors.
-#
-totals <- function(pointwise) {
-  N <- length(pointwise[[1L]])
-  ests <- lapply(pointwise, sum)
-  ses <- lapply(pointwise, function(x) sqrt(N * var(x)))
-  names(ses) <- paste0("se_", names(ses))
-  c(ests, ses)
-}
-

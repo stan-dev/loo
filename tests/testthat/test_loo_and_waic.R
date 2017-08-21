@@ -12,12 +12,23 @@ chain_id <- rep(1:2, each = nrow(LLarr))
 l1 <- suppressWarnings(loo(LLarr))
 w1 <- suppressWarnings(waic(LLarr))
 
-test_that("structured of returned objects is ok", {
+test_that("waic returns object with correct structure", {
+  expect_true(is.waic(w1))
+  expect_true(is.loo(w1))
+  expect_false(is.psis_loo(w1))
   expect_named(w1, c("estimates", "pointwise"))
+  est_names <- dimnames(w1$estimates)
+  expect_equal(est_names[[1]], c("elpd_waic", "p_waic", "waic"))
+  expect_equal(est_names[[2]], c("Estimate", "SE"))
+  expect_equal(colnames(w1$pointwise), est_names[[1]])
+})
 
+test_that("loo returns object with correct structure", {
+  expect_false(is.waic(l1))
+  expect_true(is.loo(l1))
+  expect_true(is.psis_loo(l1))
   expect_named(l1, c("estimates", "pointwise", "diagnostics"))
   expect_named(l1$diagnostics, c("pareto_k", "n_eff"))
-
   est_names <- dimnames(l1$estimates)
   expect_equal(est_names[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(est_names[[2]], c("Estimate", "SE"))
