@@ -37,6 +37,7 @@ In general, we recommend  \code{stacking} for averaging predictive distributions
 }
 \examples{
 \dontrun{
+### Usage with stanfit objects
 log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
 w1=model_weights(list(log_lik1, log_lik2),method="stacking")

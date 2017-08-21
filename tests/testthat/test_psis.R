@@ -4,18 +4,19 @@ set.seed(123)
 
 context("psis")
 
-LLarr <- source(test_path("LL_array_data.R"))$value
-LLmat <- llarray_to_matrix(LLarr)
+LLarr <- example_loglik_array()
+LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
+chain_id <- rep(1:2, each = dim(LLarr)[1])
 
 psis1 <- suppressWarnings(psis(LLarr))
 
 test_that("psis methods give same results", {
-  psis2 <- suppressWarnings(psis(LLmat, chain_id = rep(1:2, each = 50)))
+  psis2 <- suppressWarnings(psis(LLmat, chain_id))
   expect_identical(psis1, psis2)
 
-  psisvec <- suppressWarnings(psis(LLvec, chain_id = rep(1:2, each = 50)))
-  psismat <- suppressWarnings(psis(LLmat[, 1], chain_id = rep(1:2, each = 50)))
+  psisvec <- suppressWarnings(psis(LLvec, chain_id))
+  psismat <- suppressWarnings(psis(LLmat[, 1], chain_id))
   expect_identical(psisvec, psismat)
 })
 
@@ -27,13 +28,13 @@ test_that("psis throws correct errors", {
   # no NAs allowed
   LLmat[1,1] <- NA
   expect_error(
-    psis(LLmat, chain_id = rep(1:2, each = 50)),
+    psis(LLmat, chain_id),
     "!anyNA(x) is not TRUE",
     fixed = TRUE
   )
 
   # if array, must be 3-D array
-  dim(LLarr) <- c(2, 25, 2, 32)
+  dim(LLarr) <- c(2, 250, 2, 32)
   expect_error(
     psis(LLarr),
     "length(dim(x)) == 3 is not TRUE",

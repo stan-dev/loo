@@ -1,11 +1,11 @@
 library(loo)
-options(loo.cores = 1)
+options(loo.cores = 2)
 set.seed(123)
 SW <- suppressWarnings
 
 context("compare_models")
 
-LLarr <- source(test_path("LL_array_data.R"))$value
+LLarr <- example_loglik_array()
 LLarr2 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 0.5), dim = dim(LLarr))
 LLarr3 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 1), dim = dim(LLarr))
 w1 <- SW(waic(LLarr))

@@ -38,8 +38,8 @@ no truncation. The default is \code{0.75}.}
 
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-of \pkg{loo} version \code{2.0.0} the \strong{default is now 1 core}, but
-we recommend using as many (or close to as many) cores as possible.}
+of version \code{2.0.0} the \strong{default is now 1 core}, but we
+recommend using as many (or close to as many) cores as possible.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in

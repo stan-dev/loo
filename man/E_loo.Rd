@@ -17,8 +17,9 @@ E_loo(x, lw, ...)
 \item{x}{A numeric matrix or vector.}
 
 \item{lw}{A numeric matrix (or vector) of smoothed log-weights with the same
-dimensions (or length) as \code{x}. Typically this will be the
-\code{"lw_smooth"} element of the list returned by \code{\link{psislw}}.}
+dimensions (or length) as \code{x}. Typically this will be the object
+returned by the \code{\link[=weights.psis]{weights}} method for
+\code{"psis"} objects.}
 
 \item{...}{For the generic function, arguments passed to the
 individual methods.}
@@ -43,7 +44,7 @@ The matrix method returns a vector with \code{ncol(x)} elements, with
 \description{
 The \code{E_loo} function computes weighted expectations (means, variances,
 quantiles) using the smoothed importance weights obtained from the
-\link[=psislw]{PSIS} procedure. The expectations estimated by the
+\link[=psis]{PSIS} procedure. The expectations estimated by the
 \code{E_loo} function assume that the PSIS approximation is working well.
 \strong{A small \link[=pareto-k-diagnostic]{Pareto k} estimate is necessary,
 but not sufficient, for \code{E_loo} to give reliable estimates.} Additional
@@ -67,9 +68,8 @@ fit <- stan_glm(weight ~ group, data = d)
 yrep <- posterior_predict(fit)
 dim(yrep)
 
-ll <- log_lik(fit)
-lw <- psislw(-ll, cores = 2)$lw_smooth
-dim(lw)
+psis_object <- psis(log_lik(fit), chain_id = rep(1:4, each = 1000), cores = 2)
+lw <- weights(psis_object)
 
 E_loo(yrep, lw, type = "mean")
 E_loo(yrep, lw, type = "var")

@@ -20,7 +20,7 @@ print.loo <- function(x, digits = 1, ...) {
   if (!("estimates" %in% names(x))) {
     x <- convert_old_object(x)
   }
-
+  cat("\n")
   print(.fr(as.data.frame(x$estimates), digits), quote = FALSE)
   return(invisible(x))
 }
@@ -37,7 +37,9 @@ print.waic <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
-  cat("\n")
+  cat("\n------")
+  if (length(pareto_k_ids(x, threshold = 0.5)))
+    cat("\n")
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k)
@@ -61,7 +63,7 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 # internal ----------------------------------------------------------------
 print_log_lik_dim <- function(x) {
   lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
-  cat("Computed from", lldims, "log-likelihood matrix\n\n")
+  cat("Computed from", lldims, "log-likelihood matrix\n")
 }
 
 

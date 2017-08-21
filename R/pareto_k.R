@@ -35,7 +35,7 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
   prop <- x[, "Proportion"]
 
   if (sum(count[2:4]) == 0) {
-    cat("\nAll Pareto k estimates are good (k < 0.5)\n")
+    cat("\nAll Pareto k estimates are good (k < 0.5).\n")
   } else {
     tab <- cbind(
       " " = rep("", 4),
@@ -49,7 +49,7 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
     print(tab2, quote = FALSE)
 
     if (sum(count[3:4]) == 0)
-      cat("\nAll Pareto k estimates are ok (k < 0.7)\n")
+      cat("\nAll Pareto k estimates are ok (k < 0.7).\n")
 
     invisible(x)
   }

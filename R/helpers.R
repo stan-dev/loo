@@ -212,17 +212,23 @@ llarray_to_matrix <- function(x) {
 # @return iter by chain by obs array
 #
 llmatrix_to_array <- function(x, chain_id) {
-  stopifnot(is.matrix(x), all(chain_id == as.integer(chain_id)))
-  n_chain <- length(unique(chain_id))
+  stopifnot(is.matrix(x), all(chain_id == as.integer(chain_id)),
+            length(chain_id) == nrow(x))
+
   lldim <- dim(x)
-  if (lldim[1] %% n_chain != 0) {
+  chain_id <- as.integer(chain_id)
+  n_chain <- length(unique(chain_id))
+  if (max(chain_id) != n_chain) {
+    stop("max(chain_id) not equal to the number of chains.",
+         call. = FALSE)
+  } else if (lldim[1] %% n_chain != 0) {
     stop("Number of rows in matrix not divisible ",
-         "by number of chains in 'chain_id'.",
+         "by number of chains in chain_id.",
          call. = FALSE)
   }
+
   n_iter <- lldim[1] / n_chain
   n_obs <- lldim[2]
-
   a <- array(data = NA, dim = c(n_iter, n_chain, n_obs))
   for (c in seq_len(n_chain)) {
     a[, c, ] <- x[chain_id == c, , drop = FALSE]

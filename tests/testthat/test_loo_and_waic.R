@@ -4,29 +4,42 @@ set.seed(123)
 
 context("loo and waic")
 
-LLarr <- source(test_path("LL_array_data.R"))$value
-LLmat <- llarray_to_matrix(LLarr)
+LLarr <- example_loglik_array()
+LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
+chain_id <- rep(1:2, each = nrow(LLarr))
+
+l1 <- suppressWarnings(loo(LLarr))
+w1 <- suppressWarnings(waic(LLarr))
+
+test_that("structured of returned objects is ok", {
+  expect_named(w1, c("estimates", "pointwise"))
+
+  expect_named(l1, c("estimates", "pointwise", "diagnostics"))
+  expect_named(l1$diagnostics, c("pareto_k", "n_eff"))
+
+  est_names <- dimnames(l1$estimates)
+  expect_equal(est_names[[1]], c("elpd_loo", "p_loo", "looic"))
+  expect_equal(est_names[[2]], c("Estimate", "SE"))
+  expect_equal(colnames(l1$pointwise), est_names[[1]])
+})
 
 test_that("loo.array and loo.matrix give same result", {
-  l1 <- suppressWarnings(loo(LLarr))
-  l2 <- suppressWarnings(loo(LLmat, chain_id = rep(1:2, each = 50)))
+  l2 <- suppressWarnings(loo(LLmat, chain_id = chain_id))
   expect_identical(l1, l2)
 })
 
-test_that("waic.array and loo.matrix give same result", {
-  w1 <- suppressWarnings(waic(LLarr))
-  w2 <- suppressWarnings(waic(LLmat, chain_id = rep(1:2, each = 50)))
+test_that("waic.array and waic.matrix give same result", {
+  w2 <- suppressWarnings(waic(LLmat, chain_id = chain_id))
   expect_identical(w1, w2)
 })
-
 
 test_that("loo and waic error with vector input", {
   expect_error(loo(LLvec), regexp = "no applicable method")
   expect_error(waic(LLvec), regexp = "no applicable method")
 })
 
-test_that("function and matrix methods return same result", {
+test_that("waic function and matrix methods return same result", {
   set.seed(024)
 
   # fake data and posterior draws

@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' \dontrun{
-### Usage with stanfit objects
+#' ### Usage with stanfit objects
 #' log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 #' log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
 #' w1=model_weights(list(log_lik1, log_lik2),method="stacking")
@@ -83,7 +83,7 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
 #' @param BB_n A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number is 1000.
 #' @param alpha A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap.
 #' @param seed An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.
-#'@param visualise Logical, whether to visualise the selection probability.
+#' @param visualise Logical, whether to visualise the selection probability.
 #' @return   When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
 #' @details \code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
 #' @seealso
