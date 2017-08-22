@@ -9,19 +9,13 @@
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
 #'   (by class)} section below for a detailed description of how to specify the
 #'   inputs for each method.
-#' @param ... Optional arguments passed on to \code{\link{psis}}. Possible
+#' @param ... Additional arguments passed on to \code{\link{psis}}. Possible
 #'   arguments and their defaults are:
 #' \describe{
 #'  \item{\code{wtrunc = 3/4}}{
 #'   For truncating very large weights to \eqn{S}^\code{wtrunc} (set to zero
 #'   for no truncation). We recommend the default value unless there are
 #'   problems.
-#'  }
-#'  \item{\code{cores = getOption("loo.cores", 1)}}{
-#'   The number of cores to use for parallelization. The default for an entire R
-#'   session can be set with \code{options(loo.cores = NUMBER)}. As of \pkg{loo}
-#'   version \code{2.0.0}, \strong{the default is 1 core}, but we recommend
-#'   using as many (or close to as many) cores as possible.
 #'  }
 #'}
 #'
@@ -91,13 +85,13 @@
 #' draws <- rbeta(S, a, b)
 #' data <- data.frame(y,K)
 #'
-#' llfun <- function(i, data, draws) {
+#' llfun <- function(data, draws) {
 #'   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
 #' }
 #' loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
 #'
 #' # Check that we get same answer if using log-likelihood matrix
-#' log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
+#' log_lik_mat <- sapply(1:N, function(i) llfun(data[i,, drop=FALSE], draws))
 #' loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
 #' all.equal(loo_with_mat, loo_with_fn)
 #' }
@@ -110,8 +104,8 @@ loo <- function(x, ...) {
 #' @templateVar fn loo
 #' @template array
 #'
-loo.array <- function(x, ...) {
-  psis_out <- psis.array(x, ...)
+loo.array <- function(x, ..., cores = getOption("loo.cores", 1)) {
+  psis_out <- psis.array(x, ..., cores = cores)
   ll <- llarray_to_matrix(x)
   pointwise <- pointwise_loo_calcs(ll, psis_out)
   psis_loo_object(
@@ -126,7 +120,7 @@ loo.array <- function(x, ...) {
 #' @template matrix
 #' @template chain_id
 #'
-loo.matrix <- function(x, chain_id, ...) {
+loo.matrix <- function(x, ..., chain_id, cores = getOption("loo.cores", 1)) {
   psis_out <- psis.matrix(x, chain_id, ...)
   pointwise <- pointwise_loo_calcs(x, psis_out)
   psis_loo_object(
@@ -140,14 +134,88 @@ loo.matrix <- function(x, chain_id, ...) {
 #' @templateVar fn loo
 #' @template function
 #'
-loo.function <- function(x, args, ...) {
-  # TODO actually implement this when psis.function is ready. For now just
-  # convert to matrix.
-  ll <- sapply(1:args$N, function(i) x(i, args$data[i,, drop=FALSE], args$draws))
-  return(loo.matrix(ll, ...))
+loo.function <-
+  function(x,
+           ...,
+           chain_id,
+           draws = NULL,
+           data = data.frame(),
+           S = integer(),
+           N = integer(),
+           cores = getOption("loo.cores", 1)) {
 
-  # out <- old_pointwise_loo(psis = psis, llfun = x, llargs = args)
-  # structure(out, log_lik_dim = with(args, c(S,N)), class = c("psis_loo", "loo"))
+    stopifnot(is.data.frame(data) || is.matrix(data))
+    .LogLik <- match.fun(x)
+
+    if (cores == 1) {
+      psis_list <- lapply(
+        X = seq_len(N),
+        FUN = function(i) {
+          d_i <- data[i,, drop=FALSE]
+          ll_i <- as.matrix(.LogLik(d_i, draws))
+          psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
+          list(
+            pointwise = pointwise_loo_calcs(ll_i, psis_out),
+            diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
+          )
+        }
+      )
+      # for (i in 1:N) {
+      #   d_i <- data[i,, drop=FALSE]
+      #   ll_i <- as.matrix(.LogLik(d_i, draws))
+      #   psis_out <- psis.matrix(ll_i, chain_id, cores = 1, ...)
+      #   pointwise_list[[i]] <- pointwise_loo_calcs(ll_i, psis_out)
+      #   diagnostics_list[[i]] <- cbind(psis_out[["pareto_k"]], psis_out[["n_eff"]])
+      # }
+    } else {
+      if (.Platform$OS.type != "windows") {
+        psis_list <-
+          parallel::mclapply(
+            X = seq_len(N),
+            FUN = function(i) {
+              d_i <- data[i,, drop=FALSE]
+              ll_i <- as.matrix(.LogLik(d_i, draws))
+              psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
+              list(
+                pointwise = pointwise_loo_calcs(ll_i, psis_out),
+                diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
+              )
+            },
+            mc.cores = cores
+          )
+      } else {
+        cl <- parallel::makePSOCKcluster(cores)
+        on.exit(parallel::stopCluster(cl))
+        psis_list <-
+          parallel::parLapply(
+            cl = cl,
+            X = seq_len(N),
+            fun = function(i) {
+              d_i <- data[i,, drop=FALSE]
+              ll_i <- as.matrix(.LogLik(d_i, draws))
+              psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
+              list(
+                pointwise = pointwise_loo_calcs(ll_i, psis_out),
+                diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
+              )
+            }
+          )
+      }
+    }
+
+    pointwise_list <- lapply(psis_list, "[[", "pointwise")
+    diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
+
+    pointwise <- do.call(rbind, pointwise_list)
+    diagnostics <- do.call(rbind, diagnostics_list)
+    psis_loo_object(
+      pointwise = pointwise,
+      diagnostics = list(
+        pareto_k = diagnostics[, 1],
+        n_eff = diagnostics[, 2]
+      ),
+      log_lik_dim = c(S = S, N = N)
+    )
 }
 
 

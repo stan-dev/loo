@@ -2,8 +2,10 @@
 * TODO: move the items from github issue here 
 * Deprecated `psislw`. Use __`psis`__ instead. Methods for log likelihood arrays,
 matrices, vectors, and functions are provided.
-* Deprecated `compare`. Use __`compare_models`__ instead. An S3 generic and
+* Deprecated `compare`. Use __`compare_models`__ instead. An S3 generic and 
 default method are provided.
+* Added functions `example_loglik_array` and `example_loglik_matrix` that
+provide objects to use in examples and tests.
 
 
 # loo 1.1.0

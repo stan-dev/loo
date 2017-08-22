@@ -6,11 +6,10 @@
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export
-#' @param x A log-likelihood array, matrix, vector, or function. See the
-#'   \strong{Methods (by class)} section below for a detailed description of how
-#'   to specify the inputs for each method. \strong{NOTE:} \code{x} is the
-#'   \emph{negative} of the \code{lw} used by the now deprecated
-#'   \code{\link{psislw}} function.
+#' @param x A log-likelihood array, matrix, or vector. See the \strong{Methods
+#'   (by class)} section below for a detailed description of how to specify the
+#'   inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
+#'   the \code{lw} used by the now deprecated \code{\link{psislw}} function.
 #' @param ... Currently ignored.
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
 #'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
@@ -19,11 +18,6 @@
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 #'   of version \code{2.0.0} the \strong{default is now 1 core}, but we
 #'   recommend using as many (or close to as many) cores as possible.
-#'
-#' @param args Only required if \code{x} is a function. A list containing
-#'   the data required to specify the arguments to the function. See the
-#'   \strong{Methods (by class)} section below for how \code{args} should be
-#'   specified.
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:
@@ -133,20 +127,6 @@ psis.default <-
                 cores = 1)
   }
 
-#' @export
-#' @templateVar fn psis
-#' @template function
-#'
-psis.function <-
-  function(x,
-           args,
-           ...,
-           wtrunc = 3/4) {
-    stop("TODO: implement psis.function")
-    # psislw(..., llfun = x, llargs = args)
-  }
-
-
 #' @rdname psis
 #' @export
 #' @method weights psis
@@ -182,10 +162,10 @@ weights.psis <-
 
 # Do PSIS given matrix of log weights
 #
-# @param lw matrix of log weights (-loglik)
-# @param rel_n_eff vector of relative effective sample sizes
-# @param wtrunc user's scalar wtrunc argument
-# @param cores user's integer cores argument
+# @param lw Matrix of log weights (-loglik)
+# @param rel_n_eff Vector of relative effective sample sizes
+# @param wtrunc User's scalar wtrunc argument
+# @param cores User's integer cores argument
 # @return A list with class "psis" and structure described in the main doc at
 #   the top of this file.
 #
@@ -221,10 +201,10 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
     }
   }
 
-  pareto_k <- vapply(lw_list, "[[", "pareto_k", FUN.VALUE = numeric(1))
+  pareto_k <- psis_apply(lw_list, "pareto_k")
   throw_psis_warnings(pareto_k)
 
-  log_weights <- vapply(lw_list, "[[", "log_weights", FUN.VALUE = numeric(S))
+  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   if (wtrunc > 0) {
     log_weights <- apply(
       log_weights,
@@ -242,6 +222,18 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
     rel_n_eff = rel_n_eff,
     wtrunc = wtrunc
   )
+}
+
+# Extract named components from each list in a list of lists
+#
+# @param x List of lists.
+# @param item String naming the component or attribute to pull out of each list (or list-like object).
+# @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
+# @return Numeric vector or matrix.
+#
+psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
+  stopifnot(is.list(x))
+  vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
 }
 
 # Structure the object returned by the psis methods

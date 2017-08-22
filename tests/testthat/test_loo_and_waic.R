@@ -12,6 +12,11 @@ chain_id <- rep(1:2, each = nrow(LLarr))
 l1 <- suppressWarnings(loo(LLarr))
 w1 <- suppressWarnings(waic(LLarr))
 
+test_that("loo and waic results haven't changed", {
+  expect_equal_to_reference(l1, "loo.rds")
+  expect_equal_to_reference(w1, "waic.rds")
+})
+
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(w1))
   expect_true(is.loo(w1))

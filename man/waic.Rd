@@ -21,11 +21,6 @@ waic(x, ...)
 inputs for each method.}
 
 \item{...}{Currently ignored.}
-
-\item{args}{Only required if \code{x} is a function. A list containing
-the data required to specify the arguments to the function. See the
-\strong{Methods (by class)} section below for how \code{args} should be
-specified.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:

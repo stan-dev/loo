@@ -7,6 +7,10 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - logS
 }
 
+logMeanExp <- function(x) {
+  logSumExp(x) - log(length(x))
+}
+
 # Compute point estimates and standard errors from pointwise vectors
 #
 # @param x A matrix.

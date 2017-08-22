@@ -5,7 +5,6 @@
 \alias{psis.array}
 \alias{psis.matrix}
 \alias{psis.default}
-\alias{psis.function}
 \alias{weights.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
@@ -19,16 +18,13 @@ psis(x, ...)
 
 \method{psis}{default}(x, chain_id, ..., wtrunc = 3/4)
 
-\method{psis}{function}(x, args, ..., wtrunc = 3/4)
-
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, vector, or function. See the
-\strong{Methods (by class)} section below for a detailed description of how
-to specify the inputs for each method. \strong{NOTE:} \code{x} is the
-\emph{negative} of the \code{lw} used by the now deprecated
-\code{\link{psislw}} function.}
+\item{x}{A log-likelihood array, matrix, or vector. See the \strong{Methods
+(by class)} section below for a detailed description of how to specify the
+inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
+the \code{lw} used by the now deprecated \code{\link{psislw}} function.}
 
 \item{...}{Currently ignored.}
 
@@ -46,11 +42,6 @@ indexes for each each row of \code{x} (if a matrix) or each value in
 \code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
-
-\item{args}{Only required if \code{x} is a function. A list containing
-the data required to specify the arguments to the function. See the
-\strong{Methods (by class)} section below for how \code{args} should be
-specified.}
 
 \item{object}{For the \code{weights} method, an object returned by
 \code{psis} (a list with class \code{"psis"}).}
@@ -125,25 +116,6 @@ of data points. For example, the object returned by
 \code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
 \item \code{default}: A vector of length \eqn{S} (posterior sample size).
-
-\item \code{function}: A function \eqn{f} that takes arguments \code{i},
-  \code{data}, and \code{draws} and returns a vector containing the
-  log-likelihood for the \code{i}th observation evaluated at each posterior
-  draw.
-
- The \code{args} argument must also be specified and should be a named list
- with the following components:
- \itemize{
-   \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood.
-   \item \code{data}: An object containing data (e.g. observed outcome and
-   predictors) needed to compute the pointwise log-likelihood. \code{data}
-   should be in an appropriate form so that \eqn{f}\code{(i=i,
-   data=data[i,,drop=FALSE], draws=draws)} returns the \code{S}-vector of
-   log-likelihoods for the \code{i}th observation.
-   \item \code{N}: The number of observations.
-   \item \code{S}: The size of the posterior sample.
- }
 }}
 
 \section{PSIS-LOO}{

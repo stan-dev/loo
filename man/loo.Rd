@@ -9,18 +9,19 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ...)
+\method{loo}{array}(x, ..., cores = getOption("loo.cores", 1))
 
-\method{loo}{matrix}(x, chain_id, ...)
+\method{loo}{matrix}(x, ..., chain_id, cores = getOption("loo.cores", 1))
 
-\method{loo}{function}(x, args, ...)
+\method{loo}{function}(x, ..., chain_id, draws = NULL, data = data.frame(),
+  S = integer(), N = integer(), cores = getOption("loo.cores", 1))
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
 (by class)} section below for a detailed description of how to specify the
 inputs for each method.}
 
-\item{...}{Optional arguments passed on to \code{\link{psis}}. Possible
+\item{...}{Additional arguments passed on to \code{\link{psis}}. Possible
   arguments and their defaults are:
 \describe{
  \item{\code{wtrunc = 3/4}}{
@@ -28,24 +29,18 @@ inputs for each method.}
   for no truncation). We recommend the default value unless there are
   problems.
  }
- \item{\code{cores = getOption("loo.cores", 1)}}{
-  The number of cores to use for parallelization. The default for an entire R
-  session can be set with \code{options(loo.cores = NUMBER)}. As of \pkg{loo}
-  version \code{2.0.0}, \strong{the default is 1 core}, but we recommend
-  using as many (or close to as many) cores as possible.
- }
 }}
+
+\item{cores}{The number of cores to use for parallelization. The default for
+an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
+of version \code{2.0.0} the \strong{default is now 1 core}, but we
+recommend using as many (or close to as many) cores as possible.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in
 \code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
-
-\item{args}{Only required if \code{x} is a function. A list containing
-the data required to specify the arguments to the function. See the
-\strong{Methods (by class)} section below for how \code{args} should be
-specified.}
 }
 \value{
 A named list with class \code{c("psis_loo", "loo")} and components:
@@ -141,13 +136,13 @@ a <- a0 + sum(y); b <- b0 + N * K - sum(y)
 draws <- rbeta(S, a, b)
 data <- data.frame(y,K)
 
-llfun <- function(i, data, draws) {
+llfun <- function(data, draws) {
   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
 }
 loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
 
 # Check that we get same answer if using log-likelihood matrix
-log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
+log_lik_mat <- sapply(1:N, function(i) llfun(data[i,, drop=FALSE], draws))
 loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
 all.equal(loo_with_mat, loo_with_fn)
 }
