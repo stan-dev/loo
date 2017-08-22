@@ -10,10 +10,10 @@
 #'   (by class)} section below for a detailed description of how to specify the
 #'   inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
 #'   the \code{lw} used by the now deprecated \code{\link{psislw}} function.
-#' @param ... Currently ignored.
-#' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc},
-#'   where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
-#'   no truncation. The default is \code{0.75}.
+#' @param ... Arguments passed on to the various methods.
+#' @param wtrunc For truncating very large weights to \code{S^wtrunc}, where
+#'   \eqn{S} is the size of the posterior sample. The default and recommended
+#'   value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.
 #' @param cores The number of cores to use for parallelization. The default for
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 #'   of version \code{2.0.0} the \strong{default is now 1 core}, but we
@@ -73,8 +73,8 @@ psis <- function(x, ...) UseMethod("psis")
 psis.array <-
   function(x,
            ...,
-           wtrunc = 3/4,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("loo.cores", 1),
+           wtrunc = 3/4) {
     stopifnot(length(dim(x)) == 3)
     ll <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(ll))
@@ -97,8 +97,8 @@ psis.matrix <-
   function(x,
            chain_id,
            ...,
-           wtrunc = 3/4,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("loo.cores", 1),
+           wtrunc = 3/4) {
     ll <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(ll), chain_id)
     do_psis(

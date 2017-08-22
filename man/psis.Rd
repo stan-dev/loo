@@ -10,11 +10,11 @@
 \usage{
 psis(x, ...)
 
-\method{psis}{array}(x, ..., wtrunc = 3/4, cores = getOption("loo.cores",
-  1))
+\method{psis}{array}(x, ..., cores = getOption("loo.cores", 1),
+  wtrunc = 3/4)
 
-\method{psis}{matrix}(x, chain_id, ..., wtrunc = 3/4,
-  cores = getOption("loo.cores", 1))
+\method{psis}{matrix}(x, chain_id, ..., cores = getOption("loo.cores", 1),
+  wtrunc = 3/4)
 
 \method{psis}{default}(x, chain_id, ..., wtrunc = 3/4)
 
@@ -26,16 +26,16 @@ psis(x, ...)
 inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
 the \code{lw} used by the now deprecated \code{\link{psislw}} function.}
 
-\item{...}{Currently ignored.}
-
-\item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc},
-where \eqn{S} is the size of the posterior sample. Set \code{wtrunc=0} for
-no truncation. The default is \code{0.75}.}
+\item{...}{Arguments passed on to the various methods.}
 
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
+
+\item{wtrunc}{For truncating very large weights to \code{S^wtrunc}, where
+\eqn{S} is the size of the posterior sample. The default and recommended
+value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in

@@ -9,38 +9,38 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., cores = getOption("loo.cores", 1))
+\method{loo}{array}(x, ..., cores = getOption("loo.cores", 1), wtrunc = 3/4)
 
-\method{loo}{matrix}(x, ..., chain_id, cores = getOption("loo.cores", 1))
+\method{loo}{matrix}(x, ..., chain_id, cores = getOption("loo.cores", 1),
+  wtrunc = 3/4)
 
-\method{loo}{function}(x, ..., chain_id, draws = NULL, data = data.frame(),
-  S = integer(), N = integer(), cores = getOption("loo.cores", 1))
+\method{loo}{function}(x, ..., chain_id, draws = NULL, data = NULL,
+  cores = getOption("loo.cores", 1), wtrunc = 3/4)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
 (by class)} section below for a detailed description of how to specify the
 inputs for each method.}
 
-\item{...}{Additional arguments passed on to \code{\link{psis}}. Possible
-  arguments and their defaults are:
-\describe{
- \item{\code{wtrunc = 3/4}}{
-  For truncating very large weights to \eqn{S}^\code{wtrunc} (set to zero
-  for no truncation). We recommend the default value unless there are
-  problems.
- }
-}}
+\item{...}{Arguments passed on to the various methods.}
 
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
 
+\item{wtrunc}{For truncating very large weights to \code{S^wtrunc}, where
+\eqn{S} is the size of the posterior sample. The default and recommended
+value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.}
+
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in
 \code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
+
+\item{draws, data}{For the function method only. See the \strong{Methods (by
+class)} section below for details on these arguments.}
 }
 \value{
 A named list with class \code{c("psis_loo", "loo")} and components:
@@ -86,23 +86,26 @@ of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points. For example, the object returned by
 \code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
 
-\item \code{function}: A function \eqn{f} that takes arguments \code{i},
-  \code{data}, and \code{draws} and returns a vector containing the
-  log-likelihood for the \code{i}th observation evaluated at each posterior
-  draw.
+\item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
+  returns a vector containing the log-likelihood for a single observation
+  \code{i} evaluated at each posterior draw. The function should be written
+  such that, for each observation \code{i} in \code{1:N}, evaluating
+  \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
+  of length \code{S} (size of posterior sample).
 
- The \code{args} argument must also be specified and should be a named list
- with the following components:
+ If using the function method then the arguments \code{data}
+ and \code{draws} must also be specified in the call to \code{loo}:
  \itemize{
-   \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood.
    \item \code{data}: An object containing data (e.g. observed outcome and
    predictors) needed to compute the pointwise log-likelihood. \code{data}
-   should be in an appropriate form so that \eqn{f}\code{(i=i,
-   data=data[i,,drop=FALSE], draws=draws)} returns the \code{S}-vector of
-   log-likelihoods for the \code{i}th observation.
-   \item \code{N}: The number of observations.
-   \item \code{S}: The size of the posterior sample.
+   must be an object that can be indexed as described above
+   (\code{data[i,,drop=FALSE]}) to access the data for the \code{i}th
+   observation. \code{data} must have a \code{dim} attribute such that
+   \code{dim(data)[1]} is equal to \code{N}, the number of observations.
+   \item \code{draws}: An object containing the posterior draws for any
+   parameters needed to compute the pointwise log-likelihood. \code{draws}
+   must have a \code{dim} attribute such that \code{dim(draws)[1]} is equal
+   to \code{S}, the size of the posterior sample.
  }
 }}
 
@@ -114,6 +117,17 @@ For models fit to very large datasets we recommend the
   switching to \code{loo.function} if memory is an issue.
 }
 \examples{
+
+### Array and matrix methods (using example objects included with loo package)
+# Array method
+LLarr <- example_loglik_array()
+loo(LLarr)
+
+# Matrix method
+LLmat <- example_loglik_matrix()
+chain <- rep(1:ncol(LLarr), each = nrow(LLarr))
+loo(LLmat, chain_id = chain)
+
 \dontrun{
 ### Usage with stanfit objects
 # see ?extract_log_lik
@@ -124,8 +138,9 @@ print(loo1, digits = 3)
 log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 (loo2 <- loo(log_lik2))
 compare(loo1, loo2)
+}
 
-### Using log-likelihood function instead of matrix
+### Using log-likelihood function instead of array or matrix
 set.seed(024)
 
 # Simulate data and draw from posterior
@@ -133,19 +148,32 @@ N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
 p <- rbeta(1, a0, b0)
 y <- rbinom(N, size = K, prob = p)
 a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-draws <- rbeta(S, a, b)
-data <- data.frame(y,K)
+fake_posterior <- as.matrix(rbeta(S, a, b))
+dim(fake_posterior) # S x 1
+fake_data <- data.frame(y,K)
+dim(fake_data) # N x 2
 
-llfun <- function(data, draws) {
-  dbinom(data$y, size = data$K, prob = draws, log = TRUE)
+llfun <- function(data_i, draws) {
+  # each time called internally within loo the arguments will be equal to:
+  # data_i: ith row of fake_data (fake_data[i,, drop=FALSE])
+  # draws: entire fake_posterior matrix
+  dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
 }
-loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
+
+# Function method
+loo_with_fn <- loo(
+  x = llfun,
+  chain_id = rep(1, nrow(fake_posterior)), # pretend all draws came from 1 chain for this example
+  draws = fake_posterior,
+  data = fake_data
+)
 
 # Check that we get same answer if using log-likelihood matrix
-log_lik_mat <- sapply(1:N, function(i) llfun(data[i,, drop=FALSE], draws))
-loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
-all.equal(loo_with_mat, loo_with_fn)
-}
+mat <- sapply(1:N, function(i) {
+  llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
+})
+loo_with_mat <- loo(mat, chain_id = rep(1, 100))
+all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
 
 }
 \references{

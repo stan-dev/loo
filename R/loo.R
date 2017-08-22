@@ -5,19 +5,11 @@
 #' background.
 #'
 #' @export loo loo.array loo.matrix loo.function
-#' @inheritParams psis
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
 #'   (by class)} section below for a detailed description of how to specify the
 #'   inputs for each method.
-#' @param ... Additional arguments passed on to \code{\link{psis}}. Possible
-#'   arguments and their defaults are:
-#' \describe{
-#'  \item{\code{wtrunc = 3/4}}{
-#'   For truncating very large weights to \eqn{S}^\code{wtrunc} (set to zero
-#'   for no truncation). We recommend the default value unless there are
-#'   problems.
-#'  }
-#'}
+#' @param ... Arguments passed on to the various methods.
+#' @inheritParams psis
 #'
 #' @return A named list with class \code{c("psis_loo", "loo")} and components:
 #' \describe{
@@ -63,6 +55,17 @@
 #' @template loo-and-psis-references
 #'
 #' @examples
+#'
+#' ### Array and matrix methods (using example objects included with loo package)
+#' # Array method
+#' LLarr <- example_loglik_array()
+#' loo(LLarr)
+#'
+#' # Matrix method
+#' LLmat <- example_loglik_matrix()
+#' chain <- rep(1:ncol(LLarr), each = nrow(LLarr))
+#' loo(LLmat, chain_id = chain)
+#'
 #' \dontrun{
 #' ### Usage with stanfit objects
 #' # see ?extract_log_lik
@@ -73,8 +76,9 @@
 #' log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
 #' (loo2 <- loo(log_lik2))
 #' compare(loo1, loo2)
+#' }
 #'
-#' ### Using log-likelihood function instead of matrix
+#' ### Using log-likelihood function instead of array or matrix
 #' set.seed(024)
 #'
 #' # Simulate data and draw from posterior
@@ -82,19 +86,32 @@
 #' p <- rbeta(1, a0, b0)
 #' y <- rbinom(N, size = K, prob = p)
 #' a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-#' draws <- rbeta(S, a, b)
-#' data <- data.frame(y,K)
+#' fake_posterior <- as.matrix(rbeta(S, a, b))
+#' dim(fake_posterior) # S x 1
+#' fake_data <- data.frame(y,K)
+#' dim(fake_data) # N x 2
 #'
-#' llfun <- function(data, draws) {
-#'   dbinom(data$y, size = data$K, prob = draws, log = TRUE)
+#' llfun <- function(data_i, draws) {
+#'   # each time called internally within loo the arguments will be equal to:
+#'   # data_i: ith row of fake_data (fake_data[i,, drop=FALSE])
+#'   # draws: entire fake_posterior matrix
+#'   dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
 #' }
-#' loo_with_fn <- loo(llfun, chain_id = rep(1, 100), args = nlist(data, draws, N, S), cores = 1)
+#'
+#' # Function method
+#' loo_with_fn <- loo(
+#'   x = llfun,
+#'   chain_id = rep(1, nrow(fake_posterior)), # pretend all draws came from 1 chain for this example
+#'   draws = fake_posterior,
+#'   data = fake_data
+#' )
 #'
 #' # Check that we get same answer if using log-likelihood matrix
-#' log_lik_mat <- sapply(1:N, function(i) llfun(data[i,, drop=FALSE], draws))
-#' loo_with_mat <- loo(log_lik_mat, chain_id = rep(1, 100), cores = 1)
-#' all.equal(loo_with_mat, loo_with_fn)
-#' }
+#' mat <- sapply(1:N, function(i) {
+#'   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
+#' })
+#' loo_with_mat <- loo(mat, chain_id = rep(1, 100))
+#' all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
 #'
 loo <- function(x, ...) {
   UseMethod("loo")
@@ -104,84 +121,92 @@ loo <- function(x, ...) {
 #' @templateVar fn loo
 #' @template array
 #'
-loo.array <- function(x, ..., cores = getOption("loo.cores", 1)) {
-  psis_out <- psis.array(x, ..., cores = cores)
-  ll <- llarray_to_matrix(x)
-  pointwise <- pointwise_loo_calcs(ll, psis_out)
-  psis_loo_object(
-    pointwise = pointwise,
-    diagnostics = psis_out[c("pareto_k", "n_eff")],
-    log_lik_dim = attr(psis_out, "log_lik_dim")
-  )
-}
+loo.array <-
+  function(x,
+           ...,
+           cores = getOption("loo.cores", 1),
+           wtrunc = 3/4) {
+    psis_out <- psis.array(x, cores = cores, wtrunc = wtrunc)
+    ll <- llarray_to_matrix(x)
+    pointwise <- pointwise_loo_calcs(ll, psis_out)
+    psis_loo_object(
+      pointwise = pointwise,
+      diagnostics = psis_out[c("pareto_k", "n_eff")],
+      log_lik_dim = attr(psis_out, "log_lik_dim")
+    )
+  }
 
 #' @export
 #' @templateVar fn loo
 #' @template matrix
 #' @template chain_id
 #'
-loo.matrix <- function(x, ..., chain_id, cores = getOption("loo.cores", 1)) {
-  psis_out <- psis.matrix(x, chain_id, ...)
-  pointwise <- pointwise_loo_calcs(x, psis_out)
-  psis_loo_object(
-    pointwise = pointwise,
-    diagnostics = psis_out[c("pareto_k", "n_eff")],
-    log_lik_dim = attr(psis_out, "log_lik_dim")
-  )
-}
+loo.matrix <-
+  function(x,
+           ...,
+           chain_id,
+           cores = getOption("loo.cores", 1),
+           wtrunc = 3/4) {
+    psis_out <- psis.matrix(x, chain_id, cores = cores, wtrunc = wtrunc)
+    pointwise <- pointwise_loo_calcs(x, psis_out)
+    psis_loo_object(
+      pointwise = pointwise,
+      diagnostics = psis_out[c("pareto_k", "n_eff")],
+      log_lik_dim = attr(psis_out, "log_lik_dim")
+    )
+  }
 
 #' @export
 #' @templateVar fn loo
 #' @template function
+#' @param draws,data For the function method only. See the \strong{Methods (by
+#'   class)} section below for details on these arguments.
 #'
 loo.function <-
   function(x,
            ...,
            chain_id,
            draws = NULL,
-           data = data.frame(),
-           S = integer(),
-           N = integer(),
-           cores = getOption("loo.cores", 1)) {
+           data = NULL,
+           cores = getOption("loo.cores", 1),
+           wtrunc = 3/4) {
 
-    stopifnot(is.data.frame(data) || is.matrix(data))
-    .LogLik <- match.fun(x)
+    stopifnot(!is.null(dim(draws)), is.data.frame(data) || is.matrix(data))
+    S <- dim(draws)[1]
+    N <- dim(data)[1]
+
+    user_llfun <- match.fun(x)
+    arg_names <- names(formals(user_llfun))
+    if (length(arg_names) != 2 ||
+        !all(arg_names %in% c("data_i", "draws"))) {
+      stop("Log-likelihood function should have two arguments: ",
+           "'data_i' and 'draws'.", call. = FALSE)
+    }
+
 
     if (cores == 1) {
-      psis_list <- lapply(
-        X = seq_len(N),
-        FUN = function(i) {
-          d_i <- data[i,, drop=FALSE]
-          ll_i <- as.matrix(.LogLik(d_i, draws))
-          psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
-          list(
-            pointwise = pointwise_loo_calcs(ll_i, psis_out),
-            diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
-          )
-        }
-      )
-      # for (i in 1:N) {
-      #   d_i <- data[i,, drop=FALSE]
-      #   ll_i <- as.matrix(.LogLik(d_i, draws))
-      #   psis_out <- psis.matrix(ll_i, chain_id, cores = 1, ...)
-      #   pointwise_list[[i]] <- pointwise_loo_calcs(ll_i, psis_out)
-      #   diagnostics_list[[i]] <- cbind(psis_out[["pareto_k"]], psis_out[["n_eff"]])
-      # }
+      psis_list <-
+        lapply(
+          X = seq_len(N),
+          FUN = log_lik_i,
+          llfun = user_llfun,
+          data = data,
+          draws = draws,
+          chain_id = chain_id,
+          wtrunc = wtrunc
+        )
     } else {
       if (.Platform$OS.type != "windows") {
         psis_list <-
           parallel::mclapply(
+            mc.cores = cores,
             X = seq_len(N),
-            FUN = function(i) {
-              d_i <- data[i,, drop=FALSE]
-              ll_i <- as.matrix(.LogLik(d_i, draws))
-              psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
-              list(
-                pointwise = pointwise_loo_calcs(ll_i, psis_out),
-                diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
-              )
-            },
-            mc.cores = cores
+            FUN = log_lik_i,
+            llfun = user_llfun,
+            data = data,
+            draws = draws,
+            chain_id = chain_id,
+            wtrunc = wtrunc
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
@@ -190,30 +215,25 @@ loo.function <-
           parallel::parLapply(
             cl = cl,
             X = seq_len(N),
-            fun = function(i) {
-              d_i <- data[i,, drop=FALSE]
-              ll_i <- as.matrix(.LogLik(d_i, draws))
-              psis_out <- psis.matrix(as.matrix(ll_i), chain_id, cores = 1, ...)
-              list(
-                pointwise = pointwise_loo_calcs(ll_i, psis_out),
-                diagnostics = cbind(psis_out$pareto_k, psis_out$n_eff)
-              )
-            }
+            fun = log_lik_i,
+            llfun = user_llfun,
+            data = data,
+            draws = draws,
+            chain_id = chain_id,
+            wtrunc = wtrunc
           )
       }
     }
 
-    pointwise_list <- lapply(psis_list, "[[", "pointwise")
-    diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
+    pointwise <- do.call(rbind, lapply(psis_list, "[[", "pointwise"))
+    diagnostics <- list(
+      pareto_k = psis_apply(psis_list, "pareto_k"),
+      n_eff = psis_apply(psis_list, "n_eff")
+    )
 
-    pointwise <- do.call(rbind, pointwise_list)
-    diagnostics <- do.call(rbind, diagnostics_list)
     psis_loo_object(
       pointwise = pointwise,
-      diagnostics = list(
-        pareto_k = diagnostics[, 1],
-        n_eff = diagnostics[, 2]
-      ),
+      diagnostics = diagnostics,
       log_lik_dim = c(S = S, N = N)
     )
 }
@@ -238,7 +258,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   cbind(elpd_loo, p_loo, looic)
 }
 
-# structure the object returned by the loo methods
+# Structure the object returned by the loo methods
 #
 # @param pointwise Matrix containing columns elpd_loo, p_loo, looic
 # @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
@@ -251,5 +271,29 @@ psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
     nlist(estimates, pointwise, diagnostics),
     log_lik_dim = log_lik_dim,
     class = c("psis_loo", "loo")
+  )
+}
+
+
+# Function that is passed to the FUN argument of lapply, mclapply, or parLapply
+# for the loo.function method
+#
+# @param i Integer in 1:N.
+# @param llfun User's log-likelihood function that has arguments 'data_i' and
+#   'draws'.
+# @param data,draws,chain_id,wtrunc User's arguments to loo.function.
+# @param return A list of PSIS results for a single observation. The list has
+#   with components 'pointwise' (a 1x3 matrix with columns 'elpd_loo', 'p_loo',
+#   'looic'), 'pareto_k' (scalar pareto k estimate), and 'n_eff' (scalar psis
+#   n_eff estimate).
+#
+log_lik_i <- function(i, llfun, data, draws, chain_id, wtrunc) {
+  d_i <- data[i,, drop=FALSE]
+  ll_i <- as.matrix(llfun(data_i = d_i, draws = draws), ncol = 1)
+  psis_out <- psis.matrix(ll_i, chain_id = chain_id, cores = 1, wtrunc = wtrunc)
+  list(
+    pointwise = pointwise_loo_calcs(ll_i, psis_out),
+    pareto_k = psis_out$pareto_k,
+    n_eff = psis_out$n_eff
   )
 }
