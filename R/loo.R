@@ -1,8 +1,16 @@
 #' Leave-one-out cross-validation (LOO)
 #'
-#' Efficient approximate leave-one-out cross-validation for Bayesian models. See
-#' \link{loo-package} and Vehtari, Gelman, and Gabry (2016, 2017) for
-#' background.
+#' @description Efficient approximate leave-one-out cross-validation for
+#'   Bayesian models using Pareto smoothed importance sampling (PSIS). See
+#'   Vehtari, Gelman, and Gabry (2016, 2017) and \link{loo-package} for
+#'   background.
+#'
+#'   The \code{loo} function is an S3 generic and methods are provided for
+#'   computing LOO from 3-D pointwise log-likelihood arrays, pointwise
+#'   log-likelihood matrices, and log-likelihood functions. The array and matrix methods are
+#'   usually most convenient, but for models fit to very large datasets the
+#'   \code{loo.function} method is more memory efficient and may be preferable.
+#'
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -14,8 +22,8 @@
 #' @return A named list with class \code{c("psis_loo", "loo")} and components:
 #' \describe{
 #'  \item{\code{estimates}}{
-#'   A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
-#'   (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
+#'   A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
+#'   (\code{elpd_loo}, \code{p_loo}, \code{looic}). This contains point
 #'   estimates and standard errors of the expected log pointwise predictive
 #'   density (\code{elpd_loo}), the effective number of parameters
 #'   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
@@ -36,12 +44,6 @@
 #'   }
 #'  }
 #' }
-#'
-#' @note For models fit to very large datasets we recommend the
-#'   \code{loo.function} method, which is much more memory efficient than the
-#'   array and matrix methods. However, the array and matrix methods are
-#'   typically more convenient, so it is usually worth trying them and then
-#'   switching to \code{loo.function} if memory is an issue.
 #'
 #' @seealso
 #' \itemize{
@@ -171,12 +173,13 @@ loo.function <-
            cores = getOption("loo.cores", 1),
            wtrunc = 3/4) {
 
-    stopifnot(!is.null(dim(draws)), is.data.frame(data) || is.matrix(data))
+    stopifnot(is.data.frame(data) || is.matrix(data),
+              !is.null(dim(draws)))
     S <- dim(draws)[1]
     N <- dim(data)[1]
 
-    user_llfun <- match.fun(x)
-    arg_names <- names(formals(user_llfun))
+    .llfun <- match.fun(x)
+    arg_names <- names(formals(.llfun))
     if (length(arg_names) != 2 ||
         !all(arg_names %in% c("data_i", "draws"))) {
       stop("Log-likelihood function should have two arguments: ",
@@ -188,8 +191,8 @@ loo.function <-
       psis_list <-
         lapply(
           X = seq_len(N),
-          FUN = log_lik_i,
-          llfun = user_llfun,
+          FUN = .loo_i,
+          llfun = .llfun,
           data = data,
           draws = draws,
           chain_id = chain_id,
@@ -201,8 +204,8 @@ loo.function <-
           parallel::mclapply(
             mc.cores = cores,
             X = seq_len(N),
-            FUN = log_lik_i,
-            llfun = user_llfun,
+            FUN = .loo_i,
+            llfun = .llfun,
             data = data,
             draws = draws,
             chain_id = chain_id,
@@ -215,8 +218,8 @@ loo.function <-
           parallel::parLapply(
             cl = cl,
             X = seq_len(N),
-            fun = log_lik_i,
-            llfun = user_llfun,
+            fun = .loo_i,
+            llfun = .llfun,
             data = data,
             draws = draws,
             chain_id = chain_id,
@@ -225,7 +228,7 @@ loo.function <-
       }
     }
 
-    pointwise <- do.call(rbind, lapply(psis_list, "[[", "pointwise"))
+    pointwise <- do.call(rbind, lapply(psis_list, "[[", "estimates"))
     diagnostics <- list(
       pareto_k = psis_apply(psis_list, "pareto_k"),
       n_eff = psis_apply(psis_list, "n_eff")
@@ -275,25 +278,68 @@ psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
 }
 
 
+#' @description The \code{loo_i} function enables testing log-likelihood
+#'   functions for use with the \code{loo.function} method.
+#'
+#' @rdname loo
+#' @export
+#'
+#' @param i For \code{loo_i}, an integer in 1:N.
+#' @param llfun For \code{loo_i}, the same as \code{x} for the
+#'   \code{loo.function} method. A log-likelihood function as described in the
+#'   \strong{Methods (by class)} section.
+#'
+#' @return \code{loo_i} returns a named list of with results for a
+#'   single observation. The list has the following components:
+#'   \itemize{
+#'     \item \code{estimates}: 1 x 3 matrix with columns \code{elpd_loo},
+#'     \code{p_loo}, and \code{looic}.
+#'     \item \code{pareto_k}: scalar \link[=pareto-k-diagnostic]{pareto k diagnostic}.
+#'     \item \code{n_eff}: scalar \link[=psis]{PSIS} effective sample size estimate.
+#'   }
+#'
+#'
+loo_i <-
+  function(i,
+           llfun,
+           data,
+           draws,
+           chain_id = NULL,
+           wtrunc = 3 / 4) {
+    stopifnot(
+      i == as.integer(i),
+      is.data.frame(data) || is.matrix(data),
+      !is.null(dim(draws))
+    )
+    i <- as.integer(i)
+    S <- dim(draws)[1]
+    N <- dim(data)[1]
+    stopifnot(i %in% seq_len(N))
+
+    .loo_i(i, llfun = match.fun(llfun), data, draws, chain_id, wtrunc)
+  }
+
+
 # Function that is passed to the FUN argument of lapply, mclapply, or parLapply
-# for the loo.function method
-#
-# @param i Integer in 1:N.
-# @param llfun User's log-likelihood function that has arguments 'data_i' and
-#   'draws'.
-# @param data,draws,chain_id,wtrunc User's arguments to loo.function.
-# @param return A list of PSIS results for a single observation. The list has
-#   with components 'pointwise' (a 1x3 matrix with columns 'elpd_loo', 'p_loo',
-#   'looic'), 'pareto_k' (scalar pareto k estimate), and 'n_eff' (scalar psis
-#   n_eff estimate).
-#
-log_lik_i <- function(i, llfun, data, draws, chain_id, wtrunc) {
-  d_i <- data[i,, drop=FALSE]
-  ll_i <- as.matrix(llfun(data_i = d_i, draws = draws), ncol = 1)
-  psis_out <- psis.matrix(ll_i, chain_id = chain_id, cores = 1, wtrunc = wtrunc)
-  list(
-    pointwise = pointwise_loo_calcs(ll_i, psis_out),
-    pareto_k = psis_out$pareto_k,
-    n_eff = psis_out$n_eff
-  )
-}
+# for the loo.function method.
+.loo_i <-
+  function(i,
+           llfun,
+           data,
+           draws,
+           chain_id = NULL,
+           wtrunc = 3 / 4) {
+
+    d_i <- data[i, , drop = FALSE]
+    ll_i <- llfun(data_i = d_i, draws = draws)
+    psis_out <-
+      psis(x = ll_i,
+           chain_id = chain_id,
+           wtrunc = wtrunc,
+           cores = 1)
+    list(
+      estimates = pointwise_loo_calcs(ll_i, psis_out),
+      pareto_k = psis_out$pareto_k,
+      n_eff = psis_out$n_eff
+    )
+  }

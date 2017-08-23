@@ -20,7 +20,9 @@ waic(x, ...)
 (by class)} section below for a detailed description of how to specify the
 inputs for each method.}
 
-\item{...}{Currently ignored.}
+\item{...}{Arguments passed on to the various methods.}
+
+\item{args}{Deprecated.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:
@@ -80,6 +82,18 @@ of data points. For example, the object returned by
 }}
 
 \examples{
+### Array and matrix methods
+LLarr <- example_loglik_array()
+dim(LLarr)
+
+LLmat <- example_loglik_matrix()
+dim(LLmat)
+
+waic_arr <- waic(LLarr)
+waic_mat <- waic(LLmat)
+identical(waic_arr, waic_mat)
+
+
 \dontrun{
 log_lik1 <- extract_log_lik(stanfit1)
 log_lik2 <- extract_log_lik(stanfit2)

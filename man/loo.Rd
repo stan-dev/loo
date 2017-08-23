@@ -5,6 +5,7 @@
 \alias{loo.array}
 \alias{loo.matrix}
 \alias{loo.function}
+\alias{loo_i}
 \title{Leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
@@ -16,6 +17,8 @@ loo(x, ...)
 
 \method{loo}{function}(x, ..., chain_id, draws = NULL, data = NULL,
   cores = getOption("loo.cores", 1), wtrunc = 3/4)
+
+loo_i(i, llfun, data, draws, chain_id = NULL, wtrunc = 3/4)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -41,13 +44,19 @@ in \code{1:C}.}
 
 \item{draws, data}{For the function method only. See the \strong{Methods (by
 class)} section below for details on these arguments.}
+
+\item{i}{For \code{loo_i}, an integer in 1:N.}
+
+\item{llfun}{For \code{loo_i}, the same as \code{x} for the
+\code{loo.function} method. A log-likelihood function as described in the
+\strong{Methods (by class)} section.}
 }
 \value{
 A named list with class \code{c("psis_loo", "loo")} and components:
 \describe{
  \item{\code{estimates}}{
-  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three rows
-  (\code{"elpd_loo"}, \code{"p_loo"}, \code{"looic"}). This contains point
+  A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
+  (\code{elpd_loo}, \code{p_loo}, \code{looic}). This contains point
   estimates and standard errors of the expected log pointwise predictive
   density (\code{elpd_loo}), the effective number of parameters
   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
@@ -68,11 +77,30 @@ A named list with class \code{c("psis_loo", "loo")} and components:
   }
  }
 }
+
+\code{loo_i} returns a named list of with results for a
+  single observation. The list has the following components:
+  \itemize{
+    \item \code{estimates}: 1 x 3 matrix with columns \code{elpd_loo},
+    \code{p_loo}, and \code{looic}.
+    \item \code{pareto_k}: scalar \link[=pareto-k-diagnostic]{pareto k diagnostic}.
+    \item \code{n_eff}: scalar \link[=psis]{PSIS} effective sample size estimate.
+  }
 }
 \description{
-Efficient approximate leave-one-out cross-validation for Bayesian models. See
-\link{loo-package} and Vehtari, Gelman, and Gabry (2016, 2017) for
-background.
+Efficient approximate leave-one-out cross-validation for
+  Bayesian models using Pareto smoothed importance sampling (PSIS). See
+  Vehtari, Gelman, and Gabry (2016, 2017) and \link{loo-package} for
+  background.
+
+  The \code{loo} function is an S3 generic and methods are provided for
+  computing LOO from 3-D pointwise log-likelihood arrays, pointwise
+  log-likelihood matrices, and log-likelihood functions. The array and matrix methods are
+  usually most convenient, but for models fit to very large datasets the
+  \code{loo.function} method is more memory efficient and may be preferable.
+
+The \code{loo_i} function enables testing log-likelihood
+  functions for use with the \code{loo.function} method.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -109,13 +137,6 @@ of data points. For example, the object returned by
  }
 }}
 
-\note{
-For models fit to very large datasets we recommend the
-  \code{loo.function} method, which is much more memory efficient than the
-  array and matrix methods. However, the array and matrix methods are
-  typically more convenient, so it is usually worth trying them and then
-  switching to \code{loo.function} if memory is an issue.
-}
 \examples{
 
 ### Array and matrix methods (using example objects included with loo package)

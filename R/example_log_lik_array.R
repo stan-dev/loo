@@ -10,14 +10,14 @@
 #' (observations) pointwise log-likelihood array.
 #'
 #' \code{example_loglik_matrix} returns the same pointwise log-likelihood values
-#' but reshaped into a 1000 (draws*chains) x 32 (observations) matrix.
+#' as \code{example_loglik_array} but reshaped into a 1000 (draws*chains) x 32
+#' (observations) matrix.
 #'
 #' @examples
 #' LLarr <- example_loglik_array()
-#' dim_arr <- dim(LLarr)
-#'
+#' (dim_arr <- dim(LLarr))
 #' LLmat <- example_loglik_matrix()
-#' dim_mat <- dim(LLmat)
+#' (dim_mat <- dim(LLmat))
 #'
 #' all.equal(dim_mat[1], dim_arr[1] * dim_arr[2])
 #' all.equal(dim_mat[2], dim_arr[3])
@@ -33,7 +33,7 @@ example_loglik_array <- function() {
 #' @rdname example_loglik_array
 #' @export
 example_loglik_matrix <- function() {
-  # .example_loglik_array exists in R/sysdata.R
-  return(llarray_to_matrix(.example_loglik_array))
+  ll <- example_loglik_array()
+  return(llarray_to_matrix(ll))
 }
 

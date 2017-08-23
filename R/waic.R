@@ -2,7 +2,7 @@
 #'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
-#' @param ... Currently ignored.
+#' @param args Deprecated.
 #'
 #' @return A named list (of class \code{c("waic", "loo")}) with components:
 #'
@@ -27,6 +27,18 @@
 #'
 #'
 #' @examples
+#' ### Array and matrix methods
+#' LLarr <- example_loglik_array()
+#' dim(LLarr)
+#'
+#' LLmat <- example_loglik_matrix()
+#' dim(LLmat)
+#'
+#' waic_arr <- waic(LLarr)
+#' waic_mat <- waic(LLmat)
+#' identical(waic_arr, waic_mat)
+#'
+#'
 #' \dontrun{
 #' log_lik1 <- extract_log_lik(stanfit1)
 #' log_lik2 <- extract_log_lik(stanfit2)

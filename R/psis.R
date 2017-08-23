@@ -119,9 +119,8 @@ psis.default <-
            ...,
            wtrunc = 3/4) {
     stopifnot(is.null(dim(x)) || length(dim(x)) == 1)
-    ll <- validate_ll(x)
-    dim(ll) <- c(length(ll), 1)
-    psis.matrix(x = ll,
+    dim(x) <- c(length(x), 1)
+    psis.matrix(x = x,
                 chain_id = chain_id,
                 wtrunc = wtrunc,
                 cores = 1)

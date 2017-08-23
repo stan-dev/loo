@@ -14,7 +14,8 @@ example_loglik_matrix()
 (observations) pointwise log-likelihood array.
 
 \code{example_loglik_matrix} returns the same pointwise log-likelihood values
-but reshaped into a 1000 (draws*chains) x 32 (observations) matrix.
+as \code{example_loglik_array} but reshaped into a 1000 (draws*chains) x 32
+(observations) matrix.
 }
 \description{
 Example pointwise log-likelihood objects to use in demonstrations and tests.
@@ -22,10 +23,9 @@ See the \strong{Value} and \strong{Examples} sections below.
 }
 \examples{
 LLarr <- example_loglik_array()
-dim_arr <- dim(LLarr)
-
+(dim_arr <- dim(LLarr))
 LLmat <- example_loglik_matrix()
-dim_mat <- dim(LLmat)
+(dim_mat <- dim(LLmat))
 
 all.equal(dim_mat[1], dim_arr[1] * dim_arr[2])
 all.equal(dim_mat[2], dim_arr[3])
