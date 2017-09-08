@@ -353,7 +353,7 @@ psis_smooth_tail <- function(x) {
 # @return An N-vector of tail lengths.
 #
 n_pareto <- function(rel_n_eff, S) {
-  n <- pmin(0.2 * S, 3 * sqrt(S) / rel_n_eff)
+  n <- pmin(0.2 * S, 3 * sqrt(S / rel_n_eff))
   ceiling(n)
 }
 
