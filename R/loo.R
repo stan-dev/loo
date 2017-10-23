@@ -7,9 +7,10 @@
 #'
 #'   The \code{loo} function is an S3 generic and methods are provided for
 #'   computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-#'   log-likelihood matrices, and log-likelihood functions. The array and matrix methods are
-#'   usually most convenient, but for models fit to very large datasets the
-#'   \code{loo.function} method is more memory efficient and may be preferable.
+#'   log-likelihood matrices, and log-likelihood functions. The array and matrix
+#'   methods are usually most convenient, but for models fit to very large
+#'   datasets the \code{loo.function} method is more memory efficient and may be
+#'   preferable.
 #'
 #'
 #' @export loo loo.array loo.matrix loo.function
@@ -245,13 +246,14 @@ loo.function <-
 
 # internal ----------------------------------------------------------------
 
-# Compute pointwise elpd_loo, p_loo, looic from log lik matrix and
-# psis log weights
-#
-# @param ll Log-likelihood matrix.
-# @param psis_object The object returned by psis.
-# @return Named list with pointwise elpd_loo, p_loo, and looic.
-#
+#' Compute pointwise elpd_loo, p_loo, looic from log lik matrix and
+#' psis log weights
+#'
+#' @noRd
+#' @param ll Log-likelihood matrix.
+#' @param psis_object The object returned by psis.
+#' @return Named list with pointwise elpd_loo, p_loo, and looic.
+#'
 pointwise_loo_calcs <- function(ll, psis_object) {
   lpd <- logColMeansExp(ll)
   ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
@@ -261,12 +263,13 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   cbind(elpd_loo, p_loo, looic)
 }
 
-# Structure the object returned by the loo methods
-#
-# @param pointwise Matrix containing columns elpd_loo, p_loo, looic
-# @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
-# @param log_lik_dim Log likelihood matrix dimensions (attribute of psis object)
-#
+#' Structure the object returned by the loo methods
+#'
+#' @noRd
+#' @param pointwise Matrix containing columns elpd_loo, p_loo, looic
+#' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
+#' @param log_lik_dim Log likelihood matrix dimensions (attribute of psis object)
+#'
 psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
   stopifnot(is.matrix(pointwise), is.list(diagnostics))
   estimates <- table_of_estimates(pointwise)
@@ -298,7 +301,6 @@ psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
 #'     \item \code{n_eff}: scalar \link[=psis]{PSIS} effective sample size estimate.
 #'   }
 #'
-#'
 loo_i <-
   function(i,
            llfun,
@@ -321,7 +323,8 @@ loo_i <-
 
 
 # Function that is passed to the FUN argument of lapply, mclapply, or parLapply
-# for the loo.function method.
+# for the loo.function method. The arguments and return value are the same as
+# the ones documented above for loo_i.
 .loo_i <-
   function(i,
            llfun,

@@ -32,9 +32,9 @@ an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
 
-\item{wtrunc}{For truncating very large weights to \code{S^wtrunc}, where
-\eqn{S} is the size of the posterior sample. The default and recommended
-value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.}
+\item{wtrunc}{Should weights be truncated? Set to \code{FALSE} or \code{0}
+no truncation. As of version \code{2.0.0}, the default is to truncate
+the smoothed weights at the (column) maximum(s) of the raw weights.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in
@@ -95,9 +95,10 @@ Efficient approximate leave-one-out cross-validation for
 
   The \code{loo} function is an S3 generic and methods are provided for
   computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-  log-likelihood matrices, and log-likelihood functions. The array and matrix methods are
-  usually most convenient, but for models fit to very large datasets the
-  \code{loo.function} method is more memory efficient and may be preferable.
+  log-likelihood matrices, and log-likelihood functions. The array and matrix
+  methods are usually most convenient, but for models fit to very large
+  datasets the \code{loo.function} method is more memory efficient and may be
+  preferable.
 
 The \code{loo_i} function enables testing log-likelihood
   functions for use with the \code{loo.function} method.
@@ -198,14 +199,14 @@ all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
   version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
+Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{

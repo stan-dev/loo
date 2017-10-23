@@ -50,10 +50,10 @@ find the indexes of observations for which the estimated Pareto shape
 parameter \eqn{k} is larger than some \code{threshold} value, or plot
 observation indexes vs \eqn{k} estimates.
 }
-\section{Pareto k diagnostic}{
- The reliability of the PSIS-based estimates can
-  be assessed using the estimates for the shape parameter \eqn{k} of the
-  generalized Pareto distribution.
+\details{
+The reliability of the PSIS-based estimates can be assessed using the
+estimates for the shape parameter \eqn{k} of the generalized Pareto
+distribution.
 
 \itemize{
   \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
@@ -82,18 +82,17 @@ different, which is more likely to happen with a non-robust model and highly
 influential observations. A robust model may reduce the sensitivity to highly
 influential observations.
 }
-
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
   version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
+Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{psislw}} for the implementation of the PSIS algorithm.
+\code{\link{psis}} for the implementation of the PSIS algorithm.
 }

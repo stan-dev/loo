@@ -2,7 +2,7 @@
 #'
 #' Implementation of Pareto smoothed importance sampling, a method for
 #' stabilizing importance weights. For full details about the algorithm see
-#' Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
+#' Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export
@@ -11,9 +11,9 @@
 #'   inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
 #'   the \code{lw} used by the now deprecated \code{\link{psislw}} function.
 #' @param ... Arguments passed on to the various methods.
-#' @param wtrunc For truncating very large weights to \code{S^wtrunc}, where
-#'   \eqn{S} is the size of the posterior sample. The default and recommended
-#'   value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.
+#' @param wtrunc Should weights be truncated? Set to \code{FALSE} or \code{0}
+#'   no truncation. As of version \code{2.0.0}, the default is to truncate
+#'   the smoothed weights at the (column) maximum(s) of the raw weights.
 #' @param cores The number of cores to use for parallelization. The default for
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 #'   of version \code{2.0.0} the \strong{default is now 1 core}, but we
@@ -58,8 +58,6 @@
 #'   }
 #' }
 #'
-#' @inheritSection loo-package PSIS-LOO
-#'
 #' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
@@ -74,7 +72,7 @@ psis.array <-
   function(x,
            ...,
            cores = getOption("loo.cores", 1),
-           wtrunc = 3/4) {
+           wtrunc = TRUE) {
     stopifnot(length(dim(x)) == 3)
     ll <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(ll))
@@ -98,7 +96,7 @@ psis.matrix <-
            chain_id,
            ...,
            cores = getOption("loo.cores", 1),
-           wtrunc = 3/4) {
+           wtrunc = TRUE) {
     ll <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(ll), chain_id)
     do_psis(
@@ -117,7 +115,7 @@ psis.default <-
   function(x,
            chain_id,
            ...,
-           wtrunc = 3/4) {
+           wtrunc = TRUE) {
     stopifnot(is.null(dim(x)) || length(dim(x)) == 1)
     dim(x) <- c(length(x), 1)
     psis.matrix(x = x,
@@ -168,7 +166,7 @@ weights.psis <-
 # @return A list with class "psis" and structure described in the main doc at
 #   the top of this file.
 #
-do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
+do_psis <- function(lw, rel_n_eff = 1, wtrunc = TRUE, cores) {
   stopifnot(length(rel_n_eff) == ncol(lw),
             cores == as.integer(cores),
             wtrunc >= 0)
@@ -204,14 +202,12 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
   throw_psis_warnings(pareto_k)
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
-  if (wtrunc > 0) {
-    log_weights <- apply(
-      log_weights,
-      MARGIN = 2,
-      FUN = truncate_lw,
-      logS = log(S),
-      wtrunc = wtrunc
-    )
+  if (wtrunc) {
+    # truncate at the max of raw wts
+    max_wts <- apply(lw, 2, max)
+    log_weights <- sapply(1:N, function(n) {
+      truncate_lw(log_weights[, n], upper = max_wts[n])
+    })
   }
 
   psis_object(
@@ -223,29 +219,31 @@ do_psis <- function(lw, rel_n_eff, wtrunc, cores) {
   )
 }
 
-# Extract named components from each list in a list of lists
-#
-# @param x List of lists.
-# @param item String naming the component or attribute to pull out of each list (or list-like object).
-# @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
-# @return Numeric vector or matrix.
-#
+#' Extract named components from each list in a list of lists
+#'
+#' @noRd
+#' @param x List of lists.
+#' @param item String naming the component or attribute to pull out of each list (or list-like object).
+#' @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
+#' @return Numeric vector or matrix.
+#'
 psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
   stopifnot(is.list(x))
   vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
 }
 
-# Structure the object returned by the psis methods
-#
-# @param unnormalized_log_weights Smoothed and possibly truncated log weights,
-#   but unnormalized.
-# @param pareto_k Vector of GPD k estimates.
-# @param tail_len Vector of tail lengths used to fit GPD.
-# @param rel_n_eff Vector of relative MCMC n_eff for exp(log lik)
-# @param wtrunc User's wtrunc argument.
-# @return A list of class "psis" with structure described in the main doc at the
-#   top of this file.
-#
+#' Structure the object returned by the psis methods
+#'
+#' @noRd
+#' @param unnormalized_log_weights Smoothed and possibly truncated log weights,
+#'   but unnormalized.
+#' @param pareto_k Vector of GPD k estimates.
+#' @param tail_len Vector of tail lengths used to fit GPD.
+#' @param rel_n_eff Vector of relative MCMC n_eff for exp(log lik)
+#' @param wtrunc User's wtrunc argument.
+#' @return A list of class "psis" with structure described in the main doc at the
+#'   top of this file.
+#'
 psis_object <-
   function(unnormalized_log_weights,
            pareto_k,
@@ -278,13 +276,14 @@ psis_object <-
   }
 
 
-# PSIS (without truncation and normalization) on a single vector
-#
-# @param lw_i A vector of log weights (negative log likelihood).
-# @param tail_len_i An integer tail length.
-# @return list containing lw (vector of untruncated and unnormalized log
-#   weights), and pareto_k ('khat' estimate).
-#
+#' PSIS (without truncation and normalization) on a single vector
+#'
+#' @noRd
+#' @param lw_i A vector of log weights (negative log likelihood).
+#' @param tail_len_i An integer tail length.
+#' @return list containing lw (vector of untruncated and unnormalized log
+#'   weights), and pareto_k ('khat' estimate).
+#'
 do_psis_i <- function(lw_i, tail_len_i) {
   S <- length(lw_i)
   lw_i <- lw_i - max(lw_i)
@@ -317,13 +316,14 @@ do_psis_i <- function(lw_i, tail_len_i) {
 }
 
 
-# PSIS tail smoothing for a single vector
-#
-# @param x Vector of tail elements already sorted in ascending order.
-# @return List with components 'tail' (vector same size as x) and 'k' (scalar
-#   shape parameter estimate).
-# The 'tail' component contains the logs of the order statistics of the GPD.
-#
+#' PSIS tail smoothing for a single vector
+#'
+#' @noRd
+#' @param x Vector of tail elements already sorted in ascending order.
+#' @return List with components 'tail' (vector same size as x) and 'k' (scalar
+#'   shape parameter estimate).
+#' The 'tail' component contains the logs of the order statistics of the GPD.
+#'
 psis_smooth_tail <- function(x) {
   len <- length(x)
   exp_cutoff <- exp(x[1])
@@ -376,20 +376,25 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 # @return x, but modified so all values above the truncation value are set equal
 #   to the truncation value.
 #
-truncate_lw <- function(x, logS, wtrunc) {
-  val <- wtrunc * logS - logS + logSumExp(x)
-  x[x > val] <- val
+truncate_lw <- function(x, upper) {
+  x[x > upper] <- upper
   return(x)
 }
+# truncate_lw_old <- function(x, logS, wtrunc) {
+#   val <- wtrunc * logS - logS + logSumExp(x)
+#   x[x > val] <- val
+#   return(x)
+# }
 
 
-# Throw warnings about pareto k estimates
-#
-# @param k A vector of pareto k estimates.
-# @param high The value at which to warn about slighly high estimates.
-# @param too_high The value at which to warn about very high estimates.
-# @return Nothing, just possibly throws warnings.
-#
+#' Throw warnings about pareto k estimates
+#'
+#' @noRd
+#' @param k A vector of pareto k estimates.
+#' @param high The value at which to warn about slighly high estimates.
+#' @param too_high The value at which to warn about very high estimates.
+#' @return Nothing, just possibly throws warnings.
+#'
 throw_psis_warnings <- function(k, high = 0.5, too_high = 0.7) {
   if (any(k > too_high)) {
     .warn("Some Pareto k diagnostic values are too high. ",

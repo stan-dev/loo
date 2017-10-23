@@ -11,12 +11,12 @@
 psis(x, ...)
 
 \method{psis}{array}(x, ..., cores = getOption("loo.cores", 1),
-  wtrunc = 3/4)
+  wtrunc = TRUE)
 
 \method{psis}{matrix}(x, chain_id, ..., cores = getOption("loo.cores", 1),
-  wtrunc = 3/4)
+  wtrunc = TRUE)
 
-\method{psis}{default}(x, chain_id, ..., wtrunc = 3/4)
+\method{psis}{default}(x, chain_id, ..., wtrunc = TRUE)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 }
@@ -33,9 +33,9 @@ an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
 
-\item{wtrunc}{For truncating very large weights to \code{S^wtrunc}, where
-\eqn{S} is the size of the posterior sample. The default and recommended
-value is \code{3/4}. To turn off truncation set \code{wtrunc=0}.}
+\item{wtrunc}{Should weights be truncated? Set to \code{FALSE} or \code{0}
+no truncation. As of version \code{2.0.0}, the default is to truncate
+the smoothed weights at the (column) maximum(s) of the raw weights.}
 
 \item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
 indexes for each each row of \code{x} (if a matrix) or each value in
@@ -100,7 +100,7 @@ The \code{weights} method returns an object with the same dimensions
 \description{
 Implementation of Pareto smoothed importance sampling, a method for
 stabilizing importance weights. For full details about the algorithm see
-Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
+Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
 \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
@@ -118,64 +118,15 @@ of data points. For example, the object returned by
 \item \code{default}: A vector of length \eqn{S} (posterior sample size).
 }}
 
-\section{PSIS-LOO}{
- The distribution of the importance weights used in LOO may
-  have a long right tail. We use the empirical Bayes estimate of Zhang and
-  Stephens (2009) to fit a generalized Pareto distribution (gPd) to the tail
-  (20\% largest importance ratios). By examining the shape parameter \eqn{k}
-  of the fitted gPd, we are able to obtain sample based estimates of the
-  existance of the moments (Koopman et al, 2009). This extends the diagnostic
-  approach of Peruggia (1997) and Epifani et al. (2008) to be used routinely
-  with importance-sampling LOO for any model with a factorizing likelihood.
-
-  Epifani et al. (2008) show that when estimating the leave-one-out
-  predictive density, the central limit theorem holds if the variance of the
-  weight distribution is finite. These results can be extended using the
-  generalized central limit theorem for stable distributions. Thus, even if
-  the variance of the importance weight distribution is infinite, if the mean
-  exists the estimate's accuracy improves when additional draws are obtained.
-  When the tail of the weight distribution is long, a direct use of
-  importance sampling is sensitive to one or few largest values. By fitting a
-  gPd to the upper tail of the importance weights we smooth these values. The
-  procedure (implemented in the \code{\link{psis}} function) goes as
-  follows:
-
-\enumerate{
-  \item Fit the gPd to the 20\% largest importance ratios \eqn{r_s}. The
-  computation is done separately for each held-out data point \eqn{i}. In
-  simulation experiments with thousands and tens of thousands of draws, we
-  have found that the fit is not sensitive to the specific cutoff value (for
-  a consistent estimation the proportion of the samples above the cutoff
-  should get smaller when the number of draws increases).
-
-  \item Stabilize the importance ratios by replacing the \eqn{M} largest
-  ratios by the expected values of the order statistics of the fitted
-  gPd \deqn{G((z - 0.5)/M), z = 1,...,M,} where
-  \eqn{M} is the number of simulation draws used to fit the Pareto (in this
-  case, \eqn{M = 0.2S}{M = 0.2*S}) and \eqn{G} is the inverse-CDF of the gPd.
-
-  \item To guarantee finite variance of the estimate, truncate the smoothed
-  ratios with \deqn{S^{3/4}\bar{w},}{S^{3/4} * w_bar,} where \eqn{\bar{w}}{w_bar}
-  is the average of the smoothed weights.
-}
-
-The above steps must be performed for each data point \eqn{i}. The result is
-a vector of weights \eqn{w_i^s, s = 1,...,S}, for each \eqn{i}, which in
-general should be better behaved than the raw importance ratios
-\eqn{r_i^s} from which they were constructed.
-
-The results can be then combined to compute the desired LOO estimates.
-}
-
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
   version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2016). Pareto smoothed
+Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{

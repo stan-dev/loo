@@ -7,6 +7,7 @@ logColMeansExp <- function(x) {
   colLogSumExps(x) - logS
 }
 
+# more stable version of log(mean(exp(x)))
 logMeanExp <- function(x) {
   logSumExp(x) - log(length(x))
 }

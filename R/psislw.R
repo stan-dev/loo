@@ -25,8 +25,6 @@
 #'   and \code{pareto_k} (estimated generalized
 #'   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 #'
-#' @inheritSection loo-package PSIS-LOO
-#'
 #' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
