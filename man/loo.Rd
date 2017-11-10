@@ -215,7 +215,7 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at
  diagnostics.
- \item \code{\link{compare}} for model comparison.
+ \item \code{\link{compare_models}} for model comparison.
  \item \code{\link{print.loo}} for info on the \code{print} method.
 }
 }

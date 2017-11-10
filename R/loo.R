@@ -52,7 +52,7 @@
 #'  Sampling (PSIS) procedure used in the LOO-CV approximation.
 #'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
 #'  diagnostics.
-#'  \item \code{\link{compare}} for model comparison.
+#'  \item \code{\link{compare_models}} for model comparison.
 #'  \item \code{\link{print.loo}} for info on the \code{print} method.
 #' }
 #' @template loo-and-psis-references
@@ -129,13 +129,13 @@ loo.array <-
            ...,
            cores = getOption("loo.cores", 1),
            wtrunc = 3/4) {
-    psis_out <- psis.array(x, cores = cores, wtrunc = wtrunc)
+    psis_out <- psis.array(-x, cores = cores, wtrunc = wtrunc)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out[c("pareto_k", "n_eff")],
-      log_lik_dim = attr(psis_out, "log_lik_dim")
+      log_lik_dim = attr(psis_out, "dims")
     )
   }
 
@@ -150,12 +150,12 @@ loo.matrix <-
            chain_id,
            cores = getOption("loo.cores", 1),
            wtrunc = 3/4) {
-    psis_out <- psis.matrix(x, chain_id, cores = cores, wtrunc = wtrunc)
+    psis_out <- psis.matrix(-x, chain_id, cores = cores, wtrunc = wtrunc)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out[c("pareto_k", "n_eff")],
-      log_lik_dim = attr(psis_out, "log_lik_dim")
+      log_lik_dim = attr(psis_out, "dims")
     )
   }
 
@@ -336,7 +336,7 @@ loo_i <-
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws)
     psis_out <-
-      psis(x = ll_i,
+      psis(x = -ll_i,
            chain_id = chain_id,
            wtrunc = wtrunc,
            cores = 1)

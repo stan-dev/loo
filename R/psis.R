@@ -6,10 +6,10 @@
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export
-#' @param x A log-likelihood array, matrix, or vector. See the \strong{Methods
-#'   (by class)} section below for a detailed description of how to specify the
-#'   inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
-#'   the \code{lw} used by the now deprecated \code{\link{psislw}} function.
+#' @param x An array, matrix, or vector of log-weights (for LOO these are
+#'   negative log-likelihood values). See the \strong{Methods (by class)}
+#'   section below for a detailed description of how to specify the inputs for
+#'   each method.
 #' @param ... Arguments passed on to the various methods.
 #' @param wtrunc Should weights be truncated? Set to \code{FALSE} or \code{0}
 #'   no truncation. As of version \code{2.0.0}, the default is to truncate
@@ -52,7 +52,7 @@
 #'     Vector of relative effective sample size estimates of the exponentiated
 #'     log-likelihood.
 #'   }
-#'   \item{\code{log_lik_dim}}{
+#'   \item{\code{dims}}{
 #'     Integer vector of length 2 containing \code{S} (posterior sample size)
 #'     and \code{N} (number of observations).
 #'   }
@@ -74,12 +74,12 @@ psis.array <-
            cores = getOption("loo.cores", 1),
            wtrunc = TRUE) {
     stopifnot(length(dim(x)) == 3)
-    ll <- validate_ll(x)
-    rel_n_eff <- relative_n_eff(exp(ll))
+    lw <- validate_ll(x)
+    rel_n_eff <- relative_n_eff(exp(-lw))
 
-    ll <- llarray_to_matrix(ll)
+    lw <- llarray_to_matrix(lw)
     do_psis(
-      lw = -ll,
+      lw = lw,
       rel_n_eff = rel_n_eff,
       wtrunc = wtrunc,
       cores = cores
@@ -97,10 +97,10 @@ psis.matrix <-
            ...,
            cores = getOption("loo.cores", 1),
            wtrunc = TRUE) {
-    ll <- validate_ll(x)
-    rel_n_eff <- relative_n_eff(exp(ll), chain_id)
+    lw <- validate_ll(x)
+    rel_n_eff <- relative_n_eff(exp(-lw), chain_id)
     do_psis(
-      lw = -ll,
+      lw = lw,
       rel_n_eff = rel_n_eff,
       wtrunc = wtrunc,
       cores = cores
@@ -252,7 +252,7 @@ psis_object <-
            wtrunc) {
     stopifnot(is.matrix(unnormalized_log_weights))
 
-    lldim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
+    lwdim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
     norm_const_log <- colLogSumExps(unnormalized_log_weights)
 
     out <- structure(
@@ -265,7 +265,7 @@ psis_object <-
       tail_len = tail_len,
       rel_n_eff = rel_n_eff,
       wtrunc = wtrunc,
-      log_lik_dim = lldim,
+      dims = lwdim,
       class = c("psis", "list")
     )
 

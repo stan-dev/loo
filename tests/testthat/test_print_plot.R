@@ -6,7 +6,7 @@ context("print, plot, diagnostics")
 LLarr <- example_loglik_array()
 waic1 <- suppressWarnings(waic(LLarr))
 loo1 <- suppressWarnings(loo(LLarr))
-psis1 <- suppressWarnings(psis(LLarr))
+psis1 <- suppressWarnings(psis(-LLarr))
 
 
 test_that("plot methods don't error", {
@@ -28,6 +28,8 @@ test_that("plot methods throw appropriate errors/warnings", {
 
 lldim_msg <- paste0("Computed from ", prod(dim(LLarr)[1:2]) , " by ",
                     dim(LLarr)[3], " log-likelihood matrix")
+lwdim_msg <- paste0("Computed from ", prod(dim(LLarr)[1:2]) , " by ",
+                    dim(LLarr)[3], " log-weights matrix")
 
 test_that("print.waic output is ok",{
   expect_output(suppressWarnings(print(waic1)), lldim_msg)
@@ -39,7 +41,7 @@ test_that("print.waic output is ok",{
 })
 
 test_that("print.psis_loo and print.psis output ok",{
-  expect_output(print(psis1), lldim_msg)
+  expect_output(print(psis1), lwdim_msg)
   expect_output(print(psis1), "Pareto k estimates are good")
   expect_output(print(loo1), lldim_msg)
   expect_output(print(loo1), "Pareto k estimates are good")

@@ -62,8 +62,19 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 
 # internal ----------------------------------------------------------------
 print_log_lik_dim <- function(x) {
-  lldims <- paste(attr(x, "log_lik_dim"), collapse = " by ")
-  cat("Computed from", lldims, "log-likelihood matrix\n")
+  lldim <- attr(x, "log_lik_dim")
+  matrix_text <- "log-likelihood matrix\n"
+  if (is.null(lldim)) {
+    # from psis instead of loo
+    lldim <- attr(x, "dims")
+    matrix_text <- "log-weights matrix\n"
+  }
+
+  cat(
+    "Computed from",
+    paste(lldim, collapse = " by "),
+    matrix_text
+  )
 }
 
 

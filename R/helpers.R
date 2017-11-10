@@ -189,7 +189,7 @@ is.waic <- function(x) {
 
 # validating and reshaping arrays/matrices  -------------------------------
 
-# check for NAs and non-finite values in log-lik array/matrix/vector
+# check for NAs and non-finite values in log-lik (or log-weights) array/matrix/vector
 # @param x log-lik array/matrix/vector
 # @return x if no error is thrown.
 #

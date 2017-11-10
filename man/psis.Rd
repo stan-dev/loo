@@ -21,10 +21,10 @@ psis(x, ...)
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or vector. See the \strong{Methods
-(by class)} section below for a detailed description of how to specify the
-inputs for each method. \strong{NOTE:} \code{x} is the \emph{negative} of
-the \code{lw} used by the now deprecated \code{\link{psislw}} function.}
+\item{x}{An array, matrix, or vector of log-weights (for LOO these are
+negative log-likelihood values). See the \strong{Methods (by class)}
+section below for a detailed description of how to specify the inputs for
+each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
@@ -86,7 +86,7 @@ Objects of class \code{"psis"} also have the following
     Vector of relative effective sample size estimates of the exponentiated
     log-likelihood.
   }
-  \item{\code{log_lik_dim}}{
+  \item{\code{dims}}{
     Integer vector of length 2 containing \code{S} (posterior sample size)
     and \code{N} (number of observations).
   }
