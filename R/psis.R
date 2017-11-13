@@ -11,9 +11,6 @@
 #'   section below for a detailed description of how to specify the inputs for
 #'   each method.
 #' @param ... Arguments passed on to the various methods.
-#' @param wtrunc Should weights be truncated? Set to \code{FALSE} or \code{0}
-#'   no truncation. As of version \code{2.0.0}, the default is to truncate
-#'   the smoothed weights at the (column) maximum(s) of the raw weights.
 #' @param cores The number of cores to use for parallelization. The default for
 #'   an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 #'   of version \code{2.0.0} the \strong{default is now 1 core}, but we
@@ -24,9 +21,9 @@
 #'
 #' \describe{
 #'   \item{\code{log_weights}}{
-#'     Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
-#'     normalized weights use the \code{weights} method provided for objects
-#'     of class \code{"psis"}.
+#'     Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
+#'     weights. To get normalized weights use the \code{weights} method provided
+#'     for objects of class \code{"psis"}.
 #'   }
 #'   \item{\code{pareto_k}}{
 #'     Vector of estimated \link[=pareto-k-diagnostic]{shape parameter(s) k} of
@@ -69,21 +66,14 @@ psis <- function(x, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(x,
-           ...,
-           cores = getOption("loo.cores", 1),
-           wtrunc = TRUE) {
+  function(x, ..., cores = getOption("loo.cores", 1)) {
     stopifnot(length(dim(x)) == 3)
     lw <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(-lw))
-
     lw <- llarray_to_matrix(lw)
-    do_psis(
-      lw = lw,
-      rel_n_eff = rel_n_eff,
-      wtrunc = wtrunc,
-      cores = cores
-    )
+    do_psis(lw = lw,
+            rel_n_eff = rel_n_eff,
+            cores = cores)
   }
 
 #' @export
@@ -92,19 +82,12 @@ psis.array <-
 #' @template chain_id
 #'
 psis.matrix <-
-  function(x,
-           chain_id,
-           ...,
-           cores = getOption("loo.cores", 1),
-           wtrunc = TRUE) {
+  function(x, chain_id, ..., cores = getOption("loo.cores", 1)) {
     lw <- validate_ll(x)
     rel_n_eff <- relative_n_eff(exp(-lw), chain_id)
-    do_psis(
-      lw = lw,
-      rel_n_eff = rel_n_eff,
-      wtrunc = wtrunc,
-      cores = cores
-    )
+    do_psis(lw = lw,
+            rel_n_eff = rel_n_eff,
+            cores = cores)
   }
 
 #' @export
@@ -112,15 +95,11 @@ psis.matrix <-
 #' A vector of length \eqn{S} (posterior sample size).
 #'
 psis.default <-
-  function(x,
-           chain_id,
-           ...,
-           wtrunc = TRUE) {
+  function(x, chain_id, ...) {
     stopifnot(is.null(dim(x)) || length(dim(x)) == 1)
     dim(x) <- c(length(x), 1)
     psis.matrix(x = x,
                 chain_id = chain_id,
-                wtrunc = wtrunc,
                 cores = 1)
   }
 
@@ -161,15 +140,13 @@ weights.psis <-
 #
 # @param lw Matrix of log weights (-loglik)
 # @param rel_n_eff Vector of relative effective sample sizes
-# @param wtrunc User's scalar wtrunc argument
 # @param cores User's integer cores argument
 # @return A list with class "psis" and structure described in the main doc at
 #   the top of this file.
 #
-do_psis <- function(lw, rel_n_eff = 1, wtrunc = TRUE, cores) {
+do_psis <- function(lw, rel_n_eff = 1, cores) {
   stopifnot(length(rel_n_eff) == ncol(lw),
-            cores == as.integer(cores),
-            wtrunc >= 0)
+            cores == as.integer(cores))
   N <- ncol(lw)
   S <- nrow(lw)
   tail_len <- n_pareto(rel_n_eff, S)
@@ -202,20 +179,18 @@ do_psis <- function(lw, rel_n_eff = 1, wtrunc = TRUE, cores) {
   throw_psis_warnings(pareto_k)
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
-  if (wtrunc) {
-    # truncate at the max of raw wts
-    max_wts <- apply(lw, 2, max)
-    log_weights <- sapply(1:N, function(n) {
-      truncate_lw(log_weights[, n], upper = max_wts[n])
-    })
-  }
+
+  # truncate at the max of raw wts
+  max_wts <- apply(lw, 2, max)
+  log_weights <- sapply(1:N, function(n) {
+    truncate_lw(log_weights[, n], upper = max_wts[n])
+  })
 
   psis_object(
     unnormalized_log_weights = log_weights,
     pareto_k = pareto_k,
     tail_len = tail_len,
-    rel_n_eff = rel_n_eff,
-    wtrunc = wtrunc
+    rel_n_eff = rel_n_eff
   )
 }
 
@@ -240,7 +215,6 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
 #' @param rel_n_eff Vector of relative MCMC n_eff for exp(log lik)
-#' @param wtrunc User's wtrunc argument.
 #' @return A list of class "psis" with structure described in the main doc at the
 #'   top of this file.
 #'
@@ -248,8 +222,7 @@ psis_object <-
   function(unnormalized_log_weights,
            pareto_k,
            tail_len,
-           rel_n_eff,
-           wtrunc) {
+           rel_n_eff) {
     stopifnot(is.matrix(unnormalized_log_weights))
 
     lwdim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
@@ -264,7 +237,6 @@ psis_object <-
       norm_const_log = norm_const_log,
       tail_len = tail_len,
       rel_n_eff = rel_n_eff,
-      wtrunc = wtrunc,
       dims = lwdim,
       class = c("psis", "list")
     )
@@ -292,7 +264,7 @@ do_psis_i <- function(lw_i, tail_len_i) {
   if (!enough_tail_samples(tail_len_i)) {
     warning(
       "Too few tail samples to fit generalized Pareto distribution. ",
-      "Weights will be truncated (if wtrunc > 0) but not smoothed.",
+      "Weights will be truncated but not smoothed.",
       call. = FALSE
     )
   } else {
@@ -302,7 +274,7 @@ do_psis_i <- function(lw_i, tail_len_i) {
     if (all(lw_tail == lw_tail[1])) {
       warning(
         "All tail values are the same. ",
-        "Weights will be truncated (if wtrunc > 0) but not smoothed.",
+        "Weights will be truncated but not smoothed.",
         call. = FALSE
       )
     } else {
@@ -368,23 +340,17 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 }
 
 
-# Truncate a vector of (log) weights
-#
-# @param x A vector of log weights.
-# @param logS Precomputed scalar log(length(x)).
-# @param wtrunc User's scalar wtrunc parameter.
-# @return x, but modified so all values above the truncation value are set equal
-#   to the truncation value.
-#
+#' Truncate a vector of (log) weights
+#'
+#' @noRd
+#' @param x A vector of log weights.
+#' @param upper Upper bound.
+#' @return x, but modified so all values above \code{upper} are set equal to \code{upper}.
+#'
 truncate_lw <- function(x, upper) {
   x[x > upper] <- upper
   return(x)
 }
-# truncate_lw_old <- function(x, logS, wtrunc) {
-#   val <- wtrunc * logS - logS + logSumExp(x)
-#   x[x > val] <- val
-#   return(x)
-# }
 
 
 #' Throw warnings about pareto k estimates

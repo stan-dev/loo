@@ -127,9 +127,8 @@ loo <- function(x, ...) {
 loo.array <-
   function(x,
            ...,
-           cores = getOption("loo.cores", 1),
-           wtrunc = 3/4) {
-    psis_out <- psis.array(-x, cores = cores, wtrunc = wtrunc)
+           cores = getOption("loo.cores", 1)) {
+    psis_out <- psis.array(-x, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
@@ -148,9 +147,8 @@ loo.matrix <-
   function(x,
            ...,
            chain_id,
-           cores = getOption("loo.cores", 1),
-           wtrunc = 3/4) {
-    psis_out <- psis.matrix(-x, chain_id, cores = cores, wtrunc = wtrunc)
+           cores = getOption("loo.cores", 1)) {
+    psis_out <- psis.matrix(-x, chain_id, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
@@ -171,8 +169,7 @@ loo.function <-
            chain_id,
            draws = NULL,
            data = NULL,
-           cores = getOption("loo.cores", 1),
-           wtrunc = 3/4) {
+           cores = getOption("loo.cores", 1)) {
 
     stopifnot(is.data.frame(data) || is.matrix(data),
               !is.null(dim(draws)))
@@ -196,8 +193,7 @@ loo.function <-
           llfun = .llfun,
           data = data,
           draws = draws,
-          chain_id = chain_id,
-          wtrunc = wtrunc
+          chain_id = chain_id
         )
     } else {
       if (.Platform$OS.type != "windows") {
@@ -209,8 +205,7 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            chain_id = chain_id,
-            wtrunc = wtrunc
+            chain_id = chain_id
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
@@ -223,8 +218,7 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            chain_id = chain_id,
-            wtrunc = wtrunc
+            chain_id = chain_id
           )
       }
     }
@@ -306,8 +300,7 @@ loo_i <-
            llfun,
            data,
            draws,
-           chain_id = NULL,
-           wtrunc = 3 / 4) {
+           chain_id = NULL) {
     stopifnot(
       i == as.integer(i),
       is.data.frame(data) || is.matrix(data),
@@ -318,7 +311,7 @@ loo_i <-
     N <- dim(data)[1]
     stopifnot(i %in% seq_len(N))
 
-    .loo_i(i, llfun = match.fun(llfun), data, draws, chain_id, wtrunc)
+    .loo_i(i, llfun = match.fun(llfun), data, draws, chain_id)
   }
 
 
@@ -330,16 +323,11 @@ loo_i <-
            llfun,
            data,
            draws,
-           chain_id = NULL,
-           wtrunc = 3 / 4) {
+           chain_id = NULL) {
 
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws)
-    psis_out <-
-      psis(x = -ll_i,
-           chain_id = chain_id,
-           wtrunc = wtrunc,
-           cores = 1)
+    psis_out <- psis(x = -ll_i, chain_id = chain_id, cores = 1)
     list(
       estimates = pointwise_loo_calcs(ll_i, psis_out),
       pareto_k = psis_out$pareto_k,
