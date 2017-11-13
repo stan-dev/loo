@@ -9,7 +9,10 @@ LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = nrow(LLarr))
 
-l1 <- suppressWarnings(loo(LLarr))
+r_eff_arr <- relative_eff(exp(LLarr))
+r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
+
+l1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 w1 <- suppressWarnings(waic(LLarr))
 
 test_that("loo and waic results haven't changed", {
@@ -41,12 +44,12 @@ test_that("loo returns object with correct structure", {
 })
 
 test_that("loo.array and loo.matrix give same result", {
-  l2 <- suppressWarnings(loo(LLmat, chain_id = chain_id))
+  l2 <- suppressWarnings(loo(LLmat, r_eff = r_eff_mat))
   expect_identical(l1, l2)
 })
 
 test_that("waic.array and waic.matrix give same result", {
-  w2 <- suppressWarnings(waic(LLmat, chain_id = chain_id))
+  w2 <- suppressWarnings(waic(LLmat))
   expect_identical(w1, w2)
 })
 

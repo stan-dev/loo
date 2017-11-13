@@ -50,13 +50,11 @@ Widely applicable information criterion (WAIC)
 \itemize{
 \item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points. For example, the object
-returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
+chains, and \eqn{N} is the number of data points.
 
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
-of data points. For example, the object returned by
-\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
+of data points.
 
 \item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
   returns a vector containing the log-likelihood for a single observation

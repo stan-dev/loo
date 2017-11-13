@@ -8,40 +8,38 @@
 \alias{weights.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
-psis(x, ...)
+psis(log_ratios, ...)
 
-\method{psis}{array}(x, ..., cores = getOption("loo.cores", 1),
-  wtrunc = TRUE)
+\method{psis}{array}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("loo.cores", 1))
 
-\method{psis}{matrix}(x, chain_id, ..., cores = getOption("loo.cores", 1),
-  wtrunc = TRUE)
+\method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("loo.cores", 1))
 
-\method{psis}{default}(x, chain_id, ..., wtrunc = TRUE)
+\method{psis}{default}(log_ratios, ..., r_eff = NULL)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 }
 \arguments{
-\item{x}{An array, matrix, or vector of log-weights (for LOO these are
+\item{log_ratios}{An array, matrix, or vector of log-ratios (for LOO these are
 negative log-likelihood values). See the \strong{Methods (by class)}
 section below for a detailed description of how to specify the inputs for
 each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
+\item{r_eff}{Vector of relative effective sample size estimates containing
+one element per observation. The values provided should be the relative
+effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
+This is related to the relative efficiency of estimating the normalizing
+term in self-normalizing importance sampling. The default is \code{NULL},
+in which case Monte Carlo error estimates are not computed. See the
+\code{\link{relative_eff}} helper function for computing \code{r_eff}.}
+
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
-
-\item{wtrunc}{Should weights be truncated? Set to \code{FALSE} or \code{0}
-no truncation. As of version \code{2.0.0}, the default is to truncate
-the smoothed weights at the (column) maximum(s) of the raw weights.}
-
-\item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
-indexes for each each row of \code{x} (if a matrix) or each value in
-\code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
-array. If there are \code{C} chains then valid chain indexes are values
-in \code{1:C}.}
 
 \item{object}{For the \code{weights} method, an object returned by
 \code{psis} (a list with class \code{"psis"}).}
@@ -58,9 +56,9 @@ The \code{psis} methods return an object of class \code{"psis"},
 
 \describe{
   \item{\code{log_weights}}{
-    Vector or matrix of smoothed but \emph{unnormalized} log weights. To get
-    normalized weights use the \code{weights} method provided for objects
-    of class \code{"psis"}.
+    Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
+    weights. To get normalized weights use the \code{weights} method provided
+    for objects of class \code{"psis"}.
   }
   \item{\code{pareto_k}}{
     Vector of estimated \link[=pareto-k-diagnostic]{shape parameter(s) k} of
@@ -82,9 +80,8 @@ Objects of class \code{"psis"} also have the following
     Vector of tail lengths used for fitting the generalized Pareto
     distribution.
   }
-  \item{\code{rel_n_eff}}{
-    Vector of relative effective sample size estimates of the exponentiated
-    log-likelihood.
+  \item{\code{r_eff}}{
+    If specified, the user's \code{r_eff} argument.
   }
   \item{\code{dims}}{
     Integer vector of length 2 containing \code{S} (posterior sample size)
@@ -99,7 +96,7 @@ The \code{weights} method returns an object with the same dimensions
 }
 \description{
 Implementation of Pareto smoothed importance sampling, a method for
-stabilizing importance weights. For full details about the algorithm see
+stabilizing importance ratios. For full details about the algorithm see
 Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
 \link{pareto-k-diagnostic} page.
 }
@@ -107,13 +104,11 @@ Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
 \itemize{
 \item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points. For example, the object
-returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
+chains, and \eqn{N} is the number of data points.
 
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
-of data points. For example, the object returned by
-\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
+of data points.
 
 \item \code{default}: A vector of length \eqn{S} (posterior sample size).
 }}

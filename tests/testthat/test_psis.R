@@ -8,8 +8,10 @@ LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
+r_eff_arr <- relative_eff(exp(LLarr), chain_id = chain_id)
+r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
+psis1 <- psis(LLarr, r_eff = r_eff_arr)
 
-psis1 <- suppressWarnings(psis(LLarr))
 
 test_that("psis returns object with correct structure", {
   expect_true(is.psis(psis1))
@@ -22,24 +24,21 @@ test_that("psis returns object with correct structure", {
   expect_equal(length(psis1$n_eff), ncol(psis1$log_weights))
 })
 
+
 test_that("psis methods give same results", {
-  psis2 <- suppressWarnings(psis(LLmat, chain_id))
+  psis2 <- suppressWarnings(psis(LLmat, r_eff = r_eff_arr))
   expect_identical(psis1, psis2)
 
-  psisvec <- suppressWarnings(psis(LLvec, chain_id))
-  psismat <- suppressWarnings(psis(LLmat[, 1], chain_id))
+  psisvec <- suppressWarnings(psis(LLvec, r_eff = r_eff_vec))
+  psismat <- suppressWarnings(psis(LLmat[, 1], r_eff = r_eff_vec))
   expect_identical(psisvec, psismat)
 })
 
 test_that("psis throws correct errors", {
-  # vector and matrix methods need chain_id
-  expect_error(psis(LLvec), 'argument "chain_id" is missing')
-  expect_error(psis(LLmat), 'argument "chain_id" is missing')
-
   # no NAs allowed
   LLmat[1,1] <- NA
   expect_error(
-    psis(LLmat, chain_id),
+    psis(LLmat),
     "!anyNA(x) is not TRUE",
     fixed = TRUE
   )
@@ -48,7 +47,7 @@ test_that("psis throws correct errors", {
   dim(LLarr) <- c(2, 250, 2, 32)
   expect_error(
     psis(LLarr),
-    "length(dim(x)) == 3 is not TRUE",
+    "length(dim(log_ratios)) == 3 is not TRUE",
     fixed = TRUE
   )
 })
@@ -71,13 +70,13 @@ test_that("weights method returns correct output", {
 
 test_that("default psis_n_eff method works properly", {
   w <- weights(psis1, normalize = TRUE, log = FALSE)
-  expect_equal(psis_n_eff.default(w[, 1], rel_n_eff = 1), 1 / sum(w[, 1]^2))
-  expect_equal(psis_n_eff.default(w[, 1], rel_n_eff = 2), 2 / sum(w[, 1]^2))
+  expect_equal(psis_n_eff.default(w[, 1], r_eff = 1), 1 / sum(w[, 1]^2))
+  expect_equal(psis_n_eff.default(w[, 1], r_eff = 2), 2 / sum(w[, 1]^2))
   expect_warning(psis_n_eff.default(w[, 1]), "not adjusted based on MCMC n_eff")
 })
 
-test_that("default relative_n_eff method works properly", {
-  expect_equal(relative_n_eff.default(LLmat[, 1], chain_id),
+test_that("default relative_eff method works properly", {
+  expect_equal(relative_eff.default(LLmat[, 1], chain_id),
                mcmc_n_eff(LLarr[, , 1]) / 1000)
 })
 

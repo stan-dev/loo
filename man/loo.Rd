@@ -10,15 +10,15 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., cores = getOption("loo.cores", 1), wtrunc = 3/4)
+\method{loo}{array}(x, ..., r_eff = NULL, cores = getOption("loo.cores", 1))
 
-\method{loo}{matrix}(x, ..., chain_id, cores = getOption("loo.cores", 1),
-  wtrunc = 3/4)
+\method{loo}{matrix}(x, ..., r_eff = NULL, cores = getOption("loo.cores",
+  1))
 
-\method{loo}{function}(x, ..., chain_id, draws = NULL, data = NULL,
-  cores = getOption("loo.cores", 1), wtrunc = 3/4)
+\method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
+  cores = getOption("loo.cores", 1))
 
-loo_i(i, llfun, data, draws, chain_id = NULL, wtrunc = 3/4)
+loo_i(i, llfun, data, draws, r_eff = NULL)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -27,20 +27,17 @@ inputs for each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
+\item{r_eff}{Vector of relative effective sample size estimates for the
+likelihood (\code{exp(log_lik)}) of each observation. This is related to
+the relative efficiency of estimating the normalizing term in
+self-normalizing importance sampling. The default is \code{NULL}, in which
+case Monte Carlo error estimates are not computed. See the
+\code{\link{relative_eff}} helper function for computing \code{r_eff}.}
+
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
-
-\item{wtrunc}{Should weights be truncated? Set to \code{FALSE} or \code{0}
-no truncation. As of version \code{2.0.0}, the default is to truncate
-the smoothed weights at the (column) maximum(s) of the raw weights.}
-
-\item{chain_id}{A vector of length \code{NROW(x)} containing MCMC chain
-indexes for each each row of \code{x} (if a matrix) or each value in
-\code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
-array. If there are \code{C} chains then valid chain indexes are values
-in \code{1:C}.}
 
 \item{draws, data}{For the function method only. See the \strong{Methods (by
 class)} section below for details on these arguments.}
@@ -107,13 +104,11 @@ The \code{loo_i} function enables testing log-likelihood
 \itemize{
 \item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points. For example, the object
-returned by \code{\link{extract_log_lik}(stanfit, merge_chains = FALSE)}.
+chains, and \eqn{N} is the number of data points.
 
 \item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
-of data points. For example, the object returned by
-\code{\link{extract_log_lik}(stanfit, merge_chains = TRUE)}.
+of data points.
 
 \item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
   returns a vector containing the log-likelihood for a single observation

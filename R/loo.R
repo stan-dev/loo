@@ -18,7 +18,13 @@
 #'   (by class)} section below for a detailed description of how to specify the
 #'   inputs for each method.
 #' @param ... Arguments passed on to the various methods.
-#' @inheritParams psis
+#' @param r_eff Vector of relative effective sample size estimates for the
+#'   likelihood (\code{exp(log_lik)}) of each observation. This is related to
+#'   the relative efficiency of estimating the normalizing term in
+#'   self-normalizing importance sampling. The default is \code{NULL}, in which
+#'   case Monte Carlo error estimates are not computed. See the
+#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#' @template cores
 #'
 #' @return A named list with class \code{c("psis_loo", "loo")} and components:
 #' \describe{
@@ -127,8 +133,9 @@ loo <- function(x, ...) {
 loo.array <-
   function(x,
            ...,
+           r_eff = NULL,
            cores = getOption("loo.cores", 1)) {
-    psis_out <- psis.array(-x, cores = cores)
+    psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
@@ -141,14 +148,13 @@ loo.array <-
 #' @export
 #' @templateVar fn loo
 #' @template matrix
-#' @template chain_id
 #'
 loo.matrix <-
   function(x,
            ...,
-           chain_id,
+           r_eff = NULL,
            cores = getOption("loo.cores", 1)) {
-    psis_out <- psis.matrix(-x, chain_id, cores = cores)
+    psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
@@ -166,9 +172,9 @@ loo.matrix <-
 loo.function <-
   function(x,
            ...,
-           chain_id,
-           draws = NULL,
            data = NULL,
+           draws = NULL,
+           r_eff = NULL,
            cores = getOption("loo.cores", 1)) {
 
     stopifnot(is.data.frame(data) || is.matrix(data),
@@ -193,7 +199,7 @@ loo.function <-
           llfun = .llfun,
           data = data,
           draws = draws,
-          chain_id = chain_id
+          r_eff = r_eff
         )
     } else {
       if (.Platform$OS.type != "windows") {
@@ -205,7 +211,7 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            chain_id = chain_id
+            r_eff = r_eff
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
@@ -218,7 +224,7 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            chain_id = chain_id
+            r_eff = r_eff
           )
       }
     }
@@ -300,7 +306,7 @@ loo_i <-
            llfun,
            data,
            draws,
-           chain_id = NULL) {
+           r_eff = NULL) {
     stopifnot(
       i == as.integer(i),
       is.data.frame(data) || is.matrix(data),
@@ -311,7 +317,13 @@ loo_i <-
     N <- dim(data)[1]
     stopifnot(i %in% seq_len(N))
 
-    .loo_i(i, llfun = match.fun(llfun), data, draws, chain_id)
+    .loo_i(
+      i = i,
+      llfun = match.fun(llfun),
+      data = data,
+      draws = draws,
+      r_eff = r_eff
+    )
   }
 
 
@@ -323,11 +335,11 @@ loo_i <-
            llfun,
            data,
            draws,
-           chain_id = NULL) {
+           r_eff = NULL) {
 
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws)
-    psis_out <- psis(x = -ll_i, chain_id = chain_id, cores = 1)
+    psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
     list(
       estimates = pointwise_loo_calcs(ll_i, psis_out),
       pareto_k = psis_out$pareto_k,
