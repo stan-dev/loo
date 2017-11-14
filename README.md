@@ -7,15 +7,22 @@
 
 Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 
-### Install
+### Resources
 
-* **CRAN**
+* [mc-stan.org/loo](http://mc-stan.org/loo) (online documentation, vignettes)
+* [Ask a question](http://discourse.mc-stan.org) (Stan Forums on Discourse)
+* [Open an issue](https://github.com/stan-dev/loo/issues) (GitHub issues for bug reports, feature requests)
+
+
+### Installation
+
+* Install from CRAN:
 
 ```r
 install.packages("loo")
 ```
 
-* **GitHub**
+* Install from GitHub (requires [devtools](https://github.com/hadley/devtools) package):
 
 ```r
 if (!require(devtools)) install.packages("devtools")
@@ -42,9 +49,8 @@ As a byproduct of our calculations, we also obtain approximate standard errors
 for estimated predictive errors and for comparing predictive errors between two
 models.
 
-### Authors
-Aki Vehtari, Andrew Gelman, Jonah Gabry
 
 ### Python and Matlab/Octave Code
 Corresponding Python and Matlab/Octave code can be found at the
 [avehtari/PSIS](https://github.com/avehtari/PSIS) repository.
+
