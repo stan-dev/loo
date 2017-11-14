@@ -45,7 +45,7 @@
 #'  A named list containing two vectors:
 #'   \itemize{
 #'    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-#'    generaelized Pareto fit to the importance ratios for each leave-one-out
+#'    generalized Pareto fit to the importance ratios for each leave-one-out
 #'    distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
 #'    \item \code{n_eff}: PSIS effective sample size estimates.
 #'   }
@@ -110,7 +110,6 @@
 #' # Function method
 #' loo_with_fn <- loo(
 #'   x = llfun,
-#'   chain_id = rep(1, nrow(fake_posterior)), # pretend all draws came from 1 chain for this example
 #'   draws = fake_posterior,
 #'   data = fake_data
 #' )
@@ -119,7 +118,7 @@
 #' mat <- sapply(1:N, function(i) {
 #'   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 #' })
-#' loo_with_mat <- loo(mat, chain_id = rep(1, 100))
+#' loo_with_mat <- loo(mat)
 #' all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
 #'
 loo <- function(x, ...) {
@@ -140,7 +139,7 @@ loo.array <-
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
       pointwise = pointwise,
-      diagnostics = psis_out[c("pareto_k", "n_eff")],
+      diagnostics = psis_out$diagnostics,
       log_lik_dim = attr(psis_out, "dims")
     )
   }
@@ -158,7 +157,7 @@ loo.matrix <-
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
-      diagnostics = psis_out[c("pareto_k", "n_eff")],
+      diagnostics = psis_out$diagnostics,
       log_lik_dim = attr(psis_out, "dims")
     )
   }
@@ -229,15 +228,15 @@ loo.function <-
       }
     }
 
-    pointwise <- do.call(rbind, lapply(psis_list, "[[", "estimates"))
-    diagnostics <- list(
-      pareto_k = psis_apply(psis_list, "pareto_k"),
-      n_eff = psis_apply(psis_list, "n_eff")
-    )
+    pointwise <- lapply(psis_list, "[[", "estimates")
+    diagnostics <- lapply(psis_list, "[[", "diagnostics")
 
     psis_loo_object(
-      pointwise = pointwise,
-      diagnostics = diagnostics,
+      pointwise = do.call(rbind, pointwise),
+      diagnostics = list(
+        pareto_k = psis_apply(diagnostics, "pareto_k"),
+        n_eff = psis_apply(diagnostics, "n_eff")
+      ),
       log_lik_dim = c(S = S, N = N)
     )
 }
@@ -322,7 +321,7 @@ loo_i <-
       llfun = match.fun(llfun),
       data = data,
       draws = draws,
-      r_eff = r_eff
+      r_eff = r_eff[i]
     )
   }
 
@@ -337,12 +336,14 @@ loo_i <-
            draws,
            r_eff = NULL) {
 
+    if (!is.null(r_eff)) {
+      r_eff <- r_eff[i]
+    }
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws)
     psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
     list(
       estimates = pointwise_loo_calcs(ll_i, psis_out),
-      pareto_k = psis_out$pareto_k,
-      n_eff = psis_out$n_eff
+      diagnostics = psis_out$diagnostics
     )
   }
