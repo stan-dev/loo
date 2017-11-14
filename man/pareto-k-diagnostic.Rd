@@ -5,7 +5,9 @@
 \alias{pareto_k_table}
 \alias{pareto_k_ids}
 \alias{pareto_k_values}
+\alias{psis_n_eff_values}
 \alias{plot.loo}
+\alias{plot.psis}
 \title{Diagnostics for Pareto Smoothed Importance Sampling}
 \usage{
 pareto_k_table(x)
@@ -14,7 +16,13 @@ pareto_k_ids(x, threshold = 0.5)
 
 pareto_k_values(x)
 
-\method{plot}{loo}(x, ..., label_points = FALSE)
+psis_n_eff_values(x)
+
+\method{plot}{loo}(x, diagnostic = c("k", "n_eff"), ...,
+  label_points = FALSE, main = "PSIS diagnostic plot")
+
+\method{plot}{psis}(x, diagnostic = c("k", "n_eff"), ...,
+  label_points = FALSE, main = "PSIS diagnostic plot")
 }
 \arguments{
 \item{x}{An object created by \code{\link{loo}} or \code{\link{psis}}.}
@@ -26,17 +34,22 @@ pareto_k_values(x)
 greater than 0.5 will be displayed in the plot. Any arguments specified in
 \code{...} will be passed to \code{\link[graphics]{text}} and can be used
 to control the appearance of the labels.}
+
+\item{main}{A title for the plot.}
 }
 \value{
 \code{pareto_k_table} returns an object of class
-  \code{"pareto_k_table"}, which is a matrix with columns \code{"Count"} and
-  \code{"Proportion"} and has its own print method.
+  \code{"pareto_k_table"}, which is a matrix with columns \code{"Count"},
+  \code{"Proportion"}, and \code{"Min. n_eff"}, and has its own print method.
 
 \code{pareto_k_ids} returns an integer vector indicating which
 observations have Pareto \eqn{k} estimates above \code{threshold}.
 
 \code{pareto_k_values} returns a vector of the estimated Pareto
   \eqn{k} parameters.
+
+\code{psis_n_eff_values} returns a vector of the estimated PSIS
+  effective sample sizes.
 
 The \code{plot} method is called for its side effect and does not
   return anything. If \code{x} is the result of a call to \code{\link{loo}},
@@ -45,10 +58,10 @@ The \code{plot} method is called for its side effect and does not
   a call to \code{\link{waic}}.
 }
 \description{
-Print a diagnostic table summarizing the estimated Pareto shape parameters,
-find the indexes of observations for which the estimated Pareto shape
-parameter \eqn{k} is larger than some \code{threshold} value, or plot
-observation indexes vs \eqn{k} estimates.
+Print a diagnostic table summarizing the estimated Pareto shape parameters
+and PSIS effective sample sizes, find the indexes of observations for which
+the estimated Pareto shape parameter \eqn{k} is larger than some
+\code{threshold} value, or plot observation indexes vs \eqn{k} estimates.
 }
 \details{
 The reliability of the PSIS-based estimates can be assessed using the

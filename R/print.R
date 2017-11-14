@@ -82,13 +82,6 @@ print_log_lik_dim <- function(x) {
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 .k_help <- function() "See help('pareto-k-diagnostic') for details."
-.k_cut <- function(k) {
-  cut(
-    k,
-    breaks = c(-Inf, 0.5, 0.7, 1, Inf),
-    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
-  )
-}
 
 # compatibility with old loo objects
 convert_old_object <- function(x, digits = 1, ...) {

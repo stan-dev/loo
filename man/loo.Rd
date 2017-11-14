@@ -68,7 +68,7 @@ A named list with class \code{c("psis_loo", "loo")} and components:
  A named list containing two vectors:
   \itemize{
    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-   generaelized Pareto fit to the importance ratios for each leave-one-out
+   generalized Pareto fit to the importance ratios for each leave-one-out
    distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
    \item \code{n_eff}: PSIS effective sample size estimates.
   }
@@ -180,7 +180,6 @@ llfun <- function(data_i, draws) {
 # Function method
 loo_with_fn <- loo(
   x = llfun,
-  chain_id = rep(1, nrow(fake_posterior)), # pretend all draws came from 1 chain for this example
   draws = fake_posterior,
   data = fake_data
 )
@@ -189,7 +188,7 @@ loo_with_fn <- loo(
 mat <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(mat, chain_id = rep(1, 100))
+loo_with_mat <- loo(mat)
 all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
 
 }

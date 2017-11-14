@@ -60,13 +60,15 @@ The \code{psis} methods return an object of class \code{"psis"},
     weights. To get normalized weights use the \code{weights} method provided
     for objects of class \code{"psis"}.
   }
-  \item{\code{pareto_k}}{
-    Vector of estimated \link[=pareto-k-diagnostic]{shape parameter(s) k} of
-    the generalized Pareto distribution.
+ \item{\code{diagnostics}}{
+   A named list containing two vectors:
+   \itemize{
+    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+    generalized Pareto distribution. See the \code{\link{pareto-k-diagnostic}}
+    page for details.
+    \item \code{n_eff}: PSIS effective sample size estimates.
   }
-  \item{\code{n_eff}}{
-    Vector of estimated PSIS effective sample size(s).
-  }
+ }
 }
 
 Objects of class \code{"psis"} also have the following
