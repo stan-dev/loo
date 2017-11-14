@@ -20,6 +20,9 @@ logMeanExp <- function(x) {
 #'   and rownames equal to colnames(pointwise).
 #'
 table_of_estimates <- function(x) {
+  if ("mcse_elpd_loo" %in% colnames(x)) {
+    x <- x[, !colnames(x) %in% "mcse_elpd_loo"]
+  }
   out <- cbind(
     Estimate = colSums2(x),
     SE = sqrt(nrow(x) * colVars(x))

@@ -37,7 +37,8 @@ print.waic <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
-  cat("\n------")
+  cat("------\n")
+  print_mcse_summary(x, digits)
   if (length(pareto_k_ids(x, threshold = 0.5)))
     cat("\n")
   print(pareto_k_table(x), digits = digits)
@@ -61,6 +62,13 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 
 
 # internal ----------------------------------------------------------------
+
+print_mcse_summary <- function(x, digits) {
+  mc_var <- x$pointwise[, "mcse_elpd_loo"]^2
+  mcse <- sqrt(sum(mc_var))
+  cat("Monte Carlo SE of elpd_loo is", paste0(.fr(mcse, digits), "."))
+}
+
 print_dims <- function(x, ...) UseMethod("print_dims")
 print_dims.psis <- function(x, ...) {
   cat(

@@ -29,17 +29,19 @@
 #' @return A named list with class \code{c("psis_loo", "loo")} and components:
 #' \describe{
 #'  \item{\code{estimates}}{
-#'   A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
-#'   (\code{elpd_loo}, \code{p_loo}, \code{looic}). This contains point
-#'   estimates and standard errors of the expected log pointwise predictive
-#'   density (\code{elpd_loo}), the effective number of parameters
+#'   A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
+#'   (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+#'   contains point estimates and standard errors of the expected log pointwise
+#'   predictive density (\code{elpd_loo}), the Monte Carlo standard error of
+#'   \code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
 #'   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
 #'   just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
 #'  }
 #'  \item{\code{pointwise}}{
-#'   A matrix with three columns (and number of rows equal to the number of
+#'   A matrix with four columns (and number of rows equal to the number of
 #'   observations) containing the pointwise contributions of each of the above
-#'   measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
+#'   measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo},
+#'   \code{looic}).
 #'  }
 #'  \item{\code{diagnostics}}{
 #'  A named list containing two vectors:
@@ -68,23 +70,21 @@
 #' ### Array and matrix methods (using example objects included with loo package)
 #' # Array method
 #' LLarr <- example_loglik_array()
-#' loo(LLarr)
+#' rel_n_eff <- relative_eff(exp(LLarr))
+#' loo(LLarr, r_eff = rel_n_eff, cores = 2)
 #'
 #' # Matrix method
 #' LLmat <- example_loglik_matrix()
-#' chain <- rep(1:ncol(LLarr), each = nrow(LLarr))
-#' loo(LLmat, chain_id = chain)
+#' rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
+#' loo(LLmat, r_eff = rel_n_eff, cores = 2)
+#'
 #'
 #' \dontrun{
 #' ### Usage with stanfit objects
 #' # see ?extract_log_lik
 #' log_lik1 <- extract_log_lik(stanfit1, merge_chains = FALSE)
-#' loo1 <- loo(log_lik1)
-#' print(loo1, digits = 3)
-#'
-#' log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
-#' (loo2 <- loo(log_lik2))
-#' compare(loo1, loo2)
+#' rel_n_eff <- relative_eff(exp(log_lik1))
+#' loo(log_lik1, r_eff = rel_n_eff, cores = 2)
 #' }
 #'
 #' ### Using log-likelihood function instead of array or matrix
@@ -314,7 +314,8 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   elpd_loo <- colLogSumExps(ll_plus_lw)
   looic <- -2 * elpd_loo
   p_loo <- lpd - elpd_loo
-  cbind(elpd_loo, p_loo, looic)
+  mcse_elpd_loo <- mcse_elpd(ll, elpd_loo, psis_object)
+  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
 }
 
 #' Structure the object returned by the loo methods
@@ -357,3 +358,25 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
       diagnostics = psis_out$diagnostics
     )
   }
+
+
+#' Compute Monte Carlo standard error for ELPD
+#'
+#' @noRd
+#' @param llmat Log-likelihood matrix.
+#' @param E_elpd elpd_loo column of pointwise matrix.
+#' @param psis_object Object returned by psis.
+#' @return Vector of standard error estimates
+#'
+mcse_elpd <- function(llmat, E_elpd, psis_object) {
+  E_epd <- exp(E_elpd)
+  w <- weights(psis_object, log = FALSE)
+  r_eff <- attr(psis_object, "r_eff")
+  var_elpd <- sapply(seq_len(ncol(w)), function(i) {
+    var_epd_i <- sum(w[, i]^2 * (exp(llmat[, i]) - E_epd[i])^2)
+    sd_epd_i <- sqrt(var_epd_i)
+    z <- rnorm(1000, mean = E_epd[i], sd = sd_epd_i)
+    var(log(z))
+  })
+  sqrt(var_elpd / r_eff)
+}

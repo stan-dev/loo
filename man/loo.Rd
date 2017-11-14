@@ -53,17 +53,19 @@ class)} section below for details on these arguments.}
 A named list with class \code{c("psis_loo", "loo")} and components:
 \describe{
  \item{\code{estimates}}{
-  A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
-  (\code{elpd_loo}, \code{p_loo}, \code{looic}). This contains point
-  estimates and standard errors of the expected log pointwise predictive
-  density (\code{elpd_loo}), the effective number of parameters
+  A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
+  (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+  contains point estimates and standard errors of the expected log pointwise
+  predictive density (\code{elpd_loo}), the Monte Carlo standard error of
+  \code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
   just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
  }
  \item{\code{pointwise}}{
-  A matrix with three columns (and number of rows equal to the number of
+  A matrix with four columns (and number of rows equal to the number of
   observations) containing the pointwise contributions of each of the above
-  measures (\code{elpd_loo}, \code{p_loo}, \code{looic}).
+  measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo},
+  \code{looic}).
  }
  \item{\code{diagnostics}}{
  A named list containing two vectors:
@@ -139,23 +141,21 @@ of data points.
 ### Array and matrix methods (using example objects included with loo package)
 # Array method
 LLarr <- example_loglik_array()
-loo(LLarr)
+rel_n_eff <- relative_eff(exp(LLarr))
+loo(LLarr, r_eff = rel_n_eff, cores = 2)
 
 # Matrix method
 LLmat <- example_loglik_matrix()
-chain <- rep(1:ncol(LLarr), each = nrow(LLarr))
-loo(LLmat, chain_id = chain)
+rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
+loo(LLmat, r_eff = rel_n_eff, cores = 2)
+
 
 \dontrun{
 ### Usage with stanfit objects
 # see ?extract_log_lik
 log_lik1 <- extract_log_lik(stanfit1, merge_chains = FALSE)
-loo1 <- loo(log_lik1)
-print(loo1, digits = 3)
-
-log_lik2 <- extract_log_lik(stanfit2, merge_chains = FALSE)
-(loo2 <- loo(log_lik2))
-compare(loo1, loo2)
+rel_n_eff <- relative_eff(exp(log_lik1))
+loo(log_lik1, r_eff = rel_n_eff, cores = 2)
 }
 
 ### Using log-likelihood function instead of array or matrix
