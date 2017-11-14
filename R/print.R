@@ -16,7 +16,7 @@
 #' @seealso \code{\link{pareto-k-diagnostic}}
 #'
 print.loo <- function(x, digits = 1, ...) {
-  print_log_lik_dim(x)
+  print_dims(x)
   if (!("estimates" %in% names(x))) {
     x <- convert_old_object(x)
   }
@@ -51,7 +51,7 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
 #' @export
 #' @rdname print.loo
 print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
-  print_log_lik_dim(x)
+  print_dims(x)
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k)
@@ -61,19 +61,26 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 
 
 # internal ----------------------------------------------------------------
-print_log_lik_dim <- function(x) {
-  lldim <- attr(x, "log_lik_dim")
-  matrix_text <- "log-likelihood matrix\n"
-  if (is.null(lldim)) {
-    # from psis instead of loo
-    lldim <- attr(x, "dims")
-    matrix_text <- "log-weights matrix\n"
-  }
-
+print_dims <- function(x, ...) UseMethod("print_dims")
+print_dims.psis <- function(x, ...) {
   cat(
     "Computed from",
-    paste(lldim, collapse = " by "),
-    matrix_text
+    paste(dim(x), collapse = " by "),
+    "log-weights matrix\n"
+  )
+}
+print_dims.psis_loo <- function(x, ...) {
+  cat(
+    "Computed from",
+    paste(dim(x), collapse = " by "),
+    "log-likelihood matrix\n"
+  )
+}
+print_dims.waic <- function(x, ...) {
+  cat(
+    "Computed from",
+    paste(dim(x), collapse = " by "),
+    "log-likelihood matrix\n"
   )
 }
 

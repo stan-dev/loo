@@ -10,10 +10,11 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., r_eff = NULL, cores = getOption("loo.cores", 1))
+\method{loo}{array}(x, ..., r_eff = NULL, cores = getOption("loo.cores", 1),
+  save_psis = FALSE)
 
 \method{loo}{matrix}(x, ..., r_eff = NULL, cores = getOption("loo.cores",
-  1))
+  1), save_psis = FALSE)
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
   cores = getOption("loo.cores", 1))

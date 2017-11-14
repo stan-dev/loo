@@ -41,8 +41,8 @@ an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
 
-\item{object}{For the \code{weights} method, an object returned by
-\code{psis} (a list with class \code{"psis"}).}
+\item{object}{For the \code{weights} method, an object
+returned by \code{psis} (a list with class \code{"psis"}).}
 
 \item{log}{For the \code{weights} method, should the weights be returned on
 the log scale? Defaults to \code{TRUE}.}

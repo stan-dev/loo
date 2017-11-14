@@ -127,3 +127,17 @@ mcmc_n_eff <- function(x) {
   return(n_eff)
 }
 
+
+# wrapper around stats::acf that returns only the info we need in mcmc_n_eff
+# @param x,lag_max Vector and integer passed to stats::acf
+.acov <- function(x, lag_max) {
+  cov <-
+    stats::acf(x,
+               lag.max = lag_max,
+               plot = FALSE,
+               type = "covariance")
+
+  return(cov$acf[, , 1])
+}
+
+

@@ -12,12 +12,13 @@ logMeanExp <- function(x) {
   logSumExp(x) - log(length(x))
 }
 
-# Compute point estimates and standard errors from pointwise vectors
-#
-# @param x A matrix.
-# @return An ncol(pointwise) by 2 matrix with columns 'Estimate' and 'SE'
-#   and rownames equal to colnames(pointwise).
-#
+#' Compute point estimates and standard errors from pointwise vectors
+#'
+#' @noRd
+#' @param x A matrix.
+#' @return An ncol(pointwise) by 2 matrix with columns 'Estimate' and 'SE'
+#'   and rownames equal to colnames(pointwise).
+#'
 table_of_estimates <- function(x) {
   out <- cbind(
     Estimate = colSums2(x),
@@ -26,54 +27,6 @@ table_of_estimates <- function(x) {
   rownames(out) <- colnames(x)
   return(out)
 }
-
-
-# Variance of the expected loo predictive density (EPD)
-#
-# Note: this is NOT for the expected loo _log_ predictive density (ELPD)
-#
-# @param w Vector or matrix of normalized Pareto smoothed weights
-# @param w_un Vector of matrix of unnormalized Pareto smoothed weights
-# @param r_eff Precomputed relative effective sample size(s) of exp(log_lik).
-# @return A scalar if w is a vector or a vector if w is a matrix.
-#
-var_epd <- function(w, w_un, r_eff, ...) {
-  UseMethod("var_epd")
-}
-var_epd.default <- function(w, w_un, r_eff, ...) {
-  stopifnot(length(w) == length(w_un),
-            length(r_eff) == 1)
-  .var_epd_i(w, w_un, r_eff)
-}
-var_epd.matrix <- function(w, w_un, r_eff) {
-  stopifnot(identical(dim(w), dim(w_un)),
-            length(r_eff) == ncol(w))
-  sapply(1:ncol(w), function(i) {
-    .var_epd_i(w[, i], w_un[, i], r_eff[i])
-  })
-}
-
-# @param w_i Vector of normalized weights for ith obs
-# @param w_un_i Vector of unnormalized weights for ith obs
-# @param r_eff_i Scalar relative n_eff
-# @param return A scalar
-.var_epd_i <- function(w_i, w_un_i, r_eff_i) {
-  sum(w_i^2 * (1 / w_un_i - 1 / mean(w_un_i))^2) / r_eff_i
-}
-
-
-# wrapper around stats::acf that returns only the info we need in mcmc_n_eff
-# @param x,lag_max Vector and integer passed to stats::acf
-.acov <- function(x, lag_max) {
-  cov <-
-    stats::acf(x,
-               lag.max = lag_max,
-               plot = FALSE,
-               type = "covariance")
-
-  return(cov$acf[, , 1])
-}
-
 
 
 # checking classes --------------------------------------------------------

@@ -119,8 +119,8 @@ psis.default <-
 #' @rdname psis
 #' @export
 #' @method weights psis
-#' @param object For the \code{weights} method, an object returned by
-#'   \code{psis} (a list with class \code{"psis"}).
+#' @param object For the \code{weights} method, an object
+#'   returned by \code{psis} (a list with class \code{"psis"}).
 #' @param log For the \code{weights} method, should the weights be returned on
 #'   the log scale? Defaults to \code{TRUE}.
 #' @param normalize For the \code{weights} method, should the weights be
@@ -145,6 +145,12 @@ weights.psis <-
 
     return(out)
   }
+
+
+#' @export
+dim.psis <- function(x) {
+  attr(x, "dims")
+}
 
 
 # internal ----------------------------------------------------------------
@@ -238,9 +244,7 @@ psis_object <-
            r_eff) {
     stopifnot(is.matrix(unnormalized_log_weights))
 
-    lwdim <- setNames(dim(unnormalized_log_weights), c("S", "N"))
     norm_const_log <- colLogSumExps(unnormalized_log_weights)
-
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
@@ -250,7 +254,7 @@ psis_object <-
       norm_const_log = norm_const_log,
       tail_len = tail_len,
       r_eff = r_eff,
-      dims = lwdim,
+      dims = dim(unnormalized_log_weights),
       class = c("psis", "list")
     )
 

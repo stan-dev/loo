@@ -68,7 +68,7 @@ waic.matrix <- function(x, ...) {
   lldim <- dim(ll)
   pointwise <- pointwise_waic(log_lik = ll)
   throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
-  waic_object(pointwise, lldim)
+  waic_object(pointwise, dims = lldim)
 }
 
 #' @export
@@ -79,19 +79,24 @@ waic.function <- function(x, args, ...) {
   lldim <- with(args, c(S, N))
   pointwise <- pointwise_waic(llfun = x, llargs = args)
   throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
-  waic_object(pointwise, lldim)
+  waic_object(pointwise, dims = lldim)
 }
 
+
+#' @export
+dim.waic <- function(x) {
+  attr(x, "dims")
+}
 
 
 # internal ----------------------------------------------------------------
 
 # structure the object returned by the waic methods
-waic_object <- function(pointwise, log_lik_dim) {
+waic_object <- function(pointwise, dims) {
   estimates <- table_of_estimates(pointwise)
   structure(
     nlist(estimates, pointwise),
-    log_lik_dim = log_lik_dim,
+    dims = dims,
     class = c("waic", "loo")
   )
 }

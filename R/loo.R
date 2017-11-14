@@ -133,14 +133,16 @@ loo.array <-
   function(x,
            ...,
            r_eff = NULL,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("loo.cores", 1),
+           save_psis = FALSE) {
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
-      log_lik_dim = attr(psis_out, "dims")
+      dims = dim(psis_out),
+      psis_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -152,13 +154,15 @@ loo.matrix <-
   function(x,
            ...,
            r_eff = NULL,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("loo.cores", 1),
+           save_psis = FALSE) {
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
-      log_lik_dim = attr(psis_out, "dims")
+      dims = dim(psis_out),
+      psis_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -237,47 +241,9 @@ loo.function <-
         pareto_k = psis_apply(diagnostics, "pareto_k"),
         n_eff = psis_apply(diagnostics, "n_eff")
       ),
-      log_lik_dim = c(S = S, N = N)
+      dims = c(S = S, N = N)
     )
-}
-
-
-
-# internal ----------------------------------------------------------------
-
-#' Compute pointwise elpd_loo, p_loo, looic from log lik matrix and
-#' psis log weights
-#'
-#' @noRd
-#' @param ll Log-likelihood matrix.
-#' @param psis_object The object returned by psis.
-#' @return Named list with pointwise elpd_loo, p_loo, and looic.
-#'
-pointwise_loo_calcs <- function(ll, psis_object) {
-  lpd <- logColMeansExp(ll)
-  ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- colLogSumExps(ll_plus_lw)
-  looic <- -2 * elpd_loo
-  p_loo <- lpd - elpd_loo
-  cbind(elpd_loo, p_loo, looic)
-}
-
-#' Structure the object returned by the loo methods
-#'
-#' @noRd
-#' @param pointwise Matrix containing columns elpd_loo, p_loo, looic
-#' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
-#' @param log_lik_dim Log likelihood matrix dimensions (attribute of psis object)
-#'
-psis_loo_object <- function(pointwise, diagnostics, log_lik_dim) {
-  stopifnot(is.matrix(pointwise), is.list(diagnostics))
-  estimates <- table_of_estimates(pointwise)
-  structure(
-    nlist(estimates, pointwise, diagnostics),
-    log_lik_dim = log_lik_dim,
-    class = c("psis_loo", "loo")
-  )
-}
+  }
 
 
 #' @description The \code{loo_i} function enables testing log-likelihood
@@ -324,6 +290,50 @@ loo_i <-
       r_eff = r_eff[i]
     )
   }
+
+#' @export
+dim.psis_loo <- function(x) {
+  attr(x, "dims")
+}
+
+
+
+# internal ----------------------------------------------------------------
+
+#' Compute pointwise elpd_loo, p_loo, looic from log lik matrix and
+#' psis log weights
+#'
+#' @noRd
+#' @param ll Log-likelihood matrix.
+#' @param psis_object The object returned by psis.
+#' @return Named list with pointwise elpd_loo, p_loo, and looic.
+#'
+pointwise_loo_calcs <- function(ll, psis_object) {
+  lpd <- logColMeansExp(ll)
+  ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
+  elpd_loo <- colLogSumExps(ll_plus_lw)
+  looic <- -2 * elpd_loo
+  p_loo <- lpd - elpd_loo
+  cbind(elpd_loo, p_loo, looic)
+}
+
+#' Structure the object returned by the loo methods
+#'
+#' @noRd
+#' @param pointwise Matrix containing columns elpd_loo, p_loo, looic
+#' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
+#' @param dims Log likelihood matrix dimensions (attribute of psis object)
+#' @param psis_object PSIS object.
+#'
+psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
+  stopifnot(is.matrix(pointwise), is.list(diagnostics))
+  estimates <- table_of_estimates(pointwise)
+  structure(
+    nlist(estimates, pointwise, diagnostics, psis_object),
+    dims = dims,
+    class = c("psis_loo", "loo")
+  )
+}
 
 
 # Function that is passed to the FUN argument of lapply, mclapply, or parLapply
