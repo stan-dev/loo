@@ -29,13 +29,15 @@
 #'     weights. To get normalized weights use the \code{weights} method provided
 #'     for objects of class \code{"psis"}.
 #'   }
-#'   \item{\code{pareto_k}}{
-#'     Vector of estimated \link[=pareto-k-diagnostic]{shape parameter(s) k} of
-#'     the generalized Pareto distribution.
+#'  \item{\code{diagnostics}}{
+#'    A named list containing two vectors:
+#'    \itemize{
+#'     \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+#'     generalized Pareto distribution. See the \code{\link{pareto-k-diagnostic}}
+#'     page for details.
+#'     \item \code{n_eff}: PSIS effective sample size estimates.
 #'   }
-#'   \item{\code{n_eff}}{
-#'     Vector of estimated PSIS effective sample size(s).
-#'   }
+#'  }
 #' }
 #'
 #' Objects of class \code{"psis"} also have the following
@@ -242,7 +244,7 @@ psis_object <-
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
-        pareto_k = pareto_k
+        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
       ),
       # attributes
       norm_const_log = norm_const_log,
@@ -254,7 +256,7 @@ psis_object <-
 
     # need weights (normalized and not log weights) to compute psis_n_eff
     w <- weights(out, normalize = TRUE, log = FALSE)
-    out[["n_eff"]] <- psis_n_eff(w, r_eff)
+    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
     return(out)
   }
 
