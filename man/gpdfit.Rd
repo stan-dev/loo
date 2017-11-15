@@ -2,25 +2,28 @@
 % Please edit documentation in R/gpdfit.R
 \name{gpdfit}
 \alias{gpdfit}
-\title{Generalized Pareto distribution}
+\title{Estimate parameters of the Generalized Pareto distribution}
 \usage{
-gpdfit(x, wip = TRUE)
+gpdfit(x, wip = TRUE, min_grid_pts = 30)
 }
 \arguments{
 \item{x}{A numeric vector. The sample from which to estimate the parameters.}
 
 \item{wip}{Logical indicating whether to adjust \eqn{k} based on a weakly
 informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.}
+
+\item{min_grid_pts}{The minimum number of grid points used. The actual number
+used is \code{min_grid_pts + floor(sqrt(length(x)))}.}
 }
 \value{
 A named list with components \code{k} and \code{sigma}.
 }
 \description{
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
-distribution, given a sample \eqn{x}. The Pareto fit uses a prior for
-\eqn{k}, which will stabilize estimates for very small Monte Carlo sample
-sizes and low effective sample sizes. The weakly informative prior is a
-Gaussian prior centered on 0.5.
+distribution (assuming location parameter is 0), given a sample \eqn{x}. The
+Pareto fit uses a prior for \eqn{k}, which will stabilize estimates for very
+small Monte Carlo sample sizes and low effective sample sizes. The weakly
+informative prior is a Gaussian prior centered on 0.5.
 }
 \details{
 Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &

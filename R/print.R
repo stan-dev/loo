@@ -96,7 +96,7 @@ print_dims.waic <- function(x, ...) {
 # print and warning helpers
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
-.k_help <- function() "See help('pareto-k-diagnostic') for details."
+.k_help <- function() "See help('pareto-k-diagnostic') for details.\n"
 
 # compatibility with old loo objects
 convert_old_object <- function(x, digits = 1, ...) {

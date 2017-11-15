@@ -71,7 +71,7 @@
 #' # Array method
 #' LLarr <- example_loglik_array()
 #' rel_n_eff <- relative_eff(exp(LLarr))
-#' loo(LLarr, r_eff = rel_n_eff, cores = 2)
+#' loo(LLarr), r_eff = rel_n_eff, cores = 2)
 #'
 #' # Matrix method
 #' LLmat <- example_loglik_matrix()
@@ -135,6 +135,7 @@ loo.array <-
            r_eff = NULL,
            cores = getOption("loo.cores", 1),
            save_psis = FALSE) {
+    throw_r_eff_warning(r_eff)
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
@@ -156,6 +157,7 @@ loo.matrix <-
            r_eff = NULL,
            cores = getOption("loo.cores", 1),
            save_psis = FALSE) {
+    throw_r_eff_warning(r_eff)
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
@@ -182,6 +184,7 @@ loo.function <-
 
     stopifnot(is.data.frame(data) || is.matrix(data),
               !is.null(dim(draws)))
+    throw_r_eff_warning(r_eff)
     S <- dim(draws)[1]
     N <- dim(data)[1]
 
@@ -192,7 +195,6 @@ loo.function <-
       stop("Log-likelihood function should have two arguments: ",
            "'data_i' and 'draws'.", call. = FALSE)
     }
-
 
     if (cores == 1) {
       psis_list <-
@@ -366,17 +368,36 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #' @param llmat Log-likelihood matrix.
 #' @param E_elpd elpd_loo column of pointwise matrix.
 #' @param psis_object Object returned by psis.
+#' @param n_samples Number of draws to take from N(E[epd_i], SD[epd_i]).
 #' @return Vector of standard error estimates
 #'
-mcse_elpd <- function(llmat, E_elpd, psis_object) {
+mcse_elpd <- function(llmat, E_elpd, psis_object, n_samples = 1000) {
   E_epd <- exp(E_elpd)
   w <- weights(psis_object, log = FALSE)
   r_eff <- attr(psis_object, "r_eff")
   var_elpd <- sapply(seq_len(ncol(w)), function(i) {
     var_epd_i <- sum(w[, i]^2 * (exp(llmat[, i]) - E_epd[i])^2)
     sd_epd_i <- sqrt(var_epd_i)
-    z <- rnorm(1000, mean = E_epd[i], sd = sd_epd_i)
+    z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
     var(log(z))
   })
   sqrt(var_elpd / r_eff)
+}
+
+
+#' Warning message if r_eff not specified
+#'
+#' @noRd
+#' @param r_eff User's r_eff argument or NULL.
+#' @return Nothing, just throws a warning if r_eff is NULL.
+#'
+throw_r_eff_warning <- function(r_eff = NULL) {
+  if (is.null(r_eff)) {
+    warning(
+      "Relative effective sample sizes ('r_eff' argument) not specified.\n",
+      "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
+      "MCSE estimates will be over-optimistic.",
+      call. = FALSE
+    )
+  }
 }
