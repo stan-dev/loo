@@ -36,8 +36,8 @@ A named list with components \code{lw_smooth} (modified log weights)
   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 }
 \description{
-As of version \code{2.0.0} this function is deprecated. Please use
-\code{\link{psis}} instead.
+As of version \code{2.0.0} this function is deprecated. Please use the
+\code{\link{psis}} function for the new PSIS algorithm.
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical

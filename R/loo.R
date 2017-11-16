@@ -180,7 +180,8 @@ loo.function <-
            data = NULL,
            draws = NULL,
            r_eff = NULL,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("loo.cores", 1),
+           save_psis = FALSE) {
 
     stopifnot(is.data.frame(data) || is.matrix(data),
               !is.null(dim(draws)))
@@ -198,7 +199,8 @@ loo.function <-
           llfun = .llfun,
           data = data,
           draws = draws,
-          r_eff = r_eff
+          r_eff = r_eff,
+          save_psis = save_psis
         )
     } else {
       if (.Platform$OS.type != "windows") {
@@ -210,7 +212,8 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            r_eff = r_eff
+            r_eff = r_eff,
+            save_psis = save_psis
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
@@ -223,21 +226,30 @@ loo.function <-
             llfun = .llfun,
             data = data,
             draws = draws,
-            r_eff = r_eff
+            r_eff = r_eff,
+            save_psis = save_psis
           )
       }
     }
 
     pointwise <- lapply(psis_list, "[[", "estimates")
-    diagnostics <- lapply(psis_list, "[[", "diagnostics")
+    if (save_psis) {
+      psis_object_list <- lapply(psis_list, "[[", "psis_object")
+      psis_out <- list2psis(psis_object_list)
+      diagnostics <- psis_out$diagnostics
+    } else {
+      diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
+      diagnostics <- list(
+        pareto_k = psis_apply(diagnostics_list, "pareto_k"),
+        n_eff = psis_apply(diagnostics_list, "n_eff")
+      )
+    }
 
     psis_loo_object(
       pointwise = do.call(rbind, pointwise),
-      diagnostics = list(
-        pareto_k = psis_apply(diagnostics, "pareto_k"),
-        n_eff = psis_apply(diagnostics, "n_eff")
-      ),
-      dims = c(S, N)
+      diagnostics = diagnostics,
+      dims = c(S, N),
+      psis_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -283,7 +295,8 @@ loo_i <-
       llfun = match.fun(llfun),
       data = data,
       draws = draws,
-      r_eff = r_eff[i]
+      r_eff = r_eff[i],
+      save_psis = FALSE
     )
   }
 
@@ -341,7 +354,8 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
            llfun,
            data,
            draws,
-           r_eff = NULL) {
+           r_eff = NULL,
+           save_psis = FALSE) {
 
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
@@ -351,7 +365,8 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
     psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
     list(
       estimates = pointwise_loo_calcs(ll_i, psis_out),
-      diagnostics = psis_out$diagnostics
+      diagnostics = psis_out$diagnostics,
+      psis_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -394,4 +409,31 @@ throw_r_eff_warning <- function(r_eff = NULL) {
       call. = FALSE
     )
   }
+}
+
+
+
+#' Combine many psis objects into a single psis object
+#'
+#' @noRd
+#' @param objects List of psis objects, each for a single observation.
+#' @return A single psis object.
+#'
+list2psis <- function(objects) {
+  log_weights <- sapply(objects, "[[", "log_weights")
+  diagnostics <- lapply(objects, "[[", "diagnostics")
+  structure(
+    list(
+      log_weights = log_weights,
+      diagnostics = list(
+        pareto_k = psis_apply(diagnostics, item = "pareto_k"),
+        n_eff = psis_apply(diagnostics, item = "n_eff")
+      )
+    ),
+    norm_const_log = psis_apply(objects, "norm_const_log", fun = "attr"),
+    tail_len = psis_apply(objects, "tail_len", fun = "attr"),
+    r_eff = psis_apply(objects, "r_eff", fun = "attr"),
+    dims = dim(log_weights),
+    class = c("psis", "list")
+  )
 }

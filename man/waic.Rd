@@ -24,8 +24,6 @@ inputs for each method.}
 
 \item{draws, data}{For the function method only. See the \strong{Methods (by
 class)} section below for details on these arguments.}
-
-\item{args}{Deprecated.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:

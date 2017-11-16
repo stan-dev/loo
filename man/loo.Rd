@@ -17,7 +17,7 @@ loo(x, ...)
   1), save_psis = FALSE)
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("loo.cores", 1), save_psis = FALSE)
 
 loo_i(i, llfun, data, draws, r_eff = NULL)
 }
