@@ -2,7 +2,6 @@
 #'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
-#' @param args Deprecated.
 #'
 #' @return A named list (of class \code{c("waic", "loo")}) with components:
 #'
@@ -66,21 +65,48 @@ waic.array <- function(x, ...) {
 waic.matrix <- function(x, ...) {
   ll <- validate_ll(x)
   lldim <- dim(ll)
-  pointwise <- pointwise_waic(log_lik = ll)
+  lpd <- logColMeansExp(ll)
+  p_waic <- matrixStats::colVars(ll)
+  elpd_waic <- lpd - p_waic
+  waic <- -2 * elpd_waic
+  pointwise <- cbind(elpd_waic, p_waic, waic)
+
   throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
-  waic_object(pointwise, dims = lldim)
+  return(waic_object(pointwise, dims = lldim))
 }
+
 
 #' @export
 #' @templateVar fn waic
 #' @template function
+#' @param draws,data For the function method only. See the \strong{Methods (by
+#'   class)} section below for details on these arguments.
 #'
-waic.function <- function(x, args, ...) {
-  lldim <- with(args, c(S, N))
-  pointwise <- pointwise_waic(llfun = x, llargs = args)
-  throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
-  waic_object(pointwise, dims = lldim)
-}
+waic.function <-
+  function(x,
+           ...,
+           data = NULL,
+           draws = NULL) {
+    stopifnot(is.data.frame(data) || is.matrix(data),
+              !is.null(dim(draws)))
+    S <- dim(draws)[1]
+    N <- dim(data)[1]
+
+    .llfun <- validate_llfun(x)
+
+    waic_list <- lapply(seq_len(N), FUN = function(i) {
+      ll_i <- as.vector(.llfun(data_i = data[i,, drop=FALSE], draws = draws))
+      lpd_i <- logMeanExp(ll_i)
+      p_waic_i <- var(ll_i)
+      elpd_waic_i <- lpd_i - p_waic_i
+      c(elpd_waic = elpd_waic_i, p_waic = p_waic_i)
+    })
+    pointwise <- do.call(rbind, waic_list)
+    pointwise <- cbind(pointwise, waic = -2 * pointwise[, "elpd_waic"])
+
+    throw_pwaic_warnings(pointwise[, "p_waic"], digits = 1)
+    waic_object(pointwise, dims = c(S, N))
+  }
 
 
 #' @export
@@ -113,29 +139,5 @@ throw_pwaic_warnings <- function(p, digits = 1) {
           "We recommend trying loo instead.")
   }
   invisible(NULL)
-}
-
-
-pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
-  if (!missing(log_lik)) {
-    lpd <- logColMeansExp(log_lik)
-    p_waic <- matrixStats::colVars(log_lik)
-  } else {
-    if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
-           call. = FALSE)
-    lpd <- logColMeansExp_llfun(llfun, llargs)
-    p_waic <- colVars_llfun(llfun, llargs)
-  }
-  elpd_waic <- lpd - p_waic
-  waic <- -2 * elpd_waic
-  cbind(elpd_waic, p_waic, waic)
-}
-
-colVars_llfun <- function(fun, args) {
-  vapply(seq_len(args$N), FUN = function(i) {
-    x <- fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)
-    var(as.vector(x))
-  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
 }
 

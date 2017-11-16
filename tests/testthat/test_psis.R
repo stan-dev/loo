@@ -8,9 +8,9 @@ LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
-r_eff_arr <- relative_eff(exp(LLarr), chain_id = chain_id)
+r_eff_arr <- relative_eff(exp(LLarr))
 r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
-psis1 <- psis(LLarr, r_eff = r_eff_arr)
+psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
 
 
 test_that("psis returns object with correct structure", {
@@ -18,19 +18,20 @@ test_that("psis returns object with correct structure", {
   expect_false(is.loo(psis1))
   expect_false(is.psis_loo(psis1))
 
-  expect_named(psis1, c("log_weights", "pareto_k", "n_eff"))
-  expect_equal(dim(psis1$log_weights), dim(LLmat))
-  expect_equal(length(psis1$pareto_k), ncol(psis1$log_weights))
-  expect_equal(length(psis1$n_eff), ncol(psis1$log_weights))
+  expect_named(psis1, c("log_weights", "diagnostics"))
+  expect_named(psis1$diagnostics, c("pareto_k", "n_eff"))
+  expect_equal(dim(psis1), dim(LLmat))
+  expect_length(psis1$diagnostics$pareto_k, dim(psis1)[2])
+  expect_length(psis1$diagnostics$n_eff, dim(psis1)[2])
 })
 
 
 test_that("psis methods give same results", {
-  psis2 <- suppressWarnings(psis(LLmat, r_eff = r_eff_arr))
+  psis2 <- suppressWarnings(psis(-LLmat, r_eff = r_eff_arr))
   expect_identical(psis1, psis2)
 
-  psisvec <- suppressWarnings(psis(LLvec, r_eff = r_eff_vec))
-  psismat <- suppressWarnings(psis(LLmat[, 1], r_eff = r_eff_vec))
+  psisvec <- suppressWarnings(psis(-LLvec, r_eff = r_eff_vec))
+  psismat <- suppressWarnings(psis(-LLmat[, 1], r_eff = r_eff_vec))
   expect_identical(psisvec, psismat)
 })
 
@@ -38,7 +39,7 @@ test_that("psis throws correct errors", {
   # no NAs allowed
   LLmat[1,1] <- NA
   expect_error(
-    psis(LLmat),
+    psis(-LLmat),
     "!anyNA(x) is not TRUE",
     fixed = TRUE
   )
@@ -46,7 +47,7 @@ test_that("psis throws correct errors", {
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
   expect_error(
-    psis(LLarr),
+    psis(-LLarr),
     "length(dim(log_ratios)) == 3 is not TRUE",
     fixed = TRUE
   )

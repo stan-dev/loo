@@ -43,7 +43,7 @@ recommend using as many (or close to as many) cores as possible.}
 \item{draws, data}{For the function method only. See the \strong{Methods (by
 class)} section below for details on these arguments.}
 
-\item{i}{For \code{loo_i}, an integer in 1:N.}
+\item{i}{For \code{loo_i}, an integer in \code{1:N}.}
 
 \item{llfun}{For \code{loo_i}, the same as \code{x} for the
 \code{loo.function} method. A log-likelihood function as described in the
@@ -142,7 +142,7 @@ of data points.
 # Array method
 LLarr <- example_loglik_array()
 rel_n_eff <- relative_eff(exp(LLarr))
-loo(LLarr, r_eff = rel_n_eff, cores = 2)
+loo(LLarr), r_eff = rel_n_eff, cores = 2)
 
 # Matrix method
 LLmat <- example_loglik_matrix()

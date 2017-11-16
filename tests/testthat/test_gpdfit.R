@@ -5,11 +5,14 @@ context("generalized pareto")
 test_that("gpdfit returns correct result", {
   set.seed(123)
   x <- rexp(100)
-  gpdfit_val_old <- unlist(gpdfit(x, wip=FALSE))
+  gpdfit_val_old <- unlist(gpdfit(x, wip=FALSE, min_grid_pts = 80))
   expect_equal_to_reference(gpdfit_val_old, "gpdfit_old.rds")
 
-  gpdfit_val_wip <- unlist(gpdfit(x, wip=TRUE))
+  gpdfit_val_wip <- unlist(gpdfit(x, wip=TRUE, min_grid_pts = 80))
   expect_equal_to_reference(gpdfit_val_wip, "gpdfit.rds")
+
+  gpdfit_val_wip_default_grid <- unlist(gpdfit(x, wip=TRUE))
+  expect_equal_to_reference(gpdfit_val_wip_default_grid, "gpdfit_default_grid.rds")
 })
 
 test_that("qgpd returns the correct result ", {

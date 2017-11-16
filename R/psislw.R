@@ -1,7 +1,7 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
-#' As of version \code{2.0.0} this function is deprecated. Please use
-#' \code{\link{psis}} instead.
+#' As of version \code{2.0.0} this function is deprecated. Please use the
+#' \code{\link{psis}} function for the new PSIS algorithm.
 #'
 #' @export
 #' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
@@ -67,7 +67,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       # body and gPd smoothed tail
       tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
-      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE)
+      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
       k <- fit$k
       sigma <- fit$sigma
       prb <- (seq_len(tail_len) - 0.5) / tail_len

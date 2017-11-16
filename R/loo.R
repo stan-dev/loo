@@ -188,13 +188,7 @@ loo.function <-
     S <- dim(draws)[1]
     N <- dim(data)[1]
 
-    .llfun <- match.fun(x)
-    arg_names <- names(formals(.llfun))
-    if (length(arg_names) != 2 ||
-        !all(arg_names %in% c("data_i", "draws"))) {
-      stop("Log-likelihood function should have two arguments: ",
-           "'data_i' and 'draws'.", call. = FALSE)
-    }
+    .llfun <- validate_llfun(x)
 
     if (cores == 1) {
       psis_list <-
@@ -243,7 +237,7 @@ loo.function <-
         pareto_k = psis_apply(diagnostics, "pareto_k"),
         n_eff = psis_apply(diagnostics, "n_eff")
       ),
-      dims = c(S = S, N = N)
+      dims = c(S, N)
     )
   }
 
@@ -254,7 +248,7 @@ loo.function <-
 #' @rdname loo
 #' @export
 #'
-#' @param i For \code{loo_i}, an integer in 1:N.
+#' @param i For \code{loo_i}, an integer in \code{1:N}.
 #' @param llfun For \code{loo_i}, the same as \code{x} for the
 #'   \code{loo.function} method. A log-likelihood function as described in the
 #'   \strong{Methods (by class)} section.
@@ -365,18 +359,18 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #' Compute Monte Carlo standard error for ELPD
 #'
 #' @noRd
-#' @param llmat Log-likelihood matrix.
+#' @param ll Log-likelihood matrix.
 #' @param E_elpd elpd_loo column of pointwise matrix.
 #' @param psis_object Object returned by psis.
 #' @param n_samples Number of draws to take from N(E[epd_i], SD[epd_i]).
 #' @return Vector of standard error estimates
 #'
-mcse_elpd <- function(llmat, E_elpd, psis_object, n_samples = 1000) {
+mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
   E_epd <- exp(E_elpd)
   w <- weights(psis_object, log = FALSE)
   r_eff <- attr(psis_object, "r_eff")
   var_elpd <- sapply(seq_len(ncol(w)), function(i) {
-    var_epd_i <- sum(w[, i]^2 * (exp(llmat[, i]) - E_epd[i])^2)
+    var_epd_i <- sum(w[, i]^2 * (exp(ll[, i]) - E_epd[i])^2)
     sd_epd_i <- sqrt(var_epd_i)
     z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
     var(log(z))

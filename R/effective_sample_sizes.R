@@ -55,6 +55,10 @@ relative_eff.array <- function(x, ...) {
 }
 
 
+
+# internal ----------------------------------------------------------------
+
+
 #' Effective sample size for PSIS
 #'
 #' @noRd

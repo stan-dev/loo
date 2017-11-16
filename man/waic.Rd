@@ -13,7 +13,7 @@ waic(x, ...)
 
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{function}(x, args, ...)
+\method{waic}{function}(x, ..., data = NULL, draws = NULL)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -21,6 +21,9 @@ waic(x, ...)
 inputs for each method.}
 
 \item{...}{Arguments passed on to the various methods.}
+
+\item{draws, data}{For the function method only. See the \strong{Methods (by
+class)} section below for details on these arguments.}
 
 \item{args}{Deprecated.}
 }
