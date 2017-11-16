@@ -1,13 +1,20 @@
-#' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars
-
-# more stable version of log(colMeans(exp(x)))
-# @param x matrix
+#' More stable version of log(colMeans(exp(x)))
+#'
+#' @noRd
+#' @param x A matrix.
+#' @return A vector where each element is LogSumExp of a column of x.
+#'
 logColMeansExp <- function(x) {
   logS <- log(nrow(x))
   colLogSumExps(x) - logS
 }
 
-# more stable version of log(mean(exp(x)))
+#' More stable version of log(mean(exp(x)))
+#'
+#' @noRd
+#' @param x A numeric vector.
+#' @return A scalar equal to log(mean(exp(x))).
+#'
 logMeanExp <- function(x) {
   logSumExp(x) - log(length(x))
 }
@@ -49,20 +56,23 @@ is.waic <- function(x) {
 
 # validating and reshaping arrays/matrices  -------------------------------
 
-# check for NAs and non-finite values in log-lik (or log-weights) array/matrix/vector
-# @param x log-lik array/matrix/vector
-# @return x if no error is thrown.
-#
+#' Check for NAs and non-finite values in log-lik (or log-weights) array/matrix/vector
+#'
+#' @noRd
+#' @param x log-lik array/matrix/vector
+#' @return x if no error is thrown.
+#'
 validate_ll <- function(x) {
   stopifnot(!is.list(x), !anyNA(x), all(is.finite(x)))
   invisible(x)
 }
 
-# Convert iter by chain by obs array to (iter * chain) by obs matrix
-#
-# @param x array to convert.
-# @return (iter * chain) by obs matrix
-#
+#' Convert iter by chain by obs array to (iter * chain) by obs matrix
+#'
+#' @noRd
+#' @param x Array to convert.
+#' @return An (iter * chain) by obs matrix.
+#'
 llarray_to_matrix <- function(x) {
   stopifnot(is.array(x), length(dim(x)) == 3)
   xdim <- dim(x)
@@ -70,12 +80,13 @@ llarray_to_matrix <- function(x) {
   unname(x)
 }
 
-# Convert (iter * chain) by obs matrix to iter by chain by obs array
-#
-# @param x matrix to convert.
-# @param chain_id vector of chain ids.
-# @return iter by chain by obs array
-#
+#' Convert (iter * chain) by obs matrix to iter by chain by obs array
+#'
+#' @noRd
+#' @param x matrix to convert.
+#' @param chain_id vector of chain ids.
+#' @return iter by chain by obs array
+#'
 llmatrix_to_array <- function(x, chain_id) {
   stopifnot(is.matrix(x), all(chain_id == as.integer(chain_id)))
 
@@ -105,7 +116,12 @@ llmatrix_to_array <- function(x, chain_id) {
 }
 
 
-# validate log-lik function
+#' Validate log-lik function exists and has correct arg names
+#'
+#' @noRd
+#' @param x A function.
+#' @return Either returns x or throws an error.
+#'
 validate_llfun <- function(x) {
   f <- match.fun(x)
   arg_names <- names(formals(f))

@@ -10,14 +10,14 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., r_eff = NULL, cores = getOption("loo.cores", 1),
-  save_psis = FALSE)
+\method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
+  cores = getOption("loo.cores", 1))
 
-\method{loo}{matrix}(x, ..., r_eff = NULL, cores = getOption("loo.cores",
-  1), save_psis = FALSE)
+\method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
+  cores = getOption("loo.cores", 1))
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  cores = getOption("loo.cores", 1), save_psis = FALSE)
+  save_psis = FALSE, cores = getOption("loo.cores", 1))
 
 loo_i(i, llfun, data, draws, r_eff = NULL)
 }
@@ -35,6 +35,15 @@ self-normalizing importance sampling. The default is \code{NULL}, in which
 case Monte Carlo error estimates are not computed. See the
 \code{\link{relative_eff}} helper function for computing \code{r_eff}.}
 
+\item{save_psis}{Should the \code{"psis"} object created internally by
+\code{loo} be saved in the returned object? The \code{loo} function calls
+\code{\link{psis}} internally but by default discards the (potentially
+large) \code{"psis"} object after using it to compute the LOO-CV summaries.
+Setting \code{save_psis} to \code{TRUE} will add a \code{psis_object}
+component to the list returned by \code{loo}. Currently this is only needed
+if you plan to use the \code{\link{E_loo}} function to compute weighted
+expectations after running \code{loo}.}
+
 \item{cores}{The number of cores to use for parallelization. The default for
 an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
@@ -50,7 +59,8 @@ class)} section below for details on these arguments.}
 \strong{Methods (by class)} section.}
 }
 \value{
-A named list with class \code{c("psis_loo", "loo")} and components:
+The \code{loo} methods return a named list with class
+  \code{c("psis_loo", "loo")} and components:
 \describe{
  \item{\code{estimates}}{
   A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
@@ -76,29 +86,32 @@ A named list with class \code{c("psis_loo", "loo")} and components:
    \item \code{n_eff}: PSIS effective sample size estimates.
   }
  }
+ \item{\code{psis_object}}{
+ This component will be \code{NULL} unless the \code{save_psis} argument is
+ set to \code{TRUE} when calling \code{loo}. In that case \code{psis_object}
+ will be the object of class \code{"psis"} that is created when the
+ \code{loo} function calls \code{\link{psis}} internally to do the PSIS
+ procedure.
+ }
 }
 
-\code{loo_i} returns a named list of with results for a
-  single observation. The list has the following components:
-  \itemize{
-    \item \code{estimates}: 1 x 3 matrix with columns \code{elpd_loo},
-    \code{p_loo}, and \code{looic}.
-    \item \code{pareto_k}: scalar \link[=pareto-k-diagnostic]{pareto k diagnostic}.
-    \item \code{n_eff}: scalar \link[=psis]{PSIS} effective sample size estimate.
-  }
+The \code{loo_i} function returns a named list with components
+  \code{pointwise} and \code{diagnostics}. These components have the same
+  structure as the \code{pointwise} and \code{diagnostics} components of the
+  object returned by \code{loo} except they contain results for only a single
+  observation.
 }
 \description{
 Efficient approximate leave-one-out cross-validation for
   Bayesian models using Pareto smoothed importance sampling (PSIS). See
-  Vehtari, Gelman, and Gabry (2016, 2017) and \link{loo-package} for
+  Vehtari, Gelman, and Gabry (2017a and 2017b) and \link{loo-package} for
   background.
 
   The \code{loo} function is an S3 generic and methods are provided for
   computing LOO from 3-D pointwise log-likelihood arrays, pointwise
   log-likelihood matrices, and log-likelihood functions. The array and matrix
-  methods are usually most convenient, but for models fit to very large
-  datasets the \code{loo.function} method is more memory efficient and may be
-  preferable.
+  methods are most convenient, but for models fit to very large datasets the
+  \code{loo.function} method is more memory efficient and may be preferable.
 
 The \code{loo_i} function enables testing log-likelihood
   functions for use with the \code{loo.function} method.
@@ -142,7 +155,7 @@ of data points.
 # Array method
 LLarr <- example_loglik_array()
 rel_n_eff <- relative_eff(exp(LLarr))
-loo(LLarr), r_eff = rel_n_eff, cores = 2)
+loo(LLarr, r_eff = rel_n_eff, cores = 2)
 
 # Matrix method
 LLmat <- example_loglik_matrix()
@@ -159,7 +172,7 @@ loo(log_lik1, r_eff = rel_n_eff, cores = 2)
 }
 
 ### Using log-likelihood function instead of array or matrix
-set.seed(024)
+set.seed(124)
 
 # Simulate data and draw from posterior
 N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
@@ -178,19 +191,25 @@ llfun <- function(data_i, draws) {
   dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
 }
 
-# Function method
-loo_with_fn <- loo(
-  x = llfun,
-  draws = fake_posterior,
-  data = fake_data
-)
+# Use the loo_i function to check that llfun works on a single observation
+# before running on all obs. For example, using the 3rd obs in the data:
+loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
+print(loo_3$pointwise[, "elpd_loo"])
 
-# Check that we get same answer if using log-likelihood matrix
-mat <- sapply(1:N, function(i) {
+# Use loo.function method
+loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
+
+# If we look at the elpd_loo contribution from the 3rd obs it should be the
+# same as what we got above with the loo_i function and i=3:
+print(loo_with_fn$pointwise[3, "elpd_loo"])
+print(loo_3$pointwise[, "elpd_loo"])
+
+# Check that the loo.matrix method gives same answer as loo.function method
+log_lik_matrix <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(mat)
-all.equal(loo_with_mat, loo_with_fn) # should be TRUE!
+loo_with_mat <- loo(log_lik_matrix)
+all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
 }
 \references{

@@ -6,10 +6,10 @@
 #' \link{pareto-k-diagnostic} page.
 #'
 #' @export
-#' @param log_ratios An array, matrix, or vector of log-ratios (for LOO these are
-#'   negative log-likelihood values). See the \strong{Methods (by class)}
-#'   section below for a detailed description of how to specify the inputs for
-#'   each method.
+#' @param log_ratios An array, matrix, or vector of importance ratios on the log
+#'   scale (for LOO these are negative log-likelihood values). See the
+#'   \strong{Methods (by class)} section below for a detailed description of how
+#'   to specify the inputs for each method.
 #' @param ... Arguments passed on to the various methods.
 #' @template cores
 #' @param r_eff Vector of relative effective sample size estimates containing

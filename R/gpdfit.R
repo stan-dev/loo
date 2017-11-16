@@ -6,7 +6,6 @@
 #' small Monte Carlo sample sizes and low effective sample sizes. The weakly
 #' informative prior is a Gaussian prior centered on 0.5.
 #'
-#' @keywords internal
 #' @export
 #' @param x A numeric vector. The sample from which to estimate the parameters.
 #' @param wip Logical indicating whether to adjust \eqn{k} based on a weakly
@@ -17,8 +16,6 @@
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
-#'
-#' @template internal-function-note
 #'
 #' @seealso \code{\link{psis}}, \code{\link{pareto-k-diagnostic}},
 #'   \code{\link{loo-package}}

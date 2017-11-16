@@ -98,7 +98,7 @@ log_lik1 <- extract_log_lik(stanfit1)
 log_lik2 <- extract_log_lik(stanfit2)
 (waic1 <- waic(log_lik1))
 (waic2 <- waic(log_lik2))
-print(compare(waic1, waic2), digits = 2)
+print(compare_models(waic1, waic2), digits = 2)
 }
 
 }

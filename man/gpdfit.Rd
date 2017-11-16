@@ -29,11 +29,6 @@ informative prior is a Gaussian prior centered on 0.5.
 Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
   Stephens (2009).
 }
-\note{
-This function is primarily intended for internal use, but is exported
-  so that users can call it directly if interested in PSIS for purposes other
-  than \code{\link[=loo]{LOO-CV}}.
-}
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
@@ -43,4 +38,3 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 \code{\link{psis}}, \code{\link{pareto-k-diagnostic}},
   \code{\link{loo-package}}
 }
-\keyword{internal}

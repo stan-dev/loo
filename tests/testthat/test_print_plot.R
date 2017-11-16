@@ -21,7 +21,7 @@ test_that("plot methods throw appropriate errors/warnings", {
   expect_error(plot(waic1), regexp = "No Pareto k estimates found")
 
   loo1$diagnostics$pareto_k[1:5] <- Inf
-  psis1$pareto_k[1:5] <- Inf
+  psis1$diagnostics$pareto_k[1:5] <- Inf
   expect_warning(plot(loo1), regexp = "estimates are Inf/NA/NaN and not plotted.")
   expect_warning(plot(psis1), regexp = "estimates are Inf/NA/NaN and not plotted.")
 })
@@ -46,13 +46,13 @@ test_that("print.psis_loo and print.psis output ok",{
   expect_output(print(loo1), lldim_msg)
   expect_output(print(loo1), "Pareto k estimates are good")
 
-  loo1$diagnostics$pareto_k <- psis1$pareto_k <- runif(32, 0, .49)
+  loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, 0, .49)
   expect_output(print(loo1), regexp = "Pareto k estimates are good")
   expect_output(print(psis1), regexp = "Pareto k estimates are good")
 
-  loo1$diagnostics$pareto_k[1] <- psis1$pareto_k[1] <- 0.71
+  loo1$diagnostics$pareto_k[1] <- psis1$diagnostics$pareto_k[1] <- 0.71
   expect_output(print(loo1), regexp = "Pareto k diagnostic")
-  loo1$diagnostics$pareto_k[1] <- psis1$pareto_k[1] <- 1.1
+  loo1$diagnostics$pareto_k[1] <- psis1$diagnostics$pareto_k[1] <- 1.1
   expect_output(print(loo1), regexp = "Pareto k diagnostic")
 })
 
@@ -62,14 +62,14 @@ test_that("pareto_k_values works for psis_loo and psis objects, errors for waic"
   kpsis <- pareto_k_values(psis1)
   kloo <- pareto_k_values(loo1)
   expect_identical(kpsis, kloo)
-  expect_identical(kpsis, psis1$pareto_k)
+  expect_identical(kpsis, psis1$diagnostics$pareto_k)
 
   expect_error(pareto_k_values(waic1), "No Pareto k estimates found")
 })
 
 test_that("pareto_k_ids identifies correct observations", {
   for (j in 1:5) {
-    loo1$diagnostics$pareto_k <- psis1$pareto_k <- runif(32, .25, 1.25)
+    loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, .25, 1.25)
     expect_identical(
       pareto_k_ids(loo1, threshold = 0.5),
       pareto_k_ids(psis1, threshold = 0.5)
@@ -86,13 +86,15 @@ test_that("pareto_k_ids identifies correct observations", {
 })
 
 test_that("pareto_k_table gives correct output", {
-  psis1$pareto_k[1:10] <- runif(10, 0, 0.49)
-  psis1$pareto_k[11:17] <- runif(7, 0.51, 0.69)
-  psis1$pareto_k[18:20] <- runif(3, 0.71, 0.99)
-  psis1$pareto_k[21:32] <- runif(12, 1, 10)
+  psis1$diagnostics$pareto_k[1:10] <- runif(10, 0, 0.49)
+  psis1$diagnostics$pareto_k[11:17] <- runif(7, 0.51, 0.69)
+  psis1$diagnostics$pareto_k[18:20] <- runif(3, 0.71, 0.99)
+  psis1$diagnostics$pareto_k[21:32] <- runif(12, 1, 10)
   k <- pareto_k_values(psis1)
   tab <- pareto_k_table(psis1)
 
+  expect_output(print(tab), "Pareto k diagnostic values")
+  expect_identical(colnames(tab), c("Count", "Proportion", "Min. n_eff"))
   expect_equal(sum(tab[, "Count"]), length(k))
   expect_equal(sum(tab[, "Proportion"]), 1)
 
