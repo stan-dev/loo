@@ -285,8 +285,8 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
       call. = FALSE
     )
   } else {
-    tail_ids <- seq(S - tail_len_i + 1, S)
     ord <- sort.int(lw_i, index.return = TRUE)
+    tail_ids <- seq(S - tail_len_i + 1, S)
     lw_tail <- ord$x[tail_ids]
     if (all(lw_tail == lw_tail[1])) {
       warning(
@@ -295,10 +295,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
         call. = FALSE
       )
     } else {
-      smoothed <- psis_smooth_tail(lw_tail)
-      ord$x[tail_ids] <- smoothed$tail
+      cutoff <- ord$x[min(tail_ids) - 1] # largest value smaller than tail values
+      smoothed <- psis_smooth_tail(lw_tail, cutoff)
       khat <- smoothed$k
-      lw_i <- ord$x[ord$ix]
+      lw_i[ord$ix[tail_ids]] <- smoothed$tail
     }
   }
   list(log_weights = lw_i, pareto_k = khat)
@@ -310,13 +310,15 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
 #' @noRd
 #' @param x Vector of tail elements already sorted in ascending order.
 #' @return List with components 'tail' (vector same size as x) and 'k' (scalar
-#'   shape parameter estimate).
-#' The 'tail' component contains the logs of the order statistics of the GPD.
+#'   shape parameter estimate). The 'tail' component contains the logs of the
+#'   order statistics of the GPD.
 #'
-psis_smooth_tail <- function(x) {
+psis_smooth_tail <- function(x, cutoff) {
   len <- length(x)
-  exp_cutoff <- exp(x[1])
-  fit <- gpdfit(exp(x) - exp_cutoff)
+  exp_cutoff <- exp(cutoff)
+
+  # save time not sorting since x already sorted
+  fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
 
