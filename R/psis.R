@@ -173,6 +173,7 @@ do_psis <- function(log_ratios, r_eff, cores) {
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
+  throw_tail_length_warnings(tail_len)
 
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
@@ -199,7 +200,7 @@ do_psis <- function(log_ratios, r_eff, cores) {
   }
 
   pareto_k <- psis_apply(lw_list, "pareto_k")
-  throw_psis_warnings(pareto_k)
+  throw_pareto_warnings(pareto_k)
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
 
@@ -282,20 +283,14 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
   lw_i <- log_ratios_i - max(log_ratios_i)
   khat <- Inf
 
-  if (!enough_tail_samples(tail_len_i)) {
-    warning(
-      "Too few tail samples to fit generalized Pareto distribution. ",
-      "Weights will be truncated but not smoothed.",
-      call. = FALSE
-    )
-  } else {
+  if (enough_tail_samples(tail_len_i)) {
     ord <- sort.int(lw_i, index.return = TRUE)
     tail_ids <- seq(S - tail_len_i + 1, S)
     lw_tail <- ord$x[tail_ids]
     if (all(lw_tail == lw_tail[1])) {
       warning(
-        "All tail values are the same. ",
-        "Weights will be truncated but not smoothed.",
+        "Can't fit generalized Pareto distribution ",
+        "because all tail values are the same.",
         call. = FALSE
       )
     } else {
@@ -386,7 +381,7 @@ truncate_lw <- function(x, upper) {
 #' @param too_high The value at which to warn about very high estimates.
 #' @return Nothing, just possibly throws warnings.
 #'
-throw_psis_warnings <- function(k, high = 0.5, too_high = 0.7) {
+throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
   if (any(k > too_high)) {
     .warn("Some Pareto k diagnostic values are too high. ",
           .k_help())
@@ -394,5 +389,34 @@ throw_psis_warnings <- function(k, high = 0.5, too_high = 0.7) {
     .warn("Some Pareto k diagnostic values are slightly high. ",
           .k_help())
   }
+}
+
+#' Warn if not enough tail samples to fit GPD
+#'
+#' @param tail_lengths Vector of tail lengths.
+#' @return tail_lengths, invisibly.
+#'
+throw_tail_length_warnings <- function(tail_lengths) {
+  tail_len_bad <- !sapply(tail_lengths, enough_tail_samples)
+  if (any(tail_len_bad)) {
+    if (length(tail_lengths) == 1) {
+      warning(
+        "Not enough tail samples to fit the generalized Pareto distribution.",
+        call. = FALSE, immediate. = TRUE
+      )
+    } else {
+      bad <- which(tail_len_bad)
+      Nbad <- length(bad)
+      warning(
+        "Not enough tail samples to fit the generalized Pareto distribution ",
+        "in some or all columns of matrix of log importance ratios. ",
+        "Skipping the following columns: ",
+        paste(if (Nbad <= 10) bad else bad[1:10], collapse = ", "),
+        if (Nbad > 10) paste0(", ... [", Nbad - 10, " more not printed].\n") else "\n",
+        call. = FALSE, immediate. = TRUE
+      )
+    }
+  }
+  invisible(tail_lengths)
 }
 

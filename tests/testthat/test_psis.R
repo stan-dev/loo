@@ -35,7 +35,13 @@ test_that("psis methods give same results", {
   expect_identical(psisvec, psismat)
 })
 
-test_that("psis throws correct errors", {
+test_that("psis throws correct errors and warnings", {
+  # tail length warnings
+  expect_warning(
+    psis(-LLarr[1:5,, ]),
+    "Not enough tail samples to fit the generalized Pareto distribution"
+  )
+
   # no NAs or non-finite values allowed
   LLmat[1,1] <- NA
   expect_error(psis(-LLmat), "NAs not allowed in input")
@@ -54,6 +60,16 @@ test_that("psis throws correct errors", {
     "length(dim(log_ratios)) == 3 is not TRUE",
     fixed = TRUE
   )
+})
+
+test_that("throw_tail_length_warnings gives correct output", {
+  expect_silent(throw_tail_length_warnings(10))
+  expect_equal(throw_tail_length_warnings(10), 10)
+  expect_warning(throw_tail_length_warnings(1), "Not enough tail samples")
+  expect_warning(throw_tail_length_warnings(c(1, 10, 2)),
+                 "Skipping the following columns: 1, 3")
+  expect_warning(throw_tail_length_warnings(rep(1, 21)),
+                 "11 more not printed")
 })
 
 
