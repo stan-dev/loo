@@ -1,9 +1,9 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
-#' Implementation of Pareto smoothed importance sampling, a method for
-#' stabilizing importance ratios. For full details about the algorithm see
-#' Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
-#' \link{pareto-k-diagnostic} page.
+#' Implementation of Pareto smoothed importance sampling (PSIS), a method for
+#' stabilizing importance ratios. The version of the PSIS implemented here
+#' corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+#' For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 #'
 #' @export
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
@@ -60,7 +60,11 @@
 #'   }
 #' }
 #'
-#' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+#' @seealso
+#' \itemize{
+#' \item \code{\link{loo}} for approximate LOO-CV using PSIS.
+#' \item \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+#' }
 #'
 #' @template loo-and-psis-references
 #'

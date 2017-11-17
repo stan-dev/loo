@@ -2,7 +2,7 @@
 #'
 #' @description Efficient approximate leave-one-out cross-validation for
 #'   Bayesian models using Pareto smoothed importance sampling (PSIS). See
-#'   Vehtari, Gelman, and Gabry (2017a and 2017b) and \link{loo-package} for
+#'   Vehtari, Gelman, and Gabry (2017a, 2017b) and \link{loo-package} for
 #'   background.
 #'
 #'   The \code{loo} function is an S3 generic and methods are provided for
@@ -76,7 +76,6 @@
 #'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
 #'  diagnostics.
 #'  \item \code{\link{compare_models}} for model comparison.
-#'  \item \code{\link{print.loo}} for info on the \code{print} method.
 #' }
 #' @template loo-and-psis-references
 #'

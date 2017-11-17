@@ -21,8 +21,11 @@
 #'  }
 #' }
 #'
-#' @seealso \code{\link{compare}}, \code{\link{print.loo}},
-#' \code{\link{loo-package}}
+#' @seealso
+#' \itemize{
+#' \item \code{\link{loo}} for approximate LOO-CV.
+#' \item \code{\link{compare_models}} for comparing models on LOOIC or WAIC.
+#' }
 #'
 #'
 #' @examples

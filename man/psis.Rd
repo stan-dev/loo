@@ -97,10 +97,10 @@ The \code{weights} method returns an object with the same dimensions
   weights are normalized and whether or not to return them on the log scale.
 }
 \description{
-Implementation of Pareto smoothed importance sampling, a method for
-stabilizing importance ratios. For full details about the algorithm see
-Vehtari, Gelman and Gabry (2017a, 2017b). For diagnostics see the
-\link{pareto-k-diagnostic} page.
+Implementation of Pareto smoothed importance sampling (PSIS), a method for
+stabilizing importance ratios. The version of the PSIS implemented here
+corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -127,5 +127,8 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
-\code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+\itemize{
+\item \code{\link{loo}} for approximate LOO-CV using PSIS.
+\item \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+}
 }

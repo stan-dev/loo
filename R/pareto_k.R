@@ -4,6 +4,9 @@
 #' and PSIS effective sample sizes, find the indexes of observations for which
 #' the estimated Pareto shape parameter \eqn{k} is larger than some
 #' \code{threshold} value, or plot observation indexes vs. diagnostic estimates.
+#' The \strong{Details} section below provides a brief overview of the
+#' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
+#' 2017b) for full details.
 #'
 #' @name pareto-k-diagnostic
 #' @param x An object created by \code{\link{loo}} or \code{\link{psis}}.
@@ -11,34 +14,49 @@
 #' @details
 #' The reliability of the PSIS-based estimates can be assessed using the
 #' estimates for the shape parameter \eqn{k} of the generalized Pareto
-#' distribution.
+#' distribution:
 #'
 #' \itemize{
-#'   \item If \eqn{k < 1/2} the variance of the raw importance ratios is finite,
-#'   the central limit theorem holds, and the estimate converges quickly.
+#'   \item If \eqn{k < 0.5} then the distribution of raw importance ratios has
+#'   finite variance and the central limit theorem holds. However, as \eqn{k}
+#'   approaches \eqn{0.5} the RMSE of plain importance sampling (IS) increases
+#'   significantly while truncated IS (TIS) and PSIS have lower RMSE.
 #'
-#'   \item If \eqn{k} is between 1/2 and 1 the variance of the raw importance
-#'   ratios is infinite but the mean exists, the generalized central limit
-#'   theorem for stable distributions holds, and the convergence of the estimate
-#'   is slower. The variance of the PSIS estimate is finite but may be large.
+#'   \item If \eqn{0.5 \leq k < 1}{0.5 ≤ k < 1} then the variance of the raw
+#'   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
+#'   have finite variance by accepting some bias. The convergence of the
+#'   estimate is slower with increasing \eqn{k}.
+#'   If \eqn{0.5 \leq k \lesssim 0.7}{0.5 ≤ k <≈ 0.7}
+#'   we observe practically useful convergence rates and Monte Carlo error
+#'   estimates with PSIS (the bias of TIS increases faster than the bias of
+#'   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
+#'   unreliable Monte Carlo error estimates.
 #'
-#'   \item If \eqn{k > 1} the variance and the mean of the raw ratios
-#'   distribution do not exist. The variance of the PSIS estimate is finite but
-#'   may be large.
+#'   \item If \eqn{k \geq 1}{k ≥ 1} then neither the variance nor the mean of
+#'   the raw importance ratios exists. The convergence rate is close to zero and
+#'   bias can be large with practical sample sizes.
 #' }
 #'
-#' If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-#' should be warned, although in practice we have observed good performance for
-#' values of \eqn{k} up to 0.7. Even if the PSIS estimate has a finite variance,
-#' the user should consider sampling directly from \eqn{p(\theta^s | y_{-i})}
-#' for the problematic \eqn{i}, use \eqn{k}-fold cross-validation, or use a more
-#' robust model.
+#' \strong{If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the
+#' user should be warned, although in practice we have observed good performance
+#' for values of \eqn{k} up to 0.7.} If using PSIS in the context of approximate
+#' LOO-CV, even if the PSIS estimate has a finite variance the user should
+#' consider sampling directly from \eqn{p(\theta^s | y_{-i})} for any
+#' problematic observations \eqn{i}, use \eqn{k}-fold cross-validation, or use a
+#' more robust model. Importance sampling is likely to work less well if the
+#' marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
+#' \eqn{p(\theta^s | y_{-i})} are much different, which is more likely to happen
+#' with a non-robust model and highly influential observations. A robust model
+#' may reduce the sensitivity to highly influential observations.
 #'
-#' Importance sampling is likely to work less well if the marginal posterior
-#' \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
-#' different, which is more likely to happen with a non-robust model and highly
-#' influential observations. A robust model may reduce the sensitivity to highly
-#' influential observations.
+#' \subsection{Effective sample size and error estimates}{
+#'  In the case that we obtain the samples from the proposal distribution via
+#'  MCMC we can also compute estimates for the Monte Carlo error and the
+#'  effective sample size for importance sampling, which are more accurate for
+#'  PSIS than for IS and TIS (see Vehtari et al (2017b) for details). However,
+#'  the PSIS effective sample size estimate will be \strong{over-optimistic when
+#'  the estimate of \eqn{k} is greater than 0.7.}
+#' }
 #'
 #' @seealso \code{\link{psis}} for the implementation of the PSIS algorithm.
 #'
@@ -98,7 +116,7 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
 
 #' @rdname pareto-k-diagnostic
 #' @export
-#' @param threshold The threshold value for \eqn{k}.
+#' @param threshold For \code{pareto_k_ids}, the threshold value for \eqn{k}.
 #' @return \code{pareto_k_ids} returns an integer vector indicating which
 #' observations have Pareto \eqn{k} estimates above \code{threshold}.
 #'
@@ -142,16 +160,16 @@ psis_n_eff_values <- function(x) {
 #'   greater than 0.5 will be displayed in the plot. Any arguments specified in
 #'   \code{...} will be passed to \code{\link[graphics]{text}} and can be used
 #'   to control the appearance of the labels.
-#' @param main A title for the plot.
-#' @param diagnostic Which diagnostic should be plotted? The options are
-#'   \code{"k"} for Pareto \eqn{k} estimates (the default) or \code{"n_eff"} for
-#'   PSIS effective sample size estimates.
+#' @param diagnostic For the \code{plot} method, which diagnostic should be
+#'   plotted? The options are \code{"k"} for Pareto \eqn{k} estimates (the
+#'   default) or \code{"n_eff"} for PSIS effective sample size estimates.
+#' @param main For the \code{plot} method, a title for the plot.
 #'
 #' @return The \code{plot} method is called for its side effect and does not
-#'   return anything. If \code{x} is the result of a call to \code{\link{loo}},
-#'   \code{plot(x)} produces a plot of the estimates of the Pareto shape
-#'   parameters or estimates of the PSIS effective sample sizes. There is no
-#'   \code{plot} method for objects generated by a call to \code{\link{waic}}.
+#'   return anything. If \code{x} is the result of a call to \code{\link{loo}}
+#'   or \code{\link{psis}} then \code{plot(x, diagnostic)} produces a plot of
+#'   the estimates of the Pareto shape parameters (\code{diagnostic = "k"}) or
+#'   estimates of the PSIS effective sample sizes (\code{diagnostic = "n_eff"}).
 #'
 plot.loo <- function(x,
                      diagnostic = c("k", "n_eff"),
@@ -184,7 +202,8 @@ plot.loo <- function(x,
 #' @export
 #' @rdname pareto-k-diagnostic
 plot.psis <- function(x, diagnostic = c("k", "n_eff"), ...,
-                      label_points = FALSE, main = "PSIS diagnostic plot") {
+                      label_points = FALSE,
+                      main = "PSIS diagnostic plot") {
   plot.loo(x, diagnostic = diagnostic, ...,
            label_points = label_points, main = main)
 }

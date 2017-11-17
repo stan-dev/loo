@@ -16,8 +16,8 @@
 \method{print}{psis}(x, digits = 1, plot_k = FALSE, ...)
 }
 \arguments{
-\item{x}{A list with class \code{'loo'} (as returned by \code{\link{loo}} or
-\code{\link{waic}}).}
+\item{x}{An object returned by \code{\link{loo}}, \code{\link{psis}}, or
+\code{\link{waic}}.}
 
 \item{digits}{An integer passed to \code{\link[base]{round}}.}
 

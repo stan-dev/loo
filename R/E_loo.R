@@ -262,11 +262,13 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
     h_theta <- x_i
     r_theta <- exp(log_ratios_i - max(log_ratios_i))
     a <- sqrt(1 + h_theta^2) * r_theta
+    log_a <- sort(log(a))
 
-    S <- length(a)
+    S <- length(log_a)
     tail_ids <- seq(S - tail_len_i + 1, S)
-    tail_sample <- sort(log(a))[tail_ids]
+    tail_sample <- log_a[tail_ids]
+    cutoff <- log_a[min(tail_ids) - 1]
 
-    smoothed <- psis_smooth_tail(tail_sample)
+    smoothed <- psis_smooth_tail(tail_sample, cutoff)
     return(smoothed$k)
   }

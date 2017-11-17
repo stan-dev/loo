@@ -103,6 +103,8 @@ print(compare_models(waic1, waic2), digits = 2)
 
 }
 \seealso{
-\code{\link{compare}}, \code{\link{print.loo}},
-\code{\link{loo-package}}
+\itemize{
+\item \code{\link{loo}} for approximate LOO-CV.
+\item \code{\link{compare_models}} for comparing models on LOOIC or WAIC.
+}
 }

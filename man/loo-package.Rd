@@ -3,7 +3,7 @@
 \docType{package}
 \name{loo-package}
 \alias{loo-package}
-\title{Efficient LOO and WAIC for Bayesian models}
+\title{Efficient LOO-CV and WAIC for Bayesian models}
 \description{
 \if{html}{
   \figure{stanlogo.png}{options: width="50px" alt="mc-stan.org"}
@@ -11,23 +11,23 @@
 }
 
 This package implements the methods described in Vehtari, Gelman, and Gabry
-(2017a,2017b).
+(2017a, 2017b).
 }
 \details{
-Leave-one-out cross-validation (LOO-CV) and the widely
-  applicable information criterion (WAIC) are methods for estimating
-  pointwise out-of-sample prediction accuracy from a fitted Bayesian model
-  using the log-likelihood evaluated at the posterior simulations of the
-  parameter values. LOO and WAIC have various advantages over simpler
-  estimates of predictive error such as AIC and DIC but are less used in
-  practice because they involve additional computational steps. This package
-  implements the fast and stable computations for approximate LOO-CV (and
-  WAIC) laid out in Vehtari, Gelman, and Gabry (2017a). From existing
-  posterior simulation draws, we compute LOO using Pareto Smoothed Importance
-  Sampling (PSIS; Vehtari, Gelman, and Gabry, 2017b), a new procedure for
-  regularizing importance weights. As a byproduct of our calculations, we
-  also obtain approximate standard errors for estimated predictive errors and
-  for comparing of predictive errors between two models.
+Leave-one-out cross-validation (LOO-CV) and the widely applicable
+  information criterion (WAIC) are methods for estimating pointwise
+  out-of-sample prediction accuracy from a fitted Bayesian model using the
+  log-likelihood evaluated at the posterior simulations of the parameter
+  values. LOO-CV and WAIC have various advantages over simpler estimates of
+  predictive error such as AIC and DIC but are less used in practice because
+  they involve additional computational steps. This package implements the
+  fast and stable computations for approximate LOO-CV (and WAIC) laid out in
+  Vehtari, Gelman, and Gabry (2017a). From existing posterior simulation
+  draws, we compute LOO-CV using Pareto Smoothed Importance Sampling (PSIS;
+  Vehtari, Gelman, and Gabry, 2017b), a new procedure for regularizing
+  importance weights. As a byproduct of our calculations, we also obtain
+  approximate standard errors for estimated predictive errors and for
+  comparing of predictive errors between two models.
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
@@ -67,11 +67,11 @@ Peruggia, M. (1997). On the variability of case-deletion importance sampling
 weights in the Bayesian linear model. \emph{Journal of the American
 Statistical Association} \strong{92}, 199-207.
 
-Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
-\url{http://mc-stan.org/documentation/}.
+Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+\url{http://mc-stan.org}.
 
-Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1
-\url{http://mc-stan.org/interfaces/rstan.html}.
+Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+\url{http://mc-stan.org}.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.

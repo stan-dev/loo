@@ -36,4 +36,5 @@ Suggests:
     rstantools,
     testthat
 VignetteBuilder: knitr
+Encoding: UTF-8
 RoxygenNote: 6.0.1
