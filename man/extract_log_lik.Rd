@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_log_lik.R
 \name{extract_log_lik}
 \alias{extract_log_lik}
-\title{Extract pointwise log-likelihood matrix from a Stan model}
+\title{Extract pointwise log-likelihood from a Stan model}
 \usage{
 extract_log_lik(stanfit, parameter_name = "log_lik", merge_chains = TRUE)
 }
@@ -24,8 +24,8 @@ If \code{merge_chains=TRUE}, an \eqn{S} by \eqn{N} matrix of
   \eqn{I \times C = S}{I * C = S}.
 }
 \description{
-Convenience function for extracting the pointwise log-likelihood from a
-fitted Stan model.
+Convenience function for extracting the pointwise log-likelihood
+matrix or array from a fitted Stan model.
 }
 \details{
 Stan does not automatically compute and store the log-likelihood. It
@@ -44,12 +44,12 @@ Stan does not automatically compute and store the log-likelihood. It
 
  \code{vector[N] log_lik;}
 
- \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n] * beta, sigma);}
+ \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);}
 }
 \references{
-Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
-\url{http://mc-stan.org/documentation/}
+Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+\url{http://mc-stan.org/}
 
-Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
-\url{http://mc-stan.org/interfaces/rstan.html}
+Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+\url{http://mc-stan.org/}
 }

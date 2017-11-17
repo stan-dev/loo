@@ -1,7 +1,7 @@
-#' Extract pointwise log-likelihood matrix from a Stan model
+#' Extract pointwise log-likelihood from a Stan model
 #'
-#' Convenience function for extracting the pointwise log-likelihood from a
-#' fitted Stan model.
+#' Convenience function for extracting the pointwise log-likelihood
+#' matrix or array from a fitted Stan model.
 #'
 #' @export
 #' @param stanfit A \code{stanfit} object (\pkg{rstan} package).
@@ -33,14 +33,14 @@
 #'
 #'  \code{vector[N] log_lik;}
 #'
-#'  \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n] * beta, sigma);}
+#'  \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);}
 #'
 #' @references
-#' Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
-#' \url{http://mc-stan.org/documentation/}
+#' Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+#' \url{http://mc-stan.org/}
 #'
-#' Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
-#' \url{http://mc-stan.org/interfaces/rstan.html}
+#' Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+#' \url{http://mc-stan.org/}
 #'
 extract_log_lik <-
   function(stanfit,

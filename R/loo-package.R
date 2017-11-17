@@ -13,7 +13,10 @@
 #' }
 #'
 #' This package implements the methods described in Vehtari, Gelman, and Gabry
-#' (2017a, 2017b).
+#' (2017a, 2017b). To get started see the \code{\link{loo}} function for
+#' efficient approximate leave-one-out cross-validation (LOO-CV) or the
+#' \code{\link{psis}} function for the Pareto smoothed importance sampling
+#' (PSIS) algorithm.
 #'
 #' @details Leave-one-out cross-validation (LOO-CV) and the widely applicable
 #'   information criterion (WAIC) are methods for estimating pointwise
@@ -24,7 +27,7 @@
 #'   they involve additional computational steps. This package implements the
 #'   fast and stable computations for approximate LOO-CV (and WAIC) laid out in
 #'   Vehtari, Gelman, and Gabry (2017a). From existing posterior simulation
-#'   draws, we compute LOO-CV using Pareto Smoothed Importance Sampling (PSIS;
+#'   draws, we compute LOO-CV using Pareto smoothed importance sampling (PSIS;
 #'   Vehtari, Gelman, and Gabry, 2017b), a new procedure for regularizing
 #'   importance weights. As a byproduct of our calculations, we also obtain
 #'   approximate standard errors for estimated predictive errors and for

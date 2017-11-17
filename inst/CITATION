@@ -17,8 +17,11 @@ bibentry(bibtype = "Article",
          author = c(person("Aki", "Vehtari"),
                     person("Andrew", "Gelman"),
                     person("Jonah", "Gabry")),
-         year = "2016",
+         year = "2017",
          journal = "Statistics and Computing",
+         volume = 27,
+         issue = 5,
+         pages = "1413--1432",
          doi = "10.1007/s11222-016-9696-4",
          header = "To cite the loo paper:"
 )
