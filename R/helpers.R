@@ -1,14 +1,3 @@
-#' More stable version of log(colMeans(exp(x)))
-#'
-#' @noRd
-#' @param x A matrix.
-#' @return A vector where each element is LogSumExp of a column of x.
-#'
-logColMeansExp <- function(x) {
-  logS <- log(nrow(x))
-  colLogSumExps(x) - logS
-}
-
 #' More stable version of log(mean(exp(x)))
 #'
 #' @noRd
@@ -16,20 +5,29 @@ logColMeansExp <- function(x) {
 #' @return A scalar equal to log(mean(exp(x))).
 #'
 logMeanExp <- function(x) {
-  logSumExp(x) - log(length(x))
+  logS <- log(length(x))
+  logSumExp(x) - logS
+}
+
+#' More stable version of log(colMeans(exp(x)))
+#'
+#' @noRd
+#' @param x A matrix.
+#' @return A vector where each element is LogSumExp of a column of x.
+#'
+colLogMeanExps <- function(x) {
+  logS <- log(nrow(x))
+  colLogSumExps(x) - logS
 }
 
 #' Compute point estimates and standard errors from pointwise vectors
 #'
 #' @noRd
 #' @param x A matrix.
-#' @return An ncol(pointwise) by 2 matrix with columns 'Estimate' and 'SE'
-#'   and rownames equal to colnames(pointwise).
+#' @return An ncol(x) by 2 matrix with columns 'Estimate' and 'SE'
+#'   and rownames equal to colnames(x).
 #'
 table_of_estimates <- function(x) {
-  if ("mcse_elpd_loo" %in% colnames(x)) {
-    x <- x[, !colnames(x) %in% "mcse_elpd_loo"]
-  }
   out <- cbind(
     Estimate = colSums2(x),
     SE = sqrt(nrow(x) * colVars(x))

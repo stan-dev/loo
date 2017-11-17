@@ -336,10 +336,10 @@ dim.psis_loo <- function(x) {
 #' @return Named list with pointwise elpd_loo, p_loo, and looic.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
-  lpd <- logColMeansExp(ll)
-  ll_plus_lw <- ll + weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- colLogSumExps(ll_plus_lw)
+  lw <- weights(psis_object, normalize = TRUE, log = TRUE)
+  elpd_loo <- colLogSumExps(ll + lw)
   looic <- -2 * elpd_loo
+  lpd <- colLogMeanExps(ll)
   p_loo <- lpd - elpd_loo
   mcse_elpd_loo <- mcse_elpd(ll, elpd_loo, psis_object)
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
@@ -348,14 +348,18 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' Structure the object returned by the loo methods
 #'
 #' @noRd
-#' @param pointwise Matrix containing columns elpd_loo, p_loo, looic
+#' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
+#'   looic.
 #' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
-#' @param dims Log likelihood matrix dimensions (attribute of psis object)
+#' @param dims Log likelihood matrix dimensions (attribute of psis object).
 #' @param psis_object PSIS object.
+#' @return A 'psis_loo' object as described in the Value section of the loo
+#'   function documentation.
 #'
 psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   stopifnot(is.matrix(pointwise), is.list(diagnostics))
-  estimates <- table_of_estimates(pointwise)
+  cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
+  estimates <- table_of_estimates(pointwise[, cols_to_summarize])
   structure(
     nlist(estimates, pointwise, diagnostics, psis_object),
     dims = dims,

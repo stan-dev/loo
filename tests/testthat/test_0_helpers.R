@@ -39,8 +39,8 @@ test_that("reshaping functions throw correct errors", {
                fixed = TRUE)
 })
 
-test_that("logColMeansExp(x) = log(colMeans(exp(x))) ", {
-  expect_equal(logColMeansExp(LLmat), log(colMeans(exp(LLmat))))
+test_that("colLogMeanExps(x) = log(colMeans(exp(x))) ", {
+  expect_equal(colLogMeanExps(LLmat), log(colMeans(exp(LLmat))))
 })
 
 test_that("nlist works", {

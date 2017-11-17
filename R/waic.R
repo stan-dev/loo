@@ -65,7 +65,7 @@ waic.array <- function(x, ...) {
 waic.matrix <- function(x, ...) {
   ll <- validate_ll(x)
   lldim <- dim(ll)
-  lpd <- logColMeansExp(ll)
+  lpd <- colLogMeanExps(ll)
   p_waic <- matrixStats::colVars(ll)
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic

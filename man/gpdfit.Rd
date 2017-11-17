@@ -4,7 +4,7 @@
 \alias{gpdfit}
 \title{Estimate parameters of the Generalized Pareto distribution}
 \usage{
-gpdfit(x, wip = TRUE, min_grid_pts = 30)
+gpdfit(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector. The sample from which to estimate the parameters.}
@@ -12,8 +12,14 @@ gpdfit(x, wip = TRUE, min_grid_pts = 30)
 \item{wip}{Logical indicating whether to adjust \eqn{k} based on a weakly
 informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.}
 
-\item{min_grid_pts}{The minimum number of grid points used. The actual number
-used is \code{min_grid_pts + floor(sqrt(length(x)))}.}
+\item{min_grid_pts}{The minimum number of grid points used in the fitting
+algorithm. The actual number used is \code{min_grid_pts +
+floor(sqrt(length(x)))}.}
+
+\item{sort_x}{If \code{TRUE} (the default), the first step in the fitting
+algorithm is to sort the elements of \code{x}. If \code{x} is already
+sorted in ascending order then \code{sort_x} can be set to \code{FALSE} to
+skip the initial sorting step.}
 }
 \value{
 A named list with components \code{k} and \code{sigma}.

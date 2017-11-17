@@ -10,8 +10,13 @@
 #' @param x A numeric vector. The sample from which to estimate the parameters.
 #' @param wip Logical indicating whether to adjust \eqn{k} based on a weakly
 #'   informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.
-#' @param min_grid_pts The minimum number of grid points used. The actual number
-#'   used is \code{min_grid_pts + floor(sqrt(length(x)))}.
+#' @param min_grid_pts The minimum number of grid points used in the fitting
+#'   algorithm. The actual number used is \code{min_grid_pts +
+#'   floor(sqrt(length(x)))}.
+#' @param sort_x If \code{TRUE} (the default), the first step in the fitting
+#'   algorithm is to sort the elements of \code{x}. If \code{x} is already
+#'   sorted in ascending order then \code{sort_x} can be set to \code{FALSE} to
+#'   skip the initial sorting step.
 #' @return A named list with components \code{k} and \code{sigma}.
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
@@ -25,20 +30,25 @@
 #' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 #' 316-325.
 #'
-gpdfit <- function(x, wip = TRUE, min_grid_pts = 30) {
+gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
+  # See section 4 of Zhang and Stephens (2009)
+  if (sort_x) {
+    x <- sort.int(x)
+  }
   N <- length(x)
-  x <- sort.int(x, method = "quick")
   prior <- 3
   M <- min_grid_pts + floor(sqrt(N))
-  mseq <- seq_len(M)
-  sM <- 1 - sqrt(M / (mseq - 0.5))
-  Nflr <- floor(N / 4 + 0.5)
-  b <- 1 / x[N] + sM / prior / x[Nflr]
-  l <- N * lx(b, x)
-  w <- 1 / vapply(mseq, FUN = function(j) sum(exp(l - l[j])), FUN.VALUE = 0)
-  bdotw <- sum(b * w)
-  k <- mean.default(log1p(-bdotw * x))
-  sigma <- -k / bdotw
+  jj <- seq_len(M)
+  xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
+  theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
+  l_theta <- N * lx(theta, x) # profile log-lik
+  w_theta <- 1 / vapply(jj, FUN.VALUE = 0, FUN = function(j) {
+    sum(exp(l_theta - l_theta[j]))
+  })
+  theta_hat <- sum(theta * w_theta)
+  k <- mean.default(log1p(-theta_hat * x))
+  sigma <- -k / theta_hat
+
   if (wip) {
     k <- adjust_k_wip(k, n = N)
   }
