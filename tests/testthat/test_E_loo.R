@@ -96,7 +96,8 @@ test_that("E_loo.matrix equal to reference", {
 
 test_that("E_loo throws correct errors and warnings", {
   # warnings
-  expect_warning(E_test <- E_loo(x, psis_mat), "'log_ratios' not specified")
+  expect_warning(E_loo.matrix(x, psis_mat), "'log_ratios' not specified")
+  expect_warning(E_test <- E_loo.default(x[, 1], psis_vec), "'log_ratios' not specified")
   expect_null(E_test$pareto_k)
 
   # errors
@@ -124,23 +125,21 @@ test_that("E_loo throws correct errors and warnings", {
 })
 
 
-
-
-.wquant_rapprox <- function(x, w, probs) {
-  stopifnot(all(probs > 0 & probs < 1))
-  ord <- order(x)
-  d <- x[ord]
-  ww <- w[ord]
-  p <- cumsum(ww) / sum(ww)
-  stats::approx(p, d, probs, rule = 2)$y
-}
-.wquant_sim <- function(x, w, probs, n_sims) {
-  xx <- sample(x, size = n_sims, replace = TRUE, prob = w / sum(w))
-  quantile(xx, probs, names = FALSE)
-}
-
-
 test_that("weighted quantiles work", {
+  .wquant_rapprox <- function(x, w, probs) {
+    stopifnot(all(probs > 0 & probs < 1))
+    ord <- order(x)
+    d <- x[ord]
+    ww <- w[ord]
+    p <- cumsum(ww) / sum(ww)
+    stats::approx(p, d, probs, rule = 2)$y
+  }
+  .wquant_sim <- function(x, w, probs, n_sims) {
+    xx <- sample(x, size = n_sims, replace = TRUE, prob = w / sum(w))
+    quantile(xx, probs, names = FALSE)
+  }
+
+
   set.seed(123)
   pr <- seq(0.025, 0.975, 0.025)
 

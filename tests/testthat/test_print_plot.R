@@ -9,9 +9,12 @@ loo1 <- suppressWarnings(loo(LLarr))
 psis1 <- suppressWarnings(psis(-LLarr))
 
 
+
+# plotting ----------------------------------------------------------------
 test_that("plot methods don't error", {
   expect_silent(plot(loo1, label_points = FALSE))
   expect_silent(plot(psis1, label_points = TRUE))
+  expect_silent(plot(psis1, diagnostic = "n_eff", label_points = FALSE))
 
   loo1$diagnostics$pareto_k[1] <- 10
   expect_silent(plot(loo1, label_points = TRUE))
@@ -26,6 +29,9 @@ test_that("plot methods throw appropriate errors/warnings", {
   expect_warning(plot(psis1), regexp = "estimates are Inf/NA/NaN and not plotted.")
 })
 
+
+
+# printing ----------------------------------------------------------------
 lldim_msg <- paste0("Computed from ", prod(dim(LLarr)[1:2]) , " by ",
                     dim(LLarr)[3], " log-likelihood matrix")
 lwdim_msg <- paste0("Computed from ", prod(dim(LLarr)[1:2]) , " by ",
@@ -102,4 +108,11 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(k > 0.5 & k <= 0.7), tab[2,1])
   expect_equal(sum(k > 0.7 & k <= 1), tab[3,1])
   expect_equal(sum(k > 1), tab[4,1])
+})
+
+test_that("psis_n_eff_values extractor works", {
+  n_eff_psis <- psis1$diagnostics$n_eff
+  expect_type(n_eff_psis, "double")
+  expect_identical(psis_n_eff_values(psis1), n_eff_psis)
+  expect_identical(psis_n_eff_values(psis1), psis_n_eff_values(loo1))
 })

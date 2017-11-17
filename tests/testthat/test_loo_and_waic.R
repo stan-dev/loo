@@ -20,6 +20,11 @@ test_that("loo and waic results haven't changed", {
   expect_equal_to_reference(waic1, "waic.rds")
 })
 
+test_that("loo with cores=1 and cores=2 gives same results", {
+  loo2 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr, cores = 2))
+  expect_equal(loo1$estimates, loo2$estimates)
+})
+
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))
   expect_true(is.loo(waic1))

@@ -54,14 +54,21 @@ is.waic <- function(x) {
 
 # validating and reshaping arrays/matrices  -------------------------------
 
-#' Check for NAs and non-finite values in log-lik (or log-weights) array/matrix/vector
+#' Check for NAs and non-finite values in log-lik (or log-ratios)
+#' array/matrix/vector
 #'
 #' @noRd
-#' @param x log-lik array/matrix/vector
-#' @return x if no error is thrown.
+#' @param x Array/matrix/vector of log-likelihood or log-ratio values.
+#' @return x, invisibly, if no error is thrown.
 #'
 validate_ll <- function(x) {
-  stopifnot(!is.list(x), !anyNA(x), all(is.finite(x)))
+  if (is.list(x)) {
+    stop("List not allowed as input.")
+  } else if (anyNA(x)) {
+    stop("NAs not allowed in input.")
+  } else if (!all(is.finite(x))) {
+    stop("All input values must be finite.")
+  }
   invisible(x)
 }
 
@@ -114,10 +121,10 @@ llmatrix_to_array <- function(x, chain_id) {
 }
 
 
-#' Validate log-lik function exists and has correct arg names
+#' Validate that log-lik function exists and has correct arg names
 #'
 #' @noRd
-#' @param x A function.
+#' @param x A function with arguments 'data_i' and 'draws'.
 #' @return Either returns x or throws an error.
 #'
 validate_llfun <- function(x) {

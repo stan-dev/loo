@@ -262,7 +262,7 @@ psis_object <-
       class = c("psis", "list")
     )
 
-    # need weights (normalized and not log weights) to compute psis_n_eff
+    # need normalized weights (not on log scale) for psis_n_eff
     w <- weights(out, normalize = TRUE, log = FALSE)
     out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
     return(out)

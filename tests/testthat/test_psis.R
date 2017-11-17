@@ -36,13 +36,16 @@ test_that("psis methods give same results", {
 })
 
 test_that("psis throws correct errors", {
-  # no NAs allowed
+  # no NAs or non-finite values allowed
   LLmat[1,1] <- NA
-  expect_error(
-    psis(-LLmat),
-    "!anyNA(x) is not TRUE",
-    fixed = TRUE
-  )
+  expect_error(psis(-LLmat), "NAs not allowed in input")
+
+  LLmat[1,1] <- 1
+  LLmat[10, 2] <- Inf
+  expect_error(psis(-LLmat), "All input values must be finite")
+
+  # no lists allowed
+  expect_error(psis(as.list(-LLvec)), "List not allowed as input")
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
@@ -69,11 +72,16 @@ test_that("weights method returns correct output", {
 })
 
 
-test_that("default psis_n_eff method works properly", {
+test_that("psis_n_eff methods works properly", {
   w <- weights(psis1, normalize = TRUE, log = FALSE)
   expect_equal(psis_n_eff.default(w[, 1], r_eff = 1), 1 / sum(w[, 1]^2))
   expect_equal(psis_n_eff.default(w[, 1], r_eff = 2), 2 / sum(w[, 1]^2))
+  expect_equal(
+    psis_n_eff.default(w[, 1], r_eff = 2),
+    psis_n_eff.matrix(w, r_eff = rep(2, ncol(w)))[1]
+  )
   expect_warning(psis_n_eff.default(w[, 1]), "not adjusted based on MCMC n_eff")
+  expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
 })
 
 test_that("default relative_eff method works properly", {

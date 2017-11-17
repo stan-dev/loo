@@ -43,6 +43,21 @@ test_that("colLogMeanExps(x) = log(colMeans(exp(x))) ", {
   expect_equal(colLogMeanExps(LLmat), log(colMeans(exp(LLmat))))
 })
 
+test_that("validating log-lik objects and functions works", {
+  f_ok <- function(data_i, draws) return(NULL)
+  f_bad1 <- function(data_i) return(NULL)
+  f_bad2 <- function(data, draws) return(NULL)
+  expect_equal(validate_llfun(f_ok), f_ok)
+  expect_error(
+    validate_llfun(f_bad1),
+    "Log-likelihood function should have two arguments: 'data_i' and 'draws'"
+  )
+  expect_error(
+    validate_llfun(f_bad2),
+    "Log-likelihood function should have two arguments: 'data_i' and 'draws'"
+  )
+})
+
 test_that("nlist works", {
   a <- 1; b <- 2; c <- 3;
   nlist_val <- list(nlist(a, b, c), nlist(a, b, c = "tornado"))
