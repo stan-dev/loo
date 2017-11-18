@@ -82,23 +82,23 @@ waic.matrix <- function(x, ...) {
 #' @export
 #' @templateVar fn waic
 #' @template function
-#' @param draws,data For the function method only. See the \strong{Methods (by
-#'   class)} section below for details on these arguments.
+#' @param draws,data,... For the function method only. See the \strong{Methods
+#'   (by class)} section below for details on these arguments.
 #'
 waic.function <-
   function(x,
            ...,
            data = NULL,
            draws = NULL) {
-    stopifnot(is.data.frame(data) || is.matrix(data),
-              !is.null(dim(draws)))
-    S <- dim(draws)[1]
-    N <- dim(data)[1]
+    stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
 
     .llfun <- validate_llfun(x)
+    N <- dim(data)[1]
 
     waic_list <- lapply(seq_len(N), FUN = function(i) {
-      ll_i <- as.vector(.llfun(data_i = data[i,, drop=FALSE], draws = draws))
+      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
+      ll_i <- as.vector(ll_i)
+      if (i == 1) S <<- length(ll_i)
       lpd_i <- logMeanExp(ll_i)
       p_waic_i <- var(ll_i)
       elpd_waic_i <- lpd_i - p_waic_i

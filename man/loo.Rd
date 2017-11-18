@@ -19,14 +19,12 @@ loo(x, ...)
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
   save_psis = FALSE, cores = getOption("loo.cores", 1))
 
-loo_i(i, llfun, data, draws, r_eff = NULL)
+loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
 (by class)} section below for a detailed description of how to specify the
 inputs for each method.}
-
-\item{...}{Arguments passed on to the various methods.}
 
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
@@ -49,8 +47,10 @@ an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
 of version \code{2.0.0} the \strong{default is now 1 core}, but we
 recommend using as many (or close to as many) cores as possible.}
 
-\item{draws, data}{For the function method only. See the \strong{Methods (by
-class)} section below for details on these arguments.}
+\item{data, draws, ...}{For the \code{loo} function method and the \code{loo_i}
+function, the data, posterior draws, and other arguments to pass to the
+log-likelihood function. See the \strong{Methods (by class)} section below
+for details on how to specify these arguments.}
 
 \item{i}{For \code{loo_i}, an integer in \code{1:N}.}
 
@@ -131,21 +131,26 @@ of data points.
   \code{i} evaluated at each posterior draw. The function should be written
   such that, for each observation \code{i} in \code{1:N}, evaluating
   \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
-  of length \code{S} (size of posterior sample).
+  of length \code{S} (size of posterior sample). The log-likelihood function
+  can also have additional arguments but \code{data_i} and \code{draws} are
+  required.
 
  If using the function method then the arguments \code{data}
  and \code{draws} must also be specified in the call to \code{loo}:
  \itemize{
-   \item \code{data}: An object containing data (e.g. observed outcome and
-   predictors) needed to compute the pointwise log-likelihood. \code{data}
-   must be an object that can be indexed as described above
-   (\code{data[i,,drop=FALSE]}) to access the data for the \code{i}th
-   observation. \code{data} must have a \code{dim} attribute such that
-   \code{dim(data)[1]} is equal to \code{N}, the number of observations.
+   \item \code{data}: A data frame or matrix containing the data (e.g.
+   observed outcome and predictors) needed to compute the pointwise
+   log-likelihood. For each observation \code{i}, the \code{i}th row of
+   \code{data} will be passed to the \code{data_i} argument of the
+   log-likelihood function.
    \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood. \code{draws}
-   must have a \code{dim} attribute such that \code{dim(draws)[1]} is equal
-   to \code{S}, the size of the posterior sample.
+   parameters needed to compute the pointwise log-likelihood. Unlike
+   \code{data}, which is indexed by observation, for each observation the
+   entire object \code{draws} will be passed to the \code{draws} argument of
+   the log-likelihood function.
+   \item The \code{...} can be used to pass additional arguments to your
+   log-likelihood function. These arguments ase used like the \code{draws}
+   argument in that they are recycled for each observation.
  }
 }}
 

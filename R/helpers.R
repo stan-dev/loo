@@ -129,15 +129,17 @@ llmatrix_to_array <- function(x, chain_id) {
 #'
 validate_llfun <- function(x) {
   f <- match.fun(x)
+  must_have <- c("data_i", "draws")
   arg_names <- names(formals(f))
-  if (length(arg_names) != 2 ||
-      !all(arg_names %in% c("data_i", "draws"))) {
-    stop("Log-likelihood function should have two arguments: ",
-         "'data_i' and 'draws'.", call. = FALSE)
+  if (!all(must_have %in% arg_names)) {
+    stop(
+      "Log-likelihood function must have at least the arguments ",
+      "'data_i' and 'draws'",
+      call. = FALSE
+    )
   }
   return(f)
 }
-
 
 
 #' Named lists

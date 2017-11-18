@@ -30,7 +30,6 @@
 #'   component to the list returned by \code{loo}. Currently this is only needed
 #'   if you plan to use the \code{\link{E_loo}} function to compute weighted
 #'   expectations after running \code{loo}.
-#' @param ... Arguments passed on to the various methods.
 #' @template cores
 #'
 #' @return The \code{loo} methods return a named list with class
@@ -191,8 +190,10 @@ loo.matrix <-
 #' @export
 #' @templateVar fn loo
 #' @template function
-#' @param draws,data For the function method only. See the \strong{Methods (by
-#'   class)} section below for details on these arguments.
+#' @param data,draws,... For the \code{loo} function method and the \code{loo_i}
+#'   function, the data, posterior draws, and other arguments to pass to the
+#'   log-likelihood function. See the \strong{Methods (by class)} section below
+#'   for details on how to specify these arguments.
 #'
 loo.function <-
   function(x,
@@ -203,13 +204,11 @@ loo.function <-
            save_psis = FALSE,
            cores = getOption("loo.cores", 1)) {
 
-    stopifnot(is.data.frame(data) || is.matrix(data),
-              !is.null(dim(draws)))
+    stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     throw_r_eff_warning(r_eff)
-    S <- dim(draws)[1]
-    N <- dim(data)[1]
 
     .llfun <- validate_llfun(x)
+    N <- dim(data)[1]
 
     if (cores == 1) {
       psis_list <-
@@ -220,7 +219,8 @@ loo.function <-
           data = data,
           draws = draws,
           r_eff = r_eff,
-          save_psis = save_psis
+          save_psis = save_psis,
+          ...
         )
     } else {
       if (.Platform$OS.type != "windows") {
@@ -233,7 +233,8 @@ loo.function <-
             data = data,
             draws = draws,
             r_eff = r_eff,
-            save_psis = save_psis
+            save_psis = save_psis,
+            ...
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
@@ -247,7 +248,8 @@ loo.function <-
             data = data,
             draws = draws,
             r_eff = r_eff,
-            save_psis = save_psis
+            save_psis = save_psis,
+            ...
           )
       }
     }
@@ -268,7 +270,7 @@ loo.function <-
     psis_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
-      dims = c(S, N),
+      dims = c(attr(psis_list[[1]], "S"), N),
       psis_object = if (save_psis) psis_out else NULL
     )
   }
@@ -294,28 +296,57 @@ loo.function <-
 loo_i <-
   function(i,
            llfun,
-           data,
-           draws,
+           ...,
+           data = NULL,
+           draws = NULL,
            r_eff = NULL) {
     stopifnot(
       i == as.integer(i),
+      is.function(llfun) || is.character(llfun),
       is.data.frame(data) || is.matrix(data),
-      !is.null(dim(draws))
+      i <= dim(data)[1],
+      !is.null(draws)
     )
-    i <- as.integer(i)
-    S <- dim(draws)[1]
-    N <- dim(data)[1]
-    stopifnot(i %in% seq_len(N))
-
     .loo_i(
-      i = i,
+      i = as.integer(i),
       llfun = match.fun(llfun),
       data = data,
       draws = draws,
       r_eff = r_eff[i],
-      save_psis = FALSE
+      save_psis = FALSE,
+      ...
     )
   }
+
+# Function that is passed to the FUN argument of lapply, mclapply, or parLapply
+# for the loo.function method. The arguments and return value are the same as
+# the ones documented above for the user-facing loo_i function.
+.loo_i <-
+  function(i,
+           llfun,
+           ...,
+           data,
+           draws,
+           r_eff = NULL,
+           save_psis = FALSE) {
+
+    if (!is.null(r_eff)) {
+      r_eff <- r_eff[i]
+    }
+    d_i <- data[i, , drop = FALSE]
+    ll_i <- llfun(data_i = d_i, draws = draws, ...)
+    psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
+    structure(
+      list(
+        pointwise = pointwise_loo_calcs(ll_i, psis_out),
+        diagnostics = psis_out$diagnostics,
+        psis_object = if (save_psis) psis_out else NULL
+      ),
+      S = dim(psis_out)[1],
+      N = 1
+    )
+  }
+
 
 #' @export
 dim.psis_loo <- function(x) {
@@ -367,31 +398,6 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 }
 
 
-# Function that is passed to the FUN argument of lapply, mclapply, or parLapply
-# for the loo.function method. The arguments and return value are the same as
-# the ones documented above for loo_i.
-.loo_i <-
-  function(i,
-           llfun,
-           data,
-           draws,
-           r_eff = NULL,
-           save_psis = FALSE) {
-
-    if (!is.null(r_eff)) {
-      r_eff <- r_eff[i]
-    }
-    d_i <- data[i, , drop = FALSE]
-    ll_i <- llfun(data_i = d_i, draws = draws)
-    psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
-    list(
-      pointwise = pointwise_loo_calcs(ll_i, psis_out),
-      diagnostics = psis_out$diagnostics,
-      psis_object = if (save_psis) psis_out else NULL
-    )
-  }
-
-
 #' Compute Monte Carlo standard error for ELPD
 #'
 #' @noRd
@@ -413,7 +419,6 @@ mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
   })
   sqrt(var_elpd / r_eff)
 }
-
 
 #' Warning message if r_eff not specified
 #'

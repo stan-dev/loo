@@ -48,14 +48,10 @@ test_that("validating log-lik objects and functions works", {
   f_bad1 <- function(data_i) return(NULL)
   f_bad2 <- function(data, draws) return(NULL)
   expect_equal(validate_llfun(f_ok), f_ok)
-  expect_error(
-    validate_llfun(f_bad1),
-    "Log-likelihood function should have two arguments: 'data_i' and 'draws'"
-  )
-  expect_error(
-    validate_llfun(f_bad2),
-    "Log-likelihood function should have two arguments: 'data_i' and 'draws'"
-  )
+
+  bad_msg <- "Log-likelihood function must have at least the arguments 'data_i' and 'draws'"
+  expect_error(validate_llfun(f_bad1), bad_msg)
+  expect_error(validate_llfun(f_bad2), bad_msg)
 })
 
 test_that("nlist works", {
