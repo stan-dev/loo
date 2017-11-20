@@ -161,7 +161,7 @@ We can now compare the models on LOO using the `compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-diff <- compare(loo_1, loo_2)
+diff <- compare_models(loo_1, loo_2)
 ```
 
 This new object, `diff`, contains the estimated difference of expected 
