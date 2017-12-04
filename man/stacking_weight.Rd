@@ -7,18 +7,27 @@
 stacking_weight(lpd_point, optim_method = "BFGS")
 }
 \arguments{
-\item{lpd_point}{A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.}
+\item{lpd_point}{A  matrix of pointwise leave-one-out likelihood evaluated in
+different models. Each column corresponds to one model.}
 
-\item{optim_method}{The optimization method to be used in stacking; it can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default one is "BFGS".}
+\item{optim_method}{The optimization method to be used in stacking; it can
+be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
+The default one is "BFGS".}
 }
 \value{
-A vector of best model weights that maximize the leave-one-out log score of the combination.
+A vector of best model weights that maximize the leave-one-out log
+  score of the combination.
 }
 \description{
 Stacking of predictive distributions
 }
 \details{
-\code{lpd_point} is a matrix of pointwise log leave-one-out likelihood, which can be calculated from \code{\link{loo}} or through running exact LOO in advance. It should be a \eqn{N} by \eqn{K}  matrix when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is an approach that finds the optimal linear combining weight which maximizes the leave-one-out log score.
+\code{lpd_point} is a matrix of pointwise log leave-one-out
+  likelihood, which can be calculated from \code{\link{loo}} or through
+  running exact LOO in advance. It should be a \eqn{N} by \eqn{K}  matrix
+  when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is
+  an approach that finds the optimal linear combining weight which maximizes
+  the leave-one-out log score.
 }
 \examples{
 \dontrun{
@@ -28,9 +37,9 @@ stacking_weight(cbind(loo1, loo2))
 }
 }
 \seealso{
-\code{\link{loo}} for details on leave-one-out elpd estimation.
-
-\code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
-
-\code{\link{optim}} for the choice of optimization methods.
+\itemize{
+\item \code{\link{loo}} for details on leave-one-out elpd estimation.
+\item \code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
+\item \code{\link{optim}} for the choice of optimization methods.
+}
 }

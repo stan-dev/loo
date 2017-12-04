@@ -1,5 +1,10 @@
 #' Widely applicable information criterion (WAIC)
 #'
+#' The \code{waic} methods can be used to compute WAIC from the pointwise
+#' log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
+#' the \code{\link{loo}} function) because PSIS provides useful diagnostics and
+#' effective sample size and Monte Carlo estimates.
+#'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
 #'
@@ -24,7 +29,7 @@
 #' @seealso
 #' \itemize{
 #' \item \code{\link{loo}} for approximate LOO-CV.
-#' \item \code{\link{compare_models}} for comparing models on LOOIC or WAIC.
+#' \item \code{\link{compare}} for comparing models on LOOIC or WAIC.
 #' }
 #'
 #'
@@ -46,7 +51,7 @@
 #' log_lik2 <- extract_log_lik(stanfit2)
 #' (waic1 <- waic(log_lik1))
 #' (waic2 <- waic(log_lik2))
-#' print(compare_models(waic1, waic2), digits = 2)
+#' print(compare(waic1, waic2), digits = 2)
 #' }
 #'
 waic <- function(x, ...) {

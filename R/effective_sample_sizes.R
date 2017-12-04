@@ -54,6 +54,14 @@ relative_eff.array <- function(x, ...) {
   n_eff_vec / S
 }
 
+#' @export
+#' @templateVar fn relative_eff
+#' @template array
+#'
+relative_eff.function <- function(x, ..., data, draws) {
+  stop("Implement this for use in rstanarm")
+}
+
 
 
 # internal ----------------------------------------------------------------

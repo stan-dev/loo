@@ -25,6 +25,8 @@
 #' @return A named list with the following components:
 #' \describe{
 #'   \item{\code{value}}{
+#'   The result of the computation.
+#'
 #'   For the matrix method, \code{value} is a vector with \code{ncol(x)}
 #'   elements, with one exception: when \code{type} is \code{"quantile"} and
 #'   multiple values are specified in \code{probs} the \code{value} component of
@@ -36,6 +38,8 @@
 #'   \code{length(probs)} elements.
 #'   }
 #'  \item{\code{pareto_k}}{
+#'   Function-specific diagnostic.
+#'
 #'   If \code{log_ratios} is not specified when calling \code{E_loo},
 #'   \code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
 #'   will be a vector of length \code{ncol(x)} containing estimates of the shape

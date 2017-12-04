@@ -74,7 +74,7 @@
 #'  Sampling (PSIS) procedure used in the LOO-CV approximation.
 #'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
 #'  diagnostics.
-#'  \item \code{\link{compare_models}} for model comparison.
+#'  \item \code{\link{compare}} for model comparison.
 #' }
 #' @template loo-and-psis-references
 #'
@@ -366,6 +366,9 @@ dim.psis_loo <- function(x) {
 #' @return Named list with pointwise elpd_loo, p_loo, and looic.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
+  if (!is.matrix(ll)) {
+    ll <- as.matrix(ll)
+  }
   lw <- weights(psis_object, normalize = TRUE, log = TRUE)
   elpd_loo <- colLogSumExps(ll + lw)
   looic <- -2 * elpd_loo

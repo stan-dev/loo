@@ -76,21 +76,23 @@ kfold_split_stratified <- function(K = 10, x = NULL) {
   }
 
   # Otherwise we have Nlev > K
-  Size1 <- ceiling(Nlev / K) # Num levs in largest groups of levs
-  N_Size2 <- Size1 * K - Nlev # Number of groups of levels of size Size1 - 1
-  N_Size1 <- K - N_Size2 # Number of groups of levels of size S1
-  brks <- rep(NA, K-1)
-  brks[1] <- Size1 + 0.5
-  for (j in 2:N_Size1) {
-    brks[j] <- brks[j-1] + Size1
-  }
-  if (N_Size2 > 0) {
-    for (j in (N_Size1 + 1):(K-1)) {
-      brks[j] <- brks[j-1] + (Size1 - 1)
-    }
-  }
+  S1 <- ceiling(Nlev / K) # Num levs in largest groups of levs
+  N_S2 <- S1 * K - Nlev # Number of groups of levels of size S1 - 1
+  N_S1 <- K - N_S2 # Number of groups of levels of size S1
+  # brks <- rep(NA, K-1)
+  # brks[1] <- S1 + 0.5
+  # for (j in 2:N_S1) brks[j] <- brks[j-1] + S1
+  # if (N_S2 > 0) {
+  #   for (j in (N_S1 + 1):(K-1)) brks[j] <- brks[j-1] + S1 - 1
+  # }
+
   perm <- sample.int(Nlev) # permute group levels
-  grps <- findInterval(perm, brks) + 1 # +1 so min is 1 not 0
+  brks1 <- seq(from = S1 + 0.5, by = S1, length.out = N_S1)
+  brks2 <- seq(from = brks1[N_S1] + S1 - 1, by = S1 - 1, length.out = N_S2 - 1)
+  # grps <- findInterval(perm, brks) + 1 # +1 so min is 1 not 0
+  grps <- findInterval(perm, vec = c(brks1, brks2)) + 1 # +1 so min is 1 not 0
+
+
   bins <- rep(NA, length(x))
   for (j in perm) {
     bins[x == j] <- grps[j]

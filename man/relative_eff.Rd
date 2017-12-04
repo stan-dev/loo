@@ -5,6 +5,7 @@
 \alias{relative_eff.default}
 \alias{relative_eff.matrix}
 \alias{relative_eff.array}
+\alias{relative_eff.function}
 \title{Convenience function for computing relative efficiencies}
 \usage{
 relative_eff(x, ...)
@@ -14,6 +15,8 @@ relative_eff(x, ...)
 \method{relative_eff}{matrix}(x, chain_id, ...)
 
 \method{relative_eff}{array}(x, ...)
+
+\method{relative_eff}{function}(x, ..., data, draws)
 }
 \arguments{
 \item{x}{A vector, matrix, or 3-D array. See the \strong{Methods (by class)}
@@ -49,6 +52,10 @@ of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
 \item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points.
+
+\item \code{function}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 }}

@@ -28,10 +28,14 @@
 #'   fast and stable computations for approximate LOO-CV (and WAIC) laid out in
 #'   Vehtari, Gelman, and Gabry (2017a). From existing posterior simulation
 #'   draws, we compute LOO-CV using Pareto smoothed importance sampling (PSIS;
-#'   Vehtari, Gelman, and Gabry, 2017b), a new procedure for regularizing
-#'   importance weights. As a byproduct of our calculations, we also obtain
-#'   approximate standard errors for estimated predictive errors and for
+#'   Vehtari, Gelman, and Gabry, 2017b), a new procedure for regularizing and
+#'   diagnosing importance weights. As a byproduct of our calculations, we also
+#'   obtain approximate standard errors for estimated predictive errors and for
 #'   comparing of predictive errors between two models.
+#'
+#'   We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
+#'   diagnostics, and effective sample size and Monte Carlo estimates.
+#'
 #'
 #' @template loo-and-psis-references
 #' @references

@@ -1,4 +1,4 @@
-#' Diagnostics for Pareto Smoothed Importance Sampling
+#' Diagnostics for Pareto smoothed importance sampling (PSIS)
 #'
 #' Print a diagnostic table summarizing the estimated Pareto shape parameters
 #' and PSIS effective sample sizes, find the indexes of observations for which
@@ -12,15 +12,15 @@
 #' @param x An object created by \code{\link{loo}} or \code{\link{psis}}.
 #'
 #' @details
-#' The reliability of the PSIS-based estimates can be assessed using the
-#' estimates for the shape parameter \eqn{k} of the generalized Pareto
-#' distribution:
+#' The reliability and approximate convergence rate of the PSIS-based estimates
+#' can be assessed using the estimates for the shape parameter \eqn{k} of the
+#' generalized Pareto distribution:
 #'
 #' \itemize{
 #'   \item If \eqn{k < 0.5} then the distribution of raw importance ratios has
 #'   finite variance and the central limit theorem holds. However, as \eqn{k}
 #'   approaches \eqn{0.5} the RMSE of plain importance sampling (IS) increases
-#'   significantly while truncated IS (TIS) and PSIS have lower RMSE.
+#'   significantly while PSIS has lower RMSE.
 #'
 #'   \item If \eqn{0.5 \leq k < 1}{0.5 ≤ k < 1} then the variance of the raw
 #'   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
@@ -39,10 +39,13 @@
 #'
 #' \strong{If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the
 #' user should be warned, although in practice we have observed good performance
-#' for values of \eqn{k} up to 0.7.} If using PSIS in the context of approximate
+#' for values of \eqn{k} up to 0.7.} (If \eqn{k} is greater than \eqn{0.5} then
+#' WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
+#'
+#' If using PSIS in the context of approximate
 #' LOO-CV, even if the PSIS estimate has a finite variance the user should
 #' consider sampling directly from \eqn{p(\theta^s | y_{-i})} for any
-#' problematic observations \eqn{i}, use \eqn{k}-fold cross-validation, or use a
+#' problematic observations \eqn{i}, use \eqn{K}-fold cross-validation, or use a
 #' more robust model. Importance sampling is likely to work less well if the
 #' marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
 #' \eqn{p(\theta^s | y_{-i})} are much different, which is more likely to happen
@@ -56,6 +59,16 @@
 #'  PSIS than for IS and TIS (see Vehtari et al (2017b) for details). However,
 #'  the PSIS effective sample size estimate will be \strong{over-optimistic when
 #'  the estimate of \eqn{k} is greater than 0.7.}
+#'
+#'  We can also compute estimates for the Monte Carlo error and the effective
+#'  sample size for importance sampling. However, the PSIS effective sample size
+#'  estimate will be \strong{over-optimistic when the estimate of \eqn{k} is
+#'  greater than 0.7.}. In the case that we obtain the samples from the proposal
+#'  distribution via MCMC, we need to take into account also the relative
+#'  efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
+#'  Following the notation in Stan, the PSIS effective sample size is denoted
+#'  here with \eqn{n_{eff}}, instead of \eqn{S_{eff}} used by Vehtari et al
+#'  (2017b).
 #' }
 #'
 #' @seealso \code{\link{psis}} for the implementation of the PSIS algorithm.

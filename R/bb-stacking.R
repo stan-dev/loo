@@ -1,27 +1,54 @@
-#' Model averaging via stacking or Pseudo-BMA weighting.
+#' Model averaging via stacking or Pseudo-BMA weighting
+#'
 #' @export
-#' @param log_lik_list   A list of pointwise log likelihood simulation matrixes. The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter
-#' @param method    One of  \code{"stacking"} or \code{"pseudobma"}, indicating which method is to use for obtaining the optimal weights. \code{"stacking"}  refers to stacking of predictive distributions and  \code{"pseudobma"} refers to Pseudo-BMA weighting (by setting \code{"BB"=F}) or Pseudo-BMA+ weighting (by setting \code{"BB"=T}).
-#' @param BB    Logicals used when \code{"method"}=\code{"pseudobma"}. If \code{True}(default), Bayesian Bootstrap will be used to adjust the Pseudo-BMA weighting, which is called Pseudo-BMA+ weighting. It helps regularize the weight away from 0 and 1, so as to reduce the variance.
-#' @param BB_n    A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The  default number is 1000.
-#' @param alpha A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap. The default is \eqn{1}.
-#' @param  seed An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap sampling.
-#' @param  optim_method	The optimization method to be used in stacking. It can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".
+#' @param log_lik_list A list of pointwise log likelihood simulation matrixes.
+#'   The \eqn{i}th element corresponds to the \eqn{i}th model. Each row of the
+#'   matrix is the log likelihood vector evaluated using a simulated parameter.
+#' @param method One of  \code{"stacking"} or \code{"pseudobma"}, indicating
+#'   which method is to use for obtaining the optimal weights. \code{"stacking"}
+#'   refers to stacking of predictive distributions and  \code{"pseudobma"}
+#'   refers to Pseudo-BMA weighting (by setting \code{"BB"=F}) or Pseudo-BMA+
+#'   weighting (by setting \code{"BB"=T}).
+#' @param BB Logical used when \code{"method"}=\code{"pseudobma"}. If
+#'   \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the
+#'   Pseudo-BMA weighting, which is called Pseudo-BMA+ weighting. It helps
+#'   regularize the weight away from 0 and 1, so as to reduce the variance.
+#' @param BB_n A positive integer indicating the number of samples in
+#'   Bayesian Bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The
+#'   default number is 1000.
+#' @param alpha A positive scalar; the shape parameter in the Dirichlet
+#'   distribution when doing Bootstrap. The default is \eqn{1}.
+#' @param seed An integer; optional. If specified, it will fix the random seed
+#'   when dong Bayesian Bootstrap sampling.
+#' @param optim_method	The optimization method to be used in stacking. It can
+#'   be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
+#'   The default method is "BFGS".
 #'
 #' @return A vector of optimal model weights.
-#' @details This function implements  stacking of predictive distributions, Pseudo-BMA and Pseudo-BMA+ weighting for combining multiple predictive distributions.
+#' @details This function implements  stacking of predictive distributions,
+#'   Pseudo-BMA and Pseudo-BMA+ weighting for combining multiple predictive
+#'   distributions.
 #'
-#' For either method, we can use  Leave-one-out cross-validation (LOO) to estimate the expected log predictive density(elpd).  \code{Stacking} combines all model by maximizing the leave-one-out predictive density of the combination distribution. \code{Pseudo-BMA} finds the relative weights proportional to elpd of each model. \code{Pseudo-BMA+} takes into account the uncertainty resulted from having a finite number of proxy samples from the future data distribution through Bayesian bootstrap (set \code{"BB=T"}), which will keep weights further away from 0 and 1.
+#' For either method, we can use  Leave-one-out cross-validation (LOO) to
+#' estimate the expected log predictive density(elpd).  \code{Stacking} combines
+#' all model by maximizing the leave-one-out predictive density of the
+#' combination distribution. \code{Pseudo-BMA} finds the relative weights
+#' proportional to elpd of each model. \code{Pseudo-BMA+} takes into account the
+#' uncertainty resulted from having a finite number of proxy samples from the
+#' future data distribution through Bayesian bootstrap (set \code{BB=TRUE}),
+#' which will keep weights further away from 0 and 1.
 #'
-#' In general, we recommend  \code{stacking} for averaging predictive distributions, while  \code{Pseudo-BMA+} can serve as a computationally easier alternative.
+#' In general, we recommend  \code{stacking} for averaging predictive
+#' distributions, while \code{Pseudo-BMA+} can serve as a computationally
+#' easier alternative.
+#'
 #' @seealso
-#' \code{\link{model_select}} for single-model selection.
-#'
-#' \code{\link{pseudobma_weight}} for details on Pseudo-BMA and Pseudo-BMA+ weights.
-#'
-#' \code{\link{stacking_weight}} for details on stacking weighs.
-#'
-#' \code{\link{constrOptim}} for the choice of optimization methods.
+#' \itemize{
+#' \item \code{\link{model_select}} for single-model selection.
+#' \item \code{\link{pseudobma_weight}} for details on Pseudo-BMA and Pseudo-BMA+ weights.
+#' \item \code{\link{stacking_weight}} for details on stacking weighs.
+#' \item \code{\link{constrOptim}} for the choice of optimization methods.
+#' }
 #'
 #' @examples
 #' \dontrun{
@@ -75,17 +102,31 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
     }
 }
 
-#' Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.
+#' Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment
+#'
 #' @importFrom graphics barplot
 #' @export
-#' @param log_lik_list A list of pointwise log likelihood simulation matrixes The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter.
-#' @param BB Logicals. If \code{True}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.
-#' @param BB_n A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number is 1000.
-#' @param alpha A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap.
-#' @param seed An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.
+#' @inheritParams model_weights log_lik_list
+#' @param BB Logical. If \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.
+#' @param BB_n A positive integer indicating the number of samples in Bayesian
+#'   Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
+#'   is 1000.
+#' @param alpha A positive scalar; the shape parameter in the Dirichlet
+#'   distribution when doing Bootstrap.
+#' @param seed An integer; optional. If specified, it will fix the random seed
+#'   when dong Bayesian Bootstrap.
 #' @param visualise Logical, whether to visualise the selection probability.
-#' @return   When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
-#' @details \code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
+#' @return When \code{BB=FALSE}, it returns an integer indicating the index of
+#'   the best model.  When\code{BB=TRUE}, it returns a vector indicating the
+#'   probability of each model being selected to be the best model.
+#' @details \code{\link{loo}} gives an estimation of the expected log predictive
+#'   density of each model, we can pick the best model by picking the model with
+#'   the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to
+#'   make the elpd estimation more reliable, we can use Bayesian Bootstrap
+#'   adjustment. With each sample in the Bayesian Bootstrap, we compare the
+#'   adjusted elpd estimation and finally compute the probability of that model
+#'   being the optimal one. If none of the probability is close to 1, then it is
+#'   better to do model averaging rather than model selection.
 #' @seealso
 #' \code{\link{model_weights}} for model combination.
 #'
@@ -149,24 +190,31 @@ model_select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualis
 }
 
 #' Stacking of predictive distributions
-#' @importFrom stats constrOptim
-
-#' @export
-#' @param lpd_point A  matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.
-#' @param  optim_method	The optimization method to be used in stacking; it can be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent". The default one is "BFGS".
 #'
-#' @return A vector of best model weights that maximize the leave-one-out log score of the combination.
-#' @details \code{lpd_point} is a matrix of pointwise log leave-one-out likelihood, which can be calculated from \code{\link{loo}} or through running exact LOO in advance. It should be a \eqn{N} by \eqn{K}  matrix when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is an approach that finds the optimal linear combining weight which maximizes the leave-one-out log score.
+#' @importFrom stats constrOptim
+#' @export
+#' @param lpd_point A  matrix of pointwise leave-one-out likelihood evaluated in
+#'   different models. Each column corresponds to one model.
+#' @param optim_method	The optimization method to be used in stacking; it can
+#'   be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
+#'   The default one is "BFGS".
+#' @return A vector of best model weights that maximize the leave-one-out log
+#'   score of the combination.
+#' @details \code{lpd_point} is a matrix of pointwise log leave-one-out
+#'   likelihood, which can be calculated from \code{\link{loo}} or through
+#'   running exact LOO in advance. It should be a \eqn{N} by \eqn{K}  matrix
+#'   when Sample size is \eqn{N} and model number is \eqn{K}. \code{stacking} is
+#'   an approach that finds the optimal linear combining weight which maximizes
+#'   the leave-one-out log score.
 #'
 #'@seealso
-#' \code{\link{loo}} for details on leave-one-out elpd estimation.
+#' \itemize{
+#' \item \code{\link{loo}} for details on leave-one-out elpd estimation.
+#' \item \code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
+#' \item \code{\link{optim}} for the choice of optimization methods.
+#' }
 #'
-#' \code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
-#'
-#' \code{\link{optim}} for the choice of optimization methods.
-#'
-
-#'@examples
+#' @examples
 #' \dontrun{
 #' loo1 <- loo(log_lik1)$pointwise[,1]
 #' loo2 <- loo(log_lik2)$pointwise[,1]
@@ -208,18 +256,32 @@ stacking_weight<-function( lpd_point, optim_method="BFGS"){
 
 
 #' Pseudo-BMA weighting using Bayesian bootstrap samples adjustment
+#'
 #' @export
-#' @param lpd_point A matrix of pointwise leave-one-out likelihood evaluated in different models. Each column corresponds to one model.
-#' @param  BB_n  A positive integer indicating the number of samples in Bayesian Bootstrap. Default is 1000.
-#' @param alpha A positive scalar; the shape parameter in the Dirichlet distribution when doing Bayesian Bootstrap. Default is 1.
-#' @param  seed An integer; optional. If specified, it fixes the random seed when dong Bayesian Bootstrap.
+#' @param lpd_point A matrix of pointwise leave-one-out likelihood evaluated in
+#'   different models. Each column corresponds to one model.
+#' @param BB_n  A positive integer indicating the number of samples in Bayesian
+#'   Bootstrap. Default is 1000.
+#' @param alpha A positive scalar; the shape parameter in the Dirichlet
+#'   distribution when doing Bayesian Bootstrap. Default is 1.
+#' @param seed An integer; optional. If specified, it fixes the random seed when
+#'   dong Bayesian Bootstrap.
 #' @return A vector of model weights.
-#' @details \code{lpd_point} is a matrix of pointwise leave-one-out likelihood, which can be calculated from  \code{\link{loo}} or through running LOO in advance. It should be a \eqn{N} by \eqn{K} matrix when Sample size is \eqn{N} and model number is \eqn{K}.   Bayesian bootstrap  takes into account the uncertainty of finite data points and regularize the weights making them go further away from 0 and 1. The shape parameter in the Dirichlet distribution is \code{alpha}. When \code{alpha}=1, the distribution is uniform on the simplex space. A smaller \code{alpha} will keeps the final weights more away from 0 and 1.
+#' @details \code{lpd_point} is a matrix of pointwise leave-one-out likelihood,
+#'   which can be calculated from  \code{\link{loo}} or through running LOO in
+#'   advance. It should be a \eqn{N} by \eqn{K} matrix when Sample size is
+#'   \eqn{N} and model number is \eqn{K}.   Bayesian bootstrap  takes into
+#'   account the uncertainty of finite data points and regularize the weights
+#'   making them go further away from 0 and 1. The shape parameter in the
+#'   Dirichlet distribution is \code{alpha}. When \code{alpha}=1, the
+#'   distribution is uniform on the simplex space. A smaller \code{alpha} will
+#'   keeps the final weights more away from 0 and 1.
 #'
 #' @seealso
-#' \code{\link{loo}} for details on leave-one-out elpd estimation.
-#'
-#' \code{\link{stacking_weight}} for model weighting by stacking on log score.
+#' \itemize{
+#' \item \code{\link{loo}} for details on leave-one-out elpd estimation.
+#' \item \code{\link{stacking_weight}} for model weighting by stacking on log score.
+#' }
 #'
 #' @examples
 #' \dontrun{
@@ -245,9 +307,9 @@ pseudobma_weight<-function(lpd_point, BB_n=1000, alpha=1, seed=NULL) {
   return(colMeans(temp))
 }
 
-#  generate dirichlet simulations, rewritten version
+#' Generate dirichlet simulations, rewritten version
 #' @importFrom stats rgamma
-
+#' @noRd
 dirichlet_rng <- function(n, alpha) {
   K <- length(alpha)
   gamma_sim<-matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)

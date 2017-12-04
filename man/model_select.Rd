@@ -2,32 +2,43 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_select}
 \alias{model_select}
-\title{Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.}
+\title{Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment}
 \usage{
 model_select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
   visualise = T)
 }
 \arguments{
-\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes The \eqn{i} th element corresponds to the \eqn{i} th model. Each row of the matrix is the log likelihood vector evaluated using a simulated parameter.}
+\item{BB}{Logical. If \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.}
 
-\item{BB}{Logicals. If \code{True}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.}
+\item{BB_n}{A positive integer indicating the number of samples in Bayesian
+Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
+is 1000.}
 
-\item{BB_n}{A positive integer indicating the number of samples in Bayesian Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number is 1000.}
+\item{alpha}{A positive scalar; the shape parameter in the Dirichlet
+distribution when doing Bootstrap.}
 
-\item{alpha}{A positive scalar; the shape parameter in the Dirichlet distribution when doing Bootstrap.}
-
-\item{seed}{An integer; optional. If specified, it will fix the random seed when dong Bayesian Bootstrap.}
+\item{seed}{An integer; optional. If specified, it will fix the random seed
+when dong Bayesian Bootstrap.}
 
 \item{visualise}{Logical, whether to visualise the selection probability.}
 }
 \value{
-When \code{BB}=\code{False}, it returns an integer indicating the  index of the best model.  When\code{BB}=\code{TRUE}, it return a vector indicating the probability of each model being selected to be the best model.
+When \code{BB=FALSE}, it returns an integer indicating the index of
+  the best model.  When\code{BB=TRUE}, it returns a vector indicating the
+  probability of each model being selected to be the best model.
 }
 \description{
-Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment.
+Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment
 }
 \details{
-\code{\link{loo}} gives an estimation of the expected log predictive density of each model, we can pick the best model by picking the model with the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to make the elpd estimation more reliable, we can use Bayesian Bootstrap adjustment. With each sample in the Bayesian Bootstrap, we compare the adjusted elpd estimation and finally compute the probability of that model being the optimal one. If none of the probability is close to 1, then it is better to do model averaging rather than model selection.
+\code{\link{loo}} gives an estimation of the expected log predictive
+  density of each model, we can pick the best model by picking the model with
+  the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to
+  make the elpd estimation more reliable, we can use Bayesian Bootstrap
+  adjustment. With each sample in the Bayesian Bootstrap, we compare the
+  adjusted elpd estimation and finally compute the probability of that model
+  being the optimal one. If none of the probability is close to 1, then it is
+  better to do model averaging rather than model selection.
 }
 \examples{
 \dontrun{
