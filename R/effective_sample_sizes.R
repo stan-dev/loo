@@ -16,7 +16,6 @@
 #'   \code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
 #'   array. If there are \code{C} chains then valid chain indexes are values
 #'   in \code{1:C}.
-#' @param ... Arguments passed to the methods.
 #' @return A vector of relative effective sample sizes.
 #'
 relative_eff <- function(x, ...) {
@@ -163,5 +162,3 @@ mcmc_n_eff <- function(x) {
 
   return(cov$acf[, , 1])
 }
-
-

@@ -8,6 +8,10 @@ model_select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
   visualise = T)
 }
 \arguments{
+\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes.
+The \eqn{i}th element corresponds to the \eqn{i}th model. Each row of the
+matrix is the log likelihood vector evaluated using a simulated parameter.}
+
 \item{BB}{Logical. If \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.}
 
 \item{BB_n}{A positive integer indicating the number of samples in Bayesian
@@ -48,6 +52,7 @@ log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
 k=model_select(list(log_lik1,log_lik2),BB=T)
 }
+
 }
 \seealso{
 \code{\link{model_weights}} for model combination.

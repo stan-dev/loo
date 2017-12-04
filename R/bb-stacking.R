@@ -106,7 +106,9 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
 #'
 #' @importFrom graphics barplot
 #' @export
-#' @inheritParams model_weights log_lik_list
+#' @param log_lik_list A list of pointwise log likelihood simulation matrixes.
+#'   The \eqn{i}th element corresponds to the \eqn{i}th model. Each row of the
+#'   matrix is the log likelihood vector evaluated using a simulated parameter.
 #' @param BB Logical. If \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.
 #' @param BB_n A positive integer indicating the number of samples in Bayesian
 #'   Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
@@ -143,7 +145,7 @@ model_weights <-function(log_lik_list, method="stacking",BB=T,BB_n=1000, alpha=1
 #' log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
 #' k=model_select(list(log_lik1,log_lik2),BB=T)
 #' }
-
+#'
 model_select <-function(log_lik_list, BB=T,BB_n=1000, alpha=1,seed=NULL,visualise=T)
 {
   if (!is.logical(BB))

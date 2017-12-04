@@ -99,11 +99,10 @@ waic.function <-
 
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
-
+    S <- length(as.vector(.llfun(data_i = data[1,, drop=FALSE], draws = draws, ...)))
     waic_list <- lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
       ll_i <- as.vector(ll_i)
-      if (i == 1) S <<- length(ll_i)
       lpd_i <- logMeanExp(ll_i)
       p_waic_i <- var(ll_i)
       elpd_waic_i <- lpd_i - p_waic_i
