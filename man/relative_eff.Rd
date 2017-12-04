@@ -16,7 +16,7 @@ relative_eff(x, ...)
 
 \method{relative_eff}{array}(x, ...)
 
-\method{relative_eff}{function}(x, ..., data, draws)
+\method{relative_eff}{function}(x, chain_id, ..., data, draws)
 }
 \arguments{
 \item{x}{A vector, matrix, or 3-D array. See the \strong{Methods (by class)}
@@ -33,10 +33,11 @@ indexes for each each row of \code{x} (if a matrix) or each value in
 \code{x} (if a vector). No \code{chain_id} is needed if \code{x} is a 3-D
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
+
+\item{data, draws, ...}{Same as for the \code{\link{loo}} function method.}
 }
 \value{
-A scalar if \code{x} is a vector, or a vector if \code{x} is a matrix
-  or 3-D array.
+A vector of relative effective sample sizes.
 }
 \description{
 \code{relative_eff} computes the the MCMC effective sample size divided by
@@ -55,8 +56,31 @@ of data points.
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{function}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
-is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points.
+\item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
+  returns a vector containing the log-likelihood for a single observation
+  \code{i} evaluated at each posterior draw. The function should be written
+  such that, for each observation \code{i} in \code{1:N}, evaluating
+  \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
+  of length \code{S} (size of posterior sample). The log-likelihood function
+  can also have additional arguments but \code{data_i} and \code{draws} are
+  required.
+
+ If using the function method then the arguments \code{data}
+ and \code{draws} must also be specified in the call to \code{loo}:
+ \itemize{
+   \item \code{data}: A data frame or matrix containing the data (e.g.
+   observed outcome and predictors) needed to compute the pointwise
+   log-likelihood. For each observation \code{i}, the \code{i}th row of
+   \code{data} will be passed to the \code{data_i} argument of the
+   log-likelihood function.
+   \item \code{draws}: An object containing the posterior draws for any
+   parameters needed to compute the pointwise log-likelihood. Unlike
+   \code{data}, which is indexed by observation, for each observation the
+   entire object \code{draws} will be passed to the \code{draws} argument of
+   the log-likelihood function.
+   \item The \code{...} can be used to pass additional arguments to your
+   log-likelihood function. These arguments ase used like the \code{draws}
+   argument in that they are recycled for each observation.
+ }
 }}
 

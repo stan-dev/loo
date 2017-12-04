@@ -100,8 +100,22 @@ test_that("psis_n_eff methods works properly", {
   expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
 })
 
-test_that("default relative_eff method works properly", {
-  expect_equal(relative_eff.default(LLmat[, 1], chain_id),
-               mcmc_n_eff(LLarr[, , 1]) / 1000)
+test_that("relative_eff methods works properly", {
+  expect_equal(relative_eff.default(exp(LLmat[, 1]), chain_id),
+               mcmc_n_eff(exp(LLarr[, , 1])) / 1000)
+  expect_equal(relative_eff.matrix(exp(LLmat), chain_id),
+               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+  expect_equal(relative_eff.array(exp(LLarr)),
+               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+  expect_equal(relative_eff.array(exp(LLarr)),
+               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+
+  # testing function methods
+  source("function_method_stuff.R")
+  chain_id <- rep(1:2, each = S/2) # fake chain_id
+  r_eff_fn <- relative_eff.function(llfun, chain_id, data = data, draws = draws)
+  r_eff_mat <- relative_eff.matrix(llmat_from_fn, chain_id)
+  expect_equal(r_eff_fn, r_eff_mat)
+  expect_equal(r_eff_fn, rep(1, N))
 })
 

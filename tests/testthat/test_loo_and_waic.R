@@ -71,24 +71,15 @@ test_that("loo and waic error with vector input", {
 
 
 
-# fake data and posterior draws for testing function methods
-N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
-p <- rbeta(1, a0, b0)
-y <- rbinom(N, size = K, prob = p)
-a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-draws <- as.matrix(rbeta(S, a, b))
-data <- data.frame(y,K)
-llfun <- function(data_i, draws) {
-  dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
-}
-log_lik_mat <- sapply(1:N, function(i) llfun(data[i,, drop=FALSE], draws))
+# testing function methods
+source("function_method_stuff.R")
 
 waic_with_fn <- waic(llfun, data = data, draws = draws)
-waic_with_mat <- waic(log_lik_mat)
+waic_with_mat <- waic(llmat_from_fn)
 
 loo_with_fn <- loo(llfun, data = data, draws = draws,
                    r_eff = rep(1, nrow(data)))
-loo_with_mat <- loo(log_lik_mat, r_eff = rep(1, ncol(log_lik_mat)),
+loo_with_mat <- loo(llmat_from_fn, r_eff = rep(1, ncol(llmat_from_fn)),
                     save_psis = TRUE)
 
 test_that("loo_i results match loo results for ith data point", {
