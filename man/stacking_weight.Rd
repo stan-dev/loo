@@ -4,7 +4,7 @@
 \alias{stacking_weight}
 \title{Stacking of predictive distributions}
 \usage{
-stacking_weight(lpd_point, optim_method = "BFGS")
+stacking_weight(lpd_point, optim_method = "BFGS", optim_control = list())
 }
 \arguments{
 \item{lpd_point}{A  matrix of pointwise leave-one-out likelihood evaluated in
@@ -13,6 +13,8 @@ different models. Each column corresponds to one model.}
 \item{optim_method}{The optimization method to be used in stacking; it can
 be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
 The default one is "BFGS".}
+
+\item{optim_control}{A list of control parameters in optimization. See \code{\link{constrOptim}}.}
 }
 \value{
 A vector of best model weights that maximize the leave-one-out log
@@ -33,13 +35,14 @@ Stacking of predictive distributions
 \dontrun{
 loo1 <- loo(log_lik1)$pointwise[,1]
 loo2 <- loo(log_lik2)$pointwise[,1]
-stacking_weight(cbind(loo1, loo2))
-}
+stacking_weight(cbind(loo1, loo2))}
+
 }
 \seealso{
 \itemize{
 \item \code{\link{loo}} for details on leave-one-out elpd estimation.
-\item \code{\link{pseudobma_weight}} for model weighting by Pseudo-BMA and Bayesian bootstrap adjustment.
-\item \code{\link{optim}} for the choice of optimization methods.
+\item \code{\link{model_weights}} for model weighting from stanfit objects.
+\item \code{\link{pseudobma_weight}} for model weighting by pseudo-BMA and Bayesian bootstrap adjustment.
+\item \code{\link{optim}} for the choice of optimization methods and other control-parameters.
 }
 }
