@@ -69,7 +69,18 @@ print_mcse_summary <- function(x, digits) {
   cat("Monte Carlo SE of elpd_loo is", paste0(.fr(mcse, digits), ".\n"))
 }
 
+#' Print dimensions of log-likelihood or log-weights matrix
+#'
+#' @export
+#' @keywords internal
+#'
+#' @param x The object returned by \code{\link{psis}}, \code{\link{loo}}, or
+#'   \code{\link{waic}}.
+#' @param ... Ignored.
 print_dims <- function(x, ...) UseMethod("print_dims")
+
+#' @rdname print_dims
+#' @export
 print_dims.psis <- function(x, ...) {
   cat(
     "Computed from",
@@ -77,6 +88,9 @@ print_dims.psis <- function(x, ...) {
     "log-weights matrix\n"
   )
 }
+
+#' @rdname print_dims
+#' @export
 print_dims.psis_loo <- function(x, ...) {
   cat(
     "Computed from",
@@ -84,6 +98,9 @@ print_dims.psis_loo <- function(x, ...) {
     "log-likelihood matrix\n"
   )
 }
+
+#' @rdname print_dims
+#' @export
 print_dims.waic <- function(x, ...) {
   cat(
     "Computed from",
