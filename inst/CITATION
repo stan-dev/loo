@@ -25,3 +25,15 @@ bibentry(bibtype = "Article",
          doi = "10.1007/s11222-016-9696-4",
          header = "To cite the loo paper:"
 )
+
+bibentry(bibtype = "Article",
+         title = "Using stacking to average Bayesian predictive distributions",
+         author = c(person("Yuling", "Yao"),
+    		    person("Aki", "Vehtari"),
+                    person("Daniel", "Simpson"),
+                    person("Andrew", "Gelman")),
+         year = "2017",
+         journal = "Bayesian Analysis",
+         doi = "10.1214/17-BA1091",
+         header = "To cite the stacking paper:"
+)

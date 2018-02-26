@@ -2,29 +2,39 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_select}
 \alias{model_select}
-\title{Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment}
+\title{Model selection via Leave-one-out log predictive density.}
 \usage{
-model_select(log_lik_list, BB = T, BB_n = 1000, alpha = 1, seed = NULL,
-  visualise = T)
+model_select(log_lik_list, BB = TRUE, BB_n = 1000, alpha = 1,
+  seed = NULL, visualise = FALSE, r_eff_list = NULL, cores = 1)
 }
 \arguments{
 \item{log_lik_list}{A list of pointwise log likelihood simulation matrixes.
-The \eqn{i}th element corresponds to the \eqn{i}th model. Each row of the
+The \eqn{i}-th element corresponds to the \eqn{i}-th model. Each row of the
 matrix is the log likelihood vector evaluated using a simulated parameter.}
 
-\item{BB}{Logical. If \code{TRUE}(default), Bayesian Bootstrap will be used to adjust the LOO estimator.}
+\item{BB}{Logical. If \code{TRUE}(default), the Bayesian bootstrap will be used to adjust the LOO estimator.}
 
 \item{BB_n}{A positive integer indicating the number of samples in Bayesian
-Bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
+bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
 is 1000.}
 
 \item{alpha}{A positive scalar; the shape parameter in the Dirichlet
-distribution when doing Bootstrap.}
+distribution when doing the bootstrap.}
 
 \item{seed}{An integer; optional. If specified, it will fix the random seed
-when dong Bayesian Bootstrap.}
+when dong the Bayesian bootstrap.}
 
 \item{visualise}{Logical, whether to visualise the selection probability.}
+
+\item{r_eff_list}{(Optional)  A list of relative effective sample size estimates
+for the likelihood (exp(log_lik)) of each observation in each model. See
+ \code{\link{psis}} and  \code{\link{relative_eff}} helper function for
+ computing r_eff. The default is \code{NULL}.}
+
+\item{cores}{The number of cores to use for parallelization. Same as for
+\code{\link{psis}}.  The default for an entire R session can be set with
+\code{options(loo.cores = NUMBER)}. As of version 2.0.0 the default is now
+1 core, but we recommend using as many (or close to as many) cores as possible.}
 }
 \value{
 When \code{BB=FALSE}, it returns an integer indicating the index of
@@ -32,14 +42,14 @@ When \code{BB=FALSE}, it returns an integer indicating the index of
   probability of each model being selected to be the best model.
 }
 \description{
-Model selection via Leave-one-out log predictive density estimation and Bayesian Bootstrap adjustment
+Model selection via Leave-one-out log predictive density estimation and Bayesian bootstrap adjustment
 }
 \details{
 \code{\link{loo}} gives an estimation of the expected log predictive
   density of each model, we can pick the best model by picking the model with
   the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to
-  make the elpd estimation more reliable, we can use Bayesian Bootstrap
-  adjustment. With each sample in the Bayesian Bootstrap, we compare the
+  make the elpd estimation more reliable, we can use the Bayesian bootstrap
+  adjustment. With each sample in the Bayesian bootstrap, we compare the
   adjusted elpd estimation and finally compute the probability of that model
   being the optimal one. If none of the probability is close to 1, then it is
   better to do model averaging rather than model selection.
@@ -50,8 +60,7 @@ Model selection via Leave-one-out log predictive density estimation and Bayesian
 library(rstan)
 log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
-k=model_select(list(log_lik1,log_lik2),BB=T)
-}
+select_prob <- model_select(list(log_lik1,log_lik2),BB=TRUE)}
 
 }
 \seealso{
@@ -59,5 +68,5 @@ k=model_select(list(log_lik1,log_lik2),BB=T)
 
 \code{\link{compare}} for two-model comparison.
 
-\code{\link{pseudobma_weight}} for details on Pseudo-BMA weighting.
+\code{\link{pseudobma_weight}} for details on pseudo-BMA weighting.
 }
