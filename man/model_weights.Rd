@@ -21,11 +21,11 @@ pseudobma_weight(lpd_point, BB_n = 1000, alpha = 1, seed = NULL)
 (with all chains merged) and \eqn{N} is the number of data points.
 The \eqn{i}-th element corresponds to the \eqn{i}-th model.}
 
-\item{method}{One of  \code{"stacking"} or \code{"pseudobma"}, indicating
-which method is to use for obtaining the optimal weights. \code{"stacking"}
-refers to stacking of predictive distributions and  \code{"pseudobma"}
-refers to pseudo-BMA weighting (by setting \code{"BB"=FALSE}) or pseudo-BMA+
-weighting (by setting \code{"BB"=TRUE}).}
+\item{method}{Either \code{"stacking"} or \code{"pseudobma"}, indicating
+which method to use for obtaining the weights. \code{"stacking"} refers to
+stacking of predictive distributions and  \code{"pseudobma"} refers to
+pseudo-BMA weighting (by setting \code{BB=FALSE}) or pseudo-BMA+ weighting
+(by leaving the default \code{BB=TRUE}).}
 
 \item{BB}{Logical used when \code{"method"}=\code{"pseudobma"}. If
 \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust the
@@ -42,12 +42,12 @@ corresponds to a uniform distribution on the simplex space.}
 \item{seed}{When \code{BB}=\code{TRUE}, an optional integer seed for the
 Bayesian bootstrap sampling.}
 
-\item{optim_method}{The optimization method to be used for stacking. It can
-be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
-The default method is "BFGS".}
+\item{optim_method}{The optimization method to use if
+\code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
+"CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".}
 
-\item{optim_control}{A list of control parameters for optimization. See
-\code{\link{constrOptim}} for details.}
+\item{optim_control}{If \code{method="stacking"}, a list of control
+parameters for optimization. See \code{\link{constrOptim}} for details.}
 
 \item{r_eff_list}{Optionally, a list of relative effective sample size
 estimates for the likelihood \code{(exp(log_lik))} of each observation in
@@ -82,7 +82,7 @@ pseudo-BMA, and pseudo-BMA+ weighting for combining multiple predictive
 distributions. In all cases, we can use leave-one-out cross-validation (LOO)
 to estimate the expected log predictive density (ELPD).
 
-The stacking method \code{\code{method="stacking"}} combines all models by
+The stacking method (\code{method="stacking"}) combines all models by
 maximizing the leave-one-out predictive density of the combination
 distribution. That is, it finds the optimal linear combining weights for
 maximizing the leave-one-out log score.
@@ -94,49 +94,71 @@ proportional to the ELPD of each model. However, when
 bootstrap  takes into account the uncertainty of finite data points and
 regularizes the weights away from the extremes of 0 and 1.
 
-In general, we recommend  \code{stacking} for averaging predictive
-distributions, while \code{pseudo-BMA+} can serve as a computationally easier
-alternative.
+In general, we recommend stacking for averaging predictive distributions,
+while pseudo-BMA+ can serve as a computationally easier alternative.
 }
 \examples{
 \dontrun{
-### Usage with stanfit objects.
-library(rstan)
-log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
-log_lik2 <- extract(stan(model=model_2,data=data))[['log_lik']]
-w1=model_weights(list(log_lik1, log_lik2),method="stacking")
-w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=TRUE)
-}
-\dontrun{
-### A toy example
+### Demonstrating usage after fitting models with RStan
 library(rstan)
 
 # generate fake data from N(0,1).
 set.seed(100)
 N <- 100
 y <- rnorm(N, 0, 1)
+
 # Suppose we have three models: N(-1, sigma), N(0.5, sigma) and N(0.6,sigma).
-stan_code <- ' data { int n; vector[n] y; real mu_fixed; }
-parameters { real<lower=0> sigma;}model {y ~ normal(mu_fixed, sigma);}
-generated quantities {vector[n] log_lik;
-for (i in 1:n) log_lik[i] = normal_lpdf(y[i]| mu_fixed, sigma); }'
+stan_code <- "
+  data {
+    int N;
+    vector[N] y;
+    real mu_fixed;
+  }
+  parameters {
+    real<lower=0> sigma;
+  }
+  model {
+    y ~ normal(mu_fixed, sigma);
+  }
+  generated quantities {
+    vector[N] log_lik;
+    for (n in 1:N) log_lik[n] = normal_lpdf(y[n]| mu_fixed, sigma);
+  }"
+
 mod <- stan_model(model_code = stan_code)
-fit_sample_1 <- sampling(mod, data=list(n=N, y=y, mu_fixed=-1))
-fit_sample_2 <- sampling(mod, data=list(n=N, y=y, mu_fixed=0.5))
-fit_sample_3 <- sampling(mod, data=list(n=N, y=y, mu_fixed=0.6))
-log_lik_list <- lapply(c(fit_sample_1, fit_sample_2, fit_sample_3), extract_log_lik)
-r_eff_list <- lapply(c(fit_sample_1, fit_sample_2, fit_sample_3), function(x) {
-  relative_eff(exp( extract_log_lik(x, merge_chains = FALSE)))
+fit1 <- sampling(mod, data=list(N=N, y=y, mu_fixed=-1))
+fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
+fit3 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.6))
+log_lik_list <- lapply(c(fit1, fit2, fit3), extract_log_lik)
+
+# optional but recommended
+r_eff_list <- lapply(c(fit1, fit2, fit3), function(x) {
+  relative_eff(exp(extract_log_lik(x, merge_chains = FALSE)))
 })
 
-# Stacking method:
-model_weights(log_lik_list,method="stacking", r_eff_list=r_eff_list, optim_control = list(reltol=1e-10))
+# stacking method:
+model_weights(
+  log_lik_list,
+  method="stacking",
+  r_eff_list = r_eff_list,
+  optim_control = list(reltol=1e-10)
+)
 
 # pseudo-BMA method:
-model_weights(log_lik_list,method="pseudobma",BB=FALSE,r_eff_list=r_eff_list)
+model_weights(
+  log_lik_list,
+  method = "pseudobma",
+  BB = FALSE,
+  r_eff_list=r_eff_list
+ )
 
 # pseudo-BMA+ method:
-model_weights(log_lik_list,method="pseudobma",BB=TRUE,r_eff_list=r_eff_list)
+model_weights(
+  log_lik_list,
+  method = "pseudobma",
+  BB = TRUE,
+  r_eff_list=r_eff_list
+ )
 }
 
 \dontrun{

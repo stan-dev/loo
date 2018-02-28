@@ -2,71 +2,89 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_select}
 \alias{model_select}
-\title{Model selection via Leave-one-out log predictive density.}
+\alias{plot.model_select}
+\title{Model selection via Leave-one-out log predictive density}
 \usage{
 model_select(log_lik_list, BB = TRUE, BB_n = 1000, alpha = 1,
-  seed = NULL, visualise = FALSE, r_eff_list = NULL, cores = 1)
+  seed = NULL, r_eff_list = NULL, cores = getOption("loo.cores", 1))
+
+\method{plot}{model_select}(x, ...)
 }
 \arguments{
-\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes.
-The \eqn{i}-th element corresponds to the \eqn{i}-th model. Each row of the
-matrix is the log likelihood vector evaluated using a simulated parameter.}
+\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes
+(\eqn{S} by \eqn{N}), where \eqn{S} is the size of the posterior sample
+(with all chains merged) and \eqn{N} is the number of data points.
+The \eqn{i}-th element corresponds to the \eqn{i}-th model.}
 
-\item{BB}{Logical. If \code{TRUE}(default), the Bayesian bootstrap will be used to adjust the LOO estimator.}
+\item{BB}{Logical. If \code{TRUE} (the default), the Bayesian bootstrap will
+be used to adjust the LOO estimator.}
 
-\item{BB_n}{A positive integer indicating the number of samples in Bayesian
-bootstrap. It is necessary  when \code{BB}=\code{True}. The  default number
-is 1000.}
+\item{BB_n}{When \code{BB}=\code{TRUE}, a positive integer indicating the
+number of samples for the Bayesian bootstrap. The default is 1000.}
 
 \item{alpha}{A positive scalar; the shape parameter in the Dirichlet
-distribution when doing the bootstrap.}
+distribution used for the Bayesian bootstrap. The default is 1, which
+corresponds to a uniform distribution on the simplex space.}
 
-\item{seed}{An integer; optional. If specified, it will fix the random seed
-when dong the Bayesian bootstrap.}
+\item{seed}{When \code{BB}=\code{TRUE}, an optional integer seed for the
+Bayesian bootstrap sampling.}
 
-\item{visualise}{Logical, whether to visualise the selection probability.}
-
-\item{r_eff_list}{(Optional)  A list of relative effective sample size estimates
-for the likelihood (exp(log_lik)) of each observation in each model. See
- \code{\link{psis}} and  \code{\link{relative_eff}} helper function for
- computing r_eff. The default is \code{NULL}.}
+\item{r_eff_list}{Optionally, a list of relative effective sample size
+estimates for the likelihood \code{(exp(log_lik))} of each observation in
+each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
+function for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. Same as for
-\code{\link{psis}}.  The default for an entire R session can be set with
-\code{options(loo.cores = NUMBER)}. As of version 2.0.0 the default is now
-1 core, but we recommend using as many (or close to as many) cores as possible.}
+\code{\link{psis}}. The default for an entire R session can be set with
+\code{options(loo.cores = NUMBER)}. \strong{As of version 2.0.0 the default
+is now 1 core, but we recommend using as many (or close to as many) cores
+as possible.}}
+
+\item{x}{For the plot method, an object returned by \code{model_select}.}
+
+\item{...}{For the plot method, optional arguments passed to
+\code{\link{barplot}} to control the appearance of the plot.}
 }
 \value{
-When \code{BB=FALSE}, it returns an integer indicating the index of
-  the best model.  When\code{BB=TRUE}, it returns a vector indicating the
-  probability of each model being selected to be the best model.
+When \code{BB=FALSE}, \code{model_select} returns an integer
+  indicating the index of the best model. When \code{BB=TRUE}, it returns a
+  vector indicating the estimated probability of each model being selected as
+  the best model.
 }
 \description{
-Model selection via Leave-one-out log predictive density estimation and Bayesian bootstrap adjustment
+Model selection via leave-one-out log predictive density estimation and
+Bayesian bootstrap adjustment.
 }
 \details{
 \code{\link{loo}} gives an estimation of the expected log predictive
-  density of each model, we can pick the best model by picking the model with
-  the largest elpd estimation. Just like \code{\link{pseudobma_weight}}, to
-  make the elpd estimation more reliable, we can use the Bayesian bootstrap
-  adjustment. With each sample in the Bayesian bootstrap, we compare the
-  adjusted elpd estimation and finally compute the probability of that model
-  being the optimal one. If none of the probability is close to 1, then it is
-  better to do model averaging rather than model selection.
+  density (ELPD) of each model. One option for selecting the "best" model is
+  simply by picking the model with the largest elpd estimation. However, just
+  like for \code{\link{pseudobma_weight}}, to make the ELPD estimation more
+  reliable, we can use a Bayesian bootstrap adjustment. With each sample in
+  the Bayesian bootstrap, we compare the adjusted ELPD estimation and finally
+  compute the probability of that model being the optimal one. If none of the
+  probabilities are close to 1, then it is better to do model averaging
+  (see \code{\link{model_weights}}) than model selection.
 }
 \examples{
 \dontrun{
-### Usage with stanfit objects
-library(rstan)
-log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
-log_lik2 <- extract(stan(model=model_1,data=data))[['log_lik']]
-select_prob <- model_select(list(log_lik1,log_lik2),BB=TRUE)}
+# Using log_lik_list and r_eff_list computed in the Examples section
+# for the model_weights function: help(model_weights, package = "loo")
+
+# without BB the output is just which model is preferred:
+model_select(log_lik_list, BB=FALSE, r_eff_list = r_eff_list)
+
+# with BB we can give estimated probabilities as output:
+m <- model_select(log_lik_list, BB=TRUE, r_eff_list = r_eff_list)
+print(m)
+plot(m)
+}
 
 }
 \seealso{
-\code{\link{model_weights}} for model combination.
-
+\itemize{
+\item \code{\link{model_weights}} for model combination.
 \code{\link{compare}} for two-model comparison.
-
 \code{\link{pseudobma_weight}} for details on pseudo-BMA weighting.
+}
 }
