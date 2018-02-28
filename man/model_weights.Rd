@@ -2,11 +2,18 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_weights}
 \alias{model_weights}
-\title{Model averaging via stacking or pseudo-BMA weighting}
+\alias{stacking_weight}
+\alias{pseudobma_weight}
+\title{Model averaging/weighting via stacking or pseudo-BMA weighting}
 \usage{
-model_weights(log_lik_list, method = "stacking", BB = TRUE, BB_n = 1000,
-  alpha = 1, seed = NULL, optim_method = "BFGS", optim_control = list(),
-  r_eff_list = NULL, cores = 1)
+model_weights(log_lik_list, method = c("stacking", "pseudobma"), BB = TRUE,
+  BB_n = 1000, alpha = 1, seed = NULL, optim_method = "BFGS",
+  optim_control = list(), r_eff_list = NULL,
+  cores = getOption("loo.cores", 1))
+
+stacking_weight(lpd_point, optim_method = "BFGS", optim_control = list())
+
+pseudobma_weight(lpd_point, BB_n = 1000, alpha = 1, seed = NULL)
 }
 \arguments{
 \item{log_lik_list}{A list of pointwise log likelihood simulation matrixes
@@ -21,61 +28,75 @@ refers to pseudo-BMA weighting (by setting \code{"BB"=FALSE}) or pseudo-BMA+
 weighting (by setting \code{"BB"=TRUE}).}
 
 \item{BB}{Logical used when \code{"method"}=\code{"pseudobma"}. If
-\code{TRUE}(default), the Bayesian bootstrap will be used to adjust the
+\code{TRUE} (the default), the Bayesian bootstrap will be used to adjust the
 pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps
 regularize the weight away from 0 and 1, so as to reduce the variance.}
 
-\item{BB_n}{A positive integer indicating the number of samples in
-Bayesian bootstrap. It is necessary when  \code{BB}=\code{TRUE}. The
-default number is 1000.}
+\item{BB_n}{When \code{BB}=\code{TRUE}, a positive integer indicating the
+number of samples for the Bayesian bootstrap. The default is 1000.}
 
 \item{alpha}{A positive scalar; the shape parameter in the Dirichlet
-distribution of Bayesian bootstrap. The default is 1.}
+distribution used for the Bayesian bootstrap. The default is 1, which
+corresponds to a uniform distribution on the simplex space.}
 
-\item{seed}{An integer; optional. If specified, it will fix the random seed
-when dong Bayesian bootstrap sampling.}
+\item{seed}{When \code{BB}=\code{TRUE}, an optional integer seed for the
+Bayesian bootstrap sampling.}
 
-\item{optim_method}{The optimization method to be used in stacking. It can
+\item{optim_method}{The optimization method to be used for stacking. It can
 be chosen from "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN" and "Brent".
 The default method is "BFGS".}
 
-\item{optim_control}{A list of control parameters in optimization. See \code{\link{constrOptim}}.}
+\item{optim_control}{A list of control parameters for optimization. See
+\code{\link{constrOptim}} for details.}
 
-\item{r_eff_list}{(Optional)  A list of relative effective sample size estimates
-for the likelihood \code{(exp(log_lik))} of each observation in each model. See
- \code{\link{psis}} and  \code{\link{relative_eff}} helper function for
- computing r_eff. The default is \code{NULL}.}
+\item{r_eff_list}{Optionally, a list of relative effective sample size
+estimates for the likelihood \code{(exp(log_lik))} of each observation in
+each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
+function for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. Same as for
-\code{\link{psis}}.  The default for an entire R session can be set with
-\code{options(loo.cores = NUMBER)}. As of version 2.0.0 the default is now
-1 core, but we recommend using as many (or close to as many) cores as possible.}
+\code{\link{psis}}. The default for an entire R session can be set with
+\code{options(loo.cores = NUMBER)}. \strong{As of version 2.0.0 the default
+is now 1 core, but we recommend using as many (or close to as many) cores
+as possible.}}
+
+\item{lpd_point}{A matrix of pointwise log leave-one-out likelihoods
+evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
+where \eqn{N} is sample size and \eqn{K} is the number of models. Each
+column corresponds to one model. These values can be calculated
+approximately using \code{\link{loo}} or by running exact leave-one-out
+cross-validation.}
 }
 \value{
-A vector of optimal model weights.
+A numeric vector containing one weight for each model.
 }
 \description{
-Model averaging via stacking or pseudo-BMA weighting. See
- Yao et al. (2017) and  Vehtari, Gelman, and Gabry (2017) for
+Model averaging via stacking of predictive distributions,
+  pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.
+  See Yao et al. (2017) and  Vehtari, Gelman, and Gabry (2017) for
   background.
 }
 \details{
-This function implements  stacking of predictive distributions,
-  pseudo-BMA and pseudo-BMA+ weighting for combining multiple predictive
-  distributions.
+\code{model_weights} implements stacking of predictive distributions,
+pseudo-BMA, and pseudo-BMA+ weighting for combining multiple predictive
+distributions. In all cases, we can use leave-one-out cross-validation (LOO)
+to estimate the expected log predictive density (ELPD).
 
-For either method, we can use  Leave-one-out cross-validation (LOO) to
-estimate the expected log predictive density(elpd).  \code{Stacking} combines
-all model by maximizing the leave-one-out predictive density of the
-combination distribution. \code{Pseudo-BMA} finds the relative weights
-proportional to elpd of each model. \code{Pseudo-BMA+} takes into account the
-uncertainty resulted from having a finite number of proxy samples from the
-future data distribution through Bayesian bootstrap (set \code{BB=TRUE}),
-which will keep weights further away from 0 and 1.
+The stacking method \code{\code{method="stacking"}} combines all models by
+maximizing the leave-one-out predictive density of the combination
+distribution. That is, it finds the optimal linear combining weights for
+maximizing the leave-one-out log score.
+
+The pseudo-BMA method (\code{method="pseudobma"}) finds the relative weights
+proportional to the ELPD of each model. However, when
+\code{method="pseudobma"}, the default is to also use the Bayesian bootstrap
+(\code{BB=TRUE}), which corresponds to the pseudo-BMA+ method. The Bayesian
+bootstrap  takes into account the uncertainty of finite data points and
+regularizes the weights away from the extremes of 0 and 1.
 
 In general, we recommend  \code{stacking} for averaging predictive
-distributions, while \code{pseudo-BMA+} can serve as a computationally
-easier alternative.
+distributions, while \code{pseudo-BMA+} can serve as a computationally easier
+alternative.
 }
 \examples{
 \dontrun{
@@ -84,10 +105,12 @@ library(rstan)
 log_lik1 <- extract(stan(model=model_1,data=data))[['log_lik']]
 log_lik2 <- extract(stan(model=model_2,data=data))[['log_lik']]
 w1=model_weights(list(log_lik1, log_lik2),method="stacking")
-w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=TRUE)}
-
+w2=model_weights(list(log_lik1, log_lik2),method="pseudobma",BB=TRUE)
+}
 \dontrun{
-### A top example
+### A toy example
+library(rstan)
+
 # generate fake data from N(0,1).
 set.seed(100)
 N <- 100
@@ -97,19 +120,39 @@ stan_code <- ' data { int n; vector[n] y; real mu_fixed; }
 parameters { real<lower=0> sigma;}model {y ~ normal(mu_fixed, sigma);}
 generated quantities {vector[n] log_lik;
 for (i in 1:n) log_lik[i] = normal_lpdf(y[i]| mu_fixed, sigma); }'
-fit_sample_1 <- stan(model_code=stan_code, data=list(n=N, y=y, mu_fixed=-1))
-fit_sample_2 <- stan(model_code=stan_code, data=list(n=N, y=y, mu_fixed=0.5))
-fit_sample_3 <- stan(model_code=stan_code, data=list(n=N, y=y, mu_fixed=0.6))
-log_lik_list <- list(extract( fit_sample_1)[['log_lik']],extract( fit_sample_2)[['log_lik']],
-extract( fit_sample_3)[['log_lik']])
-r_eff_list <- list( relative_eff(exp( extract_log_lik(fit_sample_1, merge_chains = FALSE))),
-relative_eff( exp(extract_log_lik(fit_sample_2, merge_chains = FALSE))),
-relative_eff( exp(extract_log_lik(fit_sample_3, merge_chains = FALSE))))
-# Three model-weighting methods:
-weights1 <- model_weights(log_lik_list,method="stacking", r_eff_list=r_eff_list,
-optim_control = list(reltol=1e-10))
-weights2 <- model_weights(log_lik_list,method="pseudobma",BB=FALSE,r_eff_list=r_eff_list)
-weights3 <- model_weights(log_lik_list,method="pseudobma",BB=TRUE,r_eff_list=r_eff_list)}
+mod <- stan_model(model_code = stan_code)
+fit_sample_1 <- sampling(mod, data=list(n=N, y=y, mu_fixed=-1))
+fit_sample_2 <- sampling(mod, data=list(n=N, y=y, mu_fixed=0.5))
+fit_sample_3 <- sampling(mod, data=list(n=N, y=y, mu_fixed=0.6))
+log_lik_list <- lapply(c(fit_sample_1, fit_sample_2, fit_sample_3), extract_log_lik)
+r_eff_list <- lapply(c(fit_sample_1, fit_sample_2, fit_sample_3), function(x) {
+  relative_eff(exp( extract_log_lik(x, merge_chains = FALSE)))
+})
+
+# Stacking method:
+model_weights(log_lik_list,method="stacking", r_eff_list=r_eff_list, optim_control = list(reltol=1e-10))
+
+# pseudo-BMA method:
+model_weights(log_lik_list,method="pseudobma",BB=FALSE,r_eff_list=r_eff_list)
+
+# pseudo-BMA+ method:
+model_weights(log_lik_list,method="pseudobma",BB=TRUE,r_eff_list=r_eff_list)
+}
+
+\dontrun{
+# calling stacking_weight directly
+loo1 <- loo(log_lik1)$pointwise[,1]
+loo2 <- loo(log_lik2)$pointwise[,1]
+stacking_weight(cbind(loo1, loo2))
+}
+
+\dontrun{
+# calling pseudobma_weight directly
+loo1 <- loo(log_lik1)$pointwise[,1]
+loo2 <- loo(log_lik2)$pointwise[,1]
+pseudobma_weight(cbind(loo1, loo2))
+}
+
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical
@@ -125,10 +168,9 @@ advance publication,  doi:10.1214/17-BA1091. (\href{https://projecteuclid.org/eu
 }
 \seealso{
 \itemize{
-\item \code{\link{pseudobma_weight}} for details on pseudo-BMA and pseudo-BMA+ weights.
-\item \code{\link{stacking_weight}} for details on stacking weighs.
+\item \code{\link{loo}} for details on leave-one-out ELPD estimation.
 \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
-\item \code{\link{relative_eff}}  for  computing r_eff.
+\item \code{\link{relative_eff}} for computing \code{r_eff}.
 \item \code{\link{model_select}} for single-model selection.
 }
 }
