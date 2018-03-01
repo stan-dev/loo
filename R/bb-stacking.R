@@ -231,9 +231,7 @@ stacking_weight <-
     exp_lpd_point <- exp(lpd_point)
     negative_log_score_loo <- function(w) {
       #objective function: log score
-      if (length(w) != K - 1)
-        break
-
+      stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       sum <- 0
       for (i in 1:N) {
@@ -244,9 +242,7 @@ stacking_weight <-
 
     gradient <- function(w) {
       #gradient of the objective function
-      if (length(w) != K - 1)
-        break
-
+      stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       grad <- rep(0, K - 1)
       for (k in 1:(K - 1)) {

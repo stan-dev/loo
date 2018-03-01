@@ -77,10 +77,10 @@ Model averaging via stacking of predictive distributions,
   background.
 }
 \details{
-\code{model_weights} implements stacking of predictive distributions,
-pseudo-BMA, and pseudo-BMA+ weighting for combining multiple predictive
-distributions. In all cases, we can use leave-one-out cross-validation (LOO)
-to estimate the expected log predictive density (ELPD).
+\code{model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
+weighting for combining multiple predictive distributions. In all cases, we
+can use leave-one-out cross-validation (LOO) to estimate the expected log
+predictive density (ELPD).
 
 The stacking method (\code{method="stacking"}) combines all models by
 maximizing the leave-one-out predictive density of the combination
@@ -118,6 +118,7 @@ stan_code <- "
     real<lower=0> sigma;
   }
   model {
+    sigma ~ exponential(1);
     y ~ normal(mu_fixed, sigma);
   }
   generated quantities {
