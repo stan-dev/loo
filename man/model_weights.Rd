@@ -194,6 +194,5 @@ advance publication,  doi:10.1214/17-BA1091. (\href{https://projecteuclid.org/eu
 \item \code{\link{loo}} for details on leave-one-out ELPD estimation.
 \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
 \item \code{\link{relative_eff}} for computing \code{r_eff}.
-\item \code{\link{model_select}} for single-model selection.
 }
 }
