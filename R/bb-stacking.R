@@ -6,10 +6,10 @@
 #'   background.
 #'
 #' @export
-#' @param log_lik_list A list of pointwise log likelihood simulation matrixes
-#' (\eqn{S} by \eqn{N}), where \eqn{S} is the size of the posterior sample
-#' (with all chains merged) and \eqn{N} is the number of data points.
-#' The \eqn{i}-th element corresponds to the \eqn{i}-th model.
+#' @param x A list of pointwise log-likelihood matrices, one for each model.
+#'   Each matrix should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is the
+#'   size of the posterior sample (with all chains merged) and \eqn{N} is the
+#'   number of data points.
 #' @param method Either \code{"stacking"} or \code{"pseudobma"}, indicating
 #'   which method to use for obtaining the weights. \code{"stacking"} refers to
 #'   stacking of predictive distributions and  \code{"pseudobma"} refers to
@@ -40,6 +40,8 @@
 #'   \code{options(loo.cores = NUMBER)}. \strong{As of version 2.0.0 the default
 #'   is now 1 core, but we recommend using as many (or close to as many) cores
 #'   as possible.}
+#' @param ... Unused, except for the generic to pass arguments to individual
+#'   methods.
 #'
 #' @return A numeric vector containing one weight for each model.
 #'
@@ -121,7 +123,14 @@
 #'   optim_control = list(reltol=1e-10)
 #' )
 #'
-#' # pseudo-BMA method:
+#' # pseudo-BMA+ method:
+#' model_weights(
+#'   log_lik_list,
+#'   method = "pseudobma",
+#'   r_eff_list=r_eff_list
+#'  )
+#'
+#' # pseudo-BMA method (set BB = FALSE):
 #' model_weights(
 #'   log_lik_list,
 #'   method = "pseudobma",
@@ -129,39 +138,45 @@
 #'   r_eff_list=r_eff_list
 #'  )
 #'
-#' # pseudo-BMA+ method:
-#' model_weights(
-#'   log_lik_list,
-#'   method = "pseudobma",
-#'   BB = TRUE,
-#'   r_eff_list=r_eff_list
-#'  )
+#' # calling stacking_weights or pseudobma_weights directly
+#' lpd1 <- loo(log_lik_list[[1]], r_eff = r_eff_list[[1]])$pointwise[,1]
+#' lpd2 <- loo(log_lik_list[[2]], r_eff = r_eff_list[[2]])$pointwise[,1]
+#' lpd3 <- loo(log_lik_list[[3]], r_eff = r_eff_list[[3]])$pointwise[,1]
+#' stacking_weights(cbind(lpd1, lpd2, lpd3))
+#' pseudobma_weights(cbind(lpd1, lpd2, lpd3))
+#' pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 #' }
 #'
-model_weights <-
-  function(log_lik_list,
+model_weights <- function(x, ...) {
+  UseMethod("model_weights")
+}
+
+#' @rdname model_weights
+#' @export
+model_weights.default <-
+  function(x,
+           ...,
            method = c("stacking", "pseudobma"),
+           optim_method = "BFGS",
+           optim_control = list(),
            BB = TRUE,
            BB_n = 1000,
            alpha = 1,
            seed = NULL,
-           optim_method = "BFGS",
-           optim_control = list(),
            r_eff_list = NULL,
            cores = getOption("loo.cores", 1)) {
 
-
     method <- match.arg(method)
-    K <- length(log_lik_list) # number of models
-    N <- ncol(log_lik_list[[1]]) # number of data points
-    validate_log_lik_list(log_lik_list)
+    K <- length(x) # number of models
+    N <- ncol(x[[1]]) # number of data points
+    validate_log_lik_list(x)
     validate_r_eff_list(r_eff_list, K, N)
 
     lpd_point <- matrix(NA, N, K)
     elpd_loo <- rep(NA, K)
     for (k in 1:K) {
       r_eff_k <- r_eff_list[[k]] # possibly NULL
-      log_likelihood <- log_lik_list[[k]]
+      log_likelihood <- x[[k]]
       L <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
       lpd_point[, k] <- L$pointwise[, 1]    #calculate log(p_k (y_i | y_-i))
       elpd_loo[k] <- L$estimates["elpd_loo", 1]
@@ -169,30 +184,24 @@ model_weights <-
 
     ## 1) stacking on log score
     if (method =="stacking"){
-      wts <-
-        stacking_weight(
-          lpd_point,
-          optim_method = optim_method,
-          optim_control = optim_control
-        )
-      return(wts)
+      wts <- stacking_weights(
+        lpd_point = lpd_point,
+        optim_method = optim_method,
+        optim_control = optim_control
+      )
 
     } else {
       # method =="pseudobma"
-      if (!BB) {
-        uwts <- exp(elpd_loo - max(elpd_loo))
-        wts <- structure(
-          uwts / sum(uwts),
-          names = paste0("model", 1:K),
-          class = "pseudobma_weights"
-        )
-        return(wts)
-      } else {
-        # BB == TRUE
-        wts  <- pseudobma_weight(lpd_point, BB_n,alpha, seed)
-        return(wts)
-      }
+      wts <- pseudobma_weights(
+        lpd_point = lpd_point,
+        BB = BB,
+        BB_n = BB_n,
+        alpha = alpha,
+        seed = seed
+      )
     }
+
+    return(wts)
   }
 
 
@@ -205,17 +214,9 @@ model_weights <-
 #'   approximately using \code{\link{loo}} or by running exact leave-one-out
 #'   cross-validation.
 #'
-#' @examples
-#' \dontrun{
-#' # calling stacking_weight directly
-#' loo1 <- loo(log_lik1)$pointwise[,1]
-#' loo2 <- loo(log_lik2)$pointwise[,1]
-#' stacking_weight(cbind(loo1, loo2))
-#' }
-#'
 #' @importFrom stats constrOptim
 #'
-stacking_weight <-
+stacking_weights <-
   function(lpd_point,
            optim_method = "BFGS",
            optim_control = list()) {
@@ -229,7 +230,7 @@ stacking_weight <-
 
     exp_lpd_point <- exp(lpd_point)
     negative_log_score_loo <- function(w) {
-      #objective function: log score
+      # objective function: log score
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       sum <- 0
@@ -240,7 +241,7 @@ stacking_weight <-
     }
 
     gradient <- function(w) {
-      #gradient of the objective function
+      # gradient of the objective function
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       grad <- rep(0, K - 1)
@@ -278,16 +279,9 @@ stacking_weight <-
 #' @rdname model_weights
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' # calling pseudobma_weight directly
-#' loo1 <- loo(log_lik1)$pointwise[,1]
-#' loo2 <- loo(log_lik2)$pointwise[,1]
-#' pseudobma_weight(cbind(loo1, loo2))
-#' }
-#'
-pseudobma_weight <-
+pseudobma_weights <-
   function(lpd_point,
+           BB = TRUE,
            BB_n = 1000,
            alpha = 1,
            seed = NULL) {
@@ -300,6 +294,18 @@ pseudobma_weight <-
     if (!is.null(seed)) {
       set.seed(seed)
     }
+
+    if (!BB) {
+      elpd <- colSums2(lpd_point)
+      uwts <- exp(elpd - max(elpd))
+      wts <- structure(
+        uwts / sum(uwts),
+        names = paste0("model", 1:K),
+        class = "pseudobma_weights"
+      )
+      return(wts)
+    }
+
     temp <- matrix(NA, BB_n, K)
     BB_weighting <- dirichlet_rng(BB_n, rep(alpha, N))
     for (bb in 1:BB_n) {
@@ -362,7 +368,8 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
   if (is.null(r_eff_list)) return(invisible(TRUE))
 
   if (length(r_eff_list) != K) {
-    stop("If r_eff_list is specified then it must have the same length as log_lik_list.",
+    stop("If r_eff_list is specified then it must contain ",
+         "one component for each model being compared.",
          call. = FALSE)
   }
   if (any(sapply(r_eff_list, length) != N)) {
@@ -374,23 +381,24 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 }
 
 
-#' Validate log_lik_list argument
+#' Validate log-likelihood list argument
 #'
-#' Checks that log_lik_list has at least 2 elements and that each element
+#' Checks that log-likelihood list has at least 2 elements and that each element
 #' has the same dimensions.
 #'
 #' @noRd
-#' @param r_eff_list User's log_lik_list argument
+#' @param log_lik_list User's list of log-likelihood matrices (the 'x' argument
+#'   to model_weights).
 #' @return Either throws an error or returns \code{TRUE} invisibly.
 #'
 validate_log_lik_list <- function(log_lik_list) {
   stopifnot(is.list(log_lik_list))
   if (length(log_lik_list) < 2) {
-    stop("At least two models are required in log_lik_list.", call. = FALSE)
+    stop("At least two models are required.", call. = FALSE)
   }
-  if(length(unique(sapply(log_lik_list, ncol)))!=1 |
-     length(unique(sapply(log_lik_list, nrow)))!=1) {
-    stop("Each element of log_lik_list must have the same dimensions.", call. = FALSE)
+  if (length(unique(sapply(log_lik_list, ncol))) != 1 |
+     length(unique(sapply(log_lik_list, nrow))) != 1) {
+    stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
   }
   return(invisible(TRUE))
 }

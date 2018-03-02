@@ -2,30 +2,44 @@
 % Please edit documentation in R/bb-stacking.R
 \name{model_weights}
 \alias{model_weights}
-\alias{stacking_weight}
-\alias{pseudobma_weight}
+\alias{model_weights.default}
+\alias{stacking_weights}
+\alias{pseudobma_weights}
 \title{Model averaging/weighting via stacking or pseudo-BMA weighting}
 \usage{
-model_weights(log_lik_list, method = c("stacking", "pseudobma"), BB = TRUE,
-  BB_n = 1000, alpha = 1, seed = NULL, optim_method = "BFGS",
-  optim_control = list(), r_eff_list = NULL,
+model_weights(x, ...)
+
+\method{model_weights}{default}(x, ..., method = c("stacking", "pseudobma"),
+  optim_method = "BFGS", optim_control = list(), BB = TRUE, BB_n = 1000,
+  alpha = 1, seed = NULL, r_eff_list = NULL,
   cores = getOption("loo.cores", 1))
 
-stacking_weight(lpd_point, optim_method = "BFGS", optim_control = list())
+stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
 
-pseudobma_weight(lpd_point, BB_n = 1000, alpha = 1, seed = NULL)
+pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1,
+  seed = NULL)
 }
 \arguments{
-\item{log_lik_list}{A list of pointwise log likelihood simulation matrixes
-(\eqn{S} by \eqn{N}), where \eqn{S} is the size of the posterior sample
-(with all chains merged) and \eqn{N} is the number of data points.
-The \eqn{i}-th element corresponds to the \eqn{i}-th model.}
+\item{x}{A list of pointwise log-likelihood matrices, one for each model.
+Each matrix should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is the
+size of the posterior sample (with all chains merged) and \eqn{N} is the
+number of data points.}
+
+\item{...}{Unused, except for the generic to pass arguments to individual
+methods.}
 
 \item{method}{Either \code{"stacking"} or \code{"pseudobma"}, indicating
 which method to use for obtaining the weights. \code{"stacking"} refers to
 stacking of predictive distributions and  \code{"pseudobma"} refers to
 pseudo-BMA weighting (by setting \code{BB=FALSE}) or pseudo-BMA+ weighting
 (by leaving the default \code{BB=TRUE}).}
+
+\item{optim_method}{The optimization method to use if
+\code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
+"CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".}
+
+\item{optim_control}{If \code{method="stacking"}, a list of control
+parameters for optimization. See \code{\link{constrOptim}} for details.}
 
 \item{BB}{Logical used when \code{"method"}=\code{"pseudobma"}. If
 \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust the
@@ -41,13 +55,6 @@ corresponds to a uniform distribution on the simplex space.}
 
 \item{seed}{When \code{BB}=\code{TRUE}, an optional integer seed for the
 Bayesian bootstrap sampling.}
-
-\item{optim_method}{The optimization method to use if
-\code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
-"CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".}
-
-\item{optim_control}{If \code{method="stacking"}, a list of control
-parameters for optimization. See \code{\link{constrOptim}} for details.}
 
 \item{r_eff_list}{Optionally, a list of relative effective sample size
 estimates for the likelihood \code{(exp(log_lik))} of each observation in
@@ -145,7 +152,14 @@ model_weights(
   optim_control = list(reltol=1e-10)
 )
 
-# pseudo-BMA method:
+# pseudo-BMA+ method:
+model_weights(
+  log_lik_list,
+  method = "pseudobma",
+  r_eff_list=r_eff_list
+ )
+
+# pseudo-BMA method (set BB = FALSE):
 model_weights(
   log_lik_list,
   method = "pseudobma",
@@ -153,27 +167,13 @@ model_weights(
   r_eff_list=r_eff_list
  )
 
-# pseudo-BMA+ method:
-model_weights(
-  log_lik_list,
-  method = "pseudobma",
-  BB = TRUE,
-  r_eff_list=r_eff_list
- )
-}
-
-\dontrun{
-# calling stacking_weight directly
-loo1 <- loo(log_lik1)$pointwise[,1]
-loo2 <- loo(log_lik2)$pointwise[,1]
-stacking_weight(cbind(loo1, loo2))
-}
-
-\dontrun{
-# calling pseudobma_weight directly
-loo1 <- loo(log_lik1)$pointwise[,1]
-loo2 <- loo(log_lik2)$pointwise[,1]
-pseudobma_weight(cbind(loo1, loo2))
+# calling stacking_weights or pseudobma_weights directly
+lpd1 <- loo(log_lik_list[[1]], r_eff = r_eff_list[[1]])$pointwise[,1]
+lpd2 <- loo(log_lik_list[[2]], r_eff = r_eff_list[[2]])$pointwise[,1]
+lpd3 <- loo(log_lik_list[[3]], r_eff = r_eff_list[[3]])$pointwise[,1]
+stacking_weights(cbind(lpd1, lpd2, lpd3))
+pseudobma_weights(cbind(lpd1, lpd2, lpd3))
+pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 }
 
 }
