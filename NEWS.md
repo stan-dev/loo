@@ -1,10 +1,27 @@
 # loo 2.0.0
-* TODO: move the items from github issue here 
-* Deprecated `psislw`. Use __`psis`__ instead. Methods for log likelihood arrays,
-matrices, vectors, and functions are provided.
-* Deprecated `compare`. Use __`compare_models`__ instead. An S3 generic and 
-default method are provided.
-* Added functions `example_loglik_array` and `example_loglik_matrix` that
+
+This is a major release. Although we have attempted to maintain backwards 
+compatibility as much as possible, there are a few breaking changes.
+
+* New function `psis` replaces `psislw` (now deprecated). This version of the
+function accepts log importance ratios as its input (not log-likelihood values),
+and implements the improvements to the PSIS algorithm described in the latest
+version of https://arxiv.org/pdf/1507.02646.pdf. Additional diagnostic
+information is now also provided, including PSIS effective sample sizes.
+* New `weights.psis` method for extracting smoothed weights from a `psis`
+object. Arguments `log` and `normalize` control whether the weights are returned
+on the log scale and whether they are normalized.
+* Updated the interface for the `loo` methods to integrate nicely with the new
+PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions 
+are provided. Several arguments have changed, particularly for the
+`loo.function` method. The documentation at `help("loo")` has been updated to
+describe the new behavior.
+* The structure of the objects returned by the `loo` function has also changed
+slightly, as described in the __Value__ section at `help("loo")`.
+* New function `model_weights` computes weights for model averaging via
+stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
+weighting with the Bayesian bootstrap.
+* New functions `example_loglik_array` and `example_loglik_matrix` that
 provide objects to use in examples and tests.
 
 
