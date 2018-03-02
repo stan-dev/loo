@@ -28,7 +28,7 @@ test_that("model_weights throws correct errors", {
   expect_error(model_weights(list(log_lik1, log_lik2, log_lik3[, -1])), "same dimensions")
 
   expect_error(model_weights(ll_list, r_eff_list = r_eff_list[-1]),
-               "same length as log_lik_list")
+               "one component for each model")
 
   r_eff_list[[3]] <- rep(0.9, 51)
   expect_error(model_weights(ll_list, r_eff_list = r_eff_list),
