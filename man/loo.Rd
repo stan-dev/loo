@@ -11,13 +11,13 @@
 loo(x, ...)
 
 \method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  save_psis = FALSE, cores = getOption("loo.cores", 1))
+  save_psis = FALSE, cores = getOption("mc.cores", 1))
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
 }
