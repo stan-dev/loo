@@ -152,6 +152,7 @@ loo_model_weights <- function(x, ...) {
 
 #' @rdname loo_model_weights
 #' @export
+#' @export loo_model_weights.default
 loo_model_weights.default <-
   function(x,
            ...,
