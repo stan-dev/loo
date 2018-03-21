@@ -18,7 +18,7 @@ are provided. Several arguments have changed, particularly for the
 describe the new behavior.
 * The structure of the objects returned by the `loo` function has also changed
 slightly, as described in the __Value__ section at `help("loo")`.
-* New function `model_weights` computes weights for model averaging via
+* New function `loo_model_weights` computes weights for model averaging via
 stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
 weighting with the Bayesian bootstrap.
 * New functions `example_loglik_array` and `example_loglik_matrix` that

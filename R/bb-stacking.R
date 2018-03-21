@@ -44,7 +44,7 @@
 #' @return A numeric vector containing one weight for each model.
 #'
 #' @details
-#' \code{model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
+#' \code{loo_model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
 #' weighting for combining multiple predictive distributions. In all cases, we
 #' can use leave-one-out cross-validation (LOO) to estimate the expected log
 #' predictive density (ELPD).
@@ -114,7 +114,7 @@
 #' })
 #'
 #' # stacking method:
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method="stacking",
 #'   r_eff_list = r_eff_list,
@@ -122,7 +122,7 @@
 #' )
 #'
 #' # pseudo-BMA+ method:
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method = "pseudobma",
 #'   r_eff_list=r_eff_list,
@@ -130,7 +130,7 @@
 #'  )
 #'
 #' # pseudo-BMA method (set BB = FALSE):
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method = "pseudobma",
 #'   BB = FALSE,
@@ -146,13 +146,13 @@
 #' pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 #' }
 #'
-model_weights <- function(x, ...) {
-  UseMethod("model_weights")
+loo_model_weights <- function(x, ...) {
+  UseMethod("loo_model_weights")
 }
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
-model_weights.default <-
+loo_model_weights.default <-
   function(x,
            ...,
            method = c("stacking", "pseudobma"),
@@ -202,7 +202,7 @@ model_weights.default <-
   }
 
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
 #' @param lpd_point A matrix of pointwise log leave-one-out likelihoods
 #'   evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
@@ -273,7 +273,7 @@ stacking_weights <-
   }
 
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
 #'
 pseudobma_weights <-
@@ -381,7 +381,7 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 #'
 #' @noRd
 #' @param log_lik_list User's list of log-likelihood matrices (the 'x' argument
-#'   to model_weights).
+#'   to loo_model_weights).
 #' @return Either throws an error or returns \code{TRUE} invisibly.
 #'
 validate_log_lik_list <- function(log_lik_list) {
