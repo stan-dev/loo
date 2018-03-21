@@ -46,7 +46,7 @@ test_that("model_weights (stacking and pseudo-BMA) gives expected result", {
                             tolerance  = tol, scale=1)
 
   w2 <- model_weights(ll_list, r_eff_list=r_eff_list,
-                      method = "pseudobma", BB = TRUE, seed = 123)
+                      method = "pseudobma", BB = TRUE)
   expect_type(w2, "double")
   expect_s3_class(w2, "pseudobma_bb_weights")
   expect_length(w2, 3)
