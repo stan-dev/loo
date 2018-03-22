@@ -26,7 +26,7 @@
 #'   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
 #'   have finite variance by accepting some bias. The convergence of the
 #'   estimate is slower with increasing \eqn{k}.
-#'   If \eqn{0.5 \leq k \lessapprox 0.7}{0.5 ≤ k <≈ 0.7}
+#'   If \eqn{k} is between 0.5 and approximately 0.7 then
 #'   we observe practically useful convergence rates and Monte Carlo error
 #'   estimates with PSIS (the bias of TIS increases faster than the bias of
 #'   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
