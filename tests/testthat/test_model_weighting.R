@@ -24,6 +24,7 @@ tol <- 0.01 # absoulte tolerance of weights
 test_that("loo_model_weights throws correct errors", {
   expect_error(loo_model_weights(log_lik1), "is.list")
   expect_error(loo_model_weights(list(log_lik1)), "At least two models")
+  expect_error(loo_model_weights(list(log_lik1), method = "pseudobma"), "At least two models")
   expect_error(loo_model_weights(list(log_lik1, log_lik2[-1, ])), "same dimensions")
   expect_error(loo_model_weights(list(log_lik1, log_lik2, log_lik3[, -1])), "same dimensions")
 
@@ -44,6 +45,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_named(w1, paste0("model"  ,c(1:3)))
   expect_equal_to_reference(as.numeric(w1), "model_weights_stacking.rds",
                             tolerance  = tol, scale=1)
+  expect_output(print(w1), "Method: stacking")
 
   w2 <- loo_model_weights(ll_list, r_eff_list=r_eff_list,
                       method = "pseudobma", BB = TRUE)
@@ -53,6 +55,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_named(w2, paste0("model", c(1:3)))
   expect_equal_to_reference(as.numeric(w2), "model_weights_pseudobma.rds",
                             tolerance  = tol, scale=1)
+  expect_output(print(w2), "Method: pseudo-BMA+")
 
   w3 <- loo_model_weights(ll_list, r_eff_list=r_eff_list,
                       method = "pseudobma", BB = FALSE)
@@ -61,4 +64,5 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_named(w3, paste0("model"  ,c(1:3)))
   expect_equal(as.numeric(w3), c(5.365279e-05, 9.999436e-01, 2.707028e-06),
                tolerance  = tol, scale = 1)
+  expect_output(print(w3), "Method: pseudo-BMA")
 })
