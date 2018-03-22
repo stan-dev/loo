@@ -26,7 +26,7 @@
 #'   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
 #'   have finite variance by accepting some bias. The convergence of the
 #'   estimate is slower with increasing \eqn{k}.
-#'   If \eqn{0.5 \leq k \lesssim 0.7}{0.5 ≤ k <≈ 0.7}
+#'   If \eqn{0.5 \leq k \lessapprox 0.7}{0.5 ≤ k <≈ 0.7}
 #'   we observe practically useful convergence rates and Monte Carlo error
 #'   estimates with PSIS (the bias of TIS increases faster than the bias of
 #'   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
@@ -63,7 +63,7 @@
 #'  We can also compute estimates for the Monte Carlo error and the effective
 #'  sample size for importance sampling. However, the PSIS effective sample size
 #'  estimate will be \strong{over-optimistic when the estimate of \eqn{k} is
-#'  greater than 0.7.}. In the case that we obtain the samples from the proposal
+#'  greater than 0.7}. In the case that we obtain the samples from the proposal
 #'  distribution via MCMC, we need to take into account also the relative
 #'  efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
 #'  Following the notation in Stan, the PSIS effective sample size is denoted

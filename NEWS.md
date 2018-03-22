@@ -1,7 +1,8 @@
 # loo 2.0.0
 
-This is a major release. Although we have attempted to maintain backwards 
-compatibility as much as possible, there are a few breaking changes.
+This is a major release. Although we have attempted to maintain backwards
+compatibility as much as possible, there are a few breaking changes resulting
+primarily from changes to the structure of the returned objects.
 
 * New function `psis` replaces `psislw` (now deprecated). This version of the
 function accepts log importance ratios as its input (not log-likelihood values),
