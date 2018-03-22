@@ -13,19 +13,17 @@
 #' @param method Either \code{"stacking"} or \code{"pseudobma"}, indicating
 #'   which method to use for obtaining the weights. \code{"stacking"} refers to
 #'   stacking of predictive distributions and  \code{"pseudobma"} refers to
-#'   pseudo-BMA weighting (by setting \code{BB=FALSE}) or pseudo-BMA+ weighting
-#'   (by leaving the default \code{BB=TRUE}).
+#'   pseudo-BMA+ weighting (or plain pseudo-BMA weighting if \code{BB} is
+#'   \code{FALSE}).
 #' @param BB Logical used when \code{"method"}=\code{"pseudobma"}. If
-#'   \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust the
-#'   pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps
+#'   \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust
+#'   the pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps
 #'   regularize the weight away from 0 and 1, so as to reduce the variance.
-#' @param BB_n When \code{BB}=\code{TRUE}, a positive integer indicating the
-#'   number of samples for the Bayesian bootstrap. The default is 1000.
-#' @param alpha A positive scalar; the shape parameter in the Dirichlet
-#'   distribution used for the Bayesian bootstrap. The default is 1, which
-#'   corresponds to a uniform distribution on the simplex space.
-#' @param seed When \code{BB}=\code{TRUE}, an optional integer seed for the
-#'   Bayesian bootstrap sampling.
+#' @param BB_n For pseudo-BMA+ weighting only, the number of samples to use for
+#'   the Bayesian bootstrap. The default is 1000.
+#' @param alpha Positive scalar shape parameter in the Dirichlet distribution
+#'   used for the Bayesian bootstrap. The default is 1, which corresponds to a
+#'   uniform distribution on the simplex space.
 #' @param optim_method The optimization method to use if
 #'   \code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
 #'   "CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".
@@ -46,7 +44,7 @@
 #' @return A numeric vector containing one weight for each model.
 #'
 #' @details
-#' \code{model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
+#' \code{loo_model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
 #' weighting for combining multiple predictive distributions. In all cases, we
 #' can use leave-one-out cross-validation (LOO) to estimate the expected log
 #' predictive density (ELPD).
@@ -81,7 +79,6 @@
 #' library(rstan)
 #'
 #' # generate fake data from N(0,1).
-#' set.seed(100)
 #' N <- 100
 #' y <- rnorm(N, 0, 1)
 #'
@@ -112,11 +109,12 @@
 #'
 #' # optional but recommended
 #' r_eff_list <- lapply(c(fit1, fit2, fit3), function(x) {
-#'   relative_eff(exp(extract_log_lik(x, merge_chains = FALSE)))
+#'   ll_array <- extract_log_lik(x, merge_chains = FALSE)
+#'   relative_eff(exp(ll_array))
 #' })
 #'
 #' # stacking method:
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method="stacking",
 #'   r_eff_list = r_eff_list,
@@ -124,14 +122,15 @@
 #' )
 #'
 #' # pseudo-BMA+ method:
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method = "pseudobma",
-#'   r_eff_list=r_eff_list
+#'   r_eff_list=r_eff_list,
+#'   cores = 2
 #'  )
 #'
 #' # pseudo-BMA method (set BB = FALSE):
-#' model_weights(
+#' loo_model_weights(
 #'   log_lik_list,
 #'   method = "pseudobma",
 #'   BB = FALSE,
@@ -147,13 +146,14 @@
 #' pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 #' }
 #'
-model_weights <- function(x, ...) {
-  UseMethod("model_weights")
+loo_model_weights <- function(x, ...) {
+  UseMethod("loo_model_weights")
 }
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
-model_weights.default <-
+#' @export loo_model_weights.default
+loo_model_weights.default <-
   function(x,
            ...,
            method = c("stacking", "pseudobma"),
@@ -162,7 +162,6 @@ model_weights.default <-
            BB = TRUE,
            BB_n = 1000,
            alpha = 1,
-           seed = NULL,
            r_eff_list = NULL,
            cores = getOption("loo.cores", 1)) {
 
@@ -183,7 +182,7 @@ model_weights.default <-
     }
 
     ## 1) stacking on log score
-    if (method =="stacking"){
+    if (method =="stacking") {
       wts <- stacking_weights(
         lpd_point = lpd_point,
         optim_method = optim_method,
@@ -196,8 +195,7 @@ model_weights.default <-
         lpd_point = lpd_point,
         BB = BB,
         BB_n = BB_n,
-        alpha = alpha,
-        seed = seed
+        alpha = alpha
       )
     }
 
@@ -205,7 +203,7 @@ model_weights.default <-
   }
 
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
 #' @param lpd_point A matrix of pointwise log leave-one-out likelihoods
 #'   evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
@@ -276,23 +274,19 @@ stacking_weights <-
   }
 
 
-#' @rdname model_weights
+#' @rdname loo_model_weights
 #' @export
 #'
 pseudobma_weights <-
   function(lpd_point,
            BB = TRUE,
            BB_n = 1000,
-           alpha = 1,
-           seed = NULL) {
+           alpha = 1) {
     stopifnot(is.matrix(lpd_point))
     N <- nrow(lpd_point)
     K <- ncol(lpd_point)
     if (K < 2) {
       stop("At least two models are required for pseudo-BMA weights.")
-    }
-    if (!is.null(seed)) {
-      set.seed(seed)
     }
 
     if (!BB) {
@@ -388,7 +382,7 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 #'
 #' @noRd
 #' @param log_lik_list User's list of log-likelihood matrices (the 'x' argument
-#'   to model_weights).
+#'   to loo_model_weights).
 #' @return Either throws an error or returns \code{TRUE} invisibly.
 #'
 validate_log_lik_list <- function(log_lik_list) {
