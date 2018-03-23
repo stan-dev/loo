@@ -151,11 +151,6 @@ loo2<-loo(stan_glm2, save_psis = TRUE)
 We get again a warning, and check more details.
 
 ```{r}
-#this does not work
-#loo2plus<-loo(stan_glm2, k_threshold = 0.7)
-```
-
-```{r}
 loo2
 ```
 
