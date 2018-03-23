@@ -75,7 +75,7 @@ rstanarm](https://cran.r-project.org/web/packages/rstanarm/vignettes/count.html)
 Here we focus on methods provided by __loo__ package.
 
 Although cross-validation is mostly used for model comparison, we
-start demonstarting how it is useful also in model checking.
+start demonstrating how it is useful also in model checking.
 
 We start by computing PSIS-LOO with `loo` function. We use `save_psis
 = TRUE` to save some intermediate computation results to be re-used
@@ -85,7 +85,7 @@ loo1<-loo(stan_glm1, save_psis = TRUE)
 ```
 
 `loo` gives us warnings from Pareto diagnostics which indicates that
-leave-one-out posteriors are so much different from te full posterior
+leave-one-out posteriors are so much different from the full posterior
 that importance-sampling is not able to correct the difference.
 We can see more details by printing the loo-object.
 ```{r}
@@ -101,7 +101,7 @@ standard error (SE) of elpd_loo and NA is displayed. elpd_loo estimate
 can be considered to be very bad. In case of well specified model we
 would expect to see p_loo smaller than or similar to the total number
 of parameters in the model. Here p_loo is about 292 which about 70
-times higher than the total number of of parameteres in the model
+times higher than the total number of of parameters in the model
 indicating also bad model misspecification.
 
 We can plot $k$ values in the order of data with vertical lines
@@ -113,7 +113,7 @@ plot(loo1)
 
 This plot is useful to quickly see the distribution of $k$ values, but
 also to see possible structure with respect to data ordering. Now
-there seems to be a block of data which is easier to predict (indeces
+there seems to be a block of data which is easier to predict (indices
 around 90--150), but also for these data we see some high $k$ values.
 
 `loo` package can be used in combination with `bayesplot` package for
@@ -162,7 +162,7 @@ loo2
 Now there is only one bad $k$ value, which however is still in a such
 range that we get a useful estimate for the Monte Carlo SE of
 elpd_loo, which is small compared to other uncertainties. p_loo is
-about 7 which is a bit higher than the total number of of parameteres
+about 7 which is a bit higher than the total number of of parameters
 in the model which is possible with well specified models, but
 indicates also slight model misspecification.
 
@@ -184,7 +184,7 @@ ppc_loo_pit_overlay(roaches$y, yrep, lw = weights(loo2$psis_object))
 
 Right side of the plot looks good, but the left side indicates too
 much mass for small values and the model is likely to be misspecified.
-A reasoanble guess is that that a hurdle or zero-inflated model is
+A reasonable guess is that that a hurdle or zero-inflated model is
 needed.
 
 ```{r, count-roaches-loo}
@@ -200,7 +200,7 @@ hurdle model for another case study.
 
 Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., and Gelman,
 A. (2018). Visualization in Bayesian workflow. Journal of the Royal
-Statistical Society Series A, accepted fo publication. [arXiv preprint
+Statistical Society Series A, accepted for publication. [arXiv preprint
 arXiv:1709.01449](http://arxiv.org/abs/1709.01449)
 
 Gelman, A. and Hill, J. (2007). _Data Analysis Using Regression and
