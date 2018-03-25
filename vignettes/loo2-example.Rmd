@@ -1,6 +1,6 @@
 ---
-title: "Using the loo package"
-author: "Jonah Gabry, Ben Goodrich, and Aki Vehtari"
+title: "Using the loo package (version >= 2.0.0)"
+author: "Aki Vehtari, Jonah Gabry, Ben Goodrich"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -10,7 +10,7 @@ params:
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{loo: Using the loo package}
+%\VignetteIndexEntry{Using the loo package}
 -->
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
@@ -23,173 +23,245 @@ params:
 
 # Introduction
 
-This vignette demonstrates Pareto smoothed importance-sampling
-leave-one-out cross-validation implemented in the __loo__ package.
+This vignette demonstrates how to use the __loo__ package to carry out 
+Pareto smoothed importance-sampling leave-one-out cross-validation (PSIS-LOO) 
+for purposes of model checking and model comparison. 
 
-PSIS-LOO, the Pareto $k$ diagnostic, and the effective sample size
-estimates for PSIS-LOO are presented in
+### Links to relevant background information
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC. _Statistics and
-Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4.
-Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | 
-[arXiv preprint](http://arxiv.org/abs/1507.04544).
+Background on PSIS-LOO and its diagnostics (Pareto $k$ and effective sample
+size) can be found in:
 
-and
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | [arXiv preprint](http://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
 
-```{r, child="children/four_steps.txt"}
+
+### Required packages
+
+In addition to the __loo__ package, we'll also be using __rstanarm__ and 
+__bayesplot__:
+
+
+```{r, setup, message=FALSE}
+library("rstanarm")
+library("bayesplot")
+library("loo")
 ```
 
-This vignette focuses on Step 3 using the __loo__ package. The Poisson and negative binomial regression models and `stan_glm` used in the example are covered in more depth by the vignette entitled [Estimating Generalized Linear Models for Count Data with rstanarm](https://cran.r-project.org/web/packages/rstanarm/vignettes/count.html)
+The Poisson and negative binomial regression models used as our example and the 
+`stan_glm` function used to fit the example models are covered in more depth in 
+__rstanarm__ vignette [_Estimating Generalized Linear Models for Count Data with rstanarm_](http://mc-stan.org/rstanarm/articles/count.html).
 
-# Poisson and Negative Binomial Regression Example
+<br>
 
-The example data comes from Chapter 8.3 of [Gelman and Hill (2007)](http://www.stat.columbia.edu/~gelman/arm/)
+# Poisson and negative binomial regression example
 
-We want to make inferences about the efficacy of a certain pest management system at reducing the number of roaches in urban apartments. Here is how Gelman and Hill describe the experiment (pg. 161):
+### Pest management data
+
+The example data comes from Chapter 8.3 of [Gelman and Hill (2007)](http://www.stat.columbia.edu/~gelman/arm/).
+
+```{r}
+# the data is included with the rstanarm package
+data(roaches) 
+
+# rescale 
+roaches$roach1 <- roaches$roach1 / 100
+
+# variables
+str(roaches)
+```
+We want to make inferences about the efficacy of a certain pest management
+system at reducing the number of roaches in urban apartments. Here is how Gelman
+and Hill describe the experiment and data (pg. 161):
 
 > the treatment and control were applied to 160 and 104 apartments, respectively, and the outcome measurement $y_i$ in each apartment $i$ was the number of roaches caught in a set of traps. Different apartments had traps for different numbers of days
 
-In addition to an intercept, the regression predictors for the model are the pre-treatment number of roaches `roach1`, the treatment indicator `treatment`, and a variable indicating whether the apartment is in a building restricted to elderly residents `senior`. Because the number of days for which the roach traps were used is not the same for all apartments in the sample, we include it as an `exposure2` by adding $\ln(u_i)$) to the linear predictor $\eta_i$ and it can be specified using the `offset` argument to `stan_glm`.
+In addition to an intercept, the regression predictors for the model are
+`roach1`, the pre-treatment number of roaches (rescaled above to be in units of
+hundreds), the treatment indicator `treatment`, and a variable indicating
+whether the apartment is in a building restricted to elderly residents `senior`.
+Because the number of days for which the roach traps were used is not the same
+for all apartments in the sample, we use the `offset` argument to specify that
+`log(exposure2)` should be added to the linear predictor.
+
+### Fit Poisson model with rstanarm
 
 ```{r, count-roaches-mcmc, results="hide"}
-library(rstanarm)
-library(loo)
-library(bayesplot)
-data(roaches)
-
-# Rescale
-roaches$roach1 <- roaches$roach1 / 100
-# Estimate with stan_glm
-stan_glm1 <- stan_glm(y ~ roach1 + treatment + senior, offset = log(exposure2),
-                      data = roaches, family = poisson, 
-                      prior = normal(0,2.5), prior_intercept = normal(0,5),
-                      chains = CHAINS, cores = CORES, seed = SEED)
+# Estimate with stan_glm from rstanarm
+stan_glm1 <-
+  stan_glm(
+    formula = y ~ roach1 + treatment + senior,
+    offset = log(exposure2),
+    data = roaches,
+    family = poisson(link = "log"),
+    prior = normal(0, 2.5, autoscale = TRUE),
+    prior_intercept = normal(0, 5, autoscale = TRUE),
+    chains = 4,
+    iter = 1000,
+    seed = 12345,
+    cores = 2
+  )
 ```
 
-Usually we would also run posterior predictive checks as shown in
-[Estimating Generalized Linear Models for Count Data with
-rstanarm](https://cran.r-project.org/web/packages/rstanarm/vignettes/count.html).
-Here we focus on methods provided by __loo__ package.
+Usually we would also run posterior predictive checks as shown in the 
+__rstanarm__ vignette 
+[Estimating Generalized Linear Models for Count Data with rstanarm](http://mc-stan.org/rstanarm/articles/count.html), but 
+here we focus only on methods provided by the __loo__ package.
 
-Although cross-validation is mostly used for model comparison, we
-start demonstrating how it is useful also in model checking.
+<br>
 
-We start by computing PSIS-LOO with `loo` function. We use `save_psis
-= TRUE` to save some intermediate computation results to be re-used
-later.
+# Using the __loo__ package for model checking and comparison
+
+**_Although cross-validation is mostly used for model comparison, 
+it is also useful for model checking._**
+
+### Computing PSIS-LOO and checking diagnostics
+
+We start by computing PSIS-LOO with the `loo` function (using the method
+provided by the __rstanarm__ package, which is a wrapper around the
+`loo.function` method from the __loo__ package). We'll also use `save_psis =
+TRUE` to save some intermediate results to be re-used later.
+
 ```{r}
-loo1<-loo(stan_glm1, save_psis = TRUE)
+loo1 <- loo(stan_glm1, save_psis = TRUE)
 ```
 
-`loo` gives us warnings from Pareto diagnostics which indicates that
-leave-one-out posteriors are so much different from the full posterior
-that importance-sampling is not able to correct the difference.
-We can see more details by printing the loo-object.
+`loo` gives us warnings about the Pareto diagnostics, which indicates that for
+some observations the leave-one-out posteriors are different enough from the
+full posterior that importance-sampling is not able to correct the difference.
+We can see more details by printing the `loo` object.
 ```{r}
-loo1
+print(loo1)
 ```
 
-We can see the proportion of leave-one-out folds having high $k$
-values in different categories indicating the reliability of the
-estimates. In addition, the minimum of the effective sample in that
-category is shown to give idea why higher $k$ values are bad. As some
-$k>1$, we are not able to compute estimate for the Monte Carlo
-standard error (SE) of elpd_loo and NA is displayed. elpd_loo estimate
-can be considered to be very bad. In case of well specified model we
-would expect to see p_loo smaller than or similar to the total number
-of parameters in the model. Here p_loo is about 292 which about 70
-times higher than the total number of of parameters in the model
-indicating also bad model misspecification.
+We can see the proportion of leave-one-out folds having high $k$ values in
+different categories indicating the reliability of the estimates. In addition,
+the minimum of the effective sample sizes in that category is shown to give idea
+why higher $k$ values are bad. As some $k>1$, we are not able to compute
+estimate for the Monte Carlo standard error (SE) of the expected log predictive
+density (`elpd_loo`) and `NA` is displayed.
 
-We can plot $k$ values in the order of data with vertical lines
-corresponding to the same categories as above.
+In this case the `elpd_loo` estimate should not be considered reliable. If we
+had a well-specified model we would expect to see the estimated effective number
+of parameters (`p_loo`) to be smaller than or similar to the total number of
+parameters in the model. Here `p_loo` is about 292, which is about 70 times
+higher than the total number of parameters in the model, indicating severe model
+misspecification.
 
-```{r}
+### Plotting Pareto $k$ diagnostics
+
+Using the `plot` method on our `loo1` object produces a plot the $k$ values 
+(in the same order as observations in the dataset used to fit the model) 
+with horizontal lines corresponding to the same categories as in the
+printed output above.
+
+```{r, out.width = "70%"}
 plot(loo1)
 ```
 
 This plot is useful to quickly see the distribution of $k$ values, but
-also to see possible structure with respect to data ordering. Now
-there seems to be a block of data which is easier to predict (indices
-around 90--150), but also for these data we see some high $k$ values.
+it's often also possible to see structure with respect to data ordering. In 
+our case this is mild, but there seems to be a block of data that is easier to 
+predict (indices around 90--150), but even for these data points we see some 
+high $k$ values.
 
-`loo` package can be used in combination with `bayesplot` package for
-leave-one-out cross-validation marginal posterior predictive checks
-[Gabry et al (2018)](http://arxiv.org/abs/1709.01449). LOO-PIT values
-are cumulative probabilities for $y_i$ computed using LOO marginal
-predictive distributions $p(y_i|y_{-i})$. For a good model, the
-distribution of LOO-PIT values should be uniform and the following
-plot shows as a reference smoothed distribution estimates for several
-independently generated uniform random values.
+### Marginal posterior predictive checks
+
+The `loo` package can be used in combination with `bayesplot` package for
+leave-one-out cross-validation marginal posterior predictive checks [Gabry et al
+(2018)](http://arxiv.org/abs/1709.01449). LOO-PIT values are cumulative
+probabilities for $y_i$ computed using the LOO marginal predictive distributions
+$p(y_i|y_{-i})$. For a good model, the distribution of LOO-PIT values should be
+uniform. In the following plot the distribution (smoothed density estimate) of
+the LOO-PIT values for our model (thick curve)  is compared to many
+independently generated samples (each the same size as our dataset) from the
+standard uniform distribution (thin curves).
 
 ```{r}
 yrep <- posterior_predict(stan_glm1)
 ppc_loo_pit_overlay(roaches$y, yrep, lw = weights(loo1$psis_object))
 ```
 
-Excessive amount of values close to 0 and 1, indicate that the model
-is under-dispersed compared to data, and we should consider a model
-that can have larger dispersion.
+The excessive number of values close to 0 and 1 indicates that the model
+is under-dispersed compared to the data, and we should consider a model
+that allows for greater dispersion.
 
-Here we will try [negative
-binomial](https://en.wikipedia.org/wiki/Negative_binomial_distribution)
-regression, which is commonly used for overdispersed count data.  The
-negative binomial distribution allows the (conditional) mean and
-variance of $y$ to differ unlike the Poisson distribution.
+### Try negative binomial model for more flexibility
+
+Here we will try [negative binomial](https://en.wikipedia.org/wiki/Negative_binomial_distribution)
+regression, which is commonly used for overdispersed count data.  
+Unlike the Poisson distribution, the negative binomial distribution 
+allows the conditional mean and variance of $y$ to differ.
 
 ```{r, count-roaches-negbin, results="hide"}
-stan_glm2 <- update(stan_glm1, family = neg_binomial_2) 
+stan_glm2 <- update(stan_glm1, family = neg_binomial_2)
 ```
 
 ```{r}
-loo2<-loo(stan_glm2, save_psis = TRUE)
+loo2 <- loo(stan_glm2, save_psis = TRUE)
 ```
 
-We get again a warning, and check more details.
+We may not get any warnings here, but if we do have any issues it will only 
+be one or two high $k$ values.
 
 ```{r}
-loo2
+print(loo2)
 ```
 
-Now there is only one bad $k$ value, which however is still in a such
-range that we get a useful estimate for the Monte Carlo SE of
-elpd_loo, which is small compared to other uncertainties. p_loo is
-about 7 which is a bit higher than the total number of of parameters
-in the model which is possible with well specified models, but
-indicates also slight model misspecification.
+If there are any high $k$ values, if they are still in the `ok` or better
+range we can get still get a useful estimate for the Monte Carlo SE of
+elpd_loo.  In our case the Monte Carlo SE is small compared to other the 
+uncertainties. `p_loo` is about 7 which is a bit higher than the total number 
+of parameters in the model. There is almost certainly still some degree of 
+model misspecification, but this is much better than the `p_loo` estimate 
+for the Poisson model.
 
 Next we look at the plot of $k$ values.
+
 ```{r}
-plot(loo2)
+plot(loo2, label_points = TRUE)
 ```
 
-Most of the $k$ values are small, but we see one much higher $k$ value
-which sometimes indicates an ``outlier''. Although high $k$ values
-often indicate model misspecification, small $k$ values do not
-mean that model is well specified.
+Using the `label_points` argument will label any $k$ values larger than 0.7
+with the index of the corresponding data point. These high values 
+are often the result of model misspecification and  
+frequently correspond to data points that would be considered ``outliers'' in 
+the data and surprising according to the model [Gabry et al (2018)](http://arxiv.org/abs/1709.01449). 
+Unfortunately, while large $k$ values are a useful indicator of model
+misspecification, small $k$ values are not a guarantee that a model is
+well-specified.
 
-For further model checking we examine LOO-PIT values.
+For further model checking we examine the LOO-PIT values.
 ```{r}
 yrep <- posterior_predict(stan_glm2)
 ppc_loo_pit_overlay(roaches$y, yrep, lw = weights(loo2$psis_object))
 ```
 
-Right side of the plot looks good, but the left side indicates too
-much mass for small values and the model is likely to be misspecified.
-A reasonable guess is that that a hurdle or zero-inflated model is
-needed.
+The right side of the plot looks good, but the left side indicates too much mass 
+for small values. This model is better than the Poisson but is still not 
+capturing all of the essential features in the data. 
+
+
+### Comparing models on expected log predictive density
+
+We can use the `compare_models` function in __rstanarm__, which is a wrapper
+around __loo__'s `compare` function that also does some checks to ensure that 
+the __rstanarm__ models from which `loo1` and `loo2` were created 
+are suitable for comparison.
 
 ```{r, count-roaches-loo}
-compare_models(loo1, loo2)
+compare_models(loo1, loo2)  # compare(loo1, loo2)
 ```
 
-The difference is much larger than twice the estimated standard
-error. The negative-binomial model is better than Poisson model, but
-still it is far from perfect model as shown by LOO-PIT.  We leave a
-hurdle model for another case study.
+The difference is much larger than twice the estimated standard error. The
+negative-binomial model is better than Poisson model but is still not a great
+model according to the LOO-PIT checks. A reasonable guess is that a hurdle or
+zero-inflated model would be an improvement, but we leave that for another case
+study.
+
+
+<br>
 
 # References
 

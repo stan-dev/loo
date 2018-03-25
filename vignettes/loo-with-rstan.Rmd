@@ -1,20 +1,18 @@
 ---
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example}
+  %\VignetteIndexEntry{Using the loo package with custom Stan programs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-# Using the **loo** package
+# Using the **loo** package with RStan
 
-*The following is excerpted (with minor edits) from our paper:*
+This vignette demonstrates how to write a Stan program that computes and stores
+the pointwise log-likelihood required for using the __loo__ package. 
+Some sections are excerpted from our paper
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC. _Statistics and
-Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
-
-Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | 
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | 
 [arXiv preprint](http://arxiv.org/abs/1507.04544).
 
 <br>
@@ -33,7 +31,7 @@ enough that it is important to have a computational method for LOO that is fast
 for each data point. On the plus side, with such a large dataset, the influence
 of any given observation is small, and so the computations should be stable.
 
-### Fitting the model
+### Coding the model
 
 Here is the Stan code for fitting the logistic regression model, which 
 we save in a file called `logistic.stan`:
@@ -67,7 +65,7 @@ running Stan, `log_lik` can be extracted (using the `extract_log_lik` function
 provided in the **loo** package) as an $S \times N$ matrix, where $S$ is the 
 number of simulations (posterior draws) and $N$ is the number of data points.
 
-<br>
+### Fitting the model
 
 Next we fit the model in Stan using the **rstan** package:
 
