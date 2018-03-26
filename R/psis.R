@@ -1,13 +1,13 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
 #' Implementation of Pareto smoothed importance sampling (PSIS), a method for
-#' stabilizing importance ratios. The version of the PSIS implemented here
+#' stabilizing importance ratios. The version of PSIS implemented here
 #' corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
 #' For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 #'
 #' @export
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
-#'   scale (for LOO these are negative log-likelihood values). See the
+#'   scale (for PSIS-LOO these are \emph{negative} log-likelihood values). See the
 #'   \strong{Methods (by class)} section below for a detailed description of how
 #'   to specify the inputs for each method.
 #' @param ... Arguments passed on to the various methods.
@@ -393,6 +393,7 @@ throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
 
 #' Warn if not enough tail samples to fit GPD
 #'
+#' @noRd
 #' @param tail_lengths Vector of tail lengths.
 #' @return tail_lengths, invisibly.
 #'
