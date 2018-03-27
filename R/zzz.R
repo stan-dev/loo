@@ -1,14 +1,10 @@
 .onAttach <- function(...) {
   ver <- utils::packageVersion("loo")
-  packageStartupMessage("This is loo version ", ver)
-}
-
-.onLoad <- function(libname, pkgname) {
-  op <- options()
-  loo.op <- list(loo.cores = parallel::detectCores())
-  set_ops <- !(names(loo.op) %in% names(op))
-  if (any(set_ops))
-    options(loo.op[set_ops])
-
-  invisible()
+  packageStartupMessage(
+    "This is loo version ", ver, ". ",
+    "NOTE: as of version 2.0.0 loo defaults to 1 core ",
+    "but we recommend using as many as possible. ",
+    "Use the 'cores' argument or set options(loo.cores = NUM_CORES) ",
+    "for an entire session."
+  )
 }

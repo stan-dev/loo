@@ -1,9 +1,7 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
-#' Implementation of Pareto smoothed importance sampling, a method for
-#' stabilizing importance weights. For full details about the algorithm see
-#' Vehtari, Gelman and Gabry (2016, 2017). For diagnostics see the
-#' \link{pareto-k-diagnostic} page.
+#' As of version \code{2.0.0} this function is deprecated. Please use the
+#' \code{\link{psis}} function for the new PSIS algorithm.
 #'
 #' @export
 #' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
@@ -27,19 +25,18 @@
 #'   and \code{pareto_k} (estimated generalized
 #'   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
 #'
-#' @inheritSection loo-package PSIS-LOO
-#'
 #' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
 #'
-#' @importFrom matrixStats logSumExp
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("loo.cores", parallel::detectCores()),
                    llfun = NULL, llargs = NULL,
                    ...) {
+  .Deprecated("psis")
+
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
     cutoff <- lw_cutpoint(x, wcp, MIN_CUTOFF)
@@ -70,10 +67,11 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       # body and gPd smoothed tail
       tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
-      fit <- gpdfit(exp(x_tail) - exp_cutoff)
+      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
       k <- fit$k
+      sigma <- fit$sigma
       prb <- (seq_len(tail_len) - 0.5) / tail_len
-      qq <- qgpd(p = prb, xi = k, sigma = fit$sigma) + exp_cutoff
+      qq <- qgpd(prb, k, sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
       x_new <- x
@@ -146,8 +144,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     nlist(loos, pareto_k)
   } else {
     funval <- if (LL_FUN) llargs$S else nrow(lw)
-    lw_smooth = vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
-    nlist(lw_smooth, pareto_k)
+    lw_smooth <- vapply(out, "[[", 1L, FUN.VALUE = numeric(funval))
+    out <- nlist(lw_smooth, pareto_k)
+    class(out) <- c("psis", "list")
+    return(out)
   }
 }
 
@@ -171,19 +171,8 @@ lw_truncate <- function(y, wtrunc) {
   y
 }
 
-#' @importFrom matrixStats logSumExp
 lw_normalize <- function(y) {
   y - logSumExp(y)
-}
-
-# inverse-CDF of generalized Pareto distribution (formula from Wikipedia)
-qgpd <- function(p, xi = 1, mu = 0, sigma = 1, lower.tail = TRUE) {
-  if (is.nan(sigma) || sigma <= 0)
-    return(rep(NaN, length(p)))
-  if (!lower.tail)
-    p <- 1 - p
-
-  mu + sigma * ((1 - p)^(-xi) - 1) / xi
 }
 
 
