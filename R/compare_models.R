@@ -89,11 +89,14 @@ compare <- function(..., x = list()) {
     colnames(x) <- nms
     rnms <- rownames(x)
     comp <- x
-    patts <- c("^waic$|^looic$", "^se_waic$|^se_looic$", "elpd", "p_")
-    row_ord <- unlist(sapply(patts, function(p) grep(p, rownames(comp))),
+    ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
+    comp <- t(comp)[ord, ]
+
+    patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
+    col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
                       use.names = FALSE)
-    col_ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
-    comp <- t(comp[row_ord, col_ord])
+    comp <- comp[, col_ord]
+    comp <- cbind(elpd_diff = comp[, 1] - comp[1, 1], comp)
     class(comp) <- c("compare.loo", class(comp))
     comp
   }

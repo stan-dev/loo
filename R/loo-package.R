@@ -66,10 +66,10 @@
 #' weights in the Bayesian linear model. \emph{Journal of the American
 #' Statistical Association} \strong{92}, 199-207.
 #'
-#' Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+#' Stan Development Team (2017). The Stan C++ Library, Version 2.17.0.
 #' \url{http://mc-stan.org}.
 #'
-#' Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+#' Stan Development Team (2018). RStan: the R interface to Stan, Version 2.17.3.
 #' \url{http://mc-stan.org}.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
