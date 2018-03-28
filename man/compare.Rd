@@ -2,9 +2,12 @@
 % Please edit documentation in R/compare_models.R
 \name{compare}
 \alias{compare}
+\alias{print.compare.loo}
 \title{Model comparison}
 \usage{
 compare(..., x = list())
+
+\method{print}{compare.loo}(x, ..., digits = 1)
 }
 \arguments{
 \item{...}{At least two objects returned by \code{\link{loo}} (or
@@ -13,6 +16,9 @@ compare(..., x = list())
 \item{x}{A list of at least two objects returned by \code{\link{loo}} (or
 \code{\link{waic}}). This argument can be used as an alternative to
 specifying the objects in \code{...}.}
+
+\item{digits}{For the print method only, the number of digits to use when
+printing.}
 }
 \value{
 A vector or matrix with class \code{'compare.loo'} that has its own

@@ -102,7 +102,10 @@ compare <- function(..., x = list()) {
   }
 }
 
+#' @rdname compare
 #' @export
+#' @param digits For the print method only, the number of digits to use when
+#'   printing.
 print.compare.loo <- function(x, ..., digits = 1) {
   print(.fr(x, digits), quote = FALSE)
   invisible(x)

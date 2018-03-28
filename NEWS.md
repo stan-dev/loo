@@ -24,6 +24,8 @@ stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
 weighting with the Bayesian bootstrap.
 * New functions `example_loglik_array` and `example_loglik_matrix` that
 provide objects to use in examples and tests.
+* When comparing more than two models with `compare`, the first column of the
+output is now the `elpd` difference from the model in the first row.
 
 
 # loo 1.1.0
