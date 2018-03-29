@@ -63,6 +63,7 @@ McElreath describes the primate milk data in Statistical Rethinking as
 follows:
 
 > A popular hypothesis has it that primates with larger brains produce more energetic milk, so that brains can grow quickly. ... The question here is to what extent energy content of milk, measured here by kilocalories, is related to the percent of the brain mass that is neocortex. ... We'll end up needing female body mass as well, to see the masking that hides the relationships among the variables.
+
 ```{r}
 milk <- read.csv("milk.csv", sep=";")
 d <- as.data.frame(milk[complete.cases(milk),])
@@ -74,10 +75,15 @@ Rethinking using the following four models (we use here the default
 __rstanarm_ default priors that are weakly informative while flat
 priors were used in Statistical Rethinking).
 ```{r, results="hide"}
-fit1 <- stan_glm(kcal.per.g ~ 1, data = d)
-fit2 <- stan_glm(kcal.per.g ~ neocortex, data = d)
-fit3 <- stan_glm(kcal.per.g ~ log(mass), data = d)
-fit4 <- stan_glm(kcal.per.g ~ neocortex + log(mass), data = d)
+fit1 <- stan_glm(kcal.per.g ~ 1,
+                 data = d,
+                 chains = 4,
+                 iter = 1000,
+                 seed = 2030,
+                 cores = 2)
+fit2 <- update(fit1, formula = kcal.per.g ~ neocortex)
+fit3 <- update(fit1, formula = kcal.per.g ~ log(mass))
+fit4 <- update(fit1, formula = kcal.per.g ~ neocortex + log(mass))
 ```
 
 McElreath used WAIC for model comparison and averaging. __loo__
@@ -104,18 +110,15 @@ lpd_point<-cbind(loo1$pointwise[,1], loo2$pointwise[,1],
                  loo3$pointwise[,1], loo4$pointwise[,1])
 ```
 
-We don't get warnings for models 3 and 4. We check anyway the
-diagnostic details for these models.
+We don't get any warnings for models 3 and 4. For illustration of good results, we anyway display the diagnostic details for these models.
 
 ```{r}
 loo3
 loo4
 ```
 
-The benefit of PSIS-LOO over WAIC is better diagnostics. Here all
-$k<0.7$ and Monte Carlo SE of elpd_loo are 0.0 and 0.1 for models 3
-and 4 respectively, indicating that we can trust the weights computed
-next.
+The benefit of PSIS-LOO over WAIC is better diagnostics. Here for both models 3 and 4 all
+$k<0.7$ and Monte Carlo SE of elpd_loo is 0.1, and we can expect the model comparison to be reliable.
 
 Next we compute 1) WAIC weights, 2) Pseudo-BMA weights without
 Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian bootstrap, and
@@ -180,7 +183,12 @@ informative priors as in Statistical Rethinking).
 fit10 <- stan_glm(total_tools ~ log_pop + contact_high + log_pop*contact_high,
       	          prior = normal(0, 1, autoscale = FALSE),
       	          prior_intercept = normal(0, 100, autoscale = FALSE),
-                  data = d, family = poisson)
+                  family = poisson,
+                  data = d, 
+                  chains = 4,
+                  iter = 1000,
+                  seed = 2030,
+                  cores = 2)
 ```
 
 Before running other models, we check whether Poisson is good choice
@@ -190,7 +198,7 @@ as the conditional observation model.
 (loo10 <- loo(fit10))
 ```
 
-There is one $k>0.7$ and p_loo is larger than the total number of
+There are two $k>0.7$ and p_loo is larger than the total number of
 parameters in the model, which indicates that Poisson might be too
 narrow and negative binomial might be better, but with this few
 observations it is not so clear.
@@ -217,14 +225,8 @@ To assess whether the contact rate and interaction term are
 useful, we can make model comparison to models without these covariates.
 
 ```{r, results="hide"}
-fit11 <- stan_glm(total_tools ~ log_pop + contact_high,
-      	          prior = normal(0, 1, autoscale = FALSE),
-      	          prior_intercept = normal(0, 100, autoscale = FALSE),
-                  data = d, family = poisson)
-fit12 <- stan_glm(total_tools ~ log_pop,
-      	          prior = normal(0, 1, autoscale = FALSE),
-      	          prior_intercept = normal(0, 100, autoscale = FALSE),
-                  data = d, family = poisson)
+fit11 <- update(fit10, formula = total_tools ~ log_pop + contact_high)
+fit12 <- update(fit10, formula = total_tools ~ log_pop)
 ```
 ```{r}
 (loo11 <- loo(fit11))
