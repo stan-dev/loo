@@ -64,7 +64,7 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 # internal ----------------------------------------------------------------
 
 print_mcse_summary <- function(x, digits) {
-  if (any(pareto_k_values(x) > 0.7)) {
+  if (any(pareto_k_values(x) > 0.7, na.rm = TRUE)) {
     mcse <- NA
   } else {
     mc_var <- x$pointwise[, "mcse_elpd_loo"]^2
