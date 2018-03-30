@@ -6,10 +6,12 @@
 #'   background.
 #'
 #' @export
-#' @param x A list of pointwise log-likelihood matrices, one for each model.
-#'   Each matrix should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is the
-#'   size of the posterior sample (with all chains merged) and \eqn{N} is the
-#'   number of data points.
+#' @param x A list of pointwise log-likelihood matrices or "psis_loo" objects
+#'   (objects returned by \code{\link{loo}}), one for each model. Each
+#'   matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
+#'   the size of the posterior sample (with all chains merged) and \eqn{N} is
+#'   the number of data points. If \code{x} is a list of log-likelihood matrices
+#'   then \code{\link{loo}} is called internally on each matrix.
 #' @param method Either \code{"stacking"} or \code{"pseudobma"}, indicating
 #'   which method to use for obtaining the weights. \code{"stacking"} refers to
 #'   stacking of predictive distributions and  \code{"pseudobma"} refers to
@@ -32,7 +34,8 @@
 #' @param r_eff_list Optionally, a list of relative effective sample size
 #'   estimates for the likelihood \code{(exp(log_lik))} of each observation in
 #'   each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
-#'   function for computing \code{r_eff}.
+#'   function for computing \code{r_eff}. If \code{x} is a list of "psis_loo"
+#'   objects then \code{r_eff_list} is ignored.
 #' @template cores
 #' @param ... Unused, except for the generic to pass arguments to individual
 #'   methods.
@@ -101,37 +104,43 @@
 #' fit1 <- sampling(mod, data=list(N=N, y=y, mu_fixed=-1))
 #' fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 #' fit3 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.6))
-#' log_lik_list <- lapply(c(fit1, fit2, fit3), extract_log_lik)
+#' model_list <- list(fit1, fit2, fit3)
+#' log_lik_list <- lapply(model_list, extract_log_lik)
 #'
 #' # optional but recommended
-#' r_eff_list <- lapply(c(fit1, fit2, fit3), function(x) {
+#' r_eff_list <- lapply(model_list, function(x) {
 #'   ll_array <- extract_log_lik(x, merge_chains = FALSE)
 #'   relative_eff(exp(ll_array))
 #' })
 #'
 #' # stacking method:
-#' loo_model_weights(
+#' wts1 <- loo_model_weights(
 #'   log_lik_list,
-#'   method="stacking",
+#'   method = "stacking",
 #'   r_eff_list = r_eff_list,
 #'   optim_control = list(reltol=1e-10)
 #' )
+#' print(wts1)
+#'
+#' # can also pass a list of psis_loo objects to avoid recomputing loo
+#' loo_list <- lapply(1:length(log_lik_list), function(j) {
+#'   loo(log_lik_list[[j]], r_eff = r_eff_list[[j]])
+#' })
+#'
+#' wts2 <- loo_model_weights(
+#'   loo_list,
+#'   method = "stacking",
+#'   optim_control = list(reltol=1e-10)
+#' )
+#' all.equal(wts1, wts2)
+#'
 #'
 #' # pseudo-BMA+ method:
-#' loo_model_weights(
-#'   log_lik_list,
-#'   method = "pseudobma",
-#'   r_eff_list=r_eff_list,
-#'   cores = 2
-#'  )
+#' set.seed(1414)
+#' loo_model_weights(loo_list, method = "pseudobma")
 #'
 #' # pseudo-BMA method (set BB = FALSE):
-#' loo_model_weights(
-#'   log_lik_list,
-#'   method = "pseudobma",
-#'   BB = FALSE,
-#'   r_eff_list=r_eff_list
-#'  )
+#' loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
 #'
 #' # calling stacking_weights or pseudobma_weights directly
 #' lpd1 <- loo(log_lik_list[[1]], r_eff = r_eff_list[[1]])$pointwise[,1]
@@ -164,18 +173,26 @@ loo_model_weights.default <-
     cores <- loo_cores(cores)
     method <- match.arg(method)
     K <- length(x) # number of models
-    N <- ncol(x[[1]]) # number of data points
-    validate_log_lik_list(x)
-    validate_r_eff_list(r_eff_list, K, N)
 
-    lpd_point <- matrix(NA, N, K)
-    elpd_loo <- rep(NA, K)
-    for (k in 1:K) {
-      r_eff_k <- r_eff_list[[k]] # possibly NULL
-      log_likelihood <- x[[k]]
-      L <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
-      lpd_point[, k] <- L$pointwise[, 1]    #calculate log(p_k (y_i | y_-i))
-      elpd_loo[k] <- L$estimates["elpd_loo", 1]
+    if (is.matrix(x[[1]])) {
+      N <- ncol(x[[1]]) # number of data points
+      validate_log_lik_list(x)
+      validate_r_eff_list(r_eff_list, K, N)
+      lpd_point <- matrix(NA, N, K)
+      elpd_loo <- rep(NA, K)
+      for (k in 1:K) {
+        r_eff_k <- r_eff_list[[k]] # possibly NULL
+        log_likelihood <- x[[k]]
+        L <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
+        lpd_point[, k] <- L$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
+        elpd_loo[k] <- L$estimates["elpd_loo", "Estimate"]
+      }
+    } else if (is.psis_loo(x[[1]])) {
+      validate_psis_loo_list(x)
+      lpd_point <- do.call(cbind, lapply(x, function(obj) obj$pointwise[, "elpd_loo"]))
+      elpd_loo <- sapply(x, function(obj) obj$estimates["elpd_loo", "Estimate"])
+    } else {
+      stop("'x' must be a list of matrices or a list of 'psis_loo' objects.")
     }
 
     ## 1) stacking on log score
@@ -390,6 +407,23 @@ validate_log_lik_list <- function(log_lik_list) {
   if (length(unique(sapply(log_lik_list, ncol))) != 1 |
      length(unique(sapply(log_lik_list, nrow))) != 1) {
     stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
+  }
+  return(invisible(TRUE))
+}
+
+validate_psis_loo_list <- function(psis_loo_list) {
+  stopifnot(is.list(psis_loo_list))
+  if (length(psis_loo_list) < 2) {
+    stop("At least two models are required.", call. = FALSE)
+  }
+  if (!all(sapply(psis_loo_list, is.psis_loo))) {
+    stop("List elements must all be 'psis_loo' objects or log-likelihood matrices.")
+  }
+
+  dims <- sapply(psis_loo_list, dim)
+  if (length(unique(dims[1, ])) != 1 |
+      length(unique(dims[2, ])) != 1) {
+    stop("Each object in the list must have the same dimensions.", call. = FALSE)
   }
   return(invisible(TRUE))
 }

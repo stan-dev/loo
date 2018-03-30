@@ -19,10 +19,12 @@ stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
 \arguments{
-\item{x}{A list of pointwise log-likelihood matrices, one for each model.
-Each matrix should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is the
-size of the posterior sample (with all chains merged) and \eqn{N} is the
-number of data points.}
+\item{x}{A list of pointwise log-likelihood matrices or "psis_loo" objects
+(objects returned by \code{\link{loo}}), one for each model. Each
+matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
+the size of the posterior sample (with all chains merged) and \eqn{N} is
+the number of data points. If \code{x} is a list of log-likelihood matrices
+then \code{\link{loo}} is called internally on each matrix.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
@@ -55,7 +57,8 @@ uniform distribution on the simplex space.}
 \item{r_eff_list}{Optionally, a list of relative effective sample size
 estimates for the likelihood \code{(exp(log_lik))} of each observation in
 each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
-function for computing \code{r_eff}.}
+function for computing \code{r_eff}. If \code{x} is a list of "psis_loo"
+objects then \code{r_eff_list} is ignored.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -134,37 +137,43 @@ mod <- stan_model(model_code = stan_code)
 fit1 <- sampling(mod, data=list(N=N, y=y, mu_fixed=-1))
 fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 fit3 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.6))
-log_lik_list <- lapply(c(fit1, fit2, fit3), extract_log_lik)
+model_list <- list(fit1, fit2, fit3)
+log_lik_list <- lapply(model_list, extract_log_lik)
 
 # optional but recommended
-r_eff_list <- lapply(c(fit1, fit2, fit3), function(x) {
+r_eff_list <- lapply(model_list, function(x) {
   ll_array <- extract_log_lik(x, merge_chains = FALSE)
   relative_eff(exp(ll_array))
 })
 
 # stacking method:
-loo_model_weights(
+wts1 <- loo_model_weights(
   log_lik_list,
-  method="stacking",
+  method = "stacking",
   r_eff_list = r_eff_list,
   optim_control = list(reltol=1e-10)
 )
+print(wts1)
+
+# can also pass a list of psis_loo objects to avoid recomputing loo
+loo_list <- lapply(1:length(log_lik_list), function(j) {
+  loo(log_lik_list[[j]], r_eff = r_eff_list[[j]])
+})
+
+wts2 <- loo_model_weights(
+  loo_list,
+  method = "stacking",
+  optim_control = list(reltol=1e-10)
+)
+all.equal(wts1, wts2)
+
 
 # pseudo-BMA+ method:
-loo_model_weights(
-  log_lik_list,
-  method = "pseudobma",
-  r_eff_list=r_eff_list,
-  cores = 2
- )
+set.seed(1414)
+loo_model_weights(loo_list, method = "pseudobma")
 
 # pseudo-BMA method (set BB = FALSE):
-loo_model_weights(
-  log_lik_list,
-  method = "pseudobma",
-  BB = FALSE,
-  r_eff_list=r_eff_list
- )
+loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
 
 # calling stacking_weights or pseudobma_weights directly
 lpd1 <- loo(log_lik_list[[1]], r_eff = r_eff_list[[1]])$pointwise[,1]
