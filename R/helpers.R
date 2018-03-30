@@ -183,6 +183,19 @@ nlist <- function(...) {
   return(out)
 }
 
+
+# Check how many cores to use and throw deprecation warning if loo.cores is used
+loo_cores <- function(cores) {
+  loo_cores_op <- getOption("loo.cores", NA)
+  if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
+    cores <- loo_cores_op
+    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
+            call. = FALSE)
+  }
+  return(cores)
+}
+
+
 # nocov start
 # release reminders (for devtools)
 release_questions <- function() {

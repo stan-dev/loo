@@ -6,7 +6,8 @@
 \alias{pareto_k_ids}
 \alias{pareto_k_values}
 \alias{psis_n_eff_values}
-\alias{plot.loo}
+\alias{mcse_loo}
+\alias{plot.psis_loo}
 \alias{plot.psis}
 \title{Diagnostics for Pareto smoothed importance sampling (PSIS)}
 \usage{
@@ -18,7 +19,9 @@ pareto_k_values(x)
 
 psis_n_eff_values(x)
 
-\method{plot}{loo}(x, diagnostic = c("k", "n_eff"), ...,
+mcse_loo(x, threshold = 0.7)
+
+\method{plot}{psis_loo}(x, diagnostic = c("k", "n_eff"), ...,
   label_points = FALSE, main = "PSIS diagnostic plot")
 
 \method{plot}{psis}(x, diagnostic = c("k", "n_eff"), ...,
@@ -27,7 +30,10 @@ psis_n_eff_values(x)
 \arguments{
 \item{x}{An object created by \code{\link{loo}} or \code{\link{psis}}.}
 
-\item{threshold}{For \code{pareto_k_ids}, the threshold value for \eqn{k}.}
+\item{threshold}{For \code{pareto_k_ids}, \code{threshold} is the minimum
+\eqn{k} value to flag (default is 0.5). For \code{mcse_loo}, if any \eqn{k}
+estimates are greater than \code{threshold} the MCSE estimate is returned
+as \code{NA} (default is 0.7).}
 
 \item{diagnostic}{For the \code{plot} method, which diagnostic should be
 plotted? The options are \code{"k"} for Pareto \eqn{k} estimates (the
@@ -54,6 +60,10 @@ observations have Pareto \eqn{k} estimates above \code{threshold}.
 
 \code{psis_n_eff_values} returns a vector of the estimated PSIS
   effective sample sizes.
+
+\code{mcse_loo} returns the Monte carlo standard error (MCSE)
+  estimate for PSIS-LOO. MCSE wil be NA if any Pareto \eqn{k} values are
+  above \code{threshold}.
 
 The \code{plot} method is called for its side effect and does not
   return anything. If \code{x} is the result of a call to \code{\link{loo}}

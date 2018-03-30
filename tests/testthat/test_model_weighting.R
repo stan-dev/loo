@@ -1,5 +1,4 @@
 library(loo)
-options(loo.cores = 2)
 
 context("loo_model_weights")
 
@@ -19,14 +18,24 @@ for(s in 1:500) {
 ll_list <- list(log_lik1, log_lik2,log_lik3)
 r_eff_list <- list(rep(0.9,50), rep(0.9,50), rep(0.9,50))
 
+loo_list <- lapply(1:length(ll_list), function(j) {
+  loo(ll_list[[j]], r_eff = r_eff_list[[j]])
+})
+
 tol <- 0.01 # absoulte tolerance of weights
 
 test_that("loo_model_weights throws correct errors", {
-  expect_error(loo_model_weights(log_lik1), "is.list")
+  expect_error(loo_model_weights(log_lik1), "list of matrices or a list of 'psis_loo' objects")
   expect_error(loo_model_weights(list(log_lik1)), "At least two models")
+  expect_error(loo_model_weights(list(loo_list[[1]])), "At least two models")
   expect_error(loo_model_weights(list(log_lik1), method = "pseudobma"), "At least two models")
+
   expect_error(loo_model_weights(list(log_lik1, log_lik2[-1, ])), "same dimensions")
   expect_error(loo_model_weights(list(log_lik1, log_lik2, log_lik3[, -1])), "same dimensions")
+
+  loo_list2 <- loo_list
+  attr(loo_list2[[3]], "dims") <- c(10, 10)
+  expect_error(loo_model_weights(loo_list2), "same dimensions")
 
   expect_error(loo_model_weights(ll_list, r_eff_list = r_eff_list[-1]),
                "one component for each model")
@@ -47,6 +56,9 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
                             tolerance  = tol, scale=1)
   expect_output(print(w1), "Method: stacking")
 
+  w1_b <- loo_model_weights(loo_list)
+  expect_identical(w1, w1_b)
+
   w2 <- loo_model_weights(ll_list, r_eff_list=r_eff_list,
                       method = "pseudobma", BB = TRUE)
   expect_type(w2, "double")
@@ -65,4 +77,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_equal(as.numeric(w3), c(5.365279e-05, 9.999436e-01, 2.707028e-06),
                tolerance  = tol, scale = 1)
   expect_output(print(w3), "Method: pseudo-BMA")
+
+  w3_b <- loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
+  expect_identical(w3, w3_b)
 })

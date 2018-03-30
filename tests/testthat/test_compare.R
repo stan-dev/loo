@@ -1,5 +1,4 @@
 library(loo)
-options(loo.cores = 2)
 set.seed(123)
 SW <- suppressWarnings
 
