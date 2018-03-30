@@ -64,13 +64,11 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 # internal ----------------------------------------------------------------
 
 print_mcse_summary <- function(x, digits) {
-  if (any(pareto_k_values(x) > 0.7, na.rm = TRUE)) {
-    mcse <- NA
-  } else {
-    mc_var <- x$pointwise[, "mcse_elpd_loo"]^2
-    mcse <- sqrt(sum(mc_var))
-  }
-  cat("Monte Carlo SE of elpd_loo is", paste0(.fr(mcse, digits), ".\n"))
+  mcse_val <- mcse_loo(x)
+  cat(
+    "Monte Carlo SE of elpd_loo is",
+    paste0(.fr(mcse_val, digits), ".\n")
+  )
 }
 
 #' Print dimensions of log-likelihood or log-weights matrix
