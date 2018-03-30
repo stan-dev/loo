@@ -1,3 +1,45 @@
+# loo 2.0.0
+
+This is a major release. Although we have attempted to maintain backwards
+compatibility as much as possible, there are a few breaking changes resulting
+primarily from changes to the structure of the returned objects.
+
+
+* New function `psis()` replaces `psislw()` (now deprecated). This version of the
+function accepts log importance ratios as its input (not log-likelihood values),
+and implements the improvements to the PSIS algorithm described in the latest
+version of https://arxiv.org/pdf/1507.02646.pdf. Additional diagnostic
+information is now also provided, including PSIS effective sample sizes.
+
+* New `weights.psis` method for extracting smoothed weights from a `psis`
+object. Arguments `log` and `normalize` control whether the weights are returned
+on the log scale and whether they are normalized.
+
+* Updated the interface for the `loo()` methods to integrate nicely with the new
+PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions 
+are provided. Several arguments have changed, particularly for the
+`loo.function` method. The documentation at `help("loo")` has been updated to
+describe the new behavior.
+
+* The structure of the objects returned by the `loo()` function has also changed
+slightly, as described in the __Value__ section at `help("loo")`.
+
+* New function `loo_model_weights()` computes weights for model averaging via
+stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
+weighting with the Bayesian bootstrap.
+
+* New functions `example_loglik_array()` and `example_loglik_matrix()` that
+provide objects to use in examples and tests.
+
+* When comparing more than two models with `compare()`, the first column of the
+output is now the `elpd` difference from the model in the first row.
+
+* Two new vignettes added to demonstrate the new functionality.
+
+* Setting `options(loo.cores=...)` is now deprecated in favor of `options(mc.cores=...)`. 
+For now, if both the `loo.cores` and `mc.cores` options have been set, 
+preference will be given to `loo.cores` until it is removed in a future release. (thanks to @cfhammill)
+
 # loo 1.1.0
 * Introduce the `E_loo` function for computing weighted expectations (means, variances, quantiles).
 

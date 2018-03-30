@@ -8,3 +8,4 @@ LICENSE
 man-roxygen/*
 ^revdep$
 tests/testthat/Rplots\.pdf
+^data-raw$

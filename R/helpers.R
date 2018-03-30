@@ -1,112 +1,146 @@
-# waic and loo helpers ----------------------------------------------------
-
-#' @importFrom matrixStats colLogSumExps
-logColMeansExp <- function(x) {
-  # should be more stable than log(colMeans(exp(x)))
-  S <- nrow(x)
-  colLogSumExps(x) - log(S)
+#' More stable version of log(mean(exp(x)))
+#'
+#' @noRd
+#' @param x A numeric vector.
+#' @return A scalar equal to log(mean(exp(x))).
+#'
+logMeanExp <- function(x) {
+  logS <- log(length(x))
+  logSumExp(x) - logS
 }
 
-logColMeansExp_ll <- function(fun, args) {
-  # should be more stable than log(colMeans(exp(x)))
-  logS <- log(args$S)
-  clse <- vapply(seq_len(args$N), FUN = function(i) {
-    logSumExp(fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws))
-  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
-  clse - logS
+#' More stable version of log(colMeans(exp(x)))
+#'
+#' @noRd
+#' @param x A matrix.
+#' @return A vector where each element is LogSumExp of a column of x.
+#'
+colLogMeanExps <- function(x) {
+  logS <- log(nrow(x))
+  colLogSumExps(x) - logS
 }
 
-colVars_ll <- function(fun, args) {
-  vapply(seq_len(args$N), FUN = function(i) {
-    x <- fun(i = i, data = args$data[i,,drop=FALSE], draws = args$draws)
-    var(as.vector(x))
-  }, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
-}
-
-totals <- function(pointwise) {
-  N <- length(pointwise[[1L]])
-  total  <- unlist_lapply(pointwise, sum)
-  se <- sqrt(N * unlist_lapply(pointwise, var))
-  as.list(c(total, se))
-}
-
-#' @importFrom matrixStats colVars
-pointwise_waic <- function(log_lik, llfun = NULL, llargs = NULL) {
-  if (!missing(log_lik)) {
-    lpd <- logColMeansExp(log_lik)
-    p_waic <- colVars(log_lik)
-  } else {
-    if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
-           call. = FALSE)
-    lpd <- logColMeansExp_ll(llfun, llargs)
-    p_waic <- colVars_ll(llfun, llargs)
-  }
-  elpd_waic <- lpd - p_waic
-  waic <- -2 * elpd_waic
-  pointwise <- nlist(elpd_waic, p_waic, waic)
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out
-}
-pointwise_loo <- function(psis, log_lik, llfun = NULL, llargs = NULL) {
-  if (!missing(log_lik)) {
-    lpd <- logColMeansExp(log_lik)
-  } else {
-    if (is.null(llfun) || is.null(llargs))
-      stop("Either 'log_lik' or 'llfun' and 'llargs' must be specified.",
-           call. = FALSE)
-    lpd <- logColMeansExp_ll(llfun, llargs)
-  }
-  elpd_loo <- psis$loos
-  p_loo <- lpd - elpd_loo
-  looic <- -2 * elpd_loo
-  pointwise <- nlist(elpd_loo, p_loo, looic)
-  out <- totals(pointwise)
-  nms <- names(pointwise)
-  names(out) <- c(nms, paste0("se_", nms))
-  out$pointwise <- cbind_list(pointwise)
-  out$pareto_k <- psis$pareto_k
-  out
-}
-
-# print and warning helpers -----------------------------------------------
-.fr <- function(x, digits) format(round(x, digits), nsmall = digits)
-.warn <- function(..., call. = FALSE) warning(..., call. = call.)
-.k_help <- function() "See help('pareto-k-diagnostic') for details."
-.k_cut <- function(k) {
-  cut(
-    k,
-    breaks = c(-Inf, 0.5, 0.7, 1, Inf),
-    labels = c("(-Inf, 0.5]", "(0.5, 0.7]", "(0.7, 1]", "(1, Inf)")
+#' Compute point estimates and standard errors from pointwise vectors
+#'
+#' @noRd
+#' @param x A matrix.
+#' @return An ncol(x) by 2 matrix with columns 'Estimate' and 'SE'
+#'   and rownames equal to colnames(x).
+#'
+table_of_estimates <- function(x) {
+  out <- cbind(
+    Estimate = colSums2(x),
+    SE = sqrt(nrow(x) * colVars(x))
   )
-}
-
-pwaic_warnings <- function(p, digits = 1) {
-  badp <- p > 0.4
-  if (any(badp)) {
-    count <- sum(badp)
-    prop <- count / length(badp)
-    .warn(paste0(count, " (", .fr(100 * prop, digits),
-                 "%) p_waic estimates greater than 0.4."),
-          "\nWe recommend trying loo() instead.")
-  }
-  invisible(NULL)
+  rownames(out) <- colnames(x)
+  return(out)
 }
 
 
-# convenience functions ---------------------------------------------------
+# checking classes --------------------------------------------------------
+is.psis <- function(x) {
+  inherits(x, "psis") && is.list(x)
+}
 is.loo <- function(x) {
   inherits(x, "loo")
 }
-unlist_lapply <- function(X, FUN, ...) {
-  unlist(lapply(X, FUN, ...), use.names = FALSE)
+is.psis_loo <- function(x) {
+  inherits(x, "psis_loo") && is.loo(x)
 }
-cbind_list <- function(x) {
-  do.call(cbind, x)
+is.waic <- function(x) {
+  inherits(x, "waic") && is.loo(x)
 }
+
+
+# validating and reshaping arrays/matrices  -------------------------------
+
+#' Check for NAs and non-finite values in log-lik (or log-ratios)
+#' array/matrix/vector
+#'
+#' @noRd
+#' @param x Array/matrix/vector of log-likelihood or log-ratio values.
+#' @return x, invisibly, if no error is thrown.
+#'
+validate_ll <- function(x) {
+  if (is.list(x)) {
+    stop("List not allowed as input.")
+  } else if (anyNA(x)) {
+    stop("NAs not allowed in input.")
+  } else if (!all(is.finite(x))) {
+    stop("All input values must be finite.")
+  }
+  invisible(x)
+}
+
+#' Convert iter by chain by obs array to (iter * chain) by obs matrix
+#'
+#' @noRd
+#' @param x Array to convert.
+#' @return An (iter * chain) by obs matrix.
+#'
+llarray_to_matrix <- function(x) {
+  stopifnot(is.array(x), length(dim(x)) == 3)
+  xdim <- dim(x)
+  dim(x) <- c(prod(xdim[1:2]), xdim[3])
+  unname(x)
+}
+
+#' Convert (iter * chain) by obs matrix to iter by chain by obs array
+#'
+#' @noRd
+#' @param x matrix to convert.
+#' @param chain_id vector of chain ids.
+#' @return iter by chain by obs array
+#'
+llmatrix_to_array <- function(x, chain_id) {
+  stopifnot(is.matrix(x), all(chain_id == as.integer(chain_id)))
+
+  lldim <- dim(x)
+  n_chain <- length(unique(chain_id))
+  chain_id <- as.integer(chain_id)
+  chain_counts <- as.numeric(table(chain_id))
+
+  if (length(chain_id) != lldim[1]) {
+    stop("Number of rows in matrix not equal to length(chain_id).",
+         call. = FALSE)
+  } else if (any(chain_counts != chain_counts[1])) {
+    stop("Not all chains have same number of iterations.",
+         call. = FALSE)
+  } else if (max(chain_id) != n_chain) {
+    stop("max(chain_id) not equal to the number of chains.",
+         call. = FALSE)
+  }
+
+  n_iter <- lldim[1] / n_chain
+  n_obs <- lldim[2]
+  a <- array(data = NA, dim = c(n_iter, n_chain, n_obs))
+  for (c in seq_len(n_chain)) {
+    a[, c, ] <- x[chain_id == c, , drop = FALSE]
+  }
+  return(a)
+}
+
+
+#' Validate that log-lik function exists and has correct arg names
+#'
+#' @noRd
+#' @param x A function with arguments 'data_i' and 'draws'.
+#' @return Either returns x or throws an error.
+#'
+validate_llfun <- function(x) {
+  f <- match.fun(x)
+  must_have <- c("data_i", "draws")
+  arg_names <- names(formals(f))
+  if (!all(must_have %in% arg_names)) {
+    stop(
+      "Log-likelihood function must have at least the arguments ",
+      "'data_i' and 'draws'",
+      call. = FALSE
+    )
+  }
+  return(f)
+}
+
 
 #' Named lists
 #'
@@ -148,6 +182,19 @@ nlist <- function(...) {
 
   return(out)
 }
+
+
+# Check how many cores to use and throw deprecation warning if loo.cores is used
+loo_cores <- function(cores) {
+  loo_cores_op <- getOption("loo.cores", NA)
+  if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
+    cores <- loo_cores_op
+    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
+            call. = FALSE)
+  }
+  return(cores)
+}
+
 
 # nocov start
 # release reminders (for devtools)

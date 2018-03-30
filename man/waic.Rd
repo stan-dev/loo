@@ -2,71 +2,103 @@
 % Please edit documentation in R/waic.R
 \name{waic}
 \alias{waic}
+\alias{waic.array}
 \alias{waic.matrix}
 \alias{waic.function}
 \title{Widely applicable information criterion (WAIC)}
 \usage{
 waic(x, ...)
 
+\method{waic}{array}(x, ...)
+
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{function}(x, ..., args)
+\method{waic}{function}(x, ..., data = NULL, draws = NULL)
 }
 \arguments{
-\item{x}{A log-likelihood matrix or function. See the \strong{Methods (by
-class)} section below for a detailed description.}
+\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
+(by class)} section below for a detailed description of how to specify the
+inputs for each method.}
 
-\item{...}{Other arguments. Currently ignored.}
-
-\item{args}{Only required if \code{x} is a function. A list containing
-the data required to specify the arguments to the function. See the
-\strong{Methods (by class)} section below for how \code{args} should be
-specified.}
+\item{draws, data, ...}{For the function method only. See the \strong{Methods
+(by class)} section below for details on these arguments.}
 }
 \value{
-A named list (of class \code{'loo'}) with components:
+A named list (of class \code{c("waic", "loo")}) with components:
 
 \describe{
-\item{\code{elpd_waic, se_elpd_waic}}{expected log pointwise predictive
-density and standard error}
-\item{\code{p_waic, se_p_waic}}{estimated effective number of parameters and
-standard error}
-\item{\code{waic, se_waic}}{\code{-2 * elpd_waic} (i.e., converted to the
-deviance scale) and standard error}
-\item{\code{pointwise}}{the pointwise contributions of each of the above
-measures}
+ \item{\code{estimates}}{
+ A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
+ rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+ point estimates and standard errors of the expected log pointwise predictive
+ density (\code{elpd_waic}), the effective number of parameters
+ (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
+ \code{-2 * elpd_waic}, i.e., converted to deviance scale).
+ }
+ \item{\code{pointwise}}{
+ A matrix with three columns (and number of rows equal to the number of
+ observations) containing the pointwise contributions of each of the above
+ measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+ }
 }
 }
 \description{
-Widely applicable information criterion (WAIC)
+The \code{waic} methods can be used to compute WAIC from the pointwise
+log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
+the \code{\link{loo}} function) because PSIS provides useful diagnostics and
+effective sample size and Monte Carlo estimates.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size of the posterior
-sample (the number of simulations) and \eqn{N} is the number of data points.
-For example, the object returned by
-\code{\link{extract_log_lik}} can be used.
+\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points.
 
-\item \code{function}: A function \eqn{f} that takes arguments \code{i}, \code{data},
- and \code{draws} and returns a vector containing the log-likelihood for
- the \code{i}th observation evaluated at each posterior draw.
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+of the posterior sample (with all chains merged) and \eqn{N} is the number
+of data points.
 
- The \code{args} argument must also be specified and should be a named list
- with the following components:
+\item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
+  returns a vector containing the log-likelihood for a single observation
+  \code{i} evaluated at each posterior draw. The function should be written
+  such that, for each observation \code{i} in \code{1:N}, evaluating
+  \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
+  of length \code{S} (size of posterior sample). The log-likelihood function
+  can also have additional arguments but \code{data_i} and \code{draws} are
+  required.
+
+ If using the function method then the arguments \code{data}
+ and \code{draws} must also be specified in the call to \code{loo}:
  \itemize{
+   \item \code{data}: A data frame or matrix containing the data (e.g.
+   observed outcome and predictors) needed to compute the pointwise
+   log-likelihood. For each observation \code{i}, the \code{i}th row of
+   \code{data} will be passed to the \code{data_i} argument of the
+   log-likelihood function.
    \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood.
-   \item \code{data}: An object containing data (e.g. observed outcome and
-   predictors) needed to compute the pointwise log-likelihood. \code{data}
-   should be in an appropriate form so that \eqn{f}\code{(i=i,
-   data=data[i,,drop=FALSE], draws=draws)} returns the \code{S}-vector of
-   log-likelihoods for the \code{i}th observation.
-   \item \code{N}: The number of observations.
-   \item \code{S}: The size of the posterior sample.
+   parameters needed to compute the pointwise log-likelihood. Unlike
+   \code{data}, which is indexed by observation, for each observation the
+   entire object \code{draws} will be passed to the \code{draws} argument of
+   the log-likelihood function.
+   \item The \code{...} can be used to pass additional arguments to your
+   log-likelihood function. These arguments ase used like the \code{draws}
+   argument in that they are recycled for each observation.
  }
 }}
 
 \examples{
+### Array and matrix methods
+LLarr <- example_loglik_array()
+dim(LLarr)
+
+LLmat <- example_loglik_matrix()
+dim(LLmat)
+
+waic_arr <- waic(LLarr)
+waic_mat <- waic(LLmat)
+identical(waic_arr, waic_mat)
+
+
 \dontrun{
 log_lik1 <- extract_log_lik(stanfit1)
 log_lik2 <- extract_log_lik(stanfit2)
@@ -77,6 +109,8 @@ print(compare(waic1, waic2), digits = 2)
 
 }
 \seealso{
-\code{\link{compare}}, \code{\link{print.loo}},
-\code{\link{loo-package}}
+\itemize{
+\item \code{\link{loo}} for approximate LOO-CV.
+\item \code{\link{compare}} for comparing models on LOOIC or WAIC.
+}
 }

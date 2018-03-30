@@ -2,28 +2,39 @@
 % Please edit documentation in R/gpdfit.R
 \name{gpdfit}
 \alias{gpdfit}
-\title{Generalized Pareto distribution}
+\title{Estimate parameters of the Generalized Pareto distribution}
 \usage{
-gpdfit(x)
+gpdfit(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector. The sample from which to estimate the parameters.}
+
+\item{wip}{Logical indicating whether to adjust \eqn{k} based on a weakly
+informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.}
+
+\item{min_grid_pts}{The minimum number of grid points used in the fitting
+algorithm. The actual number used is \code{min_grid_pts +
+floor(sqrt(length(x)))}.}
+
+\item{sort_x}{If \code{TRUE} (the default), the first step in the fitting
+algorithm is to sort the elements of \code{x}. If \code{x} is already
+sorted in ascending order then \code{sort_x} can be set to \code{FALSE} to
+skip the initial sorting step.}
 }
 \value{
 A named list with components \code{k} and \code{sigma}.
 }
 \description{
 Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
-distribution, given a sample \eqn{x}.
+distribution (assuming location parameter is 0), given a sample \eqn{x}. By
+default the Pareto fit uses a prior for \eqn{k}, which will stabilize
+estimates for very small sample sizes and low effective sample sizes in the
+case of MCMC samples. The weakly informative prior is a Gaussian prior
+centered at 0.5.
 }
 \details{
 Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
   Stephens (2009).
-}
-\note{
-This function is primarily intended for internal use, but is exported
-  so that users can call it directly if interested in PSIS for purposes other
-  than \code{\link[=loo]{LOO-CV}}.
 }
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
@@ -31,7 +42,6 @@ for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
 }
 \seealso{
-\code{\link{psislw}}, \code{\link{pareto-k-diagnostic}},
+\code{\link{psis}}, \code{\link{pareto-k-diagnostic}},
   \code{\link{loo-package}}
 }
-\keyword{internal}
