@@ -1,5 +1,5 @@
 library(loo)
-options(loo.cores = 1)
+options(mc.cores = 1)
 set.seed(123)
 
 context("loo and waic")
@@ -14,6 +14,13 @@ r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
 loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 waic1 <- suppressWarnings(waic(LLarr))
 
+test_that("using loo.cores is deprecated", {
+  options(mc.cores = NULL)
+  options(loo.cores = 1)
+  expect_warning(loo(LLarr, r_eff = r_eff_arr, cores = 2), "loo.cores")
+  options(loo.cores = NULL)
+  options(mc.cores = 1)
+})
 
 test_that("loo and waic results haven't changed", {
   expect_equal_to_reference(loo1, "loo.rds")
@@ -72,7 +79,7 @@ test_that("loo and waic error with vector input", {
 
 
 # testing function methods
-source("function_method_stuff.R")
+source(test_path("function_method_stuff.R"))
 
 waic_with_fn <- waic(llfun, data = data, draws = draws)
 waic_with_mat <- waic(llmat_from_fn)
@@ -81,6 +88,13 @@ loo_with_fn <- loo(llfun, data = data, draws = draws,
                    r_eff = rep(1, nrow(data)))
 loo_with_mat <- loo(llmat_from_fn, r_eff = rep(1, ncol(llmat_from_fn)),
                     save_psis = TRUE)
+
+test_that("loo.cores deprecation warning works with function method", {
+  options(loo.cores = 1)
+  expect_warning(loo(llfun, cores = 2, data = data, draws = draws, r_eff = rep(1, nrow(data))),
+                 "loo.cores")
+  options(loo.cores=NULL)
+})
 
 test_that("loo_i results match loo results for ith data point", {
   loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws)

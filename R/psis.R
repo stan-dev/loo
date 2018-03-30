@@ -77,12 +77,7 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 psis.array <-
   function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-
+    cores <- loo_cores(cores)
     stopifnot(
       length(dim(log_ratios)) == 3,
       is.null(r_eff) || length(r_eff) == dim(log_ratios)[3]
@@ -103,12 +98,7 @@ psis.array <-
 psis.matrix <-
   function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-
+    cores <- loo_cores(cores)
     stopifnot(is.null(r_eff) || length(r_eff) == ncol(log_ratios))
     log_ratios <- validate_ll(log_ratios)
     if (is.null(r_eff)) {

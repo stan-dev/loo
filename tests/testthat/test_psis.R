@@ -1,5 +1,6 @@
 library(loo)
-options(loo.cores = 2)
+options(mc.cores=1)
+options(loo.cores=NULL)
 set.seed(123)
 
 context("psis")

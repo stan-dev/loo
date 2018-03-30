@@ -33,13 +33,7 @@
 #'   estimates for the likelihood \code{(exp(log_lik))} of each observation in
 #'   each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
 #'   function for computing \code{r_eff}.
-#' @param cores	 The number of cores to use for parallelization. Same as for
-#'  \code{\link{psis}}. This defaults to the option \code{mc.cores} which can be
-#'  set for an entire R session by \code{options(mc.cores = NUMBER)}, the old
-#'  option \code{loo.cores} is now deprecated but will be given precedence
-#'  over \code{mc.cores} until it is removed. \strong{As of version 2.0.0 the default
-#'  is now 1 core, but we recommend using as many (or close to as many) cores
-#'  as possible.}
+#' @template cores
 #' @param ... Unused, except for the generic to pass arguments to individual
 #'   methods.
 #'
@@ -167,12 +161,7 @@ loo_model_weights.default <-
            r_eff_list = NULL,
            cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-
+    cores <- loo_cores(cores)
     method <- match.arg(method)
     K <- length(x) # number of models
     N <- ncol(x[[1]]) # number of data points

@@ -155,12 +155,6 @@ loo.array <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-    
     throw_r_eff_warning(r_eff)
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
@@ -184,12 +178,6 @@ loo.matrix <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-        
     throw_r_eff_warning(r_eff)
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
@@ -218,12 +206,7 @@ loo.function <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
 
-    loo_cores <- getOption("loo.cores", NA)
-    if(!is.na(loo_cores)){
-      cores <- loo_cores
-      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
-    }
-
+    cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     throw_r_eff_warning(r_eff)
 

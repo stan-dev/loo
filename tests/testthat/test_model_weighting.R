@@ -1,5 +1,4 @@
 library(loo)
-options(loo.cores = 2)
 
 context("loo_model_weights")
 

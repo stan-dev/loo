@@ -14,11 +14,12 @@
 #' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 #'   to zero for no truncation.
 #' @param cores The number of cores to use for parallelization. This defaults to
-#'  the option \code{mc.cores} which can be set for an entire R session by
-#' \code{options(mc.cores = NUMBER)}, the old option \code{loo.cores} is now
-#' deprecated but will be given precedence  over \code{mc.cores} until it is removed.
-#' \strong{As of version 2.0.0 the default is now 1 core, but we recommend using
-#' as many (or close to as many) cores as possible.}
+#'   the option \code{mc.cores} which can be set for an entire R session by
+#'   \code{options(mc.cores = NUMBER)}, the old option \code{loo.cores} is now
+#'   deprecated but will be given precedence over \code{mc.cores} until it is
+#'   removed. \strong{As of version 2.0.0, the default is now 1 core if
+#'   \code{mc.cores} is not set, but we recommend using as many (or close to as
+#'   many) cores as possible.}
 #' @param llfun,llargs See \code{\link{loo.function}}.
 #' @param ... Ignored when \code{psislw} is called directly. The \code{...} is
 #'   only used internally when \code{psislw} is called by the \code{\link{loo}}
@@ -39,6 +40,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    llfun = NULL, llargs = NULL,
                    ...) {
   .Deprecated("psis")
+
+  cores <- loo_cores(cores)
 
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
