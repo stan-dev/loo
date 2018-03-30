@@ -34,10 +34,12 @@
 #'   each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
 #'   function for computing \code{r_eff}.
 #' @param cores	 The number of cores to use for parallelization. Same as for
-#'   \code{\link{psis}}. The default for an entire R session can be set with
-#'   \code{options(loo.cores = NUMBER)}. \strong{As of version 2.0.0 the default
-#'   is now 1 core, but we recommend using as many (or close to as many) cores
-#'   as possible.}
+#'  \code{\link{psis}}. This defaults to the option \code{mc.cores} which can be
+#'  set for an entire R session by \code{options(mc.cores = NUMBER)}, the old
+#'  option \code{loo.cores} is now deprecated but will be given precedence
+#'  over \code{mc.cores} until it is removed. \strong{As of version 2.0.0 the default
+#'  is now 1 core, but we recommend using as many (or close to as many) cores
+#'  as possible.}
 #' @param ... Unused, except for the generic to pass arguments to individual
 #'   methods.
 #'
@@ -163,7 +165,13 @@ loo_model_weights.default <-
            BB_n = 1000,
            alpha = 1,
            r_eff_list = NULL,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("mc.cores", 1)) {
+
+    loo_cores <- getOption("loo.cores", NA)
+    if(!is.na(loo_cores)){
+      cores <- loo_cores
+      message("loo cores is deprecated, please use `mc.cores` or pass `cores` explicitly")
+    }
 
     method <- match.arg(method)
     K <- length(x) # number of models

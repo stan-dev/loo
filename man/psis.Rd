@@ -11,10 +11,10 @@
 psis(log_ratios, ...)
 
 \method{psis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{psis}{default}(log_ratios, ..., r_eff = NULL)
 
