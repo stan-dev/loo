@@ -21,7 +21,7 @@
 
 \item{digits}{An integer passed to \code{\link[base]{round}}.}
 
-\item{...}{Arguments passed to \code{\link{plot.loo}} if \code{plot_k} is
+\item{...}{Arguments passed to \code{\link{plot.psis_loo}} if \code{plot_k} is
 \code{TRUE}.}
 
 \item{plot_k}{Logical. If \code{TRUE} the estimates of the Pareto shape
