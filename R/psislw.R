@@ -1,4 +1,4 @@
-#' Pareto smoothed importance sampling (PSIS)
+#' Pareto smoothed importance sampling (deprecated, old version)
 #'
 #' As of version \code{2.0.0} this function is deprecated. Please use the
 #' \code{\link{psis}} function for the new PSIS algorithm.
