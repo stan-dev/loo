@@ -8,6 +8,7 @@
 \alias{psis_n_eff_values}
 \alias{mcse_loo}
 \alias{plot.psis_loo}
+\alias{plot.loo}
 \alias{plot.psis}
 \title{Diagnostics for Pareto smoothed importance sampling (PSIS)}
 \usage{
