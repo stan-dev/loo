@@ -185,6 +185,7 @@ mcse_loo <- function(x, threshold = 0.7) {
 }
 
 #' @rdname pareto-k-diagnostic
+#' @aliases plot.loo    
 #' @export
 #' @param label_points,... For the \code{plot} method, if \code{label_points} is
 #'   \code{TRUE} the observation numbers corresponding to any values of \eqn{k}

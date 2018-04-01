@@ -213,6 +213,9 @@ loo_model_weights.default <-
       )
     }
 
+    if (!is.null(names(x)) && all(nzchar(names(x)))) {
+      wts <- setNames(wts, names(x))
+    }
     return(wts)
   }
 

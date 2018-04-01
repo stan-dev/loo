@@ -2,7 +2,7 @@
 % Please edit documentation in R/psislw.R
 \name{psislw}
 \alias{psislw}
-\title{Pareto smoothed importance sampling (PSIS)}
+\title{Pareto smoothed importance sampling (deprecated, old version)}
 \usage{
 psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("mc.cores", 1),
   llfun = NULL, llargs = NULL, ...)

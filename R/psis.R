@@ -126,6 +126,7 @@ psis.default <-
 
 #' @rdname psis
 #' @export
+#' @export weights.psis
 #' @method weights psis
 #' @param object For the \code{weights} method, an object
 #'   returned by \code{psis} (a list with class \code{"psis"}).

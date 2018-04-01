@@ -37,7 +37,7 @@
 #'
 #' grp <- gl(n = 50, k = 15, labels = state.name)
 #' ids <- kfold_split_stratified(K = 10, grp)
-#' cbind(ids, grp)
+#' table(grp, ids)
 #'
 NULL
 
