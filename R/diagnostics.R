@@ -185,7 +185,7 @@ mcse_loo <- function(x, threshold = 0.7) {
 }
 
 #' @rdname pareto-k-diagnostic
-#' @aliases plot.loo    
+#' @aliases plot.loo
 #' @export
 #' @param label_points,... For the \code{plot} method, if \code{label_points} is
 #'   \code{TRUE} the observation numbers corresponding to any values of \eqn{k}
@@ -204,12 +204,13 @@ mcse_loo <- function(x, threshold = 0.7) {
 #'   estimates of the PSIS effective sample sizes (\code{diagnostic = "n_eff"}).
 #'
 plot.psis_loo <- function(x,
-                     diagnostic = c("k", "n_eff"),
-                     ...,
-                     label_points = FALSE,
-                     main = "PSIS diagnostic plot") {
+                          diagnostic = c("k", "n_eff"),
+                          ...,
+                          label_points = FALSE,
+                          main = "PSIS diagnostic plot") {
   diagnostic <- match.arg(diagnostic)
   k <- pareto_k_values(x)
+  k[is.na(k)] <- 0  # FIXME when reloo is changed to make NA k values -Inf
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
     warning(signif(100 * mean(k_inf), 2),
@@ -270,7 +271,7 @@ plot_diagnostic <-
     axis(side = 2, las = 1)
 
     if (!n_eff_plot) {
-      krange <- range(k)
+      krange <- range(k, na.rm = TRUE)
       breaks <- c(0, 0.5, 0.7, 1)
       hex_clrs <- c("#C79999", "#A25050", "#7C0000")
       ltys <- c(3, 4, 2, 1)
