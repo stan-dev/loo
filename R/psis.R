@@ -16,9 +16,10 @@
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 #'   This is related to the relative efficiency of estimating the normalizing
-#'   term in self-normalizing importance sampling. The default is \code{NULL},
-#'   in which case Monte Carlo error estimates are not computed. See the
-#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#'   term in self-normalizing importance sampling. If \code{r_eff} is not
+#'   provided then the reported PSIS effective sample sizes and Monte Carlo
+#'   error estimates will be over-optimistic. See the \code{\link{relative_eff}}
+#'   helper function for computing \code{r_eff}.
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:
@@ -68,6 +69,21 @@
 #'
 #' @template loo-and-psis-references
 #'
+#' @examples
+#' log_ratios <- -1 * example_loglik_array()
+#' r_eff <- relative_eff(log_ratios)
+#' psis_result <- psis(log_ratios, r_eff = r_eff)
+#' str(psis_result)
+#'
+#' # extract smoothed weights
+#' lw <- weights(psis_result) # default args are log=TRUE, normalize=TRUE
+#' ulw <- weights(psis_result, normalize=FALSE) # unnormalized log-weights
+#'
+#' w <- weights(psis_result, log=FALSE) # normalized weights (not log-weights)
+#' uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
+#'
+#'
+#'
 psis <- function(log_ratios, ...) UseMethod("psis")
 
 #' @export
@@ -76,7 +92,6 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #'
 psis.array <-
   function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
-
     cores <- loo_cores(cores)
     stopifnot(
       length(dim(log_ratios)) == 3,
@@ -85,6 +100,7 @@ psis.array <-
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
     if (is.null(r_eff)) {
+      if (!called_from_loo()) throw_psis_r_eff_warning()
       r_eff <- rep(1, ncol(log_ratios))
     }
 
@@ -97,11 +113,11 @@ psis.array <-
 #'
 psis.matrix <-
   function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
-
     cores <- loo_cores(cores)
     stopifnot(is.null(r_eff) || length(r_eff) == ncol(log_ratios))
     log_ratios <- validate_ll(log_ratios)
     if (is.null(r_eff)) {
+      if (!called_from_loo()) throw_psis_r_eff_warning()
       r_eff <- rep(1, ncol(log_ratios))
     }
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
@@ -117,6 +133,7 @@ psis.default <-
               is.null(r_eff) || length(r_eff) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
     if (is.null(r_eff)) {
+      if (!called_from_loo()) throw_psis_r_eff_warning()
       r_eff <- 1
     }
     psis.matrix(log_ratios,
@@ -424,5 +441,24 @@ throw_tail_length_warnings <- function(tail_lengths) {
     }
   }
   invisible(tail_lengths)
+}
+
+
+#' Warning message if r_eff not specified
+#' @noRd
+#'
+throw_psis_r_eff_warning <- function() {
+  warning("Relative effective sample sizes ('r_eff' argument) not specified. ",
+          "PSIS n_eff will not adjusted based on MCMC n_eff.", call. = FALSE)
+}
+
+#' check if psis was called from one of the loo methods
+#' @noRd
+called_from_loo <- function() {
+  calls <- sys.calls()
+  txt <- unlist(lapply(calls, deparse))
+  patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
+  check <- sapply(txt, function(x) grepl(patts, x))
+  isTRUE(any(check))
 }
 

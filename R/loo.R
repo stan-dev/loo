@@ -19,9 +19,10 @@
 #' @param r_eff Vector of relative effective sample size estimates for the
 #'   likelihood (\code{exp(log_lik)}) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
-#'   self-normalizing importance sampling. The default is \code{NULL}, in which
-#'   case Monte Carlo error estimates are not computed. See the
-#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#'   self-normalizing importance sampling. If \code{r_eff} is not provided then
+#'   the reported PSIS effective sample sizes and Monte Carlo error estimates
+#'   will be over-optimistic. See the \code{\link{relative_eff}} helper function
+#'   for computing \code{r_eff}.
 #' @param save_psis Should the \code{"psis"} object created internally by
 #'   \code{loo} be saved in the returned object? The \code{loo} function calls
 #'   \code{\link{psis}} internally but by default discards the (potentially
@@ -155,7 +156,7 @@ loo.array <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
 
-    throw_r_eff_warning(r_eff)
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
@@ -178,7 +179,7 @@ loo.matrix <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
 
-    throw_r_eff_warning(r_eff)
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
@@ -208,7 +209,7 @@ loo.function <-
 
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    throw_r_eff_warning(r_eff)
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
 
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
@@ -427,23 +428,15 @@ mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
 }
 
 #' Warning message if r_eff not specified
-#'
 #' @noRd
-#' @param r_eff User's r_eff argument or NULL.
-#' @return Nothing, just throws a warning if r_eff is NULL.
-#'
-throw_r_eff_warning <- function(r_eff = NULL) {
-  if (is.null(r_eff)) {
-    warning(
-      "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-      "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
-      "MCSE estimates will be over-optimistic.",
-      call. = FALSE
-    )
-  }
+throw_loo_r_eff_warning <- function() {
+  warning(
+    "Relative effective sample sizes ('r_eff' argument) not specified.\n",
+    "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
+    "MCSE estimates will be over-optimistic.",
+    call. = FALSE
+  )
 }
-
-
 
 #' Combine many psis objects into a single psis object
 #'

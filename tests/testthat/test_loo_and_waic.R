@@ -117,3 +117,10 @@ test_that("save_psis option to loo.function makes correct psis object", {
   expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })
 
+
+test_that("loo throws r_eff warnings", {
+  expect_warning(loo(-LLarr), "MCSE estimates will be over-optimistic")
+  expect_warning(loo(-LLmat), "MCSE estimates will be over-optimistic")
+  expect_warning(loo(llfun, data = data, draws = draws), "MCSE estimates will be over-optimistic")
+})
+
