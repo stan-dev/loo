@@ -119,6 +119,22 @@ of data points.
 \item \code{default}: A vector of length \eqn{S} (posterior sample size).
 }}
 
+\examples{
+log_ratios <- -1 * example_loglik_array()
+r_eff <- relative_eff(log_ratios)
+psis_result <- psis(log_ratios, r_eff = r_eff)
+str(psis_result)
+
+# extract smoothed weights
+lw <- weights(psis_result) # default args are log=TRUE, normalize=TRUE
+ulw <- weights(psis_result, normalize=FALSE) # unnormalized log-weights
+
+w <- weights(psis_result, log=FALSE) # normalized weights (not log-weights)
+uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
+
+
+
+}
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.

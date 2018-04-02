@@ -37,6 +37,11 @@ test_that("psis methods give same results", {
 })
 
 test_that("psis throws correct errors and warnings", {
+  # r_eff warnings
+  expect_warning(psis(-LLarr), "Relative effective sample sizes")
+  expect_warning(psis(-LLmat), "Relative effective sample sizes")
+  expect_warning(psis(-LLmat[, 1]), "Relative effective sample sizes")
+
   # tail length warnings
   expect_warning(
     psis(-LLarr[1:5,, ]),
@@ -101,7 +106,7 @@ test_that("psis_n_eff methods works properly", {
   expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
 })
 
-test_that("relative_eff vector, matrix, and methods works properly", {
+test_that("relative_eff methods works properly", {
   expect_equal(relative_eff.default(exp(LLmat[, 1]), chain_id),
                mcmc_n_eff(exp(LLarr[, , 1])) / 1000)
   expect_equal(relative_eff.matrix(exp(LLmat), chain_id),
@@ -110,6 +115,8 @@ test_that("relative_eff vector, matrix, and methods works properly", {
                apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
   expect_equal(relative_eff.array(exp(LLarr)),
                apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+
+  expect_equal(relative_eff(exp(LLarr)), relative_eff(exp(LLarr), cores = 2))
 })
 
 test_that("relative_eff function method works properly", {
@@ -129,4 +136,8 @@ test_that("relative_eff function method works properly", {
                                     data = dat, draws = draws)
   r_eff_mat <- relative_eff.matrix(exp(log_lik(fit)), chain_id)
   expect_equal(r_eff_fn, r_eff_mat)
+
+  r_eff_fn_cores <- relative_eff.function(likfun, chain_id = chain_id,
+                                          data = dat, draws = draws, cores = 2)
+  expect_equal(r_eff_fn, r_eff_fn_cores)
 })
