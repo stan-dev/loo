@@ -1,7 +1,7 @@
 ---
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using the loo package with custom Stan programs}
+  %\VignetteIndexEntry{Using the loo package with RStan}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -53,7 +53,6 @@ model {
 generated quantities {
   vector[N] log_lik;
   for (n in 1:N) {
-    // preferred Stan syntax as of version 2.10.0
     log_lik[n] = bernoulli_logit_lpmf(y[n] | X[n] * beta);
   }
 }
@@ -100,8 +99,15 @@ approximation to exact LOO-CV:
 library("loo")
 
 # Extract pointwise log-likelihood and compute LOO
-log_lik_1 <- extract_log_lik(fit_1)
-loo_1 <- loo(log_lik_1, cores = 2)
+log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
+
+# as of loo v2.0.0 we can optionally provide 
+# relative effective sample sizes when calling loo,
+# which allows for better estimates of the 
+# PSIS effective sample sizes and Monte Carlo error 
+r_eff <- relative_eff(exp(log_lik_1)) 
+
+loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
 print(loo_1)
 ```
 
@@ -127,7 +133,7 @@ $\widehat{p}_{\rm loo}$ (effective number of parameters), and ${\rm looic} =-2\,
 The line at the bottom of the printed output provides information about the
 reliability of the LOO approximation (the interpretation of the $k$ parameter is
 explained in the PSIS-LOO section in `help("loo-package")` and in greater detail
-in Vehtari, Gelman, and Gabry (2016)). In this case the message tells us that
+in Vehtari, Gelman, and Gabry (2017)). In this case the message tells us that
 all of the estimates for $k$ are fine.
 
 ### Comparing models
@@ -140,8 +146,9 @@ well-switching data, using `log(arsenic)` instead of `arsenic` as a predictor:
 standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
 fit_2 <- stan(fit = fit_1, data = standata) 
 
-log_lik_2 <- extract_log_lik(fit_2)
-loo_2 <- loo(log_lik_2, cores = 2)
+log_lik_2 <- extract_log_lik(fit_2, merge_chains = FALSE)
+r_eff_2 <- relative_eff(exp(log_lik_2))
+loo_2 <- loo(log_lik_2, r_eff = r_eff_2, cores = 2)
 print(loo_2)
 ```
 
@@ -163,15 +170,15 @@ We can now compare the models on LOO using the `compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-diff <- compare(loo_1, loo_2)
+comp <- compare(loo_1, loo_2)
 ```
 
-This new object, `diff`, contains the estimated difference of expected 
+This new object, `comp`, contains the estimated difference of expected 
 leave-one-out prediction errors between the two models, along with the standard 
 error:
 
 ```{r, eval=FALSE}
-print(diff)
+print(comp)
 ```
 ```
 elpd_diff        se 

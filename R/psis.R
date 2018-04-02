@@ -16,9 +16,10 @@
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 #'   This is related to the relative efficiency of estimating the normalizing
-#'   term in self-normalizing importance sampling. The default is \code{NULL},
-#'   in which case Monte Carlo error estimates are not computed. See the
-#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#'   term in self-normalizing importance sampling. If \code{r_eff} is not
+#'   provided then the reported PSIS effective sample sizes and Monte Carlo
+#'   error estimates will be over-optimistic. See the \code{\link{relative_eff}}
+#'   helper function for computing \code{r_eff}.
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:

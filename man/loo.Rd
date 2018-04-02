@@ -29,9 +29,10 @@ inputs for each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling. The default is \code{NULL}, in which
-case Monte Carlo error estimates are not computed. See the
-\code{\link{relative_eff}} helper function for computing \code{r_eff}.}
+self-normalizing importance sampling. If \code{r_eff} is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. See the \code{\link{relative_eff}} helper function
+for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo} be saved in the returned object? The \code{loo} function calls
