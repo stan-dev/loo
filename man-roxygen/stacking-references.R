@@ -5,6 +5,7 @@
 #'   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
 #'   version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 #'
-#' @references Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2017) Using
-#' stacking to average Bayesian predictive distributions. \emph{Bayesian Analysis},
-#' advance publication,  doi:10.1214/17-BA1091. (\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
+#' @references Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
+#'   stacking to average Bayesian predictive distributions. \emph{Bayesian
+#'   Analysis}, advance publication,  doi:10.1214/17-BA1091.
+#'   (\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
