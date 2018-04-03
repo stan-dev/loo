@@ -10,7 +10,7 @@ params:
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{loo: Using the loo package}
+%\VignetteIndexEntry{Bayesian Stacking and Pseudo-BMA weights}
 -->
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
