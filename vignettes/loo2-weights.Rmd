@@ -77,8 +77,7 @@ str(d)
 ```
 
 We repeat the analysis in Chapter 6 of _Statistical Rethinking_ using the
-following four models (here we use here the default __rstanarm__ priors that are
-weakly informative, while flat priors were used in _Statistical Rethinking_).
+following four models (here we use the default weakly informative priors in __rstanarm__, while flat priors were used in _Statistical Rethinking_).
 
 ```{r, results="hide"}
 fit1 <- stan_glm(kcal.per.g ~ 1, data = d, seed = 2030)
@@ -112,14 +111,18 @@ waics <- c(
 We get some warnings when computing WAIC for models 3 and 4, indicating that we
 shouldn't trust the WAIC weights we will compute later. Following the
 recommendation in the warning, we next use the `loo` methods to compute PSIS-LOO
-instead. As with the `waic` methods provided by the __loo__ package, the package
-provides `loo` methods for log-likelihood arrays, matrices, and functions, but
-since we fit our model with __rstanarm__ we can just pass the fitted model
-objects directly and __rstanarm__ will extract the needed values to pass to the
-__loo__ package.
+instead. The __loo__ package provides `loo` methods for log-likelihood arrays,
+matrices, and functions, but since we fit our model with __rstanarm__ we can
+just pass the fitted model objects directly and __rstanarm__ will extract the
+needed values to pass to the __loo__ package. (Like __rstanarm__, some other R
+packages for fitting Stan models, e.g. __brms__, also provide similar methods
+for interfacing with the __loo__ package.)
 
 ```{r}
-loo1 <- loo(fit1)  # accepts a 'cores' argument which is useful for bigger datasets
+# note: the loo function accepts a 'cores' argument that we recommend specifying
+# when working with bigger datasets
+
+loo1 <- loo(fit1)
 loo2 <- loo(fit2)
 loo3 <- loo(fit3)
 loo4 <- loo(fit4)

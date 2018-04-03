@@ -50,10 +50,10 @@ library("loo")
 
 The Poisson and negative binomial regression models used below in our example, 
 as well as the `stan_glm` function used to fit the models,
-are covered in more depth in the 
-__rstanarm__ vignette [_Estimating Generalized Linear Models for Count Data with rstanarm_](http://mc-stan.org/rstanarm/articles/count.html). In the rest of 
-this vignette we will assume the reader is already somewhat familiar with 
-these models.
+are covered in more depth in the __rstanarm__ vignette 
+[_Estimating Generalized Linear Models for Count Data with rstanarm_](http://mc-stan.org/rstanarm/articles/count.html). In the rest of 
+this vignette we will assume the reader is already familiar with these kinds of
+models.
 
 
 ### Roaches data
@@ -110,8 +110,7 @@ here we focus only on methods provided by the __loo__ package.
 
 ## Using the __loo__ package for model checking and comparison
 
-**_Although cross-validation is mostly used for model comparison, 
-it is also useful for model checking._**
+_Although cross-validation is mostly used for model comparison, it is also useful for model checking._
 
 ### Computing PSIS-LOO and checking diagnostics
 
