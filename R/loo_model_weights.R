@@ -74,7 +74,7 @@
 #' @template stacking-references
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ### Demonstrating usage after fitting models with RStan
 #' library(rstan)
 #'

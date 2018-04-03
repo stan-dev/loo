@@ -14,8 +14,6 @@ params:
 -->
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
-```{r, child="children/SETTINGS-gg.txt"}
-```
 
 # Introduction
 
