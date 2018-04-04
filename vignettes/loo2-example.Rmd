@@ -224,8 +224,7 @@ model [Gabry et al (2018)](http://arxiv.org/abs/1709.01449). Unfortunately,
 while large $k$ values are a useful indicator of model misspecification, small
 $k$ values are not a guarantee that a model is well-specified.
 
-We may not get any warnings here, but if we do have any issues it will only be
-one or two high $k$ values. If there are a small number of problematic $k$
+If there are a small number of problematic $k$
 values then we can use a feature in __rstanarm__ that lets us refit the model
 once for each of these problematic observations. Each time the model is refit,
 one of the observations with a high $k$ value is omitted and the LOO
@@ -241,7 +240,7 @@ print(loo2)
 ```
 
 In the print output we can see that the Monte Carlo SE is small compared to
-other the uncertainties. 
+the other uncertainties. 
 
 On the other hand, `p_loo` is about 7 and still a bit higher than the total
 number of parameters in the model. This indicates that there is almost certainly

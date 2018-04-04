@@ -34,7 +34,8 @@ extending the model to include the separate models as special cases,
 and preferably as a continuous expansion of the model space.  For
 example, instead of model averaging over different covariate
 combinations, all potentially relevant covariates should be included
-in a model and a prior assumption that only some of the covariates are
+in a predictive model (for causal analysis more  care is needed) 
+and a prior assumption that only some of the covariates are
 relevant can be presented with regularized horseshoe prior (Piironen
 and Vehtari, 2017a). For variable selection we recommend projective
 predictive variable selection (Piironen and Vehtari, 2017a;
@@ -141,7 +142,7 @@ print(loo4)
 ```
 
 One benefit of PSIS-LOO over WAIC is better diagnostics. Here for both models 3
-and 4 all $k<0.7$ and the Monte Carlo SE of `elpd_loo` is 0.1, and we can expect
+and 4 all $k<0.7$ and the Monte Carlo SE of `elpd_loo` is 0.1 or less, and we can expect
 the model comparison to be reliable.
 
 Next we compute and compare 1) WAIC weights, 2) Pseudo-BMA weights without
@@ -153,7 +154,7 @@ waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
 stacking_wts <- stacking_weights(lpd_point)
-round(cbind(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), 3)
+round(cbind(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), 2)
 ```
 
 With all approaches Model 4 with `neocortex` and `log(mass)` gets most of the
@@ -211,6 +212,7 @@ population size and the contact rate (high vs. low).
 d <- as.data.frame(read.csv("Kline.csv", sep=";"))
 d$log_pop <- log(d$population)
 d$contact_high <- ifelse(d$contact=="high", 1, 0)
+str(d)
 ```
 
 We start with a Poisson regression model with the log population size,
@@ -247,8 +249,8 @@ leave-one-out folds with high $k$ estimates. When using __rstanarm__
 this can be done by specifying the `k_threshold` argument:
 
 ```{r}
-loo10p <- loo(fit10, k_threshold=0.7)
-print(loo10p)
+loo10 <- loo(fit10, k_threshold=0.7)
+print(loo10)
 ```
 
 In this case we see that there is not much difference, and thus it is relatively
@@ -261,10 +263,10 @@ print(waic10)
 ```
 
 The WAIC computation is giving warnings and the estimated ELPD is slightly more
-optimistic. We recommend trusting the PSIS-LOO results instead.
+optimistic. We recommend using the PSIS-LOO results instead.
 
 To assess whether the contact rate and interaction term are useful, we can make
-a comparison to models without these covariates.
+a comparison to models without these terms.
 
 ```{r, results="hide"}
 fit11 <- update(fit10, formula = total_tools ~ log_pop + contact_high)
@@ -275,12 +277,12 @@ fit12 <- update(fit10, formula = total_tools ~ log_pop)
 (loo12 <- loo(fit12))
 ```
 ```{r}
-loo11p <- loo(fit11, k_threshold=0.7)
-loo12p <- loo(fit12, k_threshold=0.7)
+loo11 <- loo(fit11, k_threshold=0.7)
+loo12 <- loo(fit12, k_threshold=0.7)
 lpd_point <- cbind(
-  loo10p$pointwise[, "elpd_loo"], 
-  loo11p$pointwise[, "elpd_loo"], 
-  loo12p$pointwise[, "elpd_loo"]
+  loo10$pointwise[, "elpd_loo"], 
+  loo11$pointwise[, "elpd_loo"], 
+  loo12$pointwise[, "elpd_loo"]
 )
 ```
 
@@ -306,13 +308,11 @@ waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
 stacking_wts <- stacking_weights(lpd_point)
-round(cbind(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), 3)
+round(cbind(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), 2)
 ```
 
 All weights favor the second model with the log population and the contact rate.
-Although asymptotically WAIC weights and Pseudo-BMA weights (without Bayesian
-bootstrap) are equal, WAIC weights are likely to be more extreme in the finite
-case, which is what we observe here. 
+WAIC weights and Pseudo-BMA weights (without Bayesian bootstrap) are similar, while Pseudo-BMA+ is more cautious and closer to stacking weights. 
 
 It may seem surprising that Bayesian stacking is giving zero weight to the first
 model, but this is likely due to the fact that the estimated effect for the
@@ -321,7 +321,8 @@ predictions. In other words, incorporating the model with the interaction (model
 1) into the model average doesn't improve the predictions at all and so model 1
 is given a weight of 0. On the other hand, models 2 and 3 are giving slightly
 different predictions and thus their combination may be slightly better than
-either alone.
+either alone. This behavior is related to the repeated similar model illustration
+in the milk example abve.
 
 # Simpler coding using `loo_model_weights` function
 
@@ -336,7 +337,7 @@ other packages (e.g. __brms__) that do the preparation work for the user
 
 ```{r}
 # using list of loo objects
-loo_list <- list(loo10p, loo11p, loo12p)
+loo_list <- list(loo10, loo11, loo12)
 loo_model_weights(loo_list)
 loo_model_weights(loo_list, method = "pseudobma")
 loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
