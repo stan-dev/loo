@@ -430,4 +430,3 @@ validate_psis_loo_list <- function(psis_loo_list) {
   }
   return(invisible(TRUE))
 }
-

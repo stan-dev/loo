@@ -5,7 +5,7 @@ compatibility wherever possible, one of the changes (the new structure of the
 returned objects) may cause errors in old code that accesses the internal
 structure of the objects returned by the `loo()` function.
 
-* New function `psis()` replaces `psislw()` (now deprecated). This version of the
+* New function `psis()` replaces `psislw()` (now deprecated). This version 
 implements the improvements to the PSIS algorithm described in the latest
 version of https://arxiv.org/pdf/1507.02646.pdf. Additional diagnostic
 information is now also provided, including PSIS effective sample sizes.

@@ -1,23 +1,35 @@
 ---
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Example}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: "Writing Stan programs for use with the loo package"
+author: "Aki Vehtari and Jonah Gabry"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 ---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Writing Stan programs for use with the loo package}
+-->
 
-# Using the **loo** package
+# Introduction
 
-*The following is excerpted (with minor edits) from our paper:*
+This vignette demonstrates how to write a Stan program that computes and stores
+the pointwise log-likelihood required for using the __loo__ package. The other
+vignettes included with the package demonstrate additional functionality.
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC. _Statistics and
-Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
+Some sections from this vignette are excerpted from our papers
 
-Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | 
-[arXiv preprint](http://arxiv.org/abs/1507.04544).
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | [arXiv preprint](http://arxiv.org/abs/1507.04544).
 
-<br>
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+
+which provide important background for understanding the methods implemented in
+the package.
+
+
+# Example: Well water in Bangladesh
 
 This example comes from a survey of residents from a small area in Bangladesh
 that was affected by arsenic in drinking water. Respondents with elevated
@@ -33,7 +45,7 @@ enough that it is important to have a computational method for LOO that is fast
 for each data point. On the plus side, with such a large dataset, the influence
 of any given observation is small, and so the computations should be stable.
 
-### Fitting the model
+## Coding the Stan model
 
 Here is the Stan code for fitting the logistic regression model, which 
 we save in a file called `logistic.stan`:
@@ -55,7 +67,6 @@ model {
 generated quantities {
   vector[N] log_lik;
   for (n in 1:N) {
-    // preferred Stan syntax as of version 2.10.0
     log_lik[n] = bernoulli_logit_lpmf(y[n] | X[n] * beta);
   }
 }
@@ -67,7 +78,7 @@ running Stan, `log_lik` can be extracted (using the `extract_log_lik` function
 provided in the **loo** package) as an $S \times N$ matrix, where $S$ is the 
 number of simulations (posterior draws) and $N$ is the number of data points.
 
-<br>
+## Fitting the model with RStan
 
 Next we fit the model in Stan using the **rstan** package:
 
@@ -93,7 +104,7 @@ beta[2] -0.89       0 0.10 -1.09 -0.96 -0.89 -0.82 -0.68  2048    1
 beta[3]  0.46       0 0.04  0.38  0.43  0.46  0.49  0.54  2198    1
 ```
 
-### Computing LOO
+## Computing approximate leave-one-out cross-validation usig PSIS-LOO
 
 We can then use the **loo** package to compute the efficient PSIS-LOO
 approximation to exact LOO-CV:
@@ -102,8 +113,14 @@ approximation to exact LOO-CV:
 library("loo")
 
 # Extract pointwise log-likelihood and compute LOO
-log_lik_1 <- extract_log_lik(fit_1)
-loo_1 <- loo(log_lik_1, cores = 2)
+log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
+
+# as of loo v2.0.0 we can optionally provide relative effective sample sizes
+# when calling loo, which allows for better estimates of the PSIS effective
+# sample sizes and Monte Carlo error
+r_eff <- relative_eff(exp(log_lik_1)) 
+
+loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
 print(loo_1)
 ```
 
@@ -129,10 +146,10 @@ $\widehat{p}_{\rm loo}$ (effective number of parameters), and ${\rm looic} =-2\,
 The line at the bottom of the printed output provides information about the
 reliability of the LOO approximation (the interpretation of the $k$ parameter is
 explained in the PSIS-LOO section in `help("loo-package")` and in greater detail
-in Vehtari, Gelman, and Gabry (2016)). In this case the message tells us that
+in Vehtari, Gelman, and Gabry (2017)). In this case the message tells us that
 all of the estimates for $k$ are fine.
 
-### Comparing models
+## Comparing models
 
 To compare this model to an alternative model for the same data we can use the 
 `compare` function in the **loo** package. First we'll fit a second model to the
@@ -142,8 +159,9 @@ well-switching data, using `log(arsenic)` instead of `arsenic` as a predictor:
 standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
 fit_2 <- stan(fit = fit_1, data = standata) 
 
-log_lik_2 <- extract_log_lik(fit_2)
-loo_2 <- loo(log_lik_2, cores = 2)
+log_lik_2 <- extract_log_lik(fit_2, merge_chains = FALSE)
+r_eff_2 <- relative_eff(exp(log_lik_2))
+loo_2 <- loo(log_lik_2, r_eff = r_eff_2, cores = 2)
 print(loo_2)
 ```
 
@@ -165,15 +183,15 @@ We can now compare the models on LOO using the `compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-diff <- compare(loo_1, loo_2)
+comp <- compare(loo_1, loo_2)
 ```
 
-This new object, `diff`, contains the estimated difference of expected 
+This new object, `comp`, contains the estimated difference of expected 
 leave-one-out prediction errors between the two models, along with the standard 
 error:
 
 ```{r, eval=FALSE}
-print(diff)
+print(comp)
 ```
 ```
 elpd_diff        se 
@@ -184,7 +202,7 @@ The positive difference in `elpd` (and its scale relative to the standard error)
 indicates a preference for the _second_ model.
 
 
-### References
+# References
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
@@ -194,4 +212,9 @@ Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._  
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. _Statistics and
-Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
+Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4.
+[online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4), 
+[arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance
+sampling. [arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
