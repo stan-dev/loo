@@ -25,10 +25,10 @@
 #' less common category of \code{x} are more evenly represented across the
 #' folds.
 #'
-#' For a grouping variable \code{x}, \code{kfold_split_stratified} keeps
-#' all observations from the same group in the same fold.
-#'
-#'
+#' For a grouping variable \code{x}, \code{kfold_split_stratified} places all
+#' observations in \code{x} from the same group/level together the same fold.
+#' The selection of which groups/levels go into which fold (relevant when when
+#' there are more folds than groups) is randomized.
 #'
 #' @examples
 #' kfold_split_random(K = 5, N = 20)
