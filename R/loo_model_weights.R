@@ -10,7 +10,11 @@
 #'   matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
 #'   the size of the posterior sample (with all chains merged) and \eqn{N} is
 #'   the number of data points. If \code{x} is a list of log-likelihood matrices
-#'   then \code{\link{loo}} is called internally on each matrix.
+#'   then \code{\link{loo}} is called internally on each matrix. Currently the
+#'   \code{loo_model_weights} function is not implemented to be used with
+#'   results from K-fold CV, but you can still obtain weights using K-fold CV
+#'   results by calling the \code{stacking_weights} function directly.
+#'
 #' @param method Either \code{"stacking"} or \code{"pseudobma"}, indicating
 #'   which method to use for obtaining the weights. \code{"stacking"} refers to
 #'   stacking of predictive distributions and  \code{"pseudobma"} refers to
@@ -42,10 +46,11 @@
 #' @return A numeric vector containing one weight for each model.
 #'
 #' @details
-#' \code{loo_model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
-#' weighting for combining multiple predictive distributions. In all cases, we
-#' can use leave-one-out cross-validation (LOO) to estimate the expected log
-#' predictive density (ELPD).
+#' \code{loo_model_weights} is a wrapper around the \code{stacking_weights} and
+#' \code{pseudobma_weights} functions that implements stacking, pseudo-BMA, and
+#' pseudo-BMA+ weighting for combining multiple predictive distributions. We can
+#' use approximate or exact leave-one-out cross-validation (LOO-CV) or K-fold CV
+#' to estimate the expected log predictive density (ELPD).
 #'
 #' The stacking method (\code{method="stacking"}) combines all models by
 #' maximizing the leave-one-out predictive density of the combination
@@ -222,12 +227,12 @@ loo_model_weights.default <-
 
 #' @rdname loo_model_weights
 #' @export
-#' @param lpd_point A matrix of pointwise log leave-one-out likelihoods
-#'   evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
-#'   where \eqn{N} is sample size and \eqn{K} is the number of models. Each
-#'   column corresponds to one model. These values can be calculated
-#'   approximately using \code{\link{loo}} or by running exact leave-one-out
-#'   cross-validation.
+#' @param lpd_point A matrix of pointwise leave-one-out (or K-fold) log
+#'   likelihoods evaluated for different models. It should be a \eqn{N} by
+#'   \eqn{K}  matrix where \eqn{N} is sample size and \eqn{K} is the number of
+#'   models. Each column corresponds to one model. These values can be
+#'   calculated approximately using \code{\link{loo}} or by running exact
+#'   leave-one-out or K-fold cross-validation.
 #'
 #' @importFrom stats constrOptim
 #'

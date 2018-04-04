@@ -24,7 +24,10 @@ pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
 the size of the posterior sample (with all chains merged) and \eqn{N} is
 the number of data points. If \code{x} is a list of log-likelihood matrices
-then \code{\link{loo}} is called internally on each matrix.}
+then \code{\link{loo}} is called internally on each matrix. Currently the
+\code{loo_model_weights} function is not implemented to be used with
+results from K-fold CV, but you can still obtain weights using K-fold CV
+results by calling the \code{stacking_weights} function directly.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
@@ -68,12 +71,12 @@ deprecated but will be given precedence over \code{mc.cores} until
 2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
 recommend using as many (or close to as many) cores as possible.}}
 
-\item{lpd_point}{A matrix of pointwise log leave-one-out likelihoods
-evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
-where \eqn{N} is sample size and \eqn{K} is the number of models. Each
-column corresponds to one model. These values can be calculated
-approximately using \code{\link{loo}} or by running exact leave-one-out
-cross-validation.}
+\item{lpd_point}{A matrix of pointwise leave-one-out (or K-fold) log
+likelihoods evaluated for different models. It should be a \eqn{N} by
+\eqn{K}  matrix where \eqn{N} is sample size and \eqn{K} is the number of
+models. Each column corresponds to one model. These values can be
+calculated approximately using \code{\link{loo}} or by running exact
+leave-one-out or K-fold cross-validation.}
 }
 \value{
 A numeric vector containing one weight for each model.
@@ -84,10 +87,11 @@ weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
 al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 }
 \details{
-\code{loo_model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
-weighting for combining multiple predictive distributions. In all cases, we
-can use leave-one-out cross-validation (LOO) to estimate the expected log
-predictive density (ELPD).
+\code{loo_model_weights} is a wrapper around the \code{stacking_weights} and
+\code{pseudobma_weights} functions that implements stacking, pseudo-BMA, and
+pseudo-BMA+ weighting for combining multiple predictive distributions. We can
+use approximate or exact leave-one-out cross-validation (LOO-CV) or K-fold CV
+to estimate the expected log predictive density (ELPD).
 
 The stacking method (\code{method="stacking"}) combines all models by
 maximizing the leave-one-out predictive density of the combination
