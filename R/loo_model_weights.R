@@ -1,9 +1,8 @@
 #' Model averaging/weighting via stacking or pseudo-BMA weighting
 #'
-#' @description Model averaging via stacking of predictive distributions,
-#'   pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.
-#'   See Yao et al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for
-#'   background.
+#' Model averaging via stacking of predictive distributions, pseudo-BMA
+#' weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
+#' al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 #'
 #' @export
 #' @param x A list of pointwise log-likelihood matrices or "psis_loo" objects
@@ -431,4 +430,3 @@ validate_psis_loo_list <- function(psis_loo_list) {
   }
   return(invisible(TRUE))
 }
-

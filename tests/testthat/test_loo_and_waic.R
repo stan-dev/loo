@@ -97,7 +97,10 @@ test_that("loo.cores deprecation warning works with function method", {
 })
 
 test_that("loo_i results match loo results for ith data point", {
-  loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws)
+  expect_warning(
+    loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws),
+    "Relative effective sample sizes"
+  )
   expect_equal(loo_i_val$pointwise[, "elpd_loo"], loo_with_fn$pointwise[2, "elpd_loo"])
   expect_equal(loo_i_val$pointwise[, "p_loo"], loo_with_fn$pointwise[2, "p_loo"])
   expect_equal(loo_i_val$diagnostics$pareto_k, loo_with_fn$diagnostics$pareto_k[2])

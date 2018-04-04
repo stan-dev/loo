@@ -79,10 +79,9 @@ cross-validation.}
 A numeric vector containing one weight for each model.
 }
 \description{
-Model averaging via stacking of predictive distributions,
-  pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.
-  See Yao et al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for
-  background.
+Model averaging via stacking of predictive distributions, pseudo-BMA
+weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
+al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 }
 \details{
 \code{loo_model_weights} implements stacking, pseudo-BMA, and pseudo-BMA+
@@ -106,7 +105,7 @@ In general, we recommend stacking for averaging predictive distributions,
 while pseudo-BMA+ can serve as a computationally easier alternative.
 }
 \examples{
-\donttest{
+\dontrun{
 ### Demonstrating usage after fitting models with RStan
 library(rstan)
 

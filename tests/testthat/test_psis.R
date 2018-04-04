@@ -57,7 +57,7 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLmat), "All input values must be finite")
 
   # no lists allowed
-  expect_error(psis(as.list(-LLvec)), "List not allowed as input")
+  expect_error(expect_warning(psis(as.list(-LLvec))), "List not allowed as input")
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
