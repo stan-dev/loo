@@ -42,17 +42,31 @@ then recombines the indexes returned from the two calls to
 \code{kfold_split_random}. This helps ensure that the observations in the
 less common category of \code{x} are more evenly represented across the
 folds.
+
+For a grouping variable \code{x}, \code{kfold_split_stratified} keeps
+all observations from the same group in the same fold.
 }
 \examples{
 kfold_split_random(K = 5, N = 20)
 
-y <- sample(c(0, 1), size = 200, replace = TRUE, prob = c(0.05, 0.95))
-table(y)
-ids <- kfold_split_balanced(K = 5, x = y)
-table(ids[y == 0])
+x <- sample(c(0, 1), size = 200, replace = TRUE, prob = c(0.05, 0.95))
+table(x)
+ids <- kfold_split_balanced(K = 5, x = x)
+table(ids[x == 0])
+table(ids[x == 1])
 
 grp <- gl(n = 50, k = 15, labels = state.name)
-ids <- kfold_split_stratified(K = 10, grp)
-table(grp, ids)
+length(grp)
+head(table(grp))
+
+ids_10 <- kfold_split_stratified(K = 10, x = grp)
+(tab_10 <- table(grp, ids_10))
+print(colSums(tab_10))
+all.equal(sum(colSums(tab_10)), length(grp))
+
+ids_9 <- kfold_split_stratified(K = 9, x = grp)
+tab_9 <- table(grp, ids_9)
+print(colSums(tab_9))
+all.equal(sum(colSums(tab_10)), length(grp))
 
 }

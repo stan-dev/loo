@@ -1,9 +1,8 @@
 #' Model averaging/weighting via stacking or pseudo-BMA weighting
 #'
-#' @description Model averaging via stacking of predictive distributions,
-#'   pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.
-#'   See Yao et al. (2017) and  Vehtari, Gelman, and Gabry (2017) for
-#'   background.
+#' Model averaging via stacking of predictive distributions, pseudo-BMA
+#' weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
+#' al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 #'
 #' @export
 #' @param x A list of pointwise log-likelihood matrices or "psis_loo" objects
@@ -70,7 +69,8 @@
 #' \item \code{\link{relative_eff}} for computing \code{r_eff}.
 #' }
 #'
-#'@template stacking-references
+#' @template loo-and-psis-references
+#' @template stacking-references
 #'
 #' @examples
 #' \dontrun{

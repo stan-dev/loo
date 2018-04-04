@@ -1,19 +1,18 @@
 # loo 2.0.0
 
-This is a major release. Although we have attempted to maintain backwards
-compatibility as much as possible, there are a few breaking changes resulting
-primarily from changes to the structure of the returned objects.
-
+This is a major release! Although we have attempted to maintain backwards
+compatibility wherever possible, one of the changes (the new structure of the
+returned objects) may cause errors in old code that accesses the internal
+structure of the objects returned by the `loo()` function.
 
 * New function `psis()` replaces `psislw()` (now deprecated). This version of the
-function accepts log importance ratios as its input (not log-likelihood values),
-and implements the improvements to the PSIS algorithm described in the latest
+implements the improvements to the PSIS algorithm described in the latest
 version of https://arxiv.org/pdf/1507.02646.pdf. Additional diagnostic
 information is now also provided, including PSIS effective sample sizes.
 
-* New `weights.psis` method for extracting smoothed weights from a `psis`
-object. Arguments `log` and `normalize` control whether the weights are returned
-on the log scale and whether they are normalized.
+* New `weights()` method for extracting smoothed weights from a `psis` object.
+Arguments `log` and `normalize` control whether the weights are returned on the
+log scale and whether they are normalized.
 
 * Updated the interface for the `loo()` methods to integrate nicely with the new
 PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions 
@@ -22,7 +21,7 @@ are provided. Several arguments have changed, particularly for the
 describe the new behavior.
 
 * The structure of the objects returned by the `loo()` function has also changed
-slightly, as described in the __Value__ section at `help("loo")`.
+slightly, as described in the __Value__ section at `help("loo", package = "loo")`.
 
 * New function `loo_model_weights()` computes weights for model averaging via
 stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
@@ -34,16 +33,21 @@ provide objects to use in examples and tests.
 * When comparing more than two models with `compare()`, the first column of the
 output is now the `elpd` difference from the model in the first row.
 
-* Two new vignettes added to demonstrate the new functionality.
+* Setting `options(loo.cores=...)` is now deprecated in favor of
+`options(mc.cores=...)`. For now, if both the `loo.cores` and `mc.cores` options
+have been set, preference will be given to `loo.cores` until it is removed in a
+future release. (thanks to @cfhammill)
 
-* Setting `options(loo.cores=...)` is now deprecated in favor of `options(mc.cores=...)`. 
-For now, if both the `loo.cores` and `mc.cores` options have been set, 
-preference will be given to `loo.cores` until it is removed in a future release. (thanks to @cfhammill)
+* Updated existing vignette and added two new vignettes demonstrating how to use
+the package.
+
 
 # loo 1.1.0
+
 * Introduce the `E_loo` function for computing weighted expectations (means, variances, quantiles).
 
 # loo 1.0.0
+
 * `pareto_k_table` and `pareto_k_ids` convenience functions for quickly identifying problematic observations
 * pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
 `(1, Inf)` (didn't used to include 0.7)

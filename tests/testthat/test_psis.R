@@ -57,7 +57,7 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLmat), "All input values must be finite")
 
   # no lists allowed
-  expect_error(psis(as.list(-LLvec)), "List not allowed as input")
+  expect_error(expect_warning(psis(as.list(-LLvec))), "List not allowed as input")
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
@@ -106,7 +106,7 @@ test_that("psis_n_eff methods works properly", {
   expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
 })
 
-test_that("relative_eff vector, matrix, and methods works properly", {
+test_that("relative_eff methods works properly", {
   expect_equal(relative_eff.default(exp(LLmat[, 1]), chain_id),
                mcmc_n_eff(exp(LLarr[, , 1])) / 1000)
   expect_equal(relative_eff.matrix(exp(LLmat), chain_id),
