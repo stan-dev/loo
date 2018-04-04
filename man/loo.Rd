@@ -234,6 +234,7 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
 }
 \seealso{
 \itemize{
+ \item The \pkg{loo} package vignettes for demonstrations.
  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at
