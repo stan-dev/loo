@@ -69,8 +69,8 @@ example as follows:
 > A popular hypothesis has it that primates with larger brains produce more energetic milk, so that brains can grow quickly. ... The question here is to what extent energy content of milk, measured here by kilocalories, is related to the percent of the brain mass that is neocortex. ... We'll end up needing female body mass as well, to see the masking that hides the relationships among the variables.
 
 ```{r}
-milk <- read.csv("milk.csv", sep=";")
-d <- as.data.frame(milk[complete.cases(milk),]) 
+data(milk)
+d <- milk[complete.cases(milk),]
 d$neocortex <- d$neocortex.perc /100
 str(d)
 ```
@@ -209,7 +209,8 @@ We build models predicting the total number of tools given the log
 population size and the contact rate (high vs. low).
 
 ```{r}
-d <- as.data.frame(read.csv("Kline.csv", sep=";"))
+data(Kline)
+d <- Kline
 d$log_pop <- log(d$population)
 d$contact_high <- ifelse(d$contact=="high", 1, 0)
 str(d)
