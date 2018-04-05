@@ -89,7 +89,7 @@ dim(yrep)
 ll <- log_lik(fit)
 dim(ll)
 
-r_eff <- relative_eff(exp(ll), chain_id = rep(1:4, each = 1000))
+r_eff <- relative_eff(exp(-ll), chain_id = rep(1:4, each = 1000))
 psis_object <- psis(log_ratios = -ll, r_eff = r_eff, cores = 2)
 
 E_loo(yrep, psis_object, type = "mean")
