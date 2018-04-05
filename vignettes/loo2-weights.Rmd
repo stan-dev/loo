@@ -22,7 +22,7 @@ Bayesian stacking and Pseudo-BMA weighting. In this vignette we can't
 provide all of the necessary background on this topic, so we encourage
 readers to refer to the paper
 
-* Yao, Y., Vehtari, A., Simpson, D., and Gelman, A.  (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, doi:10.1214/17-BA1091. [Online](https://projecteuclid.org/euclid.ba/1516093227)
+* Yao, Y., Vehtari, A., Simpson, D., and Gelman, A.  (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, \doi:10.1214/17-BA1091. [Online](https://projecteuclid.org/euclid.ba/1516093227)
 
 which provides important details on the methods demonstrated in this vignette.
 Here we just quote from the abstract of the paper: 
@@ -355,11 +355,11 @@ Electronic Journal of Statistics,
 	  
 Piironen, J. and Vehtari, A. (2017b). Comparison of Bayesian predictive
 methods for model selection. Statistics and Computing,
-27(3):711-735. doi:10.1007/s11222-016-9649-y. [Online](http://link.springer.com/article/10.1007/s11222-016-9649-y).
+27(3):711-735. \doi:10.1007/s11222-016-9649-y. [Online](http://link.springer.com/article/10.1007/s11222-016-9649-y).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. _Statistics and
-Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4.
+Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
 [online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4), 
 [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
 
@@ -367,4 +367,4 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampli
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using
 stacking to average Bayesian predictive distributions. In Bayesian
-Analysis, doi:10.1214/17-BA1091. [Online](https://projecteuclid.org/euclid.ba/1516093227).
+Analysis, \doi:10.1214/17-BA1091. [Online](https://projecteuclid.org/euclid.ba/1516093227).
