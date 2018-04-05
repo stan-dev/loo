@@ -397,7 +397,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   stopifnot(is.matrix(pointwise), is.list(diagnostics))
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
-  estimates <- table_of_estimates(pointwise[, cols_to_summarize])
+  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
   structure(
     nlist(estimates, pointwise, diagnostics, psis_object),
     dims = dims,
