@@ -7,9 +7,6 @@ cache: packages
 r_github_packages:
   - jimhester/covr
 
-r_build_args: '--no-build-vignettes'
-warnings_are_errors: false
-
 env:
   - _R_CHECK_FORCE_SUGGESTS_=false
 
