@@ -71,9 +71,10 @@
 #'
 #' @examples
 #' log_ratios <- -1 * example_loglik_array()
-#' r_eff <- relative_eff(log_ratios)
+#' r_eff <- relative_eff(exp(log_ratios))
 #' psis_result <- psis(log_ratios, r_eff = r_eff)
 #' str(psis_result)
+#' plot(psis_result)
 #'
 #' # extract smoothed weights
 #' lw <- weights(psis_result) # default args are log=TRUE, normalize=TRUE
