@@ -89,6 +89,8 @@ chains, and \eqn{N} is the number of data points.
 \examples{
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
+dim(LLarr)
+dim(LLmat)
 
 rel_n_eff_1 <- relative_eff(exp(LLarr))
 rel_n_eff_2 <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
