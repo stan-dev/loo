@@ -54,6 +54,10 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
     k <- adjust_k_wip(k, n = N)
   }
 
+  if (is.nan(k)) {
+    k <- Inf
+  }
+
   nlist(k, sigma)
 }
 
