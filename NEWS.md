@@ -1,13 +1,19 @@
 # loo 2.0.0
 
-This is a major release! Although we have attempted to maintain backwards
-compatibility wherever possible, one of the changes (the new structure of the
-returned objects) may cause errors in old code that accesses the internal
-structure of the objects returned by the `loo()` function.
+This is a major release with many changes. Whenever possible we have opted to
+deprecate rather than remove old functionality, but it is possible that old code
+that accesses elements inside loo objects by position rather than name may
+error.
+
+* New package documentation website http://mc-stan.org/loo/ with vignettes, 
+function reference, news.
+
+* Updated existing vignette and added two new vignettes demonstrating how to use
+the package.
 
 * New function `psis()` replaces `psislw()` (now deprecated). This version 
 implements the improvements to the PSIS algorithm described in the latest
-version of https://arxiv.org/pdf/1507.02646.pdf. Additional diagnostic
+version of https://arxiv.org/abs/1507.02646. Additional diagnostic
 information is now also provided, including PSIS effective sample sizes.
 
 * New `weights()` method for extracting smoothed weights from a `psis` object.
@@ -23,9 +29,15 @@ describe the new behavior.
 * The structure of the objects returned by the `loo()` function has also changed
 slightly, as described in the __Value__ section at `help("loo", package = "loo")`.
 
-* New function `loo_model_weights()` computes weights for model averaging via
+* New function `loo_model_weights()` computes weights for model averaging as
+described in https://arxiv.org/abs/1704.02030. Implemented methods include
 stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+
 weighting with the Bayesian bootstrap.
+
+* Setting `options(loo.cores=...)` is now deprecated in favor of
+`options(mc.cores=...)`. For now, if both the `loo.cores` and `mc.cores` options
+have been set, preference will be given to `loo.cores` until it is removed in a
+future release. (thanks to @cfhammill)
 
 * New functions `example_loglik_array()` and `example_loglik_matrix()` that
 provide objects to use in examples and tests.
@@ -33,13 +45,10 @@ provide objects to use in examples and tests.
 * When comparing more than two models with `compare()`, the first column of the
 output is now the `elpd` difference from the model in the first row.
 
-* Setting `options(loo.cores=...)` is now deprecated in favor of
-`options(mc.cores=...)`. For now, if both the `loo.cores` and `mc.cores` options
-have been set, preference will be given to `loo.cores` until it is removed in a
-future release. (thanks to @cfhammill)
-
-* Updated existing vignette and added two new vignettes demonstrating how to use
-the package.
+* New helper functions for splitting observations for K-fold CV:
+`kfold_split_random()`, `kfold_split_balanced()`, `kfold_split_stratified()`.
+Additional helper functions for implementing K-fold CV will be included in
+future releases.
 
 
 # loo 1.1.0
