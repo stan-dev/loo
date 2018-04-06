@@ -1,13 +1,13 @@
 #' Model comparison
 #'
-#' Compare fitted models on LOO or WAIC
+#' Compare fitted models on LOO or WAIC.
 #'
 #' @export
 #' @param ... At least two objects returned by \code{\link{loo}} (or
 #'   \code{\link{waic}}).
 #' @param x A list of at least two objects returned by \code{\link{loo}} (or
 #'   \code{\link{waic}}). This argument can be used as an alternative to
-#'   specifying the models in \code{...}.
+#'   specifying the objects in \code{...}.
 #'
 #' @return A vector or matrix with class \code{'compare.loo'} that has its own
 #'   print method. If exactly two objects are provided in \code{...} or
@@ -38,16 +38,17 @@
 #' loo1 <- loo(log_lik1)
 #' loo2 <- loo(log_lik2)
 #' print(compare(loo1, loo2), digits = 3)
+#' print(compare(x = list(loo1, loo2)))
 #'
 #' waic1 <- waic(log_lik1)
 #' waic2 <- waic(log_lik2)
 #' compare(waic1, waic2)
 #' }
 #'
-compare <- function(..., x) {
+compare <- function(..., x = list()) {
   dots <- list(...)
   if (length(dots)) {
-    if (!missing(x))
+    if (length(x))
       stop("If 'x' is specified then '...' should not be specified.")
     nms <- as.character(match.call(expand.dots = TRUE))[-1L]
   } else {
@@ -81,22 +82,30 @@ compare <- function(..., x) {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
     if (!all(Ns == Ns[1L]))
       stop("Not all models have the same number of data points.", call. = FALSE)
-    sel <- grep("pointwise|pareto_k", names(dots[[1L]]), invert = TRUE)
-    x <- sapply(dots, function(x) unlist(x[sel]))
+    x <- sapply(dots, function(x) {
+      est <- x$estimates
+      setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
+    })
     colnames(x) <- nms
     rnms <- rownames(x)
     comp <- x
-    patts <- c("^waic$|^looic$", "^se_waic$|^se_looic$", "elpd", "p_")
-    row_ord <- unlist(sapply(patts, function(p) grep(p, rownames(comp))),
+    ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
+    comp <- t(comp)[ord, ]
+
+    patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
+    col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
                       use.names = FALSE)
-    col_ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
-    comp <- t(comp[row_ord, col_ord])
+    comp <- comp[, col_ord]
+    comp <- cbind(elpd_diff = comp[, 1] - comp[1, 1], comp)
     class(comp) <- c("compare.loo", class(comp))
     comp
   }
 }
 
+#' @rdname compare
 #' @export
+#' @param digits For the print method only, the number of digits to use when
+#'   printing.
 print.compare.loo <- function(x, ..., digits = 1) {
   print(.fr(x, digits), quote = FALSE)
   invisible(x)

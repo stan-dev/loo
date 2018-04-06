@@ -16,3 +16,5 @@ inst/doc
 
 revdep/*
 tests/testthat/Rplots.pdf
+
+cran-comments.md

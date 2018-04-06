@@ -10,3 +10,4 @@ man-roxygen/*
 tests/testthat/Rplots\.pdf
 ^docs$
 ^_pkgdown\.yml$
+^data-raw$

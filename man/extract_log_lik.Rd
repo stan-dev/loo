@@ -2,24 +2,30 @@
 % Please edit documentation in R/extract_log_lik.R
 \name{extract_log_lik}
 \alias{extract_log_lik}
-\title{Extract pointwise log-likelihood matrix from a Stan model}
+\title{Extract pointwise log-likelihood from a Stan model}
 \usage{
-extract_log_lik(stanfit, parameter_name = "log_lik")
+extract_log_lik(stanfit, parameter_name = "log_lik", merge_chains = TRUE)
 }
 \arguments{
 \item{stanfit}{A \code{stanfit} object (\pkg{rstan} package).}
 
 \item{parameter_name}{A character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.}
+
+\item{merge_chains}{If \code{TRUE} (the default), all Markov chains are
+merged together (i.e., stacked) and a matrix is returned. If \code{FALSE}
+they are kept separate and an array is returned.}
 }
 \value{
-An \eqn{S} by \eqn{N} matrix of (post-warmup) extracted draws, where
-  \eqn{S} is the size of the posterior sample and \eqn{N} is the number of
-  data points.
+If \code{merge_chains=TRUE}, an \eqn{S} by \eqn{N} matrix of
+  (post-warmup) extracted draws, where \eqn{S} is the size of the posterior
+  sample and \eqn{N} is the number of data points. If
+  \code{merge_chains=FALSE}, an \eqn{I} by \eqn{C} by \eqn{N} array, where
+  \eqn{I \times C = S}{I * C = S}.
 }
 \description{
-Convenience function for extracting the pointwise log-likelihood from a
-fitted Stan model.
+Convenience function for extracting the pointwise log-likelihood
+matrix or array from a fitted Stan model.
 }
 \details{
 Stan does not automatically compute and store the log-likelihood. It
@@ -38,12 +44,12 @@ Stan does not automatically compute and store the log-likelihood. It
 
  \code{vector[N] log_lik;}
 
- \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n] * beta, sigma);}
+ \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);}
 }
 \references{
-Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
-\url{http://mc-stan.org/documentation/}
+Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+\url{http://mc-stan.org/}
 
-Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
-\url{http://mc-stan.org/interfaces/rstan.html}
+Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+\url{http://mc-stan.org/}
 }

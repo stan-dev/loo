@@ -1,82 +1,159 @@
 library(loo)
-options(loo.cores = 1)
+options(mc.cores = 1)
 set.seed(123)
-x <- matrix(rnorm(5000), 100, 50)
 
 context("loo and waic")
-test_that("loo ok with > 1 core", {
-  expect_warning(loo(x, cores = 2), "Some Pareto k diagnostic values are too high")
+
+LLarr <- example_loglik_array()
+LLmat <- example_loglik_matrix()
+LLvec <- LLmat[, 1]
+chain_id <- rep(1:2, each = nrow(LLarr))
+r_eff_arr <- relative_eff(exp(LLarr))
+r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
+
+loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
+waic1 <- suppressWarnings(waic(LLarr))
+
+test_that("using loo.cores is deprecated", {
+  options(mc.cores = NULL)
+  options(loo.cores = 1)
+  expect_warning(loo(LLarr, r_eff = r_eff_arr, cores = 2), "loo.cores")
+  options(loo.cores = NULL)
+  options(mc.cores = 1)
 })
 
-test_that("loo and waic return expected results", {
-  expect_warning(ww <- waic(x), "p_waic")
-  wnms <- names(ww)
-
-  expect_warning(ll <- loo(x), "Some Pareto k diagnostic values are too high")
-  lnms <- names(ll)
-
-  waic_val <- unlist(ww[grep("pointwise", wnms, invert = TRUE)])
-  loo_val <- unlist(ll[grep("pointwise|pareto_k", lnms, invert = TRUE)])
-
-  waic_ans <- structure(c(-25.1291601624985, 49.5591373599165, 50.258320324997,
-                          0.742909828603039, 1.05244649202819, 1.48581965720608),
-                        .Names = c("elpd_waic", "p_waic", "waic", "se_elpd_waic",
-                                   "se_p_waic", "se_waic"))
-  loo_ans <- structure(c(-24.2339828660691, 48.6639600634871, 48.4679657321382,
-                         0.706772789390649, 0.990389359906155, 1.4135455787813),
-                       .Names = c("elpd_loo", "p_loo", "looic", "se_elpd_loo",
-                                  "se_p_loo", "se_looic"))
-  expect_equal(loo_val, loo_ans)
-  expect_equal(waic_val, waic_ans)
-
-  pareto_k <- ll$pareto_k
-  pareto_k_val <- list(mean = mean(pareto_k), range = range(pareto_k))
-  pareto_k_ans <- list(mean = 0.273775211941035,
-                       range = c(-0.245572962408798, 0.859988648019406))
-  expect_equal(pareto_k_val, pareto_k_ans)
+test_that("loo and waic results haven't changed", {
+  expect_equal_to_reference(loo1, "loo.rds")
+  expect_equal_to_reference(waic1, "waic.rds")
 })
 
-test_that("loo and waic throw appropriate errors", {
-  x[1,1] <- NaN
-  expect_error(loo(x), regexp = "NA log-likelihood")
-  expect_error(waic(x), regexp = "NA log-likelihood")
+test_that("loo with cores=1 and cores=2 gives same results", {
+  loo2 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr, cores = 2))
+  expect_equal(loo1$estimates, loo2$estimates)
+})
 
-  vec <- 1:10
-  arr <- array(1:100, dim = c(2,5,10))
-  expect_error(loo(vec), regexp = "no applicable method")
-  expect_error(waic(arr), regexp = "no applicable method")
+test_that("waic returns object with correct structure", {
+  expect_true(is.waic(waic1))
+  expect_true(is.loo(waic1))
+  expect_false(is.psis_loo(waic1))
+  expect_named(
+    waic1,
+    c(
+      "estimates",
+      "pointwise",
+
+      # deprecated but still there
+      "elpd_waic",
+      "p_waic",
+      "waic",
+      "se_elpd_waic",
+      "se_p_waic",
+      "se_waic"
+    )
+  )
+  est_names <- dimnames(waic1$estimates)
+  expect_equal(est_names[[1]], c("elpd_waic", "p_waic", "waic"))
+  expect_equal(est_names[[2]], c("Estimate", "SE"))
+  expect_equal(colnames(waic1$pointwise), est_names[[1]])
+  expect_equal(dim(waic1), dim(LLmat))
+})
+
+test_that("loo returns object with correct structure", {
+  expect_false(is.waic(loo1))
+  expect_true(is.loo(loo1))
+  expect_true(is.psis_loo(loo1))
+  expect_named(
+    loo1,
+    c(
+      "estimates",
+      "pointwise",
+      "diagnostics",
+      "psis_object",
+
+      # deprecated but still there
+      "elpd_loo",
+      "p_loo",
+      "looic",
+      "se_elpd_loo",
+      "se_p_loo",
+      "se_looic"
+    )
+  )
+  expect_named(loo1$diagnostics, c("pareto_k", "n_eff"))
+  expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
+  expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))
+  expect_equal(colnames(loo1$pointwise), c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic"))
+  expect_equal(dim(loo1), dim(LLmat))
+})
+
+test_that("loo.array and loo.matrix give same result", {
+  l2 <- suppressWarnings(loo(LLmat, r_eff = r_eff_mat))
+  expect_identical(loo1$estimates, l2$estimates)
+  expect_identical(loo1$diagnostics, l2$diagnostics)
+
+  # the mcse_elpd_loo columns won't be identical because we use sampling
+  expect_identical(loo1$pointwise[, -2], l2$pointwise[, -2])
+  expect_equal(loo1$pointwise[, 2], l2$pointwise[, 2], tol = 0.005)
+})
+
+test_that("waic.array and waic.matrix give same result", {
+  waic2 <- suppressWarnings(waic(LLmat))
+  expect_identical(waic1, waic2)
+})
+
+test_that("loo and waic error with vector input", {
+  expect_error(loo(LLvec), regexp = "no applicable method")
+  expect_error(waic(LLvec), regexp = "no applicable method")
+})
+
+
+
+# testing function methods
+source(test_path("function_method_stuff.R"))
+
+waic_with_fn <- waic(llfun, data = data, draws = draws)
+waic_with_mat <- waic(llmat_from_fn)
+
+loo_with_fn <- loo(llfun, data = data, draws = draws,
+                   r_eff = rep(1, nrow(data)))
+loo_with_mat <- loo(llmat_from_fn, r_eff = rep(1, ncol(llmat_from_fn)),
+                    save_psis = TRUE)
+
+test_that("loo.cores deprecation warning works with function method", {
+  options(loo.cores = 1)
+  expect_warning(loo(llfun, cores = 2, data = data, draws = draws, r_eff = rep(1, nrow(data))),
+                 "loo.cores")
+  options(loo.cores=NULL)
+})
+
+test_that("loo_i results match loo results for ith data point", {
+  expect_warning(
+    loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws),
+    "Relative effective sample sizes"
+  )
+  expect_equal(loo_i_val$pointwise[, "elpd_loo"], loo_with_fn$pointwise[2, "elpd_loo"])
+  expect_equal(loo_i_val$pointwise[, "p_loo"], loo_with_fn$pointwise[2, "p_loo"])
+  expect_equal(loo_i_val$diagnostics$pareto_k, loo_with_fn$diagnostics$pareto_k[2])
+  expect_equal(loo_i_val$diagnostics$n_eff, loo_with_fn$diagnostics$n_eff[2])
 })
 
 test_that("function and matrix methods return same result", {
-  set.seed(024)
-
-  # fake data and posterior draws
-  N <- 50; K <- 10; S <- 100; a0 <- 3; b0 <- 2
-  p <- rbeta(1, a0, b0)
-  y <- rbinom(N, size = K, prob = p)
-  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-  draws <- rbeta(S, a, b)
-  data <- data.frame(y,K)
-  llfun <- function(i, data, draws) {
-    dbinom(data$y, size = data$K, prob = draws, log = TRUE)
-  }
-  loo_with_fn <- loo(llfun, args = nlist(data, draws, N, S))
-  waic_with_fn <- waic(llfun, args = nlist(data, draws, N, S))
-
-  # Check that we get same answer if using log-likelihood matrix
-  log_lik_mat <- sapply(1:N, function(i) llfun(i, data[i,, drop=FALSE], draws))
-  loo_with_mat <- loo(log_lik_mat)
-  waic_with_mat <- waic(log_lik_mat)
-  expect_equal(loo_with_mat, loo_with_fn)
   expect_equal(waic_with_mat, waic_with_fn)
+  expect_identical(loo_with_mat$estimates, loo_with_fn$estimates)
+  expect_identical(loo_with_mat$diagnostics, loo_with_fn$diagnostics)
+  expect_identical(dim(loo_with_mat), dim(loo_with_fn))
+})
+
+test_that("save_psis option to loo.function makes correct psis object", {
+  loo_with_fn2 <- loo(llfun, data = data, draws = draws,
+                      r_eff = rep(1, nrow(data)), save_psis = TRUE)
+  expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })
 
 
-# pareto_k_ids ------------------------------------------------------------
-test_that("pareto_k_ids identifies correct observations", {
-  ll <- suppressWarnings(loo(x))
-  expect_identical(pareto_k_ids(ll, threshold = 0.5),
-                   which(ll$pareto_k > 0.5))
-  expect_identical(pareto_k_ids(ll, threshold = 1),
-                   which(ll$pareto_k > 1))
+test_that("loo throws r_eff warnings", {
+  expect_warning(loo(-LLarr), "MCSE estimates will be over-optimistic")
+  expect_warning(loo(-LLmat), "MCSE estimates will be over-optimistic")
+  expect_warning(loo(llfun, data = data, draws = draws), "MCSE estimates will be over-optimistic")
 })
+
