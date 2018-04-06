@@ -36,7 +36,21 @@ test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))
   expect_true(is.loo(waic1))
   expect_false(is.psis_loo(waic1))
-  expect_named(waic1, c("estimates", "pointwise"))
+  expect_named(
+    waic1,
+    c(
+      "estimates",
+      "pointwise",
+
+      # deprecated but still there
+      "elpd_waic",
+      "p_waic",
+      "waic",
+      "se_elpd_waic",
+      "se_p_waic",
+      "se_waic"
+    )
+  )
   est_names <- dimnames(waic1$estimates)
   expect_equal(est_names[[1]], c("elpd_waic", "p_waic", "waic"))
   expect_equal(est_names[[2]], c("Estimate", "SE"))
@@ -48,7 +62,23 @@ test_that("loo returns object with correct structure", {
   expect_false(is.waic(loo1))
   expect_true(is.loo(loo1))
   expect_true(is.psis_loo(loo1))
-  expect_named(loo1, c("estimates", "pointwise", "diagnostics", "psis_object"))
+  expect_named(
+    loo1,
+    c(
+      "estimates",
+      "pointwise",
+      "diagnostics",
+      "psis_object",
+
+      # deprecated but still there
+      "elpd_loo",
+      "p_loo",
+      "looic",
+      "se_elpd_loo",
+      "se_p_loo",
+      "se_looic"
+    )
+  )
   expect_named(loo1$diagnostics, c("pareto_k", "n_eff"))
   expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))

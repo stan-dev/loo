@@ -127,8 +127,12 @@ dim.waic <- function(x) {
 # structure the object returned by the waic methods
 waic_object <- function(pointwise, dims) {
   estimates <- table_of_estimates(pointwise)
+  out <- nlist(estimates, pointwise)
+  # maintain backwards compatibility
+  old_nms <- c("elpd_waic", "p_waic", "waic", "se_elpd_waic", "se_p_waic", "se_waic")
+  out <- c(out, setNames(as.list(estimates), old_nms))
   structure(
-    nlist(estimates, pointwise),
+    out,
     dims = dims,
     class = c("waic", "loo")
   )

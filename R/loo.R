@@ -398,8 +398,14 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   stopifnot(is.matrix(pointwise), is.list(diagnostics))
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
+
+  out <- nlist(estimates, pointwise, diagnostics, psis_object)
+  # maintain backwards compatibility
+  old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
+  out <- c(out, setNames(as.list(estimates), old_nms))
+
   structure(
-    nlist(estimates, pointwise, diagnostics, psis_object),
+    out,
     dims = dims,
     class = c("psis_loo", "loo")
   )
@@ -462,4 +468,75 @@ list2psis <- function(objects) {
     dims = dim(log_weights),
     class = c("psis", "list")
   )
+}
+
+#' Extractor methods
+#' @name old-extractors
+#' @keywords internal
+#' @param x,i,...,exact See \link{Extract}.
+#'
+NULL
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+`[.loo` <- function(x, i) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+            "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+
+  if (is.character(i)) {
+    needs_warning <- which(flags == i)
+    if (length(needs_warning)) {
+      warning(
+        "Accessing ", flags[needs_warning], " using '[' is deprecated ",
+        "and will be removed in a future release. ",
+        "Please extract the ", flags[needs_warning],
+        " estimate from the 'estimates' component instead.",
+        call. = FALSE
+      )
+    }
+  }
+  NextMethod()
+}
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+`[[.loo` <- function(x, i, exact=TRUE) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+
+  if (is.character(i)) {
+    needs_warning <- which(flags == i)
+    if (length(needs_warning)) {
+      warning(
+        "Accessing ", flags[needs_warning], " using '[[' is deprecated ",
+        "and will be removed in a future release. ",
+        "Please extract the ", flags[needs_warning],
+        " estimate from the 'estimates' component instead.",
+        call. = FALSE
+      )
+    }
+  }
+  NextMethod()
+}
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+#'
+`$.loo` <- function(x, name) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+  needs_warning <- which(flags == name)
+  if (length(needs_warning)) {
+    warning(
+      "Accessing ", flags[needs_warning], " using '$' is deprecated ",
+      "and will be removed in a future release. ",
+      "Please extract the ", flags[needs_warning],
+      " estimate from the 'estimates' component instead.",
+      call. = FALSE
+    )
+  }
+  NextMethod()
 }
