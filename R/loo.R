@@ -473,7 +473,7 @@ list2psis <- function(objects) {
 #' Extractor methods
 #' @name old-extractors
 #' @keywords internal
-#' @param x,i,...,exact See \link{Extract}.
+#' @param x,i,exact,name See \link{Extract}.
 #'
 NULL
 

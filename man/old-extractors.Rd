@@ -14,7 +14,7 @@
 \method{$}{loo}(x, name)
 }
 \arguments{
-\item{x, i, ..., exact}{See \link{Extract}.}
+\item{x, i, exact, name}{See \link{Extract}.}
 }
 \description{
 Extractor methods
