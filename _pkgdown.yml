@@ -10,6 +10,8 @@ navbar:
       href: articles/index.html
     - text: "Functions"
       href: reference/index.html
+    - text: "News"
+      href: news/index.html
     - text: "Other Packages"
       menu:
         - text: "rstan"
@@ -32,9 +34,20 @@ navbar:
    - icon: fa-users
      href: http://discourse.mc-stan.org/
 
+home:
+  links:
+  - text: Ask a question
+    href: http://discourse.mc-stan.org/
+
 articles:
   - title: "Getting Started"
     desc: >
-      The document below provides an introduction to using the loo package.
+      These vignettes demonstrate how to use the functions in the **loo**
+      package to perform approximate leave-one-out cross-validation for
+      Bayesian models fit using MCMC, compare models on estimated predictive
+      performance on new data, and weight models for averaging predictive
+      distributions.
     contents:
-      - looexample
+      - loo2-example
+      - loo2-weights
+      - loo2-with-rstan
