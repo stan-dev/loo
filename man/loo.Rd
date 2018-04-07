@@ -246,8 +246,8 @@ loo.stanfit <-
  function(x,
          pars = "log_lik",
          ...,
-         cores = getOption("mc.cores", 1),
-         save_psis = FALSE) {
+         save_psis = FALSE,
+         cores = getOption("mc.cores", 1)) {
   stopifnot(length(pars) == 1L)
   LLarray <- loo::extract_log_lik(stanfit = x,
                                   parameter_name = pars,

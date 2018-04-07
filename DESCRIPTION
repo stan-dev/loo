@@ -18,7 +18,7 @@ Description: Efficient approximate leave-one-out cross-validation (LOO)
     regularizing importance weights. As a byproduct of the calculations, we also
     obtain approximate standard errors for estimated predictive errors and for
     the comparison of predictive errors between models. The package also 
-    provides methods for using stacking and other model weighting techiques 
+    provides methods for using stacking and other model weighting techniques 
     to average Bayesian predictive distributions.
 License: GPL (>=3)
 LazyData: TRUE
