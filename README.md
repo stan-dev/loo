@@ -5,7 +5,7 @@
 
 ### **loo** R package
 
-Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
+Efficient approximate leave-one-out cross-validation for fitted Bayesian models.
 
 ### Resources
 
@@ -22,7 +22,7 @@ Efficient leave-one-out cross-validation and WAIC for fitted Bayesian models
 install.packages("loo")
 ```
 
-* Install from GitHub (requires [devtools](https://github.com/hadley/devtools) package):
+* Install from GitHub (requires __devtools__ package):
 
 ```r
 if (!require(devtools)) install.packages("devtools")
@@ -40,14 +40,31 @@ AIC and DIC but are less used in practice because they involve additional
 computational steps.
 
 This package implements the fast and stable computations for LOO and WAIC from
-*Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC* 
-([preprint](http://arxiv.org/abs/1507.04544), 
-[published](http://link.springer.com/article/10.1007%2Fs11222-016-9696-4)).
+
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model 
+evaluation using leave-one-out cross-validation and WAIC. 
+_Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4), 
+[arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. 
+[arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
+
 From existing posterior simulation draws, we compute LOO using Pareto smoothed
 importance sampling (PSIS), a new procedure for regularizing importance weights.
 As a byproduct of our calculations, we also obtain approximate standard errors
 for estimated predictive errors and for comparing predictive errors between two
 models.
+
+As of version `2.0.0`, the package also provides methods for using stacking and
+other model weighting techiques to average Bayesian predictive distributions. 
+For details on stacking and model weighting see: 
+
+* Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using
+stacking to average Bayesian predictive distributions. In Bayesian
+Analysis, \doi:10.1214/17-BA1091. 
+[Online](https://projecteuclid.org/euclid.ba/1516093227),
+[arXiv preprint arXiv:1704.02030](https://arxiv.org/abs/1704.02030).
+
 
 
 ### Python and Matlab/Octave Code

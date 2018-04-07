@@ -14,4 +14,4 @@ env:
   - _R_CHECK_FORCE_SUGGESTS_=false
 
 after_success:
-  - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'
+  - Rscript -e 'covr::codecov(line_exclusions = list("R/zzz.R" = c(1:11)))'
