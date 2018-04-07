@@ -18,13 +18,28 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Compute weighted expectations — E_loo" />
+
+<meta property="og:description" content="The E_loo function computes weighted expectations (means, variances,
+quantiles) using the importance weights obtained from the
+PSIS smoothing procedure. The expectations estimated by the
+E_loo function assume that the PSIS approximation is working well.
+A small Pareto k estimate is necessary,
+but not sufficient, for E_loo to give reliable estimates. Additional
+diagnostic checks for gauging the reliability of the estimates are in
+development and will be added in a future release." />
+
+<meta property="og:image" content="/logo.png" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +47,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,8 +64,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">loo</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">loo</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -56,6 +77,9 @@
 </li>
 <li>
   <a href="../reference/index.html">Functions</a>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -106,6 +130,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,16 +138,17 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute weighted expectations</h1>
+    
     </div>
 
     
     <p>The <code>E_loo</code> function computes weighted expectations (means, variances,
-quantiles) using the smoothed importance weights obtained from the
-<a href='psislw.html'>PSIS</a> procedure. The expectations estimated by the
+quantiles) using the importance weights obtained from the
+<a href='psis.html'>PSIS</a> smoothing procedure. The expectations estimated by the
 <code>E_loo</code> function assume that the PSIS approximation is working well.
 <strong>A small <a href='pareto-k-diagnostic.html'>Pareto k</a> estimate is necessary,
 but not sufficient, for <code>E_loo</code> to give reliable estimates.</strong> Additional
@@ -130,60 +156,77 @@ diagnostic checks for gauging the reliability of the estimates are in
 development and will be added in a future release.</p>
     
 
-    <pre class="usage"><span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>lw</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>psis_object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>lw</span>, <span class='no'>...</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mean"</span>, <span class='st'>"var"</span>, <span class='st'>"quantile"</span>),
-  <span class='no'>probs</span>)
+<span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>psis_object</span>, <span class='no'>...</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mean"</span>, <span class='st'>"variance"</span>,
+  <span class='st'>"quantile"</span>), <span class='kw'>probs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>lw</span>, <span class='no'>...</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mean"</span>, <span class='st'>"var"</span>, <span class='st'>"quantile"</span>), <span class='no'>probs</span>)</pre>
+<span class='fu'>E_loo</span>(<span class='no'>x</span>, <span class='no'>psis_object</span>, <span class='no'>...</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mean"</span>, <span class='st'>"variance"</span>,
+  <span class='st'>"quantile"</span>), <span class='kw'>probs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A numeric matrix or vector.</p></td>
+      <td><p>A numeric vector or matrix.</p></td>
     </tr>
     <tr>
-      <th>lw</th>
-      <td><p>A numeric matrix (or vector) of smoothed log-weights with the same
-dimensions (or length) as <code>x</code>. Typically this will be the
-<code>"lw_smooth"</code> element of the list returned by <code><a href='psislw.html'>psislw</a></code>.</p></td>
+      <th>psis_object</th>
+      <td><p>An object returned by <code><a href='psis.html'>psis</a></code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For the generic function, arguments passed to the
-individual methods.</p></td>
+      <td><p>Arguments passed to individual methods.</p></td>
     </tr>
     <tr>
       <th>type</th>
       <td><p>The type of expectation to compute. The options are
-<code>"mean"</code>, <code>"var"</code> (variance), and <code>"quantile"</code>.</p></td>
+<code>"mean"</code>, <code>"variance"</code>, and <code>"quantile"</code>.</p></td>
     </tr>
     <tr>
       <th>probs</th>
-      <td><p>A vector of probabilities. Ignored unless <code>type</code> is
-<code>"quantile"</code>.</p></td>
+      <td><p>For computing quantiles, a vector of probabilities.</p></td>
+    </tr>
+    <tr>
+      <th>log_ratios</th>
+      <td><p>Optionally, a vector or matrix (the same dimensions as
+<code>x</code>) of raw (not smoothed) log ratios. If working with log-likelihood
+values, the log ratios are the <strong>negative</strong> of those values. If
+<code>log_ratios</code> is specified we are able to compute
+<a href='pareto-k-diagnostic.html'>Pareto k</a> diagnostics specific to <code>E_loo</code>.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The matrix method returns a vector with <code>ncol(x)</code> elements, with
+    <p>A named list with the following components:</p><dl class='dl-horizontal'>
+  <dt><code>value</code></dt><dd><p>The result of the computation.
+
+  For the matrix method, <code>value</code> is a vector with <code>ncol(x)</code>
+  elements, with one exception: when <code>type</code> is <code>"quantile"</code> and
+  multiple values are specified in <code>probs</code> the <code>value</code> component of
+  the retured object is a <code>length(probs)</code> by <code>ncol(x)</code> matrix.
+
+  For the default/vector method the <code>value</code> component is scalar, with
   one exception: when <code>type</code> is <code>"quantile"</code> and multiple values
-  are specified in <code>probs</code> the returned object is a <code>length(probs)</code>
-  by <code>ncol(x)</code> matrix.</p>
-<p>The default/vector method returns a scalar, with one exception: when
-  <code>type</code> is <code>"quantile"</code> and multiple values are specified in
-  <code>probs</code> the returned object is a vector with <code>length(probs)</code>
-  elements.</p>
+  are specified in <code>probs</code> the <code>value</code> component is a vector with
+  <code>length(probs)</code> elements.</p></dd>
+ <dt><code>pareto_k</code></dt><dd><p>Function-specific diagnostic.
+
+  If <code>log_ratios</code> is not specified when calling <code>E_loo</code>,
+  <code>pareto_k</code> will be <code>NULL</code>. Otherwise, for the matrix method it
+  will be a vector of length <code>ncol(x)</code> containing estimates of the shape
+  parameter \(k\) of the generalized Pareto distribution. For the
+  default/vector method, the estimate is a scalar.</p></dd>
+</dl>
+
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
+    <pre class="examples"><div class='input'><span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
 <span class='co'># matrix and draws from the posterior predictive distribution</span>
 <span class='fu'>library</span>(<span class='st'>"rstanarm"</span>)
 
@@ -194,8 +237,58 @@ individual methods.</p></td>
   <span class='kw'>weight</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>ctl</span>, <span class='no'>trt</span>),
   <span class='kw'>group</span> <span class='kw'>=</span> <span class='fu'>gl</span>(<span class='fl'>2</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"Ctl"</span>,<span class='st'>"Trt"</span>))
 )
-<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>stan_glm</span>(<span class='no'>weight</span> ~ <span class='no'>group</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>)</div><div class='output co'>#&gt; <span class='message'>trying deprecated constructor; please alert package maintainer</span></div><div class='output co'>#&gt; 
+<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/stan_glm'>stan_glm</a></span>(<span class='no'>weight</span> ~ <span class='no'>group</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>)</div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
+#&gt; 
+#&gt; Gradient evaluation took 9.6e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.96 seconds.
+#&gt; Adjust your expectations accordingly!
+#&gt; 
+#&gt; 
+#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
+#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
+#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
+#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
+#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
+#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
+#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
+#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
+#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
+#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
+#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
+#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
+#&gt; 
+#&gt;  Elapsed Time: 0.060495 seconds (Warm-up)
+#&gt;                0.060043 seconds (Sampling)
+#&gt;                0.120538 seconds (Total)
+#&gt; 
+#&gt; 
+#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
+#&gt; 
+#&gt; Gradient evaluation took 3.4e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.34 seconds.
+#&gt; Adjust your expectations accordingly!
+#&gt; 
+#&gt; 
+#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
+#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
+#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
+#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
+#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
+#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
+#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
+#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
+#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
+#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
+#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
+#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
+#&gt; 
+#&gt;  Elapsed Time: 0.059246 seconds (Warm-up)
+#&gt;                0.062003 seconds (Sampling)
+#&gt;                0.121249 seconds (Total)
+#&gt; 
+#&gt; 
+#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 #&gt; 
 #&gt; Gradient evaluation took 2.5e-05 seconds
 #&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.25 seconds.
@@ -215,65 +308,15 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.045101 seconds (Warm-up)
-#&gt;                0.046464 seconds (Sampling)
-#&gt;                0.091565 seconds (Total)
-#&gt; 
-#&gt; 
-#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
-#&gt; 
-#&gt; Gradient evaluation took 3.1e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.31 seconds.
-#&gt; Adjust your expectations accordingly!
-#&gt; 
-#&gt; 
-#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
-#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
-#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
-#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
-#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
-#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
-#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
-#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
-#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
-#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
-#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
-#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt; 
-#&gt;  Elapsed Time: 0.044581 seconds (Warm-up)
-#&gt;                0.044181 seconds (Sampling)
-#&gt;                0.088762 seconds (Total)
-#&gt; 
-#&gt; 
-#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
-#&gt; 
-#&gt; Gradient evaluation took 2e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.2 seconds.
-#&gt; Adjust your expectations accordingly!
-#&gt; 
-#&gt; 
-#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
-#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
-#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
-#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
-#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
-#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
-#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
-#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
-#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
-#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
-#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
-#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt; 
-#&gt;  Elapsed Time: 0.048517 seconds (Warm-up)
-#&gt;                0.044183 seconds (Sampling)
-#&gt;                0.0927 seconds (Total)
+#&gt;  Elapsed Time: 0.062488 seconds (Warm-up)
+#&gt;                0.062903 seconds (Sampling)
+#&gt;                0.125391 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 #&gt; 
-#&gt; Gradient evaluation took 1.1e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+#&gt; Gradient evaluation took 1.5e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -290,29 +333,64 @@ individual methods.</p></td>
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.044552 seconds (Warm-up)
-#&gt;                0.044468 seconds (Sampling)
-#&gt;                0.08902 seconds (Total)
-#&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'>posterior_predict</span>(<span class='no'>fit</span>)
+#&gt;  Elapsed Time: 0.060954 seconds (Warm-up)
+#&gt;                0.062084 seconds (Sampling)
+#&gt;                0.123038 seconds (Total)
+#&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/posterior_predict.stanreg'>posterior_predict</a></span>(<span class='no'>fit</span>)
 <span class='fu'>dim</span>(<span class='no'>yrep</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
-<span class='no'>ll</span> <span class='kw'>&lt;-</span> <span class='fu'>log_lik</span>(<span class='no'>fit</span>)
-<span class='no'>lw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psislw.html'>psislw</a></span>(-<span class='no'>ll</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)$<span class='no'>lw_smooth</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></div><div class='input'><span class='fu'>dim</span>(<span class='no'>lw</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
-<span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>lw</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt;  [1] 5.138671 4.985160 5.016090 4.915210 5.080892 5.077818 4.994131 5.075250
-#&gt;  [9] 4.992551 5.001659 4.644745 4.713694 4.696196 4.773859 4.534438 4.748797
-#&gt; [17] 4.523078 4.623510 4.711757 4.665274</div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>lw</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"var"</span>)</div><div class='output co'>#&gt;  [1] 0.5946351 0.6011310 0.6076841 0.5489710 0.6124135 0.6378487 0.6234596
-#&gt;  [8] 0.6179831 0.6181676 0.5989046 0.6289565 0.6127202 0.6286769 0.5529180
-#&gt; [15] 0.5205391 0.5717348 0.4846393 0.6264684 0.6215462 0.6415826</div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>lw</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fl'>0.5</span>) <span class='co'># median</span></div><div class='output co'>#&gt;  [1] 5.138123 4.989043 5.023238 4.930933 5.076973 5.072379 4.996906 5.079048
-#&gt;  [9] 4.981956 4.985157 4.629981 4.715855 4.698259 4.772829 4.525018 4.749758
-#&gt; [17] 4.531188 4.631676 4.710634 4.661785</div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>lw</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.1</span>, <span class='fl'>0.9</span>))</div><div class='output co'>#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
-#&gt; [1,] 4.168906 4.022142 4.018365 3.964330 4.078852 4.084518 4.001782 4.083763
-#&gt; [2,] 6.113732 5.937602 5.987116 5.831365 6.067328 6.072594 5.965669 6.042356
+<span class='no'>ll</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/log_lik.stanreg'>log_lik</a></span>(<span class='no'>fit</span>)
+<span class='fu'>dim</span>(<span class='no'>ll</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
+<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(-<span class='no'>ll</span>), <span class='kw'>chain_id</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>4</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>1000</span>))
+<span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='kw'>log_ratios</span> <span class='kw'>=</span> -<span class='no'>ll</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></div><div class='input'>
+<span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
+#&gt;  [1] 5.128833 4.984844 5.011531 4.908768 5.091755 5.073753 5.005882 5.082594
+#&gt;  [9] 4.990460 4.998012 4.643382 4.721145 4.703733 4.774520 4.509268 4.754449
+#&gt; [17] 4.505448 4.635494 4.709564 4.667213
+#&gt; 
+#&gt; $pareto_k
+#&gt; NULL
+#&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"var"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
+#&gt;  [1] 0.0001886264 0.0002327015 0.0003506593 0.0002609670 0.0002592614
+#&gt;  [6] 0.0002670433 0.0003511051 0.0002536173 0.0003262130 0.0003494336
+#&gt; [11] 0.0003217072 0.0002779428 0.0003213056 0.0002447689 0.0003370669
+#&gt; [16] 0.0002385899 0.0003215824 0.0003205583 0.0002912583 0.0003326237
+#&gt; 
+#&gt; $pareto_k
+#&gt; NULL
+#&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fl'>0.5</span>) <span class='co'># median</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
+#&gt;  [1] 5.147247 4.989908 5.022941 4.924001 5.082348 5.068875 5.008909 5.078303
+#&gt;  [9] 4.999787 5.005506 4.632665 4.714657 4.709132 4.792277 4.495063 4.747107
+#&gt; [17] 4.513051 4.635817 4.710215 4.674142
+#&gt; 
+#&gt; $pareto_k
+#&gt; NULL
+#&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.1</span>, <span class='fl'>0.9</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
+#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]    [,6]     [,7]     [,8]
+#&gt; [1,] 4.165263 4.005839 4.005688 3.930421 4.098159 4.09161 4.021794 4.104154
+#&gt; [2,] 6.051625 5.959816 5.973289 5.871907 6.089659 6.08324 5.994003 6.072161
 #&gt;          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]
-#&gt; [1,] 4.017478 4.038297 3.666715 3.741089 3.695300 3.835308 3.616535 3.814350
-#&gt; [2,] 5.991321 5.974115 5.651807 5.702884 5.670938 5.698503 5.425953 5.706992
+#&gt; [1,] 3.991392 4.003963 3.660310 3.733489 3.665923 3.835678 3.580245 3.804866
+#&gt; [2,] 5.996076 5.983452 5.652362 5.753682 5.717218 5.689535 5.439665 5.719812
 #&gt;         [,17]    [,18]    [,19]    [,20]
-#&gt; [1,] 3.644202 3.609945 3.720679 3.649208
-#&gt; [2,] 5.398620 5.608497 5.704476 5.698210</div><div class='input'>
-
+#&gt; [1,] 3.639597 3.645458 3.760062 3.644717
+#&gt; [2,] 5.367175 5.621363 5.691079 5.672983
+#&gt; 
+#&gt; $pareto_k
+#&gt; NULL
+#&gt; </div><div class='input'>
+<span class='co'># To get Pareto k diagnostic with E_loo we also need to provide the negative</span>
+<span class='co'># log-likelihood values using the log_ratios argument.</span>
+<span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> -<span class='no'>ll</span>)</div><div class='output co'>#&gt; $value
+#&gt;  [1] 5.128833 4.984844 5.011531 4.908768 5.091755 5.073753 5.005882 5.082594
+#&gt;  [9] 4.990460 4.998012 4.643382 4.721145 4.703733 4.774520 4.509268 4.754449
+#&gt; [17] 4.505448 4.635494 4.709564 4.667213
+#&gt; 
+#&gt; $pareto_k
+#&gt;  [1] 0.180522216 0.172368616 0.016644363 0.337234123 0.234526375 0.112964343
+#&gt;  [7] 0.049724409 0.271361198 0.006507165 0.072583719 0.159187834 0.192203023
+#&gt; [13] 0.012472731 0.508770508 0.496375655 0.384671512 0.588086034 0.014594418
+#&gt; [19] 0.075905565 0.082729696
+#&gt; </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -330,15 +408,18 @@ individual methods.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry.</p>
+  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

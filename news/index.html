@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>All news • loo</title>
+<title>Changelog • loo</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,19 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Changelog" />
+
+<meta property="og:image" content="/logo.png" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +38,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,8 +55,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">loo</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">loo</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -56,6 +68,9 @@
 </li>
 <li>
   <a href="../reference/index.html">Functions</a>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -106,6 +121,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,24 +129,44 @@
       
       </header>
 
-      <div class="row">
-
-  <div class="col-md-9">
+<div class="row">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Change log <small>All releases</small></h1>
+      <h1>Changelog <small></small></h1>
+      
     </div>
 
-    <div class="contents">
+    <div id="loo-2-0-0" class="section level1">
+<h1 class="page-header">
+<a href="#loo-2-0-0" class="anchor"></a>loo 2.0.0<small> Unreleased </small>
+</h1>
+<p>This is a major release with many changes. Whenever possible we have opted to deprecate rather than remove old functionality, but it is possible that old code that accesses elements inside loo objects by position rather than name may error.</p>
+<ul>
+<li><p>New package documentation website <a href="http://mc-stan.org/loo/" class="uri">http://mc-stan.org/loo/</a> with vignettes, function reference, news.</p></li>
+<li><p>Updated existing vignette and added two new vignettes demonstrating how to use the package.</p></li>
+<li><p>New function <code><a href="../reference/psis.html">psis()</a></code> replaces <code><a href="../reference/psislw.html">psislw()</a></code> (now deprecated). This version implements the improvements to the PSIS algorithm described in the latest version of <a href="https://arxiv.org/abs/1507.02646" class="uri">https://arxiv.org/abs/1507.02646</a>. Additional diagnostic information is now also provided, including PSIS effective sample sizes.</p></li>
+<li><p>New <code>weights()</code> method for extracting smoothed weights from a <code>psis</code> object. Arguments <code>log</code> and <code>normalize</code> control whether the weights are returned on the log scale and whether they are normalized.</p></li>
+<li><p>Updated the interface for the <code><a href="../reference/loo.html">loo()</a></code> methods to integrate nicely with the new PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions are provided. Several arguments have changed, particularly for the <code>loo.function</code> method. The documentation at <code>help("loo")</code> has been updated to describe the new behavior.</p></li>
+<li><p>The structure of the objects returned by the <code><a href="../reference/loo.html">loo()</a></code> function has also changed slightly, as described in the <strong>Value</strong> section at <code>help("loo", package = "loo")</code>.</p></li>
+<li><p>New function <code><a href="../reference/loo_model_weights.html">loo_model_weights()</a></code> computes weights for model averaging as described in <a href="https://arxiv.org/abs/1704.02030" class="uri">https://arxiv.org/abs/1704.02030</a>. Implemented methods include stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.</p></li>
+<li><p>Setting <code>options(loo.cores=...)</code> is now deprecated in favor of <code>options(mc.cores=...)</code>. For now, if both the <code>loo.cores</code> and <code>mc.cores</code> options have been set, preference will be given to <code>loo.cores</code> until it is removed in a future release. (thanks to <a href='http://github.com/cfhammill'>@cfhammill</a>)</p></li>
+<li><p>New functions <code><a href="../reference/example_loglik_array.html">example_loglik_array()</a></code> and <code><a href="../reference/example_loglik_array.html">example_loglik_matrix()</a></code> that provide objects to use in examples and tests.</p></li>
+<li><p>When comparing more than two models with <code><a href="../reference/compare.html">compare()</a></code>, the first column of the output is now the <code>elpd</code> difference from the model in the first row.</p></li>
+<li><p>New helper functions for splitting observations for K-fold CV: <code><a href="../reference/kfold-helpers.html">kfold_split_random()</a></code>, <code><a href="../reference/kfold-helpers.html">kfold_split_balanced()</a></code>, <code><a href="../reference/kfold-helpers.html">kfold_split_stratified()</a></code>. Additional helper functions for implementing K-fold CV will be included in future releases.</p></li>
+</ul>
+</div>
     <div id="loo-1-1-0" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-1-1-0" class="anchor"></a>loo 1.1.0</h1>
+<h1 class="page-header">
+<a href="#loo-1-1-0" class="anchor"></a>loo 1.1.0<small> 2017-03-27 </small>
+</h1>
 <ul>
 <li>Introduce the <code>E_loo</code> function for computing weighted expectations (means, variances, quantiles).</li>
 </ul>
 </div>
     <div id="loo-1-0-0" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-1-0-0" class="anchor"></a>loo 1.0.0</h1>
+<h1 class="page-header">
+<a href="#loo-1-0-0" class="anchor"></a>loo 1.0.0<small> 2016-12-16 </small>
+</h1>
 <ul>
 <li>
 <code>pareto_k_table</code> and <code>pareto_k_ids</code> convenience functions for quickly identifying problematic observations</li>
@@ -145,18 +181,20 @@
 </ul>
 </div>
     <div id="loo-0-1-6" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-6" class="anchor"></a>loo 0.1.6</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-6" class="anchor"></a>loo 0.1.6<small> 2016-03-23 </small>
+</h1>
 <ul>
-<li>GitHub repository moved from @jgabry to @stan-dev</li>
+<li>GitHub repository moved from <a href='http://github.com/jgabry'>@jgabry</a> to <a href='http://github.com/stan'>@stan</a>-dev</li>
 <li>Better error messages from <code>extract_log_lik</code>
 </li>
-<li>Fix example code in vignette (thanks to GitHub user @krz)</li>
+<li>Fix example code in vignette (thanks to GitHub user <a href='http://github.com/krz'>@krz</a>)</li>
 </ul>
 </div>
     <div id="loo-0-1-5" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-5" class="anchor"></a>loo 0.1.5</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-5" class="anchor"></a>loo 0.1.5<small> 2016-02-12 </small>
+</h1>
 <ul>
 <li>Add warnings if any p_waic estimates are greather than 0.4</li>
 <li>Improve line coverage of tests to 100%</li>
@@ -165,8 +203,9 @@
 </ul>
 </div>
     <div id="loo-0-1-4" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-4" class="anchor"></a>loo 0.1.4</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-4" class="anchor"></a>loo 0.1.4<small> 2015-12-10 </small>
+</h1>
 <p>This update makes it easier for other package authors using <strong>loo</strong> to write tests that involve running the <code>loo</code> function. It also includes minor bug fixes and additional unit tests. Highlights:</p>
 <ul>
 <li>Don’t call functions from <strong>parallel</strong> package if <code>cores=1</code>.</li>
@@ -175,8 +214,9 @@
 </ul>
 </div>
     <div id="loo-0-1-3" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-3" class="anchor"></a>loo 0.1.3</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-3" class="anchor"></a>loo 0.1.3<small> 2015-09-18 </small>
+</h1>
 <p>This update provides several important improvements, most notably an alternative method for specifying the pointwise log-likelihood that reduces memory usage and allows for <strong>loo</strong> to be used with larger datasets. This update also makes it easier to to incorporate <strong>loo</strong>’s functionality into other packages.</p>
 <ul>
 <li>Add Ben Goodrich as contributor</li>
@@ -188,15 +228,17 @@
 </ul>
 </div>
     <div id="loo-0-1-2" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-2" class="anchor"></a>loo 0.1.2</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-2" class="anchor"></a>loo 0.1.2<small> 2015-07-17 </small>
+</h1>
 <ul>
 <li>Updates names in package to reflect name changes in the accompanying paper.</li>
 </ul>
 </div>
     <div id="loo-0-1-1" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-1" class="anchor"></a>loo 0.1.1</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-1" class="anchor"></a>loo 0.1.1<small> Unreleased </small>
+</h1>
 <ul>
 <li>Better handling of special cases</li>
 <li>Deprecates <code>loo_and_waic</code> function in favor of separate functions <code>loo</code> and <code>waic</code>
@@ -205,19 +247,20 @@
 </ul>
 </div>
     <div id="loo-0-1-0" class="section level1">
-<h1 class="hasAnchor">
-<a href="#loo-0-1-0" class="anchor"></a>loo 0.1.0</h1>
+<h1 class="page-header">
+<a href="#loo-0-1-0" class="anchor"></a>loo 0.1.0<small> 2015-06-26 </small>
+</h1>
 <ul>
 <li>Initial release</li>
 </ul>
 </div>
-    </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#loo-2-0-0">2.0.0</a></li>
         <li><a href="#loo-1-1-0">1.1.0</a></li>
         <li><a href="#loo-1-0-0">1.0.0</a></li>
         <li><a href="#loo-0-1-6">0.1.6</a></li>
@@ -235,15 +278,18 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry.</p>
+  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

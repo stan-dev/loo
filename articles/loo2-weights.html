@@ -241,7 +241,7 @@ stacking_wts &lt;-<span class="st"> </span><span class="kw"><a href="../referenc
 model1     0.02     0.02        0.07         0.01
 model2     0.01     0.01        0.04         0.00
 model3     0.02     0.02        0.04         0.00
-model4     0.96     0.95        0.86         0.99</code></pre>
+model4     0.96     0.95        0.85         0.99</code></pre>
 <p>With all approaches Model 4 with <code>neocortex</code> and <code>log(mass)</code> gets most of the weight. Based on theory, Pseudo-BMA weights without Bayesian bootstrap should be close to WAIC weights, and we can also see that here. Pseudo-BMA+ weights with Bayesian bootstrap provide more cautious weights further away from 0 and 1 (see Yao et al. (2018) for a discussion of why this can be beneficial and results from related experiments). In this particular example, the Bayesian stacking weights are not much different from the other weights.</p>
 <p>One of the benefits of stacking is that it manages well if there are many similar models. Consider for example that there could be many irrelevant covariates that when included would produce a similar model to one of the existing models. To emulate this situation here we simply copy the first model a bunch of times, but you can imagine that instead we would have ten alternative models with about the same predictive performance. WAIC weights for such a scenario would be close to the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">waic_wts_demo &lt;-<span class="st"> </span>
@@ -443,8 +443,8 @@ stacking_wts &lt;-<span class="st"> </span><span class="kw"><a href="../referenc
 <span class="kw">round</span>(<span class="kw">cbind</span>(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), <span class="dv">2</span>)</code></pre></div>
 <pre><code>       waic_wts pbma_wts pbma_BB_wts stacking_wts
 model1     0.38     0.35        0.29         0.00
-model2     0.58     0.63        0.52         0.78
-model3     0.04     0.03        0.19         0.22</code></pre>
+model2     0.58     0.63        0.53         0.78
+model3     0.04     0.03        0.18         0.22</code></pre>
 <p>All weights favor the second model with the log population and the contact rate. WAIC weights and Pseudo-BMA weights (without Bayesian bootstrap) are similar, while Pseudo-BMA+ is more cautious and closer to stacking weights.</p>
 <p>It may seem surprising that Bayesian stacking is giving zero weight to the first model, but this is likely due to the fact that the estimated effect for the interaction term is close to zero and thus models 1 and 2 give very similar predictions. In other words, incorporating the model with the interaction (model 1) into the model average doesn’t improve the predictions at all and so model 1 is given a weight of 0. On the other hand, models 2 and 3 are giving slightly different predictions and thus their combination may be slightly better than either alone. This behavior is related to the repeated similar model illustration in the milk example abve.</p>
 </div>
@@ -465,9 +465,9 @@ model3 0.224 </code></pre>
 <pre><code>Method: pseudo-BMA+ with Bayesian bootstrap
 ------
        weight
-model1 0.296 
-model2 0.524 
-model3 0.180 </code></pre>
+model1 0.284 
+model2 0.540 
+model3 0.176 </code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/loo_model_weights.html">loo_model_weights</a></span>(loo_list, <span class="dt">method =</span> <span class="st">"pseudobma"</span>, <span class="dt">BB =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>Method: pseudo-BMA
 ------

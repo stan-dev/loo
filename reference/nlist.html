@@ -18,13 +18,24 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Named lists — nlist" />
+
+<meta property="og:description" content="Create a named list using specified names or, if names are omitted, using the
+names of the objects in the list. The code list(a = a, b = b) becomes
+nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b =
+2), etc." />
+
+<meta property="og:image" content="/logo.png" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +43,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,8 +60,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">loo</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">loo</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -56,6 +73,9 @@
 </li>
 <li>
   <a href="../reference/index.html">Functions</a>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -106,6 +126,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,10 +134,11 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Named lists</h1>
+    
     </div>
 
     
@@ -128,7 +150,7 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 
     <pre class="usage"><span class='fu'>nlist</span>(<span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -152,26 +174,26 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'>rnorm</span>(<span class='fl'>100</span>)
 <span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'>mat.or.vec</span>(<span class='fl'>10</span>, <span class='fl'>3</span>)
 <span class='fu'>nlist</span>(<span class='no'>a</span>,<span class='no'>b</span>)</div><div class='output co'>#&gt; $a
-#&gt;   [1]  0.3753640358  0.6671638718 -0.0085762390  0.0924404534  0.3202826420
-#&gt;   [6]  0.1650912505 -1.0532067343  0.4473946768  1.0571368249 -1.4751573301
-#&gt;  [11]  0.2007328598 -0.0704526903 -0.7503191563 -0.0940137619  0.4127494623
-#&gt;  [16] -1.2574789605  0.1970634927 -1.8923149164  0.2521761638 -0.6478509158
-#&gt;  [21] -0.2660576830 -0.2867678201 -0.5292874552 -0.5570450259 -0.5484389126
-#&gt;  [26]  0.0637433919 -1.1780599708 -1.3749018547  0.3333497355  0.5597446727
-#&gt;  [31] -1.1577567141  1.3595626446  1.3923633348 -1.6319603432  0.9944334727
-#&gt;  [36]  1.5975854685 -0.6759390641  0.5056522754  0.8613147025  0.7455505896
-#&gt;  [41]  0.9483998776 -0.2782412747  1.1369703696  0.9784894267  1.6473931433
-#&gt;  [46] -1.5064649019 -1.7938317434 -1.3929985639  0.4638976694  0.7481313731
-#&gt;  [51]  1.2235672736  0.3287331376  1.2029108012 -1.1780358319  0.9161471125
-#&gt;  [56] -0.3907389634 -0.3312925958 -0.8074691521  0.1419367987  0.3662676984
-#&gt;  [61] -2.0921697182 -0.0206317239 -0.9036675123  2.1467501026  0.5278421596
-#&gt;  [66] -1.1615360222  0.3266761594  0.4316068917  1.2290550882 -0.6725782514
-#&gt;  [71]  1.6159861082 -2.8560617851 -0.5694742942 -0.7325862311  1.6786160405
-#&gt;  [76]  0.3883841608 -0.3991853599 -1.2244360744  0.6694015824  0.9747660832
-#&gt;  [81] -0.8596496125  0.0633182687 -0.4065883075  0.2482428663 -0.2514846631
-#&gt;  [86] -0.9799973963  0.5890418888 -1.4048948877 -1.5097889155 -0.4215444125
-#&gt;  [91]  1.2801836193 -0.3640600647 -0.8525419120 -0.1058764092  1.3290976925
-#&gt;  [96] -0.2796422221  0.0507539340 -0.0793683132  0.2210828405  0.0009076064
+#&gt;   [1] -0.206789164  0.922646107 -0.320449609 -2.552648591 -1.014823576
+#&gt;   [6]  0.802262521  0.025634876  0.089030130  0.521809703  0.918410156
+#&gt;  [11]  0.962582699  0.895213242  1.268823936  0.094386351  1.292747905
+#&gt;  [16]  0.367395197 -0.594949440  0.163011962  0.316493928  1.753212839
+#&gt;  [21]  0.625038745 -0.148160369  0.392594703 -0.735622758  0.528913232
+#&gt;  [26] -0.836986269 -0.149005371  0.033899579  0.024681803  0.738543521
+#&gt;  [31] -0.014105841 -0.159204506 -1.174693604  0.975080590 -0.284539223
+#&gt;  [36]  0.330507943  1.839919226  0.039817140  1.804426538 -1.049620979
+#&gt;  [41]  0.044036707 -0.094374547  0.642173389 -0.280407516 -0.984482975
+#&gt;  [46]  0.302980034 -0.350569281  0.394746468 -0.261363418 -0.972308624
+#&gt;  [51] -0.008038233  0.209251551  0.542384381 -0.167118672  0.004403951
+#&gt;  [56]  0.389746061  0.376143228  0.592150760  0.645274454 -1.049294699
+#&gt;  [61]  0.644990191 -0.263188218  1.850312200  0.088543708  0.285163704
+#&gt;  [66] -1.162402412  2.466278714 -1.493913333  0.417038502  0.482141368
+#&gt;  [71] -0.410823237 -3.087014900  1.581796692 -0.839480582  0.410219951
+#&gt;  [76] -1.183468994  0.353053733 -0.454707326 -1.178294508 -2.018096252
+#&gt;  [81]  1.994754962 -0.960276312  0.540127375 -0.213814497 -0.445202294
+#&gt;  [86]  1.001142647  0.609748821 -2.160056912  1.156641959 -1.565620202
+#&gt;  [91] -0.158667377 -2.740516348 -0.603471438 -0.135045909 -0.051951773
+#&gt;  [96] -0.387507753 -0.846610908 -0.587023054 -1.139988089 -0.046723948
 #&gt; 
 #&gt; $b
 #&gt;       [,1] [,2] [,3]
@@ -188,26 +210,26 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 #&gt; </div><div class='input'>
 <span class='co'># Define some variables in the call and take the rest from the environment</span>
 <span class='fu'>nlist</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='kw'>veggies</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lettuce"</span>, <span class='st'>"spinach"</span>), <span class='kw'>fruits</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"banana"</span>, <span class='st'>"papaya"</span>))</div><div class='output co'>#&gt; $a
-#&gt;   [1]  0.3753640358  0.6671638718 -0.0085762390  0.0924404534  0.3202826420
-#&gt;   [6]  0.1650912505 -1.0532067343  0.4473946768  1.0571368249 -1.4751573301
-#&gt;  [11]  0.2007328598 -0.0704526903 -0.7503191563 -0.0940137619  0.4127494623
-#&gt;  [16] -1.2574789605  0.1970634927 -1.8923149164  0.2521761638 -0.6478509158
-#&gt;  [21] -0.2660576830 -0.2867678201 -0.5292874552 -0.5570450259 -0.5484389126
-#&gt;  [26]  0.0637433919 -1.1780599708 -1.3749018547  0.3333497355  0.5597446727
-#&gt;  [31] -1.1577567141  1.3595626446  1.3923633348 -1.6319603432  0.9944334727
-#&gt;  [36]  1.5975854685 -0.6759390641  0.5056522754  0.8613147025  0.7455505896
-#&gt;  [41]  0.9483998776 -0.2782412747  1.1369703696  0.9784894267  1.6473931433
-#&gt;  [46] -1.5064649019 -1.7938317434 -1.3929985639  0.4638976694  0.7481313731
-#&gt;  [51]  1.2235672736  0.3287331376  1.2029108012 -1.1780358319  0.9161471125
-#&gt;  [56] -0.3907389634 -0.3312925958 -0.8074691521  0.1419367987  0.3662676984
-#&gt;  [61] -2.0921697182 -0.0206317239 -0.9036675123  2.1467501026  0.5278421596
-#&gt;  [66] -1.1615360222  0.3266761594  0.4316068917  1.2290550882 -0.6725782514
-#&gt;  [71]  1.6159861082 -2.8560617851 -0.5694742942 -0.7325862311  1.6786160405
-#&gt;  [76]  0.3883841608 -0.3991853599 -1.2244360744  0.6694015824  0.9747660832
-#&gt;  [81] -0.8596496125  0.0633182687 -0.4065883075  0.2482428663 -0.2514846631
-#&gt;  [86] -0.9799973963  0.5890418888 -1.4048948877 -1.5097889155 -0.4215444125
-#&gt;  [91]  1.2801836193 -0.3640600647 -0.8525419120 -0.1058764092  1.3290976925
-#&gt;  [96] -0.2796422221  0.0507539340 -0.0793683132  0.2210828405  0.0009076064
+#&gt;   [1] -0.206789164  0.922646107 -0.320449609 -2.552648591 -1.014823576
+#&gt;   [6]  0.802262521  0.025634876  0.089030130  0.521809703  0.918410156
+#&gt;  [11]  0.962582699  0.895213242  1.268823936  0.094386351  1.292747905
+#&gt;  [16]  0.367395197 -0.594949440  0.163011962  0.316493928  1.753212839
+#&gt;  [21]  0.625038745 -0.148160369  0.392594703 -0.735622758  0.528913232
+#&gt;  [26] -0.836986269 -0.149005371  0.033899579  0.024681803  0.738543521
+#&gt;  [31] -0.014105841 -0.159204506 -1.174693604  0.975080590 -0.284539223
+#&gt;  [36]  0.330507943  1.839919226  0.039817140  1.804426538 -1.049620979
+#&gt;  [41]  0.044036707 -0.094374547  0.642173389 -0.280407516 -0.984482975
+#&gt;  [46]  0.302980034 -0.350569281  0.394746468 -0.261363418 -0.972308624
+#&gt;  [51] -0.008038233  0.209251551  0.542384381 -0.167118672  0.004403951
+#&gt;  [56]  0.389746061  0.376143228  0.592150760  0.645274454 -1.049294699
+#&gt;  [61]  0.644990191 -0.263188218  1.850312200  0.088543708  0.285163704
+#&gt;  [66] -1.162402412  2.466278714 -1.493913333  0.417038502  0.482141368
+#&gt;  [71] -0.410823237 -3.087014900  1.581796692 -0.839480582  0.410219951
+#&gt;  [76] -1.183468994  0.353053733 -0.454707326 -1.178294508 -2.018096252
+#&gt;  [81]  1.994754962 -0.960276312  0.540127375 -0.213814497 -0.445202294
+#&gt;  [86]  1.001142647  0.609748821 -2.160056912  1.156641959 -1.565620202
+#&gt;  [91] -0.158667377 -2.740516348 -0.603471438 -0.135045909 -0.051951773
+#&gt;  [96] -0.387507753 -0.846610908 -0.587023054 -1.139988089 -0.046723948
 #&gt; 
 #&gt; $b
 #&gt;       [,1] [,2] [,3]
@@ -251,15 +273,18 @@ Jonah Gabry
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry.</p>
+  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

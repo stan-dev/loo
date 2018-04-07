@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract pointwise log-likelihood matrix from a Stan model — extract_log_lik • loo</title>
+<title>Extract pointwise log-likelihood from a Stan model — extract_log_lik • loo</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,22 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Extract pointwise log-likelihood from a Stan model — extract_log_lik" />
+
+<meta property="og:description" content="Convenience function for extracting the pointwise log-likelihood
+matrix or array from a fitted Stan model." />
+
+<meta property="og:image" content="/logo.png" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +41,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,8 +58,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">loo</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">loo</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -56,6 +71,9 @@
 </li>
 <li>
   <a href="../reference/index.html">Functions</a>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -106,6 +124,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -113,20 +132,21 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract pointwise log-likelihood matrix from a Stan model</h1>
+    <h1>Extract pointwise log-likelihood from a Stan model</h1>
+    
     </div>
 
     
-    <p>Convenience function for extracting the pointwise log-likelihood from a
-fitted Stan model.</p>
+    <p>Convenience function for extracting the pointwise log-likelihood
+matrix or array from a fitted Stan model.</p>
     
 
-    <pre class="usage"><span class='fu'>extract_log_lik</span>(<span class='no'>stanfit</span>, <span class='kw'>parameter_name</span> <span class='kw'>=</span> <span class='st'>"log_lik"</span>)</pre>
+    <pre class="usage"><span class='fu'>extract_log_lik</span>(<span class='no'>stanfit</span>, <span class='kw'>parameter_name</span> <span class='kw'>=</span> <span class='st'>"log_lik"</span>, <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -138,13 +158,21 @@ fitted Stan model.</p>
       <td><p>A character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.</p></td>
     </tr>
+    <tr>
+      <th>merge_chains</th>
+      <td><p>If <code>TRUE</code> (the default), all Markov chains are
+merged together (i.e., stacked) and a matrix is returned. If <code>FALSE</code>
+they are kept separate and an array is returned.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An \(S\) by \(N\) matrix of (post-warmup) extracted draws, where
-  \(S\) is the size of the posterior sample and \(N\) is the number of
-  data points.</p>
+    <p>If <code>merge_chains=TRUE</code>, an \(S\) by \(N\) matrix of
+  (post-warmup) extracted draws, where \(S\) is the size of the posterior
+  sample and \(N\) is the number of data points. If
+  <code>merge_chains=FALSE</code>, an \(I\) by \(C\) by \(N\) array, where
+  \(I \times C = S\).</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -161,14 +189,14 @@ quantity) in the Stan model corresponding to the log-likelihood.</p></td>
   <code>N</code> data points, outcome <code>y</code>, predictor matrix <code>X</code>,
   coefficients <code>beta</code>, and standard deviation <code>sigma</code>:</p>
 <p><code>vector[N] log_lik;</code></p>
-<p><code>for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n] * beta, sigma);</code></p>
+<p><code>for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);</code></p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Stan Development Team (2016). The Stan C++ Library, Version 2.10.0.
-<a href = 'http://mc-stan.org/documentation/'>http://mc-stan.org/documentation/</a></p>
-<p>Stan Development Team (2016). RStan: the R interface to Stan, Version 2.10.1.
-<a href = 'http://mc-stan.org/interfaces/rstan.html'>http://mc-stan.org/interfaces/rstan.html</a></p>
+    <p>Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+<a href='http://mc-stan.org/'>http://mc-stan.org/</a></p>
+<p>Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+<a href='http://mc-stan.org/'>http://mc-stan.org/</a></p>
     
 
   </div>
@@ -189,15 +217,18 @@ quantity) in the Stan model corresponding to the log-likelihood.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry.</p>
+  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+
