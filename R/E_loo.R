@@ -30,7 +30,7 @@
 #'   For the matrix method, \code{value} is a vector with \code{ncol(x)}
 #'   elements, with one exception: when \code{type} is \code{"quantile"} and
 #'   multiple values are specified in \code{probs} the \code{value} component of
-#'   the retured object is a \code{length(probs)} by \code{ncol(x)} matrix.
+#'   the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 #'
 #'   For the default/vector method the \code{value} component is scalar, with
 #'   one exception: when \code{type} is \code{"quantile"} and multiple values
