@@ -10,9 +10,13 @@ LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
-r_eff_arr <- relative_eff(exp(-LLarr))
-r_eff_vec <- relative_eff(exp(-LLvec), chain_id = chain_id)
+r_eff_arr <- relative_eff(exp(LLarr))
+r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
+
+test_that("psis results haven't changed", {
+  expect_equal_to_reference(psis1, "psis.rds")
+})
 
 test_that("psis returns object with correct structure", {
   expect_true(is.psis(psis1))
