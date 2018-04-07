@@ -22,7 +22,7 @@
 #'    entire object \code{draws} will be passed to the \code{draws} argument of
 #'    the log-likelihood function.
 #'    \item The \code{...} can be used to pass additional arguments to your
-#'    log-likelihood function. These arguments ase used like the \code{draws}
+#'    log-likelihood function. These arguments are used like the \code{draws}
 #'    argument in that they are recycled for each observation.
 #'  }
 #'

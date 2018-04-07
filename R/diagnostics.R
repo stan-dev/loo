@@ -172,7 +172,7 @@ psis_n_eff_values <- function(x) {
 #' @rdname pareto-k-diagnostic
 #' @export
 #' @return \code{mcse_loo} returns the Monte carlo standard error (MCSE)
-#'   estimate for PSIS-LOO. MCSE wil be NA if any Pareto \eqn{k} values are
+#'   estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
 #'   above \code{threshold}.
 #'
 mcse_loo <- function(x, threshold = 0.7) {
