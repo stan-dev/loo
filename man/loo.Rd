@@ -6,7 +6,7 @@
 \alias{loo.matrix}
 \alias{loo.function}
 \alias{loo_i}
-\title{Leave-one-out cross-validation (LOO)}
+\title{Efficient approximate leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
 
@@ -106,19 +106,21 @@ The \code{loo_i} function returns a named list with components
   observation.
 }
 \description{
-Efficient approximate leave-one-out cross-validation for
-  Bayesian models using Pareto smoothed importance sampling (PSIS). See
-  Vehtari, Gelman, and Gabry (2017a, 2017b) and \link{loo-package} for
-  background.
-
-  The \code{loo} function is an S3 generic and methods are provided for
-  computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-  log-likelihood matrices, and log-likelihood functions. The array and matrix
-  methods are most convenient, but for models fit to very large datasets the
-  \code{loo.function} method is more memory efficient and may be preferable.
+The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
+models using Pareto smoothed importance sampling (PSIS). This is an
+implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
+2017b).
 
 The \code{loo_i} function enables testing log-likelihood
   functions for use with the \code{loo.function} method.
+}
+\details{
+The \code{loo} function is an S3 generic and methods are provided
+  for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
+  log-likelihood matrices, and log-likelihood functions. The array and matrix
+  methods are most convenient, but for models fit to very large datasets the
+  \code{loo.function} method is more memory efficient and may be preferable.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -157,6 +159,15 @@ of data points.
    argument in that they are recycled for each observation.
  }
 }}
+
+\section{Defining \code{loo} methods in a package}{
+ Package developers can
+  define \code{loo} methods for fitted models objects. See the example
+  \code{loo.stanfit} method in the \strong{Examples} section below for an
+  example of defining a method that calls \code{loo.array}. The
+  \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
+  method that calls \code{loo.function}.
+}
 
 \examples{
 
@@ -219,6 +230,36 @@ log_lik_matrix <- sapply(1:N, function(i) {
 })
 loo_with_mat <- loo(log_lik_matrix)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
+
+
+\dontrun{
+### For package developers: defining loo methods
+
+# An example of a possible loo method for 'stanfit' objects (rstan package).
+# A similar method is planned for a future release of rstan (or is already
+# released, depending on when you are reading this). In order for users
+# to be able to call loo(stanfit) instead of loo.stanfit(stanfit) the
+# NAMESPACE needs to be handled appropriately (roxygen2 and devtools packages
+# are good for that).
+#
+loo.stanfit <-
+ function(x,
+         pars = "log_lik",
+         ...,
+         cores = getOption("mc.cores", 1),
+         save_psis = FALSE) {
+  stopifnot(length(pars) == 1L)
+  LLarray <- loo::extract_log_lik(stanfit = x,
+                                  parameter_name = pars,
+                                  merge_chains = FALSE)
+  r_eff <- loo::relative_eff(x = exp(LLarray), cores = cores)
+  loo::loo.array(LLarray,
+                 r_eff = r_eff,
+                 cores = cores,
+                 save_psis = save_psis)
+}
+}
+
 
 }
 \references{
