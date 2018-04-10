@@ -19,7 +19,10 @@
 #'   term in self-normalizing importance sampling. If \code{r_eff} is not
 #'   provided then the reported PSIS effective sample sizes and Monte Carlo
 #'   error estimates will be over-optimistic. See the \code{\link{relative_eff}}
-#'   helper function for computing \code{r_eff}.
+#'   helper function for computing \code{r_eff}. If using \code{psis} with
+#'   draws of the \code{log_ratios} not obtained from MCMC then the warning
+#'   message thrown when not specifying \code{r_eff} can be disabled by
+#'   setting \code{r_eff} to \code{NA}.
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:
@@ -92,19 +95,14 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
+  function(log_ratios, ...,
+           r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
-    stopifnot(
-      length(dim(log_ratios)) == 3,
-      is.null(r_eff) || length(r_eff) == dim(log_ratios)[3]
-    )
+    stopifnot(length(dim(log_ratios)) == 3)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
-    if (is.null(r_eff)) {
-      if (!called_from_loo()) throw_psis_r_eff_warning()
-      r_eff <- rep(1, ncol(log_ratios))
-    }
-
+    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
@@ -113,14 +111,13 @@ psis.array <-
 #' @template matrix
 #'
 psis.matrix <-
-  function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
+  function(log_ratios,
+           ...,
+           r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
-    stopifnot(is.null(r_eff) || length(r_eff) == ncol(log_ratios))
     log_ratios <- validate_ll(log_ratios)
-    if (is.null(r_eff)) {
-      if (!called_from_loo()) throw_psis_r_eff_warning()
-      r_eff <- rep(1, ncol(log_ratios))
-    }
+    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
@@ -130,16 +127,10 @@ psis.matrix <-
 #'
 psis.default <-
   function(log_ratios, ..., r_eff = NULL) {
-    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1,
-              is.null(r_eff) || length(r_eff) == 1)
+    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
-    if (is.null(r_eff)) {
-      if (!called_from_loo()) throw_psis_r_eff_warning()
-      r_eff <- 1
-    }
-    psis.matrix(log_ratios,
-                r_eff = r_eff,
-                cores = 1)
+    r_eff <- prepare_psis_r_eff(r_eff, len = 1)
+    psis.matrix(log_ratios, r_eff = r_eff, cores = 1)
   }
 
 #' @rdname psis
@@ -191,8 +182,7 @@ dim.psis <- function(x) {
 #   the top of this file.
 #
 do_psis <- function(log_ratios, r_eff, cores) {
-  stopifnot(length(r_eff) == ncol(log_ratios),
-            cores == as.integer(cores))
+  stopifnot(cores == as.integer(cores))
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
@@ -444,8 +434,33 @@ throw_tail_length_warnings <- function(tail_lengths) {
   invisible(tail_lengths)
 }
 
+#' Prepare r_eff to pass to psis and throw warnings/errors if necessary
+#'
+#' @noRd
+#' @param r_eff User's r_eff argument.
+#' @param len The length r_eff should have if not NULL or NA.
+#' @return If \code{r_eff} has length \code{len} then \code{r_eff} is returned.
+#'   If \code{r_eff} is NULL then a warning is thrown and \code{rep(1, len)} is
+#'   returned. If \code{r_eff} is NA then the warning is skipped and
+#'   \code{rep(1, len)} is returned. If \code{r_eff} has length \code{len}
+#'   but some of the values are \code{NA} then an error is thrown.
+#'
+prepare_psis_r_eff <- function(r_eff, len) {
+  if (isTRUE(is.null(r_eff) || is.na(r_eff))) {
+    if (!called_from_loo() && is.null(r_eff)) {
+      throw_psis_r_eff_warning()
+    }
+    r_eff <- rep(1, len)
+  } else if (length(r_eff) != len) {
+    stop("'r_eff' must have one value per observation.", call. = FALSE)
+  } else if (any(is.na(r_eff))) {
+    stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
+  }
+  return(r_eff)
+}
 
-#' Warning message if r_eff not specified
+
+#' r_eff warning message
 #' @noRd
 #'
 throw_psis_r_eff_warning <- function() {
