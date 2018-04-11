@@ -187,7 +187,10 @@ This is related to the relative efficiency of estimating the normalizing
 term in self-normalizing importance sampling. If <code>r_eff</code> is not
 provided then the reported PSIS effective sample sizes and Monte Carlo
 error estimates will be over-optimistic. See the <code><a href='relative_eff.html'>relative_eff</a></code>
-helper function for computing <code>r_eff</code>.</p></td>
+helper function for computing <code>r_eff</code>. If using <code>psis</code> with
+draws of the <code>log_ratios</code> not obtained from MCMC then the warning
+message thrown when not specifying <code>r_eff</code> can be disabled by
+setting <code>r_eff</code> to <code>NA</code>.</p></td>
     </tr>
     <tr>
       <th>cores</th>
@@ -282,16 +285,16 @@ of data points.</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>log_ratios</span> <span class='kw'>&lt;-</span> -<span class='fl'>1</span> * <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(<span class='no'>log_ratios</span>))
+<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(-<span class='no'>log_ratios</span>))
 <span class='no'>psis_result</span> <span class='kw'>&lt;-</span> <span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>)
 <span class='fu'>str</span>(<span class='no'>psis_result</span>)</div><div class='output co'>#&gt; List of 2
 #&gt;  $ log_weights: num [1:1000, 1:32] -0.694 -0.941 -0.818 -0.649 -0.816 ...
 #&gt;  $ diagnostics:List of 2
-#&gt;   ..$ pareto_k: num [1:32] 0.0402 -0.0354 0.0806 -0.0422 -0.0937 ...
-#&gt;   ..$ n_eff   : num [1:32] 878 855 890 849 817 ...
+#&gt;   ..$ pareto_k: num [1:32] 0.0447 -0.0475 0.0696 -0.052 -0.1073 ...
+#&gt;   ..$ n_eff   : num [1:32] 900 888 929 895 858 ...
 #&gt;  - attr(*, "norm_const_log")= num [1:32] 6.22 6.47 6.17 6.47 6.52 ...
-#&gt;  - attr(*, "tail_len")= num [1:32] 100 102 99 102 105 107 103 108 107 102 ...
-#&gt;  - attr(*, "r_eff")= num [1:32] 0.91 0.871 0.928 0.866 0.831 ...
+#&gt;  - attr(*, "tail_len")= num [1:32] 99 100 97 100 102 104 99 100 103 99 ...
+#&gt;  - attr(*, "r_eff")= num [1:32] 0.933 0.904 0.968 0.913 0.873 ...
 #&gt;  - attr(*, "dims")= int [1:2] 1000 32
 #&gt;  - attr(*, "class")= chr [1:2] "psis" "list"</div><div class='input'><span class='fu'>plot</span>(<span class='no'>psis_result</span>)</div><div class='img'><img src='psis-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># extract smoothed weights</span>

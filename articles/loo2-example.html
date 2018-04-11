@@ -107,7 +107,7 @@
       <h1>Using the loo package (version &gt;= 2.0.0)</h1>
                         <h4 class="author">Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2018-04-06</h4>
+            <h4 class="date">2018-04-11</h4>
       
       
 
@@ -198,9 +198,9 @@ roaches<span class="op">$</span>roach1 &lt;-<span class="st"> </span>roaches<spa
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate     SE
-elpd_loo  -6244.8  727.0
-p_loo       292.7   72.9
-looic     12489.6 1453.9
+elpd_loo  -6236.9  725.4
+p_loo       284.9   69.1
+looic     12473.8 1450.7
 ------
 Monte Carlo SE of elpd_loo is NA.
 
@@ -251,7 +251,7 @@ Unlike the Poisson distribution, the negative binomial distribution allows the c
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate   SE
-elpd_loo   -895.9 37.8
+elpd_loo   -895.8 37.8
 p_loo         6.9  2.7
 looic      1791.7 75.5
 ------
@@ -259,7 +259,7 @@ Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     261   99.6%   740       
+(-Inf, 0.5]   (good)     261   99.6%   783       
  (0.5, 0.7]   (ok)         0    0.0%   &lt;NA&gt;      
    (0.7, 1]   (bad)        1    0.4%   27        
    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
@@ -306,7 +306,7 @@ Model comparison:
 (negative 'elpd_diff' favors 1st model, positive favors 2nd) 
 
 elpd_diff        se 
-   5349.1     708.3 </code></pre>
+   5341.2     706.7 </code></pre>
 <p>The difference in ELPD is much larger than twice the estimated standard error again indicating that the negative-binomial model is expected to have better predictive performance than the Poisson model. However, according to the LOO-PIT checks there is still some misspecification, and a reasonable guess is that a hurdle or zero-inflated model would be an improvement (we leave that for another case study).</p>
 <p><br></p>
 </div>

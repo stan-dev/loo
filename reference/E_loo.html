@@ -239,8 +239,8 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/stan_glm'>stan_glm</a></span>(<span class='no'>weight</span> ~ <span class='no'>group</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>)</div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 #&gt; 
-#&gt; Gradient evaluation took 0.000194 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.94 seconds.
+#&gt; Gradient evaluation took 0.000134 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.34 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -257,15 +257,15 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.071666 seconds (Warm-up)
-#&gt;                0.060012 seconds (Sampling)
-#&gt;                0.131678 seconds (Total)
+#&gt;  Elapsed Time: 0.055251 seconds (Warm-up)
+#&gt;                0.051449 seconds (Sampling)
+#&gt;                0.1067 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
 #&gt; 
-#&gt; Gradient evaluation took 3.5e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.35 seconds.
+#&gt; Gradient evaluation took 1.3e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -282,37 +282,12 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.057379 seconds (Warm-up)
-#&gt;                0.062034 seconds (Sampling)
-#&gt;                0.119413 seconds (Total)
+#&gt;  Elapsed Time: 0.050602 seconds (Warm-up)
+#&gt;                0.051318 seconds (Sampling)
+#&gt;                0.10192 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
-#&gt; 
-#&gt; Gradient evaluation took 2.8e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.28 seconds.
-#&gt; Adjust your expectations accordingly!
-#&gt; 
-#&gt; 
-#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
-#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
-#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
-#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
-#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
-#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
-#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
-#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
-#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
-#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
-#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
-#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt; 
-#&gt;  Elapsed Time: 0.071968 seconds (Warm-up)
-#&gt;                0.065139 seconds (Sampling)
-#&gt;                0.137107 seconds (Total)
-#&gt; 
-#&gt; 
-#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 #&gt; 
 #&gt; Gradient evaluation took 2.3e-05 seconds
 #&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.23 seconds.
@@ -332,63 +307,88 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.058573 seconds (Warm-up)
-#&gt;                0.065361 seconds (Sampling)
-#&gt;                0.123934 seconds (Total)
+#&gt;  Elapsed Time: 0.060142 seconds (Warm-up)
+#&gt;                0.059603 seconds (Sampling)
+#&gt;                0.119745 seconds (Total)
+#&gt; 
+#&gt; 
+#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+#&gt; 
+#&gt; Gradient evaluation took 2.6e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.
+#&gt; Adjust your expectations accordingly!
+#&gt; 
+#&gt; 
+#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
+#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
+#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
+#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
+#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
+#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
+#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
+#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
+#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
+#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
+#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
+#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
+#&gt; 
+#&gt;  Elapsed Time: 0.056988 seconds (Warm-up)
+#&gt;                0.055175 seconds (Sampling)
+#&gt;                0.112163 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/posterior_predict.stanreg'>posterior_predict</a></span>(<span class='no'>fit</span>)
 <span class='fu'>dim</span>(<span class='no'>yrep</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
-<span class='no'>ll</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/log_lik.stanreg'>log_lik</a></span>(<span class='no'>fit</span>)
-<span class='fu'>dim</span>(<span class='no'>ll</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
-<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(-<span class='no'>ll</span>), <span class='kw'>chain_id</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>4</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>1000</span>))
-<span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='kw'>log_ratios</span> <span class='kw'>=</span> -<span class='no'>ll</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></div><div class='input'>
+<span class='no'>log_ratios</span> <span class='kw'>&lt;-</span> -<span class='fl'>1</span> * <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/log_lik.stanreg'>log_lik</a></span>(<span class='no'>fit</span>)
+<span class='fu'>dim</span>(<span class='no'>ll</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'll' not found</span></div><div class='input'>
+<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(-<span class='no'>log_ratios</span>), <span class='kw'>chain_id</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>4</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>1000</span>))
+<span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></div><div class='input'>
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.128833 4.984844 5.011531 4.908768 5.091755 5.073753 5.005882 5.082594
-#&gt;  [9] 4.990460 4.998012 4.643382 4.721145 4.703733 4.774520 4.509268 4.754449
-#&gt; [17] 4.505448 4.635494 4.709564 4.667213
+#&gt;  [1] 5.128897 4.984826 5.011531 4.908784 5.091790 5.073746 5.005896 5.082598
+#&gt;  [9] 4.990450 4.998032 4.643375 4.721066 4.703745 4.774520 4.509724 4.754599
+#&gt; [17] 4.505512 4.635344 4.709592 4.667202
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"var"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 0.0001886264 0.0002327015 0.0003506593 0.0002609670 0.0002592614
-#&gt;  [6] 0.0002670433 0.0003511051 0.0002536173 0.0003262130 0.0003494336
-#&gt; [11] 0.0003217072 0.0002779428 0.0003213056 0.0002447689 0.0003370669
-#&gt; [16] 0.0002385899 0.0003215824 0.0003205583 0.0002912583 0.0003326237
+#&gt;  [1] 0.0001754501 0.0001814906 0.0003149217 0.0002419038 0.0002111947
+#&gt;  [6] 0.0002235507 0.0003156031 0.0002107437 0.0002862320 0.0003145455
+#&gt; [11] 0.0002762232 0.0002297163 0.0002857804 0.0002434963 0.0004458073
+#&gt; [16] 0.0002065586 0.0004816739 0.0002698437 0.0002521878 0.0002962633
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fl'>0.5</span>) <span class='co'># median</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.147247 4.989908 5.022941 4.924001 5.082348 5.068875 5.008909 5.078303
-#&gt;  [9] 4.999787 5.005506 4.632665 4.714657 4.709132 4.792277 4.495063 4.747107
-#&gt; [17] 4.513051 4.635817 4.710215 4.674142
+#&gt;  [1] 5.147329 4.989900 5.022945 4.924012 5.082351 5.068881 5.008923 5.078301
+#&gt;  [9] 4.999786 5.005507 4.632652 4.714507 4.709175 4.792277 4.495354 4.747111
+#&gt; [17] 4.513092 4.635710 4.710216 4.674140
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.1</span>, <span class='fl'>0.9</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]    [,6]     [,7]     [,8]
-#&gt; [1,] 4.165263 4.005839 4.005688 3.930421 4.098159 4.09161 4.021794 4.104154
-#&gt; [2,] 6.051625 5.959816 5.973289 5.871907 6.089659 6.08324 5.994003 6.072161
+#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
+#&gt; [1,] 4.165266 4.005794 4.005688 3.930393 4.098168 4.091638 4.021810 4.104155
+#&gt; [2,] 6.051758 5.959775 5.973330 5.871928 6.089724 6.083237 5.994043 6.072166
 #&gt;          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]
-#&gt; [1,] 3.991392 4.003963 3.660310 3.733489 3.665923 3.835678 3.580245 3.804866
-#&gt; [2,] 5.996076 5.983452 5.652362 5.753682 5.717218 5.689535 5.439665 5.719812
+#&gt; [1,] 3.991309 4.004000 3.660305 3.733439 3.665925 3.835678 3.583881 3.804996
+#&gt; [2,] 5.996076 5.983455 5.652360 5.753795 5.717199 5.689535 5.440069 5.721900
 #&gt;         [,17]    [,18]    [,19]    [,20]
-#&gt; [1,] 3.639597 3.645458 3.760062 3.644717
-#&gt; [2,] 5.367175 5.621363 5.691079 5.672983
+#&gt; [1,] 3.639736 3.645159 3.760078 3.644717
+#&gt; [2,] 5.365498 5.621357 5.691080 5.672981
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'>
 <span class='co'># To get Pareto k diagnostic with E_loo we also need to provide the negative</span>
 <span class='co'># log-likelihood values using the log_ratios argument.</span>
-<span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> -<span class='no'>ll</span>)</div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.128833 4.984844 5.011531 4.908768 5.091755 5.073753 5.005882 5.082594
-#&gt;  [9] 4.990460 4.998012 4.643382 4.721145 4.703733 4.774520 4.509268 4.754449
-#&gt; [17] 4.505448 4.635494 4.709564 4.667213
+<span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> <span class='no'>log_ratios</span>)</div><div class='output co'>#&gt; $value
+#&gt;  [1] 5.128897 4.984826 5.011531 4.908784 5.091790 5.073746 5.005896 5.082598
+#&gt;  [9] 4.990450 4.998032 4.643375 4.721066 4.703745 4.774520 4.509724 4.754599
+#&gt; [17] 4.505512 4.635344 4.709592 4.667202
 #&gt; 
 #&gt; $pareto_k
-#&gt;  [1] 0.180522216 0.172368616 0.016644363 0.337234123 0.234526375 0.112964343
-#&gt;  [7] 0.049724409 0.271361198 0.006507165 0.072583719 0.159187834 0.192203023
-#&gt; [13] 0.012472731 0.508770508 0.496375655 0.384671512 0.588086034 0.014594418
-#&gt; [19] 0.075905565 0.082729696
+#&gt;  [1]  0.200433088  0.176415666  0.017306495  0.347158374  0.241378021
+#&gt;  [6]  0.114432427  0.031429355  0.264012302  0.022469390  0.104256912
+#&gt; [11]  0.145207833  0.158421630  0.030003448  0.508770508  0.558038799
+#&gt; [16]  0.385210961  0.616980366 -0.003966085  0.068256269  0.085821650
 #&gt; </div><div class='input'>
 </div></pre>
   </div>
