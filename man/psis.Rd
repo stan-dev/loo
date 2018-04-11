@@ -11,10 +11,10 @@
 psis(log_ratios, ...)
 
 \method{psis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{psis}{default}(log_ratios, ..., r_eff = NULL)
 
@@ -22,7 +22,7 @@ psis(log_ratios, ...)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
-scale (for LOO these are negative log-likelihood values). See the
+scale (for PSIS-LOO these are \emph{negative} log-likelihood values). See the
 \strong{Methods (by class)} section below for a detailed description of how
 to specify the inputs for each method.}
 
@@ -32,14 +32,21 @@ to specify the inputs for each method.}
 one element per observation. The values provided should be the relative
 effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 This is related to the relative efficiency of estimating the normalizing
-term in self-normalizing importance sampling. The default is \code{NULL},
-in which case Monte Carlo error estimates are not computed. See the
-\code{\link{relative_eff}} helper function for computing \code{r_eff}.}
+term in self-normalizing importance sampling. If \code{r_eff} is not
+provided then the reported PSIS effective sample sizes and Monte Carlo
+error estimates will be over-optimistic. See the \code{\link{relative_eff}}
+helper function for computing \code{r_eff}. If using \code{psis} with
+draws of the \code{log_ratios} not obtained from MCMC then the warning
+message thrown when not specifying \code{r_eff} can be disabled by
+setting \code{r_eff} to \code{NA}.}
 
-\item{cores}{The number of cores to use for parallelization. The default for
-an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-of version \code{2.0.0} the \strong{default is now 1 core}, but we
-recommend using as many (or close to as many) cores as possible.}
+\item{cores}{The number of cores to use for parallelization. This defaults to
+the option \code{mc.cores} which can be set for an entire R session by
+\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
+deprecated but will be given precedence over \code{mc.cores} until
+\code{loo.cores} is removed in a future release. \strong{As of version
+2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
+recommend using as many (or close to as many) cores as possible.}}
 
 \item{object}{For the \code{weights} method, an object
 returned by \code{psis} (a list with class \code{"psis"}).}
@@ -98,7 +105,7 @@ The \code{weights} method returns an object with the same dimensions
 }
 \description{
 Implementation of Pareto smoothed importance sampling (PSIS), a method for
-stabilizing importance ratios. The version of the PSIS implemented here
+stabilizing importance ratios. The version of PSIS implemented here
 corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
 For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
@@ -115,6 +122,23 @@ of data points.
 \item \code{default}: A vector of length \eqn{S} (posterior sample size).
 }}
 
+\examples{
+log_ratios <- -1 * example_loglik_array()
+r_eff <- relative_eff(exp(-log_ratios))
+psis_result <- psis(log_ratios, r_eff = r_eff)
+str(psis_result)
+plot(psis_result)
+
+# extract smoothed weights
+lw <- weights(psis_result) # default args are log=TRUE, normalize=TRUE
+ulw <- weights(psis_result, normalize=FALSE) # unnormalized log-weights
+
+w <- weights(psis_result, log=FALSE) # normalized weights (not log-weights)
+uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
+
+
+
+}
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.

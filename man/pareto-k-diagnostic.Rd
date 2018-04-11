@@ -6,6 +6,8 @@
 \alias{pareto_k_ids}
 \alias{pareto_k_values}
 \alias{psis_n_eff_values}
+\alias{mcse_loo}
+\alias{plot.psis_loo}
 \alias{plot.loo}
 \alias{plot.psis}
 \title{Diagnostics for Pareto smoothed importance sampling (PSIS)}
@@ -18,7 +20,9 @@ pareto_k_values(x)
 
 psis_n_eff_values(x)
 
-\method{plot}{loo}(x, diagnostic = c("k", "n_eff"), ...,
+mcse_loo(x, threshold = 0.7)
+
+\method{plot}{psis_loo}(x, diagnostic = c("k", "n_eff"), ...,
   label_points = FALSE, main = "PSIS diagnostic plot")
 
 \method{plot}{psis}(x, diagnostic = c("k", "n_eff"), ...,
@@ -27,7 +31,10 @@ psis_n_eff_values(x)
 \arguments{
 \item{x}{An object created by \code{\link{loo}} or \code{\link{psis}}.}
 
-\item{threshold}{For \code{pareto_k_ids}, the threshold value for \eqn{k}.}
+\item{threshold}{For \code{pareto_k_ids}, \code{threshold} is the minimum
+\eqn{k} value to flag (default is 0.5). For \code{mcse_loo}, if any \eqn{k}
+estimates are greater than \code{threshold} the MCSE estimate is returned
+as \code{NA} (default is 0.7).}
 
 \item{diagnostic}{For the \code{plot} method, which diagnostic should be
 plotted? The options are \code{"k"} for Pareto \eqn{k} estimates (the
@@ -54,6 +61,10 @@ observations have Pareto \eqn{k} estimates above \code{threshold}.
 
 \code{psis_n_eff_values} returns a vector of the estimated PSIS
   effective sample sizes.
+
+\code{mcse_loo} returns the Monte carlo standard error (MCSE)
+  estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
+  above \code{threshold}.
 
 The \code{plot} method is called for its side effect and does not
   return anything. If \code{x} is the result of a call to \code{\link{loo}}
@@ -85,7 +96,7 @@ generalized Pareto distribution:
   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
   have finite variance by accepting some bias. The convergence of the
   estimate is slower with increasing \eqn{k}.
-  If \eqn{0.5 \leq k \lesssim 0.7}{0.5 ≤ k <≈ 0.7}
+  If \eqn{k} is between 0.5 and approximately 0.7 then
   we observe practically useful convergence rates and Monte Carlo error
   estimates with PSIS (the bias of TIS increases faster than the bias of
   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
@@ -122,7 +133,7 @@ may reduce the sensitivity to highly influential observations.
  We can also compute estimates for the Monte Carlo error and the effective
  sample size for importance sampling. However, the PSIS effective sample size
  estimate will be \strong{over-optimistic when the estimate of \eqn{k} is
- greater than 0.7.}. In the case that we obtain the samples from the proposal
+ greater than 0.7}. In the case that we obtain the samples from the proposal
  distribution via MCMC, we need to take into account also the relative
  efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
  Following the notation in Stan, the PSIS effective sample size is denoted

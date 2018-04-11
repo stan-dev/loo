@@ -1,16 +1,10 @@
-#' Leave-one-out cross-validation (LOO)
+#' Efficient approximate leave-one-out cross-validation (LOO)
 #'
-#' @description Efficient approximate leave-one-out cross-validation for
-#'   Bayesian models using Pareto smoothed importance sampling (PSIS). See
-#'   Vehtari, Gelman, and Gabry (2017a, 2017b) and \link{loo-package} for
-#'   background.
-#'
-#'   The \code{loo} function is an S3 generic and methods are provided for
-#'   computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-#'   log-likelihood matrices, and log-likelihood functions. The array and matrix
-#'   methods are most convenient, but for models fit to very large datasets the
-#'   \code{loo.function} method is more memory efficient and may be preferable.
-#'
+#' The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+#' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
+#' models using Pareto smoothed importance sampling (PSIS). This is an
+#' implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
+#' 2017b).
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -19,9 +13,10 @@
 #' @param r_eff Vector of relative effective sample size estimates for the
 #'   likelihood (\code{exp(log_lik)}) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
-#'   self-normalizing importance sampling. The default is \code{NULL}, in which
-#'   case Monte Carlo error estimates are not computed. See the
-#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#'   self-normalizing importance sampling. If \code{r_eff} is not provided then
+#'   the reported PSIS effective sample sizes and Monte Carlo error estimates
+#'   will be over-optimistic. See the \code{\link{relative_eff}} helper function
+#'   for computing \code{r_eff}.
 #' @param save_psis Should the \code{"psis"} object created internally by
 #'   \code{loo} be saved in the returned object? The \code{loo} function calls
 #'   \code{\link{psis}} internally but by default discards the (potentially
@@ -31,6 +26,19 @@
 #'   if you plan to use the \code{\link{E_loo}} function to compute weighted
 #'   expectations after running \code{loo}.
 #' @template cores
+#'
+#' @details The \code{loo} function is an S3 generic and methods are provided
+#'   for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
+#'   log-likelihood matrices, and log-likelihood functions. The array and matrix
+#'   methods are most convenient, but for models fit to very large datasets the
+#'   \code{loo.function} method is more memory efficient and may be preferable.
+#'
+#' @section Defining \code{loo} methods in a package: Package developers can
+#'   define \code{loo} methods for fitted models objects. See the example
+#'   \code{loo.stanfit} method in the \strong{Examples} section below for an
+#'   example of defining a method that calls \code{loo.array}. The
+#'   \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
+#'   method that calls \code{loo.function}.
 #'
 #' @return The \code{loo} methods return a named list with class
 #'   \code{c("psis_loo", "loo")} and components:
@@ -70,6 +78,7 @@
 #'
 #' @seealso
 #' \itemize{
+#'  \item The \pkg{loo} package vignettes for demonstrations.
 #'  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
 #'  Sampling (PSIS) procedure used in the LOO-CV approximation.
 #'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
@@ -140,6 +149,37 @@
 #' loo_with_mat <- loo(log_lik_matrix)
 #' all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 #'
+#'
+#' \dontrun{
+#' ### For package developers: defining loo methods
+#'
+#' # An example of a possible loo method for 'stanfit' objects (rstan package).
+#' # A similar method is planned for a future release of rstan (or is already
+#' # released, depending on when you are reading this). In order for users
+#' # to be able to call loo(stanfit) instead of loo.stanfit(stanfit) the
+#' # NAMESPACE needs to be handled appropriately (roxygen2 and devtools packages
+#' # are good for that).
+#' #
+#' loo.stanfit <-
+#'  function(x,
+#'          pars = "log_lik",
+#'          ...,
+#'          save_psis = FALSE,
+#'          cores = getOption("mc.cores", 1)) {
+#'   stopifnot(length(pars) == 1L)
+#'   LLarray <- loo::extract_log_lik(stanfit = x,
+#'                                   parameter_name = pars,
+#'                                   merge_chains = FALSE)
+#'   r_eff <- loo::relative_eff(x = exp(LLarray), cores = cores)
+#'   loo::loo.array(LLarray,
+#'                  r_eff = r_eff,
+#'                  cores = cores,
+#'                  save_psis = save_psis)
+#' }
+#' }
+#'
+#'
+
 loo <- function(x, ...) {
   UseMethod("loo")
 }
@@ -153,8 +193,9 @@ loo.array <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("loo.cores", 1)) {
-    throw_r_eff_warning(r_eff)
+           cores = getOption("mc.cores", 1)) {
+
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
@@ -175,8 +216,9 @@ loo.matrix <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("loo.cores", 1)) {
-    throw_r_eff_warning(r_eff)
+           cores = getOption("mc.cores", 1)) {
+
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
@@ -202,10 +244,11 @@ loo.function <-
            draws = NULL,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("loo.cores", 1)) {
+           cores = getOption("mc.cores", 1)) {
 
+    cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    throw_r_eff_warning(r_eff)
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
 
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
@@ -392,9 +435,15 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   stopifnot(is.matrix(pointwise), is.list(diagnostics))
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
-  estimates <- table_of_estimates(pointwise[, cols_to_summarize])
+  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
+
+  out <- nlist(estimates, pointwise, diagnostics, psis_object)
+  # maintain backwards compatibility
+  old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
+  out <- c(out, setNames(as.list(estimates), old_nms))
+
   structure(
-    nlist(estimates, pointwise, diagnostics, psis_object),
+    out,
     dims = dims,
     class = c("psis_loo", "loo")
   )
@@ -424,23 +473,15 @@ mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
 }
 
 #' Warning message if r_eff not specified
-#'
 #' @noRd
-#' @param r_eff User's r_eff argument or NULL.
-#' @return Nothing, just throws a warning if r_eff is NULL.
-#'
-throw_r_eff_warning <- function(r_eff = NULL) {
-  if (is.null(r_eff)) {
-    warning(
-      "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-      "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
-      "MCSE estimates will be over-optimistic.",
-      call. = FALSE
-    )
-  }
+throw_loo_r_eff_warning <- function() {
+  warning(
+    "Relative effective sample sizes ('r_eff' argument) not specified.\n",
+    "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
+    "MCSE estimates will be over-optimistic.",
+    call. = FALSE
+  )
 }
-
-
 
 #' Combine many psis objects into a single psis object
 #'
@@ -465,4 +506,75 @@ list2psis <- function(objects) {
     dims = dim(log_weights),
     class = c("psis", "list")
   )
+}
+
+#' Extractor methods
+#' @name old-extractors
+#' @keywords internal
+#' @param x,i,exact,name See \link{Extract}.
+#'
+NULL
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+`[.loo` <- function(x, i) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+            "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+
+  if (is.character(i)) {
+    needs_warning <- which(flags == i)
+    if (length(needs_warning)) {
+      warning(
+        "Accessing ", flags[needs_warning], " using '[' is deprecated ",
+        "and will be removed in a future release. ",
+        "Please extract the ", flags[needs_warning],
+        " estimate from the 'estimates' component instead.",
+        call. = FALSE
+      )
+    }
+  }
+  NextMethod()
+}
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+`[[.loo` <- function(x, i, exact=TRUE) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+
+  if (is.character(i)) {
+    needs_warning <- which(flags == i)
+    if (length(needs_warning)) {
+      warning(
+        "Accessing ", flags[needs_warning], " using '[[' is deprecated ",
+        "and will be removed in a future release. ",
+        "Please extract the ", flags[needs_warning],
+        " estimate from the 'estimates' component instead.",
+        call. = FALSE
+      )
+    }
+  }
+  NextMethod()
+}
+
+#' @rdname old-extractors
+#' @keywords internal
+#' @export
+#'
+`$.loo` <- function(x, name) {
+  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
+             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+  needs_warning <- which(flags == name)
+  if (length(needs_warning)) {
+    warning(
+      "Accessing ", flags[needs_warning], " using '$' is deprecated ",
+      "and will be removed in a future release. ",
+      "Please extract the ", flags[needs_warning],
+      " estimate from the 'estimates' component instead.",
+      call. = FALSE
+    )
+  }
+  NextMethod()
 }

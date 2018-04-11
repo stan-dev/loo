@@ -1,13 +1,13 @@
 #' Pareto smoothed importance sampling (PSIS)
 #'
 #' Implementation of Pareto smoothed importance sampling (PSIS), a method for
-#' stabilizing importance ratios. The version of the PSIS implemented here
+#' stabilizing importance ratios. The version of PSIS implemented here
 #' corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
 #' For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 #'
 #' @export
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
-#'   scale (for LOO these are negative log-likelihood values). See the
+#'   scale (for PSIS-LOO these are \emph{negative} log-likelihood values). See the
 #'   \strong{Methods (by class)} section below for a detailed description of how
 #'   to specify the inputs for each method.
 #' @param ... Arguments passed on to the various methods.
@@ -16,9 +16,13 @@
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 #'   This is related to the relative efficiency of estimating the normalizing
-#'   term in self-normalizing importance sampling. The default is \code{NULL},
-#'   in which case Monte Carlo error estimates are not computed. See the
-#'   \code{\link{relative_eff}} helper function for computing \code{r_eff}.
+#'   term in self-normalizing importance sampling. If \code{r_eff} is not
+#'   provided then the reported PSIS effective sample sizes and Monte Carlo
+#'   error estimates will be over-optimistic. See the \code{\link{relative_eff}}
+#'   helper function for computing \code{r_eff}. If using \code{psis} with
+#'   draws of the \code{log_ratios} not obtained from MCMC then the warning
+#'   message thrown when not specifying \code{r_eff} can be disabled by
+#'   setting \code{r_eff} to \code{NA}.
 #'
 #' @return The \code{psis} methods return an object of class \code{"psis"},
 #'   which is a named list with the following components:
@@ -68,6 +72,22 @@
 #'
 #' @template loo-and-psis-references
 #'
+#' @examples
+#' log_ratios <- -1 * example_loglik_array()
+#' r_eff <- relative_eff(exp(-log_ratios))
+#' psis_result <- psis(log_ratios, r_eff = r_eff)
+#' str(psis_result)
+#' plot(psis_result)
+#'
+#' # extract smoothed weights
+#' lw <- weights(psis_result) # default args are log=TRUE, normalize=TRUE
+#' ulw <- weights(psis_result, normalize=FALSE) # unnormalized log-weights
+#'
+#' w <- weights(psis_result, log=FALSE) # normalized weights (not log-weights)
+#' uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
+#'
+#'
+#'
 psis <- function(log_ratios, ...) UseMethod("psis")
 
 #' @export
@@ -75,17 +95,14 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(log_ratios, ..., r_eff = NULL, cores = getOption("loo.cores", 1)) {
-    stopifnot(
-      length(dim(log_ratios)) == 3,
-      is.null(r_eff) || length(r_eff) == dim(log_ratios)[3]
-    )
+  function(log_ratios, ...,
+           r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores)
+    stopifnot(length(dim(log_ratios)) == 3)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
-    if (is.null(r_eff)) {
-      r_eff <- rep(1, ncol(log_ratios))
-    }
-
+    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
@@ -94,12 +111,13 @@ psis.array <-
 #' @template matrix
 #'
 psis.matrix <-
-  function(log_ratios, ..., r_eff = NULL, cores = getOption("loo.cores", 1)) {
-    stopifnot(is.null(r_eff) || length(r_eff) == ncol(log_ratios))
+  function(log_ratios,
+           ...,
+           r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores)
     log_ratios <- validate_ll(log_ratios)
-    if (is.null(r_eff)) {
-      r_eff <- rep(1, ncol(log_ratios))
-    }
+    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
@@ -109,19 +127,15 @@ psis.matrix <-
 #'
 psis.default <-
   function(log_ratios, ..., r_eff = NULL) {
-    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1,
-              is.null(r_eff) || length(r_eff) == 1)
+    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
-    if (is.null(r_eff)) {
-      r_eff <- 1
-    }
-    psis.matrix(log_ratios,
-                r_eff = r_eff,
-                cores = 1)
+    r_eff <- prepare_psis_r_eff(r_eff, len = 1)
+    psis.matrix(log_ratios, r_eff = r_eff, cores = 1)
   }
 
 #' @rdname psis
 #' @export
+#' @export weights.psis
 #' @method weights psis
 #' @param object For the \code{weights} method, an object
 #'   returned by \code{psis} (a list with class \code{"psis"}).
@@ -168,8 +182,7 @@ dim.psis <- function(x) {
 #   the top of this file.
 #
 do_psis <- function(log_ratios, r_eff, cores) {
-  stopifnot(length(r_eff) == ncol(log_ratios),
-            cores == as.integer(cores))
+  stopifnot(cores == as.integer(cores))
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
@@ -393,6 +406,7 @@ throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
 
 #' Warn if not enough tail samples to fit GPD
 #'
+#' @noRd
 #' @param tail_lengths Vector of tail lengths.
 #' @return tail_lengths, invisibly.
 #'
@@ -418,5 +432,49 @@ throw_tail_length_warnings <- function(tail_lengths) {
     }
   }
   invisible(tail_lengths)
+}
+
+#' Prepare r_eff to pass to psis and throw warnings/errors if necessary
+#'
+#' @noRd
+#' @param r_eff User's r_eff argument.
+#' @param len The length r_eff should have if not NULL or NA.
+#' @return If \code{r_eff} has length \code{len} then \code{r_eff} is returned.
+#'   If \code{r_eff} is NULL then a warning is thrown and \code{rep(1, len)} is
+#'   returned. If \code{r_eff} is NA then the warning is skipped and
+#'   \code{rep(1, len)} is returned. If \code{r_eff} has length \code{len}
+#'   but some of the values are \code{NA} then an error is thrown.
+#'
+prepare_psis_r_eff <- function(r_eff, len) {
+  if (isTRUE(is.null(r_eff) || is.na(r_eff))) {
+    if (!called_from_loo() && is.null(r_eff)) {
+      throw_psis_r_eff_warning()
+    }
+    r_eff <- rep(1, len)
+  } else if (length(r_eff) != len) {
+    stop("'r_eff' must have one value per observation.", call. = FALSE)
+  } else if (any(is.na(r_eff))) {
+    stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
+  }
+  return(r_eff)
+}
+
+
+#' r_eff warning message
+#' @noRd
+#'
+throw_psis_r_eff_warning <- function() {
+  warning("Relative effective sample sizes ('r_eff' argument) not specified. ",
+          "PSIS n_eff will not adjusted based on MCMC n_eff.", call. = FALSE)
+}
+
+#' check if psis was called from one of the loo methods
+#' @noRd
+called_from_loo <- function() {
+  calls <- sys.calls()
+  txt <- unlist(lapply(calls, deparse))
+  patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
+  check <- sapply(txt, function(x) grepl(patts, x))
+  isTRUE(any(check))
 }
 

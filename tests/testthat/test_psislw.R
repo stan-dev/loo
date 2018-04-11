@@ -1,5 +1,4 @@
 library(loo)
-options(loo.cores = 1)
 SW <- suppressWarnings
 
 context("psislw")

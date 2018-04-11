@@ -1,5 +1,7 @@
 library(loo)
-options(loo.cores = 2)
+suppressPackageStartupMessages(library(rstanarm))
+options(mc.cores=1)
+options(loo.cores=NULL)
 set.seed(123)
 
 context("psis")
@@ -12,6 +14,9 @@ r_eff_arr <- relative_eff(exp(LLarr))
 r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
 
+test_that("psis results haven't changed", {
+  expect_equal_to_reference(psis1, "psis.rds")
+})
 
 test_that("psis returns object with correct structure", {
   expect_true(is.psis(psis1))
@@ -36,6 +41,29 @@ test_that("psis methods give same results", {
 })
 
 test_that("psis throws correct errors and warnings", {
+  # r_eff=NULL warnings
+  expect_warning(psis(-LLarr), "Relative effective sample sizes")
+  expect_warning(psis(-LLmat), "Relative effective sample sizes")
+  expect_warning(psis(-LLmat[, 1]), "Relative effective sample sizes")
+
+  # r_eff=NA disables warnings
+  expect_silent(psis(-LLarr, r_eff = NA))
+  expect_silent(psis(-LLmat, r_eff = NA))
+  expect_silent(psis(-LLmat[,1], r_eff = NA))
+
+  # r_eff=NULL and r_eff=NA give same answer
+  expect_equal(
+    suppressWarnings(psis(-LLarr)),
+    psis(-LLarr, r_eff = NA)
+  )
+
+  # r_eff wrong length is error
+  expect_error(psis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")
+
+  # r_eff has some NA values causes error
+  r_eff_arr[2] <- NA
+  expect_error(psis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
+
   # tail length warnings
   expect_warning(
     psis(-LLarr[1:5,, ]),
@@ -51,7 +79,7 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLmat), "All input values must be finite")
 
   # no lists allowed
-  expect_error(psis(as.list(-LLvec)), "List not allowed as input")
+  expect_error(expect_warning(psis(as.list(-LLvec))), "List not allowed as input")
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
@@ -110,12 +138,28 @@ test_that("relative_eff methods works properly", {
   expect_equal(relative_eff.array(exp(LLarr)),
                apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
 
-  # testing function methods
-  source("function_method_stuff.R")
-  chain_id <- rep(1:2, each = S/2) # fake chain_id
-  r_eff_fn <- relative_eff.function(llfun, chain_id, data = data, draws = draws)
-  r_eff_mat <- relative_eff.matrix(llmat_from_fn, chain_id)
-  expect_equal(r_eff_fn, r_eff_mat)
-  expect_equal(r_eff_fn, rep(1, N))
+  expect_equal(relative_eff(exp(LLarr)), relative_eff(exp(LLarr), cores = 2))
 })
 
+test_that("relative_eff function method works properly", {
+  dat <- data.frame(y = mtcars$mpg, x = mtcars$wt)
+  utils::capture.output(
+    fit <- suppressWarnings(
+      rstanarm::stan_glm(y ~ x, data = dat, chains = 2, iter = 250, seed = 123)
+    )
+  )
+  draws <- as.matrix(fit)
+  chain_id <- rep(1:2, each = 125)
+  likfun <- function(data_i, draws) {
+    dnorm(data_i$y, draws[, 1] + draws[, 2] * data_i$x, draws[, 3])
+  }
+
+  r_eff_fn <- relative_eff.function(likfun, chain_id = chain_id,
+                                    data = dat, draws = draws)
+  r_eff_mat <- relative_eff.matrix(exp(log_lik(fit)), chain_id)
+  expect_equal(r_eff_fn, r_eff_mat)
+
+  r_eff_fn_cores <- relative_eff.function(likfun, chain_id = chain_id,
+                                          data = dat, draws = draws, cores = 2)
+  expect_equal(r_eff_fn, r_eff_fn_cores)
+})

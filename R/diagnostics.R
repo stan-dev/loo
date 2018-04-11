@@ -10,6 +10,10 @@
 #'
 #' @name pareto-k-diagnostic
 #' @param x An object created by \code{\link{loo}} or \code{\link{psis}}.
+#' @param threshold For \code{pareto_k_ids}, \code{threshold} is the minimum
+#'   \eqn{k} value to flag (default is 0.5). For \code{mcse_loo}, if any \eqn{k}
+#'   estimates are greater than \code{threshold} the MCSE estimate is returned
+#'   as \code{NA} (default is 0.7).
 #'
 #' @details
 #' The reliability and approximate convergence rate of the PSIS-based estimates
@@ -26,7 +30,7 @@
 #'   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
 #'   have finite variance by accepting some bias. The convergence of the
 #'   estimate is slower with increasing \eqn{k}.
-#'   If \eqn{0.5 \leq k \lesssim 0.7}{0.5 ≤ k <≈ 0.7}
+#'   If \eqn{k} is between 0.5 and approximately 0.7 then
 #'   we observe practically useful convergence rates and Monte Carlo error
 #'   estimates with PSIS (the bias of TIS increases faster than the bias of
 #'   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
@@ -63,7 +67,7 @@
 #'  We can also compute estimates for the Monte Carlo error and the effective
 #'  sample size for importance sampling. However, the PSIS effective sample size
 #'  estimate will be \strong{over-optimistic when the estimate of \eqn{k} is
-#'  greater than 0.7.}. In the case that we obtain the samples from the proposal
+#'  greater than 0.7}. In the case that we obtain the samples from the proposal
 #'  distribution via MCMC, we need to take into account also the relative
 #'  efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
 #'  Following the notation in Stan, the PSIS effective sample size is denoted
@@ -129,7 +133,6 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
 
 #' @rdname pareto-k-diagnostic
 #' @export
-#' @param threshold For \code{pareto_k_ids}, the threshold value for \eqn{k}.
 #' @return \code{pareto_k_ids} returns an integer vector indicating which
 #' observations have Pareto \eqn{k} estimates above \code{threshold}.
 #'
@@ -168,6 +171,22 @@ psis_n_eff_values <- function(x) {
 
 #' @rdname pareto-k-diagnostic
 #' @export
+#' @return \code{mcse_loo} returns the Monte carlo standard error (MCSE)
+#'   estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
+#'   above \code{threshold}.
+#'
+mcse_loo <- function(x, threshold = 0.7) {
+  stopifnot(is.psis_loo(x))
+  if (any(pareto_k_values(x) > 0.7, na.rm = TRUE)) {
+    return(NA)
+  }
+  mc_var <- x$pointwise[, "mcse_elpd_loo"]^2
+  sqrt(sum(mc_var))
+}
+
+#' @rdname pareto-k-diagnostic
+#' @aliases plot.loo
+#' @export
 #' @param label_points,... For the \code{plot} method, if \code{label_points} is
 #'   \code{TRUE} the observation numbers corresponding to any values of \eqn{k}
 #'   greater than 0.5 will be displayed in the plot. Any arguments specified in
@@ -184,13 +203,14 @@ psis_n_eff_values <- function(x) {
 #'   the estimates of the Pareto shape parameters (\code{diagnostic = "k"}) or
 #'   estimates of the PSIS effective sample sizes (\code{diagnostic = "n_eff"}).
 #'
-plot.loo <- function(x,
-                     diagnostic = c("k", "n_eff"),
-                     ...,
-                     label_points = FALSE,
-                     main = "PSIS diagnostic plot") {
+plot.psis_loo <- function(x,
+                          diagnostic = c("k", "n_eff"),
+                          ...,
+                          label_points = FALSE,
+                          main = "PSIS diagnostic plot") {
   diagnostic <- match.arg(diagnostic)
   k <- pareto_k_values(x)
+  k[is.na(k)] <- 0  # FIXME when reloo is changed to make NA k values -Inf
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
     warning(signif(100 * mean(k_inf), 2),
@@ -213,12 +233,17 @@ plot.loo <- function(x,
 }
 
 #' @export
+#' @noRd
+#' @rdname pareto-k-diagnostic
+plot.loo <- plot.psis_loo
+
+#' @export
 #' @rdname pareto-k-diagnostic
 plot.psis <- function(x, diagnostic = c("k", "n_eff"), ...,
                       label_points = FALSE,
                       main = "PSIS diagnostic plot") {
-  plot.loo(x, diagnostic = diagnostic, ...,
-           label_points = label_points, main = main)
+  plot.psis_loo(x, diagnostic = diagnostic, ...,
+                label_points = label_points, main = main)
 }
 
 
@@ -246,7 +271,7 @@ plot_diagnostic <-
     axis(side = 2, las = 1)
 
     if (!n_eff_plot) {
-      krange <- range(k)
+      krange <- range(k, na.rm = TRUE)
       breaks <- c(0, 0.5, 0.7, 1)
       hex_clrs <- c("#C79999", "#A25050", "#7C0000")
       ltys <- c(3, 4, 2, 1)

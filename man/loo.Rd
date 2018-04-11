@@ -6,18 +6,18 @@
 \alias{loo.matrix}
 \alias{loo.function}
 \alias{loo_i}
-\title{Leave-one-out cross-validation (LOO)}
+\title{Efficient approximate leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
 
 \method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("loo.cores", 1))
+  cores = getOption("mc.cores", 1))
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  save_psis = FALSE, cores = getOption("loo.cores", 1))
+  save_psis = FALSE, cores = getOption("mc.cores", 1))
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
 }
@@ -29,9 +29,10 @@ inputs for each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling. The default is \code{NULL}, in which
-case Monte Carlo error estimates are not computed. See the
-\code{\link{relative_eff}} helper function for computing \code{r_eff}.}
+self-normalizing importance sampling. If \code{r_eff} is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. See the \code{\link{relative_eff}} helper function
+for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo} be saved in the returned object? The \code{loo} function calls
@@ -42,10 +43,13 @@ component to the list returned by \code{loo}. Currently this is only needed
 if you plan to use the \code{\link{E_loo}} function to compute weighted
 expectations after running \code{loo}.}
 
-\item{cores}{The number of cores to use for parallelization. The default for
-an entire R session can be set with \code{options(loo.cores = NUMBER)}. As
-of version \code{2.0.0} the \strong{default is now 1 core}, but we
-recommend using as many (or close to as many) cores as possible.}
+\item{cores}{The number of cores to use for parallelization. This defaults to
+the option \code{mc.cores} which can be set for an entire R session by
+\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
+deprecated but will be given precedence over \code{mc.cores} until
+\code{loo.cores} is removed in a future release. \strong{As of version
+2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
+recommend using as many (or close to as many) cores as possible.}}
 
 \item{data, draws, ...}{For the \code{loo} function method and the \code{loo_i}
 function, the data, posterior draws, and other arguments to pass to the
@@ -102,19 +106,21 @@ The \code{loo_i} function returns a named list with components
   observation.
 }
 \description{
-Efficient approximate leave-one-out cross-validation for
-  Bayesian models using Pareto smoothed importance sampling (PSIS). See
-  Vehtari, Gelman, and Gabry (2017a, 2017b) and \link{loo-package} for
-  background.
-
-  The \code{loo} function is an S3 generic and methods are provided for
-  computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-  log-likelihood matrices, and log-likelihood functions. The array and matrix
-  methods are most convenient, but for models fit to very large datasets the
-  \code{loo.function} method is more memory efficient and may be preferable.
+The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
+models using Pareto smoothed importance sampling (PSIS). This is an
+implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
+2017b).
 
 The \code{loo_i} function enables testing log-likelihood
   functions for use with the \code{loo.function} method.
+}
+\details{
+The \code{loo} function is an S3 generic and methods are provided
+  for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
+  log-likelihood matrices, and log-likelihood functions. The array and matrix
+  methods are most convenient, but for models fit to very large datasets the
+  \code{loo.function} method is more memory efficient and may be preferable.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -149,10 +155,19 @@ of data points.
    entire object \code{draws} will be passed to the \code{draws} argument of
    the log-likelihood function.
    \item The \code{...} can be used to pass additional arguments to your
-   log-likelihood function. These arguments ase used like the \code{draws}
+   log-likelihood function. These arguments are used like the \code{draws}
    argument in that they are recycled for each observation.
  }
 }}
+
+\section{Defining \code{loo} methods in a package}{
+ Package developers can
+  define \code{loo} methods for fitted models objects. See the example
+  \code{loo.stanfit} method in the \strong{Examples} section below for an
+  example of defining a method that calls \code{loo.array}. The
+  \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
+  method that calls \code{loo.function}.
+}
 
 \examples{
 
@@ -216,6 +231,36 @@ log_lik_matrix <- sapply(1:N, function(i) {
 loo_with_mat <- loo(log_lik_matrix)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
+
+\dontrun{
+### For package developers: defining loo methods
+
+# An example of a possible loo method for 'stanfit' objects (rstan package).
+# A similar method is planned for a future release of rstan (or is already
+# released, depending on when you are reading this). In order for users
+# to be able to call loo(stanfit) instead of loo.stanfit(stanfit) the
+# NAMESPACE needs to be handled appropriately (roxygen2 and devtools packages
+# are good for that).
+#
+loo.stanfit <-
+ function(x,
+         pars = "log_lik",
+         ...,
+         save_psis = FALSE,
+         cores = getOption("mc.cores", 1)) {
+  stopifnot(length(pars) == 1L)
+  LLarray <- loo::extract_log_lik(stanfit = x,
+                                  parameter_name = pars,
+                                  merge_chains = FALSE)
+  r_eff <- loo::relative_eff(x = exp(LLarray), cores = cores)
+  loo::loo.array(LLarray,
+                 r_eff = r_eff,
+                 cores = cores,
+                 save_psis = save_psis)
+}
+}
+
+
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
@@ -230,6 +275,7 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
 }
 \seealso{
 \itemize{
+ \item The \pkg{loo} package vignettes for demonstrations.
  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at

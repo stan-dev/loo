@@ -41,7 +41,7 @@ A named list with the following components:
   For the matrix method, \code{value} is a vector with \code{ncol(x)}
   elements, with one exception: when \code{type} is \code{"quantile"} and
   multiple values are specified in \code{probs} the \code{value} component of
-  the retured object is a \code{length(probs)} by \code{ncol(x)} matrix.
+  the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 
   For the default/vector method the \code{value} component is scalar, with
   one exception: when \code{type} is \code{"quantile"} and multiple values
@@ -86,11 +86,11 @@ fit <- stan_glm(weight ~ group, data = d)
 yrep <- posterior_predict(fit)
 dim(yrep)
 
-ll <- log_lik(fit)
+log_ratios <- -1 * log_lik(fit)
 dim(ll)
 
-r_eff <- relative_eff(exp(ll), chain_id = rep(1:4, each = 1000))
-psis_object <- psis(log_ratios = -ll, r_eff = r_eff, cores = 2)
+r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
+psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
 
 E_loo(yrep, psis_object, type = "mean")
 E_loo(yrep, psis_object, type = "var")
@@ -99,7 +99,7 @@ E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 
 # To get Pareto k diagnostic with E_loo we also need to provide the negative
 # log-likelihood values using the log_ratios argument.
-E_loo(yrep, psis_object, type = "mean", log_ratios = -ll)
+E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 }
 
 }

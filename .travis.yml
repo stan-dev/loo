@@ -7,8 +7,11 @@ cache: packages
 r_github_packages:
   - jimhester/covr
 
+r_build_args: '--no-build-vignettes'
+warnings_are_errors: false
+
 env:
   - _R_CHECK_FORCE_SUGGESTS_=false
 
 after_success:
-  - Rscript -e 'covr::codecov(exclusions = list("R/zzz.R"))'
+  - Rscript -e 'covr::codecov(line_exclusions = list("R/zzz.R" = c(1:11)))'

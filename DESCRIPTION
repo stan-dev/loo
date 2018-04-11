@@ -2,10 +2,11 @@ Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
 Version: 2.0.0
-Date: 2017-11-14
+Date: 2018-04-06
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
-             person("Andrew", "Gelman", email = "gelman@stat.columbia.edu", role = c("aut")),
+             person("Andrew", "Gelman", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
+             person("Yuling", "Yao", role = c("aut")),
              person("Juho", "Piironen", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
@@ -16,8 +17,9 @@ Description: Efficient approximate leave-one-out cross-validation (LOO)
     uses Pareto smoothed importance sampling (PSIS), a new procedure for
     regularizing importance weights. As a byproduct of the calculations, we also
     obtain approximate standard errors for estimated predictive errors and for
-    the comparison of predictive errors between models. We also compute the
-    widely applicable information criterion (WAIC).
+    the comparison of predictive errors between models. The package also 
+    provides methods for using stacking and other model weighting techniques 
+    to average Bayesian predictive distributions.
 License: GPL (>=3)
 LazyData: TRUE
 Depends:
@@ -28,7 +30,7 @@ Imports:
     parallel,
     stats
 Suggests:
-    bayesplot,
+    bayesplot (>= 1.5.0),
     knitr,
     rmarkdown,
     rstan, 

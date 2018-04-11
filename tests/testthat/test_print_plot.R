@@ -1,5 +1,5 @@
 library(loo)
-options(loo.cores = 2)
+set.seed(1414)
 
 context("print, plot, diagnostics")
 
@@ -110,9 +110,30 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(k > 1), tab[4,1])
 })
 
+
+
+
+# psis_neff and mcse_loo --------------------------------------------------
 test_that("psis_n_eff_values extractor works", {
   n_eff_psis <- psis1$diagnostics$n_eff
   expect_type(n_eff_psis, "double")
   expect_identical(psis_n_eff_values(psis1), n_eff_psis)
   expect_identical(psis_n_eff_values(psis1), psis_n_eff_values(loo1))
 })
+
+test_that("mcse_loo extractor gives correct value", {
+  mcse <- mcse_loo(loo1)
+  expect_type(mcse, "double")
+  expect_equal_to_reference(mcse, "mcse_loo.rds")
+})
+
+test_that("mcse_loo returns NA when it should", {
+  loo1$diagnostics$pareto_k[1] <- 1.5
+  mcse <- mcse_loo(loo1)
+  expect_equal(mcse, NA)
+})
+
+test_that("mcse_loo errors if not psis_loo object", {
+  expect_error(mcse_loo(psis1), "psis_loo")
+})
+

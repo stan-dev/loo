@@ -61,3 +61,14 @@ test_that("nlist works", {
   expect_equal(nlist_val, nlist_ans)
 })
 
+test_that("loo_cores works", {
+  expect_equal(loo_cores(10), 10)
+  options(mc.cores = 2)
+  expect_equal(loo_cores(getOption("mc.cores", 1)), 2)
+  options(mc.cores = 1)
+
+  options(loo.cores = 2)
+  expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
+  options(loo.cores=NULL)
+})
+

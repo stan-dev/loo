@@ -11,10 +11,12 @@
 }
 
 This package implements the methods described in Vehtari, Gelman, and Gabry
-(2017a, 2017b). To get started see the \code{\link{loo}} function for
-efficient approximate leave-one-out cross-validation (LOO-CV) or the
-\code{\link{psis}} function for the Pareto smoothed importance sampling
-(PSIS) algorithm.
+(2017a, 2017b) and Yao et al. (2018). To get started see the
+\code{\link{loo}} function for efficient approximate leave-one-out
+cross-validation (LOO-CV), the \code{\link{psis}} function for the Pareto
+smoothed importance sampling (PSIS) algorithm, or
+\code{\link{loo_model_weights}} for an implementation of Bayesian stacking of
+predictive distributions from multiple models.
 }
 \details{
 Leave-one-out cross-validation (LOO-CV) and the widely applicable
@@ -24,16 +26,17 @@ Leave-one-out cross-validation (LOO-CV) and the widely applicable
   values. LOO-CV and WAIC have various advantages over simpler estimates of
   predictive error such as AIC and DIC but are less used in practice because
   they involve additional computational steps. This package implements the
-  fast and stable computations for approximate LOO-CV (and WAIC) laid out in
-  Vehtari, Gelman, and Gabry (2017a). From existing posterior simulation
-  draws, we compute LOO-CV using Pareto smoothed importance sampling (PSIS;
-  Vehtari, Gelman, and Gabry, 2017b), a new procedure for regularizing and
-  diagnosing importance weights. As a byproduct of our calculations, we also
-  obtain approximate standard errors for estimated predictive errors and for
+  fast and stable computations for approximate LOO-CV laid out in Vehtari,
+  Gelman, and Gabry (2017a). From existing posterior simulation draws, we
+  compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
+  Gelman, and Gabry, 2017b), a new procedure for regularizing and diagnosing
+  importance weights. As a byproduct of our calculations, we also obtain
+  approximate standard errors for estimated predictive errors and for
   comparing of predictive errors between two models.
 
   We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
-  diagnostics, and effective sample size and Monte Carlo estimates.
+  diagnostics and effective sample size and Monte Carlo standard error
+  estimates.
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
@@ -45,6 +48,11 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+
+Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
+  stacking to average Bayesian predictive distributions. \emph{Bayesian
+  Analysis}, advance publication,  doi:10.1214/17-BA1091.
+  (\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
@@ -73,10 +81,10 @@ Peruggia, M. (1997). On the variability of case-deletion importance sampling
 weights in the Bayesian linear model. \emph{Journal of the American
 Statistical Association} \strong{92}, 199-207.
 
-Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
+Stan Development Team (2017). The Stan C++ Library, Version 2.17.0.
 \url{http://mc-stan.org}.
 
-Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
+Stan Development Team (2018). RStan: the R interface to Stan, Version 2.17.3.
 \url{http://mc-stan.org}.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
