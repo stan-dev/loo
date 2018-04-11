@@ -35,7 +35,10 @@ This is related to the relative efficiency of estimating the normalizing
 term in self-normalizing importance sampling. If \code{r_eff} is not
 provided then the reported PSIS effective sample sizes and Monte Carlo
 error estimates will be over-optimistic. See the \code{\link{relative_eff}}
-helper function for computing \code{r_eff}.}
+helper function for computing \code{r_eff}. If using \code{psis} with
+draws of the \code{log_ratios} not obtained from MCMC then the warning
+message thrown when not specifying \code{r_eff} can be disabled by
+setting \code{r_eff} to \code{NA}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -121,7 +124,7 @@ of data points.
 
 \examples{
 log_ratios <- -1 * example_loglik_array()
-r_eff <- relative_eff(exp(log_ratios))
+r_eff <- relative_eff(exp(-log_ratios))
 psis_result <- psis(log_ratios, r_eff = r_eff)
 str(psis_result)
 plot(psis_result)

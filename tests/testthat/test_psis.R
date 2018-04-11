@@ -10,9 +10,13 @@ LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
-r_eff_arr <- relative_eff(exp(-LLarr))
-r_eff_vec <- relative_eff(exp(-LLvec), chain_id = chain_id)
+r_eff_arr <- relative_eff(exp(LLarr))
+r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
+
+test_that("psis results haven't changed", {
+  expect_equal_to_reference(psis1, "psis.rds")
+})
 
 test_that("psis returns object with correct structure", {
   expect_true(is.psis(psis1))
@@ -37,10 +41,28 @@ test_that("psis methods give same results", {
 })
 
 test_that("psis throws correct errors and warnings", {
-  # r_eff warnings
+  # r_eff=NULL warnings
   expect_warning(psis(-LLarr), "Relative effective sample sizes")
   expect_warning(psis(-LLmat), "Relative effective sample sizes")
   expect_warning(psis(-LLmat[, 1]), "Relative effective sample sizes")
+
+  # r_eff=NA disables warnings
+  expect_silent(psis(-LLarr, r_eff = NA))
+  expect_silent(psis(-LLmat, r_eff = NA))
+  expect_silent(psis(-LLmat[,1], r_eff = NA))
+
+  # r_eff=NULL and r_eff=NA give same answer
+  expect_equal(
+    suppressWarnings(psis(-LLarr)),
+    psis(-LLarr, r_eff = NA)
+  )
+
+  # r_eff wrong length is error
+  expect_error(psis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")
+
+  # r_eff has some NA values causes error
+  r_eff_arr[2] <- NA
+  expect_error(psis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
 
   # tail length warnings
   expect_warning(
