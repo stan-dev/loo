@@ -228,7 +228,8 @@ values, the log ratios are the <strong>negative</strong> of those values. If
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
 <span class='co'># matrix and draws from the posterior predictive distribution</span>
-<span class='fu'>library</span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>rstanarm (Version 2.17.4, packaged: )</span></div><div class='output co'>#&gt; <span class='message'>- Do not expect the default priors to remain the same in future rstanarm versions.</span></div><div class='output co'>#&gt; <span class='message'>Thus, R scripts should specify priors explicitly, even if they are just the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>options(mc.cores = parallel::detectCores())</span></div><div class='output co'>#&gt; <span class='message'>- Plotting theme set to bayesplot::theme_default().</span></div><div class='input'>
+<span class='fu'>library</span>(<span class='st'>"rstanarm"</span>)
+
 <span class='co'># data from help("lm")</span>
 <span class='no'>ctl</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='fl'>4.17</span>,<span class='fl'>5.58</span>,<span class='fl'>5.18</span>,<span class='fl'>6.11</span>,<span class='fl'>4.50</span>,<span class='fl'>4.61</span>,<span class='fl'>5.17</span>,<span class='fl'>4.53</span>,<span class='fl'>5.33</span>,<span class='fl'>5.14</span>)
 <span class='no'>trt</span> <span class='kw'>&lt;-</span> <span class='fu'>c</span>(<span class='fl'>4.81</span>,<span class='fl'>4.17</span>,<span class='fl'>4.41</span>,<span class='fl'>3.59</span>,<span class='fl'>5.87</span>,<span class='fl'>3.83</span>,<span class='fl'>6.03</span>,<span class='fl'>4.89</span>,<span class='fl'>4.32</span>,<span class='fl'>4.69</span>)
@@ -239,8 +240,8 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/stan_glm'>stan_glm</a></span>(<span class='no'>weight</span> ~ <span class='no'>group</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>)</div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 #&gt; 
-#&gt; Gradient evaluation took 0.000134 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.34 seconds.
+#&gt; Gradient evaluation took 0.00015 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.5 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -257,37 +258,12 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.055251 seconds (Warm-up)
-#&gt;                0.051449 seconds (Sampling)
-#&gt;                0.1067 seconds (Total)
+#&gt;  Elapsed Time: 0.067668 seconds (Warm-up)
+#&gt;                0.0619 seconds (Sampling)
+#&gt;                0.129568 seconds (Total)
 #&gt; 
 #&gt; 
 #&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
-#&gt; 
-#&gt; Gradient evaluation took 1.3e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
-#&gt; Adjust your expectations accordingly!
-#&gt; 
-#&gt; 
-#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
-#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
-#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
-#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
-#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
-#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
-#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
-#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
-#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
-#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
-#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
-#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
-#&gt; 
-#&gt;  Elapsed Time: 0.050602 seconds (Warm-up)
-#&gt;                0.051318 seconds (Sampling)
-#&gt;                0.10192 seconds (Total)
-#&gt; 
-#&gt; 
-#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 #&gt; 
 #&gt; Gradient evaluation took 2.3e-05 seconds
 #&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.23 seconds.
@@ -307,15 +283,15 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.060142 seconds (Warm-up)
-#&gt;                0.059603 seconds (Sampling)
-#&gt;                0.119745 seconds (Total)
+#&gt;  Elapsed Time: 0.063336 seconds (Warm-up)
+#&gt;                0.069948 seconds (Sampling)
+#&gt;                0.133284 seconds (Total)
 #&gt; 
 #&gt; 
-#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 #&gt; 
-#&gt; Gradient evaluation took 2.6e-05 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.
+#&gt; Gradient evaluation took 3.3e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.33 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -332,13 +308,38 @@ values, the log ratios are the <strong>negative</strong> of those values. If
 #&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.056988 seconds (Warm-up)
-#&gt;                0.055175 seconds (Sampling)
-#&gt;                0.112163 seconds (Total)
+#&gt;  Elapsed Time: 0.071757 seconds (Warm-up)
+#&gt;                0.067747 seconds (Sampling)
+#&gt;                0.139504 seconds (Total)
+#&gt; 
+#&gt; 
+#&gt; SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+#&gt; 
+#&gt; Gradient evaluation took 3.9e-05 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 0.39 seconds.
+#&gt; Adjust your expectations accordingly!
+#&gt; 
+#&gt; 
+#&gt; Iteration:    1 / 2000 [  0%]  (Warmup)
+#&gt; Iteration:  200 / 2000 [ 10%]  (Warmup)
+#&gt; Iteration:  400 / 2000 [ 20%]  (Warmup)
+#&gt; Iteration:  600 / 2000 [ 30%]  (Warmup)
+#&gt; Iteration:  800 / 2000 [ 40%]  (Warmup)
+#&gt; Iteration: 1000 / 2000 [ 50%]  (Warmup)
+#&gt; Iteration: 1001 / 2000 [ 50%]  (Sampling)
+#&gt; Iteration: 1200 / 2000 [ 60%]  (Sampling)
+#&gt; Iteration: 1400 / 2000 [ 70%]  (Sampling)
+#&gt; Iteration: 1600 / 2000 [ 80%]  (Sampling)
+#&gt; Iteration: 1800 / 2000 [ 90%]  (Sampling)
+#&gt; Iteration: 2000 / 2000 [100%]  (Sampling)
+#&gt; 
+#&gt;  Elapsed Time: 0.058925 seconds (Warm-up)
+#&gt;                0.056239 seconds (Sampling)
+#&gt;                0.115164 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>yrep</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/posterior_predict.stanreg'>posterior_predict</a></span>(<span class='no'>fit</span>)
 <span class='fu'>dim</span>(<span class='no'>yrep</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
 <span class='no'>log_ratios</span> <span class='kw'>&lt;-</span> -<span class='fl'>1</span> * <span class='fu'><a href='http://www.rdocumentation.org/packages/rstanarm/topics/log_lik.stanreg'>log_lik</a></span>(<span class='no'>fit</span>)
-<span class='fu'>dim</span>(<span class='no'>ll</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'll' not found</span></div><div class='input'>
+<span class='fu'>dim</span>(<span class='no'>log_ratios</span>)</div><div class='output co'>#&gt; [1] 4000   20</div><div class='input'>
 <span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'>exp</span>(-<span class='no'>log_ratios</span>), <span class='kw'>chain_id</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>4</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>1000</span>))
 <span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></div><div class='input'>
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
