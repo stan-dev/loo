@@ -39,4 +39,5 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
+SystemRequirements:	pandoc (>= 1.12.3), pandoc-citeproc
 RoxygenNote: 6.0.1
