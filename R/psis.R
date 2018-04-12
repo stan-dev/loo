@@ -212,16 +212,9 @@ do_psis <- function(log_ratios, r_eff, cores) {
     }
   }
 
+  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")
   throw_pareto_warnings(pareto_k)
-
-  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
-
-  # truncate at the max of raw wts
-  max_wts <- apply(log_ratios, 2, max)
-  log_weights <- sapply(1:N, function(n) {
-    truncate_lw(log_weights[, n], upper = max_wts[n])
-  })
 
   psis_object(
     unnormalized_log_weights = log_weights,
@@ -313,6 +306,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
       lw_i[ord$ix[tail_ids]] <- smoothed$tail
     }
   }
+
+  # truncate at max of raw wts (i.e., 0 since max has been subtracted)
+  lw_i <- truncate_lw(lw_i, upper = 0)
+
   list(log_weights = lw_i, pareto_k = khat)
 }
 

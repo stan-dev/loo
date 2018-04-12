@@ -1,3 +1,9 @@
+# loo 2.0.0.9000
+
+* Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC) (#72).
+
+* Fix for `psis()` when `log_ratios` are very small (#74)
+
 # loo 2.0.0
 
 This is a major release with many changes. Whenever possible we have opted to
