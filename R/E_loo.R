@@ -67,7 +67,7 @@
 #' dim(yrep)
 #'
 #' log_ratios <- -1 * log_lik(fit)
-#' dim(ll)
+#' dim(log_ratios)
 #'
 #' r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
 #' psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
