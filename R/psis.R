@@ -173,14 +173,54 @@ dim.psis <- function(x) {
 
 # internal ----------------------------------------------------------------
 
-# Do PSIS given matrix of log weights
-#
-# @param lr Matrix of log ratios (-loglik)
-# @param r_eff Vector of relative effective sample sizes
-# @param cores User's integer cores argument
-# @return A list with class "psis" and structure described in the main doc at
-#   the top of this file.
-#
+#' Structure the object returned by the psis methods
+#'
+#' @noRd
+#' @param unnormalized_log_weights Smoothed and possibly truncated log weights,
+#'   but unnormalized.
+#' @param pareto_k Vector of GPD k estimates.
+#' @param tail_len Vector of tail lengths used to fit GPD.
+#' @param r_eff Vector of relative MCMC n_eff for exp(log lik)
+#' @return A list of class "psis" with structure described in the main doc at the
+#'   top of this file.
+#'
+psis_object <-
+  function(unnormalized_log_weights,
+           pareto_k,
+           tail_len,
+           r_eff) {
+    stopifnot(is.matrix(unnormalized_log_weights))
+
+    norm_const_log <- colLogSumExps(unnormalized_log_weights)
+    out <- structure(
+      list(
+        log_weights = unnormalized_log_weights,
+        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
+      ),
+      # attributes
+      norm_const_log = norm_const_log,
+      tail_len = tail_len,
+      r_eff = r_eff,
+      dims = dim(unnormalized_log_weights),
+      class = c("psis", "list")
+    )
+
+    # need normalized weights (not on log scale) for psis_n_eff
+    w <- weights(out, normalize = TRUE, log = FALSE)
+    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
+    return(out)
+  }
+
+
+#' Do PSIS given matrix of log weights
+#'
+#' @noRd
+#' @param lr Matrix of log ratios (-loglik)
+#' @param r_eff Vector of relative effective sample sizes
+#' @param cores User's integer cores argument
+#' @return A list with class "psis" and structure described in the main doc at
+#'   the top of this file.
+#'
 do_psis <- function(log_ratios, r_eff, cores) {
   stopifnot(cores == as.integer(cores))
   N <- ncol(log_ratios)
@@ -224,11 +264,13 @@ do_psis <- function(log_ratios, r_eff, cores) {
   )
 }
 
-#' Extract named components from each list in a list of lists
+#' Extract named components from each list in the list of lists obtained by
+#' parallelizing do_psis_i()
 #'
 #' @noRd
 #' @param x List of lists.
-#' @param item String naming the component or attribute to pull out of each list (or list-like object).
+#' @param item String naming the component or attribute to pull out of each list
+#'   (or list-like object).
 #' @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
 #' @return Numeric vector or matrix.
 #'
@@ -236,45 +278,6 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
   stopifnot(is.list(x))
   vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
 }
-
-#' Structure the object returned by the psis methods
-#'
-#' @noRd
-#' @param unnormalized_log_weights Smoothed and possibly truncated log weights,
-#'   but unnormalized.
-#' @param pareto_k Vector of GPD k estimates.
-#' @param tail_len Vector of tail lengths used to fit GPD.
-#' @param r_eff Vector of relative MCMC n_eff for exp(log lik)
-#' @return A list of class "psis" with structure described in the main doc at the
-#'   top of this file.
-#'
-psis_object <-
-  function(unnormalized_log_weights,
-           pareto_k,
-           tail_len,
-           r_eff) {
-    stopifnot(is.matrix(unnormalized_log_weights))
-
-    norm_const_log <- colLogSumExps(unnormalized_log_weights)
-    out <- structure(
-      list(
-        log_weights = unnormalized_log_weights,
-        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
-      ),
-      # attributes
-      norm_const_log = norm_const_log,
-      tail_len = tail_len,
-      r_eff = r_eff,
-      dims = dim(unnormalized_log_weights),
-      class = c("psis", "list")
-    )
-
-    # need normalized weights (not on log scale) for psis_n_eff
-    w <- weights(out, normalize = TRUE, log = FALSE)
-    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
-    return(out)
-  }
-
 
 #' PSIS (without truncation and normalization) on a single vector
 #'
@@ -456,22 +459,27 @@ prepare_psis_r_eff <- function(r_eff, len) {
   return(r_eff)
 }
 
-
-#' r_eff warning message
-#' @noRd
+#' Check if psis was called from one of the loo methods
 #'
-throw_psis_r_eff_warning <- function() {
-  warning("Relative effective sample sizes ('r_eff' argument) not specified. ",
-          "PSIS n_eff will not adjusted based on MCMC n_eff.", call. = FALSE)
-}
-
-#' check if psis was called from one of the loo methods
 #' @noRd
+#' @return TRUE if the loo array, matrix, or function method is found in the
+#'   active call list, FALSE otherwise.
+#'
 called_from_loo <- function() {
   calls <- sys.calls()
   txt <- unlist(lapply(calls, deparse))
   patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
   check <- sapply(txt, function(x) grepl(patts, x))
   isTRUE(any(check))
+}
+
+#' Warning message about missing r_eff argument
+#' @noRd
+throw_psis_r_eff_warning <- function() {
+  warning(
+    "Relative effective sample sizes ('r_eff' argument) not specified. ",
+    "PSIS n_eff will not adjusted based on MCMC n_eff.",
+    call. = FALSE
+  )
 }
 

@@ -509,6 +509,12 @@ list2psis <- function(objects) {
 }
 
 #' Extractor methods
+#'
+#' These are only defined in order to deprecate with a warning (rather than
+#' remove and break backwards compatibility) the old way of accessing the point
+#' estimates in a \code{"psis_loo"} or \code{"psis"} object. The new way as of
+#' v2.0.0 is to get them from the \code{"estimates"} component of the object.
+#'
 #' @name old-extractors
 #' @keywords internal
 #' @param x,i,exact,name See \link{Extract}.
