@@ -5,10 +5,10 @@
 
 <br>
 
-<div style="text-align:center">
-<a href="http://mc-stan.org">
-<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=200 alt="Stan Logo"/>
-</a>
+<div style="text-align:left">
+<span><a href="http://mc-stan.org">
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width=100 alt="Stan Logo"/> </a><h2><strong>loo</strong></h2>
+<h4>Efficient approximate leave-one-out cross-validation</h4></span>
 </div>
 
 <br>
@@ -54,13 +54,13 @@ Analysis, doi:10.1214/17-BA1091.
 ## Installation
 
 
-* Install from CRAN:
+Install the latest release from **CRAN**
 
 ```r
 install.packages("loo")
 ```
 
-* Install from GitHub (requires __devtools__ package):
+Install the latest development version from **GitHub**
 
 ```r
 if (!require(devtools)) {

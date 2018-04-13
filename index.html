@@ -113,9 +113,10 @@
     
 
 <p><br></p>
-<div style="text-align:center">
-<a href="http://mc-stan.org">
-<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width="200" alt="Stan Logo"></a>
+<div style="text-align:left">
+<span><a href="http://mc-stan.org">
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width="100" alt="Stan Logo"></a><h2><strong>loo</strong></h2>
+<h4>Efficient approximate leave-one-out cross-validation</h4></span>
 </div>
 <p><br></p>
 <p><strong>loo</strong> is an R package that allows users to perform efficient leave-one-out cross-validation for fitted Bayesian models. Leave-one-out cross-validation (LOO) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps.</p>
@@ -136,13 +137,9 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<ul>
-<li>Install from CRAN:</li>
-</ul>
+<p>Install the latest release from <strong>CRAN</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"loo"</span>)</code></pre></div>
-<ul>
-<li>Install from GitHub (requires <strong>devtools</strong> package):</li>
-</ul>
+<p>Install the latest development version from <strong>GitHub</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="op">!</span><span class="kw">require</span>(devtools)) {
   <span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
 }
