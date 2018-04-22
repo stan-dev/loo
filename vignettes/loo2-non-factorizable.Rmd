@@ -423,14 +423,14 @@ for (i in seq_len(N)) {
   yloo <- sdloo <- rep(NA, S)
   for (s in seq_len(S)) {
     p <- params[s, ]
-    yt <- y
-    yt[i] <- p$Ymi
+    y_miss_i <- y
+    y_miss_i[i] <- p$Ymi
     eta <- p$b_Intercept + p$b_INC * fit_i$data$INC + p$b_HOVAL * fit_i$data$HOVAL
     W_tilde <- diag(N) - p$lagsar * fit_i$autocor$W
     Cinv <- t(W_tilde) %*% W_tilde / p$sigma^2
-    g <- Cinv %*% (yt - solve(W_tilde, eta))
+    g <- Cinv %*% (y_miss_i - solve(W_tilde, eta))
     cbar <- diag(Cinv);
-    yloo[s] <- yt[i] - g[i] / cbar[i]
+    yloo[s] <- y_miss_i[i] - g[i] / cbar[i]
     sdloo[s] <- sqrt(1 / cbar[i])
     loglik[s, i] <- dnorm(y[i], yloo[s], sdloo[s], log = TRUE)
   }
