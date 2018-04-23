@@ -7,7 +7,7 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Andrew", "Gelman", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
              person("Yuling", "Yao", role = c("aut")),
-             person("Paul-Christian", "Bürkner", role = c("ctb"")),
+             person("Paul-Christian", "Bürkner", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")),
              person("Juho", "Piironen", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
