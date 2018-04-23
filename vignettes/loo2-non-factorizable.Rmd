@@ -6,7 +6,7 @@ output:
   html_vignette:
     toc: yes
 params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+  EVAL: !r TRUE
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
@@ -74,7 +74,9 @@ standard deviation can be computed as follows:
   \mu_{\tilde{y},-i} &= y_i-\bar{c}_{ii}^{-1} g_i \nonumber \\
   \sigma_{\tilde{y},-i} &= \sqrt{\bar{c}_{ii}^{-1}},
 \end{align}
+
 where $g_i$ and $\bar{c}_{ii}$ are
+
 \begin{align}
   g_i &= \left[C^{-1} y\right]_i \nonumber \\
   \bar{c}_{ii} &= \left[C^{-1}\right]_{ii}.
@@ -260,7 +262,9 @@ if we write
 \begin{align}
 y-(I-\rho W)^{-1}\eta &\sim {\mathrm N}(0, \sigma^2(I-\rho W)^{-1}(I-\rho W)^{-T}),
 \end{align}
+
 or more compactly, with $\widetilde{W}=(I-\rho W)$,
+
 \begin{align}
 y-\widetilde{W}^{-1}\eta &\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\widetilde{W})^{-1}),
 \end{align}
@@ -517,7 +521,7 @@ df <- data.frame(
 ggplot(df, aes(x = approx_elpd, y = exact_elpd)) +
   geom_abline(color = "gray30") +
   geom_point(size = 2) +
-  geom_point(data = df[4, ], size = 3, color = "red3") +
+  geom_point(data = df[4, ], size = 2, color = "red3") +
   xlab("Approximate elpds") +
   ylab("Exact elpds") +
   coord_fixed(xlim = c(-16, -3), ylim = c(-16, -3))
@@ -535,7 +539,7 @@ without_pt_4 <- c(
   approx = sum(psis_loo$pointwise[-4, "elpd_loo"]),
   exact = sum(exact_elpds[-4])  
 )
-round(without_pt_4, 1)
+round(without_pt_4, 2)
 ```
 
 From this we can conclude that the difference we found when including *all*

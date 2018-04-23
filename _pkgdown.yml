@@ -51,3 +51,4 @@ articles:
       - loo2-example
       - loo2-weights
       - loo2-with-rstan
+      - loo2-non-factorizable
