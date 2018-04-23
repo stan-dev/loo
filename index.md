@@ -66,10 +66,12 @@ Install the latest development version from **GitHub**
 if (!require(devtools)) {
   install.packages("devtools")
 }
-devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
+devtools::install_github("stan-dev/loo", build_vignettes = FALSE)
 ```
 
-You can also set `build_vignettes=FALSE` for a faster installation from GitHub (the vignettes can always be accessed online anytime at [mc-stan.org/loo/articles](http://mc-stan.org/loo/articles/)).
+You can also set `build_vignettes=TRUE`, but the vignettes take some time to
+buid and they can always be accessed online anytime at
+[mc-stan.org/loo/articles](http://mc-stan.org/loo/articles/)).
 
 
 ## Python and Matlab/Octave Code
