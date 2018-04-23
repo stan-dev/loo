@@ -337,14 +337,14 @@ log-likelihood values needed for approximate LOO-CV. To do this we will
 use the recipe laid out in the previous sections.
 
 ```{r}
-params <- as.data.frame(fit)
+posterior <- as.data.frame(fit)
 y <- fit$data$CRIME
 N <- length(y)
-S <- nrow(params)
+S <- nrow(posterior)
 loglik <- yloo <- sdloo <- matrix(nrow = S, ncol = N)
 
 for (s in 1:S) {
-  p <- params[s, ]
+  p <- posterior[s, ]
   eta <- p$b_Intercept + p$b_INC * fit$data$INC + p$b_HOVAL * fit$data$HOVAL
   W_tilde <- diag(N) - p$lagsar * fit$autocor$W
   Cinv <- t(W_tilde) %*% W_tilde / p$sigma^2
@@ -430,14 +430,13 @@ loglik <- matrix(nrow = S, ncol = N)
 for (i in seq_len(N)) {
   dat_mi <- COL.OLD
   dat_mi$CRIME[i] <- NA
-  fit_i <- update(fit_dummy, newdata = dat_mi, chains = 1, iter = S * 2)
-  params <- as.data.frame(fit_i)
   fit_i <- update(fit_dummy, newdata = dat_mi, 
                   # just for speed of vignette
                   chains = 1, iter = S * 2)
+  posterior <- as.data.frame(fit_i)
   yloo <- sdloo <- rep(NA, S)
   for (s in seq_len(S)) {
-    p <- params[s, ]
+    p <- posterior[s, ]
     y_miss_i <- y
     y_miss_i[i] <- p$Ymi
     eta <- p$b_Intercept + p$b_INC * fit_i$data$INC + p$b_HOVAL * fit_i$data$HOVAL
@@ -450,7 +449,7 @@ for (i in seq_len(N)) {
     loglik[s, i] <- dnorm(y[i], yloo[s], sdloo[s], log = TRUE)
   }
   ypred <- rnorm(S, yloo, sdloo)
-  res[[i]] <- data.frame(y = c(params$Ymi, ypred))
+  res[[i]] <- data.frame(y = c(posterior$Ymi, ypred))
   res[[i]]$type <- rep(c("pp", "loo"), each = S)
   res[[i]]$obs <- i
 }
