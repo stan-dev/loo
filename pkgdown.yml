@@ -5,4 +5,5 @@ articles:
   loo2-example: loo2-example.html
   loo2-weights: loo2-weights.html
   loo2-with-rstan: loo2-with-rstan.html
+  loo2-non-factorizable: loo2-non-factorizable.html
 

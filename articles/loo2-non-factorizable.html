@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@
       <h1>Leave-one-out cross-validation for non-factorizable models</h1>
                         <h4 class="author">Aki Vehtari, Paul Buerkner and Jonah Gabry</h4>
             
-            <h4 class="date">2018-04-22</h4>
+            <h4 class="date">2018-04-23</h4>
       
       
 
@@ -407,7 +407,7 @@ estimates &lt;-<span class="st"> </span><span class="kw">quantile</span>(lagsar,
 <span class="kw"><a href="http://www.rdocumentation.org/packages/bayesplot/topics/MCMC-distributions">mcmc_hist</a></span>(lagsar) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/bayesplot/topics/bayesplot-helpers">vline_at</a></span>(estimates, <span class="dt">linetype =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">1</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ggtitle</a></span>(<span class="st">"lagsar: posterior median and 50% central interval"</span>)</code></pre></div>
-<p><img src="loo2-non-factorizable_files/figure-html/plot-lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../docs/articles/loo2-non-factorizable_files/figure-html/plot-lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div id="approximate-loo-cv" class="section level3">
 <h3 class="hasAnchor">
@@ -545,7 +545,7 @@ exact_elpd &lt;-<span class="st"> </span><span class="kw">sum</span>(exact_elpds
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Approximate elpds"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Exact elpds"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/coord_fixed">coord_fixed</a></span>(<span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">16</span>, <span class="op">-</span><span class="dv">3</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">16</span>, <span class="op">-</span><span class="dv">3</span>))</code></pre></div>
-<p><img src="loo2-non-factorizable_files/figure-html/unnamed-chunk-8-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../docs/articles/loo2-non-factorizable_files/figure-html/unnamed-chunk-8-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as problematic by the PSIS-LOO approximation— is colored in red and is the clear outlier. Otherwise, the correspondence between the exact and approximate values is strong. In fact, summing over the pointwise ELPD values and leaving out the fourth observation yields practically equivalent results for approximate and exact LOO-CV:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">without_pt_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">c</span>(
   <span class="dt">approx =</span> <span class="kw">sum</span>(psis_loo<span class="op">$</span>pointwise[<span class="op">-</span><span class="dv">4</span>, <span class="st">"elpd_loo"</span>]),
