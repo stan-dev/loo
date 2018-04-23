@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.0.9000</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@
       <h1>Bayesian Stacking and Pseudo-BMA weights using the loo package</h1>
                         <h4 class="author">Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2018-04-11</h4>
+            <h4 class="date">2018-04-22</h4>
       
       
 
@@ -241,7 +241,7 @@ stacking_wts &lt;-<span class="st"> </span><span class="kw"><a href="../referenc
 model1     0.02     0.02        0.07         0.01
 model2     0.01     0.01        0.04         0.00
 model3     0.02     0.02        0.04         0.00
-model4     0.96     0.95        0.86         0.99</code></pre>
+model4     0.96     0.95        0.85         0.99</code></pre>
 <p>With all approaches Model 4 with <code>neocortex</code> and <code>log(mass)</code> gets most of the weight. Based on theory, Pseudo-BMA weights without Bayesian bootstrap should be close to WAIC weights, and we can also see that here. Pseudo-BMA+ weights with Bayesian bootstrap provide more cautious weights further away from 0 and 1 (see Yao et al. (2018) for a discussion of why this can be beneficial and results from related experiments). In this particular example, the Bayesian stacking weights are not much different from the other weights.</p>
 <p>One of the benefits of stacking is that it manages well if there are many similar models. Consider for example that there could be many irrelevant covariates that when included would produce a similar model to one of the existing models. To emulate this situation here we simply copy the first model a bunch of times, but you can imagine that instead we would have ten alternative models with about the same predictive performance. WAIC weights for such a scenario would be close to the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">waic_wts_demo &lt;-<span class="st"> </span>
@@ -310,17 +310,17 @@ d<span class="op">$</span>contact_high &lt;-<span class="st"> </span><span class
 Computed from 4000 by 10 log-likelihood matrix
 
          Estimate   SE
-elpd_loo    -40.7  6.0
-p_loo         5.5  1.8
-looic        81.3 11.9
+elpd_loo    -40.5  6.0
+p_loo         5.3  1.8
+looic        81.0 11.9
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     6     60.0%   938       
- (0.5, 0.7]   (ok)       3     30.0%   226       
-   (0.7, 1]   (bad)      1     10.0%   43        
+(-Inf, 0.5]   (good)     6     60.0%   970       
+ (0.5, 0.7]   (ok)       3     30.0%   212       
+   (0.7, 1]   (bad)      1     10.0%   130       
    (1, Inf)   (very bad) 0      0.0%   &lt;NA&gt;      
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>We get at least one observation with <span class="math inline">\(k&gt;0.7\)</span> and the estimated effective number of parameters <code>p_loo</code> is larger than the total number of parameters in the model. This indicates that Poisson might be too narrow. A negative binomial model might be better, but with so few observations it is not so clear.</p>
@@ -339,12 +339,12 @@ elpd_loo    -40.9  6.0
 p_loo         5.7  1.9
 looic        81.8 11.9
 ------
-Monte Carlo SE of elpd_loo is 0.2.
+Monte Carlo SE of elpd_loo is 0.1.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     6     66.7%   938       
- (0.5, 0.7]   (ok)       3     33.3%   226       
+(-Inf, 0.5]   (good)     6     66.7%   970       
+ (0.5, 0.7]   (ok)       3     33.3%   212       
    (0.7, 1]   (bad)      0      0.0%   &lt;NA&gt;      
    (1, Inf)   (very bad) 0      0.0%   &lt;NA&gt;      
 
@@ -362,7 +362,7 @@ Computed from 4000 by 10 log-likelihood matrix
           Estimate   SE
 elpd_waic    -40.1  5.9
 p_waic         4.9  1.7
-waic          80.1 11.8</code></pre>
+waic          80.1 11.9</code></pre>
 <pre><code>Warning: 4 (40.0%) p_waic estimates greater than 0.4. We recommend trying
 loo instead.</code></pre>
 <p>The WAIC computation is giving warnings and the estimated ELPD is slightly more optimistic. We recommend using the PSIS-LOO results instead.</p>
@@ -443,8 +443,8 @@ stacking_wts &lt;-<span class="st"> </span><span class="kw"><a href="../referenc
 <span class="kw">round</span>(<span class="kw">cbind</span>(waic_wts, pbma_wts, pbma_BB_wts, stacking_wts), <span class="dv">2</span>)</code></pre></div>
 <pre><code>       waic_wts pbma_wts pbma_BB_wts stacking_wts
 model1     0.38     0.34        0.28         0.00
-model2     0.58     0.63        0.54         0.78
-model3     0.04     0.03        0.18         0.22</code></pre>
+model2     0.58     0.63        0.53         0.78
+model3     0.04     0.03        0.19         0.22</code></pre>
 <p>All weights favor the second model with the log population and the contact rate. WAIC weights and Pseudo-BMA weights (without Bayesian bootstrap) are similar, while Pseudo-BMA+ is more cautious and closer to stacking weights.</p>
 <p>It may seem surprising that Bayesian stacking is giving zero weight to the first model, but this is likely due to the fact that the estimated effect for the interaction term is close to zero and thus models 1 and 2 give very similar predictions. In other words, incorporating the model with the interaction (model 1) into the model average doesn’t improve the predictions at all and so model 1 is given a weight of 0. On the other hand, models 2 and 3 are giving slightly different predictions and thus their combination may be slightly better than either alone. This behavior is related to the repeated similar model illustration in the milk example abve.</p>
 </div>
@@ -465,15 +465,15 @@ model3 0.221 </code></pre>
 <pre><code>Method: pseudo-BMA+ with Bayesian bootstrap
 ------
        weight
-model1 0.286 
-model2 0.526 
-model3 0.188 </code></pre>
+model1 0.284 
+model2 0.531 
+model3 0.184 </code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/loo_model_weights.html">loo_model_weights</a></span>(loo_list, <span class="dt">method =</span> <span class="st">"pseudobma"</span>, <span class="dt">BB =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>Method: pseudo-BMA
 ------
        weight
-model1 0.345 
-model2 0.628 
+model1 0.340 
+model2 0.633 
 model3 0.027 </code></pre>
 </div>
 <div id="references" class="section level1">
