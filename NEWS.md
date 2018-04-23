@@ -1,5 +1,7 @@
 # loo 2.0.0.9000
 
+* New vignette on LOO for non-factorizable joint Gaussian models (#75)
+
 * Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC) (#72).
 
 * Fix for `psis()` when `log_ratios` are very small (#74)
