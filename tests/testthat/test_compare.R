@@ -51,7 +51,7 @@ test_that("compare returns expected result (3 models)", {
   expect_equal(
     colnames(comp1),
     c(
-      "elpd_diff", "elpd_waic", "se_elpd_waic",
+      "elpd_diff", "se_diff", "elpd_waic", "se_elpd_waic",
       "p_waic", "se_p_waic", "waic", "se_waic"
     )
     )
