@@ -12,6 +12,7 @@ loo.Rproj
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+vignettes/loo2-non-factorizable_cache/*
 inst/doc
 
 revdep/*
