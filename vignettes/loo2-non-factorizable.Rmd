@@ -325,7 +325,7 @@ A model predicting `CRIME` from `INC` and `HOVAL`, while accounting for the
 spatial dependency via an SAR structure, can be specified in **brms** as
 follows.
 
-```{r fit}
+```{r fit, results="hide"}
 fit <- brm(
   CRIME ~ INC + HOVAL, 
   data = COL.OLD,
@@ -342,7 +342,7 @@ in the neighborhood. Moreover, there seems to be substantial spatial correlation
 between adjacent neighborhoods, as indicated by the posterior distribution 
 of the `lagsar` parameter.
 
-```{r plot-lagsar, message=FALSE}
+```{r lagsar, fig.width=5}
 lagsar <- as.matrix(fit, pars = "lagsar")
 estimates <- quantile(lagsar, probs = c(0.25, 0.5, 0.75))
 mcmc_hist(lagsar) + 
@@ -513,7 +513,7 @@ we would expect if there were no problematic observations. We can investigate
 this issue more closely by plotting the approximate against the exact pointwise
 ELPD values.
 
-```{r, fig.height=5}
+```{r elpd-plot, fig.height=5}
 df <- data.frame(
   approx_elpd = psis_loo$pointwise[, "elpd_loo"],
   exact_elpd = exact_elpds

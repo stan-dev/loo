@@ -302,112 +302,13 @@ SEED &lt;-<span class="st"> </span><span class="dv">10001</span>
   <span class="dt">chains =</span> <span class="dv">4</span>,
   <span class="dt">seed =</span> SEED
 )</code></pre></div>
-<pre><code>
-SAMPLING FOR MODEL 'gaussian brms-model' NOW (CHAIN 1).
-
-Gradient evaluation took 0.001035 seconds
-1000 transitions using 10 leapfrog steps per transition would take 10.35 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 21.8401 seconds (Warm-up)
-               17.7173 seconds (Sampling)
-               39.5574 seconds (Total)
-
-
-SAMPLING FOR MODEL 'gaussian brms-model' NOW (CHAIN 2).
-
-Gradient evaluation took 0.000895 seconds
-1000 transitions using 10 leapfrog steps per transition would take 8.95 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 18.0144 seconds (Warm-up)
-               16.4968 seconds (Sampling)
-               34.5112 seconds (Total)
-
-
-SAMPLING FOR MODEL 'gaussian brms-model' NOW (CHAIN 3).
-
-Gradient evaluation took 0.000899 seconds
-1000 transitions using 10 leapfrog steps per transition would take 8.99 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 18.2807 seconds (Warm-up)
-               16.0295 seconds (Sampling)
-               34.3102 seconds (Total)
-
-
-SAMPLING FOR MODEL 'gaussian brms-model' NOW (CHAIN 4).
-
-Gradient evaluation took 0.001086 seconds
-1000 transitions using 10 leapfrog steps per transition would take 10.86 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 18.1269 seconds (Warm-up)
-               15.6193 seconds (Sampling)
-               33.7461 seconds (Total)</code></pre>
 <p>The code above fits the model in <strong>Stan</strong> using a log PDF equivalent to the <code>normal_lagsar_lpdf</code> function we defined above. In the summary output below we see that both higher income and higher housing value predict lower crime rates in the neighborhood. Moreover, there seems to be substantial spatial correlation between adjacent neighborhoods, as indicated by the posterior distribution of the <code>lagsar</code> parameter.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lagsar &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(fit, <span class="dt">pars =</span> <span class="st">"lagsar"</span>)
 estimates &lt;-<span class="st"> </span><span class="kw">quantile</span>(lagsar, <span class="dt">probs =</span> <span class="kw">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>))
 <span class="kw"><a href="http://www.rdocumentation.org/packages/bayesplot/topics/MCMC-distributions">mcmc_hist</a></span>(lagsar) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/bayesplot/topics/bayesplot-helpers">vline_at</a></span>(estimates, <span class="dt">linetype =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">1</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ggtitle</a></span>(<span class="st">"lagsar: posterior median and 50% central interval"</span>)</code></pre></div>
-<p><img src="../docs/articles/loo2-non-factorizable_files/figure-html/plot-lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorizable_files/figure-html/lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div id="approximate-loo-cv" class="section level3">
 <h3 class="hasAnchor">
@@ -545,7 +446,7 @@ exact_elpd &lt;-<span class="st"> </span><span class="kw">sum</span>(exact_elpds
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">xlab</a></span>(<span class="st">"Approximate elpds"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Exact elpds"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/coord_fixed">coord_fixed</a></span>(<span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">16</span>, <span class="op">-</span><span class="dv">3</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">16</span>, <span class="op">-</span><span class="dv">3</span>))</code></pre></div>
-<p><img src="../docs/articles/loo2-non-factorizable_files/figure-html/unnamed-chunk-8-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorizable_files/figure-html/elpd-plot-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as problematic by the PSIS-LOO approximation— is colored in red and is the clear outlier. Otherwise, the correspondence between the exact and approximate values is strong. In fact, summing over the pointwise ELPD values and leaving out the fourth observation yields practically equivalent results for approximate and exact LOO-CV:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">without_pt_<span class="dv">4</span> &lt;-<span class="st"> </span><span class="kw">c</span>(
   <span class="dt">approx =</span> <span class="kw">sum</span>(psis_loo<span class="op">$</span>pointwise[<span class="op">-</span><span class="dv">4</span>, <span class="st">"elpd_loo"</span>]),
