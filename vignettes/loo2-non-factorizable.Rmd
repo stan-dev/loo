@@ -211,7 +211,7 @@ $$
 $$
 which corresponds to the following log PDF coded in **Stan**:
 
-```{lpdf, eval=FALSE}
+```{r lpdf, eval=FALSE}
 /** 
  * Normal log-pdf for spatially lagged responses
  * 
@@ -263,15 +263,19 @@ equations, we will first fit a lagged SAR model to data on crime in 49 different
 neighborhoods of Columbus, Ohio during the year 1980. The data was originally
 described in Aneslin (1988) and ships with the **spdep** R package.
 
-For the analysis we will use the **brms** package to fit the model, 
-the **loo** packge for LOO-CV, and **ggplot2** for plotting.
+In addition to the **loo** package, for this analysis we will use the **brms**
+interface to Stan to generate a Stan program and fit the model, and also the
+**bayesplot** and **ggplot2** packages for plotting.
 
 ```{r, cache=FALSE}
-library(brms)
-library(loo)
-library(ggplot2)
+library("loo")
+library("brms")
+library("bayesplot")
+library("ggplot2")
+color_scheme_set("brightblue")
 theme_set(theme_default())
-options(mc.cores = 2)
+
+
 SEED <- 10001 
 set.seed(SEED) # only sets seed for R (seed for Stan set later)
 
@@ -315,16 +319,21 @@ The code above fits the model in **Stan** using a log PDF equivalent to the
 `normal_lagsar_lpdf` function we defined above. In the summary output below we
 see that both higher income and higher housing value predict lower crime rates
 in the neighborhood. Moreover, there seems to be substantial spatial correlation
-between adjacent neighborhoods, as indicated by the `lagsar` parameter.
+between adjacent neighborhoods, as indicated by the posterior distribution 
+of the `lagsar` parameter.
 
-```{r}
-summary(fit)
+```{r plot-lagsar, message=FALSE}
+lagsar <- as.matrix(fit, pars = "lagsar")
+estimates <- quantile(lagsar, probs = c(0.25, 0.5, 0.75))
+mcmc_hist(lagsar) + 
+  vline_at(estimates, linetype = 2, size = 1) +
+  ggtitle("lagsar: posterior median and 50% central interval")
 ```
 
 ### Approximate LOO-CV
 
 After fitting the model, the next step is to compute the pointwise
-log-likelihood values we need for approximate LOO-CV. To do this we will 
+log-likelihood values needed for approximate LOO-CV. To do this we will 
 use the recipe laid out in the previous sections.
 
 ```{r}
@@ -346,7 +355,7 @@ for (s in 1:S) {
   loglik[s, ] <- dnorm(y, yloo[s, ], sdloo[s, ], log = TRUE)
 }
 
-# use psis() from the loo package
+# use loo for psis smoothing
 log_ratios <- -loglik
 psis_result <- psis(log_ratios)
 ```
@@ -395,14 +404,17 @@ section.
 ### Exact LOO-CV
 
 Exact LOO-CV for the above example is somewhat more involved, as we need to
-re-fit the model $N$ times and each time model the held-out data point as a parameter. First, we create an empty dummy model that we will update below
-as we loop over the observations.
+re-fit the model $N$ times and each time model the held-out data point as a
+parameter. First, we create an empty dummy model that we will update below as we
+loop over the observations.
 
 ```{r fit_dummy, cache = TRUE}
 # see help("mi", "brms") for details on the mi() usage
 fit_dummy <- brm(
-  CRIME | mi() ~ INC + HOVAL, data = COL.OLD,
-  autocor = cor_lagsar(COL.nb), chains = 0
+  CRIME | mi() ~ INC + HOVAL, 
+  data = COL.OLD,
+  autocor = cor_lagsar(COL.nb), 
+  chains = 0
 )
 ```
 
@@ -420,6 +432,9 @@ for (i in seq_len(N)) {
   dat_mi$CRIME[i] <- NA
   fit_i <- update(fit_dummy, newdata = dat_mi, chains = 1, iter = S * 2)
   params <- as.data.frame(fit_i)
+  fit_i <- update(fit_dummy, newdata = dat_mi, 
+                  # just for speed of vignette
+                  chains = 1, iter = S * 2)
   yloo <- sdloo <- rep(NA, S)
   for (s in seq_len(S)) {
     p <- params[s, ]
@@ -521,7 +536,7 @@ is human readable and so we can use it to learn some of the essential aspects of
 Stan and the particular model we are implementing. The Stan program below is
 a slightly modified version of the code extracted via `stancode(fit_dummy)`:
 
-```{r, brms-stan-code, eval=FALSE}
+```{r brms-stan-code, eval=FALSE}
 // generated with brms 2.2.0
 functions {
 /** 
