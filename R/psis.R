@@ -173,77 +173,6 @@ dim.psis <- function(x) {
 
 # internal ----------------------------------------------------------------
 
-# Do PSIS given matrix of log weights
-#
-# @param lr Matrix of log ratios (-loglik)
-# @param r_eff Vector of relative effective sample sizes
-# @param cores User's integer cores argument
-# @return A list with class "psis" and structure described in the main doc at
-#   the top of this file.
-#
-do_psis <- function(log_ratios, r_eff, cores) {
-  stopifnot(cores == as.integer(cores))
-  N <- ncol(log_ratios)
-  S <- nrow(log_ratios)
-  tail_len <- n_pareto(r_eff, S)
-  throw_tail_length_warnings(tail_len)
-
-  if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      do_psis_i(log_ratios[, i], tail_len[i]))
-  } else {
-    if (.Platform$OS.type != "windows") {
-      lw_list <- parallel::mclapply(
-        X = seq_len(N),
-        FUN = function(i)
-          do_psis_i(log_ratios[, i], tail_len[i]),
-        mc.cores = cores
-      )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      lw_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = function(i)
-            do_psis_i(log_ratios[, i], tail_len[i])
-        )
-    }
-  }
-
-  pareto_k <- psis_apply(lw_list, "pareto_k")
-  throw_pareto_warnings(pareto_k)
-
-  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
-
-  # truncate at the max of raw wts
-  max_wts <- apply(log_ratios, 2, max)
-  log_weights <- sapply(1:N, function(n) {
-    truncate_lw(log_weights[, n], upper = max_wts[n])
-  })
-
-  psis_object(
-    unnormalized_log_weights = log_weights,
-    pareto_k = pareto_k,
-    tail_len = tail_len,
-    r_eff = r_eff
-  )
-}
-
-#' Extract named components from each list in a list of lists
-#'
-#' @noRd
-#' @param x List of lists.
-#' @param item String naming the component or attribute to pull out of each list (or list-like object).
-#' @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
-#' @return Numeric vector or matrix.
-#'
-psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
-  stopifnot(is.list(x))
-  vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
-}
-
 #' Structure the object returned by the psis methods
 #'
 #' @noRd
@@ -283,6 +212,73 @@ psis_object <-
   }
 
 
+#' Do PSIS given matrix of log weights
+#'
+#' @noRd
+#' @param lr Matrix of log ratios (-loglik)
+#' @param r_eff Vector of relative effective sample sizes
+#' @param cores User's integer cores argument
+#' @return A list with class "psis" and structure described in the main doc at
+#'   the top of this file.
+#'
+do_psis <- function(log_ratios, r_eff, cores) {
+  stopifnot(cores == as.integer(cores))
+  N <- ncol(log_ratios)
+  S <- nrow(log_ratios)
+  tail_len <- n_pareto(r_eff, S)
+  throw_tail_length_warnings(tail_len)
+
+  if (cores == 1) {
+    lw_list <- lapply(seq_len(N), function(i)
+      do_psis_i(log_ratios[, i], tail_len[i]))
+  } else {
+    if (.Platform$OS.type != "windows") {
+      lw_list <- parallel::mclapply(
+        X = seq_len(N),
+        FUN = function(i)
+          do_psis_i(log_ratios[, i], tail_len[i]),
+        mc.cores = cores
+      )
+    } else {
+      cl <- parallel::makePSOCKcluster(cores)
+      on.exit(parallel::stopCluster(cl))
+      lw_list <-
+        parallel::parLapply(
+          cl = cl,
+          X = seq_len(N),
+          fun = function(i)
+            do_psis_i(log_ratios[, i], tail_len[i])
+        )
+    }
+  }
+
+  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
+  pareto_k <- psis_apply(lw_list, "pareto_k")
+  throw_pareto_warnings(pareto_k)
+
+  psis_object(
+    unnormalized_log_weights = log_weights,
+    pareto_k = pareto_k,
+    tail_len = tail_len,
+    r_eff = r_eff
+  )
+}
+
+#' Extract named components from each list in the list of lists obtained by
+#' parallelizing do_psis_i()
+#'
+#' @noRd
+#' @param x List of lists.
+#' @param item String naming the component or attribute to pull out of each list
+#'   (or list-like object).
+#' @param fun,fun.val passed to vapply's FUN and FUN.VALUE.
+#' @return Numeric vector or matrix.
+#'
+psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
+  stopifnot(is.list(x))
+  vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
+}
+
 #' PSIS (without truncation and normalization) on a single vector
 #'
 #' @noRd
@@ -313,6 +309,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
       lw_i[ord$ix[tail_ids]] <- smoothed$tail
     }
   }
+
+  # truncate at max of raw wts (i.e., 0 since max has been subtracted)
+  lw_i <- truncate_lw(lw_i, upper = 0)
+
   list(log_weights = lw_i, pareto_k = khat)
 }
 
@@ -459,22 +459,27 @@ prepare_psis_r_eff <- function(r_eff, len) {
   return(r_eff)
 }
 
-
-#' r_eff warning message
-#' @noRd
+#' Check if psis was called from one of the loo methods
 #'
-throw_psis_r_eff_warning <- function() {
-  warning("Relative effective sample sizes ('r_eff' argument) not specified. ",
-          "PSIS n_eff will not adjusted based on MCMC n_eff.", call. = FALSE)
-}
-
-#' check if psis was called from one of the loo methods
 #' @noRd
+#' @return TRUE if the loo array, matrix, or function method is found in the
+#'   active call list, FALSE otherwise.
+#'
 called_from_loo <- function() {
   calls <- sys.calls()
   txt <- unlist(lapply(calls, deparse))
   patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
   check <- sapply(txt, function(x) grepl(patts, x))
   isTRUE(any(check))
+}
+
+#' Warning message about missing r_eff argument
+#' @noRd
+throw_psis_r_eff_warning <- function() {
+  warning(
+    "Relative effective sample sizes ('r_eff' argument) not specified. ",
+    "PSIS n_eff will not adjusted based on MCMC n_eff.",
+    call. = FALSE
+  )
 }
 

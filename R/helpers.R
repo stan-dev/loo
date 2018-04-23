@@ -200,9 +200,9 @@ loo_cores <- function(cores) {
 # release reminders (for devtools)
 release_questions <- function() {
   c(
-    "Have you updated all references to the LOO paper?",
+    "Have you updated references?",
     "Have you updated inst/CITATION?",
-    "Have you updated R code in vignette to match the code in the paper?"
+    "Have you updated the vignettes?"
   )
 }
 # nocov end
