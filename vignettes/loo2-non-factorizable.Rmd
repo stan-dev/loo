@@ -321,7 +321,7 @@ A model predicting `CRIME` from `INC` and `HOVAL`, while accounting for the
 spatial dependency via an SAR structure, can be specified in **brms** as
 follows.
 
-```{r fit}
+```{r fit, results="hide"}
 fit <- brm(
   CRIME ~ INC + HOVAL, 
   data = COL.OLD,
