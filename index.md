@@ -70,8 +70,8 @@ devtools::install_github("stan-dev/loo", build_vignettes = FALSE)
 ```
 
 You can also set `build_vignettes=TRUE`, but the vignettes take some time to
-buid and they can always be accessed online anytime at
-[mc-stan.org/loo/articles](http://mc-stan.org/loo/articles/)).
+buid and they can always be accessed online at
+[mc-stan.org/loo/articles](http://mc-stan.org/loo/articles/).
 
 
 ## Python and Matlab/Octave Code
