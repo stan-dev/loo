@@ -65,8 +65,10 @@ install.packages("loo")
 
 ```r
 if (!require(devtools)) install.packages("devtools")
-devtools::install_github("stan-dev/loo", build_vignettes = TRUE)
+devtools::install_github("stan-dev/loo")
 ```
+You can also set `build_vignettes=TRUE` but the installation is slower and 
+the vignettes are always available online at [mc-stan.org/loo/articles/](http://mc-stan.org/loo/articles/)
 
 ### Python and Matlab/Octave Code
 Corresponding Python and Matlab/Octave code can be found at the
