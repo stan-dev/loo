@@ -10,6 +10,7 @@ loo.Rproj
 .Rproj.user/
 .Rproj.user
 # produced vignettes
+vignettes/loo2-non-factorizable_cache/*
 vignettes/*.html
 vignettes/*.pdf
 vignettes/loo2-non-factorizable_cache/*
