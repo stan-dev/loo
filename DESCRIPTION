@@ -32,10 +32,11 @@ Imports:
     stats
 Suggests:
     bayesplot (>= 1.5.0),
+    brms (>= 2.2.0),
     knitr,
     rmarkdown,
     rstan, 
-    rstanarm,
+    rstanarm (>= 2.17.4),
     rstantools,
     testthat
 VignetteBuilder: knitr
