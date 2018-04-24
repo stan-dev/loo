@@ -51,10 +51,9 @@ test_that("compare returns expected result (3 models)", {
   expect_equal(
     colnames(comp1),
     c(
-      "elpd_diff", "elpd_waic", "se_elpd_waic",
+      "elpd_diff", "se_diff", "elpd_waic", "se_elpd_waic",
       "p_waic", "se_p_waic", "waic", "se_waic"
-    )
-    )
+    ))
   expect_equal(rownames(comp1), c("w1", "w2", "w3"))
   expect_equal(comp1[1,1], 0)
   expect_s3_class(comp1, "compare.loo")

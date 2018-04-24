@@ -7,7 +7,7 @@
 \usage{
 compare(..., x = list())
 
-\method{print}{compare.loo}(x, ..., digits = 1)
+\method{print}{compare.loo}(x, ..., digits = 1, simplify = TRUE)
 }
 \arguments{
 \item{...}{At least two objects returned by \code{\link{loo}} (or
@@ -19,24 +19,42 @@ specifying the objects in \code{...}.}
 
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
+
+\item{simplify}{For the print method only, should only the essential columns
+of the summary matrix be printed when comparing more than two models? The
+entire matrix is always returned, but by default only the most important
+columns are printed.}
 }
 \value{
 A vector or matrix with class \code{'compare.loo'} that has its own
   print method. If exactly two objects are provided in \code{...} or
   \code{x}, then the difference in expected predictive accuracy and the
-  standard error of the difference are returned (see Details). \emph{The
-  difference will be positive if the expected predictive accuracy for the
-  second model is higher.} If more than two objects are provided then a
-  matrix of summary information is returned.
+  standard error of the difference are returned. If more than two objects are
+  provided then a matrix of summary information is returned (see
+  \strong{Details}).
 }
 \description{
 Compare fitted models on LOO or WAIC.
 }
 \details{
-When comparing two fitted models, we can estimate the difference in
-  their expected predictive accuracy by the difference in \code{elpd_loo} or
-  \code{elpd_waic} (multiplied by \eqn{-2}, if desired, to be on the deviance
-  scale). To compute the standard error of this difference we can use a
+When comparing two fitted models, we can estimate the difference in their
+  expected predictive accuracy by the difference in \code{elpd_loo} or
+  \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
+  deviance scale).
+
+  \emph{When that difference, \code{elpd_diff}, is positive then the expected
+  predictive accuracy for the second model is higher. A negative
+  \code{elpd_diff} favors the first model.}
+
+  When using \code{compare()} with more than two models, the values in the
+  \code{elpd_diff} and \code{se_diff} columns of the returned matrix are
+  computed by making pairwise comparisons between each model and the model
+  with the best ELPD (i.e., the model in the first row).
+  Although the \code{elpd_diff} column is equal to the difference in
+  \code{elpd_loo}, do not expect the \code{se_diff} column to be equal to the
+  the difference in \code{se_elpd_loo}.
+
+  To compute the standard error of the difference in ELPD we use a
   paired estimate to take advantage of the fact that the same set of \eqn{N}
   data points was used to fit both models. These calculations should be most
   useful when \eqn{N} is large, because then non-normality of the
