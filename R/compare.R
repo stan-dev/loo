@@ -108,12 +108,13 @@ compare <- function(..., x = list()) {
                       use.names = FALSE)
     comp <- comp[, col_ord]
 
-    # compute elpd_diff and std error relative to best model
+    # compute elpd_diff and se_elpd_diff relative to best model
+    rnms <- rownames(comp)
     diffs <- mapply(elpd_diffs, dots[ord[1]], dots[ord])
     elpd_diff <- apply(diffs, 2, sum)
     se_diff <- apply(diffs, 2, se_elpd_diff)
     comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
-
+    rownames(comp) <- rnms
     class(comp) <- c("compare.loo", class(comp))
     comp
   }
