@@ -51,25 +51,31 @@
 #' \dontrun{
 #' loo1 <- loo(log_lik1)
 #' loo2 <- loo(log_lik2)
-#' print(compare(loo1, loo2), digits = 3)
-#' print(compare(x = list(loo1, loo2)))
+#' print(loo_compare(loo1, loo2), digits = 3)
+#' print(loo_compare(x = list(loo1, loo2)))
 #'
 #' waic1 <- waic(log_lik1)
 #' waic2 <- waic(log_lik2)
-#' compare(waic1, waic2)
+#' loo_compare(waic1, waic2)
 #' }
 #'
-compare <- function(..., x = list()) {
-  dots <- list(...)
-  if (length(dots)) {
-    if (length(x)) {
-      stop("If 'x' is specified then '...' should not be specified.",
-           call. = FALSE)
-    }
-    nms <- as.character(match.call(expand.dots = TRUE))[-1L]
+loo_compare <- function(x, ...) {
+  UseMethod("loo_compare")
+}
+
+#' @rdname loo_compare
+#' @export
+loo_compare.default <- function(x, ...) {
+  if (is.loo(x)) {
+    dots <- list(...)
+    dots <- c(list(x), dots)
+    nms <- c(as.character(match.call(expand.dots = TRUE))[-1L])
   } else {
     if (!is.list(x) || !length(x)) {
-      stop("'x' must be a list.", call. = FALSE)
+      stop("'x' must be a list if not a 'loo' object.", call. = FALSE)
+    }
+    if (length(list(...))) {
+      stop("If 'x' is a list then '...' should not be specified.", call. = FALSE)
     }
     dots <- x
     nms <- names(dots)
@@ -82,12 +88,7 @@ compare <- function(..., x = list()) {
     stop("All inputs should have class 'loo'.")
   }
   if (length(dots) <= 1L) {
-    stop("'compare' requires at least two models.")
-  } else if (length(dots) == 2L) {
-    loo1 <- dots[[1]]
-    loo2 <- dots[[2]]
-    comp <- compare_two_models(loo1, loo2)
-    return(comp)
+    stop("'loo_compare' requires at least two models.")
   } else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
     if (!all(Ns == Ns[1L])) {
@@ -98,6 +99,7 @@ compare <- function(..., x = list()) {
       est <- x$estimates
       setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
     })
+
     colnames(x) <- nms
     rnms <- rownames(x)
     comp <- x
@@ -120,30 +122,34 @@ compare <- function(..., x = list()) {
   }
 }
 
+#' @rdname loo_compare
+#' @export
+#' @param digits For the print method only, the number of digits to use when
+#'   printing.
+#' @param simplify For the print method only, should only the essential columns
+#'   of the summary matrix be printed? The entire matrix is always returned, but
+#'   by default only the most important columns are printed.
+print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
+  xcopy <- x
+  if (simplify) {
+    patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
+    xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
+  }
+  print(.fr(xcopy, digits), quote = FALSE)
+  invisible(x)
+}
+
 
 
 # internal ----------------------------------------------------------------
-compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), check_dims = TRUE) {
-  if (check_dims) {
-    if (dim(loo_a)[2] != dim(loo_b)[2]) {
-      stop(paste("Models don't have the same number of data points.",
-                 "\nFound N_1 =", dim(loo_a)[2], "and N_2 =", dim(loo_b)[2]),
-           call. = FALSE)
-    }
-  }
 
-  diffs <- elpd_diffs(loo_a, loo_b)
-  comp <- c(elpd_diff = sum(diffs), se = se_elpd_diff(diffs))
-  structure(comp, class = "compare.loo")
+elpd_diffs <- function(loo_a, loo_b) {
+  pt_a <- loo_a$pointwise
+  pt_b <- loo_b$pointwise
+  elpd <- grep("^elpd", colnames(pt_a))
+  pt_b[, elpd] - pt_a[, elpd]
 }
-
-# elpd_diffs <- function(loo_a, loo_b) {
-#   pt_a <- loo_a$pointwise
-#   pt_b <- loo_b$pointwise
-#   elpd <- grep("^elpd", colnames(pt_a))
-#   pt_b[, elpd] - pt_a[, elpd]
-# }
-# se_elpd_diff <- function(diffs) {
-#   N <- length(diffs)
-#   sqrt(N) * sd(diffs)
-# }
+se_elpd_diff <- function(diffs) {
+  N <- length(diffs)
+  sqrt(N) * sd(diffs)
+}
