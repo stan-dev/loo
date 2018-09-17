@@ -124,8 +124,13 @@ loo_compare.default <- function(x, ...) {
 #'   by default only the most important columns are printed.
 print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
   xcopy <- x
-  if (simplify) {
-    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
+  if (inherits(xcopy, "old_compare.loo")) {
+    if (NCOL(xcopy) >= 2 && simplify) {
+      patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
+      xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
+    }
+  } else if (simplify) {
+     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)
   invisible(x)
@@ -134,7 +139,6 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
 
 
 # internal ----------------------------------------------------------------
-
 elpd_diffs <- function(loo_a, loo_b) {
   pt_a <- loo_a$pointwise
   pt_b <- loo_b$pointwise

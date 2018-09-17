@@ -397,6 +397,18 @@ dim.psis_loo <- function(x) {
 }
 
 
+#' @rdname loo
+#' @export
+is.loo <- function(x) {
+  inherits(x, "loo")
+}
+
+#' @rdname loo
+#' @export
+is.psis_loo <- function(x) {
+  inherits(x, "psis_loo") && is.loo(x)
+}
+
 
 # internal ----------------------------------------------------------------
 

@@ -170,6 +170,11 @@ dim.psis <- function(x) {
   attr(x, "dims")
 }
 
+#' @export
+is.psis <- function(x) {
+  inherits(x, "psis") && is.list(x)
+}
+
 
 # internal ----------------------------------------------------------------
 

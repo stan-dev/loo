@@ -37,21 +37,6 @@ table_of_estimates <- function(x) {
 }
 
 
-# checking classes --------------------------------------------------------
-is.psis <- function(x) {
-  inherits(x, "psis") && is.list(x)
-}
-is.loo <- function(x) {
-  inherits(x, "loo")
-}
-is.psis_loo <- function(x) {
-  inherits(x, "psis_loo") && is.loo(x)
-}
-is.waic <- function(x) {
-  inherits(x, "waic") && is.loo(x)
-}
-
-
 # validating and reshaping arrays/matrices  -------------------------------
 
 #' Check for NAs and non-finite values in log-lik (or log-ratios)

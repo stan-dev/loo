@@ -88,6 +88,7 @@ compare <- function(..., x = list()) {
     loo1 <- dots[[1]]
     loo2 <- dots[[2]]
     comp <- compare_two_models(loo1, loo2)
+    class(comp) <- c(class(comp), "old_compare.loo")
     return(comp)
   } else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
@@ -116,7 +117,7 @@ compare <- function(..., x = list()) {
     se_diff <- apply(diffs, 2, se_elpd_diff)
     comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
     rownames(comp) <- rnms
-    class(comp) <- c("compare.loo", class(comp))
+    class(comp) <- c("compare.loo", class(comp), "old_compare.loo")
     comp
   }
 }
@@ -137,14 +138,3 @@ compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), chec
   comp <- c(elpd_diff = sum(diffs), se = se_elpd_diff(diffs))
   structure(comp, class = "compare.loo")
 }
-
-# elpd_diffs <- function(loo_a, loo_b) {
-#   pt_a <- loo_a$pointwise
-#   pt_b <- loo_b$pointwise
-#   elpd <- grep("^elpd", colnames(pt_a))
-#   pt_b[, elpd] - pt_a[, elpd]
-# }
-# se_elpd_diff <- function(diffs) {
-#   N <- length(diffs)
-#   sqrt(N) * sd(diffs)
-# }
