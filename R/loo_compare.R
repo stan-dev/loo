@@ -6,8 +6,8 @@
 #' @param x An object of class \code{"loo"} or a list of such objects.
 #' @param ... Additional objects of class \code{"loo"}.
 #'
-#' @return A matrix with class \code{'compare.loo'} that has its own
-#'   print method. See \strong{Details}.
+#' @return A matrix with class \code{"compare.loo"} that has its own
+#'   print method. See the \strong{Details} section for more .
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -15,19 +15,17 @@
 #'   \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
 #'   deviance scale).
 #'
-#'   \emph{When that difference, \code{elpd_diff}, is positive then the expected
-#'   predictive accuracy for the second model is higher. A negative
-#'   \code{elpd_diff} favors the first model.}
+#'   When using \code{loo_compare()}, the returned matrix will have one row per
+#'   model and several columns of estimates. The values in the \code{elpd_diff}
+#'   and \code{se_diff} columns of the returned matrix are computed by making
+#'   pairwise comparisons between each model and the model with the largest ELPD
+#'   (the model in the first row). For this reason the \code{elpd_diff} column
+#'   will always have the value \code{0} in the first row (i.e., the difference
+#'   between the preferred model and itself) and negative values in subsequent
+#'   rows for the remaining models.
 #'
-#'   When using \code{compare()} with more than two models, the values in the
-#'   \code{elpd_diff} and \code{se_diff} columns of the returned matrix are
-#'   computed by making pairwise comparisons between each model and the model
-#'   with the best ELPD (i.e., the model in the first row).
-#'   Although the \code{elpd_diff} column is equal to the difference in
-#'   \code{elpd_loo}, do not expect the \code{se_diff} column to be equal to the
-#'   the difference in \code{se_elpd_loo}.
-#'
-#'   To compute the standard error of the difference in ELPD we use a
+#'   To compute the standard error of the difference in ELPD --- which should
+#'   not be expected to equal the difference of the standard errors --- we use a
 #'   paired estimate to take advantage of the fact that the same set of \eqn{N}
 #'   data points was used to fit both models. These calculations should be most
 #'   useful when \eqn{N} is large, because then non-normality of the
