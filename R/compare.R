@@ -60,6 +60,7 @@
 #' }
 #'
 compare <- function(..., x = list()) {
+  .Deprecated("loo_compare")
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {

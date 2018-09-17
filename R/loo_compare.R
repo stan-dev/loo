@@ -3,18 +3,11 @@
 #' Compare fitted models on LOO or WAIC.
 #'
 #' @export
-#' @param ... At least two objects returned by \code{\link{loo}} (or
-#'   \code{\link{waic}}).
-#' @param x A list of at least two objects returned by \code{\link{loo}} (or
-#'   \code{\link{waic}}). This argument can be used as an alternative to
-#'   specifying the objects in \code{...}.
+#' @param x An object of class \code{"loo"} or a list of such objects.
+#' @param ... Additional objects of class \code{"loo"}.
 #'
-#' @return A vector or matrix with class \code{'compare.loo'} that has its own
-#'   print method. If exactly two objects are provided in \code{...} or
-#'   \code{x}, then the difference in expected predictive accuracy and the
-#'   standard error of the difference are returned. If more than two objects are
-#'   provided then a matrix of summary information is returned (see
-#'   \strong{Details}).
+#' @return A matrix with class \code{'compare.loo'} that has its own
+#'   print method. See \strong{Details}.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -132,8 +125,7 @@ loo_compare.default <- function(x, ...) {
 print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
   xcopy <- x
   if (simplify) {
-    patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
-    xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
+    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)
   invisible(x)

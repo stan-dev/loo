@@ -13,12 +13,9 @@ loo_compare(x, ...)
 \method{print}{compare.loo}(x, ..., digits = 1, simplify = TRUE)
 }
 \arguments{
-\item{x}{A list of at least two objects returned by \code{\link{loo}} (or
-\code{\link{waic}}). This argument can be used as an alternative to
-specifying the objects in \code{...}.}
+\item{x}{An object of class \code{"loo"} or a list of such objects.}
 
-\item{...}{At least two objects returned by \code{\link{loo}} (or
-\code{\link{waic}}).}
+\item{...}{Additional objects of class \code{"loo"}.}
 
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
@@ -28,12 +25,8 @@ of the summary matrix be printed? The entire matrix is always returned, but
 by default only the most important columns are printed.}
 }
 \value{
-A vector or matrix with class \code{'compare.loo'} that has its own
-  print method. If exactly two objects are provided in \code{...} or
-  \code{x}, then the difference in expected predictive accuracy and the
-  standard error of the difference are returned. If more than two objects are
-  provided then a matrix of summary information is returned (see
-  \strong{Details}).
+A matrix with class \code{'compare.loo'} that has its own
+  print method. See \strong{Details}.
 }
 \description{
 Compare fitted models on LOO or WAIC.
