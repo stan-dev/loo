@@ -99,7 +99,7 @@ loo_compare.default <- function(x, ...) {
 
   # compute elpd_diff and se_elpd_diff relative to best model
   rnms <- rownames(comp)
-  diffs <- mapply(elpd_diffs, loos[ord[1]], loos[ord])
+  diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
   comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
