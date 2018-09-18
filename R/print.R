@@ -104,6 +104,15 @@ print_dims.waic <- function(x, ...) {
   )
 }
 
+#' @rdname print_dims
+#' @export
+print_dims.kfold <- function(x, ...) {
+  K <- attr(x, "K", exact = TRUE)
+  if (!is.null(K)) {
+    cat("Based on", paste0(K, "-fold"), "cross-validation\n")
+  }
+}
+
 
 print_mcse_summary <- function(x, digits) {
   mcse_val <- mcse_loo(x)
