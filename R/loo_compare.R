@@ -59,58 +59,54 @@ loo_compare <- function(x, ...) {
 loo_compare.default <- function(x, ...) {
   if (is.loo(x)) {
     dots <- list(...)
-    dots <- c(list(x), dots)
-    nms <- c(as.character(match.call(expand.dots = TRUE))[-1L])
+    loos <- c(list(x), dots)
   } else {
     if (!is.list(x) || !length(x)) {
-      stop("'x' must be a list if not a 'loo' object.", call. = FALSE)
+      stop("'x' must be a list if not a 'loo' object.")
     }
     if (length(list(...))) {
-      stop("If 'x' is a list then '...' should not be specified.", call. = FALSE)
+      stop("If 'x' is a list then '...' should not be specified.")
     }
-    dots <- x
-    nms <- names(dots)
-    if (!length(nms)) {
-      nms <- paste0("model", seq_along(dots))
-    }
+    loos <- x
   }
 
-  if (!all(sapply(dots, is.loo))) {
+  if (!all(sapply(loos, is.loo))) {
     stop("All inputs should have class 'loo'.")
   }
-  if (length(dots) <= 1L) {
+  if (length(loos) <= 1L) {
     stop("'loo_compare' requires at least two models.")
-  } else {
-    Ns <- sapply(dots, function(x) nrow(x$pointwise))
-    if (!all(Ns == Ns[1L])) {
-      stop("Not all models have the same number of data points.", call. = FALSE)
-    }
-
-    x <- sapply(dots, function(x) {
-      est <- x$estimates
-      setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
-    })
-
-    colnames(x) <- nms
-    rnms <- rownames(x)
-    comp <- x
-    ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
-    comp <- t(comp)[ord, ]
-    patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
-    col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
-                      use.names = FALSE)
-    comp <- comp[, col_ord]
-
-    # compute elpd_diff and se_elpd_diff relative to best model
-    rnms <- rownames(comp)
-    diffs <- mapply(elpd_diffs, dots[ord[1]], dots[ord])
-    elpd_diff <- apply(diffs, 2, sum)
-    se_diff <- apply(diffs, 2, se_elpd_diff)
-    comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
-    rownames(comp) <- rnms
-    class(comp) <- c("compare.loo", class(comp))
-    comp
   }
+
+  Ns <- sapply(loos, function(x) nrow(x$pointwise))
+  if (!all(Ns == Ns[1L])) {
+    stop("Not all models have the same number of data points.")
+  }
+
+  tmp <- sapply(loos, function(x) {
+    est <- x$estimates
+    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
+  })
+
+  colnames(tmp) <- find_model_names(loos)
+  rnms <- rownames(tmp)
+  comp <- tmp
+  ord <- order(tmp[grep("^elpd", rnms), ], decreasing = TRUE)
+  comp <- t(comp)[ord, ]
+  patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
+  col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
+                    use.names = FALSE)
+  comp <- comp[, col_ord]
+
+  # compute elpd_diff and se_elpd_diff relative to best model
+  rnms <- rownames(comp)
+  diffs <- mapply(elpd_diffs, loos[ord[1]], loos[ord])
+  elpd_diff <- apply(diffs, 2, sum)
+  se_diff <- apply(diffs, 2, se_elpd_diff)
+  comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
+  rownames(comp) <- rnms
+
+  class(comp) <- c("compare.loo", class(comp))
+  return(comp)
 }
 
 #' @rdname loo_compare
@@ -127,7 +123,7 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
       patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
       xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
     }
-  } else if (simplify) {
+  } else if (NCOL(xcopy) >= 2 && simplify) {
      xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)
@@ -146,4 +142,36 @@ elpd_diffs <- function(loo_a, loo_b) {
 se_elpd_diff <- function(diffs) {
   N <- length(diffs)
   sqrt(N) * sd(diffs)
+}
+
+
+
+#' Find the model names associated with loo objects
+#'
+#' @export
+#' @keywords internal
+#' @param x List of loo objects.
+#' @return Character vector of model names the same length as x.
+#'
+find_model_names <- function(x) {
+  out_names <- character(length(x))
+
+  names1 <- names(x)
+  names2 <- lapply(x, "attr", "model_name", exact = TRUE)
+  names3 <- lapply(x, "[[", "model_name")
+  names4 <- paste0("model", seq_along(x))
+
+  for (j in seq_along(x)) {
+    if (isTRUE(nzchar(names1[j]))) {
+      out_names[j] <- names1[j]
+    } else if (length(names2[[j]])) {
+      out_names[j] <- names2[[j]]
+    } else if (length(names3[[j]])) {
+      out_names[j] <- names3[[j]]
+    } else {
+      out_names[j] <- names4[j]
+    }
+  }
+
+  return(out_names)
 }
