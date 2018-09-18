@@ -154,6 +154,7 @@ se_elpd_diff <- function(diffs) {
 #' @return Character vector of model names the same length as x.
 #'
 find_model_names <- function(x) {
+  stopifnot(is.list(x))
   out_names <- character(length(x))
 
   names1 <- names(x)
