@@ -1,10 +1,14 @@
 # loo 2.0.0.9000
 
-* New vignette on LOO for non-factorizable joint Gaussian models (#75)
+* New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
-* Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC) (#72).
+* When comparing more than two models with `compare()` there is now also 
+an `se_diff` column in the results. The printed output (the returned object) 
+from `compare()` has also been simplified. (#78)
 
-* Fix for `psis()` when `log_ratios` are very small (#74)
+* Fix for `psis()` when `log_ratios` are very small. (#74)
+
+* Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC). (#72)
 
 # loo 2.0.0
 
