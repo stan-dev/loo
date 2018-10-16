@@ -26,20 +26,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-```{r pkgs, cache=FALSE}
-library(brms)
-library(loo)
-theme_set(theme_default())
-
-CHAINS <- 4
-SEED <- 1234
-set.seed(SEED)
-```
-
-
-\newcommand{\yy}[1]{\mathbf{y}_{{#1}}}
-
 ## Introduction
 
 One of the most common goals of a time series analysis is to use the observed
@@ -113,25 +99,25 @@ In order to assess $M$-SAP performance we would like to compute the
 predictive densities
 
 $$
-p(\yy{i<M} \,|\, \yy{<i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1})
+p(y_{i<M} \,|\, y_{<i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1}) 
 $$ 
 
 for each $i \in \{L + 1, \ldots, N - M + 1\}$. The quantities 
-$p(\yy{i<M} \,|\, \yy{<i})$ can be computed with the help of the posterior
-distribution $p(\theta \,|\, \yy{<i})$ of the parameters $\theta$ conditional on
+$p(y_{i<M} \,|\, y_{<i})$ can be computed with the help of the posterior
+distribution $p(\theta \,|\, y_{<i})$ of the parameters $\theta$ conditional on
 only the first $i-1$ observations of the time-series:
 
 $$
-p(\yy{i<M} \,| \, \yy{<i}) = 
-  \int p(\yy{i<M} \,| \, \yy{<i}, \theta) \, p(\theta\,|\,\yy{<i}) \,d\theta.
+p(y_{i<M} \,| \, y_{<i}) = 
+  \int p(y_{i<M} \,| \, y_{<i}, \theta) \, p(\theta\,|\,y_{<i}) \,d\theta. 
 $$
 
 Having obtained $S$ draws $(\theta_{<i}^{(1)}, \ldots, \theta_{<i}^{(S)})$ 
-from the posterior distribution $p(\theta\,|\,\yy{<i})$, we can estimate 
-$p(\yy{i<M} | \yy{<i})$ as
+from the posterior distribution $p(\theta\,|\,y_{<i})$, we can estimate 
+$p(y_{i<M} | y_{<i})$ as
 
 $$
-p(\yy{i<M} \,|\, \yy{<i}) \approx \sum_{s=1}^S p(\yy{i<M} \,|\, \yy{<i}, \theta_{<i}^{(s)}).
+p(y_{i<M} \,|\, y_{<i}) \approx \sum_{s=1}^S p(y_{i<M} \,|\, y_{<i}, \theta_{<i}^{(s)}).
 $$
 
 In the following, we consider factorizable models in which the response values
@@ -142,12 +128,12 @@ $$
 p(\mathbf{y} \,|\, \theta) = \prod_{i=1}^N p(y_i \,|\, \theta).
 $$
 
-In this case, $p(\yy{i<M} \,|\, \yy{<i}, \theta_{<i})$ reduces to 
+In this case, $p(y_{i<M} \,|\, y_{<i}, \theta_{<i})$ reduces to 
 $$
-p(\yy{i<M} \,|\, \theta_{<i}) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta_{<i}),
+p(y_{i<M} \,|\, \theta_{<i}) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta_{<i}),
 $$
-due to the assumption of conditional independence between $\yy{i<M}$ and
-$\yy{<i}$ given $\theta_{<i}$.
+due to the assumption of conditional independence between $y_{i<M}$ and
+$y_{<i}$ given $\theta_{<i}$.
 
 Non-factorizable models, which do not make this assumption, are discussed in a
 separate vignette [_Leave-one-out cross-validation for non-factorizable models_](http://mc-stan.org/loo/articles/loo2-non-factorizable.html).
@@ -156,19 +142,19 @@ separate vignette [_Leave-one-out cross-validation for non-factorizable models_]
 
 Unfortunately, the math above makes use of the posterior distributions from many
 different fits of the model to different subsets of the data. That is, to obtain
-the predictive density $p(\yy{i<M} \,|\, \yy{<i})$ requires fitting a model to
+the predictive density $p(y_{i<M} \,|\, y_{<i})$ requires fitting a model to
 only the first $i-1$ data points, and we will need to do this for every value of
 $i$ under consideration (all $i \in \{L + 1, \ldots, N - M + 1\}$).
 
 To reduce the number of models that need to be fit for the purpose of obtaining
-each of the densities $p(\yy{i<M} \,|\, \yy{<i})$, we propose the following
+each of the densities $p(y_{i<M} \,|\, y_{<i})$, we propose the following
 algorithm. Starting with $i = N - M + 1$, we approximate each 
-$p(\yy{i<M} \,|\, \yy{<i})$ using Pareto smoothed importance sampling (PSIS,
+$p(y_{i<M} \,|\, y_{<i})$ using Pareto smoothed importance sampling (PSIS,
 Vehtari et al, 2017ab):
 
 $$
- p(\yy{i<M} \,|\, \yy{<i}) \approx
-   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(\yy{i<M} \,|\, \theta^{(s)})}{ \sum_{s=1}^S w_i^{(s)}},
+ p(y_{i<M} \,|\, y_{<i}) \approx
+   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i<M} \,|\, \theta^{(s)})}{ \sum_{s=1}^S w_i^{(s)}},
 $$
 
 where $w_i^{(s)}$ are importance weights and $\theta^{(s)}$ are draws from the
@@ -186,15 +172,22 @@ process. At some observation $i$, the variability of importance ratios
 $r_i^{(s)}$ will become too large and importance sampling fails. We will refer
 to this particular value of $i$ as $i^\star_1$. To identify the value of
 $i^\star_1$ we check for which value of $i$ does the estimated shape parameter
-$k$ of the generalized Pareto distribution first cross $0.7$ (Vehtari et al,
-2017ab). Only then do we refit the model using only observations before
-$i^\star_1$ and then restart the process. In some cases we may only need to
-refit once and in other cases we will find a value $i^\star_2$ that requires a
-second refitting, maybe an $i^\star_3$ that requires a third refitting, and so
-on. We repeat the refitting as few times as is required (only if $k > 0.7$)
-until we arrive at $i = L+1$.  Recall that $L$ is the minimum number of
-observations we have deemed acceptable for making predictions (setting $L=0$
-means predictions of all observations should be computed).
+$k$ of the generalized Pareto distribution first crosses a certain threshold.
+Only then do we refit the model using only observations before $i^\star_1$ and
+then restart the process. In some cases we may only need to refit once and in
+other cases we will find a value $i^\star_2$ that requires a second refitting,
+maybe an $i^\star_3$ that requires a third refitting, and so on. We repeat the
+refitting as few times as is required (only if $k > \text{threshold}$) until we
+arrive at $i = L+1$. Recall that $L$ is the minimum number of observations we
+have deemed acceptable for making predictions (setting $L=0$ means predictions
+of all observations should be computed).
+
+For LOO, we recommend to use a threshold of $0.7$ (Vehtari et al, 2017ab), but
+for LFO, the threshold should be smaller as influential observations will affect
+all pointwise LFO approximations until the next refit and thus much stronger
+than in LOO. For the present case study, we choose a threshold of $0.6$, but
+more experiments are needed to give general recommendations about the threshold
+in LFO.
 
 
 ## Autoregressive models
@@ -221,8 +214,25 @@ performance, we will fit a model for 98 annual measurements of the water level
 years 1875--1972. This data set is found in the **datasets** R package, which is
 installed automatically with **R**. 
 
+In addition to the **loo** package, for this analysis we will use the **brms**
+interface to Stan to generate a Stan program and fit the model, and also the
+**bayesplot** and **ggplot2** packages for plotting.
+
+```{r pkgs, cache=FALSE}
+library("loo")
+library("brms")
+library("bayesplot")
+library("ggplot2")
+color_scheme_set("brightblue")
+theme_set(theme_default())
+
+CHAINS <- 4
+SEED <- 1234
+set.seed(SEED)
+```
+
 Before fitting a model, we will first put the data into a data frame and then
-look at the time series
+look at the time series.
 
 ```{r}
 N <- length(LakeHuron)
@@ -247,7 +257,7 @@ ggplot(df, aes(x = year, y = y)) +
 The above plot shows rather strong autocorrelation of the time-series as well as
 some trend towards lower levels for later points in time. 
 
-We can specify an AR(10) model for these data using the **brms** package as
+We can specify an AR(4) model for these data using the **brms** package as
 follows:
 
 ```{r fit, results = "hide"}
@@ -255,7 +265,7 @@ control <- list(adapt_delta = 0.95)
 fit <- brm(
   y ~ 1, 
   data = df, 
-  autocor = cor_ar(~time, p = 10), 
+  autocor = cor_ar(~time, p = 4), 
   prior = prior(normal(0, 0.5), class = "ar"),
   control = control, 
   seed = SEED, 
@@ -282,10 +292,10 @@ ggplot(cbind(df, preds), aes(x = year, y = Estimate)) +
 ```
 
 To allow for reasonable predictions of future values, we will require at least
-$L = 25$ historical observations (15 years) to make predictions.
+$L = 20$ historical observations (20 years) to make predictions.
 
 ```{r}
-L <- 25
+L <- 20
 ```
 
 We first perform approximate leave-one-out cross-validation (LOO-CV) for the
@@ -300,7 +310,7 @@ print(loo_cv)
 ## 1-step-ahead predictions leaving out all future values
 
 The most basic version of $M$-SAP is 1-SAP, in which we predict only one step
-ahead. In this case, $\yy{i<M}$ simplifies to $y_{i}$ and the LFO-CV algorithm
+ahead. In this case, $y_{i<M}$ simplifies to $y_{i}$ and the LFO-CV algorithm
 becomes considerably simpler than for larger values of $M$.
 
 ### Exact 1-step-ahead predictions
@@ -423,10 +433,10 @@ rbind_print(
 ```
 
 Next, we compute approximate 1-SAP with refit at observations where 
-the Pareto $k$ estimate exceeds the threshold of $0.65$.
+the Pareto $k$ estimate exceeds the threshold of $0.6$.
 
 ```{r}
-k_thres <- 0.7
+k_thres <- 0.6
 ```
 
 The code becomes a little bit more involved to handle the refitting procedure.
@@ -626,11 +636,11 @@ may exceed `r k_thres` rather quickly (i.e., after only few observations) and so
 many refits may be required even when carrying out the PSIS approximation
 to LFO-CV. In this case, another option is to exclude only the block of $B$ 
 future values that directly follow the observations to be predicted while 
-retaining all of the more distant values $\yy{i>B} = (y_{i + B}, \ldots, y_N)$. 
+retaining all of the more distant values $y_{i>B} = (y_{i + B}, \ldots, y_N)$. 
 This will usually result in lower Pareto $k$ estimates and thus less refitting. 
 
 This block-$M$-SAP version closely resembles the basic $M$-SAP only if values in
-the distant future, $\yy{>B}$, contain little information about the current
+the distant future, $y_{>B}$, contain little information about the current
 observations being predicted. Whether this assumption is justified will depend
 on the data and model.
 
@@ -641,10 +651,10 @@ block-1-SAP.
 
 The differences between the code for LFO-CV for 1-SAP and the code for
 block-1-SAP are very small. We now just need to define a block size $B$ of
-left-out observations, which we set to $B = 20$ for the present case study.
+left-out observations, which we set to $B = 10$ for the present case study.
 
 ```{r exact_loglik_block, results="hide"}
-B <- 20
+B <- 10
 loglik <- matrix(nrow = nsamples(fit), ncol = N)
 for (i in N:(L + 1)) {
   to <- min(i + B - 1, N)
