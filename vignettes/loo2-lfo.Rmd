@@ -381,7 +381,7 @@ For illustrative purposes, we will first compute approximate 1-SAP without any
 refitting, even when the Pareto $k$ estimate is too large. This will of course
 be a poor approximation to exact 1-SAP, in particular if the Pareto $k$
 estimates increase rather quickly beyond the threshold up to which PSIS tends to
-produce stable results ($k < 0.7$).
+produce stable results.
 
 ```{r loglik}
 approx_elpds_1sap_no_refit <- rep(NA, N)
@@ -400,12 +400,12 @@ for (i in ids) {
 
 If we plot the Pareto $k$ estimates we can see that they do start to increase 
 quickly and that once we work backwards to about halfway through the data points 
-we get $k > 0.7$. This is indicated by the vertical line in the plot below, which 
+we get $k > 0.6$. This is indicated by the vertical line in the plot below, which 
 corresponds to the point $i^\star_1$ discussed in Section
 [Approximate $M$-SAP using importance-sampling](#approximate_MSAP) above.
 
 ```{r plot_ks}
-plot_ks <- function(ks, ids, thres = 0.7) {
+plot_ks <- function(ks, ids, thres = 0.6) {
   dat_ks <- data.frame(ks = ks, ids = ids)
   ggplot(dat_ks, aes(x = ids, y = ks)) + 
     geom_point(aes(color = ks > thres), shape = 3, show.legend = FALSE) + 
