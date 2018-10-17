@@ -317,7 +317,7 @@ LFO -93.60</code></pre>
 <div id="approximate-1-step-ahead-predictions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#approximate-1-step-ahead-predictions" class="anchor"></a>Approximate 1-step-ahead predictions</h3>
-<p>For illustrative purposes, we will first compute approximate 1-SAP without any refitting, even when the Pareto <span class="math inline">\(k\)</span> estimate is too large. This will of course be a poor approximation to exact 1-SAP, in particular if the Pareto <span class="math inline">\(k\)</span> estimates increase rather quickly beyond the threshold up to which PSIS tends to produce stable results (<span class="math inline">\(k &lt; 0.7\)</span>).</p>
+<p>For illustrative purposes, we will first compute approximate 1-SAP without any refitting, even when the Pareto <span class="math inline">\(k\)</span> estimate is too large. This will of course be a poor approximation to exact 1-SAP, in particular if the Pareto <span class="math inline">\(k\)</span> estimates increase rather quickly beyond the threshold up to which PSIS tends to produce stable results.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">approx_elpds_1sap_no_refit &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">NA</span>, N)
 loglik &lt;-<span class="st"> </span><span class="kw">log_lik</span>(fit)
 ids &lt;-<span class="st"> </span>N:(L +<span class="st"> </span><span class="dv">1</span>)
@@ -330,8 +330,8 @@ for (i in ids) {
   lw_i &lt;-<span class="st"> </span><span class="kw">weights</span>(psis_part, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]
   approx_elpds_1sap_no_refit[i] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw_i +<span class="st"> </span>loglik[, i])
 }</code></pre></div>
-<p>If we plot the Pareto <span class="math inline">\(k\)</span> estimates we can see that they do start to increase quickly and that once we work backwards to about halfway through the data points we get <span class="math inline">\(k &gt; 0.7\)</span>. This is indicated by the vertical line in the plot below, which corresponds to the point <span class="math inline">\(i^\star_1\)</span> discussed in Section <a href="#approximate_MSAP">Approximate <span class="math inline">\(M\)</span>-SAP using importance-sampling</a> above.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_ks &lt;-<span class="st"> </span>function(ks, ids, <span class="dt">thres =</span> <span class="fl">0.7</span>) {
+<p>If we plot the Pareto <span class="math inline">\(k\)</span> estimates we can see that they do start to increase quickly and that once we work backwards to about halfway through the data points we get <span class="math inline">\(k &gt; 0.6\)</span>. This is indicated by the vertical line in the plot below, which corresponds to the point <span class="math inline">\(i^\star_1\)</span> discussed in Section <a href="#approximate_MSAP">Approximate <span class="math inline">\(M\)</span>-SAP using importance-sampling</a> above.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_ks &lt;-<span class="st"> </span>function(ks, ids, <span class="dt">thres =</span> <span class="fl">0.6</span>) {
   dat_ks &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">ks =</span> ks, <span class="dt">ids =</span> ids)
   <span class="kw">ggplot</span>(dat_ks, <span class="kw">aes</span>(<span class="dt">x =</span> ids, <span class="dt">y =</span> ks)) +<span class="st"> </span>
 <span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">color =</span> ks &gt;<span class="st"> </span>thres), <span class="dt">shape =</span> <span class="dv">3</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>) +<span class="st"> </span>
