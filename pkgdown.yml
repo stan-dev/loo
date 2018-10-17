@@ -1,9 +1,10 @@
-pandoc: 1.19.2.1
-pkgdown: 0.1.0.9000
-pkgdown_sha: 3e1bdfaf4ad79f999bb6ab3ddd8e84bd365037b6
+pandoc: 1.17.2
+pkgdown: 1.1.0.9000
+pkgdown_sha: 3b3188bfbbd8cc42daa3218f3884b85fd5122372
 articles:
   loo2-example: loo2-example.html
+  loo2-lfo: loo2-lfo.html
+  loo2-non-factorizable: loo2-non-factorizable.html
   loo2-weights: loo2-weights.html
   loo2-with-rstan: loo2-with-rstan.html
-  loo2-non-factorizable: loo2-non-factorizable.html
 
