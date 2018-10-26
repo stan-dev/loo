@@ -538,7 +538,7 @@ M <- 4
 loglikm <- matrix(nrow = nsamples(fit), ncol = N)
 for (i in (N - M + 1):max(L + 1, 2)) {
   fit_i <- update(fit, newdata = df[-(i:N), ], recompile = FALSE)
-  ll <- log_lik(fit_i, newdata = df[1:(i + M - 1), ])
+  ll <- log_lik(fit_i, newdata = df[1:(i + M - 1), ], oos = i:(i + M - 1))
   loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
 }
 ```
@@ -566,7 +566,8 @@ ks <- NULL
 loglik[, (N - M + 2):N] <- log_lik(fit_part)[, (N - M + 2):N]
 
 for (i in ids) {
-  ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ])
+  oos <- i:(i + M - 1)
+  ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ], oos = oos)
   loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
   loglik[, i] <- ll[, i]
   logratio <- sum_log_ratios(loglik, i:i_refit)
@@ -581,7 +582,7 @@ for (i in ids) {
       fit_part, newdata = df[1:(i - 1), ], 
       recompile = FALSE
     )
-    ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ])
+    ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ], oos = oos)
     loglik[, i] <- ll[, i]
     loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
     approx_elpds_4sap[i] <- log_mean_exp(loglikm[, i])
