@@ -33,11 +33,11 @@ psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, sav
       log_ratios[,j] <- log_ratios[,j] - max(log_ratios[,j]) # Handle underflow/overflow
     }
   }
-  psis_out <- loo:::psis.matrix(log_ratios = log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
+  psis_out <- psis.matrix(log_ratios = log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
 
   if(!is.null(log_liks)){
-    pointwise <- loo:::pointwise_loo_calcs(log_liks, psis_out)
-    obj <- loo:::psis_loo_object(pointwise = pointwise, diagnostics = psis_out$diagnostics,
+    pointwise <- pointwise_loo_calcs(log_liks, psis_out)
+    obj <- psis_loo_object(pointwise = pointwise, diagnostics = psis_out$diagnostics,
                                  dims = dim(psis_out), psis_object = if (save_psis)
                                    psis_out else NULL)
     return(obj)
