@@ -26,3 +26,9 @@ NULL
 kfold <- function(x, ...) {
   UseMethod("kfold")
 }
+
+#' @rdname kfold-generic
+#' @export
+is.kfold <- function(x) {
+  inherits(x, "kfold") && is.loo(x)
+}

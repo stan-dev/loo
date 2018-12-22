@@ -3,9 +3,12 @@
 \name{kfold-generic}
 \alias{kfold-generic}
 \alias{kfold}
+\alias{is.kfold}
 \title{Generic function for K-fold cross-validation for developers}
 \usage{
 kfold(x, ...)
+
+is.kfold(x)
 }
 \arguments{
 \item{x}{A fitted model object.}
