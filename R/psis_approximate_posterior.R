@@ -17,7 +17,7 @@
 #'
 #' @template loo-and-psis-references
 #'
-#' @export
+#' @keywords internal
 psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, save_psis, ...){
   checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_q))
   checkmate::assert_numeric(log_q, any.missing = FALSE, len = length(log_p))
