@@ -1,9 +1,13 @@
 #' Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo
 #'
-#' @param log_p The log-posterior (target) evaluated at samples from the proposal distribution (q).
-#' @param log_q The log-density (proposal) evaluated at samples from the proposal distribution (q).
-#' @param log_liks A log-likelihood matrix. See \code{\link{loo.matrix}}. Default is \code{NULL}. Then only the posterior is evaluated using the k_hat diagnostic.
-#' @inheritParams loo
+#' @param log_p    The log-posterior (target) evaluated at S samples from the proposal distribution (q). A vector of length S.
+#' @param log_q    The log-density (proposal) evaluated at S samples from the proposal distribution (q). A vector of length S.
+#' @param log_liks A log-likelihood matrix of size S * N, where N is the number of
+#'                 observations and S is the number of samples from q.
+#'                 See \code{\link{loo.matrix}} for details.
+#'                 Default is \code{NULL}. Then only the posterior is evaluated using
+#'                 the k_hat diagnostic.
+#' @inheritParams  loo
 #'
 #' @return
 #' If log likelihoods are supplied, the function returns a \code{loo} object,
@@ -24,14 +28,15 @@ psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, sav
   approx_correction <- log_p - log_q
 
   if(is.null(log_liks)){
-    approx_correction <- approx_correction - max(approx_correction) # Handle underflow/overflow
+    # Handle underflow/overflow
+    approx_correction <- approx_correction - max(approx_correction)
     log_ratios <- matrix(approx_correction, ncol = 1)
   } else {
     log_ratios <- -log_liks
-    for(j in 1:ncol(log_ratios)){
-      log_ratios[,j] <- log_ratios[,j] + approx_correction
-      log_ratios[,j] <- log_ratios[,j] - max(log_ratios[,j]) # Handle underflow/overflow
-    }
+    log_ratios <- log_ratios + approx_correction
+    # Handle underflow/overflow
+    log_ratio_max <- apply(log_ratios, 2, max)
+    log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
   }
   psis_out <- psis.matrix(log_ratios = log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
 

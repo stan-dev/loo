@@ -2,8 +2,8 @@ library(loo)
 
 context("psis_approximate_posterior")
 
- load("tests/testthat/test_data_psis_approximate_posterior.rda")
-#load("test_data_psis_approximate_posterior.rda")
+# load("tests/testthat/test_data_psis_approximate_posterior.rda")
+load("test_data_psis_approximate_posterior.rda")
 
 test_that("Laplace approximation, independent posterior", {
   log_p <- test_data_psis_approximate_posterior$laplace_independent$log_p
