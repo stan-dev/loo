@@ -2,13 +2,14 @@
 
 * New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
-* When comparing more than two models with `compare()` there is now also 
-an `se_diff` column in the results. The printed output (the returned object) 
-from `compare()` has also been simplified. (#78)
+* When comparing more than two models there is now also 
+an `se_diff` column in the results. (#78)
 
 * Fix for `psis()` when `log_ratios` are very small. (#74)
 
 * Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC). (#72)
+
+* Update effective sample size calculations to match RStan's version (#85)
 
 # loo 2.0.0
 
