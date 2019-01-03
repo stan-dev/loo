@@ -12,6 +12,8 @@ which now throws a deprecation warning. (#93)
 * Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` 
 is not applicable (i.e., draws not from MCMC). (#72)
 
+* Update effective sample size calculations to match RStan's version (#85)
+
 # loo 2.0.0
 
 This is a major release with many changes. Whenever possible we have opted to

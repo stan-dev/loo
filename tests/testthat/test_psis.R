@@ -130,13 +130,13 @@ test_that("psis_n_eff methods works properly", {
 
 test_that("relative_eff methods works properly", {
   expect_equal(relative_eff.default(exp(LLmat[, 1]), chain_id),
-               mcmc_n_eff(exp(LLarr[, , 1])) / 1000)
+               ess_rfun(exp(LLarr[, , 1])) / 1000)
   expect_equal(relative_eff.matrix(exp(LLmat), chain_id),
-               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+               apply(exp(LLarr), 3, ess_rfun) / 1000)
   expect_equal(relative_eff.array(exp(LLarr)),
-               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+               apply(exp(LLarr), 3, ess_rfun) / 1000)
   expect_equal(relative_eff.array(exp(LLarr)),
-               apply(exp(LLarr), 3, mcmc_n_eff) / 1000)
+               apply(exp(LLarr), 3, ess_rfun) / 1000)
 
   expect_equal(relative_eff(exp(LLarr)), relative_eff(exp(LLarr), cores = 2))
 })

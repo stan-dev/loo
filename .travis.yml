@@ -9,7 +9,10 @@ r_github_packages:
 
 r_build_args: '--no-build-vignettes'
 r_check_args: '--ignore-vignettes'
-warnings_are_errors: true
+# warnings_are_errors: true
+
+env:
+- _R_CHECK_FORCE_SUGGESTS_=false
 
 after_success:
   - Rscript -e 'covr::codecov(line_exclusions = list("R/zzz.R" = c(1:11)))'
