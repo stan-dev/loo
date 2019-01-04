@@ -84,9 +84,10 @@ kfold_split_stratified <- function(K = 10, x = NULL) {
   N <- length(x)
   xids <- numeric()
   for (l in 1:Nlev) {
-      xids <- c(xids, which(x==l)[sample.int(sum(x==l))])
+      xids <- c(xids, sample(which(x==l)))
   }
-  bins[xids] <- rep(1:K, ceiling(N/K), )[1:N]
+  bins <- rep(NA, N)
+  bins[xids] <- rep(1:K, ceiling(N/K))[1:N]
   return(bins)
 }
 
