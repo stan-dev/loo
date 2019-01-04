@@ -6,9 +6,9 @@
 #' @name kfold-helpers
 #' @param K The number of folds to use.
 #' @param N The number of observations in the data.
-#' @param x A discrete variable of length \code{N}. Will be coerced to
-#'   \code{\link{factor}}. For \code{x} should be a grouping variable
-#'   with at least \code{K} levels.
+#' @param x A discrete variable of length \code{N} with at least \code{K} levels
+#'   (unique values). Will be coerced to \code{\link{factor}}.
+#'   .
 #' @return An integer vector of length \code{N} where each element is an index
 #'   in \code{1:K}.
 #'
@@ -17,23 +17,26 @@
 #' of equal size (or roughly equal size).
 #'
 #' For a categorical variable \code{x} \code{kfold_split_stratified}
-#' splits the data into \code{K} groups ensuring that relative
+#' splits the observations into \code{K} groups ensuring that relative
 #' category frequencies are approximately preserved.
 #'
 #' For a grouping variable \code{x}, \code{kfold_split_grouped} places
 #' all observations in \code{x} from the same group/level together in
-#' the same fold.  The selection of which groups/levels go into which
+#' the same fold. The selection of which groups/levels go into which
 #' fold (relevant when when there are more folds than groups) is
 #' randomized.
 #'
 #' @examples
-#' kfold_split_random(K = 5, N = 20)
+#' ids <- kfold_split_random(K = 5, N = 20)
+#' print(ids)
+#' table(ids)
+#'
 #'
 #' x <- sample(c(0, 1), size = 200, replace = TRUE, prob = c(0.05, 0.95))
 #' table(x)
 #' ids <- kfold_split_stratified(K = 5, x = x)
-#' table(ids[x == 0])
-#' table(ids[x == 1])
+#' print(ids)
+#' table(ids, x)
 #'
 #' grp <- gl(n = 50, k = 15, labels = state.name)
 #' length(grp)
@@ -41,13 +44,11 @@
 #'
 #' ids_10 <- kfold_split_grouped(K = 10, x = grp)
 #' (tab_10 <- table(grp, ids_10))
-#' print(colSums(tab_10))
-#' all.equal(sum(colSums(tab_10)), length(grp))
+#' colSums(tab_10)
 #'
 #' ids_9 <- kfold_split_grouped(K = 9, x = grp)
-#' tab_9 <- table(grp, ids_9)
-#' print(colSums(tab_9))
-#' all.equal(sum(colSums(tab_10)), length(grp))
+#' (tab_9 <- table(grp, ids_9))
+#' colSums(tab_9)
 #'
 NULL
 

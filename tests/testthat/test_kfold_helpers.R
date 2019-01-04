@@ -3,24 +3,28 @@ set.seed(14014)
 
 context("kfold helper functions")
 
-test_that("kfold helpers work", {
+test_that("kfold_split_random works", {
   fold_rand <- kfold_split_random(10, 100)
   expect_length(fold_rand, 100)
   expect_equal(sort(unique(fold_rand)), 1:10)
   expect_equal(sum(fold_rand == 2), sum(fold_rand == 9))
+})
 
+test_that("kfold_split_stratified works", {
   y <- rep(c(0, 1), times = c(10, 190))
   fold_strat <- kfold_split_stratified(5, y)
   expect_true(all(table(fold_strat) == 40))
 
-  y <- rep(c(0, 1), times = c(11, 189))
-  fold_strat <- kfold_split_stratified(5, y)
-  expect_equal(range(table(fold_strat)), c(39, 41))
+  y <- rep(c(1, 2, 3), times = c(15, 33, 42))
+  fold_strat <- kfold_split_stratified(7, y)
+  expect_equal(range(table(fold_strat)), c(12, 13))
 
-  y <- rep(c(1, 2, 3), times = c(1, 1, 1))
+  y <- mtcars$cyl
   fold_strat <- kfold_split_stratified(10, y)
-  expect_equal(range(table(fold_strat)), c(2, 3))
+  expect_equal(range(table(fold_strat)), c(3, 4))
+})
 
+test_that("kfold_split_grouped works", {
   grp <- gl(n = 50, k = 15, labels = state.name)
   fold_group <- kfold_split_grouped(x = grp)
   expect_true(all(table(fold_group) == 75))
