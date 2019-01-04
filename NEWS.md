@@ -11,6 +11,8 @@ an `se_diff` column in the results. (#78)
 
 * Update effective sample size calculations to match RStan's version (#85)
 
+* Naming of k-fold helper functions now matches scikit-learn (#96)
+
 # loo 2.0.0
 
 This is a major release with many changes. Whenever possible we have opted to
