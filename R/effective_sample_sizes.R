@@ -108,7 +108,7 @@ relative_eff.function <-
           X = seq_len(N),
           FUN = function(i) {
             val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-            relative_eff.default(as.vector(val_i), chain_id = chain_id)
+            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
           }
         )
     } else {
@@ -118,7 +118,7 @@ relative_eff.function <-
             X = seq_len(N),
             FUN = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id)
+              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
             },
             mc.cores = cores
           )
@@ -131,7 +131,7 @@ relative_eff.function <-
             X = seq_len(N),
             fun = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id)
+              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
             }
           )
       }

@@ -108,7 +108,7 @@ test_that("loo and waic error with vector input", {
 
 
 
-# testing function methods
+# testing function methods ------------------------------------------------
 source(test_path("function_method_stuff.R"))
 
 waic_with_fn <- waic(llfun, data = data, draws = draws)
@@ -156,4 +156,3 @@ test_that("loo throws r_eff warnings", {
   expect_warning(loo(-LLmat), "MCSE estimates will be over-optimistic")
   expect_warning(loo(llfun, data = data, draws = draws), "MCSE estimates will be over-optimistic")
 })
-
