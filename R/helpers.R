@@ -150,7 +150,6 @@ validate_llfun <- function(x) {
 #' 2)}, etc.
 #'
 #' @export
-#' @noRd
 #' @keywords internal
 #' @param ... Objects to include in the list.
 #' @return A named list.
