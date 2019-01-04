@@ -188,24 +188,24 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
 #' @return MCMC effective sample size based on rstan's calculation.
 #'
 ess_rfun <- function(sims) {
-  # Compute the effective sample size for samples of several chains 
-  # for one parameter; see the C++ code of function  
-  # effective_sample_size in chains.cpp 
-  # 
+  # Compute the effective sample size for samples of several chains
+  # for one parameter; see the C++ code of function
+  # effective_sample_size in chains.cpp
+  #
   # Args:
-  #   sims: a 2-d array _without_ warmup samples (# iter * # chains) 
-  # 
+  #   sims: a 2-d array _without_ warmup samples (# iter * # chains)
+  #
   if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-  
-  acov <- lapply(1:chains, 
-                 FUN = function(i) autocovariance(sims[,i])) 
+
+  acov <- lapply(1:chains,
+                 FUN = function(i) autocovariance(sims[,i]))
   acov <- do.call(cbind, acov)
   chain_mean <- apply(sims, 2, mean)
-  mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1) 
+  mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
   var_plus <- mean_var * (n_samples - 1) / n_samples
-  if (chains > 1) 
+  if (chains > 1)
     var_plus <- var_plus + var(chain_mean)
   # Geyer's initial positive sequence
   rho_hat_t <- rep.int(0, n_samples)
@@ -214,7 +214,7 @@ ess_rfun <- function(sims) {
   rho_hat_t[t+1] <- rho_hat_even
   rho_hat_odd <- 1 - (mean_var - mean(acov[t+2, ])) / var_plus
   rho_hat_t[t+2] <- rho_hat_odd
-  t <- 2  
+  t <- 2
   while (t < nrow(acov)-1 && !is.nan(rho_hat_even + rho_hat_odd) && (rho_hat_even + rho_hat_odd > 0)) {
     rho_hat_even = 1 - (mean_var - mean(acov[t+1, ])) / var_plus
     rho_hat_odd = 1 - (mean_var - mean(acov[t+2, ])) / var_plus
@@ -227,7 +227,7 @@ ess_rfun <- function(sims) {
   max_t <- t
   # Geyer's initial monotone sequence
   t <- 2
-  while (t <= max_t - 2) {  
+  while (t <= max_t - 2) {
     if (rho_hat_t[t + 1] + rho_hat_t[t + 2] >
         rho_hat_t[t - 1] + rho_hat_t[t]) {
       rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2;
@@ -237,7 +237,7 @@ ess_rfun <- function(sims) {
   }
   ess <- chains * n_samples
   ess <- ess / (-1 + 2 * sum(rho_hat_t[1:max_t]))
-  ess 
+  ess
 }
 
 
@@ -265,8 +265,8 @@ autocovariance <- function(y) {
   Mt2 <- 2 * M
   yc <- y - mean(y)
   yc <- c(yc, rep.int(0, Mt2-N))
-  transform <- fft(yc)
-  ac <- fft(Conj(transform) * transform, inverse = TRUE)
+  transform <- stats::fft(yc)
+  ac <- stats::fft(Conj(transform) * transform, inverse = TRUE)
   ac <- Re(ac)[1:N]/(N*2*seq(N, 1, by = -1))
   ac
 }

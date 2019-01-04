@@ -1,5 +1,4 @@
 library(loo)
-suppressPackageStartupMessages(library(rstanarm))
 options(mc.cores=1)
 options(loo.cores=NULL)
 set.seed(123)
@@ -142,6 +141,8 @@ test_that("relative_eff methods works properly", {
 })
 
 test_that("relative_eff function method works properly", {
+  skip_on_travis()
+  suppressPackageStartupMessages(library(rstanarm))
   dat <- data.frame(y = mtcars$mpg, x = mtcars$wt)
   utils::capture.output(
     fit <- suppressWarnings(
