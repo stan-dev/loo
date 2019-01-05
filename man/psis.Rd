@@ -59,6 +59,8 @@ the log scale? Defaults to \code{TRUE}.}
 
 \item{normalize}{For the \code{weights} method, should the weights be
 normalized? Defaults to \code{TRUE}.}
+
+\item{x}{For \code{is.psis}, an object to check.}
 }
 \value{
 The \code{psis} methods return an object of class \code{"psis"},
