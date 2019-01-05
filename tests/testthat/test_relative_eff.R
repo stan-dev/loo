@@ -33,7 +33,6 @@ test_that("relative_eff matrix and function methods return identical output", {
 })
 
 test_that("relative_eff with multiple cores runs", {
-  skip_on_cran()
   source(test_path("function_method_stuff.R"))
   dim(llmat_from_fn) <- c(nrow(llmat_from_fn), 1, ncol(llmat_from_fn))
   r_eff_arr <- relative_eff(llmat_from_fn, cores = 2)
@@ -43,7 +42,7 @@ test_that("relative_eff with multiple cores runs", {
       chain_id = rep(1, nrow(draws)),
       data = data,
       draws = draws,
-      cores = 1
+      cores = 2
     )
   expect_identical(r_eff_arr, r_eff_fn)
 })

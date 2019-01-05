@@ -38,6 +38,10 @@ test_that("kfold_split_grouped works", {
   grp[grp == "Montana"] <- "Utah"
   fold_group <- kfold_split_grouped(K = 10, x = grp)
   expect_equal(sum(table(fold_group)), length(grp) - 4)
+
+  grp <- rep(c("A","B"), each = 20)
+  fold_group <- kfold_split_grouped(K = 2, x = grp)
+  expect_equal(fold_group, as.integer(as.factor(grp)))
 })
 
 test_that("kfold helper errors", {

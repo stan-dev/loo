@@ -5,7 +5,7 @@ r:
 cache: packages
 
 r_github_packages:
-  - jimhester/covr
+  - r-lib/covr
 
 r_build_args: '--no-build-vignettes'
 r_check_args: '--ignore-vignettes'
@@ -15,4 +15,4 @@ env:
 - _R_CHECK_FORCE_SUGGESTS_=false
 
 after_success:
-  - Rscript -e 'covr::codecov(line_exclusions = list("R/zzz.R" = c(1:11)))'
+  - Rscript -e 'covr::codecov(line_exclusions = c("R/zzz.R", "R/psislw.R"), function_exclusions = c("convert\\_old*"))'
