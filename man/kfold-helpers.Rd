@@ -19,13 +19,10 @@ kfold_split_grouped(K = 10, x = NULL)
 \item{N}{The number of observations in the data.}
 
 \item{x}{A discrete variable of length \code{N} with at least \code{K} levels
-(unique values). Will be coerced to \code{\link{factor}}.
-.}
-
+(unique values). Will be coerced to \code{\link{factor}}.}
 }
 \value{
-The helper functions return an integer vector of length \code{N}
-where each element is an index in \code{1:K}.
+An integer vector of length \code{N} where each element is an index in \code{1:K}.
 }
 \description{
 These functions can be used to generate indexes for use with
