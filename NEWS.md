@@ -9,10 +9,12 @@ which now throws a deprecation warning. (#93)
 
 * Improved behavior of `psis()` when `log_ratios` are very small. (#74)
 
-* Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` 
-is not applicable (i.e., draws not from MCMC). (#72)
+* Allow `r_eff=NA` to suppress warning when specifying `r_eff` is not applicable 
+(i.e., draws not from MCMC). (#72)
 
-* Update effective sample size calculations to match RStan's version (#85)
+* Update effective sample size calculations to match RStan's version. (#85)
+
+* Naming of k-fold helper functions now matches scikit-learn. (#96)
 
 # loo 2.0.0
 

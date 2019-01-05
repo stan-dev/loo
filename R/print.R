@@ -129,11 +129,10 @@ print_mcse_summary <- function(x, digits) {
 .k_help <- function() "See help('pareto-k-diagnostic') for details.\n"
 
 # compatibility with old loo objects
-convert_old_object <- function(x, digits = 1, ...) {
+convert_old_object <- function(x, digits = 1, ...) { # nocov start
   z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
   ses <- grepl("se", nms)
   list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
-}
-
+} # nocov end

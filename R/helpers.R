@@ -138,9 +138,6 @@ validate_llfun <- function(x) {
 #' @keywords internal
 #' @param ... Objects to include in the list.
 #' @return A named list.
-#'
-#' @seealso \code{\link[base]{list}}
-#' @author Jonah Gabry
 #' @examples
 #'
 #' # All variables already defined
