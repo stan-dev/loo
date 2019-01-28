@@ -143,10 +143,10 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
 # internal ----------------------------------------------------------------
 compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), check_dims = TRUE) {
   if (check_dims) {
-    if (dim(loo_a)[2] != dim(loo_b)[2]) {
+    if (dim(loo_a$pointwise)[1] != dim(loo_b$pointwise)[1]) {
       stop(paste("Models don't have the same number of data points.",
-                 "\nFound N_1 =", dim(loo_a)[2], "and N_2 =", dim(loo_b)[2]),
-           call. = FALSE)
+                 "\nFound N_1 =", dim(loo_a$pointwise)[1],
+                 "and N_2 =", dim(loo_b$pointwise)[1]), call. = FALSE)
     }
   }
 
