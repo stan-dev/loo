@@ -129,8 +129,8 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
   importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
@@ -138,5 +138,5 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
   Gelman, A. (2019), Visualization in Bayesian workflow. \emph{J. R. Stat.
   Soc. A}, 182: 389-402. doi:10.1111/rssa.12378,
-  \url{https://arxiv.org/abs/1709.01449}
+  (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal}, \href{https://arxiv.org/abs/1709.01449}{arXiv preprint})
 }

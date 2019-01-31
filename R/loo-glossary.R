@@ -3,10 +3,7 @@
 #' @name loo-glossary
 #'
 #' @template loo-and-psis-references
-#' @references Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
-#'   Gelman, A. (2019), Visualization in Bayesian workflow. \emph{J. R. Stat.
-#'   Soc. A}, 182: 389-402. doi:10.1111/rssa.12378,
-#'   \url{https://arxiv.org/abs/1709.01449}
+#' @template bayesvis-reference
 #'
 #' @description Note: VGG2017a refers to Vehtari, Gelman, and Gabry (2017a). See
 #'   \strong{References}, below.
