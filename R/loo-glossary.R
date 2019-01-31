@@ -16,7 +16,7 @@
 #' The ELPD is the theoretical expected log pointwise predictive density for a new
 #' dataset (Eq 1 in VGG2017a), which can be estimated, e.g., using
 #' cross-validation. \code{elpd_loo} is the Bayesian LOO estimate of the
-#' expected log pointwise predictive density (Eq 4 in VGG2017a).
+#' expected log pointwise predictive density (Eq 4 in VGG2017a) and
 #' is a sum of N individual pointwise log predictive densities. Probability
 #' densities can be smaller or larger than 1, and thus log predictive densities
 #' can be negative or positive.
@@ -27,12 +27,13 @@
 #' VGG2017a), we can compute the standard error by using the standard deviation
 #' of the N components and multipling by \code{sqrt(N)} (Eq 23 in VGG2017a).
 #' This standard error is a coarse description of our uncertainty about the
-#' predictive performance for unknown future data. In case of small N or severe
-#' model misspecification, the current SE estimate is overoptimistic and true SE
-#' can be twice as large. Even for moderate N, when the SE estimate is accurate
-#' estimate for the scale, it ignores the skewness.  When making model
-#' comparisons, the SE of the component-wise (pairwise) differences should be
-#' used instead (see the \code{se_diff} section below and Eq 24 in VGG2017a).
+#' predictive performance for unknown future data. When N is small or there is
+#' severe model misspecification, the current SE estimate is overoptimistic and
+#' the actual SE can even be twice as large. Even for moderate N, when the SE
+#' estimate is an accurate estimate for the scale, it ignores the skewness. When
+#' making model comparisons, the SE of the component-wise (pairwise) differences
+#' should be used instead (see the \code{se_diff} section below and Eq 24 in
+#' VGG2017a).
 #'
 #' @section Monte Carlo SE of elpd_loo:
 #'
