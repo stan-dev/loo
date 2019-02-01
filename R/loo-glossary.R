@@ -16,7 +16,10 @@
 #' expected log pointwise predictive density (Eq 4 in VGG2017a) and
 #' is a sum of N individual pointwise log predictive densities. Probability
 #' densities can be smaller or larger than 1, and thus log predictive densities
-#' can be negative or positive.
+#' can be negative or positive. For simplicity ELPD acronym is used also for
+#' expected log pointwise predictive probabilities for discrete models.
+#' Probabilities are always equal or less than 1, and thus log predictive
+#' probabilities are 0 or negative.
 #'
 #' @section Standard error of \code{elpd_loo}:
 #'
@@ -82,10 +85,11 @@
 #'
 #' \item If \code{p_loo < p} and the number of parameters \code{p} is relatively
 #' large compared to the number of observations (e.g., \code{p>N/5}), it is
-#' likely that model is so flexible or the population prior so weak that it’s
+#' likely that the model is so flexible or the population prior so weak that it’s
 #' difficult to predict the left out observation (even for the true model).
-#' This happens, for example, in the simulated 8 schools (in VGG2017a) and
-#' Gaussian processes and spatial models with short correlation lengths.
+#' This happens, for example, in the simulated 8 schools (in VGG2017a), random
+#' effect models with a few observations per random effect, and Gaussian
+#' processes and spatial models with short correlation lengths.
 #'
 #' \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
 #' If the number of parameters \code{p<<N}, then PPCs are also likely to detect the
