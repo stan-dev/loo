@@ -73,29 +73,33 @@ test_that("loo_compare returns expected result (3 models)", {
 
 # Tests for deprecated compare() ------------------------------------------
 
-test_that("compare throws deprecation warnings", {
-  expect_warning(loo::compare(w1, w2), "Deprecated")
-  expect_warning(loo::compare(w1, w1, w2), "Deprecated")
-})
+# test_that("compare throws deprecation warnings", {
+#   expect_warning(loo::compare(w1, w2), "Deprecated")
+#   expect_warning(loo::compare(w1, w1, w2), "Deprecated")
+# })
 
 test_that("compare returns expected result (2 models)", {
-  comp1 <- expect_warning(loo::compare(w1, w1), "Deprecated")
+  comp1 <- loo::compare(w1, w1)
+  # comp1 <- expect_warning(loo::compare(w1, w1), "Deprecated")
   expect_output(print(comp1), "elpd_diff")
   expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
 
-  comp2 <- expect_warning(loo::compare(w1, w2), "Deprecated")
+  comp2 <- loo::compare(w1, w2)
+  # comp2 <- expect_warning(loo::compare(w1, w2), "Deprecated")
   expect_equal_to_reference(comp2, "compare_two_models.rds")
   expect_named(comp2, c("elpd_diff", "se"))
   expect_s3_class(comp2, "compare.loo")
 
   # specifying objects via ... and via arg x gives equal results
-  comp_via_list <- expect_warning(loo::compare(x = list(w1, w2)), "Deprecated")
+  comp_via_list <- loo::compare(x = list(w1, w2))
+  # comp_via_list <- expect_warning(loo::compare(x = list(w1, w2)), "Deprecated")
   expect_equal(comp2, comp_via_list)
 })
 
 test_that("compare returns expected result (3 models)", {
   w3 <- SW(waic(LLarr3))
-  comp1 <- expect_warning(loo::compare(w1, w2, w3), "Deprecated")
+  comp1 <- loo::compare(w1, w2, w3)
+  # comp1 <- expect_warning(loo::compare(w1, w2, w3), "Deprecated")
 
   expect_equal(
     colnames(comp1),
@@ -111,6 +115,7 @@ test_that("compare returns expected result (3 models)", {
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
-  comp_via_list <- expect_warning(loo::compare(x = list(w1, w2, w3)), "Deprecated")
+  comp_via_list <- loo::compare(x = list(w1, w2, w3))
+  # comp_via_list <- expect_warning(loo::compare(x = list(w1, w2, w3)), "Deprecated")
   expect_equivalent(comp1, comp_via_list)
 })
