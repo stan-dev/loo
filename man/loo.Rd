@@ -29,10 +29,12 @@ inputs for each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling. If \code{r_eff} is not provided then
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. See the \code{\link{relative_eff}} helper function
-for computing \code{r_eff}.}
+will be over-optimistic. If the posterior draws are independent then
+\code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
+helper function for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo} be saved in the returned object? The \code{loo} function calls
@@ -42,14 +44,6 @@ Setting \code{save_psis} to \code{TRUE} will add a \code{psis_object}
 component to the list returned by \code{loo}. Currently this is only needed
 if you plan to use the \code{\link{E_loo}} function to compute weighted
 expectations after running \code{loo}.}
-
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
-recommend using as many (or close to as many) cores as possible.}}
 
 \item{data, draws, ...}{For the \code{loo} function method and the \code{loo_i}
 function, the data, posterior draws, and other arguments to pass to the
@@ -267,11 +261,11 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
 \itemize{
