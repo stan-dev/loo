@@ -78,14 +78,16 @@ drastically reduces the computational burden while also providing informative
 diagnostics about the quality of the approximation. In this case study we
 present PSIS-LFO-CV, an algorithm that typically only requires refitting the
 time-series model a small number times and will make LFO-CV tractable for many
-more realistic applications than previously possible.
+more realistic applications than previously possible. 
 
+More details can be found in our paper about approximate LFO-CV
+(Bürkner, Gabry, & Vehtari, 2019), which is available as a preprint on arXiv (https://arxiv.org/abs/1902.06281).
 
 
 ## $M$-step-ahead predictions
 
 Assume we have a time series of observations 
-$\mathbf{y} = (y_1, y_2, \ldots, y_N)$ 
+$y = (y_1, y_2, \ldots, y_N)$ 
 and let $L$ be the _minimum_ number of observations from the series that
 we will require before making predictions for future data. Depending on the
 application and how informative the data is, it may not be possible to make
@@ -99,25 +101,25 @@ In order to assess $M$-SAP performance we would like to compute the
 predictive densities
 
 $$
-p(y_{i<M} \,|\, y_{<i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1}) 
+p(y_{i+1:M} \,|\, y_{1:i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1}) 
 $$ 
 
 for each $i \in \{L + 1, \ldots, N - M + 1\}$. The quantities 
-$p(y_{i<M} \,|\, y_{<i})$ can be computed with the help of the posterior
-distribution $p(\theta \,|\, y_{<i})$ of the parameters $\theta$ conditional on
+$p(y_{i+1:M} \,|\, y_{1:i})$ can be computed with the help of the posterior
+distribution $p(\theta \,|\, y_{1:i})$ of the parameters $\theta$ conditional on
 only the first $i-1$ observations of the time-series:
 
 $$
-p(y_{i<M} \,| \, y_{<i}) = 
-  \int p(y_{i<M} \,| \, y_{<i}, \theta) \, p(\theta\,|\,y_{<i}) \,d\theta. 
+p(y_{i+1:M} \,| \, y_{1:i}) = 
+  \int p(y_{i+1:M} \,| \, y_{1:i}, \theta) \, p(\theta\,|\,y_{1:i}) \,d\theta. 
 $$
 
-Having obtained $S$ draws $(\theta_{<i}^{(1)}, \ldots, \theta_{<i}^{(S)})$ 
-from the posterior distribution $p(\theta\,|\,y_{<i})$, we can estimate 
-$p(y_{i<M} | y_{<i})$ as
+Having obtained $S$ draws $(\theta_{1:i}^{(1)}, \ldots, \theta_{1:i}^{(S)})$ 
+from the posterior distribution $p(\theta\,|\,y_{1:i})$, we can estimate 
+$p(y_{i+1:M} | y_{1:i})$ as
 
 $$
-p(y_{i<M} \,|\, y_{<i}) \approx \sum_{s=1}^S p(y_{i<M} \,|\, y_{<i}, \theta_{<i}^{(s)}).
+p(y_{i+1:M} \,|\, y_{1:i}) \approx \frac{1}{S}\sum_{s=1}^S p(y_{i+1:M} \,|\, y_{1:i}, \theta_{1:i}^{(s)}).
 $$
 
 In the following, we consider factorizable models in which the response values
@@ -125,15 +127,15 @@ are conditionally independent given the parameters and the likelihood can be
 written in the familiar form
 
 $$
-p(\mathbf{y} \,|\, \theta) = \prod_{i=1}^N p(y_i \,|\, \theta).
+p(y \,|\, \theta) = \prod_{i=1}^N p(y_i \,|\, \theta).
 $$
 
-In this case, $p(y_{i<M} \,|\, y_{<i}, \theta_{<i})$ reduces to 
+In this case, $p(y_{i+1:M} \,|\, y_{1:i}, \theta)$ reduces to 
 $$
-p(y_{i<M} \,|\, \theta_{<i}) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta_{<i}),
+p(y_{i+1:M} \,|\, \theta) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta),
 $$
-due to the assumption of conditional independence between $y_{i<M}$ and
-$y_{<i}$ given $\theta_{<i}$.
+due to the assumption of conditional independence between $y_{i+1:M}$ and
+$y_{1:i}$ given $\theta$.
 
 Non-factorizable models, which do not make this assumption, are discussed in a
 separate vignette [_Leave-one-out cross-validation for non-factorizable models_](http://mc-stan.org/loo/articles/loo2-non-factorizable.html).
@@ -142,19 +144,19 @@ separate vignette [_Leave-one-out cross-validation for non-factorizable models_]
 
 Unfortunately, the math above makes use of the posterior distributions from many
 different fits of the model to different subsets of the data. That is, to obtain
-the predictive density $p(y_{i<M} \,|\, y_{<i})$ requires fitting a model to
+the predictive density $p(y_{i+1:M} \,|\, y_{1:i})$ requires fitting a model to
 only the first $i-1$ data points, and we will need to do this for every value of
 $i$ under consideration (all $i \in \{L + 1, \ldots, N - M + 1\}$).
 
 To reduce the number of models that need to be fit for the purpose of obtaining
-each of the densities $p(y_{i<M} \,|\, y_{<i})$, we propose the following
+each of the densities $p(y_{i+1:M} \,|\, y_{1:i})$, we propose the following
 algorithm. Starting with $i = N - M + 1$, we approximate each 
-$p(y_{i<M} \,|\, y_{<i})$ using Pareto smoothed importance sampling (PSIS,
+$p(y_{i+1:M} \,|\, y_{1:i})$ using Pareto smoothed importance sampling (PSIS,
 Vehtari et al, 2017ab):
 
 $$
- p(y_{i<M} \,|\, y_{<i}) \approx
-   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i<M} \,|\, \theta^{(s)})}{ \sum_{s=1}^S w_i^{(s)}},
+ p(y_{i+1:M} \,|\, y_{1:i}) \approx
+   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i+1:M} \,|\, \theta^{(s)})}{ \sum_{s=1}^S w_i^{(s)}},
 $$
 
 where $w_i^{(s)}$ are importance weights and $\theta^{(s)}$ are draws from the
@@ -185,9 +187,8 @@ of all observations should be computed).
 For LOO, we recommend to use a threshold of $0.7$ (Vehtari et al, 2017ab), but
 for LFO, the threshold should be smaller as influential observations will affect
 all pointwise LFO approximations until the next refit and thus much stronger
-than in LOO. For the present case study, we choose a threshold of $0.6$, but
-more experiments are needed to give general recommendations about the threshold
-in LFO.
+than in LOO. For the present case study, we choose a threshold of $0.6$, 
+which also seems to be generally reasonable threshold for LFO (Bürkner et al. 2019).
 
 
 ## Autoregressive models
@@ -310,7 +311,7 @@ print(loo_cv)
 ## 1-step-ahead predictions leaving out all future values
 
 The most basic version of $M$-SAP is 1-SAP, in which we predict only one step
-ahead. In this case, $y_{i<M}$ simplifies to $y_{i}$ and the LFO-CV algorithm
+ahead. In this case, $y_{i+1:M}$ simplifies to $y_{i}$ and the LFO-CV algorithm
 becomes considerably simpler than for larger values of $M$.
 
 ### Exact 1-step-ahead predictions
@@ -461,7 +462,7 @@ for (i in ids) {
   ks <- c(ks, k)
   if (k > k_thres) {
     # refit the model based on the first i-1 observations
-    i_refit <- i
+    i_refit <- i - 1
     refits <- c(refits, i)
     fit_part <- update(fit_part, newdata = df[1:(i - 1), ], recompile = FALSE)
     loglik[, i] <- log_lik(fit_part, newdata = df[1:i, ])[, i]
@@ -521,7 +522,7 @@ calculations of more than `r round(max_diff, 2)` and the average difference is
 
 ## $M$-step-ahead predictions leaving out all future values
 
-To illustrate the application of $M$-SAP for $M > 1$, we compute next exact and
+To illustrate the application of $M$-SAP for $M > 1$, we next compute exact and
 approximate LFO-CV for the 4-SAP case.
 
 ### Exact $M$-step-ahead predictions
@@ -576,7 +577,7 @@ for (i in ids) {
   ks <- c(ks, k)
   if (k > k_thres) {
     # refit the model based on the first i-1 observations
-    i_refit <- i
+    i_refit <- i - 1
     refits <- c(refits, i)
     fit_part <- update(
       fit_part, newdata = df[1:(i - 1), ], 
@@ -602,9 +603,7 @@ plot_ks(ks, ids)
 ```
 
 The approximate ELPD computed for the 4-SAP case is not as close to its exact
-counterpart as in the 1-SAP case. Likely, we need to lower the threshold
-for the Pareto-k-values from `r k_thres` to `r k_thres - 0.05` or even 
-`r k_thres - 0.1` in order to achieve better results.
+counterpart as in the 1-SAP case.
 
 ```{r, cache = FALSE}
 approx_elpd_4sap <- sum(approx_elpds_4sap, na.rm = TRUE)
@@ -630,160 +629,19 @@ ggplot(dat_elpd_4sap, aes(x = approx_elpd, y = exact_elpd)) +
   labs(x = "Approximate ELPDs", y = "Exact ELPDs")
 ```
 
-## 1-step-ahead predictions leaving out blocks of future values
-
-Depending on the particular time-series model and data, the Pareto $k$ estimates
-may exceed `r k_thres` rather quickly (i.e., after only few observations) and so
-many refits may be required even when carrying out the PSIS approximation
-to LFO-CV. In this case, another option is to exclude only the block of $B$ 
-future values that directly follow the observations to be predicted while 
-retaining all of the more distant values $y_{i>B} = (y_{i + B}, \ldots, y_N)$. 
-This will usually result in lower Pareto $k$ estimates and thus less refitting. 
-
-This block-$M$-SAP version closely resembles the basic $M$-SAP only if values in
-the distant future, $y_{>B}$, contain little information about the current
-observations being predicted. Whether this assumption is justified will depend
-on the data and model.
-
-We will demonstrate the LFO-CV approach for the block-$M$-SAP case using
-block-1-SAP.
-
-### Exact LFO-CV for block-1-SAP
-
-The differences between the code for LFO-CV for 1-SAP and the code for
-block-1-SAP are very small. We now just need to define a block size $B$ of
-left-out observations, which we set to $B = 10$ for the present case study.
-
-```{r exact_loglik_block, results="hide"}
-B <- 10
-loglik <- matrix(nrow = nsamples(fit), ncol = N)
-for (i in N:(L + 1)) {
-  to <- min(i + B - 1, N)
-  fit_i <- update(fit, newdata = df[-(i:to), ], recompile = FALSE)
-  loglik[, i] <- log_lik(fit_i, newdata = df[1:i, ])[, i]
-}
-```
-
-Comparing the exact block-1-SAP to the exact 1-SAP reveals no substantial
-difference for this particular data set and model, but this may very well be
-different for other data sets and models.
-
-```{r, cache = FALSE}
-exact_elpds_1sap_block <- apply(loglik, 2, log_mean_exp)
-exact_elpd_1sap_block <- c(ELPD = sum(exact_elpds_1sap_block, na.rm = TRUE))
-rbind_print(
-  "Exact LFO-CV (1-SAP)" = exact_elpd_1sap, 
-  "Exact LFO-CV (block-1-SAP)" = exact_elpd_1sap_block 
-)
-```
-
-If exact block-1-SAP and exact 1-SAP were different, it would not necessarily
-imply that observations depend on distant future values, but could instead be
-due to the fact that the model parameters were estimated more precisely in the
-case of block-1-SAP since more data are available, in particular for predicting
-observations early in the time series. If this is the case we would expect the
-differences between the pointwise ELPDs for the two cases to be larger for
-earlier observations. To some degree, this is also what we see when plotting the
-differences for the present example, although these differences happen to cancel
-each other out in this case:
-
-```{r, cache = FALSE}
-dat_elpd_diff <- data.frame(
-  elpd_diff = exact_elpds_1sap_block - exact_elpds_1sap,
-  i = seq_along(exact_elpds_1sap_block)
-)
-
-ggplot(dat_elpd_diff[(L + 1):N, ], aes(x = i, y = elpd_diff)) +
-  geom_point(size = 2) +
-  labs(x = "Data Point", y = "ELPD diff")
-```
-
-### Approximate 1-step-ahead predictions
-
-We compute approximate PSIS-LFO-CV for block-1-SAP as follows.
-
-```{r refit_loglik_block, results="hide"}
-loglik <- matrix(nrow = nsamples(fit), ncol = N)
-approx_elpds_1sap_block <- rep(NA, N)
-fit_part <- fit
-ids <- N:(L + 1)
-i_refit <- N
-refits <- NULL
-ks <- NULL 
-
-for (i in ids) {
-  loglik[, i] <- log_lik(fit_part)[, i]
-  to <- min(i + B - 1, i_refit)
-  logratio <- sum_log_ratios(loglik, i:to)
-  psis_part <- suppressWarnings(psis(logratio))
-  k <- pareto_k_values(psis_part)
-  ks <- c(ks, k)
-  if (k > k_thres) {
-    # refit the model without a block of B observations
-    i_refit <- i 
-    refits <- c(refits, i)
-    fit_part <- update(fit_part, newdata = df[-(i:to), ], recompile = FALSE)
-    loglik[, i] <- log_lik(fit_part, newdata = df[1:i, ])[, i]
-    approx_elpds_1sap_block[i] <- log_mean_exp(loglik[, i])
-  } else {
-    lw_i <- weights(psis_part, normalize = TRUE)[, 1]
-    approx_elpds_1sap_block[i] <- log_sum_exp(lw_i + loglik[, i])
-  }
-}
-```
-
-Here we needed `r length(refits)` refit(s), which is remarkable given that we
-have a time-series of 98 observations and are predicting for 98 - L = `r 98 - L` 
-of them.
-
-```{r, cache = FALSE}
-plot_ks(ks, ids)
-```
-
-Consequently, it is not surprising that PSIS-LFO-CV for block-1-SAP matches the
-exact version closely.
-
-```{r, cache = FALSE}
-approx_elpd_1sap_block <- c(ELPD = sum(approx_elpds_1sap_block, na.rm = TRUE))
-rbind_print(
-  "Exact LFO-CV (block-1-SAP)" = exact_elpd_1sap_block,
-  "Approx LFO-CV (block-1-SAP)" = approx_elpd_1sap_block
-)
-```
-
-This is also visible in the plot of approximate against exact predictions.
-
-```{r, cache = FALSE}
-dat_elpd_block <- data.frame(
-  approx_elpd = approx_elpds_1sap_block,
-  exact_elpd = exact_elpds_1sap_block
-)
-
-ggplot(dat_elpd_block, aes(x = approx_elpd, y = exact_elpd)) +
-  geom_abline(color = "gray30") +
-  geom_point(size = 2) +
-  labs(x = "Approximate ELPDs", y = "Exact ELPDs")
-```
-
-When increasing $M$ in block-M-SAP, we have to make sure to simultaneously
-increase the block size $B$, as well, in order to keep the assumptions of
-block-M-SAP satisfied. This also implies that the stability of the PSIS
-approximation will decrease as we increase $M$ in block-M-SAP because we have
-to leave out more observations.
-
 ## Conclusion
 
 In this case study we have shown how to do carry out exact and approximate
 leave-future-out cross-validation for $M$-step-ahead prediction tasks. For the
-data and model used in our example the PSIS-LFO-CV algorithm provides reasonably
+data and model used in our example, the PSIS-LFO-CV algorithm provides reasonably
 stable and accurate results depite not requiring us to refit the model nearly as
-many times. For many other examples we expect similar performance, but the
-results will always vary from case to case depending on the particulars of the
-data and the time series model.
+many times. For more details on approximate LFO-CV, we refer to Bürkner et al. (2019).
 
 <br />
 
 ## References
+
+Bürkner P. C., Gabry J., & Vehtari A. (2019). Approximate leave-future-out cross-validation for time series models. [ArXiv preprint](https://arxiv.org/abs/1902.06281). 
 
 Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
