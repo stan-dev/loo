@@ -16,7 +16,7 @@
 #' expected log pointwise predictive density (Eq 4 in VGG2017a) and
 #' is a sum of N individual pointwise log predictive densities. Probability
 #' densities can be smaller or larger than 1, and thus log predictive densities
-#' can be negative or positive. For simplicity ELPD acronym is used also for
+#' can be negative or positive. For simplicity the ELPD acronym is used also for
 #' expected log pointwise predictive probabilities for discrete models.
 #' Probabilities are always equal or less than 1, and thus log predictive
 #' probabilities are 0 or negative.
@@ -106,7 +106,7 @@
 #' @section elpd_diff:
 #' \code{elpd_diff} is the difference in \code{elpd_loo} for two models. If more
 #' than two models are compared, the difference is computed relative to the
-#' model with highest elpd_loo.
+#' model with highest \code{elpd_loo}.
 #'
 #' @section se_diff:
 #'

@@ -16,7 +16,10 @@ cross-validation. \code{elpd_loo} is the Bayesian LOO estimate of the
 expected log pointwise predictive density (Eq 4 in VGG2017a) and
 is a sum of N individual pointwise log predictive densities. Probability
 densities can be smaller or larger than 1, and thus log predictive densities
-can be negative or positive.
+can be negative or positive. For simplicity the ELPD acronym is used also for
+expected log pointwise predictive probabilities for discrete models.
+Probabilities are always equal or less than 1, and thus log predictive
+probabilities are 0 or negative.
 }
 
 \section{Standard error of \code{elpd_loo}}{
@@ -90,10 +93,11 @@ etc.).
 
 \item If \code{p_loo < p} and the number of parameters \code{p} is relatively
 large compared to the number of observations (e.g., \code{p>N/5}), it is
-likely that model is so flexible or the population prior so weak that it’s
+likely that the model is so flexible or the population prior so weak that it’s
 difficult to predict the left out observation (even for the true model).
-This happens, for example, in the simulated 8 schools (in VGG2017a) and
-Gaussian processes and spatial models with short correlation lengths.
+This happens, for example, in the simulated 8 schools (in VGG2017a), random
+effect models with a few observations per random effect, and Gaussian
+processes and spatial models with short correlation lengths.
 
 \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
 If the number of parameters \code{p<<N}, then PPCs are also likely to detect the
@@ -112,7 +116,7 @@ detect the problem.
 
 \code{elpd_diff} is the difference in \code{elpd_loo} for two models. If more
 than two models are compared, the difference is computed relative to the
-model with highest elpd_loo.
+model with highest \code{elpd_loo}.
 }
 
 \section{se_diff}{
@@ -130,13 +134,14 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
   (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
   Gelman, A. (2019), Visualization in Bayesian workflow. \emph{J. R. Stat.
   Soc. A}, 182: 389-402. doi:10.1111/rssa.12378,
-  (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal}, \href{https://arxiv.org/abs/1709.01449}{arXiv preprint})
+  (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal},
+  \href{https://arxiv.org/abs/1709.01449}{arXiv preprint})
 }
