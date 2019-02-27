@@ -1,8 +1,5 @@
 # loo 2.0.0.9000
 
-* Introduced new function `loo_compare()` to eventually replace `compare()`, 
-which now throws a deprecation warning. (#93) 
-
 * New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
 * New `se_diff` column in model comparison results. (#78)
