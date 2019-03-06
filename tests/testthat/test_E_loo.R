@@ -1,5 +1,4 @@
 library(loo)
-suppressWarnings(RNGversion("3.5.0"))
 
 context("E_loo")
 
@@ -12,6 +11,7 @@ r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis_mat <- psis(-LLmat, r_eff = r_eff_mat, cores = 2)
 psis_vec <- psis(-LLvec, r_eff = r_eff_vec)
 
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(123)
 x <- matrix(rnorm(length(LLmat)), nrow = nrow(LLmat), ncol = ncol(LLmat))
 log_rats <- -LLmat
@@ -141,6 +141,7 @@ test_that("weighted quantiles work", {
   }
 
 
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(123)
   pr <- seq(0.025, 0.975, 0.025)
 
