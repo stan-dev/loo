@@ -8,15 +8,16 @@ psis_approximate_posterior(log_p, log_q, log_liks = NULL, cores, save_psis,
   ...)
 }
 \arguments{
-\item{log_p}{The log-posterior (target) evaluated at S samples from the proposal distribution (q). A vector of length S.}
+\item{log_p}{The log-posterior (target) evaluated at S samples from the
+proposal distribution (q). A vector of length S.}
 
-\item{log_q}{The log-density (proposal) evaluated at S samples from the proposal distribution (q). A vector of length S.}
+\item{log_q}{The log-density (proposal) evaluated at S samples from the
+proposal distribution (q). A vector of length S.}
 
-\item{log_liks}{A log-likelihood matrix of size S * N, where N is the number of
-observations and S is the number of samples from q.
-See \code{\link{loo.matrix}} for details.
-Default is \code{NULL}. Then only the posterior is evaluated using
-the k_hat diagnostic.}
+\item{log_liks}{A log-likelihood matrix of size S * N, where N is the number
+of observations and S is the number of samples from q. See
+\code{\link{loo.matrix}} for details. Default is \code{NULL}. Then only the
+posterior is evaluated using the k_hat diagnostic.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by

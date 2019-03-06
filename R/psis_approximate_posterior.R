@@ -1,12 +1,13 @@
 #' Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo
 #'
-#' @param log_p    The log-posterior (target) evaluated at S samples from the proposal distribution (q). A vector of length S.
-#' @param log_q    The log-density (proposal) evaluated at S samples from the proposal distribution (q). A vector of length S.
-#' @param log_liks A log-likelihood matrix of size S * N, where N is the number of
-#'                 observations and S is the number of samples from q.
-#'                 See \code{\link{loo.matrix}} for details.
-#'                 Default is \code{NULL}. Then only the posterior is evaluated using
-#'                 the k_hat diagnostic.
+#' @param log_p The log-posterior (target) evaluated at S samples from the
+#'   proposal distribution (q). A vector of length S.
+#' @param log_q The log-density (proposal) evaluated at S samples from the
+#'   proposal distribution (q). A vector of length S.
+#' @param log_liks A log-likelihood matrix of size S * N, where N is the number
+#'   of observations and S is the number of samples from q. See
+#'   \code{\link{loo.matrix}} for details. Default is \code{NULL}. Then only the
+#'   posterior is evaluated using the k_hat diagnostic.
 #' @inheritParams  loo
 #'
 #' @return
@@ -18,6 +19,7 @@
 #' @template loo-and-psis-references
 #'
 #' @keywords internal
+#'
 psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, save_psis, ...){
   checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_q))
   checkmate::assert_numeric(log_q, any.missing = FALSE, len = length(log_p))

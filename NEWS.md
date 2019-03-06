@@ -1,10 +1,14 @@
-# loo 2.0.0.9000
+# loo 2.1.0
 
 * New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
+* New vignette on "leave-future-out" cross-validation for time series models. (#90)
+
+* New glossary page (use `help("loo-glossary")`) with definitions of key terms. (#81)
+
 * New `se_diff` column in model comparison results. (#78)
 
-* Improved behavior of `psis()` when `log_ratios` are very small. (#74)
+* Improved stability of `psis()` when `log_ratios` are very small. (#74)
 
 * Allow `r_eff=NA` to suppress warning when specifying `r_eff` is not applicable 
 (i.e., draws not from MCMC). (#72)
