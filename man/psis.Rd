@@ -6,6 +6,7 @@
 \alias{psis.matrix}
 \alias{psis.default}
 \alias{weights.psis}
+\alias{is.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
 psis(log_ratios, ...)
@@ -19,6 +20,8 @@ psis(log_ratios, ...)
 \method{psis}{default}(log_ratios, ..., r_eff = NULL)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
+
+is.psis(x)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
@@ -59,6 +62,8 @@ the log scale? Defaults to \code{TRUE}.}
 
 \item{normalize}{For the \code{weights} method, should the weights be
 normalized? Defaults to \code{TRUE}.}
+
+\item{x}{For \code{is.psis}, an object to check.}
 }
 \value{
 The \code{psis} methods return an object of class \code{"psis"},

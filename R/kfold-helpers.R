@@ -1,16 +1,15 @@
 #' Helper functions for K-fold cross-validation
 #'
-#' These functions can be used to generate indexes for use with K-fold
-#' cross-validation.
+#' @description These functions can be used to generate indexes for use with
+#'   K-fold cross-validation. See the \strong{Details} section for explanations.
 #'
 #' @name kfold-helpers
 #' @param K The number of folds to use.
 #' @param N The number of observations in the data.
 #' @param x A discrete variable of length \code{N} with at least \code{K} levels
 #'   (unique values). Will be coerced to \code{\link{factor}}.
-#'   .
-#' @return An integer vector of length \code{N} where each element is an index
-#'   in \code{1:K}.
+#' 
+#' @return An integer vector of length \code{N} where each element is an index in \code{1:K}.
 #'
 #' @details
 #' \code{kfold_split_random} splits the data into \code{K} groups

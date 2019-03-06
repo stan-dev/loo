@@ -60,6 +60,7 @@
 #' }
 #'
 compare <- function(..., x = list()) {
+  # .Deprecated("loo_compare")
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {
@@ -87,6 +88,7 @@ compare <- function(..., x = list()) {
     loo1 <- dots[[1]]
     loo2 <- dots[[2]]
     comp <- compare_two_models(loo1, loo2)
+    class(comp) <- c(class(comp), "old_compare.loo")
     return(comp)
   } else {
     Ns <- sapply(dots, function(x) nrow(x$pointwise))
@@ -115,27 +117,9 @@ compare <- function(..., x = list()) {
     se_diff <- apply(diffs, 2, se_elpd_diff)
     comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
     rownames(comp) <- rnms
-    class(comp) <- c("compare.loo", class(comp))
+    class(comp) <- c("compare.loo", class(comp), "old_compare.loo")
     comp
   }
-}
-
-#' @rdname compare
-#' @export
-#' @param digits For the print method only, the number of digits to use when
-#'   printing.
-#' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed when comparing more than two models? The
-#'   entire matrix is always returned, but by default only the most important
-#'   columns are printed.
-print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
-  xcopy <- x
-  if (NCOL(xcopy) >= 2 && simplify) {
-    patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
-    xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
-  }
-  print(.fr(xcopy, digits), quote = FALSE)
-  invisible(x)
 }
 
 
@@ -153,15 +137,4 @@ compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), chec
   diffs <- elpd_diffs(loo_a, loo_b)
   comp <- c(elpd_diff = sum(diffs), se = se_elpd_diff(diffs))
   structure(comp, class = "compare.loo")
-}
-
-elpd_diffs <- function(loo_a, loo_b) {
-  pt_a <- loo_a$pointwise
-  pt_b <- loo_b$pointwise
-  elpd <- grep("^elpd", colnames(pt_a))
-  pt_b[, elpd] - pt_a[, elpd]
-}
-se_elpd_diff <- function(diffs) {
-  N <- length(diffs)
-  sqrt(N) * sd(diffs)
 }

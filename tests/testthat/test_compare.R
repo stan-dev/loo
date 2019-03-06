@@ -2,7 +2,7 @@ library(loo)
 set.seed(123)
 SW <- suppressWarnings
 
-context("compare")
+context("compare models")
 
 LLarr <- example_loglik_array()
 LLarr2 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 0.5), dim = dim(LLarr))
@@ -10,43 +10,96 @@ LLarr3 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 1), dim = dim(LLarr))
 w1 <- SW(waic(LLarr))
 w2 <- SW(waic(LLarr2))
 
-test_that("compare throws appropriate errors", {
+
+test_that("loo_compare throws appropriate errors", {
   w3 <- SW(waic(LLarr[,, -1]))
   w4 <- SW(waic(LLarr[,, -(1:2)]))
 
-  expect_error(loo::compare(w1, w2, x = list(w1, w2)),
-               regexp = "If 'x' is specified then '...' should not be specified")
-  expect_error(loo::compare(w1, list(1,2,3)),
+  expect_error(loo_compare(w1, w2, x = list(w1, w2)),
+               regexp = "If 'x' is a list then '...' should not be specified")
+  expect_error(loo_compare(w1, list(1,2,3)),
                regexp = "class 'loo'")
-  expect_error(loo::compare(w1),
+  expect_error(loo_compare(w1),
                regexp = "requires at least two models")
-  expect_error(loo::compare(x = list(w1)),
+  expect_error(loo_compare(x = list(w1)),
                regexp = "requires at least two models")
-  expect_error(loo::compare(w1, w3),
+  expect_error(loo_compare(w1, w3),
                regexp = "same number of data points")
-  expect_error(loo::compare(w1, w2, w3),
+  expect_error(loo_compare(w1, w2, w3),
                regexp = "same number of data points")
-  expect_silent(loo::compare(w1, w2))
-  expect_silent(loo::compare(w1, w1, w2))
 })
 
+
+
+comp_colnames <- c(
+  "elpd_diff", "se_diff", "elpd_waic", "se_elpd_waic",
+  "p_waic", "se_p_waic", "waic", "se_waic"
+)
+
+test_that("loo_compare returns expected results (2 models)", {
+  comp1 <- loo_compare(w1, w1)
+  expect_s3_class(comp1, "compare.loo")
+  expect_equal(colnames(comp1), comp_colnames)
+  expect_equal(rownames(comp1), c("model1", "model2"))
+  expect_output(print(comp1), "elpd_diff")
+  expect_equivalent(comp1[1:2,1], c(0, 0))
+  expect_equivalent(comp1[1:2,2], c(0, 0))
+
+  comp2 <- loo_compare(w1, w2)
+  expect_s3_class(comp2, "compare.loo")
+  expect_equal_to_reference(comp2, "loo_compare_two_models.rds")
+  expect_equal(colnames(comp2), comp_colnames)
+
+  # specifying objects via ... and via arg x gives equal results
+  expect_equal(comp2, loo_compare(x = list(w1, w2)))
+})
+
+
+test_that("loo_compare returns expected result (3 models)", {
+  w3 <- SW(waic(LLarr3))
+  comp1 <- loo_compare(w1, w2, w3)
+
+  expect_equal(colnames(comp1), comp_colnames)
+  expect_equal(rownames(comp1), c("model1", "model2", "model3"))
+  expect_equal(comp1[1,1], 0)
+  expect_s3_class(comp1, "compare.loo")
+  expect_s3_class(comp1, "matrix")
+  expect_equal_to_reference(comp1, "loo_compare_three_models.rds")
+
+  # specifying objects via '...' gives equivalent results (equal
+  # except rownames) to using 'x' argument
+  expect_equivalent(comp1, loo_compare(x = list(w1, w2, w3)))
+})
+
+# Tests for deprecated compare() ------------------------------------------
+
+# test_that("compare throws deprecation warnings", {
+#   expect_warning(loo::compare(w1, w2), "Deprecated")
+#   expect_warning(loo::compare(w1, w1, w2), "Deprecated")
+# })
+
 test_that("compare returns expected result (2 models)", {
-  comp1 <- compare(w1, w1)
+  comp1 <- loo::compare(w1, w1)
+  # comp1 <- expect_warning(loo::compare(w1, w1), "Deprecated")
   expect_output(print(comp1), "elpd_diff")
   expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
 
-  comp2 <- compare(w1, w2)
+  comp2 <- loo::compare(w1, w2)
+  # comp2 <- expect_warning(loo::compare(w1, w2), "Deprecated")
   expect_equal_to_reference(comp2, "compare_two_models.rds")
   expect_named(comp2, c("elpd_diff", "se"))
   expect_s3_class(comp2, "compare.loo")
 
   # specifying objects via ... and via arg x gives equal results
-  expect_equal(comp2, compare(x = list(w1, w2)))
+  comp_via_list <- loo::compare(x = list(w1, w2))
+  # comp_via_list <- expect_warning(loo::compare(x = list(w1, w2)), "Deprecated")
+  expect_equal(comp2, comp_via_list)
 })
 
 test_that("compare returns expected result (3 models)", {
   w3 <- SW(waic(LLarr3))
-  comp1 <- compare(w1, w2, w3)
+  comp1 <- loo::compare(w1, w2, w3)
+  # comp1 <- expect_warning(loo::compare(w1, w2, w3), "Deprecated")
 
   expect_equal(
     colnames(comp1),
@@ -62,5 +115,7 @@ test_that("compare returns expected result (3 models)", {
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
-  expect_equivalent(comp1, compare(x = list(w1, w2, w3)))
+  comp_via_list <- loo::compare(x = list(w1, w2, w3))
+  # comp_via_list <- expect_warning(loo::compare(x = list(w1, w2, w3)), "Deprecated")
+  expect_equivalent(comp1, comp_via_list)
 })

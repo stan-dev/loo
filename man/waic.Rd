@@ -5,6 +5,7 @@
 \alias{waic.array}
 \alias{waic.matrix}
 \alias{waic.function}
+\alias{is.waic}
 \title{Widely applicable information criterion (WAIC)}
 \usage{
 waic(x, ...)
@@ -14,6 +15,8 @@ waic(x, ...)
 \method{waic}{matrix}(x, ...)
 
 \method{waic}{function}(x, ..., data = NULL, draws = NULL)
+
+is.waic(x)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods

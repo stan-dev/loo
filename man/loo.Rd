@@ -6,6 +6,8 @@
 \alias{loo.matrix}
 \alias{loo.function}
 \alias{loo_i}
+\alias{is.loo}
+\alias{is.psis_loo}
 \title{Efficient approximate leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
@@ -20,6 +22,10 @@ loo(x, ...)
   save_psis = FALSE, cores = getOption("mc.cores", 1))
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
+
+is.loo(x)
+
+is.psis_loo(x)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods

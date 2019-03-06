@@ -170,6 +170,13 @@ dim.psis <- function(x) {
   attr(x, "dims")
 }
 
+#' @rdname psis
+#' @export
+#' @param x For \code{is.psis}, an object to check.
+is.psis <- function(x) {
+  inherits(x, "psis") && is.list(x)
+}
+
 
 # internal ----------------------------------------------------------------
 
