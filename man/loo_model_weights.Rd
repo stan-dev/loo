@@ -10,11 +10,12 @@
 loo_model_weights(x, ...)
 
 \method{loo_model_weights}{default}(x, ..., method = c("stacking",
-  "pseudobma"), optim_method = "BFGS", optim_control = list(), BB = TRUE,
-  BB_n = 1000, alpha = 1, r_eff_list = NULL,
+  "pseudobma"), optim_method = "BFGS", optim_control = list(),
+  BB = TRUE, BB_n = 1000, alpha = 1, r_eff_list = NULL,
   cores = getOption("mc.cores", 1))
 
-stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
+stacking_weights(lpd_point, optim_method = "BFGS",
+  optim_control = list())
 
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
@@ -209,7 +210,7 @@ Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
 }
 \seealso{
 \itemize{
-\item The \pkg{loo} package vignettes for demonstrations.
+\item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
 \item \code{\link{loo}} for details on leave-one-out ELPD estimation.
 \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
 \item \code{\link{relative_eff}} for computing \code{r_eff}.

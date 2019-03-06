@@ -18,8 +18,8 @@ loo(x, ...)
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
   cores = getOption("mc.cores", 1))
 
-\method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  save_psis = FALSE, cores = getOption("mc.cores", 1))
+\method{loo}{function}(x, ..., data = NULL, draws = NULL,
+  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1))
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
 
@@ -286,7 +286,7 @@ importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
 \itemize{
- \item The \pkg{loo} package vignettes for demonstrations.
+ \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at

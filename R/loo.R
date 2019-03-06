@@ -19,7 +19,7 @@
 #'   will be over-optimistic. If the posterior draws are independent then
 #'   \code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
 #'   helper function for computing \code{r_eff}.
-#' 
+#'
 #' @param save_psis Should the \code{"psis"} object created internally by
 #'   \code{loo} be saved in the returned object? The \code{loo} function calls
 #'   \code{\link{psis}} internally but by default discards the (potentially
@@ -81,7 +81,7 @@
 #'
 #' @seealso
 #' \itemize{
-#'  \item The \pkg{loo} package vignettes for demonstrations.
+#'  \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
 #'  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
 #'  Sampling (PSIS) procedure used in the LOO-CV approximation.
 #'  \item \link{pareto-k-diagnostic} for convenience functions for looking at

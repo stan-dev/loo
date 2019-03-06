@@ -69,7 +69,7 @@
 #'
 #' @seealso
 #' \itemize{
-#' \item The \pkg{loo} package vignettes for demonstrations.
+#' \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
 #' \item \code{\link{loo}} for details on leave-one-out ELPD estimation.
 #' \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
 #' \item \code{\link{relative_eff}} for computing \code{r_eff}.
