@@ -40,12 +40,14 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5)))
+  if (length(pareto_k_ids(x, threshold = 0.5))) {
     cat("\n")
+  }
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
-  if (plot_k)
+  if (plot_k) {
     plot(x, ...)
+  }
   invisible(x)
 }
 
@@ -56,8 +58,9 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print_dims(x)
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
-  if (plot_k)
+  if (plot_k) {
     plot(x, ...)
+  }
   invisible(x)
 }
 
@@ -129,10 +132,10 @@ print_mcse_summary <- function(x, digits) {
 .k_help <- function() "See help('pareto-k-diagnostic') for details.\n"
 
 # compatibility with old loo objects
-convert_old_object <- function(x, digits = 1, ...) { # nocov start
+convert_old_object <- function(x, digits = 1, ...) {
   z <- x[-grep("pointwise|pareto_k|n_eff", names(x))]
   uz <- unlist(z)
   nms <- names(uz)
   ses <- grepl("se", nms)
   list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
-} # nocov end
+}

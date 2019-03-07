@@ -1,6 +1,6 @@
 ---
 title: "Approximate leave-future-out cross-validation for time series models"
-author: Paul Bürkner, Aki Vehtari, Jonah Gabry
+author: "Paul Bürkner, Aki Vehtari, Jonah Gabry"
 date: "`r Sys.Date()`"
 output:
   html_vignette:

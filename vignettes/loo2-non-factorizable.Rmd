@@ -1,10 +1,11 @@
 ---
 title: "Leave-one-out cross-validation for non-factorizable models"
-author: "Aki Vehtari, Paul Buerkner and Jonah Gabry"
+author: "Aki Vehtari, Paul Bürkner and Jonah Gabry"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
     toc: yes
+encoding: "UTF-8"
 params:
   EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 ---

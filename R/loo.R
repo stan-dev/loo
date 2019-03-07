@@ -364,6 +364,7 @@ loo_i <-
     )
   }
 
+
 # Function that is passed to the FUN argument of lapply, mclapply, or parLapply
 # for the loo.function method. The arguments and return value are the same as
 # the ones documented above for the user-facing loo_i function.

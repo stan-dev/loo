@@ -84,7 +84,7 @@ loo_compare.default <- function(x, ...) {
 
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
-    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
+    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
   })
 
   colnames(tmp) <- find_model_names(loos)
@@ -133,12 +133,20 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
 
 
 # internal ----------------------------------------------------------------
+
+#' Compute pointwise elpd differences
+#' @noRd
+#' @param loo_a,loo_b Two loo objects.
 elpd_diffs <- function(loo_a, loo_b) {
   pt_a <- loo_a$pointwise
   pt_b <- loo_b$pointwise
   elpd <- grep("^elpd", colnames(pt_a))
   pt_b[, elpd] - pt_a[, elpd]
 }
+
+#' Compute standard error of the elpd difference
+#' @noRd
+#' @param diffs Vector of pointwise elpd differences
 se_elpd_diff <- function(diffs) {
   N <- length(diffs)
   sqrt(N) * sd(diffs)
