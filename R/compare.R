@@ -1,6 +1,7 @@
 #' Model comparison
 #'
-#' Compare fitted models on LOO or WAIC.
+#' \strong{This function will be deprecated in a future release}. We
+#' recommend using the new \code{\link{loo_compare}} function instead.
 #'
 #' @export
 #' @param ... At least two objects returned by \code{\link{loo}} (or

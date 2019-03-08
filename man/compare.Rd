@@ -23,7 +23,8 @@ A vector or matrix with class \code{'compare.loo'} that has its own
   \strong{Details}).
 }
 \description{
-Compare fitted models on LOO or WAIC.
+\strong{This function will be deprecated in a future release}. We
+recommend using the new \code{\link{loo_compare}} function instead.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
