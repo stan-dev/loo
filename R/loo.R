@@ -134,11 +134,11 @@
 #'
 #' # Use the loo_i function to check that llfun works on a single observation
 #' # before running on all obs. For example, using the 3rd obs in the data:
-#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
+#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
 #' print(loo_3$pointwise[, "elpd_loo"])
 #'
 #' # Use loo.function method
-#' loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
+#' loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
 #'
 #' # If we look at the elpd_loo contribution from the 3rd obs it should be the
 #' # same as what we got above with the loo_i function and i=3:
@@ -149,7 +149,7 @@
 #' log_lik_matrix <- sapply(1:N, function(i) {
 #'   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 #' })
-#' loo_with_mat <- loo(log_lik_matrix)
+#' loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
 #' all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 #'
 #'

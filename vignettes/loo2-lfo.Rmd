@@ -15,7 +15,7 @@ params:
 %\VignetteIndexEntry{Approximate leave-future-out cross-validation for time series models}
 -->
 
-```{r, child="children/SETTINGS-knitr.txt"}
+```{r settings, child="children/SETTINGS-knitr.txt"}
 ```
 
 ```{r more-knitr-ops, include=FALSE}
@@ -235,7 +235,7 @@ set.seed(SEED)
 Before fitting a model, we will first put the data into a data frame and then
 look at the time series.
 
-```{r}
+```{r hurondata}
 N <- length(LakeHuron)
 df <- data.frame(
   y = as.numeric(LakeHuron),
@@ -277,7 +277,7 @@ fit <- brm(
 The model implied predictions along with the observed values can be plotted,
 which reveals a rather good fit to the data.
 
-```{r, cache = FALSE}
+```{r plotpreds, cache = FALSE}
 preds <- posterior_predict(fit)
 preds <- cbind(
   Estimate = colMeans(preds), 
@@ -295,7 +295,7 @@ ggplot(cbind(df, preds), aes(x = year, y = Estimate)) +
 To allow for reasonable predictions of future values, we will require at least
 $L = 20$ historical observations (20 years) to make predictions.
 
-```{r}
+```{r setL}
 L <- 20
 ```
 
@@ -303,7 +303,7 @@ We first perform approximate leave-one-out cross-validation (LOO-CV) for the
 purpose of later comparison with exact and approximate LFO-CV for the 1-SAP
 case.
 
-```{r, cache = FALSE}
+```{r loo1sap, cache = FALSE}
 loo_cv <- loo(log_lik(fit)[, (L + 1):N])
 print(loo_cv)
 ```
@@ -331,7 +331,7 @@ for (i in N:max(L + 1, 2)) {
 
 Then we compute the exact expected log predictive density (ELPD):
 
-```{r}
+```{r helpers}
 # some helper functions we'll use throughout
 
 # more stable than log(sum(exp(x))) 
@@ -359,7 +359,7 @@ rbind_print <- function(...) {
 ```
 
 
-```{r, cache = FALSE}
+```{r exact1sap, cache = FALSE}
 exact_elpds_1sap <- apply(loglik_exact, 2, log_mean_exp)
 exact_elpd_1sap <- c(ELPD = sum(exact_elpds_1sap[-(1:L)]))
 
@@ -417,14 +417,14 @@ plot_ks <- function(ks, ids, thres = 0.6) {
 }
 ```
 
-```{r, cache = FALSE}
+```{r plotk1sap, cache = FALSE}
 plot_ks(ks, ids)
 ```
 
 Consequently, it is not surprising that the resulting approximate ELPD for 1-SAP 
 is far away from the exact ELPD we computed above:
 
-```{r, cache = FALSE}
+```{r compare1sap, cache = FALSE}
 approx_elpd_1sap_no_refit <- 
   c(ELPD = sum(approx_elpds_1sap_no_refit, na.rm = TRUE))
 rbind_print(
@@ -436,7 +436,7 @@ rbind_print(
 Next, we compute approximate 1-SAP with refit at observations where 
 the Pareto $k$ estimate exceeds the threshold of $0.6$.
 
-```{r}
+```{r setkthresh}
 k_thres <- 0.6
 ```
 
@@ -475,10 +475,13 @@ for (i in ids) {
 ```
 
 We see that the final Pareto-$k$-estimates are mostly well below the threshold
-of `r k_thres` and that we only needed to refit the model `r length(refits)` times at
-observations `r refits`.
+and that we only needed to refit the model a few times:
 
-```{r, cache=FALSE}
+```{r refitsummary1sap, cache=FALSE}
+cat("Using threshold ", k_thresh, 
+    ", model was refit ", length(refits), 
+    " times, at observations", refits)
+
 plot_ks(ks, ids)
 ```
 
@@ -486,7 +489,7 @@ The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP ELPD
 computed above, which indicates our algorithm to compute approximate 1-SAP
 worked well for the present data and model.
 
-```{r, cache = FALSE}
+```{r lfosummary1sap, cache = FALSE}
 approx_elpd_1sap <- sum(approx_elpds_1sap, na.rm = TRUE)
 rbind_print(
   "approx LFO (no refits)" = approx_elpd_1sap_no_refit,
@@ -499,7 +502,7 @@ Plotting exact against approximate predictions, we see that no approximation
 value deviates far from its exact counterpart, providing further evidence for
 the good quality of our approximation.
 
-```{r, cache = FALSE}
+```{r plot1sap, cache = FALSE}
 dat_elpd <- data.frame(
   approx_elpd = approx_elpds_1sap,
   exact_elpd = exact_elpds_1sap
@@ -511,14 +514,19 @@ ggplot(dat_elpd, aes(x = approx_elpd, y = exact_elpd)) +
   labs(x = "Approximate ELPDs", y = "Exact ELPDs")
 ```
 
-```{r, echo=FALSE}
+We can also look at the maximum difference and average difference between
+the approximate and exact ELPD calculations, which also indicate a ver close approximation:
+
+```{r diffs1sap}
 max_diff <- with(dat_elpd, max(abs(approx_elpd - exact_elpd), na.rm = TRUE))
 mean_diff <- with(dat_elpd, mean(abs(approx_elpd - exact_elpd), na.rm = TRUE))
+
+rbind_print(
+  "Max diff" = round(max_diff, 2), 
+  "Mean diff" =  round(mean_diff, 3)
+)
 ```
 
-No observation shows a difference between the exact and approximate ELPD
-calculations of more than `r round(max_diff, 2)` and the average difference is
-`r round(mean_diff, 3)`, resulting in a close approximation.
 
 ## $M$-step-ahead predictions leaving out all future values
 
@@ -544,7 +552,7 @@ for (i in (N - M + 1):max(L + 1, 2)) {
 }
 ```
 
-```{r, cache = FALSE}
+```{r exact4sap, cache = FALSE}
 exact_elpds_4sap <- apply(loglikm, 2, log_mean_exp)
 (exact_elpd_4sap <- c(ELPD = sum(exact_elpds_4sap, na.rm = TRUE)))
 ```
@@ -595,17 +603,20 @@ for (i in ids) {
 ```
 
 Again, we see that the final Pareto-$k$-estimates are mostly well below the
-threshold and that we only needed to refit the model `r length(refits)` times at
-observations `r refits`.
+threshold and that we only needed to refit the model a few times: 
 
-```{r, cache = FALSE}
+```{r refitsummary4sap, cache = FALSE}
+cat("Using threshold ", k_thresh, 
+    ", model was refit ", length(refits), 
+    " times, at observations", refits)
+
 plot_ks(ks, ids)
 ```
 
 The approximate ELPD computed for the 4-SAP case is not as close to its exact
 counterpart as in the 1-SAP case.
 
-```{r, cache = FALSE}
+```{r lfosummary4sap, cache = FALSE}
 approx_elpd_4sap <- sum(approx_elpds_4sap, na.rm = TRUE)
 rbind_print(
   "Approx LFO" = approx_elpd_4sap,
@@ -617,7 +628,7 @@ Plotting exact against approximate pointwise predictions confirms that, for a
 few specific data points, the approximate predictions underestimate the exact
 predictions.
 
-```{r, cache = FALSE}
+```{r plot4sap, cache = FALSE}
 dat_elpd_4sap <- data.frame(
   approx_elpd = approx_elpds_4sap,
   exact_elpd = exact_elpds_4sap
@@ -643,7 +654,7 @@ many times. For more details on approximate LFO-CV, we refer to Bürkner et al. 
 
 Bürkner P. C., Gabry J., & Vehtari A. (2019). Approximate leave-future-out cross-validation for time series models. [ArXiv preprint](https://arxiv.org/abs/1902.06281). 
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
 
@@ -653,7 +664,7 @@ Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. 
 
 ### Appendix: Session information
 
-```{r}
+```{r sessioninfo}
 sessionInfo()
 ```
 

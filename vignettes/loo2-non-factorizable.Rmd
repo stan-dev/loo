@@ -13,7 +13,7 @@ params:
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Leave-one-out cross-validation for non-factorizable models}
 -->
-```{r, child="children/SETTINGS-knitr.txt"}
+```{r settings, child="children/SETTINGS-knitr.txt"}
 ```
 ```{r more-knitr-ops, include=FALSE}
 knitr::opts_chunk$set(
@@ -284,7 +284,7 @@ In addition to the **loo** package, for this analysis we will use the **brms**
 interface to Stan to generate a Stan program and fit the model, and also the
 **bayesplot** and **ggplot2** packages for plotting.
 
-```{r, cache=FALSE}
+```{r setup, cache=FALSE}
 library("loo")
 library("brms")
 library("bayesplot")
@@ -307,7 +307,7 @@ households in the neighbood
 * `HOVAL`: housing value in units of $1000 USD 
 * `INC`: household income in units of $1000 USD
 
-```{r}
+```{r data}
 str(COL.OLD[, c("CRIME", "HOVAL", "INC")])
 ```
 
@@ -353,7 +353,7 @@ After fitting the model, the next step is to compute the pointwise
 log-likelihood values needed for approximate LOO-CV. To do this we will 
 use the recipe laid out in the previous sections.
 
-```{r}
+```{r approx}
 posterior <- as.data.frame(fit)
 y <- fit$data$CRIME
 N <- length(y)
@@ -384,14 +384,14 @@ of $0.7$ (Vehtari et al, 2017ab). In the plot below, we see that the fourth
 observation is problematic and so may reduce the accuracy of the LOO-CV
 approximation.
 
-```{r, cache = FALSE}
+```{r plot, cache = FALSE}
 plot(psis_result, label_points = TRUE)
 ```
 
 We can also check that the conditional leave-one-out predictive distribution
 equations work correctly, for instance, using the last posterior draw:
 
-```{r, cache = FALSE}
+```{r checklast, cache = FALSE}
 yloo_sub <- yloo[S, ]
 sdloo_sub <- sdloo[S, ]
 df <- data.frame(
@@ -414,7 +414,7 @@ Finally, we use PSIS-LOO to approximate the expected log predictive density
 (ELPD) for new data, which we will validate using exact LOO-CV in the upcoming
 section.
 
-```{r}
+```{r psisloo}
 (psis_loo <- loo(loglik))
 ```
 
@@ -510,7 +510,7 @@ we would expect if there were no problematic observations. We can investigate
 this issue more closely by plotting the approximate against the exact pointwise
 ELPD values.
 
-```{r, fig.height=5}
+```{r compare, fig.height=5}
 df <- data.frame(
   approx_elpd = psis_loo$pointwise[, "elpd_loo"],
   exact_elpd = exact_elpds
@@ -531,7 +531,7 @@ is strong. In fact, summing over the pointwise ELPD values and leaving out the
 fourth observation yields practically equivalent results for approximate and
 exact LOO-CV:
 
-````{r}
+````{r pt4}
 without_pt_4 <- c(
   approx = sum(psis_loo$pointwise[-4, "elpd_loo"]),
   exact = sum(exact_elpds[-4])  
@@ -674,6 +674,6 @@ Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyper
 
 Vehtari A., Mononen T., Tolvanen V., Sivula T., & Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. *Journal of Machine Learning Research*, 17(103), 1--38. [Online](http://jmlr.org/papers/v17/14-540.html).
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
