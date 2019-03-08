@@ -137,7 +137,7 @@
 #' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
 #' print(loo_3$pointwise[, "elpd_loo"])
 #'
-#' # Use loo.function method
+#' # Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
 #' loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
 #'
 #' # If we look at the elpd_loo contribution from the 3rd obs it should be the

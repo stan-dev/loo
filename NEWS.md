@@ -1,5 +1,8 @@
 # loo 2.1.0
 
+* New function `loo_compare()` for model comparison that will eventually replace
+the existing `compare()` function. (#93)
+
 * New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
 * New vignette on "leave-future-out" cross-validation for time series models. (#90)
