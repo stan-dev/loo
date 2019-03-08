@@ -478,7 +478,7 @@ We see that the final Pareto-$k$-estimates are mostly well below the threshold
 and that we only needed to refit the model a few times:
 
 ```{r refitsummary1sap, cache=FALSE}
-cat("Using threshold ", k_thresh, 
+cat("Using threshold ", k_thres, 
     ", model was refit ", length(refits), 
     " times, at observations", refits)
 
@@ -606,7 +606,7 @@ Again, we see that the final Pareto-$k$-estimates are mostly well below the
 threshold and that we only needed to refit the model a few times: 
 
 ```{r refitsummary4sap, cache = FALSE}
-cat("Using threshold ", k_thresh, 
+cat("Using threshold ", k_thres, 
     ", model was refit ", length(refits), 
     " times, at observations", refits)
 
