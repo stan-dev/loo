@@ -111,7 +111,7 @@ fixes and additional unit tests. Highlights:
 
 * Don't call functions from __parallel__ package if `cores=1`.
 * Return entire vector/matrix of smoothed weights rather than a summary statistic when `psislw` function is called in an interactive session.
-* [Test coverage > 80%](https://codecov.io/github/jgabry/loo?branch=master)
+* Test coverage > 80%
 
 # loo 0.1.3
 This update provides several important improvements, most notably an alternative
