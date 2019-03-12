@@ -62,7 +62,7 @@ observations have Pareto \eqn{k} estimates above \code{threshold}.
 \code{psis_n_eff_values} returns a vector of the estimated PSIS
   effective sample sizes.
 
-\code{mcse_loo} returns the Monte carlo standard error (MCSE)
+\code{mcse_loo} returns the Monte Carlo standard error (MCSE)
   estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
   above \code{threshold}.
 

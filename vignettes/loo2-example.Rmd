@@ -116,7 +116,7 @@ We start by computing PSIS-LOO with the `loo` function. Since we fit our model
 using __rstanarm__ we can use the `loo` method for `stanreg` objects (fitted
 model objects from __rstanarm__), which doesn't require us to first extract the
 pointwise log-likelihood values. If we had written our own Stan program instead
-of using __rstanarm__ we would pass an array or matrix of log-liklihood values
+of using __rstanarm__ we would pass an array or matrix of log-likelihood values
 to the `loo` function (see, e.g. `help("loo.array", package = "loo")`). We'll
 also use the argument `save_psis = TRUE` to save some intermediate results to be
 re-used later.

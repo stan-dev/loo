@@ -537,7 +537,7 @@ approximate LFO-CV for the 4-SAP case.
 
 The necessary steps are the same as for 1-SAP with the exception that the
 log-density values of interest are now the sums of the log predictive densities
-of four consequtive observations. Further, the stability of the PSIS
+of four consecutive observations. Further, the stability of the PSIS
 approximation actually stays the same for all $M$ as it only depends on the
 number of observations we leave out, not on the number of observations we
 predict.
@@ -645,14 +645,14 @@ ggplot(dat_elpd_4sap, aes(x = approx_elpd, y = exact_elpd)) +
 In this case study we have shown how to do carry out exact and approximate
 leave-future-out cross-validation for $M$-step-ahead prediction tasks. For the
 data and model used in our example, the PSIS-LFO-CV algorithm provides reasonably
-stable and accurate results depite not requiring us to refit the model nearly as
+stable and accurate results despite not requiring us to refit the model nearly as
 many times. For more details on approximate LFO-CV, we refer to Bürkner et al. (2019).
 
 <br />
 
 ## References
 
-Bürkner P. C., Gabry J., & Vehtari A. (2019). Approximate leave-future-out cross-validation for time series models. [ArXiv preprint](https://arxiv.org/abs/1902.06281). 
+Bürkner P. C., Gabry J., & Vehtari A. (2019). Approximate leave-future-out cross-validation for time series models. [arXiv preprint](https://arxiv.org/abs/1902.06281). 
 
 Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 

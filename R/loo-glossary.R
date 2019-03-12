@@ -25,7 +25,7 @@
 #'
 #' As \code{elpd_loo} is defined as the sum of N independent components (Eq 4 in
 #' VGG2017a), we can compute the standard error by using the standard deviation
-#' of the N components and multipling by \code{sqrt(N)} (Eq 23 in VGG2017a).
+#' of the N components and multiplying by \code{sqrt(N)} (Eq 23 in VGG2017a).
 #' This standard error is a coarse description of our uncertainty about the
 #' predictive performance for unknown future data. When N is small or there is
 #' severe model misspecification, the current SE estimate is overoptimistic and
