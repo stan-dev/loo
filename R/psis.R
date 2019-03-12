@@ -170,6 +170,13 @@ dim.psis <- function(x) {
   attr(x, "dims")
 }
 
+#' @rdname psis
+#' @export
+#' @param x For \code{is.psis}, an object to check.
+is.psis <- function(x) {
+  inherits(x, "psis") && is.list(x)
+}
+
 
 # internal ----------------------------------------------------------------
 
@@ -446,14 +453,14 @@ throw_tail_length_warnings <- function(tail_lengths) {
 #'   but some of the values are \code{NA} then an error is thrown.
 #'
 prepare_psis_r_eff <- function(r_eff, len) {
-  if (isTRUE(is.null(r_eff) || is.na(r_eff))) {
+  if (isTRUE(is.null(r_eff) || all(is.na(r_eff)))) {
     if (!called_from_loo() && is.null(r_eff)) {
       throw_psis_r_eff_warning()
     }
     r_eff <- rep(1, len)
   } else if (length(r_eff) != len) {
     stop("'r_eff' must have one value per observation.", call. = FALSE)
-  } else if (any(is.na(r_eff))) {
+  } else if (anyNA(r_eff)) {
     stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
   }
   return(r_eff)

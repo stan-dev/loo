@@ -104,7 +104,7 @@ beta[2] -0.89       0 0.10 -1.09 -0.96 -0.89 -0.82 -0.68  2048    1
 beta[3]  0.46       0 0.04  0.38  0.43  0.46  0.49  0.54  2198    1
 ```
 
-## Computing approximate leave-one-out cross-validation usig PSIS-LOO
+## Computing approximate leave-one-out cross-validation using PSIS-LOO
 
 We can then use the **loo** package to compute the efficient PSIS-LOO
 approximation to exact LOO-CV:

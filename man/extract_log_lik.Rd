@@ -4,7 +4,8 @@
 \alias{extract_log_lik}
 \title{Extract pointwise log-likelihood from a Stan model}
 \usage{
-extract_log_lik(stanfit, parameter_name = "log_lik", merge_chains = TRUE)
+extract_log_lik(stanfit, parameter_name = "log_lik",
+  merge_chains = TRUE)
 }
 \arguments{
 \item{stanfit}{A \code{stanfit} object (\pkg{rstan} package).}

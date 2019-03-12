@@ -6,6 +6,8 @@
 \alias{loo.matrix}
 \alias{loo.function}
 \alias{loo_i}
+\alias{is.loo}
+\alias{is.psis_loo}
 \title{Efficient approximate leave-one-out cross-validation (LOO)}
 \usage{
 loo(x, ...)
@@ -16,10 +18,14 @@ loo(x, ...)
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
   cores = getOption("mc.cores", 1))
 
-\method{loo}{function}(x, ..., data = NULL, draws = NULL, r_eff = NULL,
-  save_psis = FALSE, cores = getOption("mc.cores", 1))
+\method{loo}{function}(x, ..., data = NULL, draws = NULL,
+  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1))
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
+
+is.loo(x)
+
+is.psis_loo(x)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
@@ -29,10 +35,12 @@ inputs for each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling. If \code{r_eff} is not provided then
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. See the \code{\link{relative_eff}} helper function
-for computing \code{r_eff}.}
+will be over-optimistic. If the posterior draws are independent then
+\code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
+helper function for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo} be saved in the returned object? The \code{loo} function calls
@@ -49,7 +57,10 @@ the option \code{mc.cores} which can be set for an entire R session by
 deprecated but will be given precedence over \code{mc.cores} until
 \code{loo.cores} is removed in a future release. \strong{As of version
 2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
-recommend using as many (or close to as many) cores as possible.}}
+recommend using as many (or close to as many) cores as possible.}
+Note for Windows 10 users: it is recommended to avoid using the
+\code{.Rprofile} file to set \code{mc.cores} (using the \code{cores}
+argument or setting \code{mc.cores} interactively or in a script is fine).}
 
 \item{data, draws, ...}{For the \code{loo} function method and the \code{loo_i}
 function, the data, posterior draws, and other arguments to pass to the
@@ -213,11 +224,11 @@ llfun <- function(data_i, draws) {
 
 # Use the loo_i function to check that llfun works on a single observation
 # before running on all obs. For example, using the 3rd obs in the data:
-loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
+loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
 print(loo_3$pointwise[, "elpd_loo"])
 
-# Use loo.function method
-loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
+# Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
+loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
 
 # If we look at the elpd_loo contribution from the 3rd obs it should be the
 # same as what we got above with the loo_i function and i=3:
@@ -228,7 +239,7 @@ print(loo_3$pointwise[, "elpd_loo"])
 log_lik_matrix <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(log_lik_matrix)
+loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
 
@@ -267,15 +278,15 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
 \itemize{
- \item The \pkg{loo} package vignettes for demonstrations.
+ \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at

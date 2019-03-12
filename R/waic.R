@@ -121,6 +121,12 @@ dim.waic <- function(x) {
   attr(x, "dims")
 }
 
+#' @rdname waic
+#' @export
+is.waic <- function(x) {
+  inherits(x, "waic") && is.loo(x)
+}
+
 
 # internal ----------------------------------------------------------------
 

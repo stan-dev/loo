@@ -10,6 +10,7 @@ loo.Rproj
 .Rproj.user/
 .Rproj.user
 # produced vignettes
+vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*
 vignettes/*.html
 vignettes/*.pdf
@@ -20,3 +21,4 @@ revdep/*
 tests/testthat/Rplots.pdf
 
 cran-comments.md
+CRAN-RELEASE

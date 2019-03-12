@@ -1,14 +1,24 @@
-# loo 2.0.0.9000
+# loo 2.1.0
+
+* New function `loo_compare()` for model comparison that will eventually replace
+the existing `compare()` function. (#93)
 
 * New vignette on LOO for non-factorizable joint Gaussian models. (#75)
 
-* When comparing more than two models with `compare()` there is now also 
-an `se_diff` column in the results. The printed output (the returned object) 
-from `compare()` has also been simplified. (#78)
+* New vignette on "leave-future-out" cross-validation for time series models. (#90)
 
-* Fix for `psis()` when `log_ratios` are very small. (#74)
+* New glossary page (use `help("loo-glossary")`) with definitions of key terms. (#81)
 
-* Allow `r_eff=NA` to suppress warning from `psis()` when specifying `r_eff` is not applicable (i.e., draws not from MCMC). (#72)
+* New `se_diff` column in model comparison results. (#78)
+
+* Improved stability of `psis()` when `log_ratios` are very small. (#74)
+
+* Allow `r_eff=NA` to suppress warning when specifying `r_eff` is not applicable 
+(i.e., draws not from MCMC). (#72)
+
+* Update effective sample size calculations to match RStan's version. (#85)
+
+* Naming of k-fold helper functions now matches scikit-learn. (#96)
 
 # loo 2.0.0
 
@@ -101,7 +111,7 @@ fixes and additional unit tests. Highlights:
 
 * Don't call functions from __parallel__ package if `cores=1`.
 * Return entire vector/matrix of smoothed weights rather than a summary statistic when `psislw` function is called in an interactive session.
-* [Test coverage > 80%](https://codecov.io/github/jgabry/loo?branch=master)
+* Test coverage > 80%
 
 # loo 0.1.3
 This update provides several important improvements, most notably an alternative

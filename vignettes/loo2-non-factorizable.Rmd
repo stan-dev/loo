@@ -1,10 +1,11 @@
 ---
 title: "Leave-one-out cross-validation for non-factorizable models"
-author: "Aki Vehtari, Paul Buerkner and Jonah Gabry"
+author: "Aki Vehtari, Paul Bürkner and Jonah Gabry"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
     toc: yes
+encoding: "UTF-8"
 params:
   EVAL: !r TRUE
 ---
@@ -12,12 +13,12 @@ params:
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Leave-one-out cross-validation for non-factorizable models}
 -->
-```{r, child="children/SETTINGS-knitr.txt"}
+```{r settings, child="children/SETTINGS-knitr.txt"}
 ```
 ```{r more-knitr-ops, include=FALSE}
 knitr::opts_chunk$set(
   cache=TRUE,
-  message=FALSE, 
+  message=FALSE,
   warning=FALSE
 )
 ```
@@ -38,7 +39,7 @@ $$
 The function $p$ will be either a probability density function (PDF) or a
 probability mass function (PMF) depending on whether we have a continuous or
 discrete outcome. When $p(y)$ can be factorized in this way, the conditional
-pointwise log-likelihood can be obtained easily by computing 
+pointwise log-likelihood can be obtained easily by computing
 $\log p(y_i \,|\, \theta)$ for each $i$. We then save each of these individual
 contributions to the log-likelihood rather than simply summing them to obtain
 the total log-likelihood.
@@ -46,7 +47,7 @@ the total log-likelihood.
 The situation is more complicated for *non-factorizable* models in which
 response values are not conditionally independent. When there is residual
 dependency even after accounting for the model parameters $\theta$, the
-conditional pointwise log-likelihood has the general form 
+conditional pointwise log-likelihood has the general form
 $\log p(y_i \,|\, y_{-i}, \theta)$, where $y_{-i}$ denotes all response
 values except observation $i$.
 
@@ -120,7 +121,7 @@ $$
 
 Here, $p(\theta\,|\,y_{-i})$ is the leave-one-out posterior distribution for
 $\theta$, that is, the posterior distribution for $\theta$ obtained by fitting
-the model while holding out the $i$th observation. 
+the model while holding out the $i$th observation.
 
 To avoid the cost of sampling from $N$ leave-one-out posteriors, it is possible
 to take the posterior draws $\theta^{(s)}, \, s=1,\ldots,S$, from the
@@ -216,9 +217,9 @@ $$
 where $\rho$ is the spatial correlation parameter and $W$ is a user-defined
 weight matrix. The matrix $W$ has entries $w_{ii} = 0$ along the diagonal and
 the off-diagonal entries $w_{ij}$ are larger when areas $i$ and $j$ are closer
-to each other. In a linear model, the predictor term $\eta$ is given by 
-$\eta = X \beta$ with design matrix $X$ and regression coefficients $\beta$. 
-However, since the above equation holds for arbitrary $\eta$, these results are 
+to each other. In a linear model, the predictor term $\eta$ is given by
+$\eta = X \beta$ with design matrix $X$ and regression coefficients $\beta$.
+However, since the above equation holds for arbitrary $\eta$, these results are
 not restricted to linear models.
 
 If we have $\epsilon \sim {\mathrm N}(0, \,\sigma^2 I)$, it follows that
@@ -228,9 +229,9 @@ $$
 which corresponds to the following log PDF coded in **Stan**:
 
 ```{r lpdf, eval=FALSE}
-/** 
+/**
  * Normal log-pdf for spatially lagged responses
- * 
+ *
  * @param y Vector of response values.
  * @param mu Mean parameter vector.
  * @param sigma Positive scalar residual standard deviation.
@@ -239,24 +240,24 @@ which corresponds to the following log PDF coded in **Stan**:
  *
  * @return A scalar to be added to the log posterior.
  */
-real normal_lagsar_lpdf(vector y, vector mu, real sigma, 
+real normal_lagsar_lpdf(vector y, vector mu, real sigma,
                         real rho, matrix W) {
   int N = rows(y);
   real inv_sigma2 = 1 / square(sigma);
   matrix[N, N] W_tilde = -rho * W;
   vector[N] half_pred;
-  
+
   for (n in 1:N) W_tilde[n,n] += 1;
-  
+
   half_pred = W_tilde * (y - mdivide_left(W_tilde, mu));
-  
+
   return 0.5 * log_determinant(crossprod(W_tilde) * inv_sigma2) -
          0.5 * dot_self(half_pred) * inv_sigma2;
 }
 ```
 
 For the purpose of computing LOO-CV, it makes sense to rewrite the SAR model in
-slightly different form. Conditional on $\rho$, $\eta$, and $\sigma$, 
+slightly different form. Conditional on $\rho$, $\eta$, and $\sigma$,
 if we write
 
 \begin{align}
@@ -287,7 +288,7 @@ In addition to the **loo** package, for this analysis we will use the **brms**
 interface to Stan to generate a Stan program and fit the model, and also the
 **bayesplot** and **ggplot2** packages for plotting.
 
-```{r, cache=FALSE}
+```{r setup, cache=FALSE}
 library("loo")
 library("brms")
 library("bayesplot")
@@ -296,21 +297,21 @@ color_scheme_set("brightblue")
 theme_set(theme_default())
 
 
-SEED <- 10001 
+SEED <- 10001
 set.seed(SEED) # only sets seed for R (seed for Stan set later)
 
 # loads COL.OLD data frame and COL.nb neighbor list
-data(oldcol, package = "spdep") 
+data(oldcol, package = "spdep")
 ```
 
 The three variables in the data set relevant to this example are:
 
 * `CRIME`: the number of residential burglaries and vehicle thefts per thousand
 households in the neighbood
-* `HOVAL`: housing value in units of $1000 USD 
+* `HOVAL`: housing value in units of $1000 USD
 * `INC`: household income in units of $1000 USD
 
-```{r}
+```{r data}
 str(COL.OLD[, c("CRIME", "HOVAL", "INC")])
 ```
 
@@ -327,7 +328,7 @@ follows.
 
 ```{r fit, results="hide"}
 fit <- brm(
-  CRIME ~ INC + HOVAL, 
+  CRIME ~ INC + HOVAL,
   data = COL.OLD,
   autocor = cor_lagsar(COL.nb),
   chains = 4,
@@ -339,13 +340,13 @@ The code above fits the model in **Stan** using a log PDF equivalent to the
 `normal_lagsar_lpdf` function we defined above. In the summary output below we
 see that both higher income and higher housing value predict lower crime rates
 in the neighborhood. Moreover, there seems to be substantial spatial correlation
-between adjacent neighborhoods, as indicated by the posterior distribution 
+between adjacent neighborhoods, as indicated by the posterior distribution
 of the `lagsar` parameter.
 
 ```{r lagsar, fig.width=5}
 lagsar <- as.matrix(fit, pars = "lagsar")
 estimates <- quantile(lagsar, probs = c(0.25, 0.5, 0.75))
-mcmc_hist(lagsar) + 
+mcmc_hist(lagsar) +
   vline_at(estimates, linetype = 2, size = 1) +
   ggtitle("lagsar: posterior median and 50% central interval")
 ```
@@ -353,10 +354,10 @@ mcmc_hist(lagsar) +
 ### Approximate LOO-CV
 
 After fitting the model, the next step is to compute the pointwise
-log-likelihood values needed for approximate LOO-CV. To do this we will 
+log-likelihood values needed for approximate LOO-CV. To do this we will
 use the recipe laid out in the previous sections.
 
-```{r}
+```{r approx}
 posterior <- as.data.frame(fit)
 y <- fit$data$CRIME
 N <- length(y)
@@ -387,26 +388,26 @@ of $0.7$ (Vehtari et al, 2017ab). In the plot below, we see that the fourth
 observation is problematic and so may reduce the accuracy of the LOO-CV
 approximation.
 
-```{r, cache = FALSE}
+```{r plot, cache = FALSE}
 plot(psis_result, label_points = TRUE)
 ```
 
 We can also check that the conditional leave-one-out predictive distribution
 equations work correctly, for instance, using the last posterior draw:
 
-```{r, cache = FALSE}
+```{r checklast, cache = FALSE}
 yloo_sub <- yloo[S, ]
 sdloo_sub <- sdloo[S, ]
 df <- data.frame(
-  y = y, 
+  y = y,
   yloo = yloo_sub,
   ymin = yloo_sub - sdloo_sub * 2,
   ymax = yloo_sub + sdloo_sub * 2
 )
 ggplot(data=df, aes(x = y, y = yloo, ymin = ymin, ymax = ymax)) +
   geom_errorbar(
-    width = 1, 
-    color = "skyblue3", 
+    width = 1,
+    color = "skyblue3",
     position = position_jitter(width = 0.25)
   ) +
   geom_abline(color = "gray30", size = 1.2) +
@@ -417,7 +418,7 @@ Finally, we use PSIS-LOO to approximate the expected log predictive density
 (ELPD) for new data, which we will validate using exact LOO-CV in the upcoming
 section.
 
-```{r}
+```{r psisloo}
 (psis_loo <- loo(loglik))
 ```
 
@@ -431,9 +432,9 @@ loop over the observations.
 ```{r fit_dummy, cache = TRUE}
 # see help("mi", "brms") for details on the mi() usage
 fit_dummy <- brm(
-  CRIME | mi() ~ INC + HOVAL, 
+  CRIME | mi() ~ INC + HOVAL,
   data = COL.OLD,
-  autocor = cor_lagsar(COL.nb), 
+  autocor = cor_lagsar(COL.nb),
   chains = 0
 )
 ```
@@ -441,7 +442,7 @@ fit_dummy <- brm(
 Next, we fit the model $N$ times, each time leaving out a single observation and
 then computing the log predictive density for that observation. For obvious
 reasons, this takes much longer than the approximation we computed above, but it
-is necessary in order to validate the approximate LOO-CV method. Thanks 
+is necessary in order to validate the approximate LOO-CV method. Thanks
 to the PSIS-LOO approximation, in general doing these slow exact computations
 can be avoided.
 
@@ -452,7 +453,7 @@ loglik <- matrix(nrow = S, ncol = N)
 for (i in seq_len(N)) {
   dat_mi <- COL.OLD
   dat_mi$CRIME[i] <- NA
-  fit_i <- update(fit_dummy, newdata = dat_mi, 
+  fit_i <- update(fit_dummy, newdata = dat_mi,
                   # just for vignette
                   chains = 1, iter = S * 2)
   posterior <- as.data.frame(fit_i)
@@ -513,7 +514,7 @@ we would expect if there were no problematic observations. We can investigate
 this issue more closely by plotting the approximate against the exact pointwise
 ELPD values.
 
-```{r elpd-plot, fig.height=5}
+```{r compare, fig.height=5}
 df <- data.frame(
   approx_elpd = psis_loo$pointwise[, "elpd_loo"],
   exact_elpd = exact_elpds
@@ -534,7 +535,7 @@ is strong. In fact, summing over the pointwise ELPD values and leaving out the
 fourth observation yields practically equivalent results for approximate and
 exact LOO-CV:
 
-````{r}
+````{r pt4}
 without_pt_4 <- c(
   approx = sum(psis_loo$pointwise[-4, "elpd_loo"]),
   exact = sum(exact_elpds[-4])  
@@ -560,9 +561,9 @@ a slightly modified version of the code extracted via `stancode(fit_dummy)`:
 ```{r brms-stan-code, eval=FALSE}
 // generated with brms 2.2.0
 functions {
-/** 
+/**
  * Normal log-pdf for spatially lagged responses
- * 
+ *
  * @param y Vector of response values.
  * @param mu Mean parameter vector.
  * @param sigma Positive scalar residual standard deviation.
@@ -677,6 +678,6 @@ Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyper
 
 Vehtari A., Mononen T., Tolvanen V., Sivula T., & Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. *Journal of Machine Learning Research*, 17(103), 1--38. [Online](http://jmlr.org/papers/v17/14-540.html).
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).

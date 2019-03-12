@@ -3,72 +3,67 @@
 \name{kfold-helpers}
 \alias{kfold-helpers}
 \alias{kfold_split_random}
-\alias{kfold_split_balanced}
 \alias{kfold_split_stratified}
+\alias{kfold_split_grouped}
 \title{Helper functions for K-fold cross-validation}
 \usage{
 kfold_split_random(K = 10, N = NULL)
 
-kfold_split_balanced(K = 10, x = NULL)
-
 kfold_split_stratified(K = 10, x = NULL)
+
+kfold_split_grouped(K = 10, x = NULL)
 }
 \arguments{
 \item{K}{The number of folds to use.}
 
 \item{N}{The number of observations in the data.}
 
-\item{x}{A discrete variable of length \code{N}. Will be coerced to
-\code{\link{factor}}. For \code{kfold_split_balanced} \code{x} should be a
-binary variable. For \code{kfold_split_stratified} \code{x} should be a
-grouping variable with at least \code{K} levels.}
+\item{x}{A discrete variable of length \code{N} with at least \code{K} levels
+(unique values). Will be coerced to \code{\link{factor}}.}
 }
 \value{
-An integer vector of length \code{N} where each element is an index
-  in \code{1:K}.
+An integer vector of length \code{N} where each element is an index in \code{1:K}.
 }
 \description{
-These functions can be used to generate indexes for use with K-fold
-cross-validation.
+These functions can be used to generate indexes for use with
+  K-fold cross-validation. See the \strong{Details} section for explanations.
 }
 \details{
 \code{kfold_split_random} splits the data into \code{K} groups
 of equal size (or roughly equal size).
 
-For a binary variable \code{x} that has many more \code{0}s than \code{1}s
-(or vice-versa) \code{kfold_split_balanced} first splits the data by value of
-\code{x}, does \code{kfold_split_random} within each of the two groups, and
-then recombines the indexes returned from the two calls to
-\code{kfold_split_random}. This helps ensure that the observations in the
-less common category of \code{x} are more evenly represented across the
-folds.
+For a categorical variable \code{x} \code{kfold_split_stratified}
+splits the observations into \code{K} groups ensuring that relative
+category frequencies are approximately preserved.
 
-For a grouping variable \code{x}, \code{kfold_split_stratified} places all
-observations in \code{x} from the same group/level together the same fold.
-The selection of which groups/levels go into which fold (relevant when when
-there are more folds than groups) is randomized.
+For a grouping variable \code{x}, \code{kfold_split_grouped} places
+all observations in \code{x} from the same group/level together in
+the same fold. The selection of which groups/levels go into which
+fold (relevant when when there are more folds than groups) is
+randomized.
 }
 \examples{
-kfold_split_random(K = 5, N = 20)
+ids <- kfold_split_random(K = 5, N = 20)
+print(ids)
+table(ids)
+
 
 x <- sample(c(0, 1), size = 200, replace = TRUE, prob = c(0.05, 0.95))
 table(x)
-ids <- kfold_split_balanced(K = 5, x = x)
-table(ids[x == 0])
-table(ids[x == 1])
+ids <- kfold_split_stratified(K = 5, x = x)
+print(ids)
+table(ids, x)
 
 grp <- gl(n = 50, k = 15, labels = state.name)
 length(grp)
 head(table(grp))
 
-ids_10 <- kfold_split_stratified(K = 10, x = grp)
+ids_10 <- kfold_split_grouped(K = 10, x = grp)
 (tab_10 <- table(grp, ids_10))
-print(colSums(tab_10))
-all.equal(sum(colSums(tab_10)), length(grp))
+colSums(tab_10)
 
-ids_9 <- kfold_split_stratified(K = 9, x = grp)
-tab_9 <- table(grp, ids_9)
-print(colSums(tab_9))
-all.equal(sum(colSums(tab_10)), length(grp))
+ids_9 <- kfold_split_grouped(K = 9, x = grp)
+(tab_9 <- table(grp, ids_9))
+colSums(tab_9)
 
 }

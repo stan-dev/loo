@@ -40,12 +40,14 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5)))
+  if (length(pareto_k_ids(x, threshold = 0.5))) {
     cat("\n")
+  }
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
-  if (plot_k)
+  if (plot_k) {
     plot(x, ...)
+  }
   invisible(x)
 }
 
@@ -56,8 +58,9 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print_dims(x)
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
-  if (plot_k)
+  if (plot_k) {
     plot(x, ...)
+  }
   invisible(x)
 }
 
@@ -104,6 +107,15 @@ print_dims.waic <- function(x, ...) {
   )
 }
 
+#' @rdname print_dims
+#' @export
+print_dims.kfold <- function(x, ...) {
+  K <- attr(x, "K", exact = TRUE)
+  if (!is.null(K)) {
+    cat("Based on", paste0(K, "-fold"), "cross-validation\n")
+  }
+}
+
 
 print_mcse_summary <- function(x, digits) {
   mcse_val <- mcse_loo(x)
@@ -127,4 +139,3 @@ convert_old_object <- function(x, digits = 1, ...) {
   ses <- grepl("se", nms)
   list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
 }
-

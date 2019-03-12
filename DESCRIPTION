@@ -1,17 +1,18 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 2.0.0.9000
-Date: 2018-04-06
+Version: 2.1.0
+Date: 2019-03-12
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Andrew", "Gelman", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
              person("Yuling", "Yao", role = c("aut")),
              person("Paul-Christian", "Bürkner", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")),
-             person("Juho", "Piironen", role = c("ctb")))
+             person("Juho", "Piironen", role = c("ctb")),
+             person("Mans", "Magnusson", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
-URL: http://mc-stan.org, http://discourse.mc-stan.org
+URL: http://mc-stan.org/loo, http://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
     for Bayesian models fit using Markov chain Monte Carlo. The approximation
@@ -29,7 +30,8 @@ Imports:
     graphics,
     matrixStats (>= 0.52),
     parallel,
-    stats
+    stats,
+    checkmate
 Suggests:
     bayesplot (>= 1.5.0),
     brms (>= 2.2.0),
@@ -41,5 +43,5 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
-SystemRequirements:	pandoc (>= 1.12.3), pandoc-citeproc
-RoxygenNote: 6.0.1
+SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
+RoxygenNote: 6.1.1

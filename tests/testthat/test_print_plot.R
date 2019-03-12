@@ -18,6 +18,9 @@ test_that("plot methods don't error", {
 
   loo1$diagnostics$pareto_k[1] <- 10
   expect_silent(plot(loo1, label_points = TRUE))
+
+  expect_output(print(loo1, plot_k = TRUE))
+  expect_output(print(psis1, plot_k = TRUE))
 })
 
 test_that("plot methods throw appropriate errors/warnings", {
@@ -109,7 +112,6 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(k > 0.7 & k <= 1), tab[3,1])
   expect_equal(sum(k > 1), tab[4,1])
 })
-
 
 
 

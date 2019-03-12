@@ -323,7 +323,7 @@ predictions. In other words, incorporating the model with the interaction (model
 is given a weight of 0. On the other hand, models 2 and 3 are giving slightly
 different predictions and thus their combination may be slightly better than
 either alone. This behavior is related to the repeated similar model illustration
-in the milk example abve.
+in the milk example above.
 
 # Simpler coding using `loo_model_weights` function
 

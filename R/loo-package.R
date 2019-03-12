@@ -13,12 +13,15 @@
 #' }
 #'
 #' This package implements the methods described in Vehtari, Gelman, and Gabry
-#' (2017a, 2017b) and Yao et al. (2018). To get started see the
+#' (2017a, 2017b) and Yao et al. (2018). To get started see the \pkg{loo}
+#' package vignettes
+#' \href{https://mc-stan.org/loo/articles/index.html}{vignettes},
 #' \code{\link{loo}} function for efficient approximate leave-one-out
 #' cross-validation (LOO-CV), the \code{\link{psis}} function for the Pareto
 #' smoothed importance sampling (PSIS) algorithm, or
 #' \code{\link{loo_model_weights}} for an implementation of Bayesian stacking of
 #' predictive distributions from multiple models.
+#'
 #'
 #' @details Leave-one-out cross-validation (LOO-CV) and the widely applicable
 #'   information criterion (WAIC) are methods for estimating pointwise

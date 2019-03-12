@@ -10,11 +10,12 @@
 loo_model_weights(x, ...)
 
 \method{loo_model_weights}{default}(x, ..., method = c("stacking",
-  "pseudobma"), optim_method = "BFGS", optim_control = list(), BB = TRUE,
-  BB_n = 1000, alpha = 1, r_eff_list = NULL,
+  "pseudobma"), optim_method = "BFGS", optim_control = list(),
+  BB = TRUE, BB_n = 1000, alpha = 1, r_eff_list = NULL,
   cores = getOption("mc.cores", 1))
 
-stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
+stacking_weights(lpd_point, optim_method = "BFGS",
+  optim_control = list())
 
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
@@ -69,7 +70,10 @@ the option \code{mc.cores} which can be set for an entire R session by
 deprecated but will be given precedence over \code{mc.cores} until
 \code{loo.cores} is removed in a future release. \strong{As of version
 2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
-recommend using as many (or close to as many) cores as possible.}}
+recommend using as many (or close to as many) cores as possible.}
+Note for Windows 10 users: it is recommended to avoid using the
+\code{.Rprofile} file to set \code{mc.cores} (using the \code{cores}
+argument or setting \code{mc.cores} interactively or in a script is fine).}
 
 \item{lpd_point}{A matrix of pointwise leave-one-out (or K-fold) log
 likelihoods evaluated for different models. It should be a \eqn{N} by
@@ -193,11 +197,11 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
   stacking to average Bayesian predictive distributions. \emph{Bayesian
@@ -206,7 +210,7 @@ Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
 }
 \seealso{
 \itemize{
-\item The \pkg{loo} package vignettes for demonstrations.
+\item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
 \item \code{\link{loo}} for details on leave-one-out ELPD estimation.
 \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
 \item \code{\link{relative_eff}} for computing \code{r_eff}.

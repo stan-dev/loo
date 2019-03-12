@@ -2,12 +2,9 @@
 % Please edit documentation in R/compare.R
 \name{compare}
 \alias{compare}
-\alias{print.compare.loo}
 \title{Model comparison}
 \usage{
 compare(..., x = list())
-
-\method{print}{compare.loo}(x, ..., digits = 1, simplify = TRUE)
 }
 \arguments{
 \item{...}{At least two objects returned by \code{\link{loo}} (or
@@ -16,14 +13,6 @@ compare(..., x = list())
 \item{x}{A list of at least two objects returned by \code{\link{loo}} (or
 \code{\link{waic}}). This argument can be used as an alternative to
 specifying the objects in \code{...}.}
-
-\item{digits}{For the print method only, the number of digits to use when
-printing.}
-
-\item{simplify}{For the print method only, should only the essential columns
-of the summary matrix be printed when comparing more than two models? The
-entire matrix is always returned, but by default only the most important
-columns are printed.}
 }
 \value{
 A vector or matrix with class \code{'compare.loo'} that has its own
@@ -34,7 +23,8 @@ A vector or matrix with class \code{'compare.loo'} that has its own
   \strong{Details}).
 }
 \description{
-Compare fitted models on LOO or WAIC.
+\strong{This function will be deprecated in a future release}. We
+recommend using the new \code{\link{loo_compare}} function instead.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
@@ -83,9 +73,9 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }

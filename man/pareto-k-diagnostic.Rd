@@ -62,7 +62,7 @@ observations have Pareto \eqn{k} estimates above \code{threshold}.
 \code{psis_n_eff_values} returns a vector of the estimated PSIS
   effective sample sizes.
 
-\code{mcse_loo} returns the Monte carlo standard error (MCSE)
+\code{mcse_loo} returns the Monte Carlo standard error (MCSE)
   estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
   above \code{threshold}.
 
@@ -92,7 +92,7 @@ generalized Pareto distribution:
   approaches \eqn{0.5} the RMSE of plain importance sampling (IS) increases
   significantly while PSIS has lower RMSE.
 
-  \item If \eqn{0.5 \leq k < 1}{0.5 ≤ k < 1} then the variance of the raw
+  \item If \eqn{0.5 \leq k < 1}{0.5 <= k < 1} then the variance of the raw
   importance ratios is infinite, but the mean exists. TIS and PSIS estimates
   have finite variance by accepting some bias. The convergence of the
   estimate is slower with increasing \eqn{k}.
@@ -102,7 +102,7 @@ generalized Pareto distribution:
   PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
   unreliable Monte Carlo error estimates.
 
-  \item If \eqn{k \geq 1}{k ≥ 1} then neither the variance nor the mean of
+  \item If \eqn{k \geq 1}{k >= 1} then neither the variance nor the mean of
   the raw importance ratios exists. The convergence rate is close to zero and
   bias can be large with practical sample sizes.
 }
@@ -146,11 +146,11 @@ Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
   Bayesian model evaluation using leave-one-out cross-validation and WAIC.
   \emph{Statistics and Computing}. 27(5), 1413--1432.
   doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{published
-  version}, \href{http://arxiv.org/abs/1507.04544}{arXiv preprint}).
+  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
+  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-  importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
 }
 \seealso{
 \code{\link{psis}} for the implementation of the PSIS algorithm.

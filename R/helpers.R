@@ -37,21 +37,6 @@ table_of_estimates <- function(x) {
 }
 
 
-# checking classes --------------------------------------------------------
-is.psis <- function(x) {
-  inherits(x, "psis") && is.list(x)
-}
-is.loo <- function(x) {
-  inherits(x, "loo")
-}
-is.psis_loo <- function(x) {
-  inherits(x, "psis_loo") && is.loo(x)
-}
-is.waic <- function(x) {
-  inherits(x, "waic") && is.loo(x)
-}
-
-
 # validating and reshaping arrays/matrices  -------------------------------
 
 #' Check for NAs and non-finite values in log-lik (or log-ratios)
@@ -153,9 +138,6 @@ validate_llfun <- function(x) {
 #' @keywords internal
 #' @param ... Objects to include in the list.
 #' @return A named list.
-#'
-#' @seealso \code{\link[base]{list}}
-#' @author Jonah Gabry
 #' @examples
 #'
 #' # All variables already defined

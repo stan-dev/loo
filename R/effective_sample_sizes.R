@@ -61,14 +61,14 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
   if (cores == 1) {
-    n_eff_vec <- apply(x, 3, mcmc_n_eff)
+    n_eff_vec <- apply(x, 3, ess_rfun)
   } else {
     if (.Platform$OS.type != "windows") {
       n_eff_list <-
         parallel::mclapply(
           mc.cores = cores,
           X = seq_len(dim(x)[3]),
-          FUN = function(i) mcmc_n_eff(x[, , i])
+          FUN = function(i) ess_rfun(x[, , i])
         )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -77,7 +77,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(dim(x)[3]),
-          fun = function(i) mcmc_n_eff(x[, , i])
+          fun = function(i) ess_rfun(x[, , i])
         )
     }
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
@@ -108,7 +108,7 @@ relative_eff.function <-
           X = seq_len(N),
           FUN = function(i) {
             val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-            relative_eff.default(as.vector(val_i), chain_id = chain_id)
+            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
           }
         )
     } else {
@@ -118,7 +118,7 @@ relative_eff.function <-
             X = seq_len(N),
             FUN = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id)
+              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
             },
             mc.cores = cores
           )
@@ -131,7 +131,7 @@ relative_eff.function <-
             X = seq_len(N),
             fun = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id)
+              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
             }
           )
       }
@@ -182,52 +182,91 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
 #' MCMC effective sample size calculation
 #'
 #' @noRd
-#' @param x An iterations by chains matrix of draws for a single parameter. In
-#'   the case of the loo package, this will be the _exponentiated_ log-likelihood
-#'   values for the ith observation.
+#' @param sims An iterations by chains matrix of draws for a single parameter.
+#'   In the case of the loo package, this will be the _exponentiated_
+#'   log-likelihood values for the ith observation.
 #' @return MCMC effective sample size based on rstan's calculation.
 #'
-mcmc_n_eff <- function(x) {
-  if (!is.matrix(x)) {
-    x <- as.matrix(x)
+ess_rfun <- function(sims) {
+  # Compute the effective sample size for samples of several chains
+  # for one parameter; see the C++ code of function
+  # effective_sample_size in chains.cpp
+  #
+  # Args:
+  #   sims: a 2-d array _without_ warmup samples (# iter * # chains)
+  #
+  if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
+  chains <- ncol(sims)
+  n_samples <- nrow(sims)
+
+  acov <- lapply(1:chains,
+                 FUN = function(i) autocovariance(sims[,i]))
+  acov <- do.call(cbind, acov)
+  chain_mean <- apply(sims, 2, mean)
+  mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
+  var_plus <- mean_var * (n_samples - 1) / n_samples
+  if (chains > 1)
+    var_plus <- var_plus + var(chain_mean)
+  # Geyer's initial positive sequence
+  rho_hat_t <- rep.int(0, n_samples)
+  t <- 0
+  rho_hat_even <- 1;
+  rho_hat_t[t+1] <- rho_hat_even
+  rho_hat_odd <- 1 - (mean_var - mean(acov[t+2, ])) / var_plus
+  rho_hat_t[t+2] <- rho_hat_odd
+  t <- 2
+  while (t < nrow(acov)-1 && !is.nan(rho_hat_even + rho_hat_odd) && (rho_hat_even + rho_hat_odd > 0)) {
+    rho_hat_even = 1 - (mean_var - mean(acov[t+1, ])) / var_plus
+    rho_hat_odd = 1 - (mean_var - mean(acov[t+2, ])) / var_plus
+    if ((rho_hat_even + rho_hat_odd) >= 0) {
+      rho_hat_t[t+1] <- rho_hat_even
+      rho_hat_t[t+2] <- rho_hat_odd
+    }
+    t <- t + 2
   }
-  n_chain <- ncol(x)
-  n_iter <- nrow(x)
-
-  acov <- apply(x, 2, .acov, lag_max = n_iter - 1)
-  chain_means <- colMeans(x)
-  mean_var <- mean(acov[1, ]) * n_iter / (n_iter - 1)
-  var_plus <- mean_var * (n_iter - 1) / n_iter
-  if (n_chain > 1) {
-    var_plus <- var_plus + var(chain_means)
+  max_t <- t
+  # Geyer's initial monotone sequence
+  t <- 2
+  while (t <= max_t - 2) {
+    if (rho_hat_t[t + 1] + rho_hat_t[t + 2] >
+        rho_hat_t[t - 1] + rho_hat_t[t]) {
+      rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2;
+      rho_hat_t[t + 2] = rho_hat_t[t + 1];
+    }
+    t <- t + 2
   }
-
-  rho_hat_sum <- 0
-  for (t in 2:nrow(acov)) {
-    rho_hat <- 1 - (mean_var - mean(acov[t, ])) / var_plus
-    if (is.nan(rho_hat))
-      rho_hat <- 0
-    if (rho_hat < 0)
-      break
-    rho_hat_sum <- rho_hat_sum + rho_hat
-  }
-
-  n_eff <- n_chain * n_iter
-  if (rho_hat_sum > 0)
-    n_eff <- n_eff / (1 + 2 * rho_hat_sum)
-
-  return(n_eff)
+  ess <- chains * n_samples
+  ess <- ess / (-1 + 2 * sum(rho_hat_t[1:max_t]))
+  ess
 }
 
 
-# wrapper around stats::acf that returns only the info we need in mcmc_n_eff
-# @param x,lag_max Vector and integer passed to stats::acf
-.acov <- function(x, lag_max) {
-  cov <-
-    stats::acf(x,
-               lag.max = lag_max,
-               plot = FALSE,
-               type = "covariance")
+fft_next_good_size <- function(N) {
+  # Find the optimal next size for the FFT so that
+  # a minimum number of zeros are padded.
+  if (N <= 2)
+    return(2)
+  while (TRUE) {
+    m = N
+    while ((m %% 2) == 0) m = m / 2
+    while ((m %% 3) == 0) m = m / 3
+    while ((m %% 5) == 0) m = m / 5
+    if (m <= 1)
+      return(N)
+    N = N + 1
+  }
+}
 
-  return(cov$acf[, , 1])
+autocovariance <- function(y) {
+  # Compute autocovariance estimates for every lag for the specified
+  # input sequence using a fast Fourier transform approach.
+  N <- length(y)
+  M <- fft_next_good_size(N)
+  Mt2 <- 2 * M
+  yc <- y - mean(y)
+  yc <- c(yc, rep.int(0, Mt2-N))
+  transform <- stats::fft(yc)
+  ac <- stats::fft(Conj(transform) * transform, inverse = TRUE)
+  ac <- Re(ac)[1:N]/(N*2*seq(N, 1, by = -1))
+  ac
 }
