@@ -25,7 +25,7 @@
 #' @references
 #' Hinde and Milligan. 2011. Evolutionary Anthropology 20:9-23.
 #'
-#' Kline, M.A. and R. Boyd. 2010. Proc R Soc B 277:2559–2564.
+#' Kline, M.A. and R. Boyd. 2010. Proc R Soc B 277:2559-2564.
 #'
 #' McElreath, R. (2016a). rethinking: Statistical Rethinking book package.
 #' R package version 1.59.
