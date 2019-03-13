@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract pointwise log-likelihood from a Stan model — extract_log_lik • loo</title>
+<title>Model comparison — loo_compare • loo</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="Extract pointwise log-likelihood from a Stan model — extract_log_lik" />
+<meta property="og:title" content="Model comparison — loo_compare" />
 
-<meta property="og:description" content="Convenience function for extracting the pointwise log-likelihood
-matrix or array from a fitted Stan model." />
+<meta property="og:description" content="Compare fitted models on LOO or WAIC." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -144,74 +143,104 @@ matrix or array from a fitted Stan model." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract pointwise log-likelihood from a Stan model</h1>
+    <h1>Model comparison</h1>
     
-    <div class="hidden name"><code>extract_log_lik.Rd</code></div>
+    <div class="hidden name"><code>loo_compare.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Convenience function for extracting the pointwise log-likelihood
-matrix or array from a fitted Stan model.</p>
+    <p>Compare fitted models on LOO or WAIC.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>extract_log_lik</span>(<span class='no'>stanfit</span>, <span class='kw'>parameter_name</span> <span class='kw'>=</span> <span class='st'>"log_lik"</span>,
-  <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>loo_compare</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>loo_compare</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for compare.loo</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>stanfit</th>
-      <td><p>A <code>stanfit</code> object (<span class="pkg">rstan</span> package).</p></td>
+      <th>x</th>
+      <td><p>An object of class <code>"loo"</code> or a list of such objects.</p></td>
     </tr>
     <tr>
-      <th>parameter_name</th>
-      <td><p>A character string naming the parameter (or generated
-quantity) in the Stan model corresponding to the log-likelihood.</p></td>
+      <th>...</th>
+      <td><p>Additional objects of class <code>"loo"</code>.</p></td>
     </tr>
     <tr>
-      <th>merge_chains</th>
-      <td><p>If <code>TRUE</code> (the default), all Markov chains are
-merged together (i.e., stacked) and a matrix is returned. If <code>FALSE</code>
-they are kept separate and an array is returned.</p></td>
+      <th>digits</th>
+      <td><p>For the print method only, the number of digits to use when
+printing.</p></td>
+    </tr>
+    <tr>
+      <th>simplify</th>
+      <td><p>For the print method only, should only the essential columns
+of the summary matrix be printed? The entire matrix is always returned, but
+by default only the most important columns are printed.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>merge_chains=TRUE</code>, an \(S\) by \(N\) matrix of
-  (post-warmup) extracted draws, where \(S\) is the size of the posterior
-  sample and \(N\) is the number of data points. If
-  <code>merge_chains=FALSE</code>, an \(I\) by \(C\) by \(N\) array, where
-  \(I \times C = S\).</p>
+    <p>A matrix with class <code>"compare.loo"</code> that has its own
+  print method. See the <strong>Details</strong> section for more .</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Stan does not automatically compute and store the log-likelihood. It
-  is up to the user to incorporate it into the Stan program if it is to be
-  extracted after fitting the model. In a Stan model, the pointwise log
-  likelihood can be coded as a vector in the transformed parameters block
-  (and then summed up in the model block) or it can be coded entirely in the
-  generated quantities block. We recommend using the generated quantities
-  block so that the computations are carried out only once per iteration
-  rather than once per HMC leapfrog step.</p>
-<p>For example, the following is the <code>generated quantities</code> block for
-  computing and saving the log-likelihood for a linear regression model with
-  <code>N</code> data points, outcome <code>y</code>, predictor matrix <code>X</code>,
-  coefficients <code>beta</code>, and standard deviation <code>sigma</code>:</p>
-<p><code>vector[N] log_lik;</code></p>
-<p><code>for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);</code></p>
+    <p>When comparing two fitted models, we can estimate the difference in their
+  expected predictive accuracy by the difference in <code>elpd_loo</code> or
+  <code>elpd_waic</code> (or multiplied by \(-2\), if desired, to be on the
+  deviance scale).</p>
+<p>When using <code>loo_compare()</code>, the returned matrix will have one row per
+  model and several columns of estimates. The values in the <code>elpd_diff</code>
+  and <code>se_diff</code> columns of the returned matrix are computed by making
+  pairwise comparisons between each model and the model with the largest ELPD
+  (the model in the first row). For this reason the <code>elpd_diff</code> column
+  will always have the value <code>0</code> in the first row (i.e., the difference
+  between the preferred model and itself) and negative values in subsequent
+  rows for the remaining models.</p>
+<p>To compute the standard error of the difference in ELPD --- which should
+  not be expected to equal the difference of the standard errors --- we use a
+  paired estimate to take advantage of the fact that the same set of \(N\)
+  data points was used to fit both models. These calculations should be most
+  useful when \(N\) is large, because then non-normality of the
+  distribution is not such an issue when estimating the uncertainty in these
+  sums. These standard errors, for all their flaws, should give a better
+  sense of uncertainty than what is obtained using the current standard
+  approach of comparing differences of deviances to a Chi-squared
+  distribution, a practice derived for Gaussian linear models or
+  asymptotically, and which only applies to nested models in any case.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
-<a href='http://mc-stan.org/'>http://mc-stan.org/</a></p>
-<p>Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
-<a href='http://mc-stan.org/'>http://mc-stan.org/</a></p>
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  <em>Statistics and Computing</em>. 27(5), 1413--1432.
+  doi:10.1007/s11222-016-9696-4.
+  (<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>
+  journal</a>, <a href='http://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
+importance sampling. arXiv preprint: <a href='http://arxiv.org/abs/1507.02646/'>http://arxiv.org/abs/1507.02646/</a></p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>loo1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik1</span>)
+<span class='no'>loo2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik2</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'>loo_compare</span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'>loo_compare</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>)))
+
+<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik1</span>)
+<span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik2</span>)
+<span class='fu'>loo_compare</span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>)
+<span class='co'># }</span><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -223,7 +252,9 @@ they are kept separate and an array is returned.</p></td>
       <li><a href="#details">Details</a></li>
 
       <li><a href="#references">References</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Print methods — print.loo • loo</title>
+<title>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo — psis_approximate_posterior • loo</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Print methods — print.loo" />
+<meta property="og:title" content="Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo — psis_approximate_posterior" />
 
-<meta property="og:description" content="Print methods" />
+<meta property="og:description" content="Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -143,62 +143,92 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Print methods</h1>
+    <h1>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo</h1>
     
-    <div class="hidden name"><code>print.loo.Rd</code></div>
+    <div class="hidden name"><code>psis_approximate_posterior.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Print methods</p>
+    <p>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo</p>
     
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for loo</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for waic</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for psis_loo</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>plot_k</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for psis</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>plot_k</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>psis_approximate_posterior</span>(<span class='no'>log_p</span>, <span class='no'>log_q</span>, <span class='kw'>log_liks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>cores</span>,
+  <span class='no'>save_psis</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An object returned by <code><a href='loo.html'>loo</a></code>, <code><a href='psis.html'>psis</a></code>, or
-<code><a href='waic.html'>waic</a></code>.</p></td>
+      <th>log_p</th>
+      <td><p>The log-posterior (target) evaluated at S samples from the
+proposal distribution (q). A vector of length S.</p></td>
     </tr>
     <tr>
-      <th>digits</th>
-      <td><p>An integer passed to <code><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></code>.</p></td>
+      <th>log_q</th>
+      <td><p>The log-density (proposal) evaluated at S samples from the
+proposal distribution (q). A vector of length S.</p></td>
+    </tr>
+    <tr>
+      <th>log_liks</th>
+      <td><p>A log-likelihood matrix of size S * N, where N is the number
+of observations and S is the number of samples from q. See
+<code><a href='loo.html'>loo.matrix</a></code> for details. Default is <code>NULL</code>. Then only the
+posterior is evaluated using the k_hat diagnostic.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>The number of cores to use for parallelization. This defaults to
+the option <code>mc.cores</code> which can be set for an entire R session by
+<code><a href='https://www.rdocumentation.org/packages/base/topics/options'>options(mc.cores = NUMBER)</a></code>. The old option <code>loo.cores</code> is now
+deprecated but will be given precedence over <code>mc.cores</code> until
+<code>loo.cores</code> is removed in a future release. <strong>As of version
+2.0.0 the default is now 1 core if <code>mc.cores</code> is not set, but we
+recommend using as many (or close to as many) cores as possible.</strong>
+Note for Windows 10 users: it is recommended to avoid using the
+<code>.Rprofile</code> file to set <code>mc.cores</code> (using the <code>cores</code>
+argument or setting <code>mc.cores</code> interactively or in a script is fine).</p></td>
+    </tr>
+    <tr>
+      <th>save_psis</th>
+      <td><p>Should the <code>"psis"</code> object created internally by
+<code>loo</code> be saved in the returned object? The <code>loo</code> function calls
+<code><a href='psis.html'>psis</a></code> internally but by default discards the (potentially
+large) <code>"psis"</code> object after using it to compute the LOO-CV summaries.
+Setting <code>save_psis</code> to <code>TRUE</code> will add a <code>psis_object</code>
+component to the list returned by <code>loo</code>. Currently this is only needed
+if you plan to use the <code><a href='E_loo.html'>E_loo</a></code> function to compute weighted
+expectations after running <code>loo</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed to <code><a href='pareto-k-diagnostic.html'>plot.psis_loo</a></code> if <code>plot_k</code> is
-<code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>plot_k</th>
-      <td><p>Logical. If <code>TRUE</code> the estimates of the Pareto shape
-parameter \(k\) are plotted. Ignored if <code>x</code> was generated by
-<code><a href='waic.html'>waic</a></code>. To just plot \(k\) without printing use the
-<code><a href='pareto-k-diagnostic.html'>plot method</a></code>.</p></td>
+      <td><p>For the <code>loo</code> function method and the <code>loo_i</code>
+function, the data, posterior draws, and other arguments to pass to the
+log-likelihood function. See the <strong>Methods (by class)</strong> section below
+for details on how to specify these arguments.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>x</code>, invisibly.</p>
+    <p>If log likelihoods are supplied, the function returns a <code>loo</code> object,
+otherwise the function returns a <code>psis</code> object.</p>
+    
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
+  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
+  <em>Statistics and Computing</em>. 27(5), 1413--1432.
+  doi:10.1007/s11222-016-9696-4.
+  (<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>
+  journal</a>, <a href='http://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
+importance sampling. arXiv preprint: <a href='http://arxiv.org/abs/1507.02646/'>http://arxiv.org/abs/1507.02646/</a></p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a></code></p></div>
+    <div class='dont-index'><p><code>loo</code> and <code>psis</code></p></div>
     
 
   </div>
@@ -208,6 +238,8 @@ parameter \(k\) are plotted. Ignored if <code>x</code> was generated by
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#references">References</a></li>
 
       <li><a href="#see-also">See also</a></li>
           </ul>
