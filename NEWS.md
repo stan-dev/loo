@@ -1,3 +1,6 @@
+# loo 2.1.0.9000
+
+
 # loo 2.1.0
 
 * New function `loo_compare()` for model comparison that will eventually replace

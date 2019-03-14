@@ -1,7 +1,7 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 2.1.0
+Version: 2.1.0.9000
 Date: 2019-03-12
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Andrew", "Gelman", role = c("aut")),
@@ -15,13 +15,15 @@ Maintainer: Jonah Gabry <jsg2201@columbia.edu>
 URL: https://mc-stan.org/loo, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
-    for Bayesian models fit using Markov chain Monte Carlo. The approximation
-    uses Pareto smoothed importance sampling (PSIS), a new procedure for
-    regularizing importance weights. As a byproduct of the calculations, we also
-    obtain approximate standard errors for estimated predictive errors and for
-    the comparison of predictive errors between models. The package also 
-    provides methods for using stacking and other model weighting techniques 
-    to average Bayesian predictive distributions.
+    for Bayesian models fit using Markov chain Monte Carlo, as 
+    described in Vehtari, Gelman, and Gabry (2017) <doi:10.1007/s11222-016-9696-4>. 
+    The approximation uses Pareto smoothed importance sampling (PSIS), 
+    a new procedure for regularizing importance weights. 
+    As a byproduct of the calculations, we also obtain approximate 
+    standard errors for estimated predictive errors and for the comparison 
+    of predictive errors between models. The package also provides methods 
+    for using stacking and other model weighting techniques to average 
+    Bayesian predictive distributions.
 License: GPL (>=3)
 LazyData: TRUE
 Depends:
