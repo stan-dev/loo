@@ -1,7 +1,11 @@
 # loo 2.1.0.9000
 
+(GitHub issue/PR number in parentheses)
+
 
 # loo 2.1.0
+
+(GitHub issue/PR number in parentheses)
 
 * New function `loo_compare()` for model comparison that will eventually replace
 the existing `compare()` function. (#93)
