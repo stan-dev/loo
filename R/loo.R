@@ -483,7 +483,7 @@ mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
     var_epd_i <- sum(w[, i]^2 * (exp(ll[, i]) - E_epd[i])^2)
     sd_epd_i <- sqrt(var_epd_i)
     z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
-    var(log(z))
+    var(log(pmax(z,1e-5)))
   })
   sqrt(var_elpd / r_eff)
 }
