@@ -118,22 +118,29 @@
 
 <p><br></p>
 <div style="text-align:left">
-<span><a href="http://mc-stan.org">
+<span><a href="https://mc-stan.org">
 <img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width="100" alt="Stan Logo"></a><h2><strong>loo</strong></h2>
 <h4>Efficient approximate leave-one-out cross-validation</h4></span>
 </div>
 <p><br></p>
-<p><strong>loo</strong> is an R package that allows users to perform efficient leave-one-out cross-validation for fitted Bayesian models. Leave-one-out cross-validation (LOO) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps.</p>
+<p><strong>loo</strong> is an R package that allows users to compute efficient approximate leave-one-out cross-validation for fitted Bayesian models, as well as model weights that can be used to average predictive distributions.</p>
+<div id="getting-started" class="section level2">
+<h2 class="hasAnchor">
+<a href="#getting-started" class="anchor"></a>Getting Started</h2>
+<p>If you are just getting started with <strong>loo</strong> we recommend starting with the tutorial <a href="https://mc-stan.org/loo/articles/index.html">vignettes</a>. There are also many examples throughout the package <a href="https://mc-stan.org/loo/reference/index.html">documentation</a>.</p>
+</div>
 <div id="details" class="section level2">
 <h2 class="hasAnchor">
 <a href="#details" class="anchor"></a>Details</h2>
-<p>The package implements the fast and stable computations for LOO from</p>
+<p>Leave-one-out cross-validation (LOO-CV, or LOO for short) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps.</p>
+<p>The <strong>loo</strong> R package package implements the fast and stable computations for approximate LOO-CV and WAIC from</p>
 <ul>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="http://link.springer.com/article/10.1007%5C%2Fs11222-016-9696-4">Online</a>, <a href="http://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p></li>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p></li>
 </ul>
-<p>From existing posterior simulation draws, we compute LOO using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models.</p>
-<p>As of version <code>2.0.0</code>, the package also provides methods for using stacking and other model weighting techiques to average Bayesian predictive distributions. For details on stacking and model weighting see:</p>
+<p>From existing posterior simulation draws, we compute approximate LOO-CV using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models.</p>
+<p>We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful diagnostics and effective sample size and Monte Carlo standard error estimates.</p>
+<p>As of version <code>2.0.0</code>, the <strong>loo</strong> package also provides methods for using stacking and other model weighting techiques to average Bayesian predictive distributions. For details on stacking and model weighting see:</p>
 <ul>
 <li>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, <a href="doi:10.1214/17-BA1091" class="uri">doi:10.1214/17-BA1091</a>. <a href="https://projecteuclid.org/euclid.ba/1516093227">Online</a>, <a href="https://arxiv.org/abs/1704.02030">arXiv preprint arXiv:1704.02030</a>.</li>
 </ul>
@@ -148,7 +155,7 @@
 <a class="sourceLine" id="cb2-2" data-line-number="2">  <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>)</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">}</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"stan-dev/loo"</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
-<p>You can also set <code>build_vignettes=TRUE</code>, but the vignettes take some time to buid and they can always be accessed online at <a href="http://mc-stan.org/loo/articles/">mc-stan.org/loo/articles</a>.</p>
+<p>We do <em>not</em> recommend setting <code>build_vignettes=TRUE</code> when installing from GitHub because the vignettes take a long time to build and are always available online at <a href="https://mc-stan.org/loo/articles/">mc-stan.org/loo/articles/</a>.</p>
 </div>
 <div id="python-and-matlaboctave-code" class="section level2">
 <h2 class="hasAnchor">
@@ -198,8 +205,8 @@
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/stan-dev/loo"><img src="https://travis-ci.org/stan-dev/loo.svg?branch=master" alt="Travis-CI Build Status"></a></li>
 <li><a href="https://codecov.io/github/stan-dev/loo?branch=master"><img src="https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg" alt="codecov"></a></li>
-<li><a href="http://cran.r-project.org/web/packages/loo"><img src="http://www.r-pkg.org/badges/version/loo?color=blue" alt="CRAN_Status_Badge"></a></li>
-<li><a href="http://cran.r-project.org/web/packages/loo"><img src="http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
+<li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://www.r-pkg.org/badges/version/loo?color=blue" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
 </ul>
 </div>
 </div>
