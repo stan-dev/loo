@@ -27,11 +27,11 @@ for approximate LOO-CV and WAIC from
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model 
 evaluation using leave-one-out cross-validation and WAIC. 
 _Statistics and Computing_. 27(5), 1413--1432. 
-doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4), 
-[arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
+[arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. 
-[arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
+[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
 
 From existing posterior simulation draws, we compute approximate LOO-CV using
 Pareto smoothed importance sampling (PSIS), a new procedure for regularizing
@@ -55,8 +55,8 @@ Analysis, doi:10.1214/17-BA1091.
 
 ### Resources
 
-* [mc-stan.org/loo](http://mc-stan.org/loo) (online documentation, vignettes)
-* [Ask a question](http://discourse.mc-stan.org) (Stan Forums on Discourse)
+* [mc-stan.org/loo](https://mc-stan.org/loo) (online documentation, vignettes)
+* [Ask a question](https://discourse.mc-stan.org) (Stan Forums on Discourse)
 * [Open an issue](https://github.com/stan-dev/loo/issues) (GitHub issues for bug reports, feature requests)
 
 
@@ -74,8 +74,9 @@ install.packages("loo")
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("stan-dev/loo")
 ```
-You can also set `build_vignettes=TRUE` but the installation is slower and 
-the vignettes are always available online at [mc-stan.org/loo/articles/](http://mc-stan.org/loo/articles/)
+We do _not_ recommend setting `build_vignettes=TRUE` when installing from GitHub
+because the vignettes take a long time to build and are always available
+online at [mc-stan.org/loo/articles/](http://mc-stan.org/loo/articles/).
 
 ### Python and Matlab/Octave Code
 Corresponding Python and Matlab/Octave code can be found at the
