@@ -1,11 +1,11 @@
-[<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width=100 alt="Stan Logo"/>](http://mc-stan.org)
+[<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width=100 alt="Stan Logo"/>](https://mc-stan.org)
 
 # loo
 
 [![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=master)](https://travis-ci.org/stan-dev/loo)
 [![codecov](https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg)](https://codecov.io/github/stan-dev/loo?branch=master)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
-[![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
+[![RStudio_CRAN_mirror_downloads_badge](https://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
 
 ### Efficient approximate leave-one-out cross-validation for fitted Bayesian models
 
@@ -76,7 +76,7 @@ devtools::install_github("stan-dev/loo")
 ```
 We do _not_ recommend setting `build_vignettes=TRUE` when installing from GitHub
 because the vignettes take a long time to build and are always available
-online at [mc-stan.org/loo/articles/](http://mc-stan.org/loo/articles/).
+online at [mc-stan.org/loo/articles/](https://mc-stan.org/loo/articles/).
 
 ### Python and Matlab/Octave Code
 Corresponding Python and Matlab/Octave code can be found at the
