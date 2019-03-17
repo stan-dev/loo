@@ -70,23 +70,12 @@ loo_compare.default <- function(x, ...) {
     loos <- x
   }
 
-  if (!all(sapply(loos, is.loo))) {
-    stop("All inputs should have class 'loo'.")
-  }
-  if (length(loos) <= 1L) {
-    stop("'loo_compare' requires at least two models.")
-  }
-
-  Ns <- sapply(loos, function(x) nrow(x$pointwise))
-  if (!all(Ns == Ns[1L])) {
-    stop("Not all models have the same number of data points.")
-  }
+  loo_compare_checks(loos)
 
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
     setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
   })
-
   colnames(tmp) <- find_model_names(loos)
   rnms <- rownames(tmp)
   comp <- tmp
@@ -152,6 +141,33 @@ se_elpd_diff <- function(diffs) {
   sqrt(N) * sd(diffs)
 }
 
+
+#' Perform checks on loo objects before comparison
+#' @noRd
+#' @param loos List of loo objects
+#' @return Nothing, just possibly throws errors/warnings
+loo_compare_checks <- function(loos) {
+  if (length(loos) <= 1L) {
+    stop("'loo_compare' requires at least two models.", call.=FALSE)
+  }
+  if (!all(sapply(loos, is.loo))) {
+    stop("All inputs should have class 'loo'.", call.=FALSE)
+  }
+
+  Ns <- sapply(loos, function(x) nrow(x$pointwise))
+  if (!all(Ns == Ns[1L])) {
+    stop("Not all models have the same number of data points.", call.=FALSE)
+  }
+
+  yhash <- lapply(loos, attr, which = "yhash")
+  yhash_check <- sapply(yhash, function(x) {
+    isTRUE(all.equal(x, yhash[[1]]))
+  })
+  if (!all(yhash_check)) {
+    warning("Not all models have the same y variable.", call. = FALSE)
+  }
+
+}
 
 
 #' Find the model names associated with loo objects
