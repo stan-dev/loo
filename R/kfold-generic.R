@@ -32,3 +32,8 @@ kfold <- function(x, ...) {
 is.kfold <- function(x) {
   inherits(x, "kfold") && is.loo(x)
 }
+
+#' @export
+dim.kfold <- function(x) {
+  attr(x, "dims")
+}

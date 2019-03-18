@@ -396,15 +396,19 @@ loo_i <-
 
 
 #' @export
-dim.psis_loo <- function(x) {
+dim.loo <- function(x) {
   attr(x, "dims")
 }
-
 
 #' @rdname loo
 #' @export
 is.loo <- function(x) {
   inherits(x, "loo")
+}
+
+#' @export
+dim.psis_loo <- function(x) {
+  attr(x, "dims")
 }
 
 #' @rdname loo
