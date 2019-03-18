@@ -147,6 +147,7 @@ se_elpd_diff <- function(diffs) {
 #' @param loos List of loo objects
 #' @return Nothing, just possibly throws errors/warnings
 loo_compare_checks <- function(loos) {
+  ## errors
   if (length(loos) <= 1L) {
     stop("'loo_compare' requires at least two models.", call.=FALSE)
   }
@@ -159,6 +160,7 @@ loo_compare_checks <- function(loos) {
     stop("Not all models have the same number of data points.", call.=FALSE)
   }
 
+  ## warnings
   yhash <- lapply(loos, attr, which = "yhash")
   yhash_check <- sapply(yhash, function(x) {
     isTRUE(all.equal(x, yhash[[1]]))
@@ -167,6 +169,19 @@ loo_compare_checks <- function(loos) {
     warning("Not all models have the same y variable.", call. = FALSE)
   }
 
+  if (all(sapply(loos, is.kfold))) {
+    Ks <- unlist(lapply(loos, attr, which = "K"))
+    if (!all(Ks == Ks[1])) {
+      warning("Not all kfold objects have the same K value. ",
+              "For a more accurate comparison use the same number of folds. ",
+              call. = FALSE)
+    }
+  } else if (any(sapply(loos, is.kfold)) && any(sapply(loos, is.psis_loo))) {
+    warning("Comparing LOO-CV to K-fold-CV. ",
+            "For a more accurate comparison use the same number of folds ",
+            "or loo for all models compared.",
+            call. = FALSE)
+  }
 }
 
 
