@@ -340,10 +340,14 @@ psis_smooth_tail <- function(x, cutoff) {
   fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
-
-  p <- (seq_len(len) - 0.5) / len
-  qq <- qgpd(p, k, sigma) + exp_cutoff
-  list(tail = log(qq), k = k)
+  if (is.finite(k)) {
+      p <- (seq_len(len) - 0.5) / len
+      qq <- qgpd(p, k, sigma) + exp_cutoff
+      tail <- log(qq)
+  } else {
+      tail <- x
+  }
+  list(tail = tail, k = k)
 }
 
 
