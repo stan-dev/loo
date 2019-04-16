@@ -197,7 +197,6 @@ psis_object <-
            tail_len,
            r_eff) {
     stopifnot(is.matrix(unnormalized_log_weights))
-
     norm_const_log <- colLogSumExps(unnormalized_log_weights)
     out <- structure(
       list(
@@ -489,7 +488,7 @@ called_from_loo <- function() {
 throw_psis_r_eff_warning <- function() {
   warning(
     "Relative effective sample sizes ('r_eff' argument) not specified. ",
-    "PSIS n_eff will not adjusted based on MCMC n_eff.",
+    "PSIS n_eff will not be adjusted based on MCMC n_eff.",
     call. = FALSE
   )
 }

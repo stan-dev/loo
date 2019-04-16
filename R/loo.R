@@ -251,10 +251,14 @@ loo.function <-
 
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    if (is.null(r_eff)) throw_loo_r_eff_warning()
-
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
+
+    if (is.null(r_eff)) {
+      throw_loo_r_eff_warning()
+    } else {
+      r_eff <- prepare_psis_r_eff(r_eff, len = N)
+    }
 
     if (cores == 1) {
       psis_list <-
