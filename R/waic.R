@@ -29,7 +29,7 @@
 #' @seealso
 #' \itemize{
 #' \item \code{\link{loo}} for approximate LOO-CV.
-#' \item \code{\link{compare}} for comparing models on LOOIC or WAIC.
+#' \item \code{\link{loo_compare}} for comparing models via approximate LOO-CV or WAIC.
 #' }
 #'
 #'
