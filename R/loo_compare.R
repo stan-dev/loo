@@ -161,11 +161,12 @@ loo_compare_checks <- function(loos) {
   }
 
   ## warnings
-  yhash <- lapply(loos, attr, which = "yhash")  # will be list of NULLs if no 'yhash' attr
-  yhash_check <- sapply(yhash, function(x) {
+
+  yhash <- lapply(loos, attr, which = "yhash")
+  yhash_ok <- sapply(yhash, function(x) { # ok only if all yhash are same (all NULL is ok)
     isTRUE(all.equal(x, yhash[[1]]))
   })
-  if (!all(yhash_check)) {
+  if (!all(yhash_ok)) {
     warning("Not all models have the same y variable. ('yhash' attributes do not match)",
             call. = FALSE)
   }
