@@ -55,3 +55,46 @@ articles:
       - loo2-with-rstan
       - loo2-non-factorizable
       - loo2-lfo
+
+reference:
+  - title: "Package description, glossary, and included data sets"
+    contents:
+      - loo-package
+      - loo-glossary
+      - loo-datasets
+  - title: "Approximate LOO-CV"
+    desc: >
+      Approximate LOO-CV, Pareto smoothed importance sampling (PSIS), and
+      diagnostics.
+    contents:
+      - loo
+      - E_loo
+      - psis
+      - pareto-k-diagnostic
+  - title: "Model comparison and weighting/averaging"
+    desc: >
+      Functions for comparing models and computing model weights via stacking of
+      predictive distributions or pseudo-BMA weighting.
+    contents:
+      - loo_compare
+      - loo_model_weights
+      - stacking_weights
+      - pseudobma_weights
+  - title: "Helper functions for K-fold CV"
+    contents:
+      - kfold_split_random
+      - kfold_split_stratified
+      - kfold_split_grouped
+      - kfold
+  - title: "Other functions"
+    contents:
+      - waic
+      - extract_log_lik
+      - relative_eff
+      - gpdfit
+      - starts_with("example_loglik")
+      - print.loo
+  - title: "Deprecated functions"
+    contents:
+      - compare
+      - psislw
