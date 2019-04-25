@@ -1,6 +1,6 @@
 ---
-title: "Approximate leave-future-out cross-validation for time series models"
-author: "Paul Bürkner, Aki Vehtari, Jonah Gabry"
+title: "Approximate leave-future-out cross-validation for Bayesian time series models"
+author: "Paul Bürkner, Jonah Gabry, Aki Vehtari"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -12,7 +12,7 @@ params:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Approximate leave-future-out cross-validation for time series models}
+%\VignetteIndexEntry{Approximate leave-future-out cross-validation for Bayesian time series models}
 -->
 
 ```{r settings, child="children/SETTINGS-knitr.txt"}
@@ -91,7 +91,7 @@ $y = (y_1, y_2, \ldots, y_N)$
 and let $L$ be the _minimum_ number of observations from the series that
 we will require before making predictions for future data. Depending on the
 application and how informative the data is, it may not be possible to make
-reasonable predictions for $y_{i}$ based on $(y_1, \dots, y_{i-1})$ until $i$ is
+reasonable predictions for $y_{i+1}$ based on $(y_1, \dots, y_{i})$ until $i$ is
 large enough so that we can learn enough about the time series to predict future
 observations. Setting $L=10$, for example, means that we will only assess
 predictive performance starting with observation $y_{11}$, so that we
@@ -101,13 +101,14 @@ In order to assess $M$-SAP performance we would like to compute the
 predictive densities
 
 $$
-p(y_{i+1:M} \,|\, y_{1:i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1}) 
+p(y_{i+1:M} \,|\, y_{1:i}) = 
+  p(y_{i+1}, \ldots, y_{i + M} \,|\, y_{1},...,y_{i}) 
 $$ 
 
-for each $i \in \{L + 1, \ldots, N - M + 1\}$. The quantities 
+for each $i \in \{L, \ldots, N - M\}$. The quantities 
 $p(y_{i+1:M} \,|\, y_{1:i})$ can be computed with the help of the posterior
 distribution $p(\theta \,|\, y_{1:i})$ of the parameters $\theta$ conditional on
-only the first $i-1$ observations of the time-series:
+only the first $i$ observations of the time-series:
 
 $$
 p(y_{i+1:M} \,| \, y_{1:i}) = 
@@ -132,7 +133,7 @@ $$
 
 In this case, $p(y_{i+1:M} \,|\, y_{1:i}, \theta)$ reduces to 
 $$
-p(y_{i+1:M} \,|\, \theta) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta),
+p(y_{i+1:M} \,|\, \theta) = \prod_{j = i+1}^{i + M} p(y_j \,|\, \theta),
 $$
 due to the assumption of conditional independence between $y_{i+1:M}$ and
 $y_{1:i}$ given $\theta$.
@@ -145,12 +146,12 @@ separate vignette [_Leave-one-out cross-validation for non-factorizable models_]
 Unfortunately, the math above makes use of the posterior distributions from many
 different fits of the model to different subsets of the data. That is, to obtain
 the predictive density $p(y_{i+1:M} \,|\, y_{1:i})$ requires fitting a model to
-only the first $i-1$ data points, and we will need to do this for every value of
-$i$ under consideration (all $i \in \{L + 1, \ldots, N - M + 1\}$).
+only the first $i$ data points, and we will need to do this for every value of
+$i$ under consideration (all $i \in \{L, \ldots, N - M\}$).
 
 To reduce the number of models that need to be fit for the purpose of obtaining
 each of the densities $p(y_{i+1:M} \,|\, y_{1:i})$, we propose the following
-algorithm. Starting with $i = N - M + 1$, we approximate each 
+algorithm. Starting with $i = N - M$, we approximate each 
 $p(y_{i+1:M} \,|\, y_{1:i})$ using Pareto smoothed importance sampling (PSIS,
 Vehtari et al, 2017ab):
 
@@ -180,7 +181,7 @@ then restart the process. In some cases we may only need to refit once and in
 other cases we will find a value $i^\star_2$ that requires a second refitting,
 maybe an $i^\star_3$ that requires a third refitting, and so on. We repeat the
 refitting as few times as is required (only if $k > \text{threshold}$) until we
-arrive at $i = L+1$. Recall that $L$ is the minimum number of observations we
+arrive at $i = L$. Recall that $L$ is the minimum number of observations we
 have deemed acceptable for making predictions (setting $L=0$ means predictions
 of all observations should be computed).
 
@@ -323,9 +324,13 @@ densities by refitting the model many times:
 
 ```{r exact_loglik, results="hide"}
 loglik_exact <- matrix(nrow = nsamples(fit), ncol = N)
-for (i in N:max(L + 1, 2)) {
-  fit_i <- update(fit, newdata = df[-(i:N), ], recompile = FALSE)
-  loglik_exact[, i] <- log_lik(fit_i, newdata = df[1:i, ])[, i]
+for (i in (N - 1):L) {
+  past <- 1:i
+  oos <- i + 1
+  df_past <- df[past, , drop = FALSE]
+  df_oos <- df[c(past, oos), , drop = FALSE]
+  fit_i <- update(fit, newdata = df_past, recompile = FALSE)
+  loglik_exact[, i + 1] <- log_lik(fit_i, newdata = df_oos, oos = oos)[, oos]
 }
 ```
 
@@ -387,15 +392,14 @@ produce stable results.
 ```{r loglik}
 approx_elpds_1sap_no_refit <- rep(NA, N)
 loglik <- log_lik(fit)
-ids <- N:(L + 1)
 ks <- NULL
 
-for (i in ids) {
-  logratio <- sum_log_ratios(loglik, i:N)
-  psis_part <- suppressWarnings(psis(logratio))
-  ks <- c(ks, pareto_k_values(psis_part))
-  lw_i <- weights(psis_part, normalize = TRUE)[, 1]
-  approx_elpds_1sap_no_refit[i] <- log_sum_exp(lw_i + loglik[, i])
+for (i in (N - 1):L) {
+  logratio <- sum_log_ratios(loglik, (i + 1):N)
+  psis_obj <- suppressWarnings(psis(logratio))
+  ks <- c(ks, pareto_k_values(psis_obj))
+  lw <- weights(psis_obj, normalize = TRUE)[, 1]
+  approx_elpds_1sap_no_refit[i + 1] <- log_sum_exp(lw + loglik[, i + 1])
 }
 ```
 
@@ -418,7 +422,7 @@ plot_ks <- function(ks, ids, thres = 0.6) {
 ```
 
 ```{r plotk1sap, cache = FALSE}
-plot_ks(ks, ids)
+plot_ks(ks, N:(L + 1))
 ```
 
 Consequently, it is not surprising that the resulting approximate ELPD for 1-SAP 
@@ -447,29 +451,30 @@ no additional computational costs since we had to refit the model anyway.
 ```{r refit_loglik, results="hide"}
 loglik <- matrix(nrow = nsamples(fit), ncol = N)
 approx_elpds_1sap <- rep(NA, N)
-
-fit_part <- fit
-ids <- N:(L + 1)
+fit_past <- fit
 i_refit <- N
-refits <- NULL
-ks <- NULL
+refits <- ks <- NULL
 
-for (i in ids) {
-  loglik[, i] <- log_lik(fit_part)[, i]
-  logratio <- sum_log_ratios(loglik, i:i_refit)
-  psis_part <- suppressWarnings(psis(logratio))
-  k <- pareto_k_values(psis_part)
+for (i in (N - 1):L) {
+  loglik[, i + 1] <- log_lik(fit_past)[, i + 1]
+  logratio <- sum_log_ratios(loglik, (i + 1):i_refit)
+  psis_obj <- suppressWarnings(psis(logratio))
+  k <- pareto_k_values(psis_obj)
   ks <- c(ks, k)
   if (k > k_thres) {
-    # refit the model based on the first i-1 observations
-    i_refit <- i - 1
+    # refit the model based on the first i observations
+    i_refit <- i
     refits <- c(refits, i)
-    fit_part <- update(fit_part, newdata = df[1:(i - 1), ], recompile = FALSE)
-    loglik[, i] <- log_lik(fit_part, newdata = df[1:i, ])[, i]
-    approx_elpds_1sap[i] <- log_mean_exp(loglik[, i])
+    past <- 1:i
+    oos <- i + 1
+    df_past <- df[past, , drop = FALSE]
+    df_oos <- df[c(past, oos), , drop = FALSE]
+    fit_past <- update(fit_past, newdata = df_past, recompile = FALSE)
+    loglik[, i + 1] <- log_lik(fit_past, newdata = df_oos)[, oos]
+    approx_elpds_1sap[i + 1] <- log_mean_exp(loglik[, i + 1])
   } else {
-    lw_i <- weights(psis_part, normalize = TRUE)[, 1]
-    approx_elpds_1sap[i] <- log_sum_exp(lw_i + loglik[, i])
+    lw <- weights(psis_obj, normalize = TRUE)[, 1]
+    approx_elpds_1sap[i + 1] <- log_sum_exp(lw + loglik[, i + 1])
   }
 } 
 ```
@@ -482,7 +487,7 @@ cat("Using threshold ", k_thres,
     ", model was refit ", length(refits), 
     " times, at observations", refits)
 
-plot_ks(ks, ids)
+plot_ks(ks, N:(L + 1))
 ```
 
 The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP ELPD
@@ -517,7 +522,7 @@ ggplot(dat_elpd, aes(x = approx_elpd, y = exact_elpd)) +
 We can also look at the maximum difference and average difference between
 the approximate and exact ELPD calculations, which also indicate a ver close approximation:
 
-```{r diffs1sap}
+```{r diffs1sap, cache=FALSE}
 max_diff <- with(dat_elpd, max(abs(approx_elpd - exact_elpd), na.rm = TRUE))
 mean_diff <- with(dat_elpd, mean(abs(approx_elpd - exact_elpd), na.rm = TRUE))
 
@@ -526,7 +531,6 @@ rbind_print(
   "Mean diff" =  round(mean_diff, 3)
 )
 ```
-
 
 ## $M$-step-ahead predictions leaving out all future values
 
@@ -545,10 +549,14 @@ predict.
 ```{r exact_loglikm, results="hide"}
 M <- 4
 loglikm <- matrix(nrow = nsamples(fit), ncol = N)
-for (i in (N - M + 1):max(L + 1, 2)) {
-  fit_i <- update(fit, newdata = df[-(i:N), ], recompile = FALSE)
-  ll <- log_lik(fit_i, newdata = df[1:(i + M - 1), ], oos = i:(i + M - 1))
-  loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
+for (i in (N - M):L) {
+  past <- 1:i
+  oos <- (i + 1):(i + M)
+  df_past <- df[past, , drop = FALSE]
+  df_oos <- df[c(past, oos), , drop = FALSE]
+  fit_past <- update(fit, newdata = df_past, recompile = FALSE)
+  ll <- log_lik(fit_past, newdata = df_oos, oos = oos)
+  loglikm[, i + 1] <- rowSums(ll[, oos])
 }
 ```
 
@@ -566,38 +574,35 @@ underlying principles remain the same.
 ```{r refit_loglikm, results="hide"}
 loglikm <- loglik <- matrix(nrow = nsamples(fit), ncol = N)
 approx_elpds_4sap <- rep(NA, N)
-fit_part <- fit
-ids <- (N - M + 1):(L + 1)
-i_refit <- N - M + 1
-refits <- NULL
-ks <- NULL
+fit_past <- fit
+i_refit <- N
+refits <- ks <- NULL
 
-loglik[, (N - M + 2):N] <- log_lik(fit_part)[, (N - M + 2):N]
-
-for (i in ids) {
-  oos <- i:(i + M - 1)
-  ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ], oos = oos)
-  loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
-  loglik[, i] <- ll[, i]
-  logratio <- sum_log_ratios(loglik, i:i_refit)
-  psis_part <- suppressWarnings(psis(logratio))
-  k <- pareto_k_values(psis_part)
+loglik[, (N - M + 2):N] <- log_lik(fit_past)[, (N - M + 2):N]
+for (i in (N - M):L) {
+  past <- 1:i
+  oos <- (i + 1):(i + M)
+  df_oos <- df[c(past, oos), , drop = FALSE]
+  ll <- log_lik(fit_past, newdata = df_oos, oos = oos)
+  loglik[, i + 1] <- ll[, i + 1]
+  logratio <- sum_log_ratios(loglik, (i + 1):i_refit)
+  psis_obj <- suppressWarnings(psis(logratio))
+  k <- pareto_k_values(psis_obj)
   ks <- c(ks, k)
   if (k > k_thres) {
-    # refit the model based on the first i-1 observations
-    i_refit <- i - 1
+    # refit the model based on the first i observations
+    i_refit <- i
     refits <- c(refits, i)
-    fit_part <- update(
-      fit_part, newdata = df[1:(i - 1), ], 
-      recompile = FALSE
-    )
-    ll <- log_lik(fit_part, newdata = df[1:(i + M - 1), ], oos = oos)
-    loglik[, i] <- ll[, i]
-    loglikm[, i] <- rowSums(ll[, i:(i + M - 1)])
-    approx_elpds_4sap[i] <- log_mean_exp(loglikm[, i])
+    df_past <- df[past, , drop = FALSE]
+    fit_past <- update(fit, newdata = df_past, recompile = FALSE)
+    ll <- log_lik(fit_past, newdata = df_oos, oos = oos)
+    loglikm[, i + 1] <- rowSums(ll[, oos])
+    loglik[, i + 1] <- ll[, i + 1]
+    approx_elpds_4sap[i + 1] <- log_mean_exp(loglikm[, i + 1])
   } else {
-    lw_i <- weights(psis_part, normalize = TRUE)[, 1]
-    approx_elpds_4sap[i] <- log_sum_exp(lw_i + loglikm[, i])
+    lw <- weights(psis_obj, normalize = TRUE)[, 1]
+    loglikm[, i + 1] <- rowSums(ll[, oos])
+    approx_elpds_4sap[i + 1] <- log_sum_exp(lw + loglikm[, i + 1])
   }
 } 
 ```
@@ -610,7 +615,7 @@ cat("Using threshold ", k_thres,
     ", model was refit ", length(refits), 
     " times, at observations", refits)
 
-plot_ks(ks, ids)
+plot_ks(ks, (N - M + 1):(L + 1))
 ```
 
 The approximate ELPD computed for the 4-SAP case is not as close to its exact
@@ -670,5 +675,5 @@ sessionInfo()
 
 ### Appendix: Licenses
 
-* Code &copy; 2018, Paul Bürkner, Aki Vehtari, Jonah Gabry (licensed under BSD-3).
-* Text &copy; 2018, Paul Bürkner, Aki Vehtari, Jonah Gabry (licensed under CC-BY-NC 4.0).
+* Code &copy; 2018, Paul Bürkner, Jonah Gabry, Aki Vehtari (licensed under BSD-3).
+* Text &copy; 2018, Paul Bürkner, Jonah Gabry, Aki Vehtari (licensed under CC-BY-NC 4.0).
