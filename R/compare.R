@@ -1,4 +1,4 @@
-#' Model comparison
+#' Model comparison (deprecated, old version)
 #'
 #' \strong{This function will be deprecated in a future release}. We
 #' recommend using the new \code{\link{loo_compare}} function instead.

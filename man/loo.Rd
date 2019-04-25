@@ -291,6 +291,6 @@ importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
  Sampling (PSIS) procedure used in the LOO-CV approximation.
  \item \link{pareto-k-diagnostic} for convenience functions for looking at
  diagnostics.
- \item \code{\link{compare}} for model comparison.
+ \item \code{\link{loo_compare}} for model comparison.
 }
 }

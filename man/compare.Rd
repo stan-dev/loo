@@ -2,7 +2,7 @@
 % Please edit documentation in R/compare.R
 \name{compare}
 \alias{compare}
-\title{Model comparison}
+\title{Model comparison (deprecated, old version)}
 \usage{
 compare(..., x = list())
 }
