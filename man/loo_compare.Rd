@@ -29,7 +29,10 @@ A matrix with class \code{"compare.loo"} that has its own
   print method. See the \strong{Details} section for more .
 }
 \description{
-Compare fitted models on LOO or WAIC.
+Compare fitted models based on \link[=loo-glossary]{ELPD}.
+
+  By default the print method shows only the most important information. Use
+  \code{print(..., simplify=FALSE)} to print a more detailed summary.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
@@ -59,15 +62,25 @@ When comparing two fitted models, we can estimate the difference in their
   asymptotically, and which only applies to nested models in any case.
 }
 \examples{
-\dontrun{
-loo1 <- loo(log_lik1)
-loo2 <- loo(log_lik2)
-print(loo_compare(loo1, loo2), digits = 3)
-print(loo_compare(x = list(loo1, loo2)))
+# very artificial example, just for demonstration!
+LL <- example_loglik_array()
+loo1 <- loo(LL, r_eff = NA)     # should be worst model when compared
+loo2 <- loo(LL + 1, r_eff = NA) # should be second best model when compared
+loo3 <- loo(LL + 2, r_eff = NA) # should be best model when compared
 
-waic1 <- waic(log_lik1)
-waic2 <- waic(log_lik2)
-loo_compare(waic1, waic2)
+comp <- loo_compare(loo1, loo2, loo3)
+print(comp, digits = 2)
+
+# show more details with simplify=FALSE
+# (will be the same for all models in this artificial example)
+print(comp, simplify = FALSE, digits = 3)
+
+# can use a list of objects
+loo_compare(x = list(loo1, loo2, loo3))
+
+\dontrun{
+# works for waic (and kfold) too
+loo_compare(waic(LL), waic(LL - 10))
 }
 
 }
