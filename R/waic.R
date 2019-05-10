@@ -1,37 +1,40 @@
 #' Widely applicable information criterion (WAIC)
 #'
-#' The \code{waic} methods can be used to compute WAIC from the pointwise
+#' The `waic()` methods can be used to compute WAIC from the pointwise
 #' log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-#' the \code{\link{loo}} function) because PSIS provides useful diagnostics and
+#' the [loo()] function) because PSIS provides useful diagnostics and
 #' effective sample size and Monte Carlo estimates.
 #'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
 #'
-#' @return A named list (of class \code{c("waic", "loo")}) with components:
+#' @return A named list (of class `c("waic", "loo")`) with components:
 #'
 #' \describe{
-#'  \item{\code{estimates}}{
-#'  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
-#'  rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+#'  \item{`estimates`}{
+#'  A matrix with two columns (`"Estimate"`, `"SE"`) and three
+#'  rows (`"elpd_waic"`, `"p_waic"`, `"waic"`). This contains
 #'  point estimates and standard errors of the expected log pointwise predictive
-#'  density (\code{elpd_waic}), the effective number of parameters
-#'  (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
-#'  \code{-2 * elpd_waic}, i.e., converted to deviance scale).
+#'  density (`elpd_waic`), the effective number of parameters
+#'  (`p_waic`) and the information criterion `waic` (which is just
+#'  `-2 * elpd_waic`, i.e., converted to deviance scale).
 #'  }
-#'  \item{\code{pointwise}}{
+#'  \item{`pointwise`}{
 #'  A matrix with three columns (and number of rows equal to the number of
 #'  observations) containing the pointwise contributions of each of the above
-#'  measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+#'  measures (`elpd_waic`, `p_waic`, `waic`).
 #'  }
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item \code{\link{loo}} for approximate LOO-CV.
-#' \item \code{\link{loo_compare}} for comparing models via approximate LOO-CV or WAIC.
-#' }
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) for
+#'   more details on why `loo()` is usually preferred to `waic()`.
+#' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
 #'
+#' @references
+#' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
+#' widely application information criterion in singular learning theory.
+#' *Journal of Machine Learning Research* **11**, 3571-3594.
 #'
 #' @examples
 #' ### Array and matrix methods
@@ -87,8 +90,8 @@ waic.matrix <- function(x, ...) {
 #' @export
 #' @templateVar fn waic
 #' @template function
-#' @param draws,data,... For the function method only. See the \strong{Methods
-#'   (by class)} section below for details on these arguments.
+#' @param draws,data,... For the function method only. See the
+#' **Methods (by class)** section below for details on these arguments.
 #'
 waic.function <-
   function(x,

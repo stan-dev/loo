@@ -19,8 +19,7 @@ print_dims(x, ...)
 \method{print_dims}{kfold}(x, ...)
 }
 \arguments{
-\item{x}{The object returned by \code{\link{psis}}, \code{\link{loo}}, or
-\code{\link{waic}}.}
+\item{x}{The object returned by \code{\link[=psis]{psis()}}, \code{\link[=loo]{loo()}}, or \code{\link[=waic]{waic()}}.}
 
 \item{...}{Ignored.}
 }

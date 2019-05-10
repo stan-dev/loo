@@ -6,15 +6,15 @@
 #'   proposal distribution (q). A vector of length S.
 #' @param log_liks A log-likelihood matrix of size S * N, where N is the number
 #'   of observations and S is the number of samples from q. See
-#'   \code{\link{loo.matrix}} for details. Default is \code{NULL}. Then only the
+#'   [loo.matrix()] for details. Default is `NULL`. Then only the
 #'   posterior is evaluated using the k_hat diagnostic.
 #' @inheritParams  loo
 #'
 #' @return
-#' If log likelihoods are supplied, the function returns a \code{loo} object,
-#' otherwise the function returns a \code{psis} object.
+#' If log likelihoods are supplied, the function returns a `"loo"` object,
+#' otherwise the function returns a `"psis"` object.
 #'
-#' @seealso \code{loo} and \code{psis}
+#' @seealso `loo` and `psis`
 #'
 #' @template loo-and-psis-references
 #'

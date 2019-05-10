@@ -1,97 +1,93 @@
 #' Efficient approximate leave-one-out cross-validation (LOO)
 #'
-#' The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+#' The `loo()` methods for arrays, matrices, and functions compute PSIS-LOO
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-#' models using Pareto smoothed importance sampling (PSIS). This is an
+#' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is an
 #' implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
 #' 2017b).
 #'
 #' @export loo loo.array loo.matrix loo.function
-#' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
-#'   (by class)} section below for a detailed description of how to specify the
-#'   inputs for each method.
+#' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
+#'   section, below, has detailed descriptions of how to specify the inputs for
+#'   each method.
 #' @param r_eff Vector of relative effective sample size estimates for the
-#'   likelihood (\code{exp(log_lik)}) of each observation. This is related to
+#'   likelihood (`exp(log_lik)`) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
 #'   self-normalizing importance sampling when using posterior draws obtained
-#'   with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
+#'   with MCMC. If MCMC draws are used and `r_eff` is not provided then
 #'   the reported PSIS effective sample sizes and Monte Carlo error estimates
 #'   will be over-optimistic. If the posterior draws are independent then
-#'   \code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
-#'   helper function for computing \code{r_eff}.
+#'   `r_eff=1` and can be omitted. See the [relative_eff()]
+#'   helper functions for computing `r_eff`.
 #'
-#' @param save_psis Should the \code{"psis"} object created internally by
-#'   \code{loo} be saved in the returned object? The \code{loo} function calls
-#'   \code{\link{psis}} internally but by default discards the (potentially
-#'   large) \code{"psis"} object after using it to compute the LOO-CV summaries.
-#'   Setting \code{save_psis} to \code{TRUE} will add a \code{psis_object}
-#'   component to the list returned by \code{loo}. Currently this is only needed
-#'   if you plan to use the \code{\link{E_loo}} function to compute weighted
-#'   expectations after running \code{loo}.
+#' @param save_psis Should the `"psis"` object created internally by `loo()` be
+#'   saved in the returned object? The `loo()` function calls [psis()]
+#'   internally but by default discards the (potentially large) `"psis"` object
+#'   after using it to compute the LOO-CV summaries. Setting `save_psis=TRUE`
+#'   will add a `psis_object` component to the list returned by `loo`. Currently
+#'   this is only needed if you plan to use the [E_loo()] function to compute
+#'   weighted expectations after running `loo`.
 #' @template cores
 #'
-#' @details The \code{loo} function is an S3 generic and methods are provided
-#'   for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-#'   log-likelihood matrices, and log-likelihood functions. The array and matrix
-#'   methods are most convenient, but for models fit to very large datasets the
-#'   \code{loo.function} method is more memory efficient and may be preferable.
+#' @details The `loo()` function is an S3 generic and methods are provided for
+#'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
+#'   log-likelihood functions. The array and matrix methods are the most
+#'   convenient, but for models fit to very large datasets the `loo.function()`
+#'   method is more memory efficient and may be preferable.
 #'
-#' @section Defining \code{loo} methods in a package: Package developers can
-#'   define \code{loo} methods for fitted models objects. See the example
-#'   \code{loo.stanfit} method in the \strong{Examples} section below for an
-#'   example of defining a method that calls \code{loo.array}. The
-#'   \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
-#'   method that calls \code{loo.function}.
+#' @section Defining `loo()` methods in a package: Package developers can define
+#'   `loo()` methods for fitted models objects. See the example `loo.stanfit()`
+#'   method in the **Examples** section below for an example of defining a
+#'   method that calls `loo.array()`. The `loo.stanreg()` method in the
+#'   **rstanarm** package is an example of defining a method that calls
+#'   `loo.function()`.
 #'
-#' @return The \code{loo} methods return a named list with class
-#'   \code{c("psis_loo", "loo")} and components:
+#' @return The `loo()` methods return a named list with class
+#'   `c("psis_loo", "loo")` and components:
 #' \describe{
-#'  \item{\code{estimates}}{
-#'   A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
-#'   (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+#'  \item{`estimates`}{
+#'   A matrix with two columns (`Estimate`, `SE`) and four rows
+#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`). This
 #'   contains point estimates and standard errors of the expected log pointwise
-#'   predictive density (\code{elpd_loo}), the Monte Carlo standard error of
-#'   \code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
-#'   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
-#'   just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
+#'   predictive density (`elpd_loo`), the Monte Carlo standard error of
+#'   `elpd_loo` (`mcse_elpd_loo`), the effective number of parameters
+#'   (`p_loo`) and the LOO information criterion `looic` (which is
+#'   just `-2 * elpd_loo`, i.e., converted to deviance scale).
 #'  }
-#'  \item{\code{pointwise}}{
+#'
+#'  \item{`pointwise`}{
 #'   A matrix with four columns (and number of rows equal to the number of
 #'   observations) containing the pointwise contributions of each of the above
-#'   measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo},
-#'   \code{looic}).
+#'   measures (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`).
 #'  }
-#'  \item{\code{diagnostics}}{
+#'
+#'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
-#'   \itemize{
-#'    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-#'    generalized Pareto fit to the importance ratios for each leave-one-out
-#'    distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
-#'    \item \code{n_eff}: PSIS effective sample size estimates.
-#'   }
+#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
+#'      generalized Pareto fit to the importance ratios for each leave-one-out
+#'      distribution. See the [pareto-k-diagnostic] page for details.
+#'    * `n_eff`: PSIS effective sample size estimates.
 #'  }
-#'  \item{\code{psis_object}}{
-#'  This component will be \code{NULL} unless the \code{save_psis} argument is
-#'  set to \code{TRUE} when calling \code{loo}. In that case \code{psis_object}
-#'  will be the object of class \code{"psis"} that is created when the
-#'  \code{loo} function calls \code{\link{psis}} internally to do the PSIS
-#'  procedure.
+#'
+#'  \item{`psis_object`}{
+#'  This component will be `NULL` unless the `save_psis` argument is set to
+#'  `TRUE` when calling `loo()`. In that case `psis_object` will be the object
+#'  of class `"psis"` that is created when the `loo()` function calls [psis()]
+#'  internally to do the PSIS procedure.
 #'  }
 #' }
 #'
 #' @seealso
-#' \itemize{
-#'  \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
-#'  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
-#'  Sampling (PSIS) procedure used in the LOO-CV approximation.
-#'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
-#'  diagnostics.
-#'  \item \code{\link{loo_compare}} for model comparison.
-#' }
+#'  * The **loo** package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'    for demonstrations.
+#'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
+#'    procedure used in the LOO-CV approximation.
+#'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.
+#'  * [loo_compare()] for model comparison.
+#'
 #' @template loo-and-psis-references
 #'
 #' @examples
-#'
 #' ### Array and matrix methods (using example objects included with loo package)
 #' # Array method
 #' LLarr <- example_loglik_array()
@@ -235,10 +231,10 @@ loo.matrix <-
 #' @export
 #' @templateVar fn loo
 #' @template function
-#' @param data,draws,... For the \code{loo} function method and the \code{loo_i}
-#'   function, the data, posterior draws, and other arguments to pass to the
-#'   log-likelihood function. See the \strong{Methods (by class)} section below
-#'   for details on how to specify these arguments.
+#' @param data,draws,... For the `loo.function()` method and the `loo_i()`
+#'   function, these are the data, posterior draws, and other arguments to pass
+#'   to the log-likelihood function. See the **Methods (by class)** section
+#'   below for details on how to specify these arguments.
 #'
 loo.function <-
   function(x,
@@ -326,21 +322,21 @@ loo.function <-
   }
 
 
-#' @description The \code{loo_i} function enables testing log-likelihood
-#'   functions for use with the \code{loo.function} method.
+#' @description The `loo_i()` function enables testing log-likelihood
+#'   functions for use with the `loo.function()` method.
 #'
 #' @rdname loo
 #' @export
 #'
-#' @param i For \code{loo_i}, an integer in \code{1:N}.
-#' @param llfun For \code{loo_i}, the same as \code{x} for the
-#'   \code{loo.function} method. A log-likelihood function as described in the
-#'   \strong{Methods (by class)} section.
+#' @param i For `loo_i()`, an integer in `1:N`.
+#' @param llfun For `loo_i()`, the same as `x` for the
+#'   `loo.function()` method. A log-likelihood function as described in the
+#'   **Methods (by class)** section.
 #'
-#' @return The \code{loo_i} function returns a named list with components
-#'   \code{pointwise} and \code{diagnostics}. These components have the same
-#'   structure as the \code{pointwise} and \code{diagnostics} components of the
-#'   object returned by \code{loo} except they contain results for only a single
+#' @return The `loo_i()` function returns a named list with components
+#'   `pointwise` and `diagnostics`. These components have the same
+#'   structure as the `pointwise` and `diagnostics` components of the
+#'   object returned by `loo()` except they contain results for only a single
 #'   observation.
 #'
 loo_i <-
@@ -429,7 +425,7 @@ is.psis_loo <- function(x) {
 #'
 #' @noRd
 #' @param ll Log-likelihood matrix.
-#' @param psis_object The object returned by psis.
+#' @param psis_object The object returned by `psis()`.
 #' @return Named list with pointwise elpd_loo, p_loo, and looic.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
@@ -450,10 +446,10 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @noRd
 #' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
 #'   looic.
-#' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
-#' @param dims Log likelihood matrix dimensions (attribute of psis object).
-#' @param psis_object PSIS object.
-#' @return A 'psis_loo' object as described in the Value section of the loo
+#' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
+#' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
+#' @param psis_object An object of class `"psis"`, as returned by the [psis()] function.
+#' @return A `'psis_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
 psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
@@ -479,8 +475,8 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #' @noRd
 #' @param ll Log-likelihood matrix.
 #' @param E_elpd elpd_loo column of pointwise matrix.
-#' @param psis_object Object returned by psis.
-#' @param n_samples Number of draws to take from N(E[epd_i], SD[epd_i]).
+#' @param psis_object Object returned by [psis()].
+#' @param n_samples Number of draws to take from `Normal(E[epd_i], SD[epd_i])`.
 #' @return Vector of standard error estimates.
 #'
 mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
@@ -510,8 +506,8 @@ throw_loo_r_eff_warning <- function() {
 #' Combine many psis objects into a single psis object
 #'
 #' @noRd
-#' @param objects List of psis objects, each for a single observation.
-#' @return A single psis object.
+#' @param objects List of `"psis"` objects, each for a single observation.
+#' @return A single `"psis"` object.
 #'
 list2psis <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
@@ -536,8 +532,8 @@ list2psis <- function(objects) {
 #'
 #' These are only defined in order to deprecate with a warning (rather than
 #' remove and break backwards compatibility) the old way of accessing the point
-#' estimates in a \code{"psis_loo"} or \code{"psis"} object. The new way as of
-#' v2.0.0 is to get them from the \code{"estimates"} component of the object.
+#' estimates in a `"psis_loo"` or `"psis"` object. The new way as of
+#' v2.0.0 is to get them from the `"estimates"` component of the object.
 #'
 #' @name old-extractors
 #' @keywords internal

@@ -1,16 +1,15 @@
 #' Objects to use in examples and tests
 #'
 #' Example pointwise log-likelihood objects to use in demonstrations and tests.
-#' See the \strong{Value} and \strong{Examples} sections below.
+#' See the **Value** and **Examples** sections below.
 #'
 #' @export
-#'
 #' @return
-#' \code{example_loglik_array} returns a 500 (draws) x 2 (chains) x 32
+#' `example_loglik_array()` returns a 500 (draws) x 2 (chains) x 32
 #' (observations) pointwise log-likelihood array.
 #'
-#' \code{example_loglik_matrix} returns the same pointwise log-likelihood values
-#' as \code{example_loglik_array} but reshaped into a 1000 (draws*chains) x 32
+#' `example_loglik_matrix()` returns the same pointwise log-likelihood values
+#' as `example_loglik_array()` but reshaped into a 1000 (draws*chains) x 32
 #' (observations) matrix.
 #'
 #' @examples

@@ -26,40 +26,40 @@ by default only the most important columns are printed.}
 }
 \value{
 A matrix with class \code{"compare.loo"} that has its own
-  print method. See the \strong{Details} section for more .
+print method. See the \strong{Details} section.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD}.
 
-  By default the print method shows only the most important information. Use
-  \code{print(..., simplify=FALSE)} to print a more detailed summary.
+By default the print method shows only the most important information. Use
+\code{print(..., simplify=FALSE)} to print a more detailed summary.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
-  expected predictive accuracy by the difference in \code{elpd_loo} or
-  \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
-  deviance scale).
+expected predictive accuracy by the difference in \code{elpd_loo} or
+\code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
+deviance scale).
 
-  When using \code{loo_compare()}, the returned matrix will have one row per
-  model and several columns of estimates. The values in the \code{elpd_diff}
-  and \code{se_diff} columns of the returned matrix are computed by making
-  pairwise comparisons between each model and the model with the largest ELPD
-  (the model in the first row). For this reason the \code{elpd_diff} column
-  will always have the value \code{0} in the first row (i.e., the difference
-  between the preferred model and itself) and negative values in subsequent
-  rows for the remaining models.
+When using \code{loo_compare()}, the returned matrix will have one row per
+model and several columns of estimates. The values in the \code{elpd_diff}
+and \code{se_diff} columns of the returned matrix are computed by making
+pairwise comparisons between each model and the model with the largest ELPD
+(the model in the first row). For this reason the \code{elpd_diff} column
+will always have the value \code{0} in the first row (i.e., the difference
+between the preferred model and itself) and negative values in subsequent
+rows for the remaining models.
 
-  To compute the standard error of the difference in ELPD --- which should
-  not be expected to equal the difference of the standard errors --- we use a
-  paired estimate to take advantage of the fact that the same set of \eqn{N}
-  data points was used to fit both models. These calculations should be most
-  useful when \eqn{N} is large, because then non-normality of the
-  distribution is not such an issue when estimating the uncertainty in these
-  sums. These standard errors, for all their flaws, should give a better
-  sense of uncertainty than what is obtained using the current standard
-  approach of comparing differences of deviances to a Chi-squared
-  distribution, a practice derived for Gaussian linear models or
-  asymptotically, and which only applies to nested models in any case.
+To compute the standard error of the difference in ELPD --- which should
+not be expected to equal the difference of the standard errors --- we use a
+paired estimate to take advantage of the fact that the same set of \eqn{N}
+data points was used to fit both models. These calculations should be most
+useful when \eqn{N} is large, because then non-normality of the
+distribution is not such an issue when estimating the uncertainty in these
+sums. These standard errors, for all their flaws, should give a better
+sense of uncertainty than what is obtained using the current standard
+approach of comparing differences of deviances to a Chi-squared
+distribution, a practice derived for Gaussian linear models or
+asymptotically, and which only applies to nested models in any case.
 }
 \examples{
 # very artificial example, just for demonstration!
@@ -85,13 +85,13 @@ loo_compare(waic(LL), waic(LL - 10))
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }

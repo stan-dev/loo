@@ -10,11 +10,11 @@ example_loglik_array()
 example_loglik_matrix()
 }
 \value{
-\code{example_loglik_array} returns a 500 (draws) x 2 (chains) x 32
+\code{example_loglik_array()} returns a 500 (draws) x 2 (chains) x 32
 (observations) pointwise log-likelihood array.
 
-\code{example_loglik_matrix} returns the same pointwise log-likelihood values
-as \code{example_loglik_array} but reshaped into a 1000 (draws*chains) x 32
+\code{example_loglik_matrix()} returns the same pointwise log-likelihood values
+as \code{example_loglik_array()} but reshaped into a 1000 (draws*chains) x 32
 (observations) matrix.
 }
 \description{
