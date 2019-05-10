@@ -2,7 +2,8 @@
 
 (GitHub issue/PR number in parentheses)
 
-* Use markdown in roxygen documentation
+* `compare()` is now deprecated in favor of `loo_compare()`.
+* Use markdown in roxygen documentation.
 
 
 # loo 2.1.0
