@@ -23,8 +23,8 @@ test_that("using loo.cores is deprecated", {
 })
 
 test_that("loo and waic results haven't changed", {
-  expect_equal_to_reference(loo1, "loo.rds")
-  expect_equal_to_reference(waic1, "waic.rds")
+  expect_equal_to_reference(loo1, "reference-results/loo.rds")
+  expect_equal_to_reference(waic1, "reference-results/waic.rds")
 })
 
 test_that("loo with cores=1 and cores=2 gives same results", {

@@ -52,7 +52,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_s3_class(w1, "stacking_weights")
   expect_length(w1, 3)
   expect_named(w1, paste0("model"  ,c(1:3)))
-  expect_equal_to_reference(as.numeric(w1), "model_weights_stacking.rds",
+  expect_equal_to_reference(as.numeric(w1), "reference-results/model_weights_stacking.rds",
                             tolerance  = tol, scale=1)
   expect_output(print(w1), "Method: stacking")
 
@@ -65,7 +65,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_s3_class(w2, "pseudobma_bb_weights")
   expect_length(w2, 3)
   expect_named(w2, paste0("model", c(1:3)))
-  expect_equal_to_reference(as.numeric(w2), "model_weights_pseudobma.rds",
+  expect_equal_to_reference(as.numeric(w2), "reference-results/model_weights_pseudobma.rds",
                             tolerance  = tol, scale=1)
   expect_output(print(w2), "Method: pseudo-BMA+")
 
