@@ -2,7 +2,7 @@
 #'
 #' The `waic()` methods can be used to compute WAIC from the pointwise
 #' log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-#' the [loo()] function) because PSIS provides useful diagnostics and
+#' the [loo()] function) because PSIS provides useful diagnostics as well as
 #' effective sample size and Monte Carlo estimates.
 #'
 #' @export waic waic.array waic.matrix waic.function
@@ -27,14 +27,17 @@
 #' }
 #'
 #' @seealso
-#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) for
-#'   more details on why `loo()` is usually preferred to `waic()`.
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) and
+#'   Vehtari, Gelman, and Gabry (2017a, 2017b) for more details on why we
+#'   usually prefer `loo()` to `waic()`.
 #' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
 #'
 #' @references
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.
 #' *Journal of Machine Learning Research* **11**, 3571-3594.
+#'
+#' @template loo-and-psis-references
 #'
 #' @examples
 #' ### Array and matrix methods

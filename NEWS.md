@@ -2,8 +2,9 @@
 
 (GitHub issue/PR number in parentheses)
 
-* `compare()` is now __deprecated__ in favor of [`loo_compare()`](https://mc-stan.org/loo/reference/loo_compare.html).
-* Use markdown syntax in roxygen documentation wherever possible.
+* `compare()` is now __deprecated__ in favor of [`loo_compare()`](https://mc-stan.org/loo/reference/loo_compare.html). (#93)
+
+* Use markdown syntax in roxygen documentation wherever possible. (#108)
 
 
 # loo 2.1.0

@@ -15,4 +15,5 @@ env:
 - _R_CHECK_FORCE_SUGGESTS_=false
 
 after_success:
-  - Rscript -e 'covr::codecov(line_exclusions = c("R/zzz.R", "R/psislw.R"), function_exclusions = c("convert\\_old*"))'
+  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/zzz.R", "R/psislw.R", "R/effective_sample_sizes.R" = c(74:81, 126:136), "R/psis.R"= c(245:253), "R/loo.R" = c(288:301)))'
+

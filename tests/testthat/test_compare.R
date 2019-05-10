@@ -29,6 +29,23 @@ test_that("loo_compare throws appropriate errors", {
                regexp = "same number of data points")
 })
 
+test_that("loo_compare throws appropriate warnings", {
+  w3 <- w1; w4 <- w2
+  class(w3) <- class(w4) <- c("kfold", "loo")
+  attr(w3, "K") <- 2
+  attr(w4, "K") <- 3
+  expect_warning(loo_compare(w3, w4), "Not all kfold objects have the same K value")
+
+  class(w4) <- c("psis_loo", "loo")
+  attr(w4, "K") <- NULL
+  expect_warning(loo_compare(w3, w4), "Comparing LOO-CV to K-fold-CV")
+
+  w3 <- w1; w4 <- w2
+  attr(w3, "yhash") <- "a"
+  attr(w4, "yhash") <- "b"
+  expect_warning(loo_compare(w3, w4), "Not all models have the same y variable")
+})
+
 
 
 comp_colnames <- c(

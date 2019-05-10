@@ -270,6 +270,7 @@ loo.function <-
         )
     } else {
       if (.Platform$OS.type != "windows") {
+        # On Mac or Linux use mclapply() for multiple cores
         psis_list <-
           parallel::mclapply(
             mc.cores = cores,
@@ -283,6 +284,7 @@ loo.function <-
             ...
           )
       } else {
+        # On Windows use makePSOCKcluster() and parLapply() for multiple cores
         cl <- parallel::makePSOCKcluster(cores)
         on.exit(parallel::stopCluster(cl))
         psis_list <-
