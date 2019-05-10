@@ -1,35 +1,34 @@
 #' Pareto smoothed importance sampling (deprecated, old version)
 #'
-#' As of version \code{2.0.0} this function is deprecated. Please use the
-#' \code{\link{psis}} function for the new PSIS algorithm.
+#' As of version `2.0.0` this function is **deprecated**. Please use the
+#' [psis()] function for the new PSIS algorithm.
 #'
 #' @export
-#' @param lw A matrix or vector of log weights. For computing LOO, \code{lw =
-#'   -log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
+#' @param lw A matrix or vector of log weights. For computing LOO, `lw =
+#'   -log_lik`, the *negative* of an \eqn{S} (simulations) by \eqn{N} (data
 #'   points) pointwise log-likelihood matrix.
 #' @param wcp The proportion of importance weights to use for the generalized
-#'   Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
+#'   Pareto fit. The `100*wcp`\% largest weights are used as the sample
 #'   from which to estimate the parameters of the generalized Pareto
 #'   distribution.
-#' @param wtrunc For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
+#' @param wtrunc For truncating very large weights to \eqn{S}^`wtrunc`. Set
 #'   to zero for no truncation.
 #' @param cores The number of cores to use for parallelization. This defaults to
-#'   the option \code{mc.cores} which can be set for an entire R session by
-#'   \code{options(mc.cores = NUMBER)}, the old option \code{loo.cores} is now
-#'   deprecated but will be given precedence over \code{mc.cores} until it is
-#'   removed. \strong{As of version 2.0.0, the default is now 1 core if
-#'   \code{mc.cores} is not set, but we recommend using as many (or close to as
-#'   many) cores as possible.}
-#' @param llfun,llargs See \code{\link{loo.function}}.
-#' @param ... Ignored when \code{psislw} is called directly. The \code{...} is
-#'   only used internally when \code{psislw} is called by the \code{\link{loo}}
+#'   the option `mc.cores` which can be set for an entire R session by
+#'   `options(mc.cores = NUMBER)`, the old option `loo.cores` is now
+#'   deprecated but will be given precedence over `mc.cores` until it is
+#'   removed. **As of version 2.0.0, the default is now 1 core if
+#'   `mc.cores` is not set, but we recommend using as many (or close to as
+#'   many) cores as possible.**
+#' @param llfun,llargs See [loo.function()].
+#' @param ... Ignored when `psislw()` is called directly. The `...` is
+#'   only used internally when `psislw()` is called by the [loo()]
 #'   function.
 #'
-#' @return A named list with components \code{lw_smooth} (modified log weights)
-#'   and \code{pareto_k} (estimated generalized
-#'   Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
+#' @return A named list with components `lw_smooth` (modified log weights) and
+#'   `pareto_k` (estimated generalized Pareto shape parameter(s) k).
 #'
-#' @seealso \code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+#' @seealso [pareto-k-diagnostic] for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
 #'

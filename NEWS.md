@@ -2,6 +2,8 @@
 
 (GitHub issue/PR number in parentheses)
 
+* Use markdown in roxygen documentation
+
 
 # loo 2.1.0
 

@@ -5,7 +5,7 @@
 \title{LOO package glossary}
 \description{
 Note: VGG2017a refers to Vehtari, Gelman, and Gabry (2017a). See
-  \strong{References}, below.
+\strong{References}, below.
 }
 \section{ELPD and \code{elpd_loo}}{
 
@@ -129,19 +129,19 @@ and some more difficult to predict for all models).
 }
 
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
-  Gelman, A. (2019), Visualization in Bayesian workflow. \emph{J. R. Stat.
-  Soc. A}, 182: 389-402. doi:10.1111/rssa.12378,
-  (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal},
-  \href{https://arxiv.org/abs/1709.01449}{arXiv preprint})
+Gelman, A. (2019), Visualization in Bayesian workflow.
+\emph{J. R. Stat. Soc. A}, 182: 389-402. doi:10.1111/rssa.12378
+(\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal version},
+\href{https://arxiv.org/abs/1709.01449}{preprint arXiv:1709.01449})
 }

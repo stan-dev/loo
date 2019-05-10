@@ -2,17 +2,17 @@
 % Please edit documentation in R/loo_compare.R
 \name{find_model_names}
 \alias{find_model_names}
-\title{Find the model names associated with loo objects}
+\title{Find the model names associated with \code{"loo"} objects}
 \usage{
 find_model_names(x)
 }
 \arguments{
-\item{x}{List of loo objects.}
+\item{x}{List of \code{"loo"} objects.}
 }
 \value{
-Character vector of model names the same length as x.
+Character vector of model names the same length as \code{x.}
 }
 \description{
-Find the model names associated with loo objects
+Find the model names associated with \code{"loo"} objects
 }
 \keyword{internal}

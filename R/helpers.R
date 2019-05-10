@@ -1,19 +1,19 @@
-#' More stable version of log(mean(exp(x)))
+#' More stable version of `log(mean(exp(x)))`
 #'
 #' @noRd
 #' @param x A numeric vector.
-#' @return A scalar equal to log(mean(exp(x))).
+#' @return A scalar equal to `log(mean(exp(x)))`.
 #'
 logMeanExp <- function(x) {
   logS <- log(length(x))
   logSumExp(x) - logS
 }
 
-#' More stable version of log(colMeans(exp(x)))
+#' More stable version of `log(colMeans(exp(x)))`
 #'
 #' @noRd
 #' @param x A matrix.
-#' @return A vector where each element is LogSumExp of a column of x.
+#' @return A vector where each element is `logMeanExp` of a column of `x`.
 #'
 colLogMeanExps <- function(x) {
   logS <- log(nrow(x))
@@ -24,8 +24,8 @@ colLogMeanExps <- function(x) {
 #'
 #' @noRd
 #' @param x A matrix.
-#' @return An ncol(x) by 2 matrix with columns 'Estimate' and 'SE'
-#'   and rownames equal to colnames(x).
+#' @return An `ncol(x)` by 2 matrix with columns `"Estimate"` and `"SE"`
+#'   and rownames equal to `colnames(x)`.
 #'
 table_of_estimates <- function(x) {
   out <- cbind(
@@ -39,12 +39,12 @@ table_of_estimates <- function(x) {
 
 # validating and reshaping arrays/matrices  -------------------------------
 
-#' Check for NAs and non-finite values in log-lik (or log-ratios)
+#' Check for `NA` and non-finite values in log-lik (or log-ratios)
 #' array/matrix/vector
 #'
 #' @noRd
 #' @param x Array/matrix/vector of log-likelihood or log-ratio values.
-#' @return x, invisibly, if no error is thrown.
+#' @return `x`, invisibly, if no error is thrown.
 #'
 validate_ll <- function(x) {
   if (is.list(x)) {
@@ -109,8 +109,8 @@ llmatrix_to_array <- function(x, chain_id) {
 #' Validate that log-lik function exists and has correct arg names
 #'
 #' @noRd
-#' @param x A function with arguments 'data_i' and 'draws'.
-#' @return Either returns x or throws an error.
+#' @param x A function with arguments `data_i` and `draws`.
+#' @return Either returns `x` or throws an error.
 #'
 validate_llfun <- function(x) {
   f <- match.fun(x)
@@ -130,9 +130,8 @@ validate_llfun <- function(x) {
 #' Named lists
 #'
 #' Create a named list using specified names or, if names are omitted, using the
-#' names of the objects in the list. The code \code{list(a = a, b = b)} becomes
-#' \code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b =
-#' 2)}, etc.
+#' names of the objects in the list. The code `list(a = a, b = b)` becomes
+#' `nlist(a,b)` and `list(a = a, b = 2)` becomes `nlist(a, b = 2)`, etc.
 #'
 #' @export
 #' @keywords internal

@@ -1,29 +1,29 @@
 #' Model comparison
 #'
-#' @description Compare fitted models based on \link[=loo-glossary]{ELPD}.
+#' @description Compare fitted models based on [ELPD][loo-glossary].
 #'
 #'   By default the print method shows only the most important information. Use
-#'   \code{print(..., simplify=FALSE)} to print a more detailed summary.
+#'   `print(..., simplify=FALSE)` to print a more detailed summary.
 #'
 #' @export
-#' @param x An object of class \code{"loo"} or a list of such objects.
-#' @param ... Additional objects of class \code{"loo"}.
+#' @param x An object of class `"loo"` or a list of such objects.
+#' @param ... Additional objects of class `"loo"`.
 #'
-#' @return A matrix with class \code{"compare.loo"} that has its own
-#'   print method. See the \strong{Details} section for more .
+#' @return A matrix with class `"compare.loo"` that has its own
+#'   print method. See the **Details** section.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
-#'   expected predictive accuracy by the difference in \code{elpd_loo} or
-#'   \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
+#'   expected predictive accuracy by the difference in `elpd_loo` or
+#'   `elpd_waic` (or multiplied by \eqn{-2}, if desired, to be on the
 #'   deviance scale).
 #'
-#'   When using \code{loo_compare()}, the returned matrix will have one row per
-#'   model and several columns of estimates. The values in the \code{elpd_diff}
-#'   and \code{se_diff} columns of the returned matrix are computed by making
+#'   When using `loo_compare()`, the returned matrix will have one row per
+#'   model and several columns of estimates. The values in the `elpd_diff`
+#'   and `se_diff` columns of the returned matrix are computed by making
 #'   pairwise comparisons between each model and the model with the largest ELPD
-#'   (the model in the first row). For this reason the \code{elpd_diff} column
-#'   will always have the value \code{0} in the first row (i.e., the difference
+#'   (the model in the first row). For this reason the `elpd_diff` column
+#'   will always have the value `0` in the first row (i.e., the difference
 #'   between the preferred model and itself) and negative values in subsequent
 #'   rows for the remaining models.
 #'
@@ -138,7 +138,7 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
 
 #' Compute pointwise elpd differences
 #' @noRd
-#' @param loo_a,loo_b Two loo objects.
+#' @param loo_a,loo_b Two `"loo"` objects.
 elpd_diffs <- function(loo_a, loo_b) {
   pt_a <- loo_a$pointwise
   pt_b <- loo_b$pointwise
@@ -155,10 +155,10 @@ se_elpd_diff <- function(diffs) {
 }
 
 
-#' Perform checks on loo objects before comparison
+#' Perform checks on `"loo"` objects before comparison
 #' @noRd
-#' @param loos List of loo objects
-#' @return Nothing, just possibly throws errors/warnings
+#' @param loos List of `"loo"` objects.
+#' @return Nothing, just possibly throws errors/warnings.
 loo_compare_checks <- function(loos) {
   ## errors
   if (length(loos) <= 1L) {
@@ -200,12 +200,12 @@ loo_compare_checks <- function(loos) {
 }
 
 
-#' Find the model names associated with loo objects
+#' Find the model names associated with `"loo"` objects
 #'
 #' @export
 #' @keywords internal
-#' @param x List of loo objects.
-#' @return Character vector of model names the same length as x.
+#' @param x List of `"loo"` objects.
+#' @return Character vector of model names the same length as `x.`
 #'
 find_model_names <- function(x) {
   stopifnot(is.list(x))
