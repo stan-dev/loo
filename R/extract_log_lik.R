@@ -37,10 +37,10 @@
 #'
 #' @references
 #' Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
-#' <http://mc-stan.org/>
+#' <https://mc-stan.org/>
 #'
 #' Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
-#' <http://mc-stan.org/>
+#' <https://mc-stan.org/>
 #'
 extract_log_lik <-
   function(stanfit,
@@ -51,7 +51,6 @@ extract_log_lik <-
     if (stanfit@mode != 0)
       stop("Stan model does not contain posterior draws.")
 
-    # nocov start
     if (!requireNamespace("rstan", quietly = TRUE))
       stop("Please load the 'rstan' package.")
 
@@ -62,4 +61,4 @@ extract_log_lik <-
     }
 
     return(unname(log_lik))
-  } # nocov end
+  }

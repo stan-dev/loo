@@ -111,6 +111,20 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(k > 0.5 & k <= 0.7), tab[2,1])
   expect_equal(sum(k > 0.7 & k <= 1), tab[3,1])
   expect_equal(sum(k > 1), tab[4,1])
+
+  psis1$diagnostics$pareto_k[1:32] <- 0.4
+  expect_output(print(pareto_k_table(psis1)), "All Pareto k estimates are good (k < 0.5)",
+                fixed = TRUE)
+
+  psis1$diagnostics$pareto_k[1:32] <- 0.65
+  expect_output(print(pareto_k_table(psis1)), "All Pareto k estimates are ok (k < 0.7)",
+                fixed = TRUE)
+
+  # if n_eff is NULL
+  psis1$diagnostics$n_eff <- NULL
+  tab2 <- pareto_k_table(psis1)
+  expect_output(print(tab2), "<NA>")
+  expect_equal(unname(tab2[, "Min. n_eff"]), rep(NA_real_, 4))
 })
 
 
@@ -121,6 +135,9 @@ test_that("psis_n_eff_values extractor works", {
   expect_type(n_eff_psis, "double")
   expect_identical(psis_n_eff_values(psis1), n_eff_psis)
   expect_identical(psis_n_eff_values(psis1), psis_n_eff_values(loo1))
+
+  psis1$diagnostics$n_eff <- NULL
+  expect_error(psis_n_eff_values(psis1), "No PSIS n_eff estimates found")
 })
 
 test_that("mcse_loo extractor gives correct value", {

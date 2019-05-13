@@ -150,12 +150,16 @@ weights.psis <-
            ...,
            log = TRUE,
            normalize = TRUE) {
-    out <- object[["log_weights"]]  # smoothed but unnormalized log weights
-    const <- attr(object, "norm_const_log")  # precomputed colLogSumExp(log_weights)
-    if (normalize)
-      out <- sweep(out, 2, const)
-    if (!log)
+    out <- object[["log_weights"]] # smoothed but unnormalized log weights
+    if (normalize) {
+      out <- sweep(out,
+                   MARGIN = 2,
+                   STATS = attr(object, "norm_const_log"), # colLogSumExp(log_weights)
+                   check.margin = FALSE)
+    }
+    if (!log) {
       out <- exp(out)
+    }
 
     return(out)
   }
@@ -193,7 +197,7 @@ psis_object <-
            tail_len,
            r_eff) {
     stopifnot(is.matrix(unnormalized_log_weights))
-    norm_const_log <- colLogSumExps(unnormalized_log_weights)
+    norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
@@ -208,7 +212,7 @@ psis_object <-
     )
 
     # need normalized weights (not on log scale) for psis_n_eff
-    w <- weights(out, normalize = TRUE, log = FALSE)
+    w <- weights.psis(out, normalize = TRUE, log = FALSE)
     out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
     return(out)
   }
@@ -237,9 +241,9 @@ do_psis <- function(log_ratios, r_eff, cores) {
     if (.Platform$OS.type != "windows") {
       lw_list <- parallel::mclapply(
         X = seq_len(N),
+        mc.cores = cores,
         FUN = function(i)
-          do_psis_i(log_ratios[, i], tail_len[i]),
-        mc.cores = cores
+          do_psis_i(log_ratios[, i], tail_len[i])
       )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -277,17 +281,25 @@ do_psis <- function(log_ratios, r_eff, cores) {
 #' @return Numeric vector or matrix.
 #'
 psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
-  stopifnot(is.list(x))
+  if (!is.list(x)) stop("Internal error ('x' must be a list for psis_apply)")
   vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
 }
 
-#' PSIS (without truncation and normalization) on a single vector
+#' PSIS on a single vector
 #'
 #' @noRd
-#' @param log_ratios_i A vector of log ratios (for `loo()`, negative log likelihoods).
+#' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
+#'   log likelihoods).
 #' @param tail_len_i An integer tail length.
-#' @return List containing `lw` (vector of untruncated and unnormalized log
-#'   weights), and `pareto_k` ('khat' estimate).
+#'
+#' @details
+#' * The maximum of the log ratios is subtracted from each of them
+#' * If there are enough tail samples then the tail is smoothed with PSIS
+#' * The log weights (or log ratios if no smoothing) larger than zero are set to 0
+#'
+#' @return A named list containing:
+#' * `lw`: vector of unnormalized log weights
+#' * `pareto_k`: scalar Pareto k estimate.
 #'
 do_psis_i <- function(log_ratios_i, tail_len_i) {
   S <- length(log_ratios_i)
@@ -298,7 +310,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
     ord <- sort.int(lw_i, index.return = TRUE)
     tail_ids <- seq(S - tail_len_i + 1, S)
     lw_tail <- ord$x[tail_ids]
-    if (all(lw_tail == lw_tail[1])) {
+    if (abs(max(lw_tail) - min(lw_tail)) < sqrt(.Machine$double.eps)) {
       warning(
         "Can't fit generalized Pareto distribution ",
         "because all tail values are the same.",
@@ -313,7 +325,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
   }
 
   # truncate at max of raw wts (i.e., 0 since max has been subtracted)
-  lw_i <- truncate_lw(lw_i, upper = 0)
+  lw_i[lw_i > 0] <- 0
 
   list(log_weights = lw_i, pareto_k = khat)
 }
@@ -323,9 +335,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
 #'
 #' @noRd
 #' @param x Vector of tail elements already sorted in ascending order.
-#' @return List with components `tail` (vector same size as `x`) and `k` (scalar
-#'   shape parameter estimate). The `tail` component contains the logs of the
+#' @return A named list containing:
+#' * `tail`: vector same size as `x` containing the logs of the
 #'   order statistics of the generalized pareto distribution.
+#' * `k`: scalar shape parameter estimate.
 #'
 psis_smooth_tail <- function(x, cutoff) {
   len <- length(x)
@@ -362,8 +375,7 @@ psis_smooth_tail <- function(x, cutoff) {
 #' @return An N-vector of tail lengths.
 #'
 n_pareto <- function(r_eff, S) {
-  n <- pmin(0.2 * S, 3 * sqrt(S / r_eff))
-  ceiling(n)
+  ceiling(pmin(0.2 * S, 3 * sqrt(S / r_eff)))
 }
 
 #' Check for enough tail samples to fit GPD
@@ -378,19 +390,6 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 }
 
 
-#' Truncate a vector of (log) weights
-#'
-#' @noRd
-#' @param x A vector of log weights.
-#' @param upper Upper bound.
-#' @return `x`, but modified so all values above `upper` are set equal to `upper`.
-#'
-truncate_lw <- function(x, upper) {
-  x[x > upper] <- upper
-  return(x)
-}
-
-
 #' Throw warnings about pareto k estimates
 #'
 #' @noRd
@@ -401,11 +400,9 @@ truncate_lw <- function(x, upper) {
 #'
 throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
   if (any(k > too_high)) {
-    .warn("Some Pareto k diagnostic values are too high. ",
-          .k_help())
+    .warn("Some Pareto k diagnostic values are too high. ", .k_help())
   } else if (any(k > high)) {
-    .warn("Some Pareto k diagnostic values are slightly high. ",
-          .k_help())
+    .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
   }
 }
 
@@ -432,7 +429,8 @@ throw_tail_length_warnings <- function(tail_lengths) {
         "Skipping the following columns: ",
         paste(if (Nbad <= 10) bad else bad[1:10], collapse = ", "),
         if (Nbad > 10) paste0(", ... [", Nbad - 10, " more not printed].\n") else "\n",
-        call. = FALSE, immediate. = TRUE
+        call. = FALSE,
+        immediate. = TRUE
       )
     }
   }
@@ -444,11 +442,12 @@ throw_tail_length_warnings <- function(tail_lengths) {
 #' @noRd
 #' @param r_eff User's `r_eff` argument.
 #' @param len The length `r_eff` should have if not `NULL` or `NA`.
-#' @return If `r_eff` has length `len` then `r_eff` is returned.
-#'   If `r_eff` is `NULL` then a warning is thrown and `rep(1, len)` is
-#'   returned. If `r_eff` is `NA` then the warning is skipped and
-#'   `rep(1, len)` is returned. If `r_eff` has length `len`
-#'   but some of the values are `NA` then an error is thrown.
+#' @return
+#' * If `r_eff` has length `len` then `r_eff` is returned.
+#' * If `r_eff` is `NULL` then a warning is thrown and `rep(1, len)` is returned.
+#' * If `r_eff` is `NA` then the warning is skipped and
+#'   `rep(1, len)` is returned.
+#' * If `r_eff` has length `len` but has `NA`s then an error is thrown.
 #'
 prepare_psis_r_eff <- function(r_eff, len) {
   if (isTRUE(is.null(r_eff) || all(is.na(r_eff)))) {

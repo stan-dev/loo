@@ -65,6 +65,6 @@ importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{
-\code{loo} and \code{psis}
+\code{\link[=loo]{loo()}} and \code{\link[=psis]{psis()}}
 }
 \keyword{internal}

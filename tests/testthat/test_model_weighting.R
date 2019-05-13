@@ -24,7 +24,7 @@ loo_list <- lapply(1:length(ll_list), function(j) {
 
 tol <- 0.01 # absoulte tolerance of weights
 
-test_that("loo_model_weights throws correct errors", {
+test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(loo_model_weights(log_lik1), "list of matrices or a list of 'psis_loo' objects")
   expect_error(loo_model_weights(list(log_lik1)), "At least two models")
   expect_error(loo_model_weights(list(loo_list[[1]])), "At least two models")
@@ -43,6 +43,12 @@ test_that("loo_model_weights throws correct errors", {
   r_eff_list[[3]] <- rep(0.9, 51)
   expect_error(loo_model_weights(ll_list, r_eff_list = r_eff_list),
                "same length as the number of columns")
+
+  expect_error(loo_model_weights(list(loo_list[[1]], 2)),
+               "List elements must all be 'psis_loo' objects or log-likelihood matrices",
+               fixed = TRUE)
+
+  expect_warning(loo_model_weights(ll_list), "Relative effective sample sizes")
 })
 
 
@@ -81,3 +87,11 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   w3_b <- loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
   expect_identical(w3, w3_b)
 })
+
+test_that("stacking_weights and pseudobma_weights throw correct errors", {
+  xx <- cbind(rnorm(10))
+  expect_error(stacking_weights(xx), "two models are required")
+  expect_error(pseudobma_weights(xx), "two models are required")
+})
+
+

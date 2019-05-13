@@ -127,3 +127,17 @@ test_that("psis_n_eff methods works properly", {
   expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
 })
 
+
+test_that("do_psis_i throws warning if all tail values the same", {
+  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
+  val <- expect_warning(do_psis_i(xx, tail_len_i = 6), "all tail values are the same")
+  expect_equal(val$pareto_k, Inf)
+})
+
+test_that("psis_smooth_tail returns original tail values if k is infinite", {
+  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
+  val <- suppressWarnings(psis_smooth_tail(xx, 3))
+  expect_equal(val$tail, xx)
+  expect_equal(val$k, Inf)
+})
+

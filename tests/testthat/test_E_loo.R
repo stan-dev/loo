@@ -27,6 +27,8 @@ E_test_var_vec <- E_loo(x[, 1], psis_vec, type = "var", log_ratios = log_rats[,1
 E_test_quant_vec <- E_loo(x[, 1], psis_vec, type = "quant", probs = 0.5, log_ratios = log_rats[,1])
 E_test_quant_vec2 <- E_loo(x[, 1], psis_vec, type = "quant", probs = c(0.1, 0.5, 0.9), log_ratios = log_rats[,1])
 
+# E_loo_khat
+khat <- E_loo_khat(x, psis_mat, log_rats)
 
 test_that("E_loo return types correct for matrix method", {
   expect_type(E_test_mean, "list")

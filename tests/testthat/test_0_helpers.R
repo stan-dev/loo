@@ -59,6 +59,7 @@ test_that("nlist works", {
   nlist_val <- list(nlist(a, b, c), nlist(a, b, c = "tornado"))
   nlist_ans <- list(list(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = "tornado"))
   expect_equal(nlist_val, nlist_ans)
+  expect_equal(nlist(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = 3))
 })
 
 test_that("loo_cores works", {

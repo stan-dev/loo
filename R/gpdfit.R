@@ -40,7 +40,7 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
   xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
   theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
   l_theta <- N * lx(theta, x) # profile log-lik
-  w_theta <- 1 / vapply(jj, FUN.VALUE = 0, FUN = function(j) {
+  w_theta <- 1 / vapply(jj, FUN.VALUE = numeric(1), FUN = function(j) {
     sum(exp(l_theta - l_theta[j]))
   })
   theta_hat <- sum(theta * w_theta)
@@ -63,7 +63,7 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
 
 lx <- function(a,x) {
   a <- -a
-  k <- sapply(a, FUN = function(y) mean(log1p(y * x)))
+  k <- vapply(a, FUN = function(a_i) mean(log1p(a_i * x)), FUN.VALUE = numeric(1))
   log(a / k) - k - 1
 }
 
@@ -78,8 +78,8 @@ lx <- function(a,x) {
 #'
 adjust_k_wip <- function(k, n) {
   a <- 10
-  nplusa <- n + a
-  k * n / nplusa + a * 0.5 / nplusa
+  n_plus_a <- n + a
+  k * n / n_plus_a + a * 0.5 / n_plus_a
 }
 
 
@@ -93,8 +93,9 @@ adjust_k_wip <- function(k, n) {
 #' @return Vector of quantiles.
 #'
 qgpd <- function(p, k, sigma) {
-  if (is.nan(sigma) || sigma <= 0)
+  if (is.nan(sigma) || sigma <= 0) {
     return(rep(NaN, length(p)))
+  }
 
   sigma * expm1(-k * log1p(-p)) / k
 }

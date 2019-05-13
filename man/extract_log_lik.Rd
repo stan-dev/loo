@@ -49,8 +49,8 @@ coefficients \code{beta}, and standard deviation \code{sigma}:
 }
 \references{
 Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
-\url{http://mc-stan.org/}
+\url{https://mc-stan.org/}
 
 Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
-\url{http://mc-stan.org/}
+\url{https://mc-stan.org/}
 }

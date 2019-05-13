@@ -384,7 +384,10 @@ loo_i <-
     }
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
-    psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
+    if (!is.matrix(ll_i)) {
+      ll_i <- as.matrix(ll_i)
+    }
+    psis_out <- psis.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -434,12 +437,12 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
     ll <- as.matrix(ll)
   }
-  lw <- weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- colLogSumExps(ll + lw)
-  looic <- -2 * elpd_loo
-  lpd <- colLogMeanExps(ll)
+  lw <- weights.psis(psis_object, normalize = TRUE, log = TRUE)
+  elpd_loo <- matrixStats::colLogSumExps(ll + lw)
+  lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
   mcse_elpd_loo <- mcse_elpd(ll, elpd_loo, psis_object)
+  looic <- -2 * elpd_loo
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
 }
 
@@ -455,7 +458,9 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #'   function documentation.
 #'
 psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
-  stopifnot(is.matrix(pointwise), is.list(diagnostics))
+  if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
+  if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
@@ -483,14 +488,19 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #'
 mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
   E_epd <- exp(E_elpd)
-  w <- weights(psis_object, log = FALSE)
+  w <- weights.psis(psis_object, log = FALSE)
   r_eff <- attr(psis_object, "r_eff")
-  var_elpd <- sapply(seq_len(ncol(w)), function(i) {
-    var_epd_i <- sum(w[, i]^2 * (exp(ll[, i]) - E_epd[i])^2)
-    sd_epd_i <- sqrt(var_epd_i)
-    z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
-    var(log(z[z>0]))
-  })
+  var_elpd <-
+    vapply(
+      seq_len(ncol(w)),
+      FUN.VALUE = numeric(1),
+      FUN = function(i) {
+        var_epd_i <- sum(w[, i] ^ 2 * (exp(ll[, i]) - E_epd[i]) ^ 2)
+        sd_epd_i <- sqrt(var_epd_i)
+        z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
+        var(log(z[z > 0]))
+      }
+    )
   sqrt(var_elpd / r_eff)
 }
 

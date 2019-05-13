@@ -6,18 +6,18 @@
 #'
 logMeanExp <- function(x) {
   logS <- log(length(x))
-  logSumExp(x) - logS
+  matrixStats::logSumExp(x) - logS
 }
 
 #' More stable version of `log(colMeans(exp(x)))`
 #'
 #' @noRd
 #' @param x A matrix.
-#' @return A vector where each element is `logMeanExp` of a column of `x`.
+#' @return A vector where each element is `logMeanExp()` of a column of `x`.
 #'
 colLogMeanExps <- function(x) {
   logS <- log(nrow(x))
-  colLogSumExps(x) - logS
+  matrixStats::colLogSumExps(x) - logS
 }
 
 #' Compute point estimates and standard errors from pointwise vectors
@@ -29,8 +29,8 @@ colLogMeanExps <- function(x) {
 #'
 table_of_estimates <- function(x) {
   out <- cbind(
-    Estimate = colSums2(x),
-    SE = sqrt(nrow(x) * colVars(x))
+    Estimate = matrixStats::colSums2(x),
+    SE = sqrt(nrow(x) * matrixStats::colVars(x))
   )
   rownames(out) <- colnames(x)
   return(out)

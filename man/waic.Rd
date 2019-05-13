@@ -48,7 +48,7 @@ measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
 \description{
 The \code{waic()} methods can be used to compute WAIC from the pointwise
 log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-the \code{\link[=loo]{loo()}} function) because PSIS provides useful diagnostics and
+the \code{\link[=loo]{loo()}} function) because PSIS provides useful diagnostics as well as
 effective sample size and Monte Carlo estimates.
 }
 \section{Methods (by class)}{
@@ -116,11 +116,22 @@ print(compare(waic1, waic2), digits = 2)
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.
 \emph{Journal of Machine Learning Research} \strong{11}, 3571-3594.
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{
 \itemize{
-\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes} for
-more details on why \code{loo()} is usually preferred to \code{waic()}.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes} and
+Vehtari, Gelman, and Gabry (2017a, 2017b) for more details on why we
+usually prefer \code{loo()} to \code{waic()}.
 \item \code{\link[=loo_compare]{loo_compare()}} for comparing models on approximate LOO-CV or WAIC.
 }
 }

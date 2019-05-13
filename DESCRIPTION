@@ -4,9 +4,9 @@ Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
 Version: 2.1.0.9000
 Date: 2019-03-12
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
-             person("Andrew", "Gelman", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
              person("Yuling", "Yao", role = c("aut")),
+             person("Andrew", "Gelman", role = c("aut")),
              person("Paul-Christian", "Bürkner", role = c("ctb")),
              person("Ben", "Goodrich", role = c("ctb")),
              person("Juho", "Piironen", role = c("ctb")),
@@ -32,11 +32,11 @@ Imports:
     graphics,
     matrixStats (>= 0.52),
     parallel,
-    stats,
-    checkmate
+    stats
 Suggests:
     bayesplot (>= 1.5.0),
     brms (>= 2.2.0),
+    checkmate,
     ggplot2,
     knitr,
     rmarkdown,

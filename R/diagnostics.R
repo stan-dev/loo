@@ -75,8 +75,8 @@ NULL
 #'
 pareto_k_table <- function(x) {
   k <- pareto_k_values(x)
-  n_eff <- psis_n_eff_values(x)
-  if (is.null(n_eff)) {
+  n_eff <- try(psis_n_eff_values(x), silent = TRUE)
+  if (inherits(n_eff, "try-error")) {
     n_eff <- rep(NA, length(k))
   }
 

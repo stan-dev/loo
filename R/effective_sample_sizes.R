@@ -199,8 +199,7 @@ ess_rfun <- function(sims) {
   chains <- ncol(sims)
   n_samples <- nrow(sims)
 
-  acov <- lapply(1:chains,
-                 FUN = function(i) autocovariance(sims[,i]))
+  acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
