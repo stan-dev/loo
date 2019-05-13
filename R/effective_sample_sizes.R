@@ -202,7 +202,7 @@ ess_rfun <- function(sims) {
   acov <- lapply(1:chains,
                  FUN = function(i) autocovariance(sims[,i]))
   acov <- do.call(cbind, acov)
-  chain_mean <- apply(sims, 2, mean)
+  chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
   var_plus <- mean_var * (n_samples - 1) / n_samples
   if (chains > 1)
