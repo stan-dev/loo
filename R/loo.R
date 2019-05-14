@@ -441,7 +441,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   elpd_loo <- matrixStats::colLogSumExps(ll + lw)
   lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
-  mcse_elpd_loo <- mcse_elpd(ll, elpd_loo, psis_object)
+  mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
   looic <- -2 * elpd_loo
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
 }
@@ -486,16 +486,16 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #' @param n_samples Number of draws to take from `Normal(E[epd_i], SD[epd_i])`.
 #' @return Vector of standard error estimates.
 #'
-mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
+mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
+  lik <- exp(ll)
+  w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
-  w <- weights.psis(psis_object, log = FALSE)
-  r_eff <- attr(psis_object, "r_eff")
   var_elpd <-
     vapply(
-      seq_len(ncol(w)),
+      seq_len(ncol(w2)),
       FUN.VALUE = numeric(1),
       FUN = function(i) {
-        var_epd_i <- sum(w[, i] ^ 2 * (exp(ll[, i]) - E_epd[i]) ^ 2)
+        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2)
         sd_epd_i <- sqrt(var_epd_i)
         z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
         var(log(z[z > 0]))
@@ -503,6 +503,7 @@ mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
     )
   sqrt(var_elpd / r_eff)
 }
+
 
 #' Warning message if r_eff not specified
 #' @noRd

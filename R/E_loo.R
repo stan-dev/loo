@@ -105,7 +105,7 @@ E_loo.default <-
     E_fun <- .E_fun(type)
     r_eff <- NULL
     if (type == "variance") {
-      r_eff <- attr(psis_object, "r_eff")
+      r_eff <- relative_eff(psis_object)
     }
 
     w <- as.vector(weights.psis(psis_object, log = FALSE))
@@ -142,7 +142,7 @@ E_loo.matrix <-
     fun_val <- numeric(1)
     r_eff <- NULL
     if (type == "variance") {
-      r_eff <- attr(psis_object, "r_eff")
+      r_eff <- relative_eff(psis_object)
     } else if (type == "quantile") {
       stopifnot(
         is.numeric(probs),
