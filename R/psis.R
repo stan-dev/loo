@@ -83,8 +83,8 @@
 #' uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
 #'
 #'
-#'
 psis <- function(log_ratios, ...) UseMethod("psis")
+
 
 #' @export
 #' @templateVar fn psis
@@ -102,6 +102,7 @@ psis.array <-
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
+
 #' @export
 #' @templateVar fn psis
 #' @template matrix
@@ -117,6 +118,7 @@ psis.matrix <-
     do_psis(log_ratios, r_eff = r_eff, cores = cores)
   }
 
+
 #' @export
 #' @templateVar fn psis
 #' @template vector
@@ -129,12 +131,12 @@ psis.default <-
     psis.matrix(log_ratios, r_eff = r_eff, cores = 1)
   }
 
+
 #' @rdname psis
 #' @export
 #' @export weights.psis
 #' @method weights psis
-#' @param object For the `weights()` method, an object returned by `psis()` (a
-#'   list with class `"psis"`).
+#' @param object,x An object returned by `psis()`.
 #' @param log For the `weights()` method, should the weights be returned on
 #'   the log scale? Defaults to `TRUE`.
 #' @param normalize For the `weights()` method, should the weights be
@@ -165,17 +167,55 @@ weights.psis <-
   }
 
 
+# Subset a psis object without breaking it
+#
+#' @rdname psis
+#' @export
+#' @param subset For the `subset()` method, a vector indicating which
+#'   observations (columns of weights) to keep. Can be a logical vector of
+#'   length `ncol(x)` (for a psis object `x`) or a shorter integer vector
+#'   containing only the indexes to keep.
+#'
+#' @return The `subset()` method returns a valid `"psis"` object
+subset.psis <- function(x, subset, ...) {
+  if (anyNA(subset)) {
+    stop("NAs not allowed in subset.", call. = FALSE)
+  }
+  if (is.logical(subset) || all(subset %in% c(0,1))) {
+    stopifnot(length(subset) == dim(x)[2])
+    subset <- which(as.logical(subset))
+  } else {
+    stopifnot(length(subset) <= dim(x)[2],
+              all(subset == as.integer(subset)))
+    subset <- as.integer(subset)
+  }
+
+  x$log_weights <- x$log_weights[, subset, drop=FALSE]
+  x$diagnostics$pareto_k <- x$diagnostics$pareto_k[subset]
+  x$diagnostics$n_eff <- x$diagnostics$n_eff[subset]
+
+  attr(x, "dims") <- c(dim(x)[1], length(subset))
+  attr(x, "norm_const_log") <- attr(x, "norm_const_log")[subset]
+  attr(x, "tail_len") <- attr(x, "tail_len")[subset]
+  attr(x, "r_eff") <- attr(x, "r_eff")[subset]
+
+  x
+}
+
+
+#' @rdname psis
 #' @export
 dim.psis <- function(x) {
   attr(x, "dims")
 }
 
+
 #' @rdname psis
 #' @export
-#' @param x For `is.psis()`, an object to check.
 is.psis <- function(x) {
   inherits(x, "psis") && is.list(x)
 }
+
 
 
 # internal ----------------------------------------------------------------
