@@ -125,7 +125,7 @@ re-used later.
 loo1 <- loo(fit1, save_psis = TRUE)
 ```
 
-`loo` gives us warnings about the Pareto diagnostics, which indicates that for
+`loo` gives us warnings about the Pareto diagnostics, which indicate that for
 some observations the leave-one-out posteriors are different enough from the
 full posterior that importance-sampling is not able to correct the difference.
 We can see more details by printing the `loo` object.
@@ -153,7 +153,7 @@ misspecification.
 
 ### Plotting Pareto $k$ diagnostics
 
-Using the `plot` method on our `loo1` object produces a plot the $k$ values 
+Using the `plot` method on our `loo1` object produces a plot of the $k$ values
 (in the same order as the observations in the dataset used to fit the model) 
 with horizontal lines corresponding to the same categories as in the
 printed output above.
