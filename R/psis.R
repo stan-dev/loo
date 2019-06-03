@@ -171,12 +171,16 @@ weights.psis <-
 #
 #' @rdname psis
 #' @export
+#' @export subset.psis
+#' @method subset psis
 #' @param subset For the `subset()` method, a vector indicating which
 #'   observations (columns of weights) to keep. Can be a logical vector of
 #'   length `ncol(x)` (for a psis object `x`) or a shorter integer vector
 #'   containing only the indexes to keep.
 #'
-#' @return The `subset()` method returns a valid `"psis"` object
+#' @return The `subset()` returns a `"psis"` object. It is the same as the input
+#'   but without the contents corresponding to the unselected indexes.
+#'
 subset.psis <- function(x, subset, ...) {
   if (anyNA(subset)) {
     stop("NAs not allowed in subset.", call. = FALSE)
@@ -194,12 +198,15 @@ subset.psis <- function(x, subset, ...) {
   x$diagnostics$pareto_k <- x$diagnostics$pareto_k[subset]
   x$diagnostics$n_eff <- x$diagnostics$n_eff[subset]
 
-  attr(x, "dims") <- c(dim(x)[1], length(subset))
-  attr(x, "norm_const_log") <- attr(x, "norm_const_log")[subset]
-  attr(x, "tail_len") <- attr(x, "tail_len")[subset]
-  attr(x, "r_eff") <- attr(x, "r_eff")[subset]
-
-  x
+  structure(
+    .Data = x,
+    class = class(x),
+    dims = c(dim(x)[1], length(subset)),
+    norm_const_log = attr(x, "norm_const_log")[subset],
+    tail_len = attr(x, "tail_len")[subset],
+    r_eff = attr(x, "r_eff")[subset],
+    subset = subset
+  )
 }
 
 

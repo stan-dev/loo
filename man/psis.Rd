@@ -71,8 +71,6 @@ the log scale? Defaults to \code{TRUE}.}
 \item{normalize}{For the \code{weights()} method, should the weights be
 normalized? Defaults to \code{TRUE}.}
 
-\item{x}{For \code{is.psis()}, an object to check.}
-
 \item{subset}{For the \code{subset()} method, a vector indicating which
 observations (columns of weights) to keep. Can be a logical vector of
 length \code{ncol(x)} (for a psis object \code{x}) or a shorter integer vector
@@ -122,7 +120,8 @@ the \code{log_weights} component of the \code{"psis"} object. The \code{normaliz
 \code{log} arguments control whether the returned weights are normalized and
 whether or not to return them on the log scale.
 
-The \code{subset()} method returns a valid \code{"psis"} object
+The \code{subset()} method returns the input \code{"psis"} object but dropping
+the contents corresponding to the unselected indexes.
 }
 \description{
 Implementation of Pareto smoothed importance sampling (PSIS), a method for

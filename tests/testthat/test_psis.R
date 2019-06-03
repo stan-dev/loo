@@ -115,6 +115,29 @@ test_that("weights method returns correct output", {
 })
 
 
+test_that("subset method works correctly", {
+  dims <- dim(psis1)
+  a1 <- subset(psis1, subset = rep_len(c(TRUE, FALSE), dims[2]))
+  a2 <- subset(psis1, subset = seq(1, dims[2], by = 2))
+  expect_identical(a1, a2) # logical subsetting same as specifying indexes
+
+  a3 <- subset(psis1, subset = c(1, 4, 20))
+  expect_equal(a3$log_weights, psis1$log_weights[, c(1, 4, 20), drop=FALSE])
+  expect_equal(attr(a3, "tail_len"), attr(psis1, "tail_len")[c(1, 4, 20)])
+  expect_equal(attr(a3, "subset"), c(1, 4, 20))
+  expect_error(
+    subset(psis1, subset = c(TRUE, FALSE)),
+    "length(subset) == dim(x)[2] is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    subset(psis1, subset = seq_len(dim(psis1)[2] + 1)),
+    "length(subset) <= dim(x)[2] is not TRUE",
+    fixed = TRUE
+  )
+})
+
+
 test_that("psis_n_eff methods works properly", {
   w <- weights(psis1, normalize = TRUE, log = FALSE)
   expect_equal(psis_n_eff.default(w[, 1], r_eff = 1), 1 / sum(w[, 1]^2))
