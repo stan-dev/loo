@@ -125,6 +125,7 @@ test_that("subset method works correctly", {
   expect_equal(a3$log_weights, psis1$log_weights[, c(1, 4, 20), drop=FALSE])
   expect_equal(attr(a3, "tail_len"), attr(psis1, "tail_len")[c(1, 4, 20)])
   expect_equal(attr(a3, "subset"), c(1, 4, 20))
+
   expect_error(
     subset(psis1, subset = c(TRUE, FALSE)),
     "length(subset) == dim(x)[2] is not TRUE",
@@ -134,6 +135,10 @@ test_that("subset method works correctly", {
     subset(psis1, subset = seq_len(dim(psis1)[2] + 1)),
     "length(subset) <= dim(x)[2] is not TRUE",
     fixed = TRUE
+  )
+  expect_error(
+    subset(psis1, subset = c(1, NA, 3)),
+    "NAs not allowed in subset"
   )
 })
 
