@@ -30,18 +30,13 @@ psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, sav
   checkmate::assert_integerish(cores)
   checkmate::assert_flag(save_psis)
 
-  approx_correction <- log_p - log_q
-
   if (is.null(log_liks)){
+    approx_correction <- log_p - log_q
     # Handle underflow/overflow
     approx_correction <- approx_correction - max(approx_correction)
     log_ratios <- matrix(approx_correction, ncol = 1)
   } else {
-    log_ratios <- -log_liks
-    log_ratios <- log_ratios + approx_correction
-    # Handle underflow/overflow
-    log_ratio_max <- matrixStats::colMaxs(log_ratios)
-    log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
+    log_ratios <- correct_log_ratios(log_ratios = -log_liks, log_p = log_p, log_g = log_q)
   }
   psis_out <- psis.matrix(log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
 
@@ -59,6 +54,21 @@ psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, sav
 }
 
 
+
+#' Correct log ratios for posterior approximations
+#'
+#' @param log_ratios The log-likelihood ratios (ie -ll) to correct
+#' @inheritParams psis_approximate_posterior
+#' @keywords internal
+correct_log_ratios <- function(log_ratios, log_p, log_g){
+  approx_correction <- log_p - log_g
+  log_ratios <- log_ratios + approx_correction
+  # Handle underflow/overflow
+  log_ratio_max <- matrixStats::colMaxs(log_ratios)
+  log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
+
+  log_ratios
+}
 
 
 #' Pareto smoothed importance sampling (PSIS)
@@ -100,18 +110,7 @@ ap_psis.matrix <- function(log_ratios, log_p, log_g,
     cores <- loo_cores(cores)
     log_ratios <- validate_ll(log_ratios)
 
-    approx_correction <- log_p - log_g
-    log_ratios <- log_ratios + approx_correction
-    # Handle underflow/overflow
-    log_ratio_max <- matrixStats::colMaxs(log_ratios)
-    log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
-
-    ## Posterior approximation correction
-    #approx_correction <- log_p - log_g
-    #log_ratios <- log_ratios + approx_correction
-    # Handle underflow/overflow
-    #log_ratio_max <- apply(log_ratios, 2, max)
-    #log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
+    log_ratios <- correct_log_ratios(log_ratios, log_p = log_p, log_g = log_g)
 
     do_psis(log_ratios, r_eff = rep(1, ncol(log_ratios)), cores = cores)
   }
