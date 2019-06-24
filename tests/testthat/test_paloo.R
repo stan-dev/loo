@@ -69,7 +69,9 @@ test_that("paloo.array works as paloo.matrix", {
 
   # Check equivalence
   expect_equal(aploo1$estimates, aploo2$estimates)
+  expect_equal(class(aploo1), class(aploo2))
   expect_failure(expect_equal(aploo1b$estimates, aploo2$estimates))
+  expect_failure(expect_equal(class(aploo1), class(aploo1b)))
 
   # Should fail with matrix
   expect_error(aploo2 <- aploo.matrix(x = ll, log_p = as.matrix(log_p), log_g = log_g))
@@ -87,6 +89,7 @@ test_that("paloo.function works as paloo.matrix", {
 
   # Check equivalence
   expect_equal(aploo1$estimates, aploo2$estimates)
+  expect_equal(class(aploo1), class(aploo2))
   expect_failure(expect_equal(aploo1b$estimates, aploo2$estimates))
 })
 

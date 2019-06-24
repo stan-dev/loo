@@ -153,12 +153,15 @@ aploo.function <-
       )
     }
 
-    psis_loo_object(
+    ap_psis <- psis_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
       psis_object = if (save_psis) psis_out else NULL
     )
+
+    class(ap_psis) <- c("psis_aploo", class(ap_psis))
+    ap_psis
   }
 
 
