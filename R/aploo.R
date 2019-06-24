@@ -98,7 +98,7 @@ aploo.matrix <-
     checkmate::assert_numeric(log_g, len = length(log_p))
     checkmate::assert_null(dim(log_g))
 
-    ap_psis <- psis_approximate_posterior(log_p = log_p, log_q = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
+    ap_psis <- psis_approximate_posterior(log_p = log_p, log_g = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
     class(ap_psis) <- c("psis_aploo", class(ap_psis))
     ap_psis
   }

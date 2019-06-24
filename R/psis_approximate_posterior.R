@@ -2,8 +2,9 @@
 #'
 #' @param log_p The log-posterior (target) evaluated at S samples from the
 #'   proposal distribution (q). A vector of length S.
-#' @param log_q The log-density (proposal) evaluated at S samples from the
+#' @param log_g The log-density (proposal) evaluated at S samples from the
 #'   proposal distribution (q). A vector of length S.
+#' @param log_q Deprecated argument name (the same as log_g).
 #' @param log_liks A log-likelihood matrix of size S * N, where N is the number
 #'   of observations and S is the number of samples from q. See
 #'   [loo.matrix()] for details. Default is `NULL`. Then only the
@@ -20,23 +21,27 @@
 #'
 #' @keywords internal
 #'
-psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, save_psis, ...){
+psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL, cores, save_psis, ..., log_q = NULL){
   if (!requireNamespace("checkmate", quietly=TRUE)) {
     stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
   }
-  checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_q))
-  checkmate::assert_numeric(log_q, any.missing = FALSE, len = length(log_p))
+  if(!is.null(log_q)){
+    .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
+    log_g <- log_q
+  }
+  checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_g), null.ok = FALSE)
+  checkmate::assert_numeric(log_g, any.missing = FALSE, len = length(log_p), null.ok = FALSE)
   checkmate::assert_matrix(log_liks, null.ok = TRUE, nrows = length(log_p))
   checkmate::assert_integerish(cores)
   checkmate::assert_flag(save_psis)
 
   if (is.null(log_liks)){
-    approx_correction <- log_p - log_q
+    approx_correction <- log_p - log_g
     # Handle underflow/overflow
     approx_correction <- approx_correction - max(approx_correction)
     log_ratios <- matrix(approx_correction, ncol = 1)
   } else {
-    log_ratios <- correct_log_ratios(log_ratios = -log_liks, log_p = log_p, log_g = log_q)
+    log_ratios <- correct_log_ratios(log_ratios = -log_liks, log_p = log_p, log_g = log_g)
   }
   psis_out <- psis.matrix(log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
 
