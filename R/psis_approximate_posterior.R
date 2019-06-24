@@ -64,7 +64,7 @@ correct_log_ratios <- function(log_ratios, log_p, log_g){
   approx_correction <- log_p - log_g
   log_ratios <- log_ratios + approx_correction
   # Handle underflow/overflow
-  log_ratio_max <- matrixStats::colMaxs(log_ratios)
+  log_ratio_max <- apply(log_ratios, 2, max)
   log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
 
   log_ratios
