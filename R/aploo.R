@@ -94,7 +94,9 @@ aploo.matrix <-
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_numeric(log_p, len = nrow(x))
+    checkmate::assert_null(dim(log_p))
     checkmate::assert_numeric(log_g, len = length(log_p))
+    checkmate::assert_null(dim(log_g))
 
     ap_psis <- psis_approximate_posterior(log_p = log_p, log_q = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
     class(ap_psis) <- c("psis_aploo", class(ap_psis))
@@ -131,9 +133,12 @@ aploo.function <-
                                     .llfun = .llfun,
                                     data = data,
                                     draws = draws,
-                                    r_eff = 1,
+                                    r_eff = NULL, # r_eff is ignored
                                     save_psis = save_psis,
-                                    log_p = log_p, log_g = log_g, ...)
+                                    log_p = log_p,
+                                    log_g = log_g,
+                                    cores = cores,
+                                    ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -157,7 +162,7 @@ aploo.function <-
   }
 
 
-.approx_loo_i <-
+.aploo_i <-
   function(i,
            llfun,
            ...,
@@ -168,12 +173,10 @@ aploo.function <-
            r_eff = NULL,
            save_psis = FALSE) {
 
-    if (!is.null(r_eff)) {
-      r_eff <- r_eff[i]
-    }
+    if(!is.null(r_eff)) warning("r_eff not implemented for aploo")
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
-    psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, r_eff = r_eff, cores = 1)
+    psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, cores = 1)
 
     structure(
       list(

@@ -617,3 +617,58 @@ NULL
   }
   NextMethod()
 }
+
+
+#' Parallel psis list computations
+#' @details
+#' Refactored function to handle parallel computations
+#' for psis_list
+parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
+  if (cores == 1) {
+    psis_list <-
+      lapply(
+        X = seq_len(N),
+        FUN = .loo_i,
+        llfun = .llfun,
+        data = data,
+        draws = draws,
+        r_eff = r_eff,
+        save_psis = save_psis,
+        ...
+      )
+  } else {
+    if (.Platform$OS.type != "windows") {
+      # On Mac or Linux use mclapply() for multiple cores
+      psis_list <-
+        parallel::mclapply(
+          mc.cores = cores,
+          X = seq_len(N),
+          FUN = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          ...
+        )
+    } else {
+      # On Windows use makePSOCKcluster() and parLapply() for multiple cores
+      cl <- parallel::makePSOCKcluster(cores)
+      on.exit(parallel::stopCluster(cl))
+      psis_list <-
+        parallel::parLapply(
+          cl = cl,
+          X = seq_len(N),
+          fun = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          ...
+        )
+    }
+  }
+}
+
+

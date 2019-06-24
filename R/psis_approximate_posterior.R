@@ -58,3 +58,72 @@ psis_approximate_posterior <- function(log_p, log_q, log_liks = NULL, cores, sav
   )
 }
 
+
+
+
+#' Pareto smoothed importance sampling (PSIS)
+#' using approximate posteriors
+#'
+#'
+ap_psis <- function(log_ratios, log_p, log_g,...) {
+  UseMethod("ap_psis")
+}
+
+#' @export
+#' @templateVar fn psis
+#' @template array
+#'
+ap_psis.array <-
+  function(log_ratios, log_p, log_g, ...,
+           cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores)
+    stopifnot(length(dim(log_ratios)) == 3)
+    log_ratios <- validate_ll(log_ratios)
+    log_ratios <- llarray_to_matrix(log_ratios)
+
+    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
+    ap_psis.matrix(log_ratios = log_ratios,
+                   log_p = log_p,
+                   log_q = log_q,
+                   cores = 1)
+  }
+
+#' @export
+#' @templateVar fn psis
+#' @template matrix
+#'
+ap_psis.matrix <- function(log_ratios, log_p, log_g,
+           ...,
+           cores = getOption("mc.cores", 1)) {
+    checkmate::assert_numeric(log_p, len = nrow(log_ratios))
+    checkmate::assert_numeric(log_g, len = nrow(log_ratios))
+    cores <- loo_cores(cores)
+    log_ratios <- validate_ll(log_ratios)
+
+    approx_correction <- log_p - log_g
+    log_ratios <- log_ratios + approx_correction
+    # Handle underflow/overflow
+    log_ratio_max <- matrixStats::colMaxs(log_ratios)
+    log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
+
+    ## Posterior approximation correction
+    #approx_correction <- log_p - log_g
+    #log_ratios <- log_ratios + approx_correction
+    # Handle underflow/overflow
+    #log_ratio_max <- apply(log_ratios, 2, max)
+    #log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)
+
+    do_psis(log_ratios, r_eff = rep(1, ncol(log_ratios)), cores = cores)
+  }
+
+#' @export
+#' @templateVar fn psis
+#' @template vector
+#'
+ap_psis.default <- function(log_ratios, log_p, log_q, ...) {
+    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
+    dim(log_ratios) <- c(length(log_ratios), 1)
+    ap_psis.matrix(log_ratios, log_p, log_q, cores = 1)
+  }
+
+
