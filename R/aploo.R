@@ -4,19 +4,19 @@
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
 #'   section, below, has detailed descriptions of how to specify the inputs for
 #'   each method.
-#' @export aploo aploo.array aploo.matrix aploo.function
+#' @export loo_approximate_posterior loo_approximate_posterior.array loo_approximate_posterior.matrix loo_approximate_posterior.function
 #'
-#' @param save_psis Should the `"psis"` object created internally by `aploo()` be
+#' @param save_psis Should the `"psis"` object created internally by `loo_approximate_posterior()` be
 #'   saved in the returned object? See \link{loo} for details.
 #' @template cores
 #'
-#' @details The `aploo()` function is an S3 generic and methods are provided for
+#' @details The `loo_approximate_posterior()` function is an S3 generic and methods are provided for
 #'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
 #'   log-likelihood functions. The implementation work for posterior approximations
 #'   where it is possible to compute the log density for the posterior approximation.
 #'
-#' @return The `aploo()` methods return a named list with class
-#'   `c("psis_aploo", "psis_loo", "loo")` with the additional slot:
+#' @return The `loo_approximate_posterior()` methods return a named list with class
+#'   `c("psis_loo_ap", "psis_loo", "loo")` with the additional slot:
 #' \describe{
 #'  \item{`posterior_approximation`}{
 #'   A list with two vectors, `log_p` and `log_g` of the same length
@@ -29,35 +29,18 @@
 #'
 #' @template large-data-references
 #'
-#' @examples
-#' ### Array and matrix methods (using example objects included with loo package)
-#' # Array method
-#' LLarr <- example_loglik_array()
-#' rel_n_eff <- relative_eff(exp(LLarr))
-#' loo(LLarr, r_eff = rel_n_eff, cores = 2)
-#'
-#' # Matrix method
-#' LLmat <- example_loglik_matrix()
-#' rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
-#' loo(LLmat, r_eff = rel_n_eff, cores = 2)
-#'
-#'
-#'
-aploo <- function(x, log_p, log_g, ...) {
-  UseMethod("aploo")
-}
 
 #' @rdname aploo
 #' @export
-approximate_posterior_loo <- function(x, log_p, log_g, ...) {
-  UseMethod("aploo")
+loo_approximate_posterior <- function(x, log_p, log_g, ...) {
+  UseMethod("loo_approximate_posterior")
 }
 
 #' @export
 #' @templateVar fn aploo
 #' @template array
 #'
-aploo.array <-
+loo_approximate_posterior.array <-
   function(x,
            log_p,
            log_g,
@@ -75,13 +58,13 @@ aploo.array <-
     ll <- llarray_to_matrix(x)
     log_p <- as.vector(log_p)
     log_g <- as.vector(log_g)
-    aploo.matrix(ll, log_p = log_p, log_g = log_g, ...,  save_psis = save_psis, cores = cores)
+    loo_approximate_posterior.matrix(ll, log_p = log_p, log_g = log_g, ...,  save_psis = save_psis, cores = cores)
   }
 
 #' @export
 #' @templateVar fn aploo
 #' @template matrix
-aploo.matrix <-
+loo_approximate_posterior.matrix <-
   function(x,
            log_p,
            log_g,
@@ -99,7 +82,7 @@ aploo.matrix <-
     checkmate::assert_null(dim(log_g))
 
     ap_psis <- psis_approximate_posterior(log_p = log_p, log_g = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
-    class(ap_psis) <- c("psis_aploo", class(ap_psis))
+    class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
     ap_psis
   }
 
@@ -111,7 +94,7 @@ aploo.matrix <-
 #'   to the log-likelihood function. See the **Methods (by class)** section
 #'   below for details on how to specify these arguments.
 #'
-aploo.function <-
+loo_approximate_posterior.function <-
   function(x,
            ...,
            data = NULL,
@@ -129,7 +112,7 @@ aploo.function <-
     N <- dim(data)[1]
 
     psis_list <- parallel_psis_list(N = N,
-                                    .loo_i = .aploo_i,
+                                    .loo_i = .loo_ap_i,
                                     .llfun = .llfun,
                                     data = data,
                                     draws = draws,
@@ -160,12 +143,12 @@ aploo.function <-
       psis_object = if (save_psis) psis_out else NULL
     )
 
-    class(ap_psis) <- c("psis_aploo", class(ap_psis))
+    class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
     ap_psis
   }
 
 
-.aploo_i <-
+.loo_ap_i <-
   function(i,
            llfun,
            ...,

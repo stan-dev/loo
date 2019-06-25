@@ -1,6 +1,6 @@
 library(loo)
 
-context("paloo")
+context("loo_approximate_posterior")
 
 # Create test data
 # Checked by Mans M and Paul B 24th of June 2019
@@ -48,7 +48,7 @@ for(j in 1:N){
 }
 
 
-test_that("paloo.array works as paloo.matrix", {
+test_that("loo_approximate_posterior.array works as loo_approximate_posterior.matrix", {
   skip_if_not_installed("checkmate")
 
   # Create array with two "chains"
@@ -63,8 +63,8 @@ test_that("paloo.array works as paloo.matrix", {
   expect_equivalent(ll_array[1:2,2,1:2], ll[(S/2+1):((S/2)+2),1:2])
 
   # Compute aploo
-  expect_silent(aploo1 <- aploo.matrix(x = ll, log_p = log_p, log_g = log_g))
-  expect_silent(aploo2 <- aploo.array(x = ll_array, log_p = log_p_mat, log_g = log_g_mat))
+  expect_silent(aploo1 <- loo_approximate_posterior.matrix(x = ll, log_p = log_p, log_g = log_g))
+  expect_silent(aploo2 <- loo_approximate_posterior.array(x = ll_array, log_p = log_p_mat, log_g = log_g_mat))
   expect_silent(aploo1b <- loo.matrix(x = ll, r_eff = rep(1, N)))
 
   # Check equivalence
@@ -74,18 +74,18 @@ test_that("paloo.array works as paloo.matrix", {
   expect_failure(expect_equal(class(aploo1), class(aploo1b)))
 
   # Should fail with matrix
-  expect_error(aploo2 <- aploo.matrix(x = ll, log_p = as.matrix(log_p), log_g = log_g))
-  expect_error(aploo2 <- aploo.matrix(x = ll, log_p = as.matrix(log_p), log_g = as.matrix(log_g)))
+  expect_error(aploo2 <- loo_approximate_posterior.matrix(x = ll, log_p = as.matrix(log_p), log_g = log_g))
+  expect_error(aploo2 <- loo_approximate_posterior.matrix(x = ll, log_p = as.matrix(log_p), log_g = as.matrix(log_g)))
 })
 
 
-test_that("paloo.function works as paloo.matrix", {
+test_that("loo_approximate_posterior.function works as loo_approximate_posterior.matrix", {
   skip_if_not_installed("checkmate")
 
   # Compute aploo
-  expect_silent(aploo1 <- aploo.matrix(x = ll, log_p = log_p, log_g = log_g))
+  expect_silent(aploo1 <- loo_approximate_posterior.matrix(x = ll, log_p = log_p, log_g = log_g))
   expect_silent(aploo1b <- loo.matrix(x = ll, r_eff = rep(1, N)))
-  expect_silent(aploo2 <- aploo.function(x = llfun, log_p = log_p, log_g = log_g, data = fake_data, draws = fake_laplace_posterior))
+  expect_silent(aploo2 <- loo_approximate_posterior.function(x = llfun, log_p = log_p, log_g = log_g, data = fake_data, draws = fake_laplace_posterior))
 
   # Check equivalence
   expect_equal(aploo1$estimates, aploo2$estimates)
