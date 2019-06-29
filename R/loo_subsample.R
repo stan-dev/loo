@@ -1,10 +1,11 @@
+#' @title
 #' Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations
 #'
 #'
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
 #'   section, below, has detailed descriptions of how to specify the inputs for
 #'   each method.
-#' @export loo_approximate_posterior loo_approximate_posterior.array loo_approximate_posterior.matrix loo_approximate_posterior.function
+#' @export loo_subsample loo_subsample.function
 #'
 #' @param save_psis Should the `"psis"` object created internally by `loo_approximate_posterior()` be
 #'   saved in the returned object? See \link{loo} for details.
@@ -27,10 +28,8 @@
 #'
 #' @seealso loo, psis, loo_compare
 #'
-#' @template large-data-references
+#' @template loo-large-data-references
 #'
-
-#' @rdname aploo
 #' @export
 loo_subsample <- function(x, ...) {
   if (!requireNamespace("checkmate", quietly=TRUE)) {
@@ -67,9 +66,9 @@ loo_subsample <- function(x, ...) {
 #'     \item{\code{lpd}}{
 #'     uses the lpds (ie. \eqn{p(y_i|y)})}
 #'     \item{\code{tis}}{
-#'     uses truncated importance sampling to approximate PSIS-LOO
+#'     uses truncated importance sampling to approximate PSIS-LOO}
 #'     \item{\code{waic}}{
-#'     uses waic (ie. \eqn{p(y_i|y) - p_{waic}})
+#'     uses waic (ie. \eqn{p(y_i|y) - p_{waic}})}
 #'     \item{\code{waic_grad_marginal}}{
 #'     uses waic approximation using first order delta method and
 #'     posterior marginal variances to approximate \eqn{p_{waic}}
@@ -230,13 +229,12 @@ loo_subsample.function <-
     loo_ss <- psis_loo_ss_object(x = plo,
                                  idxs = idxs,
                                  elpd_loo_approx = elpd_loo_approx,
-                                 observations = observations,
                                  loo_approximation = loo_approximation,
                                  loo_approximation_draws = loo_approximation_draws,
                                  estimator = estimator,
-                                 llfun = llfun,
-                                 llgrad = llgrad,
-                                 llhess = llhess)
+                                 .llfun = .llfun,
+                                 .llgrad = .llgrad,
+                                 .llhess = .llhess)
     loo_ss
   }
 
@@ -280,7 +278,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   if(is.null(loo_approximation)) return(NULL)
 
   if(loo_approximation == "waic"){
-    stop("make this more efficient, by extracting") # TODO
+    # TODO: stop("make this more efficient, by extracting")
     draws <- thin_draws(draws, loo_approximation_draws)
     waic_full_obj <- waic.function(.llfun, data = data, draws = draws)
     return(waic_full_obj$pointwise[,"elpd_waic"])

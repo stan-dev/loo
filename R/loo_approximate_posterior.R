@@ -1,3 +1,4 @@
+#' @title
 #' Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations
 #'
 #'
@@ -27,19 +28,16 @@
 #'
 #' @seealso loo, psis, loo_compare
 #'
-#' @template large-data-references
+#' @template loo-large-data-references
 #'
-
-#' @rdname aploo
 #' @export
 loo_approximate_posterior <- function(x, log_p, log_g, ...) {
   UseMethod("loo_approximate_posterior")
 }
 
 #' @export
-#' @templateVar fn aploo
+#' @templateVar fn loo_approximate_posterior
 #' @template array
-#'
 loo_approximate_posterior.array <-
   function(x,
            log_p,
@@ -62,7 +60,7 @@ loo_approximate_posterior.array <-
   }
 
 #' @export
-#' @templateVar fn aploo
+#' @templateVar fn loo_approximate_posterior
 #' @template matrix
 loo_approximate_posterior.matrix <-
   function(x,
@@ -87,9 +85,9 @@ loo_approximate_posterior.matrix <-
   }
 
 #' @export
-#' @templateVar fn aploo
+#' @templateVar fn loo_approximate_posterior
 #' @template function
-#' @param data,draws,... For the `aploo.function()` method and the `loo_i()`
+#' @param data,draws,... For the `loo_approximate_posterior.function()` method and the `loo_i()`
 #'   function, these are the data, posterior draws, and other arguments to pass
 #'   to the log-likelihood function. See the **Methods (by class)** section
 #'   below for details on how to specify these arguments.
