@@ -121,7 +121,7 @@ loo_subsample.function <-
            cores = getOption("mc.cores", 1),
            loo_approximation = "plpd",
            loo_approximation_draws = NULL,
-           estimator = "hh",
+           estimator = "diff_srs",
            llgrad = NULL,
            llhess = NULL) {
 
@@ -140,9 +140,9 @@ loo_subsample.function <-
                                                  coerce = TRUE)
     if(length(observations) > 1) checkmate::assert_integerish(observations, upper = dim(data)[1])
 
-    checkmate::assert_numeric(log_p, len = length(log_g))
+    checkmate::assert_numeric(log_p, len = length(log_g), null.ok = TRUE)
     checkmate::assert_null(dim(log_p))
-    checkmate::assert_numeric(log_g, len = length(log_p))
+    checkmate::assert_numeric(log_g, len = length(log_p), null.ok = TRUE)
     checkmate::assert_null(dim(log_g))
 
     if(is.null(log_p) & is.null(log_g)){
@@ -198,16 +198,19 @@ loo_subsample.function <-
     # Draw subsample of observations
     if(length(observations) == 1){
       # Compute idxs
-      idxs <- subsample_idxs(estimator, elpd_loo_approx, observations)
+      idxs <- subsample_idxs(estimator = estimator,
+                             elpd_loo_approximation = elpd_loo_approx,
+                             m = observations)
     } else {
       # Compute idxs
       idxs <- compute_idxs(observations)
     }
     data_subsample <- data[idxs$idx,, drop = FALSE]
+    if(length(r_eff) > 1) r_eff <- r_eff[idxs$idx]
 
     # Compute elpd_loo
     # TODO: Add test with long r_eff, i.e. handling r_eff
-    if(!is.null(log_p) & !is.null(log_q)){
+    if(!is.null(log_p) & !is.null(log_g)){
       plo <- loo_approximate_posterior.function(x = .llfun,
                                                 data = data_subsample,
                                                 draws = draws,
@@ -430,13 +433,13 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, m){
     idxs_df <- pps_sample(m, pis = pi_values)
   }
 
-  if(estimator == "srs_diff" | estimator == "srs"){
+  if(estimator == "diff_srs" | estimator == "srs"){
     idx <- 1:length(elpd_loo_approximation)
     idx_m <- idx[order(runif(length(elpd_loo_approximation)))][1:m]
     idx_m <- idx_m[order(idx_m)]
     idxs_df <- data.frame(idx=as.integer(idx_m), m_i=1L)
   }
-  assert_subsample_idxs(idxs_df)
+  assert_subsample_idxs(x = idxs_df)
   idxs_df
 }
 
@@ -452,7 +455,7 @@ hh_elpd_loo_approximation_to_pis <- function(elpd_loo_approximation){
 #' Compute subsampling indecies from an observation vector
 compute_idxs <- function(observations){
   checkmate::assert_integer(observations, lower = 1, min.len = 2, any.missing = FALSE)
-  stop("implement")
+  stop("implement") # TODO
   assert_subsample_idxs(idxs_df)
   idxs_df
 }
@@ -463,9 +466,9 @@ assert_subsample_idxs <- function(x){
                                any.missing = FALSE,
                                min.rows = 1,
                                col.names = "named")
-  checkmate::assert_names(names(x), c("idx", "m_i"))
+  checkmate::assert_names(names(x), identical.to = c("idx", "m_i"))
   checkmate::assert_integer(x$idx, lower = 1, any.missing = FALSE, unique = TRUE)
-  checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE, unique = TRUE)
+  checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
 }
 
 
@@ -509,15 +512,13 @@ psis_loo_ss_object <- function(x,
   warning("fix  the todo")
   # TODO: Assert that the approx loo is the same in pointwise as the idx in the approx_loo vector
 
-
-
   # Construct object
   class(x) <- c("psis_loo_ss", class(x))
-  x$pointwise <- cbind(as.data.frame(x$pointwise), idxs_df)
-  x$pointwise$elpd_loo_approx <- elpd_loo_approx[idxs_df$idx]
+  x$pointwise <- cbind(as.data.frame(x$pointwise), idxs)
+  x$pointwise$elpd_loo_approx <- elpd_loo_approx[idxs$idx]
   x$pointwise <- as.matrix(x$pointwise)
-  x$estimates <- cbind(x$estimates, matrix(0, nrow = nrow(x$subsamling_loo$estimates)))
-  colnames(x$estimates)[ncol(x$subsamling_loo$estimates)] <- "subsampling SE"
+  x$estimates <- cbind(x$estimates, matrix(0, nrow = nrow(x$estimates)))
+  colnames(x$estimates)[ncol(x$estimates)] <- "subsampling SE"
 
   x$subsamling_loo <- list()
   x$subsamling_loo$elpd_loo_approx <- elpd_loo_approx
@@ -531,8 +532,8 @@ psis_loo_ss_object <- function(x,
   # Compute estimates
   if(estimator == "hh"){
     x <- loo_subsample_estimation_hh(x)
-  } else if(estimator == "srs_diff"){
-    x <- loo_subsample_estimation_srs_diff(x)
+  } else if(estimator == "diff_srs"){
+    x <- loo_subsample_estimation_diff_srs(x)
   } else if(estimator == "srs"){
     x <- loo_subsample_estimation_srs(x)
   } else {
@@ -602,19 +603,20 @@ whhest <- function(z, m_i, y, N){
 
 #' Estimate elpd using the difference estimator and srs wor
 #' @param x a quick_psis_loo object
-loo_estimation_srs_diff <- function(x){
+loo_subsample_estimation_diff_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
-  elpd_loo_est <- srs_diff_est(x$subsamling_loo$elpd_loo_approx, y = x$pointwise$elpd_loo, y_idx = x$pointwise$idx)
+  elpd_loo_est <- srs_diff_est(x$subsamling_loo$elpd_loo_approx, y = x$pointwise[, "elpd_loo"], y_idx = x$pointwise[, "idx"])
   x$estimates["elpd_loo", "Estimate"] <- elpd_loo_est$y_hat
   x$estimates["elpd_loo", "SE"] <- sqrt(elpd_loo_est$hat_v_y)
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(elpd_loo_est$v_y_hat)
 
   #  elpd_p_est <- srs_diff_est(x$quick_psis_loo$approx_loo, y = x$pointwise$elpd_loo, y_idx = x$pointwise$idx)
-  x$estimates["p_loo", "Estimate"] <- x$p_loo <- NA
-  x$estimates["p_loo", "SE"] <- x$se_p_loo <- NA
+  x$estimates["p_loo", "Estimate"] <- NA
+  x$estimates["p_loo", "SE"] <-  NA
   x$estimates["p_loo", "subsampling SE"] <- NA
-  warning("not implemented")
+  warning("not implemented p_loo computation")
+
   x <- update_psis_loo_ss_object(x)
 
   x
@@ -632,7 +634,6 @@ srs_diff_est <- function(y_approx, y, y_idx){
   N <- length(y_approx)
   m <- length(y)
   y_approx_m <- y_approx[y_idx]
-
 
   e_i <- y - y_approx_m
   t_pi_tilde <- sum(y_approx)
@@ -654,15 +655,16 @@ srs_diff_est <- function(y_approx, y, y_idx){
 loo_estimation_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
-  elpd_loo_est <- srs_est(y = x$pointwise$elpd_loo, y_approx = x$subsamling_loo$elpd_loo_approx)
+  elpd_loo_est <- srs_est(y = x$pointwise[, "elpd_loo"], y_approx = x$subsamling_loo$elpd_loo_approx)
   x$estimates["elpd_loo", "Estimate"] <- elpd_loo_est$y_hat
   x$estimates["elpd_loo", "SE"] <- sqrt(elpd_loo_est$hat_v_y)
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(elpd_loo_est$v_y_hat)
 
-  #  elpd_p_est <- srs_diff_est(x$quick_psis_loo$approx_loo, y = x$pointwise$elpd_loo, y_idx = x$pointwise$idx)
-  x$estimates["p_loo", "Estimate"] <- x$p_loo <- NA
-  x$estimates["p_loo", "SE"] <- x$se_p_loo <- NA
-  x$estimates["p_loo", "subsampling SE"] <- NA
+  p_loo_est <- srs_est(y = x$pointwise[, "p_loo"], y_approx = x$subsamling_loo$elpd_loo_approx)
+  x$estimates["p_loo", "Estimate"] <- p_loo_est$y_hat
+  x$estimates["p_loo", "SE"] <- sqrt(p_loo_est$hat_v_y)
+  x$estimates["p_loo", "subsampling SE"] <- sqrt(p_loo_est$v_y_hat)
+
 
   x <- update_psis_loo_ss_object(x)
 
