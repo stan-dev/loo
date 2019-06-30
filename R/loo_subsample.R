@@ -155,7 +155,7 @@ loo_subsample.function <-
     checkmate::assert_flag(save_psis)
     cores <- loo_cores(cores)
 
-    checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices())
+    checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
     checkmate::assert_int(loo_approximation_draws, lower = 2, null.ok = TRUE)
     checkmate::assert_choice(estimator, choices = estimator_choices())
 
@@ -210,6 +210,7 @@ loo_subsample.function <-
 
     # Compute elpd_loo
     # TODO: Add test with long r_eff, i.e. handling r_eff
+    # TODO: Fix so r_eff is only computed for subsample
     if(!is.null(log_p) & !is.null(log_g)){
       plo <- loo_approximate_posterior.function(x = .llfun,
                                                 data = data_subsample,
@@ -577,7 +578,7 @@ update_psis_loo_ss_object <- function(x){
 #  x$estimates["looic", "Estimate"] <- x$looic <- looic_loo_est$y_hat
 #  x$estimates["looic", "SE"] <- x$se_looic <- sqrt(looic_loo_est$hat_v_y)
 #  x$quick_psis_loo$se_estimates["looic"] <- sqrt(looic_loo_est$v_y_hat)
-
+  x
 }
 
 #' Weighted Hansen-Hurwitz estimator
