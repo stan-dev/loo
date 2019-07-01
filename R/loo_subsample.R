@@ -720,10 +720,14 @@ assert_subsample_idxs <- function(x){
   checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
 }
 
+# TODO: Handle loo_subsample when too many samples are chosen (ie obs > nrow(data))
+
 assert_psis_loo_ss <- function(x){
-  # Test
-  warning("implement these assertions")
-  # Add test that the elpd_loo_approx in pointwise is correct
+  checkmate::assert_class(x, "psis_loo_ss")
+  checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object"))
+  checkmate::assert_names(rownames(x$estimates), must.include = c("elpd_loo", "p_loo", "looic"))
+  checkmate::assert_names(colnames(x$estimates), must.include = c("Estimate", "SE", "subsampling SE"))
+  assert_subsampling_pointwise(x$pointwise)
   x
 }
 
@@ -910,20 +914,26 @@ loo_subsample_estimation_hh <- function(x){
   x$estimates["p_loo", "SE"] <- sqrt(hh_p_loo$hat_v_y_ppz)
   x$estimates["p_loo", "subsampling SE"] <- sqrt(hh_p_loo$v_hat_y_ppz)
 
-  x <- update_psis_loo_ss_object(x)
+  x <- update_psis_loo_ss_estimates(x)
   x
 }
 
 #' Update object with estimates
-update_psis_loo_ss_object <- function(x){
+update_psis_loo_ss_estimates <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
-  warning("update_psis_loo_ss_object not implemented")
-  # 1. Compute looic
-  # 2. Update x$p_loo,  x$se_p_loo, x$looic,  x$se_looic, x$elpd_loo, x$se_elpd_loo
-#  x$estimates["looic", "Estimate"] <- x$looic <- looic_loo_est$y_hat
-#  x$estimates["looic", "SE"] <- x$se_looic <- sqrt(looic_loo_est$hat_v_y)
-#  x$quick_psis_loo$se_estimates["looic"] <- sqrt(looic_loo_est$v_y_hat)
+  # TODO: Double check this computation with a test suite/mejl to Aki
+  x$estimates["looic", "Estimate"] <- (-2) * x$estimates["elpd_loo", "Estimate"]
+  x$estimates["looic", "SE"] <- 2 * x$estimates["elpd_loo", "SE"]
+  x$estimates["looic", "subsampling SE"] <- 2 * x$estimates["elpd_loo", "subsampling SE"]
+
+  x$elpd_loo <- x$estimates["elpd_loo", "Estimate"]
+  x$p_loo <- x$estimates["p_loo", "Estimate"]
+  x$looic <- x$estimates["looic", "Estimate"]
+  x$se_elpd_loo <- x$estimates["elpd_loo", "SE"]
+  x$se_p_loo <- x$estimates["p_loo", "SE"]
+  x$se_looic <- x$estimates["looic", "SE"]
+
   x
 }
 
@@ -953,18 +963,18 @@ whhest <- function(z, m_i, y, N){
 loo_subsample_estimation_diff_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
-  elpd_loo_est <- srs_diff_est(x$subsamling_loo$elpd_loo_approx, y = x$pointwise[, "elpd_loo"], y_idx = x$pointwise[, "idx"])
+  elpd_loo_est <- srs_diff_est(y_approx = x$subsamling_loo$elpd_loo_approx, y = x$pointwise[, "elpd_loo"], y_idx = x$pointwise[, "idx"])
   x$estimates["elpd_loo", "Estimate"] <- elpd_loo_est$y_hat
   x$estimates["elpd_loo", "SE"] <- sqrt(elpd_loo_est$hat_v_y)
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(elpd_loo_est$v_y_hat)
 
-  #  elpd_p_est <- srs_diff_est(x$quick_psis_loo$approx_loo, y = x$pointwise$elpd_loo, y_idx = x$pointwise$idx)
-  x$estimates["p_loo", "Estimate"] <- NA
-  x$estimates["p_loo", "SE"] <-  NA
-  x$estimates["p_loo", "subsampling SE"] <- NA
-  warning("not implemented p_loo computation")
+  # TODO: Check that it is clear that p_eff is estimated using srs
+  p_loo_est <- srs_est(y = x$pointwise[, "p_loo"], y_approx = x$subsamling_loo$elpd_loo_approx)
+  x$estimates["p_loo", "Estimate"] <- p_loo_est$y_hat
+  x$estimates["p_loo", "SE"] <- sqrt(p_loo_est$hat_v_y)
+  x$estimates["p_loo", "subsampling SE"] <- sqrt(p_loo_est$v_y_hat)
 
-  x <- update_psis_loo_ss_object(x)
+  x <- update_psis_loo_ss_estimates(x)
 
   x
 }
@@ -1012,8 +1022,7 @@ loo_estimation_srs <- function(x){
   x$estimates["p_loo", "SE"] <- sqrt(p_loo_est$hat_v_y)
   x$estimates["p_loo", "subsampling SE"] <- sqrt(p_loo_est$v_y_hat)
 
-
-  x <- update_psis_loo_ss_object(x)
+  x <- update_psis_loo_ss_estimates(x)
 
   x
 }
