@@ -129,8 +129,6 @@ loo_subsample.function <-
     .llfun <- validate_llfun(x)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     if (checkmate::test_class(observations, "psis_loo_ss")) {
-      # TODO: Fix this
-      stop("Check also that the estimator of the object is the same")
       observations <- obs_idx(observations)
     }
     observations <- checkmate::assert_integerish(observations, null.ok = TRUE,
@@ -139,6 +137,8 @@ loo_subsample.function <-
                                                  any.missing = FALSE,
                                                  coerce = TRUE)
     if(length(observations) > 1) checkmate::assert_integerish(observations, upper = dim(data)[1])
+    # TODO: Message when setting observations.
+    # State how these observations will be asumed to been sampled (if not using object).
 
     checkmate::assert_numeric(log_p, len = length(log_g), null.ok = TRUE)
     checkmate::assert_null(dim(log_p))
@@ -359,7 +359,7 @@ update.psis_loo_ss <- function(object,
 
     if(!is.null(cidxs$new)){
       if(!is.null(object$approximate_posterior$log_p) & !is.null(object$approximate_posterior$log_g)){
-        plo <- loo_approximate_posterior.function(x = .llfun,
+        plo <- loo_approximate_posterior.function(x = object$subsamling_loo$.llfun,
                                                   data = data_new_subsample,
                                                   draws = draws,
                                                   log_p = object$approximate_posterior$log_p,
@@ -368,7 +368,7 @@ update.psis_loo_ss <- function(object,
                                                   save_psis = !is.null(object$psis_object),
                                                   cores = cores)
       } else {
-        plo <- loo.function(x = .llfun,
+        plo <- loo.function(x = object$subsamling_loo$.llfun,
                             data = data_new_subsample,
                             draws = draws,
                             r_eff = r_eff,
@@ -380,26 +380,24 @@ update.psis_loo_ss <- function(object,
         add_subsampling_vars_to_pointwise(plo$pointwise,
                                           cidxs$new,
                                           object$subsamling_loo$elpd_loo_approx)
+    } else {
+      plo <- NULL
     }
-
-
     # TODO: Combine psis objects from psis_save in rbind.psis_loo_ss
     # TODO: Test so all are null below and it works as expected
-
     # Update object (diagnostics and pointwise)
-    if(is.null(cidxs$new)) plo <- NULL
     if(length(observations) == 1){
       # Add new samples pointwise and diagnostic
-      object<- rbind.psis_loo_ss(object, plo)
+      object <- rbind.psis_loo_ss(object, x = plo)
 
       # Update m_i for current pointwise (diagnostic stay the same)
-      object$pointwise <- update_m_i_in_pointwise(pointwise, cidxs$add, type = "add")
+      object$pointwise <- update_m_i_in_pointwise(object$pointwise, cidxs$add, type = "add")
     } else {
       # Add new samples pointwise and diagnostic
       object<- rbind.psis_loo_ss(object, plo)
 
       # Replace m_i current pointwise and diagnostics
-      object$pointwise <- update_m_i_in_pointwise(pointwise, cidxs$add, type = "replace")
+      object$pointwise <- update_m_i_in_pointwise(object$pointwise, cidxs$add, type = "replace")
 
       # Remove samples
       object <- remove_idx.psis_loo_ss(object, cidxs$remove)
@@ -820,7 +818,7 @@ add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx){
 rbind.psis_loo_ss <- function(object, x){
   checkmate::assert_class(object, "psis_loo_ss")
   if(is.null(x)) return(object) # Fallback
-  checkmate::assert_class(x, "loo_ss")
+  checkmate::assert_class(x, "psis_loo")
   assert_subsampling_pointwise(object$pointwise)
   assert_subsampling_pointwise(x$pointwise)
   checkmate::assert_disjunct(object$pointwise[, "idx"], x$pointwise[, "idx"])
@@ -828,9 +826,9 @@ rbind.psis_loo_ss <- function(object, x){
   object$pointwise <- rbind(object$pointwise,
                             x$pointwise)
   object$diagnostics$pareto_k <- c(object$diagnostics$pareto_k,
-                                   plo$diagnostics$pareto_k)
+                                   x$diagnostics$pareto_k)
   object$diagnostics$n_eff <- c(object$diagnostics$n_eff,
-                                plo$diagnostics$n_eff)
+                                x$diagnostics$n_eff)
   object
 }
 
