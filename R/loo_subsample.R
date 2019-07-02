@@ -207,8 +207,6 @@ loo_subsample.function <-
     if(length(r_eff) > 1) r_eff <- r_eff[idxs$idx]
 
     # Compute elpd_loo
-    # TODO: Add test with long r_eff, i.e. handling r_eff
-    # TODO: Fix so r_eff is only computed for subsample
     if(!is.null(log_p) & !is.null(log_g)){
       plo <- loo_approximate_posterior.function(x = .llfun,
                                                 data = data_subsample,
@@ -240,9 +238,6 @@ loo_subsample.function <-
   }
 
 
-# TODO: skip("implement loo_subsampling.matrix and loo_subsampling.array.")
-
-
 #' Update \code{psis_loo_ss} objects
 #'
 #' @details
@@ -266,6 +261,10 @@ update.psis_loo_ss <- function(object,
                                llhess = NULL){
   # Fallback
   # TODO: if nothing is updated, just return the object
+  # TODO: cleanup/read through documentation
+  # TODO: Test that sampling wr can have duplicates, wor cannot
+  # TODO: Add vignette as test case
+
 
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   cores <- loo_cores(cores)
@@ -298,7 +297,6 @@ update.psis_loo_ss <- function(object,
     object$pointwise[, "elpd_loo_approx"] <- object$subsamling_loo$elpd_loo_approx[object$pointwise[, "idx"]]
   }
 
-  # TODO: test update loo observations
   # Update observations
   if(!is.null(observations)){
     # TODO: Refactor observatcion checks
@@ -317,9 +315,6 @@ update.psis_loo_ss <- function(object,
       # Assert we add new observations
       checkmate::assert_int(observations, lower = nobs(object) + 1)
     }
-
-    # TODO: Only update observations if a new vector is supplied or new obs are more than previous (i.e. adding)
-    # TODO: Add in estimators that remove points that are m_i == 0
 
     # Compute subsample indecies
     if(length(observations) > 1){
@@ -348,7 +343,7 @@ update.psis_loo_ss <- function(object,
     # Identify how to update object
     cidxs <- compare_idxs(idxs, object)
 
-    # TODO: Assert that we cant update loo_approx with HH (since need sampling)
+    # TODO: Test that we cant update loo_approx with HH (since need sampling)
     # TODO: Create function for set of estimators with and withour replacement
 
     # Compute new observations
@@ -414,12 +409,11 @@ update.psis_loo_ss <- function(object,
   } else {
     stop("No correct estimator used.")
   }
-  # TODO: Fix assert_psis_loo_ss
+
   assert_psis_loo_ss(object)
   object
 }
 
-# TODO: Test nobs() and obs_idx()
 # TODO: Fix Error: /Users/mansmagnusson/Dropbox (Personlig)/Projekt/loo/man/elpd_loo_approximation.Rd:79: Bad \link text
 
 #' The observations indecies in the original data
@@ -447,8 +441,6 @@ obs_idx <- function(x, rep = TRUE){
   }
   idxs
 }
-
-# TODO: Test that nobs and obs_idx give the same result for HH
 
 #' @export
 nobs.psis_loo_ss <- function(x){
@@ -492,7 +484,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   }
 
   N <- dim(data)[1]
-  # TODO: Test this in testsuite
+
   if(loo_approximation == "none") return(rep(1L,N))
 
   if(loo_approximation == "waic"){
@@ -544,8 +536,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
       lpd_i <- logMeanExp(ll_i)
       lpd_i
     }))
-    # TODO: Cleanup this function (when test suits pass)
-    # Refactor each method to its own function instead of the if-else
 
     if(loo_approximation == "waic_grad" |
        loo_approximation == "waic_hess") {
@@ -587,7 +577,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 }
 
-# TODO: Implement TIS
 
 ### TODO: MAKE THIS GENERIC AND REMOVE STANREG
 #' Compute \eqn{E(\theta)} as point estimate.
@@ -736,8 +725,6 @@ assert_subsample_idxs <- function(x){
   checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
 }
 
-# TODO: Handle loo_subsample when too many samples are chosen (ie obs > nrow(data))
-
 assert_psis_loo_ss <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
   checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object"))
@@ -786,7 +773,6 @@ psis_loo_ss_object <- function(x,
   checkmate::assert_function(.llfun, args = c("data_i", "draws"), ordered = TRUE)
   checkmate::assert_function(.llgrad, args = c("data_i", "draws"), ordered = TRUE, null.ok = TRUE)
   checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE, null.ok = TRUE)
-  # TODO: Assert that the approx loo is the same in pointwise as the idx in the approx_loo vector
 
   # Construct object
   class(x) <- c("psis_loo_ss", class(x))
@@ -850,8 +836,6 @@ rbind.psis_loo_ss <- function(object, x){
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
-
-# TODO: Test that sampling wr can have duplicates, wor cannot
 
 remove_idx.psis_loo_ss <- function(object, idxs){
   checkmate::assert_class(object, "psis_loo_ss")
@@ -1053,10 +1037,5 @@ srs_est <- function(y, y_approx){
 
   est_list
 }
-
-
-## Print methods ---
-
-# TODO: Fix  this
 
 

@@ -151,6 +151,8 @@ test_that("Test the srs estimator with 'none' approximation", {
   expect_s3_class(loo_ss, "psis_loo_ss")
   expect_error(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1100, loo_approximation = "none", estimator = "srs", r_eff = rep(1, nrow(fake_data))))
 
+  expect_equal(length(obs_idx(loo_ss)), nobs(loo_ss))
+
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
@@ -194,8 +196,12 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_s3_class(loo_ss_max, "psis_loo_ss")
   expect_silent(loo_ss_max2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = 1100, r_eff = rep(1, nrow(fake_data))))
   expect_equal(nobs(loo_ss_max2), 1100)
+  expect_error(loo_ss_max2 <- update(loo_ss_max2, draws = fake_posterior, data = fake_data, observations = 300, r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
   expect_equal(loo_ss$estimates, loo_ss2$estimates)
+  expect_equal(length(obs_idx(loo_ss_max)), length(obs_idx(loo_ss_max2)))
+  expect_equal(length(obs_idx(loo_ss_max)), nobs(loo_ss_max))
+
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
@@ -273,6 +279,9 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_equal(loo_ss4$pointwise[ss4_order,c(1,3,4)], true_loo$pointwise[,c(1,3,4)])
   expect_equal(loo_ss4$diagnostics$pareto_k[ss4_order], true_loo$diagnostics$pareto_k)
   expect_equal(loo_ss4$diagnostics$n_eff[ss4_order], true_loo$diagnostics$n_eff)
+
+  expect_error(loo_ss_min <- update(object = loo_ss, draws = fake_posterior, data = fake_data, observations = 50, r_eff = rep(1, nrow(fake_data))))
+
 
   # Add tests for changing approx variable
   expect_silent(loo_ss_lpd <- update(object = loo_ss, draws = fake_posterior, data = fake_data, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
