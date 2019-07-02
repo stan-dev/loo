@@ -460,6 +460,10 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
               loo_ap_ss$estimates[i, "subsampling SE"])
   }
 
+  expect_equal(round(full_loo$estimates), round(loo_ap_ss_full$estimates))
+  expect_failure(expect_equal(full_loo$estimates, loo_ap_ss_full$estimates))
+  expect_equal(dim(full_loo), dim(loo_ap_ss_full))
+  expect_s3_class(loo_ap_ss_full, "psis_loo_ap")
 })
 
 
