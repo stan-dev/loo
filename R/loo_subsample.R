@@ -156,7 +156,7 @@ loo_subsample.function <-
     cores <- loo_cores(cores)
 
     checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
-    checkmate::assert_int(loo_approximation_draws, lower = 2, null.ok = TRUE)
+    checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
     checkmate::assert_choice(estimator, choices = estimator_choices())
 
     .llgrad <- .llhess <- NULL
@@ -523,6 +523,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
      loo_approximation == "waic_grad_marginal" |
      loo_approximation == "waic_hess"){
 
+    draws <- thin_draws(draws, loo_approximation_draws)
     point_est <- compute_point_estimate(draws)
     lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
@@ -627,10 +628,24 @@ thin_draws <- function(draws, loo_approximation_draws){
 }
 #' @rdname thin_draws
 thin_draws_matrix <- function(draws, loo_approximation_draws){
-  S <- nrow(draws)
+  checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
+  S <- ndraws(draws)
   idx <- 1:loo_approximation_draws * S %/% loo_approximation_draws
   draws <- draws[idx, , drop = FALSE]
   draws
+}
+
+#' Returns the number of posterior draws from a draws object.
+ndraws <- function(x){
+  UseMethod("ndraws")
+}
+
+ndraws.matrix <- function(x){
+  nrow(x)
+}
+
+ndraws.default <- function(x){
+  stop("ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
 

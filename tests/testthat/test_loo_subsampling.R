@@ -229,6 +229,38 @@ test_that("elpd_loo_approximation works as expected", {
 })
 
 
+test_that("Test loo_approximation_draws", {
+  set.seed(123)
+  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
+  p <- 0.7
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  fake_posterior <- draws <- as.matrix(rbeta(S, a, b))
+  fake_data <- data.frame(y,K)
+  rm(N, K, S, a0, b0, p, y, a, b)
+  llfun_test <- function(data_i, draws) {
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+
+  expect_silent(res1 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", loo_approximation_draws = NULL, cores = 1))
+  expect_silent(res2 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", loo_approximation_draws = 10, cores = 1))
+  expect_silent(res3 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior[1:10*100,], loo_approximation = "waic", loo_approximation_draws = NULL, cores = 1))
+  expect_failure(expect_equal(res1, res3))
+  expect_equal(res2, res3)
+
+  expect_silent(loo_ss1 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss2 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 10, r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss3 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 31, r_eff = rep(1, nrow(fake_data))))
+  expect_error(loo_ss4 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 3100, r_eff = rep(1, nrow(fake_data))))
+
+  expect_equal(names(loo_ss1$subsamling_loo), c("elpd_loo_approx", "loo_approximation", "loo_approximation_draws", "estimator", ".llfun", ".llgrad", ".llhess"))
+  expect_null(loo_ss1$subsamling_loo$loo_approximation_draws)
+  expect_equal(loo_ss2$subsamling_loo$loo_approximation_draws, 10L)
+  expect_equal(loo_ss3$subsamling_loo$loo_approximation_draws, 31L)
+
+})
+
+
 
 context("loo_subsampling_estimation")
 
@@ -291,5 +323,379 @@ test_that("whhest works as expected", {
 })
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Move up to
+
+
+
+
+
+
+test_that("full quick_loo works as ordinary loo ", {
+  set.seed(123)
+  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
+  p <- 0.7
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  fake_posterior <- as.matrix(rbeta(S, a, b))
+  fake_data <- data.frame(y,K)
+  llfun <- function(data_i, draws) {
+    # each time called internally within loo the arguments will be equal to:
+    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+
+  expect_silent(true_loo <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = 1))
+  expect_silent(qloo_full <- loo:::quick_loo.function(x = llfun, draws = fake_posterior, data = fake_data, m = NULL, type = "point", r_eff = 1))
+
+  expect_equal(true_loo$estimates["elpd_loo", "Estimate"], qloo_full$estimates["elpd_loo", "Estimate"], tol = 0.00000001)
+  expect_equal(true_loo$estimates["p_loo", "Estimate"], qloo_full$estimates["p_loo", "Estimate"], tol = 0.00000001)
+  expect_equal(true_loo$estimates["looic", "Estimate"], qloo_full$estimates["looic", "Estimate"], tol = 0.00000001)
+
+  expect_equal(dim(true_loo),dim(qloo_full))
+  expect_equal(true_loo$diagnostics, qloo_full$diagnostics)
+
+})
+
+
+
+test_that("overall quick_loo with radon data", {
+  # load("tests/testthat/test_quick_laplace_loo.rda")
+  load("test_quick_laplace_loo.rda")
+
+  set.seed(134)
+  expect_silent(full_loo <- loo:::loo.function(x = llfun, draws = draws, data = data, r_eff = 1))
+  set.seed(134)
+  expect_silent(qloo <- loo:::quick_loo.function(x = llfun, draws = draws, data = data, m = 200, type = "point", r_eff = 1))
+  set.seed(134)
+  expect_silent(qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 200, type = "point", r_eff = 1))
+  expect_s3_class(qloo_approx, "quick_psis_loo")
+  expect_silent(qloo_approx_full <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
+  expect_s3_class(qloo_approx_full, "psis_loo")
+
+  expect_equal(full_loo$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["elpd_loo"])
+  expect_equal(full_loo$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["p_loo"])
+  expect_equal(full_loo$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["looic"])
+  expect_failure(expect_equal(full_loo$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(full_loo$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(full_loo$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 0.00000001))
+
+  expect_equal(qloo_approx_full$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["elpd_loo"])
+  expect_equal(qloo_approx_full$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["p_loo"])
+  expect_equal(qloo_approx_full$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["looic"])
+
+  expect_output(print(qloo_approx), "Posterior approximation used has been corrected for")
+  expect_failure(expect_output(print(qloo), "Posterior approximation used has been corrected for"))
+
+  warning("Fix expect_output(print(qloo_approx_full)...")
+  #expect_output(print(qloo_approx_full), "Posterior approximation used has been corrected for")
+
+  set.seed(4712)
+  expect_silent(qloo2 <- loo:::quick_loo.quick_psis_loo(x = qloo, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
+  expect_gt(dim(qloo2)[2], dim(qloo)[2])
+  expect_gt(dim(qloo2$pointwise)[1], dim(qloo$pointwise)[1])
+  expect_equal(sum(qloo$pointwise$m_i), 200)
+  expect_equal(sum(qloo2$pointwise$m_i), 1000)
+  for(i in seq_along(qloo2$quick_psis_loo$se_estimates[1:3])) {
+    expect_lt(qloo2$quick_psis_loo$se_estimates[i], qloo$quick_psis_loo$se_estimates[i])
+  }
+
+  set.seed(4712)
+  expect_s3_class(qloo_approx, "quick_psis_loo")
+  expect_error(qloo_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
+  expect_silent(qloo_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
+  expect_gt(dim(qloo_approx2)[2], dim(qloo_approx)[2])
+  expect_gt(dim(qloo_approx2$pointwise)[1], dim(qloo_approx$pointwise)[1])
+  expect_equal(sum(qloo_approx$pointwise$m_i), 200)
+  expect_equal(sum(qloo_approx2$pointwise$m_i), 1000)
+  for(i in seq_along(qloo_approx2$quick_psis_loo$se_estimates[1:3])) {
+    expect_lt(qloo_approx2$quick_psis_loo$se_estimates[i], qloo_approx$quick_psis_loo$se_estimates[i])
+  }
+
+})
+
+
+
+
+test_that("overall full quick_loo with radon data", {
+  # load("tests/testthat/test_quick_laplace_loo.rda")
+  load("test_quick_laplace_loo.rda")
+
+  set.seed(4712)
+  expect_silent(full_loo <- loo:::loo.function(x = llfun, draws = draws, data = data, r_eff = 1))
+  set.seed(4712)
+  expect_silent(qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 100, type = "point", r_eff = 1))
+  set.seed(4712)
+  expect_silent(full_qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
+
+  expect_equal(round(full_loo$estimates), round(full_qloo_approx$estimates))
+  expect_failure(expect_equal(full_loo$estimates, full_qloo_approx$estimates))
+  expect_equal(dim(full_loo), dim(full_qloo_approx))
+  expect_true(full_qloo_approx$approx_corrected)
+
+  skip("This is nice to have!")
+  # Refactor the code and make look better (i.e. create a quick_psis with m observations)
+  expect_silent(qloo_full_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
+  expect_silent(qloo_full_approx3 <- loo:::quick_loo.psis_loo(x = full_qloo_approx, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
+
+})
+
+
+test_that("waic using delta method and gradient", {
+  if(FALSE){
+    # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
+    set.seed(123)
+    N <- 400; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
+    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 1)
+    X <- X_full; y <- y_full
+    Lambda_0 <- diag(length(beta)); mu_0 <- c(0,0)
+    b_hat <- solve(t(X)%*%X)%*%t(X)%*%y
+    mu_n <- solve(t(X)%*%X)%*%(t(X)%*%X%*%b_hat + Lambda_0%*%mu_0)
+    Lambda_n <- t(X)%*%X + Lambda_0
+    fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
+    colnames(fake_posterior) <- c("a", "b")
+    fake_data <- data.frame(y, X)
+    save(fake_posterior, fake_data, file = "normal_reg_waic_test_example.rda")
+  } else {
+    load(file = "normal_reg_waic_test_example.rda")
+  }
+
+  .llfun <- function(data_i, draws) {
+    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = 1, log = TRUE)
+  }
+
+  .llgrad <- function(data_i, draws) {
+    x_i <- data_i[, "X2"]
+    gr <- cbind(data_i$y - draws[,"a"] - draws[,"b"]*x_i,
+                (data_i$y - draws[,"a"] - draws[,"b"]*x_i) * x_i)
+    colnames(gr) <- c("a", "b")
+    gr
+  }
+
+  data <- fake_data
+  fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
+
+  expect_silent(approx_loo_waic <- loo:::approx_loo_variable(.llfun, data, draws = fake_posterior, cores = 1, approx_type = "waic_full"))
+  expect_silent(approx_loo_waic_delta <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta", .llgrad = .llgrad))
+  expect_silent(approx_loo_waic_delta_diag <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta_diag", .llgrad = .llgrad))
+
+  # Test that the approaches should not deviate  too much
+  diff_waic_delta <- mean(approx_loo_waic - approx_loo_waic_delta)
+  diff_waic_delta_diag <- mean(approx_loo_waic - approx_loo_waic_delta_diag)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta_diag, tol = 0.1)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
+
+
+  expect_silent(test_qloo_waic <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_full", m = 50, llgrad = .llgrad))
+  expect_silent(test_qloo_delta <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta", m = 50, llgrad = .llgrad))
+  expect_silent(test_qloo_diag <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta_diag", m = 50, llgrad = .llgrad))
+  expect_silent(test_qloo_point <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "point", m = 50, llgrad = .llgrad))
+
+  #test_qloo_waic$quick_psis_loo$se_estimates
+  #test_qloo_delta$quick_psis_loo$se_estimates
+  #test_qloo_diag$quick_psis_loo$se_estimates
+  #test_qloo_point$quick_psis_loo$se_estimates
+
+})
+
+
+test_that("waic using delta 2nd order method", {
+  if(FALSE){
+    # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
+    set.seed(123)
+    N <- 100; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
+    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 0.5)
+    X <- X_full; y <- y_full
+    fake_posterior <- MCMCpack::MCMCregress(y~x, data = data.frame(y = y,x=X[,2]), thin = 10, mcmc = 10000) # Because Im lazy
+    fake_posterior <- as.matrix(fake_posterior)
+    fake_posterior[,"sigma2"] <- sqrt(fake_posterior[,"sigma2"]) # TODO: Double check this with Michael
+    colnames(fake_posterior) <- c("a", "b", "sigma")
+    fake_data <- data.frame(y, X)
+    save(fake_posterior, fake_data, file = "normal_reg_waic_test_example2.rda")
+  } else {
+    load(file = "normal_reg_waic_test_example2.rda")
+  }
+
+  .llfun <- function(data_i, draws) {
+    # data_i: ith row of fdata (data_i <- fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = draws[, c("sigma")], log = TRUE)
+  }
+
+  .llgrad <- function(data_i, draws) {
+    sigma <- draws[,"sigma"]
+    sigma2 <- sigma^2
+    b <- draws[,"b"]
+    a <- draws[,"a"]
+    x_i <- unlist(data_i[, c("X1", "X2")])
+    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
+
+    gr <- cbind(e * x_i[1] / sigma2,
+                e * x_i[2] / sigma2,
+                - 1 / sigma + e^2 / (sigma2 * sigma))
+    colnames(gr) <- c("a", "b", "sigma")
+    gr
+  }
+
+  .llhess <- function(data_i, draws) {
+    hess_array <- array(0, dim = c(ncol(draws), ncol(draws), nrow(draws)), dimnames = list(colnames(draws),colnames(draws),NULL))
+    sigma <- draws[,"sigma"]
+    sigma2 <- sigma^2
+    sigma3 <- sigma2*sigma
+    b <- draws[,"b"]
+    a <- draws[,"a"]
+    x_i <- unlist(data_i[, c("X1", "X2")])
+    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
+
+    hess_array[1,1,] <- - x_i[1]^2 / sigma2
+    hess_array[1,2,] <- hess_array[2,1,] <- - x_i[1] * x_i[2] / sigma2
+    hess_array[2,2,] <- - x_i[2]^2 / sigma2
+    hess_array[3,1,] <- hess_array[1,3,] <- -2 * x_i[1] * e / sigma3
+    hess_array[3,2,] <- hess_array[2,3,] <- -2 * x_i[2] * e / sigma3
+    hess_array[3,3,] <- 1 / sigma2 - 3 * e^2 / (sigma2^2)
+    hess_array
+  }
+
+  data <- fake_data
+  draws <- fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
+
+  expect_silent(approx_loo_waic <- loo:::approx_loo_variable(.llfun, data, draws = fake_posterior, cores = 1, approx_type = "waic_full"))
+  expect_silent(approx_loo_waic_delta <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta", .llgrad = .llgrad))
+  expect_silent(approx_loo_waic_delta2 <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta2", .llgrad = .llgrad, .llhess = .llhess))
+  # plot(approx_loo_waic, approx_loo_waic_delta)
+  # mean(abs(approx_loo_waic - approx_loo_waic_delta))
+  # mean(abs(approx_loo_waic - approx_loo_waic_delta2))
+
+  # Test that the approaches should not deviate too much
+  expect_equal(approx_loo_waic,approx_loo_waic_delta2, tol = 0.01)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
+
+  expect_silent(test_qloo_waic <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_full", m = 50, llgrad = .llgrad))
+  expect_error(test_qloo_delta2 <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta2", m = 50, llgrad = .llgrad))
+  expect_silent(test_qloo_delta2 <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta2", m = 50, llgrad = .llgrad, llhess = .llhess))
+  expect_silent(test_qloo_delta <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta", m = 50, llgrad = .llgrad))
+  expect_silent(test_qloo_point <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "point", m = 50, llgrad = .llgrad))
+})
+
+
+test_that("srs_diff_est works as expected", {
+  set.seed(1234)
+  N <- 1000
+  y_true <- 1:N
+  sigma_hat_true <- sqrt(N * sum((y_true - mean(y_true))^2) / length(y_true))
+  y_approx <- rnorm(N, y_true, 0.1)
+  m <- 100
+  sigma_hat <- y_hat <- se_y_hat <- numeric(10000)
+  for(i in 1:10000){
+    y_idx <- sample(1:N, size = m)
+    y <- y_true[y_idx]
+    res <- loo:::srs_diff_est(y_approx, y, y_idx)
+    y_hat[i] <- res$y_hat
+    se_y_hat[i] <- sqrt(res$v_y_hat)
+    sigma_hat[i] <- sqrt(res$hat_v_y)
+  }
+  expect_equal(mean(y_hat), sum(y_true), tol = 0.1)
+
+  in_ki <- y_hat + 2 * se_y_hat > sum(y_true) & y_hat - 2*se_y_hat < sum(y_true)
+  expect_equal(mean(in_ki), 0.95, tol = 0.01)
+
+  # Should be  unbiased
+  expect_equal(mean(sigma_hat), sigma_hat_true, tol = 0.1)
+
+  m <- N
+  y_idx <- sample(1:N, size = m)
+  y <- y_true[y_idx]
+  res <- loo:::srs_diff_est(y_approx, y, y_idx)
+  expect_equal(res$y_hat, 500500, tol = 0.0001)
+  expect_equal(res$v_y_hat, 0, tol = 0.0001)
+  expect_equal(sqrt(res$hat_v_y), sigma_hat_true, tol = 0.1)
+
+})
+
+test_that("srs_est works as expected", {
+  set.seed(1234)
+  # Cochran 1976 example Table 2.2
+
+  y <- c(rep(42,23),rep(41,4), 36, 32, 29, 27, 27, 23, 19, 16, 16, 15, 15, 14, 11, 10, 9, 7, 6, 6, 6, 5, 5, 4, 3)
+  expect_equal(sum(y), 1471)
+  approx_loo <- rep(0L, 676)
+  expect_equal(sum(y^2), 54497)
+  res <- loo:::srs_est(y = y, approx_loo)
+  expect_equal(res$y_hat, 19888, tol = 0.0001)
+  expect_equal(res$v_y_hat, 676^2*229*(1-0.074)/50, tol = 0.0001)
+  expect_equal(res$hat_v_y, 676 * var(y), tol = 0.0001)
+
+  # Simulation example
+  set.seed(1234)
+  N <- 1000
+  y_true <- 1:N
+  sigma_hat_true <- sqrt(N * sum((y_true - mean(y_true))^2) / length(y_true))
+
+  m <- 100
+  y_hat <- se_y_hat <- sigma_hat <- numeric(10000)
+  for(i in 1:10000){
+    y_idx <- sample(1:N, size = m)
+    y <- y_true[y_idx]
+    res <- loo:::srs_est(y = y, approx_loo = y_true)
+    y_hat[i] <- res$y_hat
+    se_y_hat[i] <- sqrt(res$v_y_hat)
+    sigma_hat[i] <- sqrt(res$hat_v_y)
+  }
+  expect_equal(mean(y_hat), sum(y_true), tol = 0.1)
+
+  in_ki <- y_hat + 2*se_y_hat > sum(y_true) & y_hat - 2*se_y_hat < sum(y_true)
+  expect_equal(mean(in_ki), 0.95, tol = 0.01)
+
+  # Should be  unbiased
+  expect_equal(mean(sigma_hat), sigma_hat_true, tol = 0.1)
+
+  m <- N
+  y_idx <- sample(1:N, size = m)
+  y <- y_true[y_idx]
+  res <- loo:::srs_est(y, y_true)
+  expect_equal(res$y_hat, 500500, tol = 0.0001)
+  expect_equal(res$v_y_hat, 0, tol = 0.0001)
+})
+
+
+
+test_that("overall quick_loo works with srs_diff as expected (compared with loo)", {
+  set.seed(1234)
+  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
+  p <- 0.7
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  fake_posterior <- as.matrix(rbeta(S, a, b))
+  fake_data <- data.frame(y,K)
+  llfun <- function(data_i, draws) {
+    # each time called internally within loo the arguments will be equal to:
+    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+
+  true_loo <- loo.function(x = llfun, draws = fake_posterior, data = fake_data, r_eff = 1)
+  qloo1 <- loo:::quick_loo.function(x = llfun, draws = fake_posterior, data = fake_data, m = 200, approx_type = "point", estimator = "srs_diff", r_eff = 1)
+  expect_equal(true_loo$estimates[1,1], qloo1$estimates[1,1], tol = 0.1)
+
+})
 
 
