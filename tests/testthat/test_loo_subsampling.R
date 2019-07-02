@@ -79,7 +79,7 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
   expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss_lpd10$estimates["p_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss_lpd10$estimates["looic", "Estimate"], tol = 0.00000001))
 
-  skip("Add tests on supplying observation vector") # TODO
+  skip("Add tests on supplying observation vector with HH") # TODO
 
 })
 
@@ -173,6 +173,45 @@ test_that("Test the srs estimator with 'none' approximation", {
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
 
   skip("test all approximations and sample approaches.") # TODO
+
+})
+
+test_that("Test the Hansen-Hurwitz estimator", {
+  skip_if_not_installed("checkmate")
+
+  set.seed(123)
+  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
+  p <- 0.7
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  fake_posterior <- as.matrix(rbeta(S, a, b))
+  fake_data <- data.frame(y,K)
+  rm(N, K, S, a0, b0, p, y, a, b)
+  llfun_test <- function(data_i, draws) {
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+
+  expect_silent(true_loo <- loo(llfun_test, draws = fake_posterior, data = fake_data, r_eff = rep(1, nrow(fake_data))))
+  expect_s3_class(true_loo, "psis_loo")
+  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 300, loo_approximation = "plpd", estimator = "hh", r_eff = rep(1, nrow(fake_data))))
+  expect_s3_class(loo_ss, "psis_loo_ss")
+
+  # Check consistency
+  expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
+                    loo_ss$subsamling_loo$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
+
+  # Expect values
+  z <- 2
+  expect_lte(loo_ss$estimates["elpd_loo", "Estimate"] - z * loo_ss$estimates["elpd_loo", "subsampling SE"], true_loo$estimates["elpd_loo", "Estimate"])
+  expect_gte(loo_ss$estimates["elpd_loo", "Estimate"] + z * loo_ss$estimates["elpd_loo", "subsampling SE"], true_loo$estimates["elpd_loo", "Estimate"])
+  expect_lte(loo_ss$estimates["p_loo", "Estimate"] - z * loo_ss$estimates["p_loo", "subsampling SE"], true_loo$estimates["p_loo", "Estimate"])
+  expect_gte(loo_ss$estimates["p_loo", "Estimate"] + z * loo_ss$estimates["p_loo", "subsampling SE"], true_loo$estimates["p_loo", "Estimate"])
+  expect_lte(loo_ss$estimates["looic", "Estimate"] - z * loo_ss$estimates["looic", "subsampling SE"], true_loo$estimates["looic", "Estimate"])
+  expect_gte(loo_ss$estimates["looic", "Estimate"] + z * loo_ss$estimates["looic", "subsampling SE"], true_loo$estimates["looic", "Estimate"])
+
+  expect_failure(expect_equal(true_loo$estimates["elpd_loo", "Estimate"], loo_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss$estimates["p_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
 
 })
 

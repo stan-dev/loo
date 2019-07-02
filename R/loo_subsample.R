@@ -658,7 +658,7 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   checkmate::assert_numeric(elpd_loo_approximation)
 
   if(estimator == "hh"){
-    pi_values <- hh_elpd_approx_to_pis(elpd_loo_approximation)
+    pi_values <- hh_elpd_loo_approximation_to_pis(elpd_loo_approximation)
     idxs_df <- pps_sample(observations, pis = pi_values)
   }
 
@@ -900,16 +900,27 @@ loo_subsample_estimation_hh <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
   N <- length(x$subsamling_loo$elpd_loo_approx)
   pis <- hh_elpd_loo_approximation_to_pis(x$subsamling_loo$elpd_loo_approx)
-  pis_sample <- pis[x$pointwise$idx]
+  pis_sample <- pis[x$pointwise[,"idx"]]
 
-  hh_elpd_loo <- whhest(z = pis_sample, m_i = x$pointwise$m_i, y = x$pointwise$elpd_loo, N)
+  hh_elpd_loo <- whhest(z = pis_sample, m_i = x$pointwise[, "m_i"], y = x$pointwise[, "elpd_loo"], N)
+  srs_elpd_loo <- srs_est(y = x$pointwise[, "elpd_loo"], y_approx = pis_sample)
   x$estimates["elpd_loo", "Estimate"]  <- hh_elpd_loo$y_hat_ppz
-  x$estimates["elpd_loo", "SE"]  <- sqrt(hh_elpd_loo$hat_v_y_ppz)
+  if(hh_elpd_loo$hat_v_y_ppz > 0){
+    x$estimates["elpd_loo", "SE"]  <- sqrt(hh_elpd_loo$hat_v_y_ppz)
+  } else {
+    warning("Negative estimate of SE, more subsampling obs. needed.", call. = FALSE)
+    x$estimates["elpd_loo", "SE"]  <- NaN
+  }
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(hh_elpd_loo$v_hat_y_ppz)
 
-  hh_p_loo <- whhest(z = pis_sample, m_i = x$pointwise$m_i, y = x$pointwise$p_loo, N)
+  hh_p_loo <- whhest(z = pis_sample, m_i = x$pointwise[,"m_i"], y = x$pointwise[,"p_loo"], N)
   x$estimates["p_loo", "Estimate"] <- hh_p_loo$y_hat_ppz
-  x$estimates["p_loo", "SE"] <- sqrt(hh_p_loo$hat_v_y_ppz)
+  if(hh_p_loo$hat_v_y_ppz > 0){
+    x$estimates["p_loo", "SE"]  <- sqrt(hh_p_loo$hat_v_y_ppz)
+  } else {
+    warning("Negative estimate of SE, more subsampling obs. needed.", call. = FALSE)
+    x$estimates["elpd_loo", "SE"]  <- NaN
+  }
   x$estimates["p_loo", "subsampling SE"] <- sqrt(hh_p_loo$v_hat_y_ppz)
 
   x <- update_psis_loo_ss_estimates(x)
