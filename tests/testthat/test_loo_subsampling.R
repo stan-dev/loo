@@ -302,6 +302,8 @@ test_that("Test loo_approximation_draws", {
 
 })
 
+
+
 test_that("waic using delta method and gradient", {
   if(FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
@@ -352,7 +354,83 @@ test_that("waic using delta method and gradient", {
   expect_silent(loo_ss_waic_delta <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad", observations = 50, llgrad = .llgrad))
   expect_silent(loo_ss_waic_delta_marginal <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad_marginal", observations = 50, llgrad = .llgrad))
   expect_silent(loo_ss_plpd <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "plpd", observations = 50, llgrad = .llgrad))
+  expect_error(loo_ss_waic_delta <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad", observations = 50))
+})
 
+test_that("waic using delta 2nd order method", {
+  if(FALSE){
+    # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
+    set.seed(123)
+    N <- 100; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
+    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 0.5)
+    X <- X_full; y <- y_full
+    fake_posterior <- MCMCpack::MCMCregress(y~x, data = data.frame(y = y,x=X[,2]), thin = 10, mcmc = 10000) # Because Im lazy
+    fake_posterior <- as.matrix(fake_posterior)
+    fake_posterior[,"sigma2"] <- sqrt(fake_posterior[,"sigma2"])
+    colnames(fake_posterior) <- c("a", "b", "sigma")
+    fake_data <- data.frame(y, X)
+    save(fake_posterior, fake_data, file = test_path("normal_reg_waic_test_example2.rda"), compression_level = 9)
+  } else {
+    load(file = test_path("normal_reg_waic_test_example2.rda"))
+  }
+
+  .llfun <- function(data_i, draws) {
+    # data_i: ith row of fdata (data_i <- fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = draws[, c("sigma")], log = TRUE)
+  }
+
+  .llgrad <- function(data_i, draws) {
+    sigma <- draws[,"sigma"]
+    sigma2 <- sigma^2
+    b <- draws[,"b"]
+    a <- draws[,"a"]
+    x_i <- unlist(data_i[, c("X1", "X2")])
+    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
+
+    gr <- cbind(e * x_i[1] / sigma2,
+                e * x_i[2] / sigma2,
+                - 1 / sigma + e^2 / (sigma2 * sigma))
+    colnames(gr) <- c("a", "b", "sigma")
+    gr
+  }
+
+  .llhess <- function(data_i, draws) {
+    hess_array <- array(0, dim = c(ncol(draws), ncol(draws), nrow(draws)), dimnames = list(colnames(draws),colnames(draws),NULL))
+    sigma <- draws[,"sigma"]
+    sigma2 <- sigma^2
+    sigma3 <- sigma2*sigma
+    b <- draws[,"b"]
+    a <- draws[,"a"]
+    x_i <- unlist(data_i[, c("X1", "X2")])
+    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
+
+    hess_array[1,1,] <- - x_i[1]^2 / sigma2
+    hess_array[1,2,] <- hess_array[2,1,] <- - x_i[1] * x_i[2] / sigma2
+    hess_array[2,2,] <- - x_i[2]^2 / sigma2
+    hess_array[3,1,] <- hess_array[1,3,] <- -2 * x_i[1] * e / sigma3
+    hess_array[3,2,] <- hess_array[2,3,] <- -2 * x_i[2] * e / sigma3
+    hess_array[3,3,] <- 1 / sigma2 - 3 * e^2 / (sigma2^2)
+    hess_array
+  }
+
+  #data <- fake_data
+  fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
+  #draws <- fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
+
+  expect_silent(approx_loo_waic <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic"))
+  expect_silent(approx_loo_waic_delta <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic_grad", .llgrad = .llgrad))
+  expect_silent(approx_loo_waic_delta2 <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic_hess", .llgrad = .llgrad, .llhess = .llhess))
+
+  # Test that the approaches should not deviate too much
+  expect_equal(approx_loo_waic,approx_loo_waic_delta2, tol = 0.01)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
+
+  expect_silent(test_loo_ss_waic <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic", observations = 50, llgrad = .llgrad))
+  expect_error(test_loo_ss_delta2 <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_hess", observations = 50, llgrad = .llgrad))
+  expect_silent(test_loo_ss_delta2 <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_hess", observations = 50, llgrad = .llgrad, llhess = .llhess))
+  expect_silent(test_loo_ss_delta <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad", observations = 50, llgrad = .llgrad))
+  expect_silent(test_loo_ss_point <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "plpd", observations = 50, llgrad = .llgrad))
 })
 
 
@@ -542,88 +620,6 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
 
 
 # Move up to
-
-
-
-test_that("waic using delta 2nd order method", {
-  if(FALSE){
-    # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
-    set.seed(123)
-    N <- 100; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
-    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 0.5)
-    X <- X_full; y <- y_full
-    fake_posterior <- MCMCpack::MCMCregress(y~x, data = data.frame(y = y,x=X[,2]), thin = 10, mcmc = 10000) # Because Im lazy
-    fake_posterior <- as.matrix(fake_posterior)
-    fake_posterior[,"sigma2"] <- sqrt(fake_posterior[,"sigma2"]) # TODO: Double check this with Michael
-    colnames(fake_posterior) <- c("a", "b", "sigma")
-    fake_data <- data.frame(y, X)
-    save(fake_posterior, fake_data, file = "normal_reg_waic_test_example2.rda")
-  } else {
-    load(file = "normal_reg_waic_test_example2.rda")
-  }
-
-  .llfun <- function(data_i, draws) {
-    # data_i: ith row of fdata (data_i <- fake_data[i,, drop=FALSE])
-    # draws: entire fake_posterior matrix
-    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = draws[, c("sigma")], log = TRUE)
-  }
-
-  .llgrad <- function(data_i, draws) {
-    sigma <- draws[,"sigma"]
-    sigma2 <- sigma^2
-    b <- draws[,"b"]
-    a <- draws[,"a"]
-    x_i <- unlist(data_i[, c("X1", "X2")])
-    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
-
-    gr <- cbind(e * x_i[1] / sigma2,
-                e * x_i[2] / sigma2,
-                - 1 / sigma + e^2 / (sigma2 * sigma))
-    colnames(gr) <- c("a", "b", "sigma")
-    gr
-  }
-
-  .llhess <- function(data_i, draws) {
-    hess_array <- array(0, dim = c(ncol(draws), ncol(draws), nrow(draws)), dimnames = list(colnames(draws),colnames(draws),NULL))
-    sigma <- draws[,"sigma"]
-    sigma2 <- sigma^2
-    sigma3 <- sigma2*sigma
-    b <- draws[,"b"]
-    a <- draws[,"a"]
-    x_i <- unlist(data_i[, c("X1", "X2")])
-    e <- (data_i$y - draws[,"a"] * x_i[1] - draws[,"b"] * x_i[2])
-
-    hess_array[1,1,] <- - x_i[1]^2 / sigma2
-    hess_array[1,2,] <- hess_array[2,1,] <- - x_i[1] * x_i[2] / sigma2
-    hess_array[2,2,] <- - x_i[2]^2 / sigma2
-    hess_array[3,1,] <- hess_array[1,3,] <- -2 * x_i[1] * e / sigma3
-    hess_array[3,2,] <- hess_array[2,3,] <- -2 * x_i[2] * e / sigma3
-    hess_array[3,3,] <- 1 / sigma2 - 3 * e^2 / (sigma2^2)
-    hess_array
-  }
-
-  data <- fake_data
-  draws <- fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
-
-  expect_silent(approx_loo_waic <- loo:::approx_loo_variable(.llfun, data, draws = fake_posterior, cores = 1, approx_type = "waic_full"))
-  expect_silent(approx_loo_waic_delta <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta", .llgrad = .llgrad))
-  expect_silent(approx_loo_waic_delta2 <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta2", .llgrad = .llgrad, .llhess = .llhess))
-  # plot(approx_loo_waic, approx_loo_waic_delta)
-  # mean(abs(approx_loo_waic - approx_loo_waic_delta))
-  # mean(abs(approx_loo_waic - approx_loo_waic_delta2))
-
-  # Test that the approaches should not deviate too much
-  expect_equal(approx_loo_waic,approx_loo_waic_delta2, tol = 0.01)
-  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
-
-  expect_silent(test_qloo_waic <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_full", m = 50, llgrad = .llgrad))
-  expect_error(test_qloo_delta2 <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta2", m = 50, llgrad = .llgrad))
-  expect_silent(test_qloo_delta2 <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta2", m = 50, llgrad = .llgrad, llhess = .llhess))
-  expect_silent(test_qloo_delta <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta", m = 50, llgrad = .llgrad))
-  expect_silent(test_qloo_point <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "point", m = 50, llgrad = .llgrad))
-})
-
-
 
 
 

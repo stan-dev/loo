@@ -420,6 +420,7 @@ update.psis_loo_ss <- function(object,
 }
 
 # TODO: Test nobs() and obs_idx()
+# TODO: Fix Error: /Users/mansmagnusson/Dropbox (Personlig)/Projekt/loo/man/elpd_loo_approximation.Rd:79: Bad \link text
 
 #' The observations indecies in the original data
 #'
