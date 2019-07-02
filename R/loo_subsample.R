@@ -200,7 +200,7 @@ loo_subsample.function <-
       # Compute idxs
       idxs <- subsample_idxs(estimator = estimator,
                              elpd_loo_approximation = elpd_loo_approx,
-                             m = observations)
+                             observations = observations)
     } else {
       # Compute idxs
       idxs <- compute_idxs(observations)
@@ -334,7 +334,7 @@ update.psis_loo_ss <- function(object,
       if(object$subsamling_loo$estimator %in% c("hh")){
         idxs <- subsample_idxs(estimator = object$subsamling_loo$estimator,
                                elpd_loo_approximation = object$subsamling_loo$elpd_loo_approx,
-                               m = observations - current_obs)
+                               observations = observations - current_obs)
       }
       # If sampling without replacement
       # TODO: test this part
@@ -343,7 +343,7 @@ update.psis_loo_ss <- function(object,
         new_idx <- (1:length(object$subsamling_loo$elpd_loo_approx))[-current_idxs]
         idxs <- subsample_idxs(estimator = object$subsamling_loo$estimator,
                                elpd_loo_approximation = object$subsamling_loo$elpd_loo_approx[-current_idxs],
-                               m = observations - current_obs)
+                               observations = observations - current_obs)
         idxs$idx <- new_idx[idxs$idx]
       }
     }
@@ -656,19 +656,19 @@ ndraws.default <- function(x){
 #'
 #' @param estimator The estimator to use (\code{hh},\code{srs_diff})
 #'
-subsample_idxs <- function(estimator, elpd_loo_approximation, m){
+subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   checkmate::assert_choice(estimator, choices = estimator_choices())
   checkmate::assert_numeric(elpd_loo_approximation)
-  checkmate::assert_int(m, lower = 1, upper = length(elpd_loo_approximation))
 
   if(estimator == "hh"){
     pi_values <- hh_elpd_approx_to_pis(elpd_loo_approximation)
-    idxs_df <- pps_sample(m, pis = pi_values)
+    idxs_df <- pps_sample(observations, pis = pi_values)
   }
 
   if(estimator == "diff_srs" | estimator == "srs"){
+    checkmate::assert_int(observations, lower = 1, upper = length(elpd_loo_approximation))
     idx <- 1:length(elpd_loo_approximation)
-    idx_m <- idx[order(runif(length(elpd_loo_approximation)))][1:m]
+    idx_m <- idx[order(runif(length(elpd_loo_approximation)))][1:observations]
     idx_m <- idx_m[order(idx_m)]
     idxs_df <- data.frame(idx=as.integer(idx_m), m_i=1L)
   }

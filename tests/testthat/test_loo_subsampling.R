@@ -83,6 +83,36 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
 
 })
 
+test_that("loo with subsampling of all observations works as ordinary loo.", {
+  set.seed(123)
+  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
+  p <- 0.7
+  y <- rbinom(N, size = K, prob = p)
+  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
+  fake_posterior <- as.matrix(rbeta(S, a, b))
+  fake_data <- data.frame(y,K)
+  rm(N, K, S, a0, b0, p, y, a, b)
+  llfun_test <- function(data_i, draws) {
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+
+  expect_silent(true_loo <- loo(llfun_test, draws = fake_posterior, data = fake_data, r_eff = rep(1, nrow(fake_data))))
+  expect_s3_class(true_loo, "psis_loo")
+  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1000, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+  expect_s3_class(loo_ss, "psis_loo_ss")
+  expect_error(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1001, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+
+  expect_equal(true_loo$estimates["elpd_loo", "Estimate"], loo_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001)
+  expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss$estimates["p_loo", "Estimate"], tol = 0.00000001)
+  expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001)
+
+  expect_equal(dim(true_loo),dim(loo_ss))
+  expect_equal(true_loo$diagnostics, loo_ss$diagnostics)
+
+  skip("also test this for the HH  where the subsamples can be larger than observations") # TODO
+
+})
+
 test_that("Test the srs estimator with 'none' approximation", {
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
@@ -345,36 +375,6 @@ test_that("whhest works as expected", {
 
 
 
-
-test_that("full quick_loo works as ordinary loo ", {
-  set.seed(123)
-  N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
-  p <- 0.7
-  y <- rbinom(N, size = K, prob = p)
-  a <- a0 + sum(y); b <- b0 + N * K - sum(y)
-  fake_posterior <- as.matrix(rbeta(S, a, b))
-  fake_data <- data.frame(y,K)
-  llfun <- function(data_i, draws) {
-    # each time called internally within loo the arguments will be equal to:
-    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
-    # draws: entire fake_posterior matrix
-    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
-  }
-
-  expect_silent(true_loo <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = 1))
-  expect_silent(qloo_full <- loo:::quick_loo.function(x = llfun, draws = fake_posterior, data = fake_data, m = NULL, type = "point", r_eff = 1))
-
-  expect_equal(true_loo$estimates["elpd_loo", "Estimate"], qloo_full$estimates["elpd_loo", "Estimate"], tol = 0.00000001)
-  expect_equal(true_loo$estimates["p_loo", "Estimate"], qloo_full$estimates["p_loo", "Estimate"], tol = 0.00000001)
-  expect_equal(true_loo$estimates["looic", "Estimate"], qloo_full$estimates["looic", "Estimate"], tol = 0.00000001)
-
-  expect_equal(dim(true_loo),dim(qloo_full))
-  expect_equal(true_loo$diagnostics, qloo_full$diagnostics)
-
-})
-
-
-
 test_that("overall quick_loo with radon data", {
   # load("tests/testthat/test_quick_laplace_loo.rda")
   load("test_quick_laplace_loo.rda")
@@ -388,6 +388,8 @@ test_that("overall quick_loo with radon data", {
   expect_s3_class(qloo_approx, "quick_psis_loo")
   expect_silent(qloo_approx_full <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
   expect_s3_class(qloo_approx_full, "psis_loo")
+
+
 
   expect_equal(full_loo$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["elpd_loo"])
   expect_equal(full_loo$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["p_loo"])
