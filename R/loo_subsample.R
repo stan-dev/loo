@@ -663,7 +663,9 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   }
 
   if(estimator == "diff_srs" | estimator == "srs"){
-    checkmate::assert_int(observations, lower = 1, upper = length(elpd_loo_approximation))
+    if(observations > length(elpd_loo_approximation)) {
+      stop("'observations' is larger than total sample size.", call. = FALSE)
+    }
     idx <- 1:length(elpd_loo_approximation)
     idx_m <- idx[order(runif(length(elpd_loo_approximation)))][1:observations]
     idx_m <- idx_m[order(idx_m)]

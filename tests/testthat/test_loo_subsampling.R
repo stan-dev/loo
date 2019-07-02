@@ -79,8 +79,6 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
   expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss_lpd10$estimates["p_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss_lpd10$estimates["looic", "Estimate"], tol = 0.00000001))
 
-  skip("Add tests on supplying observation vector with HH") # TODO
-
 })
 
 test_that("loo with subsampling of all observations works as ordinary loo.", {
@@ -111,8 +109,6 @@ test_that("loo with subsampling of all observations works as ordinary loo.", {
   expect_equal(dim(true_loo),dim(loo_ss))
   expect_equal(true_loo$diagnostics, loo_ss$diagnostics)
 
-  skip("also test this for the HH  where the subsamples can be larger than observations") # TODO
-
 })
 
 test_that("overall loo_subsample works with diff_srs as expected (compared with loo)", {
@@ -132,7 +128,6 @@ test_that("overall loo_subsample works with diff_srs as expected (compared with 
   expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, obs = 200, loo_approximation = "plpd", estimator = "diff_srs", r_eff  = rep(1, nrow(fake_data))))
   expect_equal(true_loo$estimates[1,1], loo_ss$estimates[1,1], tol = 0.1)
 
-  skip("implement loo_subsampling.matrix and loo_subsampling.array.") # TODO
 })
 
 test_that("Test the srs estimator with 'none' approximation", {
@@ -154,6 +149,8 @@ test_that("Test the srs estimator with 'none' approximation", {
   expect_s3_class(true_loo, "psis_loo")
   expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 200, loo_approximation = "none", estimator = "srs", r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(loo_ss, "psis_loo_ss")
+  expect_error(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1100, loo_approximation = "none", estimator = "srs", r_eff = rep(1, nrow(fake_data))))
+
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
@@ -171,8 +168,6 @@ test_that("Test the srs estimator with 'none' approximation", {
   expect_failure(expect_equal(true_loo$estimates["elpd_loo", "Estimate"], loo_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss$estimates["p_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
-
-  skip("test all approximations and sample approaches.") # TODO
 
 })
 
@@ -195,10 +190,19 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_s3_class(true_loo, "psis_loo")
   expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 300, loo_approximation = "plpd", estimator = "hh", r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(loo_ss, "psis_loo_ss")
+  expect_silent(loo_ss_max <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1100, loo_approximation = "plpd", estimator = "hh", r_eff = rep(1, nrow(fake_data))))
+  expect_s3_class(loo_ss_max, "psis_loo_ss")
+  expect_silent(loo_ss_max2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = 1100, r_eff = rep(1, nrow(fake_data))))
+  expect_equal(nobs(loo_ss_max2), 1100)
+  expect_silent(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
+  expect_equal(loo_ss$estimates, loo_ss2$estimates)
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
                     loo_ss$subsamling_loo$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
+  # Check consistency
+  expect_equivalent(loo_ss_max$pointwise[, "elpd_loo_approx"],
+                    loo_ss_max$subsamling_loo$elpd_loo_approx[loo_ss_max$pointwise[, "idx"]])
 
   # Expect values
   z <- 2
@@ -212,6 +216,9 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_failure(expect_equal(true_loo$estimates["elpd_loo", "Estimate"], loo_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss$estimates["p_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
+
+  expect_lte(loo_ss_max$estimates["elpd_loo", "Estimate"] - z * loo_ss_max$estimates["elpd_loo", "subsampling SE"], true_loo$estimates["elpd_loo", "Estimate"])
+  expect_gte(loo_ss_max$estimates["elpd_loo", "Estimate"] + z * loo_ss_max$estimates["elpd_loo", "subsampling SE"], true_loo$estimates["elpd_loo", "Estimate"])
 
 })
 
@@ -641,7 +648,6 @@ test_that("srs_est works as expected", {
   expect_equal(res$y_hat, 500500, tol = 0.0001)
   expect_equal(res$v_y_hat, 0, tol = 0.0001)
 
-  skip("Add test for HH") # TODO
 })
 
 
@@ -748,7 +754,6 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   expect_equal(dim(full_loo), dim(loo_ap_ss_full))
   expect_s3_class(loo_ap_ss_full, "psis_loo_ap")
 
-  skip("Add test suites for exact print output") # TODO
 })
 
 
