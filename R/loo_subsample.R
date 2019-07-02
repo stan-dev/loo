@@ -149,7 +149,7 @@ loo_subsample.function <-
       if (is.null(r_eff)) {
         throw_loo_r_eff_warning()
       } else {
-        r_eff <- prepare_psis_r_eff(r_eff, len = N)
+        r_eff <- prepare_psis_r_eff(r_eff, len = dim(data)[1])
       }
     }
     checkmate::assert_flag(save_psis)
@@ -243,6 +243,9 @@ loo_subsample.function <-
   }
 
 
+# TODO: skip("implement loo_subsampling.matrix and loo_subsampling.array.")
+
+
 #' Update \code{psis_loo_ss} objects
 #'
 #' @details
@@ -302,8 +305,8 @@ update.psis_loo_ss <- function(object,
   # Update observations
   if(!is.null(observations)){
     if (checkmate::test_class(observations, "psis_loo_ss")) {
-      # TODO: Fix this
-      stop("Check also that the estimator of the object is the same")
+      # TODO: Message when setting observations.
+      # State how these observations will be asumed to been sampled (if not using object).
       observations <- obs_idx(observations)
     }
     observations <- checkmate::assert_integerish(observations, null.ok = TRUE,
@@ -347,8 +350,6 @@ update.psis_loo_ss <- function(object,
 
     # Identify how to update object
     cidxs <- compare_idxs(idxs, object)
-    data_new_subsample <- data[cidxs$new$idx,, drop = FALSE]
-    if(length(r_eff) > 1) r_eff <- r_eff[cidxs$new$idx]
 
     # TODO: Assert that we cant update loo_approx with HH (since need sampling)
     # TODO: Create function for set of estimators with and withour replacement
@@ -358,6 +359,9 @@ update.psis_loo_ss <- function(object,
     # TODO: Fix so r_eff is only computed for subsample
 
     if(!is.null(cidxs$new)){
+      data_new_subsample <- data[cidxs$new$idx,, drop = FALSE]
+      if(length(r_eff) > 1) r_eff <- r_eff[cidxs$new$idx]
+
       if(!is.null(object$approximate_posterior$log_p) & !is.null(object$approximate_posterior$log_g)){
         plo <- loo_approximate_posterior.function(x = object$subsamling_loo$.llfun,
                                                   data = data_new_subsample,
@@ -480,7 +484,7 @@ estimator_choices <- function() {
 elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation, loo_approximation_draws = NULL, .llgrad = NULL, .llhess = NULL){
   checkmate::assert_function(.llfun, args = c("data_i", "draws"), ordered = TRUE)
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-  checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = TRUE)
+  checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
   checkmate::assert_int(loo_approximation_draws, lower = 2, null.ok = TRUE)
   cores <- loo_cores(cores)
   if(!is.null(.llgrad)){
@@ -492,7 +496,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
   N <- dim(data)[1]
   # TODO: Test this in testsuite
-  if(is.null(loo_approximation)) return(NULL)
+  if(loo_approximation == "none") return(rep(1L,N))
 
   if(loo_approximation == "waic"){
     # TODO: stop("make this more efficient, by extracting")
@@ -829,14 +833,16 @@ rbind.psis_loo_ss <- function(object, x){
                                    x$diagnostics$pareto_k)
   object$diagnostics$n_eff <- c(object$diagnostics$n_eff,
                                 x$diagnostics$n_eff)
+  attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
 
-remove_idx.psis_loo_ss <- function(object, idxs = cidxs$remove){
+# TODO: Test that sampling wr can have duplicates, wor cannot
+
+remove_idx.psis_loo_ss <- function(object, idxs){
   checkmate::assert_class(object, "psis_loo_ss")
   if(is.null(idxs)) return(object) # Fallback
   assert_subsample_idxs(idxs)
-  checkmate::assert_choice(type, choices = c("replace", "add"))
 
   row_map <- data.frame(row_no = 1:nrow(object$pointwise), idx = object$pointwise[, "idx"])
   row_map <- merge(row_map, idxs, by = "idx", all.y = TRUE)
@@ -844,6 +850,7 @@ remove_idx.psis_loo_ss <- function(object, idxs = cidxs$remove){
   object$pointwise <- object$pointwise[-row_map$row_no,,drop = FALSE]
   object$diagnostics$pareto_k <- object$diagnostics$pareto_k[-row_map$row_no]
   object$diagnostics$n_eff <- object$diagnostics$n_eff[-row_map$row_no]
+  attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
 
@@ -864,25 +871,6 @@ update_m_i_in_pointwise <- function(pointwise, idxs, type = "replace"){
   }
   pointwise
 }
-
-remove_idx.psis_loo_ss <- function(pointwise, idxs = cidxs$add, type = "replace"){
-  assert_subsampling_pointwise(pointwise)
-  assert_subsample_idxs(idxs)
-  checkmate::assert_choice(type, choices = c("replace", "add"))
-
-  row_map <- data.frame(row_no = 1:nrow(pointwise), idx = pointwise[, "idx"])
-  row_map <- merge(row_map, cidxs$add, by = "idx", all.y = TRUE)
-
-  if(type == "replace"){
-    pointwise[row_map$row_no, "m_i"] <- row_map$m_i
-  }
-  if(type == "add"){
-    pointwise[row_map$row_no, "m_i"] <- pointwise[row_map$row_no, "m_i"] + row_map$m_i
-  }
-  pointwise
-}
-
-
 
 assert_subsampling_pointwise <- function(pointwise){
   checkmate::assert_matrix(pointwise,
@@ -1007,7 +995,7 @@ srs_diff_est <- function(y_approx, y, y_idx){
 
 #' Estimate elpd using the standard SRS estimator and SRS WOR
 #' @param x a quick_psis_loo object
-loo_estimation_srs <- function(x){
+loo_subsample_estimation_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
   elpd_loo_est <- srs_est(y = x$pointwise[, "elpd_loo"], y_approx = x$subsamling_loo$elpd_loo_approx)
