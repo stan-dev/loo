@@ -1,4 +1,4 @@
-library(loo)
+suppressPackageStartupMessages(library(loo))
 
 context("loo_approximate_posterior")
 
@@ -76,8 +76,14 @@ test_that("loo_approximate_posterior.array works as loo_approximate_posterior.ma
   # Should fail with matrix
   expect_error(aploo2 <- loo_approximate_posterior.matrix(x = ll, log_p = as.matrix(log_p), log_g = log_g))
   expect_error(aploo2 <- loo_approximate_posterior.matrix(x = ll, log_p = as.matrix(log_p), log_g = as.matrix(log_g)))
-})
 
+  # Expect log_p and log_g be stored in the approximate_posterior in the same way
+  expect_length(aploo1$approximate_posterior$log_p, nrow(ll))
+  expect_length(aploo1$approximate_posterior$log_g, nrow(ll))
+  expect_equal(aploo1$approximate_posterior$log_p, aploo2$approximate_posterior$log_p)
+  expect_equal(aploo1$approximate_posterior$log_g, aploo2$approximate_posterior$log_g)
+
+})
 
 test_that("loo_approximate_posterior.function works as loo_approximate_posterior.matrix", {
   skip_if_not_installed("checkmate")
@@ -91,5 +97,14 @@ test_that("loo_approximate_posterior.function works as loo_approximate_posterior
   expect_equal(aploo1$estimates, aploo2$estimates)
   expect_equal(class(aploo1), class(aploo2))
   expect_failure(expect_equal(aploo1b$estimates, aploo2$estimates))
+
+  # Check equivalence
+  # Expect log_p and log_g be stored in the approximate_posterior in the same way
+  expect_length(aploo2$approximate_posterior$log_p, nrow(fake_laplace_posterior))
+  expect_length(aploo2$approximate_posterior$log_g, nrow(fake_laplace_posterior))
+  expect_equal(aploo1$approximate_posterior$log_p, aploo2$approximate_posterior$log_p)
+  expect_equal(aploo1$approximate_posterior$log_g, aploo2$approximate_posterior$log_g)
+
 })
+
 

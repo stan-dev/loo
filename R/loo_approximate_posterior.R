@@ -80,6 +80,7 @@ loo_approximate_posterior.matrix <-
     checkmate::assert_null(dim(log_g))
 
     ap_psis <- psis_approximate_posterior(log_p = log_p, log_g = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
+    ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
     class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
     ap_psis
   }
@@ -141,10 +142,10 @@ loo_approximate_posterior.function <-
       psis_object = if (save_psis) psis_out else NULL
     )
 
+    ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
     class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
     ap_psis
   }
-
 
 .loo_ap_i <-
   function(i,
@@ -160,6 +161,9 @@ loo_approximate_posterior.function <-
     if(!is.null(r_eff)) warning("r_eff not implemented for aploo")
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
+    if (!is.matrix(ll_i)) {
+      ll_i <- as.matrix(ll_i)
+    }
     psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, cores = 1)
 
     structure(
