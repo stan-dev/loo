@@ -131,11 +131,10 @@ loo_subsample.function <-
     if (checkmate::test_class(observations, "psis_loo_ss")) {
       observations <- obs_idx(observations)
     }
-    observations <- checkmate::assert_integerish(observations, null.ok = TRUE,
-                                                 lower = 1,
-                                                 min.len = 1,
-                                                 any.missing = FALSE,
-                                                 coerce = TRUE)
+    checkmate::assert_integerish(observations,
+                                 null.ok = TRUE,
+                                 lower = 1, any.missing = FALSE)
+    if(!is.null(observations)) observations <- as.integer(observations)
     if(length(observations) > 1) checkmate::assert_integerish(observations, upper = dim(data)[1])
     # TODO: Message when setting observations.
     # State how these observations will be asumed to been sampled (if not using object).
@@ -166,7 +165,7 @@ loo_subsample.function <-
     # Fallbacks
     if(is.null(observations)){
       if(is.null(log_p) & is.null(log_g)){
-        lobj <- loo.function(x, ...,
+        lobj <- loo.function(.llfun, ...,
                              data = data,
                              draws = draws,
                              r_eff = r_eff,
@@ -174,12 +173,11 @@ loo_subsample.function <-
                              cores = cores)
       } else {
         lobj <- loo_approximate_posterior.function(
-                             x, ...,
+                             .llfun, ...,
                              log_p = log_p,
                              log_g = log_g,
                              data = data,
                              draws = draws,
-                             r_eff = r_eff,
                              save_psis = save_psis,
                              cores = cores)
       }
@@ -216,8 +214,7 @@ loo_subsample.function <-
                                                 data = data_subsample,
                                                 draws = draws,
                                                 log_p = log_p,
-                                                log_q = log_q,
-                                                r_eff = r_eff,
+                                                log_g = log_g,
                                                 save_psis = save_psis,
                                                 cores = cores)
     } else {
@@ -304,16 +301,16 @@ update.psis_loo_ss <- function(object,
   # TODO: test update loo observations
   # Update observations
   if(!is.null(observations)){
+    # TODO: Refactor observatcion checks
     if (checkmate::test_class(observations, "psis_loo_ss")) {
       # TODO: Message when setting observations.
       # State how these observations will be asumed to been sampled (if not using object).
       observations <- obs_idx(observations)
     }
-    observations <- checkmate::assert_integerish(observations, null.ok = TRUE,
-                                                 lower = 1,
-                                                 min.len = 1,
-                                                 any.missing = FALSE,
-                                                 coerce = TRUE)
+    checkmate::assert_integerish(observations,
+                                 null.ok = TRUE,
+                                 lower = 1, any.missing = FALSE)
+    if(!is.null(observations)) observations <- as.integer(observations)
     if(length(observations) > 1){
       checkmate::assert_integerish(observations, upper = dim(data)[1])
     } else {
@@ -367,8 +364,7 @@ update.psis_loo_ss <- function(object,
                                                   data = data_new_subsample,
                                                   draws = draws,
                                                   log_p = object$approximate_posterior$log_p,
-                                                  log_q = object$approximate_posterior$log_g,
-                                                  r_eff = r_eff,
+                                                  log_g = object$approximate_posterior$log_g,
                                                   save_psis = !is.null(object$psis_object),
                                                   cores = cores)
       } else {

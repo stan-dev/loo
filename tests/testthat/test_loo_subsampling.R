@@ -4,6 +4,8 @@ options(mc.cores = 1)
 context("loo_subsampling")
 
 test_that("overall loo_subampling works as expected (compared with loo) for diff_est", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -84,6 +86,8 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
 })
 
 test_that("loo with subsampling of all observations works as ordinary loo.", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -114,6 +118,8 @@ test_that("loo with subsampling of all observations works as ordinary loo.", {
 })
 
 test_that("Test the srs estimator with 'none' approximation", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -152,6 +158,8 @@ test_that("Test the srs estimator with 'none' approximation", {
 
 
 test_that("update.psis_loo_ss works as expected (compared with loo)", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -218,6 +226,8 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 context("loo_subsampling_approximations")
 
 test_that("elpd_loo_approximation works as expected", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 10; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -260,6 +270,8 @@ test_that("elpd_loo_approximation works as expected", {
 
 
 test_that("Test loo_approximation_draws", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -295,6 +307,8 @@ test_that("Test loo_approximation_draws", {
 context("loo_subsampling_estimation")
 
 test_that("whhest works as expected", {
+  skip_if_not_installed("checkmate")
+
   N <- 100
   m <- 10
   z <- rep(1/N, m)
@@ -353,6 +367,104 @@ test_that("whhest works as expected", {
 })
 
 
+context("loo_subsampling cases")
+
+test_that("Test loo_subsampling and loo_approx with radon data", {
+  skip_if_not_installed("checkmate")
+  load(test_path("test_radon_laplace_loo.rda"))
+  # Rename to spot variable leaking errors
+  llfun_test <- llfun
+  log_p_test <- log_p
+  log_g_test <- log_q
+  draws_test <- draws
+  data_test <- data
+  rm(llfun, log_p,log_q, draws, data)
+
+  set.seed(134)
+  expect_silent(full_loo <- loo(llfun_test, draws = draws_test, data = data_test, r_eff = rep(1, nrow(data_test))))
+  expect_s3_class(full_loo, "psis_loo")
+
+  set.seed(134)
+  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = draws_test, data = data_test, observations = 200, loo_approximation = "plpd", r_eff = rep(1, nrow(data_test))))
+  expect_s3_class(loo_ss, "psis_loo_ss")
+
+  set.seed(134)
+  expect_silent(loo_ap_ss <- loo_subsample(x = llfun_test, draws = draws_test, data = data_test, log_p = log_p_test, log_g = log_g_test, observations = 200, loo_approximation = "plpd", r_eff = rep(1, nrow(data_test))))
+  expect_s3_class(loo_ap_ss, "psis_loo_ss")
+  expect_s3_class(loo_ap_ss, "psis_loo_ap")
+
+  expect_silent(loo_ap_ss_full <- loo_subsample(x = llfun_test, log_p = log_p_test, log_g = log_g_test, draws = draws_test, data = data_test, observations = NULL, loo_approximation = "plpd", r_eff = rep(1, nrow(data_test))))
+  expect_failure(expect_s3_class(loo_ap_ss_full, "psis_loo_ss"))
+  expect_s3_class(loo_ap_ss_full, "psis_loo_ap")
+
+  # Expect similar results
+  z <- 2
+  expect_lte(loo_ss$estimates["elpd_loo", "Estimate"] - z * loo_ss$estimates["elpd_loo", "subsampling SE"], full_loo$estimates["elpd_loo", "Estimate"])
+  expect_gte(loo_ss$estimates["elpd_loo", "Estimate"] + z * loo_ss$estimates["elpd_loo", "subsampling SE"], full_loo$estimates["elpd_loo", "Estimate"])
+  expect_lte(loo_ss$estimates["p_loo", "Estimate"] - z * loo_ss$estimates["p_loo", "subsampling SE"], full_loo$estimates["p_loo", "Estimate"])
+  expect_gte(loo_ss$estimates["p_loo", "Estimate"] + z * loo_ss$estimates["p_loo", "subsampling SE"], full_loo$estimates["p_loo", "Estimate"])
+  expect_lte(loo_ss$estimates["looic", "Estimate"] - z * loo_ss$estimates["looic", "subsampling SE"], full_loo$estimates["looic", "Estimate"])
+  expect_gte(loo_ss$estimates["looic", "Estimate"] + z * loo_ss$estimates["looic", "subsampling SE"], full_loo$estimates["looic", "Estimate"])
+
+  expect_failure(expect_equal(full_loo$estimates["elpd_loo", "Estimate"], loo_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(full_loo$estimates["p_loo", "Estimate"], loo_ss$estimates["p_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(full_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
+
+  z <- 2
+  expect_lte(loo_ap_ss$estimates["elpd_loo", "Estimate"] - z * loo_ap_ss$estimates["elpd_loo", "subsampling SE"], loo_ap_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_gte(loo_ap_ss$estimates["elpd_loo", "Estimate"] + z * loo_ap_ss$estimates["elpd_loo", "subsampling SE"], loo_ap_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_lte(loo_ap_ss$estimates["p_loo", "Estimate"] - z * loo_ap_ss$estimates["p_loo", "subsampling SE"], loo_ap_ss_full$estimates["p_loo", "Estimate"])
+  expect_gte(loo_ap_ss$estimates["p_loo", "Estimate"] + z * loo_ap_ss$estimates["p_loo", "subsampling SE"], loo_ap_ss_full$estimates["p_loo", "Estimate"])
+  expect_lte(loo_ap_ss$estimates["looic", "Estimate"] - z * loo_ap_ss$estimates["looic", "subsampling SE"], loo_ap_ss_full$estimates["looic", "Estimate"])
+  expect_gte(loo_ap_ss$estimates["looic", "Estimate"] + z * loo_ap_ss$estimates["looic", "subsampling SE"], loo_ap_ss_full$estimates["looic", "Estimate"])
+
+  expect_failure(expect_equal(loo_ap_ss_full$estimates["elpd_loo", "Estimate"], loo_ap_ss$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(loo_ap_ss_full$estimates["p_loo", "Estimate"], loo_ap_ss$estimates["p_loo", "Estimate"], tol = 0.00000001))
+  expect_failure(expect_equal(loo_ap_ss_full$estimates["looic", "Estimate"], loo_ap_ss$estimates["looic", "Estimate"], tol = 0.00000001))
+
+  # TODO: Add test suites for exact output
+  # Correct printout
+  expect_failure(expect_output(print(full_loo), "Posterior approximation correction used\\."))
+  expect_failure(expect_output(print(full_loo), "subsampled log-likelihood\nvalues"))
+
+  expect_failure(expect_output(print(loo_ss), "Posterior approximation correction used\\."))
+  expect_output(print(loo_ss), "subsampled log-likelihood\nvalues")
+
+  expect_output(print(loo_ap_ss), "Posterior approximation correction used\\.")
+  expect_output(print(loo_ap_ss), "subsampled log-likelihood\nvalues")
+
+  expect_output(print(loo_ap_ss_full), "Posterior approximation correction used\\.")
+  expect_failure(expect_output(print(loo_ap_ss_full), "subsampled log-likelihood\nvalues"))
+
+
+  # Test update
+  set.seed(4712)
+  expect_silent(loo_ss2 <- update(loo_ss, draws = draws_test, data = data_test, observations = 1000, r_eff = rep(1, nrow(data_test))))
+  expect_gt(dim(loo_ss2)[2], dim(loo_ss)[2])
+  expect_gt(dim(loo_ss2$pointwise)[1], dim(loo_ss$pointwise)[1])
+  expect_equal(nobs(loo_ss), 200)
+  expect_equal(nobs(loo_ss2), 1000)
+  for(i in 1:nrow(loo_ss2$estimates)) {
+    expect_lt(loo_ss2$estimates[i, "subsampling SE"],
+              loo_ss$estimates[i, "subsampling SE"])
+  }
+
+  set.seed(4712)
+  expect_silent(loo_ap_ss2 <- update(object = loo_ap_ss, draws = draws_test, data = data_test, observations = 2000))
+  expect_gt(dim(loo_ap_ss2)[2], dim(loo_ap_ss)[2])
+  expect_gt(dim(loo_ap_ss2$pointwise)[1], dim(loo_ap_ss$pointwise)[1])
+  expect_equal(nobs(loo_ap_ss), 200)
+  expect_equal(nobs(loo_ap_ss2), 2000)
+  for(i in 1:nrow(loo_ap_ss2$estimates)) {
+    expect_lt(loo_ap_ss2$estimates[i, "subsampling SE"],
+              loo_ap_ss$estimates[i, "subsampling SE"])
+  }
+
+})
+
+
+
+
 
 
 
@@ -375,62 +487,6 @@ test_that("whhest works as expected", {
 
 
 
-test_that("overall quick_loo with radon data", {
-  # load("tests/testthat/test_quick_laplace_loo.rda")
-  load("test_quick_laplace_loo.rda")
-
-  set.seed(134)
-  expect_silent(full_loo <- loo:::loo.function(x = llfun, draws = draws, data = data, r_eff = 1))
-  set.seed(134)
-  expect_silent(qloo <- loo:::quick_loo.function(x = llfun, draws = draws, data = data, m = 200, type = "point", r_eff = 1))
-  set.seed(134)
-  expect_silent(qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 200, type = "point", r_eff = 1))
-  expect_s3_class(qloo_approx, "quick_psis_loo")
-  expect_silent(qloo_approx_full <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
-  expect_s3_class(qloo_approx_full, "psis_loo")
-
-
-
-  expect_equal(full_loo$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["elpd_loo"])
-  expect_equal(full_loo$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["p_loo"])
-  expect_equal(full_loo$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["looic"])
-  expect_failure(expect_equal(full_loo$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 0.00000001))
-  expect_failure(expect_equal(full_loo$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 0.00000001))
-  expect_failure(expect_equal(full_loo$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 0.00000001))
-
-  expect_equal(qloo_approx_full$estimates["elpd_loo", "Estimate"], qloo$estimates["elpd_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["elpd_loo"])
-  expect_equal(qloo_approx_full$estimates["p_loo", "Estimate"], qloo$estimates["p_loo", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["p_loo"])
-  expect_equal(qloo_approx_full$estimates["looic", "Estimate"], qloo$estimates["looic", "Estimate"], tol = 5 * qloo$quick_psis_loo$se_estimates["looic"])
-
-  expect_output(print(qloo_approx), "Posterior approximation used has been corrected for")
-  expect_failure(expect_output(print(qloo), "Posterior approximation used has been corrected for"))
-
-  warning("Fix expect_output(print(qloo_approx_full)...")
-  #expect_output(print(qloo_approx_full), "Posterior approximation used has been corrected for")
-
-  set.seed(4712)
-  expect_silent(qloo2 <- loo:::quick_loo.quick_psis_loo(x = qloo, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
-  expect_gt(dim(qloo2)[2], dim(qloo)[2])
-  expect_gt(dim(qloo2$pointwise)[1], dim(qloo$pointwise)[1])
-  expect_equal(sum(qloo$pointwise$m_i), 200)
-  expect_equal(sum(qloo2$pointwise$m_i), 1000)
-  for(i in seq_along(qloo2$quick_psis_loo$se_estimates[1:3])) {
-    expect_lt(qloo2$quick_psis_loo$se_estimates[i], qloo$quick_psis_loo$se_estimates[i])
-  }
-
-  set.seed(4712)
-  expect_s3_class(qloo_approx, "quick_psis_loo")
-  expect_error(qloo_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
-  expect_silent(qloo_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 800, type = "point", r_eff = 1))
-  expect_gt(dim(qloo_approx2)[2], dim(qloo_approx)[2])
-  expect_gt(dim(qloo_approx2$pointwise)[1], dim(qloo_approx$pointwise)[1])
-  expect_equal(sum(qloo_approx$pointwise$m_i), 200)
-  expect_equal(sum(qloo_approx2$pointwise$m_i), 1000)
-  for(i in seq_along(qloo_approx2$quick_psis_loo$se_estimates[1:3])) {
-    expect_lt(qloo_approx2$quick_psis_loo$se_estimates[i], qloo_approx$quick_psis_loo$se_estimates[i])
-  }
-
-})
 
 
 
@@ -457,6 +513,8 @@ test_that("overall full quick_loo with radon data", {
   expect_silent(qloo_full_approx3 <- loo:::quick_loo.psis_loo(x = full_qloo_approx, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
 
 })
+
+
 
 
 test_that("waic using delta method and gradient", {
