@@ -302,6 +302,59 @@ test_that("Test loo_approximation_draws", {
 
 })
 
+test_that("waic using delta method and gradient", {
+  if(FALSE){
+    # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
+    set.seed(123)
+    N <- 400; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
+    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 1)
+    X <- X_full; y <- y_full
+    Lambda_0 <- diag(length(beta)); mu_0 <- c(0,0)
+    b_hat <- solve(t(X)%*%X)%*%t(X)%*%y
+    mu_n <- solve(t(X)%*%X)%*%(t(X)%*%X%*%b_hat + Lambda_0%*%mu_0)
+    Lambda_n <- t(X)%*%X + Lambda_0
+    fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
+    colnames(fake_posterior) <- c("a", "b")
+    fake_data <- data.frame(y, X)
+    save(fake_posterior, fake_data, file = test_path("normal_reg_waic_test_example.rda"))
+  } else {
+    load(file = test_path("normal_reg_waic_test_example.rda"))
+  }
+
+  .llfun <- function(data_i, draws) {
+    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
+    # draws: entire fake_posterior matrix
+    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = 1, log = TRUE)
+  }
+
+  .llgrad <- function(data_i, draws) {
+    x_i <- data_i[, "X2"]
+    gr <- cbind(data_i$y - draws[,"a"] - draws[,"b"]*x_i,
+                (data_i$y - draws[,"a"] - draws[,"b"]*x_i) * x_i)
+    colnames(gr) <- c("a", "b")
+    gr
+  }
+
+  fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
+
+  expect_silent(approx_loo_waic <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic"))
+  expect_silent(approx_loo_waic_delta <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic_grad", .llgrad = .llgrad))
+  expect_silent(approx_loo_waic_delta_diag <- loo:::elpd_loo_approximation(.llfun, data = fake_data, draws = fake_posterior, cores = 1, loo_approximation = "waic_grad_marginal", .llgrad = .llgrad))
+
+  # Test that the approaches should not deviate too much
+  diff_waic_delta <- mean(approx_loo_waic - approx_loo_waic_delta)
+  diff_waic_delta_diag <- mean(approx_loo_waic - approx_loo_waic_delta_diag)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta_diag, tol = 0.1)
+  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
+
+  # Test usage in subsampling_loo
+  expect_silent(loo_ss_waic <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic", observations = 50, llgrad = .llgrad))
+  expect_silent(loo_ss_waic_delta <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad", observations = 50, llgrad = .llgrad))
+  expect_silent(loo_ss_waic_delta_marginal <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "waic_grad_marginal", observations = 50, llgrad = .llgrad))
+  expect_silent(loo_ss_plpd <- loo_subsample(x = .llfun, data = fake_data, draws = fake_posterior, cores = 1, r_eff = rep(1, nrow(fake_data)), loo_approximation = "plpd", observations = 50, llgrad = .llgrad))
+
+})
+
 
 
 context("loo_subsampling_estimation")
@@ -365,6 +418,9 @@ test_that("whhest works as expected", {
   expect_equal(whe1$hat_v_y_ppz, whe1$hat_v_y_ppz)
 
 })
+
+
+
 
 
 context("loo_subsampling cases")
@@ -489,98 +545,6 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
 
 
 
-
-
-
-
-
-
-test_that("overall full quick_loo with radon data", {
-  # load("tests/testthat/test_quick_laplace_loo.rda")
-  load("test_quick_laplace_loo.rda")
-
-  set.seed(4712)
-  expect_silent(full_loo <- loo:::loo.function(x = llfun, draws = draws, data = data, r_eff = 1))
-  set.seed(4712)
-  expect_silent(qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = 100, type = "point", r_eff = 1))
-  set.seed(4712)
-  expect_silent(full_qloo_approx <- loo:::quick_loo.function(x = llfun, log_p = log_p, log_q = log_q, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
-
-  expect_equal(round(full_loo$estimates), round(full_qloo_approx$estimates))
-  expect_failure(expect_equal(full_loo$estimates, full_qloo_approx$estimates))
-  expect_equal(dim(full_loo), dim(full_qloo_approx))
-  expect_true(full_qloo_approx$approx_corrected)
-
-  skip("This is nice to have!")
-  # Refactor the code and make look better (i.e. create a quick_psis with m observations)
-  expect_silent(qloo_full_approx2 <- loo:::quick_loo.quick_psis_loo(x = qloo_approx, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
-  expect_silent(qloo_full_approx3 <- loo:::quick_loo.psis_loo(x = full_qloo_approx, draws = draws, data = data, m = NULL, type = "point", r_eff = 1))
-
-})
-
-
-
-
-test_that("waic using delta method and gradient", {
-  if(FALSE){
-    # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
-    set.seed(123)
-    N <- 400; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
-    y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 1)
-    X <- X_full; y <- y_full
-    Lambda_0 <- diag(length(beta)); mu_0 <- c(0,0)
-    b_hat <- solve(t(X)%*%X)%*%t(X)%*%y
-    mu_n <- solve(t(X)%*%X)%*%(t(X)%*%X%*%b_hat + Lambda_0%*%mu_0)
-    Lambda_n <- t(X)%*%X + Lambda_0
-    fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
-    colnames(fake_posterior) <- c("a", "b")
-    fake_data <- data.frame(y, X)
-    save(fake_posterior, fake_data, file = "normal_reg_waic_test_example.rda")
-  } else {
-    load(file = "normal_reg_waic_test_example.rda")
-  }
-
-  .llfun <- function(data_i, draws) {
-    # data_i: ith row of fdata (fake_data[i,, drop=FALSE])
-    # draws: entire fake_posterior matrix
-    dnorm(data_i$y, mean = draws[, c("a", "b")] %*% t(as.matrix(data_i[, c("X1", "X2")])), sd = 1, log = TRUE)
-  }
-
-  .llgrad <- function(data_i, draws) {
-    x_i <- data_i[, "X2"]
-    gr <- cbind(data_i$y - draws[,"a"] - draws[,"b"]*x_i,
-                (data_i$y - draws[,"a"] - draws[,"b"]*x_i) * x_i)
-    colnames(gr) <- c("a", "b")
-    gr
-  }
-
-  data <- fake_data
-  fake_posterior <- cbind(fake_posterior, runif(nrow(fake_posterior)))
-
-  expect_silent(approx_loo_waic <- loo:::approx_loo_variable(.llfun, data, draws = fake_posterior, cores = 1, approx_type = "waic_full"))
-  expect_silent(approx_loo_waic_delta <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta", .llgrad = .llgrad))
-  expect_silent(approx_loo_waic_delta_diag <- loo:::approx_loo_variable(.llfun, data, fake_posterior, cores = 1, approx_type = "waic_delta_diag", .llgrad = .llgrad))
-
-  # Test that the approaches should not deviate  too much
-  diff_waic_delta <- mean(approx_loo_waic - approx_loo_waic_delta)
-  diff_waic_delta_diag <- mean(approx_loo_waic - approx_loo_waic_delta_diag)
-  expect_equal(approx_loo_waic,approx_loo_waic_delta_diag, tol = 0.1)
-  expect_equal(approx_loo_waic,approx_loo_waic_delta, tol = 0.01)
-
-
-  expect_silent(test_qloo_waic <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_full", m = 50, llgrad = .llgrad))
-  expect_silent(test_qloo_delta <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta", m = 50, llgrad = .llgrad))
-  expect_silent(test_qloo_diag <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta_diag", m = 50, llgrad = .llgrad))
-  expect_silent(test_qloo_point <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "point", m = 50, llgrad = .llgrad))
-
-  #test_qloo_waic$quick_psis_loo$se_estimates
-  #test_qloo_delta$quick_psis_loo$se_estimates
-  #test_qloo_diag$quick_psis_loo$se_estimates
-  #test_qloo_point$quick_psis_loo$se_estimates
-
-})
-
-
 test_that("waic using delta 2nd order method", {
   if(FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
@@ -658,6 +622,9 @@ test_that("waic using delta 2nd order method", {
   expect_silent(test_qloo_delta <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "waic_delta", m = 50, llgrad = .llgrad))
   expect_silent(test_qloo_point <- loo:::quick_loo.function(x = .llfun, data = data, draws = fake_posterior, cores = 1, r_eff = 1, approx_type = "point", m = 50, llgrad = .llgrad))
 })
+
+
+
 
 
 test_that("srs_diff_est works as expected", {
