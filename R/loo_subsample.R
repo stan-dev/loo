@@ -273,6 +273,8 @@ update.psis_loo_ss <- function(object,
      is.null(llhess)) return(object)
 
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
+  checkmate::assert_true(all(dim(data) == object$subsamling_loo$data_dim))
+  checkmate::assert_true(nparameters(draws) == object$subsamling_loo$nparameters)
   cores <- loo_cores(cores)
 
   # Update elpd approximations
@@ -287,7 +289,6 @@ update.psis_loo_ss <- function(object,
     if(is.null(llgrad)) .llgrad <- object$subsamling_loo$.llgrad else .llgrad <- validate_llfun(llgrad)
     if(is.null(llhess)) .llhess <- object$subsamling_loo$.llhess else .llhess <- validate_llfun(llhess)
 
-    # TODO: Add tests for dimensions of data and params
     # Compute loo approximation
     elpd_loo_approx <-
       elpd_loo_approximation(.llfun = object$subsamling_loo$.llfun,
@@ -340,13 +341,7 @@ update.psis_loo_ss <- function(object,
     # Identify how to update object
     cidxs <- compare_idxs(idxs, object)
 
-    # TODO: Test that we cant update loo_approx with HH (since need sampling)
-    # TODO: Create function for set of estimators with and withour replacement
-
     # Compute new observations
-    # TODO: Add test with long r_eff, i.e. handling r_eff
-    # TODO: Fix so r_eff is only computed for subsample
-
     if(!is.null(cidxs$new)){
       data_new_subsample <- data[cidxs$new$idx,, drop = FALSE]
       if(length(r_eff) > 1) r_eff <- r_eff[cidxs$new$idx]
@@ -375,8 +370,6 @@ update.psis_loo_ss <- function(object,
     } else {
       plo <- NULL
     }
-    # TODO: Combine psis objects from psis_save in rbind.psis_loo_ss
-    # TODO: Test so all are null below and it works as expected
     # Update object (diagnostics and pointwise)
     if(length(observations) == 1){
       # Add new samples pointwise and diagnostic
@@ -411,8 +404,6 @@ update.psis_loo_ss <- function(object,
   object
 }
 
-# TODO: Fix Error: /Users/mansmagnusson/Dropbox (Personlig)/Projekt/loo/man/elpd_loo_approximation.Rd:79: Bad \link text
-
 #' The observations indecies in the original data
 #'
 #' @details
@@ -444,7 +435,6 @@ nobs.psis_loo_ss <- function(x){
   as.integer(sum(x$pointwise[,"m_i"]))
 }
 
-
 # internal ----------------------------------------------------------------
 
 loo_approximation_choices <- function() {
@@ -461,7 +451,7 @@ estimator_choices <- function() {
 #' Compute approximation to loo_i:s
 #'
 #' @details
-#' See \link{\code{loo_subsample.function()}} \code{loo_approximation} argument.
+#' See \code{\link{loo_subsample.function()}} and \code{loo_approximation} argument.
 #'
 #' @inheritParams loo_subsample.function
 #'
@@ -485,7 +475,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   if(loo_approximation == "none") return(rep(1L,N))
 
   if(loo_approximation == "waic"){
-    # TODO: stop("make this more efficient, by extracting")
     draws <- thin_draws(draws, loo_approximation_draws)
     waic_full_obj <- waic.function(.llfun, data = data, draws = draws)
     return(waic_full_obj$pointwise[,"elpd_waic"])
@@ -544,7 +533,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     }
 
     p_eff_approx <- numeric(N)
-    if(cores>1) warning("Multicore is not implemented for waic_delta") # TODO: Look at this
+    if(cores>1) warning("Multicore is not implemented for waic_delta")
 
     if(loo_approximation == "waic_grad"){
       for(i in 1:nrow(data)){
@@ -560,14 +549,15 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     } else if(loo_approximation == "waic_hess") {
       checkmate::assert_true(!is.null(.llhess))
       for(i in 1:nrow(data)){
-        # TODO: Check with Michael on efficient implementation
         grad_i <- t(.llgrad(data[i,,drop = FALSE], point_est))
         hess_i <- .llhess(data_i = data[i,,drop = FALSE], draws = point_est[,rownames(grad_i), drop = FALSE])[,,1]
         local_cov <- cov_est[rownames(grad_i), rownames(grad_i)]
         p_eff_approx[i] <- t(grad_i) %*% local_cov %*% grad_i +
           0.5 * sum(diag(local_cov %*% hess_i %*% local_cov %*% hess_i))
       }
-    } else {stop(loo_approximation, " is not implemented!")}
+    } else {
+      stop(loo_approximation, " is not implemented!")
+      }
 
     return(lpds - p_eff_approx)
   }
@@ -575,48 +565,44 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 }
 
 
-### TODO: MAKE THIS GENERIC AND REMOVE STANREG
 #' Compute \eqn{E(\theta)} as point estimate.
 #' @rdname thin_draws
 compute_point_estimate <- function(draws){
-  if(is.matrix(draws)){
-    draws <- t(as.matrix(colMeans(draws)))
-  } else if(is.stanreg.draws(draws)){
-    for(i in seq_along(draws)){
-      if(is.matrix(draws[[i]])){
-        draws[[i]] <- t(as.matrix(colMeans(draws[[i]])))
-      }
-    }
-  }
-  draws
+  UseMethod("compute_point_estimate")
 }
 
-### TODO: MAKE THIS GENERIC AND REMOVE STANREG
+compute_point_estimate.matrix <- function(draws){
+  t(as.matrix(colMeans(draws)))
+}
+
+compute_point_estimate.default <- function(draws){
+  stop("compute_point_estimate() has not been implemented for objects of class '", class(x), "'")
+}
+
 #' Thin draws for a matrix with draws and for rstanarm stan_reg objects.
 #' @param draws a draws object with draws from the posterior.
 #' @param loo_approximation_draws the number of posterior draws to return (ie after thinning)
 thin_draws <- function(draws, loo_approximation_draws){
-  if(!is.null(loo_approximation_draws)) {
-    if(is.matrix(draws)){
-      draws <- thin_draws_matrix(draws, loo_approximation_draws)
-    } else if(is.stanreg.draws(draws)){
-      for(i in seq_along(draws)){
-        if(is.matrix(draws[[i]])){
-          draws[[i]] <- thin_draws_matrix(draws[[i]], loo_approximation_draws)
-        }
-      }
-    }
-  }
-  return(draws)
+  UseMethod("thin_draws")
 }
-#' @rdname thin_draws
-thin_draws_matrix <- function(draws, loo_approximation_draws){
+
+thin_draws.matrix <- function(draws, loo_approximation_draws){
+  if(is.null(loo_approximation_draws)) return(draws)
   checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
   S <- ndraws(draws)
   idx <- 1:loo_approximation_draws * S %/% loo_approximation_draws
   draws <- draws[idx, , drop = FALSE]
   draws
 }
+
+thin_draws.numeric <- function(draws, loo_approximation_draws){
+  thin_draws.matrix(as.matrix(draws), loo_approximation_draws)
+}
+
+thin_draws.default <- function(draws, loo_approximation_draws){
+  stop("thin_draws() has not been implemented for objects of class '", class(draws), "'")
+}
+
 
 #' Returns the number of posterior draws from a draws object.
 ndraws <- function(x){

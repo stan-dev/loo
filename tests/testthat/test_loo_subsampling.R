@@ -201,6 +201,7 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_equal(nobs(loo_ss_max2), 1100)
   expect_gt(max(loo_ss_max2$pointwise[, "m_i"]), 1)
   expect_error(loo_ss_max2 <- update(loo_ss_max2, draws = fake_posterior, data = fake_data, observations = 300, r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_max3 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = 1500, r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
   expect_error(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
   expect_equal(loo_ss$estimates, loo_ss2$estimates)
@@ -253,6 +254,10 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_s3_class(true_loo, "psis_loo")
   expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 500, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(loo_ss, "psis_loo_ss")
+
+  # Check error when draws and data dimensions differ
+  expect_error(loo_ss2 <- update(object = loo_ss, draws = cbind(fake_posterior, 1), data = fake_data, observations = 600, r_eff = rep(1, nrow(fake_data))))
+  expect_error(loo_ss2 <- update(object = loo_ss, draws = fake_posterior, data = fake_data[-1,], observations = 600, r_eff = rep(1, nrow(fake_data))))
 
   # Add tests for adding observations
   expect_silent(loo_ss2 <- update(object = loo_ss, draws = fake_posterior, data = fake_data, observations = 600, r_eff = rep(1, nrow(fake_data))))
@@ -375,6 +380,7 @@ test_that("Test loo_approximation_draws", {
   expect_silent(res1 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", loo_approximation_draws = NULL, cores = 1))
   expect_silent(res2 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", loo_approximation_draws = 10, cores = 1))
   expect_silent(res3 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior[1:10*100,], loo_approximation = "waic", loo_approximation_draws = NULL, cores = 1))
+  expect_silent(res4 <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior[1:10*100,, drop = FALSE], loo_approximation = "waic", loo_approximation_draws = NULL, cores = 1))
   expect_failure(expect_equal(res1, res3))
   expect_equal(res2, res3)
 
