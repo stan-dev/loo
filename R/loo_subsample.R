@@ -1,8 +1,7 @@
 #' @title
-#' Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations
+#' Efficient approximate leave-one-out cross-validation (LOO) using subsampling
 #'
-#'
-#' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
+#' @param x A function. The **Methods (by class)**
 #'   section, below, has detailed descriptions of how to specify the inputs for
 #'   each method.
 #' @export loo_subsample loo_subsample.function
@@ -11,12 +10,11 @@
 #'   saved in the returned object? See \link{loo} for details.
 #' @template cores
 #'
-#' @details The `loo_approximate_posterior()` function is an S3 generic and methods are provided for
-#'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
-#'   log-likelihood functions. The implementation work for posterior approximations
-#'   where it is possible to compute the log density for the posterior approximation.
+#' @details The `loo_subsample()` function is an S3 generic and methods are provided for
+#'   log-likelihood functions. The implementation work for both MCMC and for posterior
+#'   approximations where it is possible to compute the log density for the approximation.
 #'
-#' @return The `loo_approximate_posterior()` methods return a named list with class
+#' @return The `loo_subsample()` methods return a named list with class
 #'   `c("psis_loo_ap", "psis_loo", "loo")` with the additional slot:
 #' \describe{
 #'  \item{`posterior_approximation`}{
@@ -43,23 +41,31 @@ loo_subsample <- function(x, ...) {
 #' @template function
 #' @param data,draws,... For the `loo_subsample.function()` method and the `loo_i()`
 #'   function, these are the data, posterior draws, and other arguments to pass
-#'   to the log-likelihood function. See the **Methods (by class)** section
-#'   below for details on how to specify these arguments.
+#'   to the log-likelihood function.
 #' @param observations The subsample observations to use. The argument can take four (4) types of arguments.
-#'   If \code{NULL} is supplied, all observations are used and the algorithm just use standard psis loo.
-#'   If a single integer is supplied this is the number of integers used.
-#'   If a vector of integers, this will be the indecies used to subset the data. Note, this should only be used
-#'   when subsampling have been done previously.
-#'   If a \code{psis_loo_ss} object is supplied, the observations used for that is used.
+#'   If \code{NULL} is supplied, all observations are used and the algorithm just use standard loo or
+#'   loo_approximate_posterior.
+#'   If a single integer is supplied this is the number of observations that are subsampled.
+#'   If a vector of integers, this will be the indecies used to subset the data.
+#'   Note, these observations need to be subsampled with the same scheme as given by
+#'   \code{estimator}.
+#'   If a \code{psis_loo_ss} object is supplied, the same observations are used.
 #'
-#' @param log_p Should be supplied if approximate posterior draws are used. Default (NULL) posterior draws from true posterior (i.e. using MCMC). The log-posterior (target) evaluated at S samples from the proposal distribution (g). A vector of length S.
-#' @param log_q Should be supplied if approximate posterior draws are used. Default (NULL) posterior draws from true posterior (i.e. using MCMC). The log-density (proposal) evaluated at S samples from the proposal distribution (g). A vector of length S.
+#' @param log_p
+#'   Should be supplied if approximate posterior draws are used.
+#'   Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
+#'   The log-posterior (target) evaluated at S samples from the proposal
+#'   distribution (g). A vector of the same length as the number of posterior draws.
+#' @param log_q
+#'   Should be supplied if approximate posterior draws are used.
+#'   Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
+#'   The log-density (proposal) evaluated at S samples from the proposal
+#'   distribution (g). A vector of the same length as the number of posterior draws.
 #'
-#' @param loo_approximation What type of approximation the PSIS-LOO:s should be used.
+#' @param loo_approximation What type of approximation of the loo_i:s should be used.
 #'   Default is \code{plpd} or log predictive density using the posterior expectation.
-#'   If \code{NULL}, no approximation is done.
 #'   There are six different methods implemented to approximate loo_i:s.
-#'   See references for more details.
+#'   See the references for more details.
 #'   \describe{
 #'     \item{\code{plpd}}{
 #'     uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
@@ -90,9 +96,10 @@ loo_subsample <- function(x, ...) {
 #'
 #' @param loo_approximation_draws The number of posterior draws
 #' used when integrating over the posterior.
-#' Used by \code{lpd} and \code{waic}.
+#' Used by loo_approximation \code{lpd} and \code{waic}.
 #'
-#' @param estimator How should elpd_loo be estimated. Default is \code{diff_srs}.
+#' @param estimator How should elpd_loo, p_loo and looic be estimated.
+#'  Default is \code{diff_srs}.
 #'   \describe{
 #'     \item{\code{diff_srs}}{
 #'     uses the difference estimator with simple random sampling (srs).
@@ -104,9 +111,12 @@ loo_subsample <- function(x, ...) {
 #'     uses simple random sampling and ordinary estimation.}
 #'  }
 #'
-#' @param llgrad the gradient of the log-likelihood. This is used
-#'        with Default is \code{NULL}.
-#' @param llhess the hessian of the log-likelihood. Default is \code{NULL}.
+#' @param llgrad the gradient of the log-likelihood. This is only used
+#'        with \code{waic_grad}, \code{waic_grad_marginal} and \code{waic_hess}.
+#'        Default is \code{NULL}.
+#' @param llhess the hessian of the log-likelihood. This is only used
+#'        with \code{waic_hess}.
+#'        Default is \code{NULL}.
 #' @template cores
 #'
 loo_subsample.function <-
@@ -259,7 +269,6 @@ update.psis_loo_ss <- function(object,
      is.null(llgrad) &
      is.null(llhess)) return(object)
 
-  # TODO: cleanup/read through documentation
   # TODO: Test that sampling wr can have duplicates, wor cannot
   # TODO: Add vignette as test case
   # TODO: Assert that skip if missing checkmate in all tests
