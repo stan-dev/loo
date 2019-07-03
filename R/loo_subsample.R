@@ -95,7 +95,8 @@ loo_subsample <- function(x, ...) {
 #' @param estimator How should elpd_loo be estimated. Default is \code{diff_srs}.
 #'   \describe{
 #'     \item{\code{diff_srs}}{
-#'     uses the difference estimator with simple random sampling (srs)}
+#'     uses the difference estimator with simple random sampling (srs).
+#'     p_loo is estimated using standard srs.}
 #'     \item{\code{hh}}{
 #'     uses the Hansen-Hurwitz estimator with sampling proportional
 #'     to size, where abs of loo_approximation is used as size.}
@@ -257,15 +258,18 @@ update.psis_loo_ss <- function(object,
   # TODO: Test that sampling wr can have duplicates, wor cannot
   # TODO: Add vignette as test case
 
-
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   cores <- loo_cores(cores)
 
   # TODO: Add r_eff in object, ie handle it. See relative_eff() function.
 
-
   # Update elpd approximations
   if(!is.null(loo_approximation) | !is.null(loo_approximation_draws)){
+    if(object$subsamling_loo$estimator %in% "hh"){
+      # HH estimation uses elpd_loo approx to sample,
+      # so updating it will lead to incorrect results
+      stop("Can not update loo_approximation when using PPS sampling.", call. = FALSE)
+    }
     if(is.null(loo_approximation)) loo_approximation <- object$subsamling_loo$loo_approximation
     if(is.null(loo_approximation_draws)) loo_approximation_draws <- object$subsamling_loo$loo_approximation_draws
     if(is.null(llgrad)) .llgrad <- object$subsamling_loo$.llgrad else .llgrad <- validate_llfun(llgrad)
@@ -696,8 +700,6 @@ compare_idxs  <- function(idxs, object){
   result
 }
 
-# TODO: Assert that HH cannot update loo_approx
-
 assert_observations <- function(x, N, estimator){
   checkmate::assert_int(N)
   checkmate::assert_choice(estimator, choices = estimator_choices())
@@ -925,7 +927,6 @@ loo_subsample_estimation_hh <- function(x){
 update_psis_loo_ss_estimates <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
-  # TODO: Double check this computation with a test suite/mejl to Aki
   x$estimates["looic", "Estimate"] <- (-2) * x$estimates["elpd_loo", "Estimate"]
   x$estimates["looic", "SE"] <- 2 * x$estimates["elpd_loo", "SE"]
   x$estimates["looic", "subsampling SE"] <- 2 * x$estimates["elpd_loo", "subsampling SE"]
@@ -971,7 +972,6 @@ loo_subsample_estimation_diff_srs <- function(x){
   x$estimates["elpd_loo", "SE"] <- sqrt(elpd_loo_est$hat_v_y)
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(elpd_loo_est$v_y_hat)
 
-  # TODO: Check that it is clear that p_eff is estimated using srs
   p_loo_est <- srs_est(y = x$pointwise[, "p_loo"], y_approx = x$subsamling_loo$elpd_loo_approx)
   x$estimates["p_loo", "Estimate"] <- p_loo_est$y_hat
   x$estimates["p_loo", "SE"] <- sqrt(p_loo_est$hat_v_y)

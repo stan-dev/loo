@@ -198,6 +198,7 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_equal(nobs(loo_ss_max2), 1100)
   expect_error(loo_ss_max2 <- update(loo_ss_max2, draws = fake_posterior, data = fake_data, observations = 300, r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
+  expect_error(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
   expect_equal(loo_ss$estimates, loo_ss2$estimates)
   expect_equal(length(obs_idx(loo_ss_max)), length(obs_idx(loo_ss_max2)))
   expect_equal(length(obs_idx(loo_ss_max)), nobs(loo_ss_max))
