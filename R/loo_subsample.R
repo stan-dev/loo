@@ -236,7 +236,10 @@ loo_subsample.function <-
                                  estimator = estimator,
                                  .llfun = .llfun,
                                  .llgrad = .llgrad,
-                                 .llhess = .llhess)
+                                 .llhess = .llhess,
+                                 data_dim = dim(data),
+                                 ndraws = ndraws(draws),
+                                 nparameters = nparameters(draws))
     loo_ss
   }
 
@@ -268,8 +271,6 @@ update.psis_loo_ss <- function(object,
      is.null(loo_approximation_draws) &
      is.null(llgrad) &
      is.null(llhess)) return(object)
-
-  # TODO: Add vignette as test case
 
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   cores <- loo_cores(cores)
@@ -326,7 +327,6 @@ update.psis_loo_ss <- function(object,
                                observations = observations - current_obs)
       }
       # If sampling without replacement
-      # TODO: test this part
       if(object$subsamling_loo$estimator %in% c("diff_srs", "srs")){
         current_idxs <- obs_idx(object, rep = FALSE)
         new_idx <- (1:length(object$subsamling_loo$elpd_loo_approx))[-current_idxs]
@@ -631,6 +631,17 @@ ndraws.default <- function(x){
   stop("ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
+nparameters <- function(x){
+  UseMethod("nparameters")
+}
+
+nparameters.matrix <- function(x){
+  ncol(x)
+}
+
+nparameters.default <- function(x){
+  stop("nparameters() has not been implemented for objects of class '", class(x), "'")
+}
 
 
 ## Subsampling -----
@@ -783,7 +794,8 @@ psis_loo_ss_object <- function(x,
                                elpd_loo_approx,
                                loo_approximation, loo_approximation_draws,
                                estimator,
-                               .llfun, .llgrad, .llhess){
+                               .llfun, .llgrad, .llhess,
+                               data_dim, ndraws, nparameters){
   # Assertions
   checkmate::assert_class(x, "psis_loo")
   assert_subsample_idxs(idxs)
@@ -794,6 +806,10 @@ psis_loo_ss_object <- function(x,
   checkmate::assert_function(.llfun, args = c("data_i", "draws"), ordered = TRUE)
   checkmate::assert_function(.llgrad, args = c("data_i", "draws"), ordered = TRUE, null.ok = TRUE)
   checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE, null.ok = TRUE)
+  checkmate::assert_integer(data_dim, len = 2, lower = 1, any.missing = FALSE)
+  checkmate::assert_int(ndraws, lower = 1)
+  checkmate::assert_int(nparameters, lower = 1)
+
 
   # Construct object
   class(x) <- c("psis_loo_ss", class(x))
@@ -809,6 +825,9 @@ psis_loo_ss_object <- function(x,
   x$subsamling_loo$.llfun <- .llfun
   x$subsamling_loo[".llgrad"] <- list(.llgrad)
   x$subsamling_loo[".llhess"] <- list(.llhess)
+  x$subsamling_loo$data_dim <- data_dim
+  x$subsamling_loo$ndraws <- ndraws
+  x$subsamling_loo$nparameters <- nparameters
 
   # Compute estimates
   if(estimator == "hh"){
