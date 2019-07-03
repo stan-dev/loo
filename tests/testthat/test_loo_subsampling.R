@@ -108,10 +108,13 @@ test_that("loo with subsampling of all observations works as ordinary loo.", {
 
   expect_equal(dim(true_loo),dim(loo_ss))
   expect_equal(true_loo$diagnostics, loo_ss$diagnostics)
+  expect_equal(max(loo_ss$pointwise[, "m_i"]), 1)
 
 })
 
 test_that("overall loo_subsample works with diff_srs as expected (compared with loo)", {
+  skip_if_not_installed("checkmate")
+
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -196,6 +199,7 @@ test_that("Test the Hansen-Hurwitz estimator", {
   expect_s3_class(loo_ss_max, "psis_loo_ss")
   expect_silent(loo_ss_max2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = 1100, r_eff = rep(1, nrow(fake_data))))
   expect_equal(nobs(loo_ss_max2), 1100)
+  expect_gt(max(loo_ss_max2$pointwise[, "m_i"]), 1)
   expect_error(loo_ss_max2 <- update(loo_ss_max2, draws = fake_posterior, data = fake_data, observations = 300, r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
   expect_error(loo_ss2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = loo_ss, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
@@ -389,6 +393,8 @@ test_that("Test loo_approximation_draws", {
 
 
 test_that("waic using delta method and gradient", {
+  skip_if_not_installed("checkmate")
+
   if(FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
     set.seed(123)
@@ -442,6 +448,8 @@ test_that("waic using delta method and gradient", {
 })
 
 test_that("waic using delta 2nd order method", {
+  skip_if_not_installed("checkmate")
+
   if(FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
     set.seed(123)
@@ -587,6 +595,8 @@ test_that("whhest works as expected", {
 
 
 test_that("srs_diff_est works as expected", {
+  skip_if_not_installed("checkmate")
+
   set.seed(1234)
   N <- 1000
   y_true <- 1:N
@@ -621,6 +631,8 @@ test_that("srs_diff_est works as expected", {
 })
 
 test_that("srs_est works as expected", {
+  skip_if_not_installed("checkmate")
+
   set.seed(1234)
   # Cochran 1976 example Table 2.2
 

@@ -269,14 +269,10 @@ update.psis_loo_ss <- function(object,
      is.null(llgrad) &
      is.null(llhess)) return(object)
 
-  # TODO: Test that sampling wr can have duplicates, wor cannot
   # TODO: Add vignette as test case
-  # TODO: Assert that skip if missing checkmate in all tests
 
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   cores <- loo_cores(cores)
-
-  # TODO: Add r_eff in object, ie handle it. See relative_eff() function.
 
   # Update elpd approximations
   if(!is.null(loo_approximation) | !is.null(loo_approximation_draws)){
