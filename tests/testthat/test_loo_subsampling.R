@@ -261,6 +261,12 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
               loo_ss$estimates[i, "subsampling SE"])
   }
 
+  expect_silent(loo_ss2b <- update(object = loo_ss, draws = fake_posterior, data = fake_data))
+  expect_equal(loo_ss2b$estimates, loo_ss$estimates)
+  expect_equal(loo_ss2b$pointwise, loo_ss$pointwise)
+  expect_equal(loo_ss2b$diagnostics$pareto_k, loo_ss$diagnostics$pareto_k)
+  expect_equal(loo_ss2b$diagnostics$n_eff, loo_ss$diagnostics$n_eff)
+
   expect_silent(loo_ss3 <- update(object = loo_ss2, draws = fake_posterior, data = fake_data, observations = loo_ss))
   expect_equal(loo_ss3$estimates, loo_ss$estimates)
   expect_equal(loo_ss3$pointwise, loo_ss$pointwise)

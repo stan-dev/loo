@@ -253,10 +253,16 @@ update.psis_loo_ss <- function(object,
                                llgrad = NULL,
                                llhess = NULL){
   # Fallback
-  # TODO: if nothing is updated, just return the object
+  if(is.null(observations) &
+     is.null(loo_approximation) &
+     is.null(loo_approximation_draws) &
+     is.null(llgrad) &
+     is.null(llhess)) return(object)
+
   # TODO: cleanup/read through documentation
   # TODO: Test that sampling wr can have duplicates, wor cannot
   # TODO: Add vignette as test case
+  # TODO: Assert that skip if missing checkmate in all tests
 
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   cores <- loo_cores(cores)
