@@ -44,7 +44,7 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss$estimates["looic", "Estimate"], tol = 0.00000001))
 
   # Test that observations works as expected
-  expect_silent(loo_ss2 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = obs_idx(loo_ss), loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+  expect_message(loo_ss2 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = obs_idx(loo_ss), loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
   expect_equal(loo_ss2$estimates, loo_ss$estimates, tol = 0.00000001)
   expect_silent(loo_ss2 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = loo_ss, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
   expect_equal(loo_ss2$estimates, loo_ss$estimates, tol = 0.00000001)

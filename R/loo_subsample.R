@@ -128,17 +128,9 @@ loo_subsample.function <-
     # Asserting inputs
     .llfun <- validate_llfun(x)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    if (checkmate::test_class(observations, "psis_loo_ss")) {
-      observations <- obs_idx(observations)
-    }
-    checkmate::assert_integerish(observations,
-                                 null.ok = TRUE,
-                                 lower = 1, any.missing = FALSE)
-    if(!is.null(observations)) observations <- as.integer(observations)
-    if(length(observations) > 1) checkmate::assert_integerish(observations, upper = dim(data)[1])
-    # TODO: Message when setting observations.
-    # State how these observations will be asumed to been sampled (if not using object).
-
+    observations <- assert_observations(observations,
+                                        N = dim(data)[1],
+                                        estimator)
     checkmate::assert_numeric(log_p, len = length(log_g), null.ok = TRUE)
     checkmate::assert_null(dim(log_p))
     checkmate::assert_numeric(log_g, len = length(log_p), null.ok = TRUE)
@@ -299,20 +291,10 @@ update.psis_loo_ss <- function(object,
 
   # Update observations
   if(!is.null(observations)){
-    # TODO: Refactor observatcion checks
-    if (checkmate::test_class(observations, "psis_loo_ss")) {
-      # TODO: Message when setting observations.
-      # State how these observations will be asumed to been sampled (if not using object).
-      observations <- obs_idx(observations)
-    }
-    checkmate::assert_integerish(observations,
-                                 null.ok = TRUE,
-                                 lower = 1, any.missing = FALSE)
-    if(!is.null(observations)) observations <- as.integer(observations)
-    if(length(observations) > 1){
-      checkmate::assert_integerish(observations, upper = dim(data)[1])
-    } else {
-      # Assert we add new observations
+    observations <- assert_observations(observations,
+                                        N = dim(data)[1],
+                                        object$subsamling_loo$estimator)
+    if(length(observations) == 1) {
       checkmate::assert_int(observations, lower = nobs(object) + 1)
     }
 
@@ -712,6 +694,32 @@ compare_idxs  <- function(idxs, object){
   }
 
   result
+}
+
+# TODO: Assert that HH cannot update loo_approx
+
+assert_observations <- function(x, N, estimator){
+  checkmate::assert_int(N)
+  checkmate::assert_choice(estimator, choices = estimator_choices())
+  if(is.null(x)) return(x)
+  if (checkmate::test_class(x, "psis_loo_ss")) {
+    x <- obs_idx(x)
+    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
+    return(x)
+  }
+  x <- as.integer(x)
+  if(length(x) > 1) {
+    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
+    if(estimator %in% "hh") {
+      message("Sampling proportional to elpd approximation and with replacement assumed.")
+    }
+    if(estimator %in% c("diff_srs", "srs")) {
+      message("Simple random sampling with replacement assumed.")
+    }
+  } else {
+    checkmate::assert_integer(x, lower = 1, any.missing = FALSE)
+  }
+  x
 }
 
 assert_subsample_idxs <- function(x){
