@@ -139,7 +139,7 @@ print_dims.psis_loo_ss <- function(x, ...) {
     "Computed from",
     paste(c(dim(x)[1], nobs(x)) , collapse = " by "),
     "subsampled log-likelihood\nvalues from",
-    length(x$subsamling_loo$elpd_loo_approx),
+    length(x$loo_subsampling$elpd_loo_approx),
     "total observations.\n"
   )
 }

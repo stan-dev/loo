@@ -28,7 +28,7 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
-                    loo_ss$subsamling_loo$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
+                    loo_ss$loo_subsampling$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
 
   # Expect values
   z <- 2
@@ -159,7 +159,7 @@ test_that("Test the srs estimator with 'none' approximation", {
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
-                    loo_ss$subsamling_loo$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
+                    loo_ss$loo_subsampling$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
 
   # Expect values
   z <- 2
@@ -211,10 +211,10 @@ test_that("Test the Hansen-Hurwitz estimator", {
 
   # Check consistency
   expect_equivalent(loo_ss$pointwise[, "elpd_loo_approx"],
-                    loo_ss$subsamling_loo$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
+                    loo_ss$loo_subsampling$elpd_loo_approx[loo_ss$pointwise[, "idx"]])
   # Check consistency
   expect_equivalent(loo_ss_max$pointwise[, "elpd_loo_approx"],
-                    loo_ss_max$subsamling_loo$elpd_loo_approx[loo_ss_max$pointwise[, "idx"]])
+                    loo_ss_max$loo_subsampling$elpd_loo_approx[loo_ss_max$pointwise[, "idx"]])
 
   # Expect values
   z <- 2
@@ -301,7 +301,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 
   # Add tests for changing approx variable
   expect_silent(loo_ss_lpd <- update(object = loo_ss, draws = fake_posterior, data = fake_data, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
-  expect_failure(expect_equal(loo_ss_lpd$subsamling_loo$elpd_loo_approx, loo_ss$subsamling_loo$elpd_loo_approx))
+  expect_failure(expect_equal(loo_ss_lpd$loo_subsampling$elpd_loo_approx, loo_ss$loo_subsampling$elpd_loo_approx))
   expect_equal(dim(loo_ss_lpd)[2], dim(loo_ss)[2])
   expect_equal(dim(loo_ss_lpd)[2], dim(loo_ss_lpd$pointwise)[1])
   expect_length(loo_ss_lpd$diagnostics$pareto_k, 500)
@@ -389,10 +389,10 @@ test_that("Test loo_approximation_draws", {
   expect_silent(loo_ss3 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 31, r_eff = rep(1, nrow(fake_data))))
   expect_error(loo_ss4 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 3100, r_eff = rep(1, nrow(fake_data))))
 
-  expect_equal(names(loo_ss1$subsamling_loo), c("elpd_loo_approx", "loo_approximation", "loo_approximation_draws", "estimator", ".llfun", ".llgrad", ".llhess", "data_dim", "ndraws", "nparameters"))
-  expect_null(loo_ss1$subsamling_loo$loo_approximation_draws)
-  expect_equal(loo_ss2$subsamling_loo$loo_approximation_draws, 10L)
-  expect_equal(loo_ss3$subsamling_loo$loo_approximation_draws, 31L)
+  expect_equal(names(loo_ss1$loo_subsampling), c("elpd_loo_approx", "loo_approximation", "loo_approximation_draws", "estimator", ".llfun", ".llgrad", ".llhess", "data_dim", "ndraws", "nparameters"))
+  expect_null(loo_ss1$loo_subsampling$loo_approximation_draws)
+  expect_equal(loo_ss2$loo_subsampling$loo_approximation_draws, 10L)
+  expect_equal(loo_ss3$loo_subsampling$loo_approximation_draws, 31L)
 
 })
 
@@ -961,6 +961,7 @@ test_that("loo_compare_subsample", {
   expect_silent(lss2o1 <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = lss1, r_eff = rep(1, N)))
   expect_silent(lss3o1 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = lss1, r_eff = rep(1, N)))
 
+  # loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3))
 
 })
 

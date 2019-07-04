@@ -82,6 +82,7 @@ loo_approximate_posterior.matrix <-
     ap_psis <- psis_approximate_posterior(log_p = log_p, log_g = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
     class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
+    assert_psis_loo_ap(ap_psis)
     ap_psis
   }
 
@@ -144,6 +145,7 @@ loo_approximate_posterior.function <-
 
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
     class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
+    assert_psis_loo_ap(ap_psis)
     ap_psis
   }
 
@@ -176,4 +178,13 @@ loo_approximate_posterior.function <-
       N = 1
     )
   }
+
+
+assert_psis_loo_ap <- function(x){
+  checkmate::assert_class(x, "psis_loo_ap")
+  checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "approximate_posterior"))
+  checkmate::assert_names(names(x$approximate_posterior), must.include = c("log_p", "log_g"))
+  checkmate::assert_numeric(x$approximate_posterior$log_p, len = length(x$approximate_posterior$log_g), any.missing = FALSE)
+  checkmate::assert_numeric(x$approximate_posterior$log_g, len = length(x$approximate_posterior$log_p), any.missing = FALSE)
+}
 
