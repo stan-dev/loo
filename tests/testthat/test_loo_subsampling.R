@@ -883,30 +883,85 @@ test_that("Test the vignette", {
   expect_warning(looss_2 <- loo_subsample(llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, obs = 100, estimator = "hh", loo_approximation = "lpd", loo_approximation_draws = 100))
   expect_output(print(looss_2), "Computed from 4000 by 100 subsampled log-likelihood")
   expect_output(print(looss_2), "values from 3020 total observations.")
-  expect_output(print(looss_2), "elpd_loo  -1970.2 15.3            1.7")
-  expect_output(print(looss_2), "p_loo         3.3  0.1            0.4")
+  expect_output(print(looss_2), "elpd_loo  -1968.9 15.4            0.5")
+  expect_output(print(looss_2), "p_loo         3.5  0.2            0.5")
   expect_s3_class(looss_2, c("psis_loo_ss", "psis_loo", "loo"))
 
   set.seed(4711)
   expect_warning(aploo_1 <- loo_approximate_posterior(llfun_logistic, draws = parameter_draws_laplace, data = stan_df, log_p = log_p, log_g = log_g))
   expect_output(print(aploo_1), "Computed from 2000 by 3020 log-likelihood matrix")
-  expect_output(print(aploo_1), "elpd_loo  -1968.5 15.6")
-  expect_output(print(aploo_1), "p_loo         3.3  0.2")
+  expect_output(print(aploo_1), "elpd_loo  -1968.4 15.6")
+  expect_output(print(aploo_1), "p_loo         3.2  0.2")
   expect_output(print(aploo_1), "Posterior approximation correction used.")
-  expect_output(print(aploo_1), "\\(-Inf, 0.5\\]   \\(good\\)     2917  96.6")
-  expect_output(print(aploo_1), "\\(0.5, 0.7\\]   \\(ok\\)         92   3.0")
+  expect_output(print(aploo_1), "\\(-Inf, 0.5\\]   \\(good\\)     2989  99.0")
+  expect_output(print(aploo_1), "\\(0.5, 0.7\\]   \\(ok\\)         31   1.0")
   expect_s3_class(aploo_1, c("psis_loo_ap", "psis_loo", "loo"))
 
   set.seed(4711)
   expect_warning(looapss_1 <- loo_subsample(llfun_logistic, draws = parameter_draws_laplace, data = stan_df, log_p = log_p, log_g = log_g, observations = 100))
   expect_output(print(looapss_1), "Computed from 2000 by 100 subsampled log-likelihood")
   expect_output(print(looapss_1), "values from 3020 total observations.")
-  expect_output(print(looapss_1), "elpd_loo  -1968.3 15.6            0.4")
-  expect_output(print(looapss_1), "p_loo         3.0  0.1            0.5")
-  expect_output(print(looapss_1), "\\(-Inf, 0.5\\]   \\(good\\)     95    95.0")
+  expect_output(print(looapss_1), "elpd_loo  -1968.2 15.6            0.4")
+  expect_output(print(looapss_1), "p_loo         2.9  0.1            0.5")
+  expect_output(print(looapss_1), "\\(-Inf, 0.5\\]   \\(good\\)     97    97.0")
   expect_output(print(looapss_1), "\\(0.5, 0.7\\]   \\(ok\\)        3     3.0")
 
   skip("Add loo_compare here")
+})
+
+
+context("loo_compare_subsample")
+
+test_that("loo_compare_subsample", {
+  skip_if_not_installed("checkmate")
+
+  set.seed(123)
+  N <- 1000
+  x1 <- rnorm(N)
+  x2 <- rnorm(N)
+  x3 <- rnorm(N)
+  sigma <- 2
+  y <- rnorm(N, 1 + 2*x1 - 2*x2 - 1*x3, sd = sigma)
+  X <- cbind("x0" = rep(1, N), x1, x2, x3)
+
+  # Generate samples from posterior
+  samples_blin <- function(X, y, sigma, draws = 1000){
+    XtX <- t(X)%*%X
+    b_hat <- solve(XtX) %*% (t(X) %*% y)
+    Lambda_n = XtX + diag(ncol(X))
+    mu_n <- solve(Lambda_n) %*% (XtX %*% b_hat + diag(ncol(X)) %*% rep(0,ncol(X)))
+    L <- t(chol(sigma^2 * solve(Lambda_n)))
+    draws_mat <- matrix(0, ncol=ncol(X), nrow = draws)
+    for(i in 1:draws){
+      z <- rnorm(length(mu_n))
+      draws_mat[i,] <- L %*% z + mu_n
+    }
+    draws_mat
+  }
+
+  fake_posterior1 <- samples_blin(X[,1:2], y, sigma, draws = 1000)
+  fake_posterior2 <- samples_blin(X[,1:3], y, sigma, draws = 1000)
+  fake_posterior3 <- samples_blin(X, y, sigma, draws = 1000)
+
+  fake_data1 <- data.frame(y, X[,1:2])
+  fake_data2 <- data.frame(y, X[,1:3])
+  fake_data3 <- data.frame(y, X)
+
+  llfun_test <- function(data_i, draws) {
+    dnorm(x = data_i$y, mean = draws %*% t(data_i[,-1, drop=FALSE]), sd = sigma, log = TRUE)
+  }
+
+  expect_silent(l1 <- loo(llfun_test, data = fake_data1, draws = fake_posterior1, r_eff = rep(1, N)))
+  expect_silent(l2 <- loo(llfun_test, data = fake_data2, draws = fake_posterior2, r_eff = rep(1, N)))
+  expect_silent(l3 <- loo(llfun_test, data = fake_data3, draws = fake_posterior3, r_eff = rep(1, N)))
+
+  expect_silent(lss1 <- loo_subsample(llfun_test, data = fake_data1, draws = fake_posterior1, observations = 100, r_eff = rep(1, N)))
+  expect_silent(lss2 <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = 100, r_eff = rep(1, N)))
+  expect_silent(lss3 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = 100, r_eff = rep(1, N)))
+  expect_silent(lss2o1 <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = lss1, r_eff = rep(1, N)))
+  expect_silent(lss3o1 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = lss1, r_eff = rep(1, N)))
+
+
 })
 
 
