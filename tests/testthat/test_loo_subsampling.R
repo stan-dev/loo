@@ -831,6 +831,7 @@ test_that("Test the vignette", {
     standata <- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
 
     # Fit model
+    set.seed(4711)
     fit_1 <- stan(model_code = stan_code, data = standata, seed = 4711)
     print(fit_1, pars = "beta")
 
@@ -839,14 +840,22 @@ test_that("Test the vignette", {
     loo_i(1, llfun_logistic, data = stan_df, draws = parameter_draws)
 
     sm <- stan_model(model_code = stan_code)
+    set.seed(4711)
     fit_laplace <- optimizing(sm, data = standata, draws = 2000, seed = 42)
     parameter_draws_laplace <- fit_laplace$theta_tilde
     log_p <- fit_laplace$log_p # The log density of the posterior
     log_g <- fit_laplace$log_g # The log density of the approximation
 
+    # For comparisons
+    standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
+    stan_df2 <- as.data.frame(standata)
+    set.seed(4711)
+    fit_2 <- stan(fit = fit_1, data = standata, seed = 4711)
+    parameter_draws_2 <- extract(fit_2)$beta
+
     save(llfun_logistic,
-         stan_df,
-         parameter_draws, parameter_draws_laplace,
+         stan_df, stan_df2,
+         parameter_draws, parameter_draws_laplace, parameter_draws_2,
          log_p, log_g,
          file = test_path("loo_subsample_vignette.rda"), compression_level = 9)
 
