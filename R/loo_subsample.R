@@ -386,15 +386,20 @@ update.psis_loo_ss <- function(object,
       object$pointwise <- update_m_i_in_pointwise(object$pointwise, cidxs$add, type = "add")
     } else {
       # Add new samples pointwise and diagnostic
-      object<- rbind.psis_loo_ss(object, plo)
+      object <- rbind.psis_loo_ss(object, plo)
 
       # Replace m_i current pointwise and diagnostics
       object$pointwise <- update_m_i_in_pointwise(object$pointwise, cidxs$add, type = "replace")
 
       # Remove samples
-      object <- remove_idx.psis_loo_ss(object, cidxs$remove)
+      object <- remove_idx.psis_loo_ss(object, idxs = cidxs$remove)
+      stopifnot(setequal(obs_idx(object), observations))
+
+      # Order object as in observations
+      object <- order.psis_loo_ss(object, observations)
     }
   }
+
 
   # Compute estimates
   if(object$loo_subsampling$estimator == "hh"){
@@ -873,7 +878,7 @@ as.psis_loo_ss.psis_loo <- function(x){
   x$loo_subsampling <- list(elpd_loo_approx=x$pointwise[, "elpd_loo"],
                            loo_approximation = "psis",
                            loo_approximation_draws = NULL,
-                           estimator = "srs",
+                           estimator = "diff_srs",
                            data_dim = c(nrow(x$pointwise), NA),
                            ndraws = NA,
                            nparameters = NA)
@@ -962,6 +967,22 @@ remove_idx.psis_loo_ss <- function(object, idxs){
   object$diagnostics$n_eff <- object$diagnostics$n_eff[-row_map$row_no]
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
+}
+
+
+order.psis_loo_ss <- function(x, observations){
+  checkmate::assert_class(x, "psis_loo_ss")
+  checkmate::assert_integer(observations, len = nobs(x))
+  if(identical(obs_idx(x), observations)) return(x) # Fallback
+  checkmate::assert_set_equal(obs_idx(x), observations)
+
+  row_map_x <- data.frame(row_no_x = 1:nrow(x$pointwise), idx = x$pointwise[, "idx"])
+  row_map_obs <- data.frame(row_no_obs = 1:length(observations), idx = observations)
+  row_map <- merge(row_map_obs, row_map_x, by = "idx", sort = FALSE)
+  x$pointwise <- x$pointwise[row_map$row_no_x,,drop = FALSE]
+  x$diagnostics$pareto_k <- x$diagnostics$pareto_k[row_map$row_no_x]
+  x$diagnostics$n_eff <- x$diagnostics$n_eff[row_map$row_no_x]
+  x
 }
 
 update_m_i_in_pointwise <- function(pointwise, idxs, type = "replace"){

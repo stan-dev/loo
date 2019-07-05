@@ -307,9 +307,21 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 
   expect_error(loo_ss_min <- update(object = loo_ss, draws = fake_posterior, data = fake_data, observations = 50, r_eff = rep(1, nrow(fake_data))))
 
+  expect_silent(true_loo_ss <- loo:::as.psis_loo_ss.psis_loo(true_loo))
+  expect_silent(loo_ss_subset0 <- update(true_loo_ss, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
+  expect_true(identical(obs_idx(loo_ss_subset0), obs_idx(loo_ss)))
   expect_silent(loo_ss_subset1 <- update(object = loo_ss, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
   expect_message(loo_ss_subset2 <- update(object = loo_ss, observations = obs_idx(loo_ss)[1:10], r_eff = rep(1, nrow(fake_data))))
   expect_equal(nobs(loo_ss_subset2), 10)
+
+
+  expect_silent(true_loo_ss <- loo:::as.psis_loo_ss.psis_loo(true_loo))
+  set.seed(4711)
+  expect_silent(loo_ss2 <- update(object = loo_ss, draws = fake_posterior, data = fake_data, observations = 600, r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss2_subset0 <- update(object = true_loo_ss, observations = loo_ss2, r_eff = rep(1, nrow(fake_data))))
+  expect_true(setequal(obs_idx(loo_ss2), obs_idx(loo_ss2_subset0)))
+  expect_true(identical(obs_idx(loo_ss2), obs_idx(loo_ss2_subset0)))
+  expect_true(identical(loo_ss2$diagnostic, loo_ss2_subset0$diagnostic))
 
   # Add tests for changing approx variable
   expect_silent(loo_ss_lpd <- update(object = loo_ss, draws = fake_posterior, data = fake_data, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))

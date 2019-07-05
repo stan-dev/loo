@@ -33,8 +33,6 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
   checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
 
-  # Fallback (if both are full psis_loo objects)
-
 
   ref_idx <- obs_idx(ref_loo[[1]])
   compare_idx <- obs_idx(compare_loo[[1]])
@@ -55,7 +53,7 @@ loo_compare_ss <- function(ref_loo, compare_loo){
 
   # Use subset
   if(compare_subset_of_ref | ref_subset_of_compare){
-    if(compare_subset_of_ref) ref_loo[[1]] <- update(ref_loo[[1]], observations = compare_loo[[1]])
+    if(compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
     if(ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
     message("Estimated elpd_diff using observations common to '", names(ref_loo),"' and '", names(compare_loo), "'.")
     return(loo_compare_ss_diff(ref_loo, compare_loo))
