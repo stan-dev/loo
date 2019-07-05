@@ -83,6 +83,11 @@ loo_compare.default <- function(x, ...) {
     loos <- x
   }
 
+  # If subsampling is used
+  if(any(sapply(loos, inherits, "psis_loo_ss"))) {
+    return(loo_compare.psis_loo_ss_list(loos))
+  }
+
   loo_compare_checks(loos)
 
   comp <- loo_compare_matrix(loos)

@@ -1007,6 +1007,13 @@ test_that("loo_compare_subsample", {
   expect_silent(lcss2m <- loo:::loo_compare.psis_loo_ss_list(x = list(lss2o1, lss3o1)))
   expect_equal(unname(lcss2m[,]), unname(lcsso[1:2,]))
 
+  expect_warning(lcssapi <- loo_compare(lss1, lss2, lss3))
+  expect_equal(lcssapi, lcss)
+  expect_warning(lcssohhapi <- loo_compare(lss1, lss2hh, lss3o1))
+  expect_equal(lcssohhapi, lcssohh)
+  expect_silent(lcss2mapi <- loo_compare(lss2o1, lss3o1))
+  expect_equal(lcss2mapi, lcss2m)
+
 })
 
 
