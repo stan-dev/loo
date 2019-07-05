@@ -286,7 +286,7 @@ update.psis_loo_ss <- function(object,
   # Update elpd approximations
   if(!is.null(loo_approximation) | !is.null(loo_approximation_draws)){
     stopifnot(is.data.frame(data) || is.matrix(data) & !is.null(draws))
-    if(object$loo_subsampling$estimator %in% "hh"){
+    if(object$loo_subsampling$estimator %in% "hh_pps"){
       # HH estimation uses elpd_loo approx to sample,
       # so updating it will lead to incorrect results
       stop("Can not update loo_approximation when using PPS sampling.", call. = FALSE)
@@ -330,7 +330,7 @@ update.psis_loo_ss <- function(object,
       current_obs <- nobs(object)
 
       # If sampling with replacement
-      if(object$loo_subsampling$estimator %in% c("hh")){
+      if(object$loo_subsampling$estimator %in% c("hh_pps")){
         idxs <- subsample_idxs(estimator = object$loo_subsampling$estimator,
                                elpd_loo_approximation = object$loo_subsampling$elpd_loo_approx,
                                observations = observations - current_obs)
@@ -404,7 +404,7 @@ update.psis_loo_ss <- function(object,
 
 
   # Compute estimates
-  if(object$loo_subsampling$estimator == "hh"){
+  if(object$loo_subsampling$estimator == "hh_pps"){
     object <- loo_subsample_estimation_hh(object)
   } else if(object$loo_subsampling$estimator == "diff_srs"){
     object <- loo_subsample_estimation_diff_srs(object)
@@ -468,14 +468,12 @@ loo_approximation_choices <- function(api = TRUE) {
   lac
 }
 
-# TODO: Change hh to hh_pps
-
 #' The estimators implemented
 #'
 #' @noRd
 #' @return a character vector of allowed choices
 estimator_choices <- function() {
-  c("hh", "diff_srs", "srs")
+  c("hh_pps", "diff_srs", "srs")
 }
 
 
@@ -687,7 +685,7 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   checkmate::assert_numeric(elpd_loo_approximation)
   checkmate::assert_int(observations)
 
-  if(estimator == "hh"){
+  if(estimator == "hh_pps"){
     pi_values <- pps_elpd_loo_approximation_to_pis(elpd_loo_approximation)
     idxs_df <- pps_sample(observations, pis = pi_values)
   }
@@ -777,6 +775,7 @@ compare_idxs  <- function(idxs, object){
 
 
 #' Draw a PPS sample with replacement and return a idx_df
+#' @noRd
 #' @details
 #' We are sampling with replacement, hence we only want to compute elpd
 #' for each observation once.
@@ -849,7 +848,7 @@ psis_loo_ss_object <- function(x,
   x$loo_subsampling$nparameters <- nparameters
 
   # Compute estimates
-  if(estimator == "hh"){
+  if(estimator == "hh_pps"){
     x <- loo_subsample_estimation_hh(x)
   } else if(estimator == "diff_srs"){
     x <- loo_subsample_estimation_diff_srs(x)
@@ -1232,7 +1231,7 @@ assert_observations <- function(x, N, estimator){
   x <- as.integer(x)
   if(length(x) > 1) {
     checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
-    if(estimator %in% "hh") {
+    if(estimator %in% "hh_pps") {
       message("Sampling proportional to elpd approximation and with replacement assumed.")
     }
     if(estimator %in% c("diff_srs", "srs")) {

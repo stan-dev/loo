@@ -1,4 +1,9 @@
-
+#' Compare \code{psis_loo_ss} objects
+#' @noRd
+#' @param x a list with \code{psis_loo} objects
+#' @param ... currently ignored.
+#' @return a compare.loo_ss object
+#' @author Mans Magnusson
 loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
@@ -25,8 +30,11 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
   return(comp)
 }
 
-
-
+#' Compare a reference loo object with a comaprison loo object
+#' @noRd
+#' @param ref_loo a named list with a \code{psis_loo_ss} object
+#' @param compare_loo a named list with a  \code{psis_loo_ss} object
+#' @return a 1 by 3 elpd_diff estimation
 loo_compare_ss <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
@@ -41,7 +49,7 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   compare_subset_of_ref <- base::setequal(intersect_idx, compare_idx)
 
   # Using HH estimation
-  if(ref_loo[[1]]$loo_subsampling$estimator == "hh" | compare_loo[[1]]$loo_subsampling$estimator == "hh"){
+  if(ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
     warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
@@ -66,6 +74,10 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   }
 }
 
+#' Compute a naive diff SE
+#' @noRd
+#' @inheritParams loo_compare_ss
+#' @return a 1 by 3 elpd_diff estimation
 loo_compare_ss_naive <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
@@ -83,6 +95,10 @@ loo_compare_ss_naive <- function(ref_loo, compare_loo){
   c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
 }
 
+#' Compare a effective diff SE
+#' @noRd
+#' @inheritParams loo_compare_ss
+#' @return a 1 by 3 elpd_diff estimation
 loo_compare_ss_diff <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
@@ -106,7 +122,13 @@ loo_compare_ss_diff <- function(ref_loo, compare_loo){
 }
 
 
-
+#' Check list of \code{psis_loo} objects
+#' @details Similar to loo_compare_checks but checks dim size rather than
+#' pointwise dim since different pointwise sizes of \code{psis_loo_ss} will work.
+#' Can probably be removed by refactoring \code{loo_compare_checks()}
+#' @noRd
+#' @inheritParams loo_compare_ss
+#' @return a 1 by 3 elpd_diff estimation
 loo_compare_checks.psis_loo_ss_list <- function(loos) {
   ## errors
   if (length(loos) <= 1L) {
@@ -149,11 +171,7 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 
 #' @rdname loo_compare
 #' @export
-#' @param digits For the print method only, the number of digits to use when
-#'   printing.
-#' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed? The entire matrix is always returned, but
-#'   by default only the most important columns are printed.
+#' @inheritParams print.compare.loo
 print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
@@ -168,11 +186,12 @@ print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
   invisible(x)
 }
 
-# Remove below
 
-
+#' Compute comparison matrix for \code{psis_loo_ss} objects
+#' @noRd
 #' @keywords internal
-#' @param loos List of `"loo"` objects.
+#' @param loos List of \code{psis_loo_ss} objects.
+#' @return a \code{compare.loo_ss} matrix
 loo_compare_matrix.psis_loo_ss_list <- function(loos){
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
@@ -190,45 +209,4 @@ loo_compare_matrix.psis_loo_ss_list <- function(loos){
                     use.names = FALSE)
   comp <- comp[, col_ord]
   comp
-}
-
-
-loo_row_is_subset_of_loo_col.psis_loo_ss_list <- function(x){
-  mn <- find_model_names(x)
-  subset_matrix <- matrix(as.logical(NA),
-                          nrow = length(mn), ncol = length(mn),
-                          dimnames = list(mn,mn))
-  oi <- lapply(x, obs_idx) # obs_idx list
-  no <- lapply(x, nobs)
-  is_psis_loo <- lapply(x, FUN = function(x) !inherits(try(as.psis_loo(x), silent = TRUE), "try-error"))
-
-  for(row in seq_along(mn)){
-    for(col in seq_along(mn)){
-      if(no[[row]] > no[[col]]){
-        subset_matrix[row, col] <- FALSE
-      } else if(is_psis_loo[[col]]){
-        subset_matrix[row, col] <- TRUE
-      } else if(is_psis_loo[[row]] & is_psis_loo[[col]]){
-        subset_matrix[row, col] <- FALSE
-      } else {
-        subset_matrix[row, col] <- base::setequal(base::intersect(oi[[row]], oi[[col]]), oi[[row]])
-      }
-    }
-  }
-  subset_matrix
-}
-
-loo_same_estimator.psis_loo_ss_list <- function(x){
-  mn <- find_model_names(x)
-  same_mat <- matrix(as.logical(NA),
-                     nrow = length(mn), ncol = length(mn),
-                     dimnames = list(mn,mn))
-  for(row in seq_along(mn)){
-    for(col in seq_along(mn)){
-      if(col < row) next
-      same_estim <- x[[row]]$loo_subsampling$estimator == x[[col]]$loo_subsampling$estimator
-      same_mat[row, col] <- same_mat[col, row] <- same_estim
-    }
-  }
-  same_mat
 }

@@ -20,6 +20,7 @@
 #' @template loo-and-psis-references
 #'
 #' @keywords internal
+#' @noRd
 #'
 psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL, cores, save_psis, ..., log_q = NULL){
   if (!requireNamespace("checkmate", quietly=TRUE)) {
@@ -64,6 +65,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
 #'
 #' @param log_ratios The log-likelihood ratios (ie -ll) to correct
 #' @inheritParams psis_approximate_posterior
+#' @noRd
 #' @keywords internal
 correct_log_ratios <- function(log_ratios, log_p, log_g){
   approx_correction <- log_p - log_g

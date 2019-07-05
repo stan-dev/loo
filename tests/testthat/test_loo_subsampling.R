@@ -202,9 +202,9 @@ test_that("Test the Hansen-Hurwitz estimator", {
 
   expect_silent(true_loo <- loo(llfun_test, draws = fake_posterior, data = fake_data, r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(true_loo, "psis_loo")
-  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 300, loo_approximation = "plpd", estimator = "hh", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 300, loo_approximation = "plpd", estimator = "hh_pps", r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(loo_ss, "psis_loo_ss")
-  expect_silent(loo_ss_max <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1100, loo_approximation = "plpd", estimator = "hh", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_max <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1100, loo_approximation = "plpd", estimator = "hh_pps", r_eff = rep(1, nrow(fake_data))))
   expect_s3_class(loo_ss_max, "psis_loo_ss")
   expect_silent(loo_ss_max2 <- update(loo_ss, draws = fake_posterior, data = fake_data, observations = 1100, r_eff = rep(1, nrow(fake_data))))
   expect_equal(nobs(loo_ss_max2), 1100)
@@ -914,7 +914,7 @@ test_that("Test the vignette", {
   expect_s3_class(looss_1b, c("psis_loo_ss", "psis_loo", "loo"))
 
   set.seed(4711)
-  expect_warning(looss_2 <- loo_subsample(llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, obs = 100, estimator = "hh", loo_approximation = "lpd", loo_approximation_draws = 100))
+  expect_warning(looss_2 <- loo_subsample(llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, obs = 100, estimator = "hh_pps", loo_approximation = "lpd", loo_approximation_draws = 100))
   expect_output(print(looss_2), "Computed from 4000 by 100 subsampled log-likelihood")
   expect_output(print(looss_2), "values from 3020 total observations.")
   expect_output(print(looss_2), "elpd_loo  -1968.9 15.4            0.5")
@@ -1025,7 +1025,7 @@ test_that("loo_compare_subsample", {
   expect_silent(lss3 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = 100, r_eff = rep(1, N)))
   expect_silent(lss2o1 <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = lss1, r_eff = rep(1, N)))
   expect_silent(lss3o1 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = lss1, r_eff = rep(1, N)))
-  expect_silent(lss2hh <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = 100, estimator = "hh", r_eff = rep(1, N)))
+  expect_silent(lss2hh <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = 100, estimator = "hh_pps", r_eff = rep(1, N)))
 
   expect_warning(lcss <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3)))
   expect_warning(lcss2 <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3o1)))

@@ -226,7 +226,9 @@ find_model_names <- function(x) {
 }
 
 
+#' Compute the loo_compare matrix
 #' @keywords internal
+#' @noRd
 #' @param loos List of `"loo"` objects.
 loo_compare_matrix <- function(loos){
   tmp <- sapply(loos, function(x) {
@@ -246,6 +248,7 @@ loo_compare_matrix <- function(loos){
 }
 
 #' Computes the order of loos for comparison
+#' @noRd
 #' @keywords internal
 #' @param loos List of `"loo"` objects.
 loo_compare_order <- function(loos){

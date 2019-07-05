@@ -149,6 +149,9 @@ loo_approximate_posterior.function <-
     ap_psis
   }
 
+# Function that is passed to the FUN argument of lapply, mclapply, or parLapply
+# for the loo_approximate_posterior.function method. The arguments and return
+# value are the same as the ones documented for the user-facing loo_i function.
 .loo_ap_i <-
   function(i,
            llfun,
