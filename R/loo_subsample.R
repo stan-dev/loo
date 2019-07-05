@@ -254,6 +254,8 @@ loo_subsample.function <-
 #' If an integer is supplied, new observations will be sampled to
 #' reach the supplied sample size.
 #'
+#' @return a \code{psis_loo_ss} object
+#'
 #' @export
 update.psis_loo_ss <- function(object,
                                data = NULL,
@@ -427,7 +429,7 @@ update.psis_loo_ss <- function(object,
 #' If \code{rep = FALSE} only the unique indecies are returned.
 #'
 #' @param x a \code{psis_loo_ss} object.
-#' @param rep should multiple samples of same observation be returned?
+#' @param rep should multiple samples of same observations be returned?
 #'
 #' @return an integer lector of length \code{nobs}.
 #'
@@ -442,6 +444,7 @@ obs_idx <- function(x, rep = TRUE){
   idxs
 }
 
+#' The number of observations in a \code{psis_loo_ss} object.
 #' @export
 nobs.psis_loo_ss <- function(x){
   as.integer(sum(x$pointwise[,"m_i"]))
@@ -449,13 +452,28 @@ nobs.psis_loo_ss <- function(x){
 
 # internal ----------------------------------------------------------------
 
-#' @param api the choices available in the loo API
+#' The possible choices of loo_approximations implemented
+#'
+#' @details
+#' The choice \code{psis} is returned if a \code{psis_loo} object
+#' is converted to a \code{psis_loo_ss} object with \code{as.psis_loo_ss()}.
+#' But \code{psis} cannot be chosen in the api of \code{loo_subsample()}.
+#'
+#' @noRd
+#' @param api the choices available in the loo API or all possible choices.
+#' @return a character vector of allowed choices
 loo_approximation_choices <- function(api = TRUE) {
   lac <- c("plpd", "lpd", "waic", "waic_grad_marginal", "waic_grad", "waic_hess", "none")
   if(!api) lac <- c(lac, "psis")
   lac
 }
 
+# TODO: Change hh to hh_pps
+
+#' The estimators implemented
+#'
+#' @noRd
+#' @return a character vector of allowed choices
 estimator_choices <- function() {
   c("hh", "diff_srs", "srs")
 }
@@ -467,11 +485,10 @@ estimator_choices <- function() {
 #'
 #' @details
 #' See \code{\link{loo_subsample.function()}} and \code{loo_approximation} argument.
-#'
+#' @noRd
 #' @inheritParams loo_subsample.function
 #'
 #' @return a vector with approximations of elpd_{loo,i}s
-#'
 elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation, loo_approximation_draws = NULL, .llgrad = NULL, .llhess = NULL){
   checkmate::assert_function(.llfun, args = c("data_i", "draws"), ordered = TRUE)
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -580,8 +597,10 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 }
 
 
-#' Compute \eqn{E(\theta)} as point estimate.
-#' @rdname thin_draws
+#' Compute a point estimate from a draws object
+#' @noRd
+#' @param draws a draws object with draws from the posterior.
+#' @return a 1 by P matrix with poin estimates from a draws object
 compute_point_estimate <- function(draws){
   UseMethod("compute_point_estimate")
 }
@@ -594,9 +613,11 @@ compute_point_estimate.default <- function(draws){
   stop("compute_point_estimate() has not been implemented for objects of class '", class(x), "'")
 }
 
-#' Thin draws for a matrix with draws and for rstanarm stan_reg objects.
-#' @param draws a draws object with draws from the posterior.
+#' Thin a draws object
+#' @noRd
+#' @param draws a draws object with posterior draws.
 #' @param loo_approximation_draws the number of posterior draws to return (ie after thinning)
+#' @return a thinned draws object
 thin_draws <- function(draws, loo_approximation_draws){
   UseMethod("thin_draws")
 }
@@ -619,7 +640,10 @@ thin_draws.default <- function(draws, loo_approximation_draws){
 }
 
 
-#' Returns the number of posterior draws from a draws object.
+#' The number of posterior draws in a draws object.
+#' @noRd
+#' @param x a draws object with posterior draws.
+#' @return an integer with the number of draws.
 ndraws <- function(x){
   UseMethod("ndraws")
 }
@@ -632,6 +656,10 @@ ndraws.default <- function(x){
   stop("ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
+#' The number of posterior parameters in a draws object.
+#' @noRd
+#' @param x a draws object with posterior draws.
+#' @return an integer with the number of parameters in the draws object.
 nparameters <- function(x){
   UseMethod("nparameters")
 }
@@ -647,16 +675,20 @@ nparameters.default <- function(x){
 
 ## Subsampling -----
 
-#' Subsampling strategy used
+#' Subsampling strategy
 #'
-#' @param estimator The estimator to use (\code{hh},\code{srs_diff})
-#'
+#' @noRd
+#' @param estimator The estimator to use, see \code{estimator_choices()}.
+#' @param elpd_loo_approximation a vector of loo approximations, see \code{elpd_loo_approximation()}.
+#' @param observations the total number of subsample observations to sample.
+#' @return an \code{subsample_idxs} \code{data.frame}.
 subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   checkmate::assert_choice(estimator, choices = estimator_choices())
   checkmate::assert_numeric(elpd_loo_approximation)
+  checkmate::assert_int(observations)
 
   if(estimator == "hh"){
-    pi_values <- hh_elpd_loo_approximation_to_pis(elpd_loo_approximation)
+    pi_values <- pps_elpd_loo_approximation_to_pis(elpd_loo_approximation)
     idxs_df <- pps_sample(observations, pis = pi_values)
   }
 
@@ -673,8 +705,12 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
   idxs_df
 }
 
-#' Compute pis from approximation for use in HH estimation
-hh_elpd_loo_approximation_to_pis <- function(elpd_loo_approximation){
+#' Compute pis from approximation for use in pps sampling.
+#' @noRd
+#' @details pis are the sampling probabilities and sum to 1
+#' @inheritParams subsample_idxs
+#' @return a vector of pis
+pps_elpd_loo_approximation_to_pis <- function(elpd_loo_approximation){
   checkmate::assert_numeric(elpd_loo_approximation)
   pi_values <- abs(elpd_loo_approximation)
   pi_values <- pi_values/sum(pi_values) # \tilde{\pi}
@@ -683,6 +719,9 @@ hh_elpd_loo_approximation_to_pis <- function(elpd_loo_approximation){
 
 
 #' Compute subsampling indecies from an observation vector
+#' @noRd
+#' @param observation a vector of indecies
+#' @return a \code{subsample_idxs} \code{data.frame}.
 compute_idxs <- function(observations){
   checkmate::assert_integer(observations, lower = 1, min.len = 2, any.missing = FALSE)
   tab <- table(observations)
@@ -692,6 +731,19 @@ compute_idxs <- function(observations){
 }
 
 
+#' Compare the indecies to prepare handling
+#'
+#' @details
+#' The function compares the object and sampled indecies
+#' into \code{new} (observations) not in \code{object},
+#' \code{add} (observations) in \code{object}, and
+#' \code{remove} (observations) in \code{object} but not in
+#' idxs.
+#' @noRd
+#' @param idxs a \code{subsample_idxs} \code{data.frame}
+#' @param object a \code{psis_loo_ss} object
+#' @return a list of three \code{subsample_idxs} \code{data.frame}s.
+#' Elements without any observations, returns \code{NULL}.
 compare_idxs  <- function(idxs, object){
   assert_subsample_idxs(idxs)
   current_idx <- compute_idxs(obs_idx(object))
@@ -722,64 +774,6 @@ compare_idxs  <- function(idxs, object){
 
   result
 }
-
-assert_observations <- function(x, N, estimator){
-  checkmate::assert_int(N)
-  checkmate::assert_choice(estimator, choices = estimator_choices())
-  if(is.null(x)) return(x)
-  if (checkmate::test_class(x, "psis_loo_ss")) {
-    x <- obs_idx(x)
-    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
-    return(x)
-  }
-  x <- as.integer(x)
-  if(length(x) > 1) {
-    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
-    if(estimator %in% "hh") {
-      message("Sampling proportional to elpd approximation and with replacement assumed.")
-    }
-    if(estimator %in% c("diff_srs", "srs")) {
-      message("Simple random sampling with replacement assumed.")
-    }
-  } else {
-    checkmate::assert_integer(x, lower = 1, any.missing = FALSE)
-  }
-  x
-}
-
-assert_subsample_idxs <- function(x){
-  checkmate::assert_data_frame(x,
-                               types = c("integer", "integer"),
-                               any.missing = FALSE,
-                               min.rows = 1,
-                               col.names = "named")
-  checkmate::assert_names(names(x), identical.to = c("idx", "m_i"))
-  checkmate::assert_integer(x$idx, lower = 1, any.missing = FALSE, unique = TRUE)
-  checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
-}
-
-
-assert_psis_loo_ss <- function(x){
-  checkmate::assert_class(x, "psis_loo_ss")
-  checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "loo_subsampling"))
-  checkmate::assert_names(rownames(x$estimates), must.include = c("elpd_loo", "p_loo", "looic"))
-  checkmate::assert_names(colnames(x$estimates), must.include = c("Estimate", "SE", "subsampling SE"))
-  assert_subsampling_pointwise(x$pointwise)
-  checkmate::assert_names(names(x$loo_subsampling),
-                          must.include = c("elpd_loo_approx",
-                                           "loo_approximation", "loo_approximation_draws",
-                                           "estimator",
-                                           "data_dim", "ndraws", "nparameters"))
-  checkmate::assert_numeric(x$loo_subsampling$elpd_loo_approx, any.missing = FALSE, len = x$loo_subsampling$data_dim[1])
-  checkmate::assert_choice(x$loo_subsampling$loo_approximation, choices = loo_approximation_choices(api = FALSE))
-  checkmate::assert_int(x$loo_subsampling$loo_approximation_draws, null.ok = TRUE)
-  checkmate::assert_choice(x$loo_subsampling$estimator, choices = estimator_choices())
-  checkmate::assert_integer(x$loo_subsampling$data_dim, any.missing = TRUE, len = 2)
-  checkmate::assert_int(x$loo_subsampling$data_dim[1], na.ok = FALSE)
-  checkmate::assert_integer(x$loo_subsampling$ndraws, len = 1, any.missing = TRUE)
-  checkmate::assert_integer(x$loo_subsampling$nparameters, len = 1, any.missing = TRUE)
-}
-
 
 
 #' Draw a sample and return a idx_df
@@ -1000,12 +994,6 @@ update_m_i_in_pointwise <- function(pointwise, idxs, type = "replace"){
   pointwise
 }
 
-assert_subsampling_pointwise <- function(pointwise){
-  checkmate::assert_matrix(pointwise,
-                           any.missing = FALSE,
-                           ncols = 7)
-  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "idx", "m_i", "elpd_loo_approx"))
-}
 
 
 ## Estimation ---
@@ -1015,7 +1003,7 @@ assert_subsampling_pointwise <- function(pointwise){
 loo_subsample_estimation_hh <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
   N <- length(x$loo_subsampling$elpd_loo_approx)
-  pis <- hh_elpd_loo_approximation_to_pis(x$loo_subsampling$elpd_loo_approx)
+  pis <- pps_elpd_loo_approximation_to_pis(x$loo_subsampling$elpd_loo_approx)
   pis_sample <- pis[x$pointwise[,"idx"]]
 
   hh_elpd_loo <- whhest(z = pis_sample, m_i = x$pointwise[, "m_i"], y = x$pointwise[, "elpd_loo"], N)
@@ -1167,6 +1155,72 @@ srs_est <- function(y, y_approx){
 }
 
 
+
+# Specialized assertions ---
+
+assert_observations <- function(x, N, estimator){
+  checkmate::assert_int(N)
+  checkmate::assert_choice(estimator, choices = estimator_choices())
+  if(is.null(x)) return(x)
+  if (checkmate::test_class(x, "psis_loo_ss")) {
+    x <- obs_idx(x)
+    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
+    return(x)
+  }
+  x <- as.integer(x)
+  if(length(x) > 1) {
+    checkmate::assert_integer(x, lower = 1, upper = N, any.missing = FALSE)
+    if(estimator %in% "hh") {
+      message("Sampling proportional to elpd approximation and with replacement assumed.")
+    }
+    if(estimator %in% c("diff_srs", "srs")) {
+      message("Simple random sampling with replacement assumed.")
+    }
+  } else {
+    checkmate::assert_integer(x, lower = 1, any.missing = FALSE)
+  }
+  x
+}
+
+assert_subsample_idxs <- function(x){
+  checkmate::assert_data_frame(x,
+                               types = c("integer", "integer"),
+                               any.missing = FALSE,
+                               min.rows = 1,
+                               col.names = "named")
+  checkmate::assert_names(names(x), identical.to = c("idx", "m_i"))
+  checkmate::assert_integer(x$idx, lower = 1, any.missing = FALSE, unique = TRUE)
+  checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
+}
+
+
+assert_psis_loo_ss <- function(x){
+  checkmate::assert_class(x, "psis_loo_ss")
+  checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "loo_subsampling"))
+  checkmate::assert_names(rownames(x$estimates), must.include = c("elpd_loo", "p_loo", "looic"))
+  checkmate::assert_names(colnames(x$estimates), must.include = c("Estimate", "SE", "subsampling SE"))
+  assert_subsampling_pointwise(x$pointwise)
+  checkmate::assert_names(names(x$loo_subsampling),
+                          must.include = c("elpd_loo_approx",
+                                           "loo_approximation", "loo_approximation_draws",
+                                           "estimator",
+                                           "data_dim", "ndraws", "nparameters"))
+  checkmate::assert_numeric(x$loo_subsampling$elpd_loo_approx, any.missing = FALSE, len = x$loo_subsampling$data_dim[1])
+  checkmate::assert_choice(x$loo_subsampling$loo_approximation, choices = loo_approximation_choices(api = FALSE))
+  checkmate::assert_int(x$loo_subsampling$loo_approximation_draws, null.ok = TRUE)
+  checkmate::assert_choice(x$loo_subsampling$estimator, choices = estimator_choices())
+  checkmate::assert_integer(x$loo_subsampling$data_dim, any.missing = TRUE, len = 2)
+  checkmate::assert_int(x$loo_subsampling$data_dim[1], na.ok = FALSE)
+  checkmate::assert_integer(x$loo_subsampling$ndraws, len = 1, any.missing = TRUE)
+  checkmate::assert_integer(x$loo_subsampling$nparameters, len = 1, any.missing = TRUE)
+}
+
+assert_subsampling_pointwise <- function(pointwise){
+  checkmate::assert_matrix(pointwise,
+                           any.missing = FALSE,
+                           ncols = 7)
+  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "idx", "m_i", "elpd_loo_approx"))
+}
 
 
 
