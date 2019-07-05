@@ -940,7 +940,38 @@ test_that("Test the vignette", {
   expect_output(print(looapss_1), "\\(-Inf, 0.5\\]   \\(good\\)     97    97.0")
   expect_output(print(looapss_1), "\\(0.5, 0.7\\]   \\(ok\\)        3     3.0")
 
-  skip("Add loo_compare here")
+  # Loo compare
+  set.seed(4711)
+  expect_warning(looss_1 <- loo_subsample(llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100))
+  set.seed(4712)
+  expect_warning(looss_2 <- loo_subsample(x = llfun_logistic, draws = parameter_draws_2, data = stan_df2, observations = 100))
+  expect_output(print(looss_2), "Computed from 4000 by 100 subsampled log-likelihood")
+  expect_output(print(looss_2), "values from 3020 total observations.")
+  expect_output(print(looss_2), "elpd_loo  -1952.0 16.2            0.2")
+  expect_output(print(looss_2), "p_loo         2.6  0.1            0.3")
+
+  expect_warning(comp <- loo_compare(looss_1, looss_2), "Different subsamples in 'model2' and 'model1'. Naive diff SE is used.")
+  expect_output(print(comp), "model1 16.5      22.5     0.4")
+
+  set.seed(4712)
+  expect_warning(looss_2_m <- loo_subsample(x = llfun_logistic, draws = parameter_draws_2, data = stan_df2, observations = looss_1))
+  expect_message(looss_2_m <- suppressWarnings(loo_subsample(x = llfun_logistic, draws = parameter_draws_2, data = stan_df2, observations = obs_idx(looss_1))),
+                 "Simple random sampling with replacement assumed.")
+
+  expect_silent(comp <- loo_compare(looss_1, looss_2_m))
+  expect_output(print(comp), "model1 16.1       4.4     0.1")
+
+  set.seed(4712)
+  expect_warning(looss_1 <- update(looss_1, draws = parameter_draws, data = stan_df, observations = 200))
+  expect_warning(looss_2_m <- update(looss_2_m, draws = parameter_draws_2, data = stan_df2, observations = looss_1))
+  expect_silent(comp2 <- loo_compare(looss_1, looss_2_m))
+  expect_output(print(comp2), "model1 16.3       4.4     0.1")
+
+  expect_warning(looss_2_full <- loo(x = llfun_logistic, draws = parameter_draws_2, data = stan_df2))
+  expect_message(comp3 <- loo_compare(x = list(looss_1, looss_2_full)),
+                 "Estimated elpd_diff using observations common to 'model2' and 'model1'.")
+  expect_output(print(comp3), "model1 16.5       4.4     0.3")
+
 })
 
 
