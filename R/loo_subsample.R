@@ -256,8 +256,8 @@ loo_subsample.function <-
 #'
 #' @export
 update.psis_loo_ss <- function(object,
-                               data,
-                               draws,
+                               data = NULL,
+                               draws = NULL,
                                observations = NULL,
                                r_eff = NULL,
                                cores = getOption("mc.cores", 1),
@@ -272,13 +272,18 @@ update.psis_loo_ss <- function(object,
      is.null(llgrad) &
      is.null(llhess)) return(object)
 
-  stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-  checkmate::assert_true(all(dim(data) == object$loo_subsampling$data_dim))
-  checkmate::assert_true(nparameters(draws) == object$loo_subsampling$nparameters)
+  if(!is.null(data)){
+    stopifnot(is.data.frame(data) || is.matrix(data))
+    checkmate::assert_true(all(dim(data) == object$loo_subsampling$data_dim))
+  }
+  if(!is.null(draws)){
+    checkmate::assert_true(nparameters(draws) == object$loo_subsampling$nparameters)
+  }
   cores <- loo_cores(cores)
 
   # Update elpd approximations
   if(!is.null(loo_approximation) | !is.null(loo_approximation_draws)){
+    stopifnot(is.data.frame(data) || is.matrix(data) & !is.null(draws))
     if(object$loo_subsampling$estimator %in% "hh"){
       # HH estimation uses elpd_loo approx to sample,
       # so updating it will lead to incorrect results
@@ -309,10 +314,11 @@ update.psis_loo_ss <- function(object,
   # Update observations
   if(!is.null(observations)){
     observations <- assert_observations(observations,
-                                        N = dim(data)[1],
+                                        N = object$loo_subsampling$data_dim[1],
                                         object$loo_subsampling$estimator)
     if(length(observations) == 1) {
       checkmate::assert_int(observations, lower = nobs(object) + 1)
+      stopifnot(is.data.frame(data) || is.matrix(data) & !is.null(draws))
     }
 
     # Compute subsample indecies
@@ -343,6 +349,7 @@ update.psis_loo_ss <- function(object,
 
     # Compute new observations
     if(!is.null(cidxs$new)){
+      stopifnot(is.data.frame(data) || is.matrix(data) & !is.null(draws))
       data_new_subsample <- data[cidxs$new$idx,, drop = FALSE]
       if(length(r_eff) > 1) r_eff <- r_eff[cidxs$new$idx]
 
@@ -370,7 +377,7 @@ update.psis_loo_ss <- function(object,
     } else {
       plo <- NULL
     }
-    # Update object (diagnostics and pointwise)
+
     if(length(observations) == 1){
       # Add new samples pointwise and diagnostic
       object <- rbind.psis_loo_ss(object, x = plo)
@@ -894,6 +901,7 @@ as.psis_loo.psis_loo_ss <- function(x){
     if(inherits(x, "psis_loo_ap")){
       plo$approximate_posterior <- list(log_p = x$approximate_posterior$log_p,
                                         log_g = x$approximate_posterior$log_g)
+      class(plo) <- c("psis_loo_ap", class(plo))
       assert_psis_loo_ap(plo)
     }
   } else {

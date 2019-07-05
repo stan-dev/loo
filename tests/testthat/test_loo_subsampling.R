@@ -79,6 +79,15 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
   expect_failure(expect_equal(true_loo$estimates["p_loo", "Estimate"], loo_ss_lpd10$estimates["p_loo", "Estimate"], tol = 0.00000001))
   expect_failure(expect_equal(true_loo$estimates["looic", "Estimate"], loo_ss_lpd10$estimates["looic", "Estimate"], tol = 0.00000001))
 
+  # Test conversion of objects
+  expect_silent(true_loo_2 <- loo:::as.psis_loo.psis_loo(true_loo))
+  expect_silent(true_loo_ss <- loo:::as.psis_loo_ss.psis_loo(true_loo))
+  expect_s3_class(true_loo_ss, "psis_loo_ss")
+  expect_silent(true_loo_conv <- loo:::as.psis_loo.psis_loo_ss(true_loo_ss))
+  expect_failure(expect_s3_class(true_loo_conv, "psis_loo_ss"))
+  expect_equal(true_loo_conv, true_loo)
+  expect_error(loo:::as.psis_loo.psis_loo_ss(loo_ss))
+
 })
 
 test_that("loo with subsampling of all observations works as ordinary loo.", {
@@ -298,6 +307,9 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 
   expect_error(loo_ss_min <- update(object = loo_ss, draws = fake_posterior, data = fake_data, observations = 50, r_eff = rep(1, nrow(fake_data))))
 
+  expect_silent(loo_ss_subset1 <- update(object = loo_ss, observations = loo_ss, r_eff = rep(1, nrow(fake_data))))
+  expect_message(loo_ss_subset2 <- update(object = loo_ss, observations = obs_idx(loo_ss)[1:10], r_eff = rep(1, nrow(fake_data))))
+  expect_equal(nobs(loo_ss_subset2), 10)
 
   # Add tests for changing approx variable
   expect_silent(loo_ss_lpd <- update(object = loo_ss, draws = fake_posterior, data = fake_data, loo_approximation = "lpd", r_eff = rep(1, nrow(fake_data))))
@@ -759,6 +771,16 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   expect_output(print(loo_ap_ss_full), "Posterior approximation correction used\\.")
   expect_failure(expect_output(print(loo_ap_ss_full), "subsampled log-likelihood\nvalues"))
 
+  # Test conversion of objects
+  expect_silent(loo_ap_full <- loo:::as.psis_loo.psis_loo(loo_ap_ss_full))
+  expect_s3_class(loo_ap_full, "psis_loo_ap")
+  expect_silent(loo_ap_full_ss <- loo:::as.psis_loo_ss.psis_loo(loo_ap_full))
+  expect_s3_class(loo_ap_full_ss, "psis_loo_ss")
+  expect_s3_class(loo_ap_full_ss, "psis_loo_ap")
+  expect_silent(loo_ap_full2 <- loo::: as.psis_loo.psis_loo_ss(loo_ap_full_ss))
+  expect_s3_class(loo_ap_full2, "psis_loo_ap")
+  expect_failure(expect_s3_class(loo_ap_full2, "psis_loo_ss"))
+  expect_equal(loo_ap_full2,loo_ap_full)
 
   # Test update
   set.seed(4712)
@@ -960,8 +982,30 @@ test_that("loo_compare_subsample", {
   expect_silent(lss3 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = 100, r_eff = rep(1, N)))
   expect_silent(lss2o1 <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = lss1, r_eff = rep(1, N)))
   expect_silent(lss3o1 <- loo_subsample(llfun_test, data = fake_data3, draws = fake_posterior3, observations = lss1, r_eff = rep(1, N)))
+  expect_silent(lss2hh <- loo_subsample(llfun_test, data = fake_data2, draws = fake_posterior2, observations = 100, estimator = "hh", r_eff = rep(1, N)))
 
-  # loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3))
+  expect_warning(lcss <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3)))
+  expect_warning(lcss2 <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3o1)))
+  expect_silent(lcsso <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2o1, lss3o1)))
+  expect_warning(lcssohh <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2hh, lss3o1)))
+  expect_message(lcssf1 <- loo:::loo_compare.psis_loo_ss_list(x = list(loo:::as.psis_loo_ss.psis_loo(l1), lss2o1, lss3o1)))
+  expect_message(lcssf2 <- loo:::loo_compare.psis_loo_ss_list(x = list(loo:::as.psis_loo_ss.psis_loo(l1), lss2o1, loo:::as.psis_loo_ss.psis_loo(l3))))
+
+  expect_equal(round(lcss[,1]), round(lcsso[,1]))
+  expect_equal(round(lcss2[,1]), round(lcsso[,1]))
+  expect_equal(round(lcssohh[,1]), round(lcsso[,1]))
+  expect_equal(round(lcssf1[,1]), round(lcsso[,1]))
+  expect_equal(round(lcssf2[,1]), round(lcsso[,1]))
+
+  expect_gt(lcss[,2][2], lcsso[,2][2])
+  expect_gt(lcss[,2][3], lcsso[,2][3])
+  expect_gt(lcss2[,2][2], lcsso[,2][2])
+  expect_equal(lcss2[,2][3], lcsso[,2][3])
+  expect_gt(lcssohh[,2][2], lcsso[,2][2])
+  expect_equal(lcssohh[,2][3], lcsso[,2][3])
+
+  expect_silent(lcss2m <- loo:::loo_compare.psis_loo_ss_list(x = list(lss2o1, lss3o1)))
+  expect_equal(unname(lcss2m[,]), unname(lcsso[1:2,]))
 
 })
 
