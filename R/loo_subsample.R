@@ -917,9 +917,6 @@ as.psis_loo.psis_loo_ss <- function(x){
 }
 
 
-# TODO: test conversions between classes
-
-
 add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx){
   checkmate::assert_matrix(pointwise,
                            any.missing = FALSE,
