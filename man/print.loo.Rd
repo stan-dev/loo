@@ -4,6 +4,7 @@
 \alias{print.loo}
 \alias{print.waic}
 \alias{print.psis_loo}
+\alias{print.psis_loo_ap}
 \alias{print.psis}
 \title{Print methods}
 \usage{
@@ -12,6 +13,8 @@
 \method{print}{waic}(x, digits = 1, ...)
 
 \method{print}{psis_loo}(x, digits = 1, plot_k = FALSE, ...)
+
+\method{print}{psis_loo_ap}(x, digits = 1, plot_k = FALSE, ...)
 
 \method{print}{psis}(x, digits = 1, plot_k = FALSE, ...)
 }
