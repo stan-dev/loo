@@ -776,10 +776,13 @@ compare_idxs  <- function(idxs, object){
 }
 
 
-#' Draw a sample and return a idx_df
+#' Draw a PPS sample with replacement and return a idx_df
 #' @details
 #' We are sampling with replacement, hence we only want to compute elpd
 #' for each observation once.
+#' @param m the total sampling size
+#' @param pis the probability of selecting each observation
+#' @return a \code{subsample_idxs} \code{data.frame}
 pps_sample <- function(m, pis){
   checkmate::assert_int(m)
   checkmate::assert_numeric(pis, min.len = 2, lower = 0, upper = 1)
@@ -788,15 +791,23 @@ pps_sample <- function(m, pis){
   colnames(idxs_df) <- c("idx", "m_i")
   idxs_df$idx <- as.integer(idxs_df$idx)
   idxs_df$m_i <- as.integer(idxs_df$m_i)
+  assert_subsample_idxs(idxs_df)
   idxs_df
 }
 
 ## Constructor ---
 
-#' Add components needed for subsampling loo
+#' Construct a \code{psis_loo_ss} object
 #'
-#' @param x either a psis_loo object or a quick_psis_loo object.
-#' @param approx_corr has approximation corrections been done
+#' @noRd
+#' @param x a \code{psis_loo} object.
+#' @param idxs a \code{subsample_idxs} \code{data.frame}.
+#' @param elpd_loo_approximation a vector of loo approximations, see \code{elpd_loo_approximation()}.
+#' @inheritParams loo_subsample
+#' @param .llfun,.llgrad,.llhess  see llfun, llgrad and llhess in \code{loo_subsample()}.
+#' @param data_dim dimension of the data object.
+#' @param ndraws,nparameters dimensions of the draws object.
+#' @return a \code{psis_loo_ss} object.
 psis_loo_ss_object <- function(x,
                                idxs,
                                elpd_loo_approx,
@@ -910,7 +921,12 @@ as.psis_loo.psis_loo_ss <- function(x){
   return(plo)
 }
 
-
+#' Add subsampling information to the pointwise element in a \code{psis_loo} object.
+#' @noRd
+#' @param pointwise the \code{pointwise} \code{data.frame} element in a \code{psis_loo} object.
+#' @param idxs a \code{subsample_idxs} \code{data.frame}.
+#' @param elpd_loo_approximation a vector of loo approximations, see \code{elpd_loo_approximation()}.
+#' @return a \code{pointwise} \code{data.frame} with subsampling information
 add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx){
   checkmate::assert_matrix(pointwise,
                            any.missing = FALSE,
@@ -927,6 +943,11 @@ add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx){
   pw
 }
 
+#' Add \code{psis_loo} object to a \code{psis_loo_ss} object
+#' @noRd
+#' @param object a \code{psis_loo_ss} object.
+#' @param x a \code{psis_loo} object.
+#' @return an updated \code{psis_loo_ss} object.
 rbind.psis_loo_ss <- function(object, x){
   checkmate::assert_class(object, "psis_loo_ss")
   if(is.null(x)) return(object) # Fallback
@@ -945,6 +966,11 @@ rbind.psis_loo_ss <- function(object, x){
   object
 }
 
+#' Remove observations in \code{idxs} from \code{object}.
+#' @noRd
+#' @param object a \code{psis_loo_ss} object.
+#' @param idxs a \code{subsample_idxs} \code{data.frame}.
+#' @return an \code{psis_loo_ss} object.
 remove_idx.psis_loo_ss <- function(object, idxs){
   checkmate::assert_class(object, "psis_loo_ss")
   if(is.null(idxs)) return(object) # Fallback
@@ -960,7 +986,11 @@ remove_idx.psis_loo_ss <- function(object, idxs){
   object
 }
 
-
+#' Order \code{object} as \code{observations}.
+#' @noRd
+#' @param x a \code{psis_loo_ss} object.
+#' @param observations a vector with indecies.
+#' @return an ordered \code{psis_loo_ss} object.
 order.psis_loo_ss <- function(x, observations){
   checkmate::assert_class(x, "psis_loo_ss")
   checkmate::assert_integer(observations, len = nobs(x))
@@ -976,6 +1006,13 @@ order.psis_loo_ss <- function(x, observations){
   x
 }
 
+#' Update m_i in a \code{pointwise} element.
+#' @noRd
+#' @param x a \code{psis_loo_ss} \code{pointwise} \code{data.frame}
+#' @param idxs a \code{subsample_idxs} \code{data.frame}.
+#' @param should the m_i:s in \code{idxs} \code{replace} the current m_i:s or
+#' \code{add} to them.
+#' @return an ordered \code{psis_loo_ss} object.
 update_m_i_in_pointwise <- function(pointwise, idxs, type = "replace"){
   assert_subsampling_pointwise(pointwise)
   if(is.null(idxs)) return(pointwise) # Fallback
@@ -998,8 +1035,10 @@ update_m_i_in_pointwise <- function(pointwise, idxs, type = "replace"){
 
 ## Estimation ---
 
-#' Estimate elpd using the Hansen-Hurwitz estimator
-#' @param x a quick_psis_loo object
+#' Estimate the elpd using the Hansen-Hurwitz estimator
+#' @noRd
+#' @param x a \code{psis_loo_ss} object
+#' @return a \code{psis_loo_ss} object
 loo_subsample_estimation_hh <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
   N <- length(x$loo_subsampling$elpd_loo_approx)
@@ -1031,7 +1070,14 @@ loo_subsample_estimation_hh <- function(x){
   x
 }
 
-#' Update object with estimates
+#' Update a \code{psis_loo_ss} object with generic estimates
+#'
+#' @noRd
+#' @details
+#' Updates a \code{psis_loo_ss} with generic estimates (looic)
+#' and updates components in the object based on x$estimate.
+#' @param x a \code{psis_loo_ss} object
+#' @return x a \code{psis_loo_ss} object
 update_psis_loo_ss_estimates <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
@@ -1050,10 +1096,12 @@ update_psis_loo_ss_estimates <- function(x){
 }
 
 #' Weighted Hansen-Hurwitz estimator
+#' @noRd
 #' @param z Normalized probabilities for the observation
 #' @param m_i The number of times obs i was selected
 #' @param y the values observed
 #' @param N total number of observations in finite population
+#' @return a list with estimates
 whhest <- function(z, m_i, y, N){
   checkmate::assert_numeric(z, lower = 0, upper = 1)
   checkmate::assert_numeric(y, len = length(z))
@@ -1071,7 +1119,9 @@ whhest <- function(z, m_i, y, N){
 
 
 #' Estimate elpd using the difference estimator and srs wor
-#' @param x a quick_psis_loo object
+#' @noRd
+#' @param x a \code{psis_loo_ss} object
+#' @return a \code{psis_loo_ss} object
 loo_subsample_estimation_diff_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
@@ -1091,9 +1141,11 @@ loo_subsample_estimation_diff_srs <- function(x){
 }
 
 #' Difference estimation using SRS-WOR sampling
+#' @noRd
 #' @param y_approx Approximated values of all observations
 #' @param y the values observed
 #' @param y_idx the index of y in y_approx
+#' @return a list with estimates
 srs_diff_est <- function(y_approx, y, y_idx){
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
@@ -1119,7 +1171,9 @@ srs_diff_est <- function(y_approx, y, y_idx){
 
 
 #' Estimate elpd using the standard SRS estimator and SRS WOR
-#' @param x a quick_psis_loo object
+#' @noRd
+#' @param x a \code{psis_loo_ss} object
+#' @return a \code{psis_loo_ss} object
 loo_subsample_estimation_srs <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
 
@@ -1139,8 +1193,10 @@ loo_subsample_estimation_srs <- function(x){
 }
 
 #' Simple SRS-WOR estimation
+#' @noRd
 #' @param y the values observed
 #' @param y_approx a vector of length N
+#' @return a list of estimates
 srs_est <- function(y, y_approx){
   checkmate::assert_numeric(y)
   checkmate::assert_numeric(y_approx, min.len = length(y))
@@ -1156,8 +1212,14 @@ srs_est <- function(y, y_approx){
 
 
 
-# Specialized assertions ---
+## Specialized assertions of objects ---
 
+#' Assert that the object has the expected properties
+#' @noRd
+#' @param x an object to assert
+#' @param N the total number of data points in data
+#' @param estimator the estimator used
+#' @return an asserted object of \code{x}
 assert_observations <- function(x, N, estimator){
   checkmate::assert_int(N)
   checkmate::assert_choice(estimator, choices = estimator_choices())
@@ -1182,6 +1244,10 @@ assert_observations <- function(x, N, estimator){
   x
 }
 
+#' Assert that the object has the expected properties
+#' @noRd
+#' @inheritParams assert_observations
+#' @return an asserted object of \code{x}
 assert_subsample_idxs <- function(x){
   checkmate::assert_data_frame(x,
                                types = c("integer", "integer"),
@@ -1191,9 +1257,13 @@ assert_subsample_idxs <- function(x){
   checkmate::assert_names(names(x), identical.to = c("idx", "m_i"))
   checkmate::assert_integer(x$idx, lower = 1, any.missing = FALSE, unique = TRUE)
   checkmate::assert_integer(x$m_i, lower = 1, any.missing = FALSE)
+  x
 }
 
-
+#' Assert that the object has the expected properties
+#' @noRd
+#' @inheritParams assert_observations
+#' @return an asserted object of \code{x}
 assert_psis_loo_ss <- function(x){
   checkmate::assert_class(x, "psis_loo_ss")
   checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "loo_subsampling"))
@@ -1213,13 +1283,19 @@ assert_psis_loo_ss <- function(x){
   checkmate::assert_int(x$loo_subsampling$data_dim[1], na.ok = FALSE)
   checkmate::assert_integer(x$loo_subsampling$ndraws, len = 1, any.missing = TRUE)
   checkmate::assert_integer(x$loo_subsampling$nparameters, len = 1, any.missing = TRUE)
+  x
 }
 
-assert_subsampling_pointwise <- function(pointwise){
-  checkmate::assert_matrix(pointwise,
+#' Assert that the object has the expected properties
+#' @noRd
+#' @inheritParams assert_observations
+#' @return an asserted object of \code{x}
+assert_subsampling_pointwise <- function(x){
+  checkmate::assert_matrix(x,
                            any.missing = FALSE,
                            ncols = 7)
-  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "idx", "m_i", "elpd_loo_approx"))
+  checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "idx", "m_i", "elpd_loo_approx"))
+  x
 }
 
 
