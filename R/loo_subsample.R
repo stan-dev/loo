@@ -529,7 +529,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
      loo_approximation == "waic_hess"){
 
     draws <- .thin_draws(draws, loo_approximation_draws)
-    point_est <- compute_point_estimate(draws)
+    point_est <- .compute_point_estimate(draws)
     lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
       ll_i <- as.vector(ll_i)
@@ -544,7 +544,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
      loo_approximation == "waic_hess") {
     checkmate::assert_true(!is.null(.llgrad))
 
-    point_est <- compute_point_estimate(draws)
+    point_est <- .compute_point_estimate(draws)
     # Compute the lpds
     lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
@@ -596,23 +596,27 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 
 #' Compute a point estimate from a draws object
-#' @noRd
+#'
+#' @details This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
+#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#'
 #' @param draws a draws object with draws from the posterior.
 #' @return a 1 by P matrix with poin estimates from a draws object
-compute_point_estimate <- function(draws){
-  UseMethod("compute_point_estimate")
+#' @keywords internal
+#' @export
+.compute_point_estimate <- function(draws){
+  UseMethod(".compute_point_estimate")
 }
 
-compute_point_estimate.matrix <- function(draws){
+.compute_point_estimate.matrix <- function(draws){
   t(as.matrix(colMeans(draws)))
 }
 
-compute_point_estimate.default <- function(draws){
-  stop("compute_point_estimate() has not been implemented for objects of class '", class(x), "'")
+.compute_point_estimate.default <- function(draws){
+  stop(".compute_point_estimate() has not been implemented for objects of class '", class(x), "'")
 }
 
 #' Thin a draws object
-#' @noRd
 #'
 #' @details This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
 #' only be used by developers to enable subsampling_loo for arbitrary draws objects.
