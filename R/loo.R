@@ -588,6 +588,8 @@ NULL
 #' for psis_list
 #'
 #' @inheritParams loo.function
+#' @param .loo_i The function used to compute individual loo contributions.
+#' @param .llfun See llfun in \code{loo.function()}.
 #' @param N the total number of observations (i.e. \code{nrow(data)}).
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){

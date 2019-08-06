@@ -87,7 +87,7 @@ ap_psis <- function(log_ratios, log_p, log_g, ...) {
 }
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn ap_psis
 #' @template array
 #'
 ap_psis.array <-
@@ -101,12 +101,12 @@ ap_psis.array <-
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     ap_psis.matrix(log_ratios = log_ratios,
                    log_p = log_p,
-                   log_q = log_q,
+                   log_g = log_g,
                    cores = 1)
   }
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn ap_psis
 #' @template matrix
 #'
 ap_psis.matrix <- function(log_ratios, log_p, log_g,
@@ -123,7 +123,7 @@ ap_psis.matrix <- function(log_ratios, log_p, log_g,
   }
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn ap_psis
 #' @template vector
 #'
 ap_psis.default <- function(log_ratios, log_p, log_g, ...) {

@@ -4,12 +4,16 @@
 \alias{update.psis_loo_ss}
 \title{Update \code{psis_loo_ss} objects}
 \usage{
-\method{update}{psis_loo_ss}(object, data = NULL, draws = NULL,
+\method{update}{psis_loo_ss}(object, ..., data = NULL, draws = NULL,
   observations = NULL, r_eff = NULL, cores = getOption("mc.cores",
   1), loo_approximation = NULL, loo_approximation_draws = NULL,
   llgrad = NULL, llhess = NULL)
 }
 \arguments{
+\item{object}{A \code{psis_loo_ss} object to update.}
+
+\item{...}{Currently not used.}
+
 \item{data}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function.}

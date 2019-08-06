@@ -4,10 +4,10 @@
 \alias{nobs.psis_loo_ss}
 \title{The number of observations in a \code{psis_loo_ss} object.}
 \usage{
-\method{nobs}{psis_loo_ss}(x)
+\method{nobs}{psis_loo_ss}(object, ...)
 }
 \arguments{
-\item{x}{a \code{psis_loo_ss} object.}
+\item{object}{a \code{psis_loo_ss} object.}
 }
 \description{
 The number of observations in a \code{psis_loo_ss} object.

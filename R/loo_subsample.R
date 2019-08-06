@@ -253,10 +253,12 @@ loo_subsample.function <-
 #' If an integer is supplied, new observations will be sampled to
 #' reach the supplied sample size.
 #' @inheritParams loo_subsample.function
+#' @param object A \code{psis_loo_ss} object to update.
+#' @param ... Currently not used.
 #' @return a \code{psis_loo_ss} object
 #' @importFrom stats update
 #' @export
-update.psis_loo_ss <- function(object,
+update.psis_loo_ss <- function(object, ...,
                                data = NULL,
                                draws = NULL,
                                observations = NULL,
@@ -445,10 +447,10 @@ obs_idx <- function(x, rep = TRUE){
 
 #' The number of observations in a \code{psis_loo_ss} object.
 #' @importFrom stats nobs
-#' @param x a \code{psis_loo_ss} object.
+#' @param object a \code{psis_loo_ss} object.
 #' @export
-nobs.psis_loo_ss <- function(x){
-  as.integer(sum(x$pointwise[,"m_i"]))
+nobs.psis_loo_ss <- function(object, ...){
+  as.integer(sum(object$pointwise[,"m_i"]))
 }
 
 # internal ----------------------------------------------------------------
@@ -556,7 +558,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     if(loo_approximation == "waic_grad" |
        loo_approximation == "waic_hess") {
-      cov_est <- cov(draws)
+      cov_est <- stats::cov(draws)
     }
 
     if(loo_approximation == "waic_grad_marginal") {
@@ -614,7 +616,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 }
 
 .compute_point_estimate.default <- function(draws){
-  stop(".compute_point_estimate() has not been implemented for objects of class '", class(x), "'")
+  stop(".compute_point_estimate() has not been implemented for objects of class '", class(draws), "'")
 }
 
 #' Thin a draws object
@@ -691,10 +693,10 @@ subsample_idxs <- function(estimator, elpd_loo_approximation, observations){
 
   if(estimator == "diff_srs" | estimator == "srs"){
     if(observations > length(elpd_loo_approximation)) {
-      stop("'observations' is larger than total sample size.", call. = FALSE)
+      stop("'observations' is larger than the total sample size in 'data'.", call. = FALSE)
     }
     idx <- 1:length(elpd_loo_approximation)
-    idx_m <- idx[order(runif(length(elpd_loo_approximation)))][1:observations]
+    idx_m <- idx[order(stats::runif(length(elpd_loo_approximation)))][1:observations]
     idx_m <- idx_m[order(idx_m)]
     idxs_df <- data.frame(idx=as.integer(idx_m), m_i=1L)
   }

@@ -10,6 +10,10 @@ parallel_psis_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores,
 \arguments{
 \item{N}{the total number of observations (i.e. \code{nrow(data)}).}
 
+\item{.loo_i}{The function used to compute individual loo contributions.}
+
+\item{.llfun}{See llfun in \code{loo.function()}.}
+
 \item{data}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
