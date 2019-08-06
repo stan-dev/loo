@@ -112,7 +112,7 @@ loo_compare_ss_diff <- function(ref_loo, compare_loo){
 
   diff_approx <- ref_loo[[1]]$loo_subsampling$elpd_loo_approx - compare_loo[[1]]$loo_subsampling$elpd_loo_approx
   diff_sample <- ref_loo[[1]]$pointwise[,"elpd_loo"] - compare_loo[[1]]$pointwise[,"elpd_loo"]
-  est <- loo:::srs_diff_est(diff_approx, y = diff_sample, y_idx = ref_loo[[1]]$pointwise[,"idx"])
+  est <- srs_diff_est(diff_approx, y = diff_sample, y_idx = ref_loo[[1]]$pointwise[,"idx"])
 
   elpd_loo_diff <- est$y_hat
   elpd_loo_diff_se <- sqrt(est$hat_v_y)
