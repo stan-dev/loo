@@ -17,6 +17,6 @@ The number of posterior parameters in a draws object.
 }
 \details{
 This is a generic function to return the total number of parameters from an arbitrary draws objects. The function is internal and should
-only be used by developers to enable subsampling_loo for arbitrary draws objects.
+only be used by developers to enable loo_subsample() for arbitrary draws objects.
 }
 \keyword{internal}

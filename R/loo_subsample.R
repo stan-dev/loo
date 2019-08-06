@@ -255,7 +255,7 @@ loo_subsample.function <-
 #' reach the supplied sample size.
 #'
 #' @return a \code{psis_loo_ss} object
-#'
+#' @importFrom stats update
 #' @export
 update.psis_loo_ss <- function(object,
                                data = NULL,
@@ -445,6 +445,7 @@ obs_idx <- function(x, rep = TRUE){
 }
 
 #' The number of observations in a \code{psis_loo_ss} object.
+#' @importFrom stats nobs
 #' @export
 nobs.psis_loo_ss <- function(x){
   as.integer(sum(x$pointwise[,"m_i"]))
@@ -598,7 +599,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 #' Compute a point estimate from a draws object
 #'
 #' @details This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
-#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#' only be used by developers to enable loo_subsample() for arbitrary draws objects.
 #'
 #' @param draws a draws object with draws from the posterior.
 #' @return a 1 by P matrix with poin estimates from a draws object
@@ -619,7 +620,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 #' Thin a draws object
 #'
 #' @details This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
-#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#' only be used by developers to enable loo_subsample() for arbitrary draws objects.
 #'
 #' @param draws a draws object with posterior draws.
 #' @param loo_approximation_draws the number of posterior draws to return (ie after thinning)
@@ -651,7 +652,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 #' The number of posterior draws in a draws object.
 #'
 #' @details This is a generic function to return the total number of draws from an arbitrary draws objects. The function is internal and should
-#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#' only be used by developers to enable loo_subsample() for arbitrary draws objects.
 #'
 #' @param x a draws object with posterior draws.
 #' @return an integer with the number of draws.
@@ -671,7 +672,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 #' The number of posterior parameters in a draws object.
 #' @details This is a generic function to return the total number of parameters from an arbitrary draws objects. The function is internal and should
-#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#' only be used by developers to enable loo_subsample() for arbitrary draws objects.
 #'
 #' @param x a draws object with posterior draws.
 #' @return an integer with the number of parameters in the draws object.
