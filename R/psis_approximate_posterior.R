@@ -1,9 +1,9 @@
 #' Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo
 #'
 #' @param log_p The log-posterior (target) evaluated at S samples from the
-#'   proposal distribution (q). A vector of length S.
+#'   proposal distribution (g). A vector of length S.
 #' @param log_g The log-density (proposal) evaluated at S samples from the
-#'   proposal distribution (q). A vector of length S.
+#'   proposal distribution (g). A vector of length S.
 #' @param log_q Deprecated argument name (the same as log_g).
 #' @param log_liks A log-likelihood matrix of size S * N, where N is the number
 #'   of observations and S is the number of samples from q. See
@@ -20,7 +20,6 @@
 #' @template loo-and-psis-references
 #'
 #' @keywords internal
-#' @noRd
 #'
 psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL, cores, save_psis, ..., log_q = NULL){
   if (!requireNamespace("checkmate", quietly=TRUE)) {
@@ -63,8 +62,8 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
 
 #' Correct log ratios for posterior approximations
 #'
-#' @param log_ratios The log-likelihood ratios (ie -ll) to correct
 #' @inheritParams psis_approximate_posterior
+#' @inheritParams ap_psis
 #' @noRd
 #' @keywords internal
 correct_log_ratios <- function(log_ratios, log_p, log_g){
@@ -80,9 +79,10 @@ correct_log_ratios <- function(log_ratios, log_p, log_g){
 
 #' Pareto smoothed importance sampling (PSIS)
 #' using approximate posteriors
-#'
-#'
-ap_psis <- function(log_ratios, log_p, log_g,...) {
+#' @inheritParams psis_approximate_posterior
+#' @param log_ratios The log-likelihood ratios (ie -log_liks)
+#' @param ... Currently not in use.
+ap_psis <- function(log_ratios, log_p, log_g, ...) {
   UseMethod("ap_psis")
 }
 

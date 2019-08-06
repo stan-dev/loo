@@ -24,6 +24,12 @@ loo_approximate_posterior(x, log_p, log_g, ...)
 section, below, has detailed descriptions of how to specify the inputs for
 each method.}
 
+\item{log_p}{The log-posterior (target) evaluated at S samples from the
+proposal distribution (g). A vector of length S.}
+
+\item{log_g}{The log-density (proposal) evaluated at S samples from the
+proposal distribution (g). A vector of length S.}
+
 \item{save_psis}{Should the \code{"psis"} object created internally by \code{loo_approximate_posterior()} be
 saved in the returned object? See \link{loo} for details.}
 

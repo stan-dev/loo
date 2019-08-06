@@ -27,7 +27,7 @@
 #' }
 #'
 #' @seealso loo, psis, loo_compare
-#'
+#' @inheritParams psis_approximate_posterior
 #' @template loo-large-data-references
 #'
 #' @export

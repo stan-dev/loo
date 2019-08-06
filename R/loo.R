@@ -584,9 +584,12 @@ NULL
 
 
 #' Parallel psis list computations
-#' @details
-#' Refactored function to handle parallel computations
+#' @details Refactored function to handle parallel computations
 #' for psis_list
+#'
+#' @inheritParams loo.function
+#' @param N the total number of observations (i.e. \code{nrow(data)}).
+#'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
   if (cores == 1) {
     psis_list <-

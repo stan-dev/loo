@@ -9,6 +9,92 @@
   1), loo_approximation = NULL, loo_approximation_draws = NULL,
   llgrad = NULL, llhess = NULL)
 }
+\arguments{
+\item{data}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function.}
+
+\item{draws}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function.}
+
+\item{observations}{The subsample observations to use. The argument can take four (4) types of arguments.
+If \code{NULL} is supplied, all observations are used and the algorithm just use standard loo or
+loo_approximate_posterior.
+If a single integer is supplied this is the number of observations that are subsampled.
+If a vector of integers, this will be the indecies used to subset the data.
+Note, these observations need to be subsampled with the same scheme as given by
+\code{estimator}.
+If a \code{psis_loo_ss} object is supplied, the same observations are used.}
+
+\item{r_eff}{Vector of relative effective sample size estimates for the
+likelihood (\code{exp(log_lik)}) of each observation. This is related to
+the relative efficiency of estimating the normalizing term in
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. If the posterior draws are independent then
+\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
+helper functions for computing \code{r_eff}.}
+
+\item{cores}{The number of cores to use for parallelization. This defaults to
+the option \code{mc.cores} which can be set for an entire R session by
+\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
+deprecated but will be given precedence over \code{mc.cores} until
+\code{loo.cores} is removed in a future release. \strong{As of version
+2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
+recommend using as many (or close to as many) cores as possible.
+\itemize{
+\item Note for Windows 10 users: it is \strong{strongly}
+\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
+the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
+setting \code{mc.cores} interactively or in a script is fine).
+}}
+
+\item{loo_approximation}{What type of approximation of the loo_i:s should be used.
+Default is \code{plpd} or log predictive density using the posterior expectation.
+There are six different methods implemented to approximate loo_i:s.
+See the references for more details.
+\describe{
+\item{\code{plpd}}{
+uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
+\item{\code{lpd}}{
+uses the lpds (ie. \eqn{p(y_i|y)})}
+\item{\code{tis}}{
+uses truncated importance sampling to approximate PSIS-LOO}
+\item{\code{waic}}{
+uses waic (ie. \eqn{p(y_i|y) - p_{waic}})}
+\item{\code{waic_grad_marginal}}{
+uses waic approximation using first order delta method and
+posterior marginal variances to approximate \eqn{p_{waic}}
+(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad_marginal).
+Require gradient of likelihood function.}
+\item{\code{waic_grad}}{
+uses waic approximation using first order delta method and
+posterior covariance to approximate \eqn{p_{waic}}
+(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
+Require gradient of likelihood function.}
+\item{\code{waic_grad}}{
+uses waic approximation using second order delta method and
+posterior covariance to approximate \eqn{p_{waic}}
+(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
+Require gradient and Hessian of likelihood function.}
+}
+As points estimates of \eqn{\hat{\theta}}, the expectation
+of the posterior parameters  ares used.}
+
+\item{loo_approximation_draws}{The number of posterior draws
+used when integrating over the posterior.
+Used by loo_approximation \code{lpd} and \code{waic}.}
+
+\item{llgrad}{the gradient of the log-likelihood. This is only used
+with \code{waic_grad}, \code{waic_grad_marginal} and \code{waic_hess}.
+Default is \code{NULL}.}
+
+\item{llhess}{the hessian of the log-likelihood. This is only used
+with \code{waic_hess}.
+Default is \code{NULL}.}
+}
 \value{
 a \code{psis_loo_ss} object
 }

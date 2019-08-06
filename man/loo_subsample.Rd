@@ -36,6 +36,21 @@ Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
 The log-posterior (target) evaluated at S samples from the proposal
 distribution (g). A vector of the same length as the number of posterior draws.}
 
+\item{log_g}{Should be supplied if approximate posterior draws are used.
+Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
+The log-density (proposal) evaluated at S samples from the proposal
+distribution (g). A vector of the same length as the number of posterior draws.}
+
+\item{r_eff}{Vector of relative effective sample size estimates for the
+likelihood (\code{exp(log_lik)}) of each observation. This is related to
+the relative efficiency of estimating the normalizing term in
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. If the posterior draws are independent then
+\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
+helper functions for computing \code{r_eff}.}
+
 \item{save_psis}{Should the \code{"psis"} object created internally by \code{loo_approximate_posterior()} be
 saved in the returned object? See \link{loo} for details.}
 
@@ -109,25 +124,6 @@ Default is \code{NULL}.}
 \item{llhess}{the hessian of the log-likelihood. This is only used
 with \code{waic_hess}.
 Default is \code{NULL}.}
-
-\item{log_q}{Should be supplied if approximate posterior draws are used.
-Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
-The log-density (proposal) evaluated at S samples from the proposal
-distribution (g). A vector of the same length as the number of posterior draws.}
-
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
-\itemize{
-\item Note for Windows 10 users: it is \strong{strongly}
-\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
 }
 \value{
 The \code{loo_subsample()} methods return a named list with class

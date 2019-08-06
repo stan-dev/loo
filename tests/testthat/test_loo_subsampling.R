@@ -789,7 +789,7 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   expect_silent(loo_ap_full_ss <- loo:::as.psis_loo_ss.psis_loo(loo_ap_full))
   expect_s3_class(loo_ap_full_ss, "psis_loo_ss")
   expect_s3_class(loo_ap_full_ss, "psis_loo_ap")
-  expect_silent(loo_ap_full2 <- loo::: as.psis_loo.psis_loo_ss(loo_ap_full_ss))
+  expect_silent(loo_ap_full2 <- loo:::as.psis_loo.psis_loo_ss(loo_ap_full_ss))
   expect_s3_class(loo_ap_full2, "psis_loo_ap")
   expect_failure(expect_s3_class(loo_ap_full2, "psis_loo_ss"))
   expect_equal(loo_ap_full2,loo_ap_full)

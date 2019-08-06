@@ -7,6 +7,17 @@ using approximate posteriors}
 \usage{
 ap_psis(log_ratios, log_p, log_g, ...)
 }
+\arguments{
+\item{log_ratios}{The log-likelihood ratios (ie -log_liks)}
+
+\item{log_p}{The log-posterior (target) evaluated at S samples from the
+proposal distribution (g). A vector of length S.}
+
+\item{log_g}{The log-density (proposal) evaluated at S samples from the
+proposal distribution (g). A vector of length S.}
+
+\item{...}{Currently not in use.}
+}
 \description{
 Pareto smoothed importance sampling (PSIS)
 using approximate posteriors

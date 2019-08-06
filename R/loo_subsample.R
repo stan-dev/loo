@@ -6,6 +6,7 @@
 #'   each method.
 #' @export loo_subsample loo_subsample.function
 #'
+#' @inheritParams loo
 #' @param save_psis Should the `"psis"` object created internally by `loo_approximate_posterior()` be
 #'   saved in the returned object? See \link{loo} for details.
 #' @template cores
@@ -56,7 +57,7 @@ loo_subsample <- function(x, ...) {
 #'   Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
 #'   The log-posterior (target) evaluated at S samples from the proposal
 #'   distribution (g). A vector of the same length as the number of posterior draws.
-#' @param log_q
+#' @param log_g
 #'   Should be supplied if approximate posterior draws are used.
 #'   Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
 #'   The log-density (proposal) evaluated at S samples from the proposal
@@ -117,7 +118,6 @@ loo_subsample <- function(x, ...) {
 #' @param llhess the hessian of the log-likelihood. This is only used
 #'        with \code{waic_hess}.
 #'        Default is \code{NULL}.
-#' @template cores
 #'
 loo_subsample.function <-
   function(x,
@@ -253,7 +253,7 @@ loo_subsample.function <-
 #' as supplied.
 #' If an integer is supplied, new observations will be sampled to
 #' reach the supplied sample size.
-#'
+#' @inheritParams loo_subsample.function
 #' @return a \code{psis_loo_ss} object
 #' @importFrom stats update
 #' @export
@@ -446,6 +446,7 @@ obs_idx <- function(x, rep = TRUE){
 
 #' The number of observations in a \code{psis_loo_ss} object.
 #' @importFrom stats nobs
+#' @param x a \code{psis_loo_ss} object.
 #' @export
 nobs.psis_loo_ss <- function(x){
   as.integer(sum(x$pointwise[,"m_i"]))
