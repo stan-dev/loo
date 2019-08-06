@@ -158,7 +158,7 @@ loo_subsample.function <-
     cores <- loo_cores(cores)
 
     checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
-    checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
+    checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
     checkmate::assert_choice(estimator, choices = estimator_choices())
 
     .llgrad <- .llhess <- NULL
@@ -238,8 +238,8 @@ loo_subsample.function <-
                                  .llgrad = .llgrad,
                                  .llhess = .llhess,
                                  data_dim = dim(data),
-                                 ndraws = ndraws(draws),
-                                 nparameters = nparameters(draws))
+                                 ndraws = .ndraws(draws),
+                                 nparameters = .nparameters(draws))
     loo_ss
   }
 
@@ -279,7 +279,7 @@ update.psis_loo_ss <- function(object,
     checkmate::assert_true(all(dim(data) == object$loo_subsampling$data_dim))
   }
   if(!is.null(draws)){
-    checkmate::assert_true(nparameters(draws) == object$loo_subsampling$nparameters)
+    checkmate::assert_true(.nparameters(draws) == object$loo_subsampling$nparameters)
   }
   cores <- loo_cores(cores)
 
@@ -632,8 +632,8 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 .thin_draws.matrix <- function(draws, loo_approximation_draws){
   if(is.null(loo_approximation_draws)) return(draws)
-  checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
-  S <- ndraws(draws)
+  checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
+  S <- .ndraws(draws)
   idx <- 1:loo_approximation_draws * S %/% loo_approximation_draws
   draws <- draws[idx, , drop = FALSE]
   draws
@@ -649,35 +649,44 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 
 #' The number of posterior draws in a draws object.
-#' @noRd
+#'
+#' @details This is a generic function to return the total number of draws from an arbitrary draws objects. The function is internal and should
+#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#'
 #' @param x a draws object with posterior draws.
 #' @return an integer with the number of draws.
-ndraws <- function(x){
-  UseMethod("ndraws")
+#' @keywords internal
+#' @export
+.ndraws <- function(x){
+  UseMethod(".ndraws")
 }
 
-ndraws.matrix <- function(x){
+.ndraws.matrix <- function(x){
   nrow(x)
 }
 
-ndraws.default <- function(x){
-  stop("ndraws() has not been implemented for objects of class '", class(x), "'")
+.ndraws.default <- function(x){
+  stop(".ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
 #' The number of posterior parameters in a draws object.
-#' @noRd
+#' @details This is a generic function to return the total number of parameters from an arbitrary draws objects. The function is internal and should
+#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#'
 #' @param x a draws object with posterior draws.
 #' @return an integer with the number of parameters in the draws object.
-nparameters <- function(x){
-  UseMethod("nparameters")
+#' @keywords internal
+#' @export
+.nparameters <- function(x){
+  UseMethod(".nparameters")
 }
 
-nparameters.matrix <- function(x){
+.nparameters.matrix <- function(x){
   ncol(x)
 }
 
-nparameters.default <- function(x){
-  stop("nparameters() has not been implemented for objects of class '", class(x), "'")
+.nparameters.default <- function(x){
+  stop(".nparameters() has not been implemented for objects of class '", class(x), "'")
 }
 
 
