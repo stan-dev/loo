@@ -413,7 +413,7 @@ test_that("Test loo_approximation_draws", {
   expect_silent(loo_ss3 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 31, r_eff = rep(1, nrow(fake_data))))
   expect_error(loo_ss4 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", loo_approximation_draws = 3100, r_eff = rep(1, nrow(fake_data))))
 
-  expect_equal(names(loo_ss1$loo_subsampling), c("elpd_loo_approx", "loo_approximation", "loo_approximation_draws", "estimator", ".llfun", ".llgrad", ".llhess", "data_dim", "ndraws", "nparameters"))
+  expect_equal(names(loo_ss1$loo_subsampling), c("elpd_loo_approx", "loo_approximation", "loo_approximation_draws", "estimator", ".llfun", ".llgrad", ".llhess", "data_dim", "ndraws"))
   expect_null(loo_ss1$loo_subsampling$loo_approximation_draws)
   expect_equal(loo_ss2$loo_subsampling$loo_approximation_draws, 10L)
   expect_equal(loo_ss3$loo_subsampling$loo_approximation_draws, 31L)

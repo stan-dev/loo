@@ -238,8 +238,7 @@ loo_subsample.function <-
                                  .llgrad = .llgrad,
                                  .llhess = .llhess,
                                  data_dim = dim(data),
-                                 ndraws = .ndraws(draws),
-                                 nparameters = .nparameters(draws))
+                                 ndraws = .ndraws(draws))
     loo_ss
   }
 
@@ -279,7 +278,7 @@ update.psis_loo_ss <- function(object,
     checkmate::assert_true(all(dim(data) == object$loo_subsampling$data_dim))
   }
   if(!is.null(draws)){
-    checkmate::assert_true(.nparameters(draws) == object$loo_subsampling$nparameters)
+    # No current checks
   }
   cores <- loo_cores(cores)
 
@@ -671,27 +670,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   stop(".ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
-#' The number of posterior parameters in a draws object.
-#' @details This is a generic function to return the total number of parameters from an arbitrary draws objects. The function is internal and should
-#' only be used by developers to enable loo_subsample() for arbitrary draws objects.
-#'
-#' @param x a draws object with posterior draws.
-#' @return an integer with the number of parameters in the draws object.
-#' @keywords internal
-#' @export
-.nparameters <- function(x){
-  UseMethod(".nparameters")
-}
-
-.nparameters.matrix <- function(x){
-  ncol(x)
-}
-
-.nparameters.default <- function(x){
-  stop(".nparameters() has not been implemented for objects of class '", class(x), "'")
-}
-
-
 ## Subsampling -----
 
 #' Subsampling strategy
@@ -826,7 +804,7 @@ pps_sample <- function(m, pis){
 #' @inheritParams loo_subsample
 #' @param .llfun,.llgrad,.llhess  see llfun, llgrad and llhess in \code{loo_subsample()}.
 #' @param data_dim dimension of the data object.
-#' @param ndraws,nparameters dimensions of the draws object.
+#' @param ndraws dimension of the draws object.
 #' @return a \code{psis_loo_ss} object.
 psis_loo_ss_object <- function(x,
                                idxs,
@@ -834,7 +812,7 @@ psis_loo_ss_object <- function(x,
                                loo_approximation, loo_approximation_draws,
                                estimator,
                                .llfun, .llgrad, .llhess,
-                               data_dim, ndraws, nparameters){
+                               data_dim, ndraws){
   # Assertions
   checkmate::assert_class(x, "psis_loo")
   assert_subsample_idxs(idxs)
@@ -847,8 +825,6 @@ psis_loo_ss_object <- function(x,
   checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE, null.ok = TRUE)
   checkmate::assert_integer(data_dim, len = 2, lower = 1, any.missing = FALSE)
   checkmate::assert_int(ndraws, lower = 1)
-  checkmate::assert_int(nparameters, lower = 1)
-
 
   # Construct object
   class(x) <- c("psis_loo_ss", class(x))
@@ -866,7 +842,6 @@ psis_loo_ss_object <- function(x,
   x$loo_subsampling[".llhess"] <- list(.llhess)
   x$loo_subsampling$data_dim <- data_dim
   x$loo_subsampling$ndraws <- ndraws
-  x$loo_subsampling$nparameters <- nparameters
 
   # Compute estimates
   if(estimator == "hh_pps"){
@@ -905,8 +880,7 @@ as.psis_loo_ss.psis_loo <- function(x){
                            loo_approximation_draws = NULL,
                            estimator = "diff_srs",
                            data_dim = c(nrow(x$pointwise), NA),
-                           ndraws = NA,
-                           nparameters = NA)
+                           ndraws = NA)
   assert_psis_loo_ss(x)
   x
 }
@@ -1294,7 +1268,7 @@ assert_psis_loo_ss <- function(x){
                           must.include = c("elpd_loo_approx",
                                            "loo_approximation", "loo_approximation_draws",
                                            "estimator",
-                                           "data_dim", "ndraws", "nparameters"))
+                                           "data_dim", "ndraws"))
   checkmate::assert_numeric(x$loo_subsampling$elpd_loo_approx, any.missing = FALSE, len = x$loo_subsampling$data_dim[1])
   checkmate::assert_choice(x$loo_subsampling$loo_approximation, choices = loo_approximation_choices(api = FALSE))
   checkmate::assert_int(x$loo_subsampling$loo_approximation_draws, null.ok = TRUE)
@@ -1302,7 +1276,6 @@ assert_psis_loo_ss <- function(x){
   checkmate::assert_integer(x$loo_subsampling$data_dim, any.missing = TRUE, len = 2)
   checkmate::assert_int(x$loo_subsampling$data_dim[1], na.ok = FALSE)
   checkmate::assert_integer(x$loo_subsampling$ndraws, len = 1, any.missing = TRUE)
-  checkmate::assert_integer(x$loo_subsampling$nparameters, len = 1, any.missing = TRUE)
   x
 }
 
