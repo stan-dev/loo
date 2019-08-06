@@ -137,7 +137,7 @@ test_that("overall loo_subsample works with diff_srs as expected (compared with 
   }
 
   expect_silent(true_loo <- loo(x = llfun_test, draws = fake_posterior, data = fake_data, r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, obs = 200, loo_approximation = "plpd", estimator = "diff_srs", r_eff  = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 200, loo_approximation = "plpd", estimator = "diff_srs", r_eff  = rep(1, nrow(fake_data))))
   expect_equal(true_loo$estimates[1,1], loo_ss$estimates[1,1], tol = 0.1)
 
 })
@@ -914,7 +914,7 @@ test_that("Test the vignette", {
   expect_s3_class(looss_1b, c("psis_loo_ss", "psis_loo", "loo"))
 
   set.seed(4711)
-  expect_warning(looss_2 <- loo_subsample(llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, obs = 100, estimator = "hh_pps", loo_approximation = "lpd", loo_approximation_draws = 100))
+  expect_warning(looss_2 <- loo_subsample(x = llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, estimator = "hh_pps", loo_approximation = "lpd", loo_approximation_draws = 100))
   expect_output(print(looss_2), "Computed from 4000 by 100 subsampled log-likelihood")
   expect_output(print(looss_2), "values from 3020 total observations.")
   expect_output(print(looss_2), "elpd_loo  -1968.9 15.4            0.5")

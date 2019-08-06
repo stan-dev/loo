@@ -195,7 +195,7 @@ The performance relies on two parts, the estimation method, and the approximatio
 
 ```{r, eval=FALSE}
 set.seed(4711)
-looss_2 <- loo_subsample(x = llfun_logistic, draws = parameter_draws, data = stan_df, obs = 100, estimator = "hh_pps", loo_approximation = "lpd", loo_approximation_draws = 100)
+looss_2 <- loo_subsample(x = llfun_logistic, draws = parameter_draws, data = stan_df, observations = 100, estimator = "hh_pps", loo_approximation = "lpd", loo_approximation_draws = 100)
 print(looss_2)
 ```
 
