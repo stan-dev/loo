@@ -505,14 +505,14 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   if(loo_approximation == "none") return(rep(1L,N))
 
   if(loo_approximation == "waic"){
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     waic_full_obj <- waic.function(.llfun, data = data, draws = draws)
     return(waic_full_obj$pointwise[,"elpd_waic"])
   }
 
   # Compute the lpd or log p(y_i|y_{-i})
   if (loo_approximation == "lpd"){
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws)
       ll_i <- as.vector(ll_i)
@@ -528,7 +528,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
      loo_approximation == "waic_grad_marginal" |
      loo_approximation == "waic_hess"){
 
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     point_est <- compute_point_estimate(draws)
     lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
       ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
@@ -613,14 +613,20 @@ compute_point_estimate.default <- function(draws){
 
 #' Thin a draws object
 #' @noRd
+#'
+#' @details This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
+#' only be used by developers to enable subsampling_loo for arbitrary draws objects.
+#'
 #' @param draws a draws object with posterior draws.
 #' @param loo_approximation_draws the number of posterior draws to return (ie after thinning)
+#' @keywords internal
+#' @export
 #' @return a thinned draws object
-thin_draws <- function(draws, loo_approximation_draws){
-  UseMethod("thin_draws")
+.thin_draws <- function(draws, loo_approximation_draws){
+  UseMethod(".thin_draws")
 }
 
-thin_draws.matrix <- function(draws, loo_approximation_draws){
+.thin_draws.matrix <- function(draws, loo_approximation_draws){
   if(is.null(loo_approximation_draws)) return(draws)
   checkmate::assert_int(loo_approximation_draws, lower = 1, upper = ndraws(draws), null.ok = TRUE)
   S <- ndraws(draws)
@@ -629,12 +635,12 @@ thin_draws.matrix <- function(draws, loo_approximation_draws){
   draws
 }
 
-thin_draws.numeric <- function(draws, loo_approximation_draws){
-  thin_draws.matrix(as.matrix(draws), loo_approximation_draws)
+.thin_draws.numeric <- function(draws, loo_approximation_draws){
+  .thin_draws.matrix(as.matrix(draws), loo_approximation_draws)
 }
 
-thin_draws.default <- function(draws, loo_approximation_draws){
-  stop("thin_draws() has not been implemented for objects of class '", class(draws), "'")
+.thin_draws.default <- function(draws, loo_approximation_draws){
+  stop(".thin_draws() has not been implemented for objects of class '", class(draws), "'")
 }
 
 
