@@ -435,7 +435,8 @@ test_that("waic using delta method and gradient", {
     b_hat <- solve(t(X)%*%X)%*%t(X)%*%y
     mu_n <- solve(t(X)%*%X)%*%(t(X)%*%X%*%b_hat + Lambda_0%*%mu_0)
     Lambda_n <- t(X)%*%X + Lambda_0
-    fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
+    # Uncomment row below when running. Commented out to remove CHECK warnings
+    # fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
     colnames(fake_posterior) <- c("a", "b")
     fake_data <- data.frame(y, X)
     save(fake_posterior, fake_data, file = test_path("normal_reg_waic_test_example.rda"))
@@ -486,7 +487,8 @@ test_that("waic using delta 2nd order method", {
     N <- 100; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
     y_full <- rnorm(n = N, mean = X_full%*%beta, sd = 0.5)
     X <- X_full; y <- y_full
-    fake_posterior <- MCMCpack::MCMCregress(y~x, data = data.frame(y = y,x=X[,2]), thin = 10, mcmc = 10000) # Because Im lazy
+    # Uncomment row below when running. Commented out to remove CHECK warnings
+    # fake_posterior <- MCMCpack::MCMCregress(y~x, data = data.frame(y = y,x=X[,2]), thin = 10, mcmc = 10000) # Because Im lazy
     fake_posterior <- as.matrix(fake_posterior)
     fake_posterior[,"sigma2"] <- sqrt(fake_posterior[,"sigma2"])
     colnames(fake_posterior) <- c("a", "b", "sigma")
