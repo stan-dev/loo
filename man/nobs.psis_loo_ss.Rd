@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{object}{a \code{psis_loo_ss} object.}
+
+\item{...}{Currently not is use.}
 }
 \description{
 The number of observations in a \code{psis_loo_ss} object.

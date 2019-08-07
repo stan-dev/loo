@@ -448,6 +448,7 @@ obs_idx <- function(x, rep = TRUE){
 #' The number of observations in a \code{psis_loo_ss} object.
 #' @importFrom stats nobs
 #' @param object a \code{psis_loo_ss} object.
+#' @param ... Currently not is use.
 #' @export
 nobs.psis_loo_ss <- function(object, ...){
   as.integer(sum(object$pointwise[,"m_i"]))
