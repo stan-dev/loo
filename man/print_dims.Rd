@@ -6,6 +6,7 @@
 \alias{print_dims.psis_loo}
 \alias{print_dims.waic}
 \alias{print_dims.kfold}
+\alias{print_dims.psis_loo_ss}
 \title{Print dimensions of log-likelihood or log-weights matrix}
 \usage{
 print_dims(x, ...)
@@ -17,6 +18,8 @@ print_dims(x, ...)
 \method{print_dims}{waic}(x, ...)
 
 \method{print_dims}{kfold}(x, ...)
+
+\method{print_dims}{psis_loo_ss}(x, ...)
 }
 \arguments{
 \item{x}{The object returned by \code{\link[=psis]{psis()}}, \code{\link[=loo]{loo()}}, or \code{\link[=waic]{waic()}}.}
