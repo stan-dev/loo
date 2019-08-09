@@ -29,7 +29,7 @@ print.loo <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.waic <- function(x, digits = 1, ...) {
   print.loo(x, digits = digits, ...)
-  throw_pwaic_warnings(x$pointwise[, "p_waic"], digits = digits)
+  throw_pwaic_warnings(x$pointwise[, "p_waic"], digits = digits, warn = FALSE)
   invisible(x)
 }
 
