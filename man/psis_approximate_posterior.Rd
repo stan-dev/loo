@@ -4,15 +4,15 @@
 \alias{psis_approximate_posterior}
 \title{Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo}
 \usage{
-psis_approximate_posterior(log_p, log_q, log_liks = NULL, cores,
-  save_psis, ...)
+psis_approximate_posterior(log_p = NULL, log_g = NULL,
+  log_liks = NULL, cores, save_psis, ..., log_q = NULL)
 }
 \arguments{
 \item{log_p}{The log-posterior (target) evaluated at S samples from the
-proposal distribution (q). A vector of length S.}
+proposal distribution (g). A vector of length S.}
 
-\item{log_q}{The log-density (proposal) evaluated at S samples from the
-proposal distribution (q). A vector of length S.}
+\item{log_g}{The log-density (proposal) evaluated at S samples from the
+proposal distribution (g). A vector of length S.}
 
 \item{log_liks}{A log-likelihood matrix of size S * N, where N is the number
 of observations and S is the number of samples from q. See
@@ -45,6 +45,8 @@ weighted expectations after running \code{loo}.}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
 below for details on how to specify these arguments.}
+
+\item{log_q}{Deprecated argument name (the same as log_g).}
 }
 \value{
 If log likelihoods are supplied, the function returns a \code{"loo"} object,
