@@ -256,51 +256,15 @@ loo.function <-
       r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
 
-    if (cores == 1) {
-      psis_list <-
-        lapply(
-          X = seq_len(N),
-          FUN = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          ...
-        )
-    } else {
-      if (.Platform$OS.type != "windows") {
-        # On Mac or Linux use mclapply() for multiple cores
-        psis_list <-
-          parallel::mclapply(
-            mc.cores = cores,
-            X = seq_len(N),
-            FUN = .loo_i,
-            llfun = .llfun,
-            data = data,
-            draws = draws,
-            r_eff = r_eff,
-            save_psis = save_psis,
-            ...
-          )
-      } else {
-        # On Windows use makePSOCKcluster() and parLapply() for multiple cores
-        cl <- parallel::makePSOCKcluster(cores)
-        on.exit(parallel::stopCluster(cl))
-        psis_list <-
-          parallel::parLapply(
-            cl = cl,
-            X = seq_len(N),
-            fun = .loo_i,
-            llfun = .llfun,
-            data = data,
-            draws = draws,
-            r_eff = r_eff,
-            save_psis = save_psis,
-            ...
-          )
-      }
-    }
+    psis_list <- parallel_psis_list(N = N,
+                                    .loo_i = .loo_i,
+                                    .llfun = .llfun,
+                                    data = data,
+                                    draws = draws,
+                                    r_eff = r_eff,
+                                    save_psis = save_psis,
+                                    cores = cores,
+                                    ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -617,3 +581,63 @@ NULL
   }
   NextMethod()
 }
+
+
+#' Parallel psis list computations
+#' @details Refactored function to handle parallel computations
+#' for psis_list
+#'
+#' @inheritParams loo.function
+#' @param .loo_i The function used to compute individual loo contributions.
+#' @param .llfun See llfun in \code{loo.function()}.
+#' @param N the total number of observations (i.e. \code{nrow(data)}).
+#'
+parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
+  if (cores == 1) {
+    psis_list <-
+      lapply(
+        X = seq_len(N),
+        FUN = .loo_i,
+        llfun = .llfun,
+        data = data,
+        draws = draws,
+        r_eff = r_eff,
+        save_psis = save_psis,
+        ...
+      )
+  } else {
+    if (.Platform$OS.type != "windows") {
+      # On Mac or Linux use mclapply() for multiple cores
+      psis_list <-
+        parallel::mclapply(
+          mc.cores = cores,
+          X = seq_len(N),
+          FUN = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          ...
+        )
+    } else {
+      # On Windows use makePSOCKcluster() and parLapply() for multiple cores
+      cl <- parallel::makePSOCKcluster(cores)
+      on.exit(parallel::stopCluster(cl))
+      psis_list <-
+        parallel::parLapply(
+          cl = cl,
+          X = seq_len(N),
+          fun = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          ...
+        )
+    }
+  }
+}
+
+
