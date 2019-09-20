@@ -152,14 +152,15 @@ waic_object <- function(pointwise, dims) {
 
 # waic warnings
 # @param p 'p_waic' estimates
-throw_pwaic_warnings <- function(p, digits = 1) {
+throw_pwaic_warnings <- function(p, digits = 1, warn = TRUE) {
   badp <- p > 0.4
   if (any(badp)) {
     count <- sum(badp)
     prop <- count / length(badp)
-    .warn(paste0(count, " (", .fr(100 * prop, digits),
-                 "%) p_waic estimates greater than 0.4. "),
-          "We recommend trying loo instead.")
+    msg <- paste0("\n", count, " (", .fr(100 * prop, digits),
+                  "%) p_waic estimates greater than 0.4. ",
+                  "We recommend trying loo instead.")
+    if (warn) .warn(msg) else cat(msg, "\n")
   }
   invisible(NULL)
 }

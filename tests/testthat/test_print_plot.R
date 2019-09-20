@@ -41,11 +41,9 @@ lwdim_msg <- paste0("Computed from ", prod(dim(LLarr)[1:2]) , " by ",
                     dim(LLarr)[3], " log-weights matrix")
 
 test_that("print.waic output is ok",{
-  expect_output(suppressWarnings(print(waic1)), lldim_msg)
-  expect_warning(
-    capture.output(print(waic1)),
-    "p_waic estimates greater than 0.4. We recommend trying loo instead.",
-    fixed = TRUE
+  expect_output(print(waic1), lldim_msg)
+  expect_output(print(waic1),
+    "p_waic estimates greater than 0.4. We recommend trying loo instead."
   )
 })
 
