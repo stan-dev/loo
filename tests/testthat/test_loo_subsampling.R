@@ -972,7 +972,7 @@ test_that("Test the vignette", {
 
   expect_warning(looss_2_full <- loo(x = llfun_logistic, draws = parameter_draws_2, data = stan_df2))
   expect_message(comp3 <- loo_compare(x = list(looss_1, looss_2_full)),
-                 "Estimated elpd_diff using observations common to 'model2' and 'model1'.")
+                 "Estimated elpd_diff using observations included in loo calculations for all models.")
   expect_output(print(comp3), "model1 16.5       4.4     0.3")
 
 })

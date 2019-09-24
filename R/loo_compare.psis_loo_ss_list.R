@@ -63,13 +63,14 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   if(compare_subset_of_ref | ref_subset_of_compare){
     if(compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
     if(ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
-    message("Estimated elpd_diff using observations common to '", names(ref_loo),"' and '", names(compare_loo), "'.")
+    message("Estimated elpd_diff using observations included in loo calculations for all models.")
     return(loo_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # If different samples
   if(!compare_subset_of_ref & !ref_subset_of_compare){
-    warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo), "'. Naive diff SE is used.", call. = FALSE)
+    warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
+            "'. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 }
