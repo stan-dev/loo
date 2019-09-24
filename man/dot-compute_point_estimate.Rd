@@ -16,7 +16,8 @@ a 1 by P matrix with poin estimates from a draws object
 Compute a point estimate from a draws object
 }
 \details{
-This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
-only be used by developers to enable loo_subsample() for arbitrary draws objects.
+This is a generic function to thin draws from arbitrary draws
+objects. The function is internal and should only be used by developers to
+enable \code{\link[=loo_subsample]{loo_subsample()}} for arbitrary draws objects.
 }
 \keyword{internal}

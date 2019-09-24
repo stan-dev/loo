@@ -18,7 +18,8 @@ a thinned draws object
 Thin a draws object
 }
 \details{
-This is a generic function to thin draws from arbitrary draws objects. The function is internal and should
-only be used by developers to enable loo_subsample() for arbitrary draws objects.
+This is a generic function to thin draws from arbitrary draws
+objects. The function is internal and should only be used by developers to
+enable loo_subsample() for arbitrary draws objects.
 }
 \keyword{internal}

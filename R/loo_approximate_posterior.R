@@ -1,36 +1,38 @@
-#' @title
-#' Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations
+#' Efficient approximate leave-one-out cross-validation (LOO) for posterior
+#' approximations
 #'
-#'
-#' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
-#'   section, below, has detailed descriptions of how to specify the inputs for
-#'   each method.
-#' @export loo_approximate_posterior loo_approximate_posterior.array loo_approximate_posterior.matrix loo_approximate_posterior.function
-#'
-#' @param save_psis Should the `"psis"` object created internally by `loo_approximate_posterior()` be
-#'   saved in the returned object? See \link{loo} for details.
+#' @param x A log-likelihood array, matrix, or function.
+#'   The **Methods (by class)** section, below, has detailed descriptions of how
+#'   to specify the inputs for each method.
+#' @param save_psis Should the `"psis"` object created internally by
+#'   `loo_approximate_posterior()` be saved in the returned object? See
+#'   [loo()] for details.
 #' @template cores
+#' @inheritParams psis_approximate_posterior
 #'
-#' @details The `loo_approximate_posterior()` function is an S3 generic and methods are provided for
-#'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
-#'   log-likelihood functions. The implementation work for posterior approximations
-#'   where it is possible to compute the log density for the posterior approximation.
+#' @details The `loo_approximate_posterior()` function is an S3 generic and
+#'   methods are provided for 3-D pointwise log-likelihood arrays, pointwise
+#'   log-likelihood matrices, and log-likelihood functions. The implementation
+#'   works for posterior approximations where it is possible to compute the log
+#'   density for the posterior approximation.
 #'
-#' @return The `loo_approximate_posterior()` methods return a named list with class
-#'   `c("psis_loo_ap", "psis_loo", "loo")` with the additional slot:
+#' @return The `loo_approximate_posterior()` methods return a named list with
+#'   class `c("psis_loo_ap", "psis_loo", "loo")`. It has the same structure
+#'   as the objects returned by [loo()] but with the additional slot:
 #' \describe{
 #'  \item{`posterior_approximation`}{
 #'   A list with two vectors, `log_p` and `log_g` of the same length
 #'   containing the posterior density and the approximation density
-#'   for the individual dras.
+#'   for the individual draws.
 #'  }
 #' }
 #'
-#' @seealso loo, psis, loo_compare
-#' @inheritParams psis_approximate_posterior
+#' @seealso [loo()], [psis()], [loo_compare()]
 #' @template loo-large-data-references
 #'
-#' @export
+#' @export loo_approximate_posterior
+#' @export loo_approximate_posterior.array loo_approximate_posterior.matrix loo_approximate_posterior.function
+#'
 loo_approximate_posterior <- function(x, log_p, log_g, ...) {
   UseMethod("loo_approximate_posterior")
 }
@@ -56,7 +58,14 @@ loo_approximate_posterior.array <-
     ll <- llarray_to_matrix(x)
     log_p <- as.vector(log_p)
     log_g <- as.vector(log_g)
-    loo_approximate_posterior.matrix(ll, log_p = log_p, log_g = log_g, ...,  save_psis = save_psis, cores = cores)
+    loo_approximate_posterior.matrix(
+      ll,
+      log_p = log_p,
+      log_g = log_g,
+      ...,
+      save_psis = save_psis,
+      cores = cores
+    )
   }
 
 #' @export
@@ -79,7 +88,15 @@ loo_approximate_posterior.matrix <-
     checkmate::assert_numeric(log_g, len = length(log_p))
     checkmate::assert_null(dim(log_g))
 
-    ap_psis <- psis_approximate_posterior(log_p = log_p, log_g = log_g, log_liks = x, ..., cores = cores, save_psis = save_psis)
+    ap_psis <-
+      psis_approximate_posterior(
+        log_p = log_p,
+        log_g = log_g,
+        log_liks = x,
+        ...,
+        cores = cores,
+        save_psis = save_psis
+      )
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
     class(ap_psis) <- c("psis_loo_ap", class(ap_psis))
     assert_psis_loo_ap(ap_psis)
@@ -89,10 +106,10 @@ loo_approximate_posterior.matrix <-
 #' @export
 #' @templateVar fn loo_approximate_posterior
 #' @template function
-#' @param data,draws,... For the `loo_approximate_posterior.function()` method and the `loo_i()`
-#'   function, these are the data, posterior draws, and other arguments to pass
-#'   to the log-likelihood function. See the **Methods (by class)** section
-#'   below for details on how to specify these arguments.
+#' @param data,draws,... For the `loo_approximate_posterior.function()` method,
+#'   these are the data, posterior draws, and other arguments to pass to the
+#'   log-likelihood function. See the **Methods (by class)** section below for
+#'   details on how to specify these arguments.
 #'
 loo_approximate_posterior.function <-
   function(x,

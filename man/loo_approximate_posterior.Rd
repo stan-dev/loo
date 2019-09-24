@@ -5,7 +5,8 @@
 \alias{loo_approximate_posterior.array}
 \alias{loo_approximate_posterior.matrix}
 \alias{loo_approximate_posterior.function}
-\title{Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations}
+\title{Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations}
 \usage{
 loo_approximate_posterior(x, log_p, log_g, ...)
 
@@ -20,9 +21,9 @@ loo_approximate_posterior(x, log_p, log_g, ...)
   cores = getOption("mc.cores", 1))
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or function. The \strong{Methods (by class)}
-section, below, has detailed descriptions of how to specify the inputs for
-each method.}
+\item{x}{A log-likelihood array, matrix, or function.
+The \strong{Methods (by class)} section, below, has detailed descriptions of how
+to specify the inputs for each method.}
 
 \item{log_p}{The log-posterior (target) evaluated at S samples from the
 proposal distribution (g). A vector of length S.}
@@ -30,8 +31,9 @@ proposal distribution (g). A vector of length S.}
 \item{log_g}{The log-density (proposal) evaluated at S samples from the
 proposal distribution (g). A vector of length S.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo_approximate_posterior()} be
-saved in the returned object? See \link{loo} for details.}
+\item{save_psis}{Should the \code{"psis"} object created internally by
+\code{loo_approximate_posterior()} be saved in the returned object? See
+\code{\link[=loo]{loo()}} for details.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -47,30 +49,33 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{data, draws, ...}{For the \code{loo_approximate_posterior.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
+\item{data, draws, ...}{For the \code{loo_approximate_posterior.function()} method,
+these are the data, posterior draws, and other arguments to pass to the
+log-likelihood function. See the \strong{Methods (by class)} section below for
+details on how to specify these arguments.}
 }
 \value{
-The \code{loo_approximate_posterior()} methods return a named list with class
-\code{c("psis_loo_ap", "psis_loo", "loo")} with the additional slot:
+The \code{loo_approximate_posterior()} methods return a named list with
+class \code{c("psis_loo_ap", "psis_loo", "loo")}. It has the same structure
+as the objects returned by \code{\link[=loo]{loo()}} but with the additional slot:
 \describe{
 \item{\code{posterior_approximation}}{
 A list with two vectors, \code{log_p} and \code{log_g} of the same length
 containing the posterior density and the approximation density
-for the individual dras.
+for the individual draws.
 }
 }
 }
 \description{
-Efficient approximate leave-one-out cross-validation (LOO) for posterior approximations
+Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations
 }
 \details{
-The \code{loo_approximate_posterior()} function is an S3 generic and methods are provided for
-3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
-log-likelihood functions. The implementation work for posterior approximations
-where it is possible to compute the log density for the posterior approximation.
+The \code{loo_approximate_posterior()} function is an S3 generic and
+methods are provided for 3-D pointwise log-likelihood arrays, pointwise
+log-likelihood matrices, and log-likelihood functions. The implementation
+works for posterior approximations where it is possible to compute the log
+density for the posterior approximation.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -120,5 +125,5 @@ Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 }
 \seealso{
-loo, psis, loo_compare
+\code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}
 }

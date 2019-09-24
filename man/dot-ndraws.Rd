@@ -16,7 +16,8 @@ an integer with the number of draws.
 The number of posterior draws in a draws object.
 }
 \details{
-This is a generic function to return the total number of draws from an arbitrary draws objects. The function is internal and should
-only be used by developers to enable loo_subsample() for arbitrary draws objects.
+This is a generic function to return the total number of draws from
+an arbitrary draws objects. The function is internal and should only be
+used by developers to enable \code{\link[=loo_subsample]{loo_subsample()}} for arbitrary draws objects.
 }
 \keyword{internal}

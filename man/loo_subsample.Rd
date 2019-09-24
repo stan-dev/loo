@@ -14,32 +14,30 @@ loo_subsample(x, ...)
   estimator = "diff_srs", llgrad = NULL, llhess = NULL)
 }
 \arguments{
-\item{x}{A function. The \strong{Methods (by class)}
-section, below, has detailed descriptions of how to specify the inputs for
-each method.}
+\item{x}{A function. The \strong{Methods (by class)} section, below, has detailed
+descriptions of how to specify the inputs.}
 
-\item{data, draws, ...}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function.}
+\item{data, draws, ...}{For \code{loo_subsample.function()}, these are the data,
+posterior draws, and other arguments to pass to the log-likelihood
+function.}
 
-\item{observations}{The subsample observations to use. The argument can take four (4) types of arguments.
-If \code{NULL} is supplied, all observations are used and the algorithm just use standard loo or
-loo_approximate_posterior.
-If a single integer is supplied this is the number of observations that are subsampled.
-If a vector of integers, this will be the indecies used to subset the data.
-Note, these observations need to be subsampled with the same scheme as given by
-\code{estimator}.
-If a \code{psis_loo_ss} object is supplied, the same observations are used.}
+\item{observations}{The subsample observations to use. The argument can take
+four (4) types of arguments:
+\itemize{
+\item \code{NULL} to use all observations. The algorithm then just uses
+standard \code{loo()} or \code{loo_approximate_posterior()}.
+\item A single integer to specify the number of observations to be subsampled.
+\item A vector of integers to provide the indices used to subset the data.
+\emph{These observations need to be subsampled with the same scheme as given by
+the \code{estimator} argument}.
+\item A \code{psis_loo_ss} object to use the same observations that were used in a
+previous call to \code{loo_subsample()}.
+}}
 
-\item{log_p}{Should be supplied if approximate posterior draws are used.
-Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
-The log-posterior (target) evaluated at S samples from the proposal
-distribution (g). A vector of the same length as the number of posterior draws.}
-
-\item{log_g}{Should be supplied if approximate posterior draws are used.
-Default (\code{NULL}) posterior draws from true posterior (i.e. using MCMC).
-The log-density (proposal) evaluated at S samples from the proposal
-distribution (g). A vector of the same length as the number of posterior draws.}
+\item{log_p, log_g}{Should be supplied only if approximate posterior draws are
+used. The default (\code{NULL}) indicates draws are from "true" posterior (i.e.
+using MCMC). If not \code{NULL} then they should be specified as described in
+\code{\link[=loo_approximate_posterior]{loo_approximate_posterior()}}.}
 
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
@@ -51,8 +49,8 @@ will be over-optimistic. If the posterior draws are independent then
 \code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
 helper functions for computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo_approximate_posterior()} be
-saved in the returned object? See \link{loo} for details.}
+\item{save_psis}{Should the \code{"psis"} object created internally by
+\code{loo_subsample()} be saved in the returned object? See \code{\link[=loo]{loo()}} for details.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -68,10 +66,10 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{loo_approximation}{What type of approximation of the loo_i:s should be used.
-Default is \code{plpd} or log predictive density using the posterior expectation.
-There are six different methods implemented to approximate loo_i:s.
-See the references for more details.
+\item{loo_approximation}{What type of approximation of the loo_i's should be used?
+The default is \code{plpd} (the log predictive density using the posterior expectation).
+There are six different methods implemented to approximate loo_i's
+(see the references for more details):
 \describe{
 \item{\code{plpd}}{
 uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
@@ -97,42 +95,42 @@ posterior covariance to approximate \eqn{p_{waic}}
 (ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
 Require gradient and Hessian of likelihood function.}
 }
-As points estimates of \eqn{\hat{\theta}}, the expectation
-of the posterior parameters  ares used.}
+As point estimates of \eqn{\hat{\theta}}, the posterior expectations
+of the parameters are used.}
 
-\item{loo_approximation_draws}{The number of posterior draws
-used when integrating over the posterior.
-Used by loo_approximation \code{lpd} and \code{waic}.}
+\item{loo_approximation_draws}{The number of posterior draws used when
+integrating over the posterior. This is used if \code{loo_approximation="lpd"}
+or \code{loo_approximation="waic"}.}
 
-\item{estimator}{How should elpd_loo, p_loo and looic be estimated.
-Default is \code{diff_srs}.
+\item{estimator}{How should \code{elpd_loo}, \code{p_loo} and \code{looic} be estimated?
+The default is \code{diff_srs}.
 \describe{
 \item{\code{diff_srs}}{
 uses the difference estimator with simple random sampling (srs).
-p_loo is estimated using standard srs.}
+\code{p_loo} is estimated using standard srs.}
 \item{\code{hh}}{
 uses the Hansen-Hurwitz estimator with sampling proportional
-to size, where abs of loo_approximation is used as size.}
+to size, where \code{abs} of loo_approximation is used as size.}
 \item{\code{srs}}{
 uses simple random sampling and ordinary estimation.}
 }}
 
-\item{llgrad}{the gradient of the log-likelihood. This is only used
-with \code{waic_grad}, \code{waic_grad_marginal} and \code{waic_hess}.
-Default is \code{NULL}.}
+\item{llgrad}{The gradient of the log-likelihood. This
+is only used when \code{loo_approximation} is \code{"waic_grad"},
+\code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{the hessian of the log-likelihood. This is only used
-with \code{waic_hess}.
-Default is \code{NULL}.}
+\item{llhess}{The hessian of the log-likelihood. This is only used
+with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
-The \code{loo_subsample()} methods return a named list with class
-\code{c("psis_loo_ap", "psis_loo", "loo")} with the additional slot:
+\code{loo_subsample()} returns a named list with class
+\code{c("psis_loo_ss", "psis_loo", "loo")}. This has the same structure
+as objects returned by \code{\link[=loo]{loo()}} but with the additional slot:
 \describe{
-\item{\code{posterior_approximation}}{
+\item{\code{loo_subsampling}}{
 A list with two vectors, \code{log_p} and \code{log_g} of the same length
 containing the posterior density and the approximation density
-for the individual dras.
+for the individual draws.
 }
 }
 }
@@ -140,9 +138,10 @@ for the individual dras.
 Efficient approximate leave-one-out cross-validation (LOO) using subsampling
 }
 \details{
-The \code{loo_subsample()} function is an S3 generic and methods are provided for
-log-likelihood functions. The implementation work for both MCMC and for posterior
-approximations where it is possible to compute the log density for the approximation.
+The \code{loo_subsample()} function is an S3 generic and a methods is
+currently provided for log-likelihood functions. The implementation works
+for both MCMC and for posterior approximations where it is possible to
+compute the log density for the approximation.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -184,5 +183,5 @@ Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 }
 \seealso{
-loo, psis, loo_compare
+\code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}
 }

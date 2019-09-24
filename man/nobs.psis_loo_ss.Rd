@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{a \code{psis_loo_ss} object.}
 
-\item{...}{Currently not is use.}
+\item{...}{Currently unused.}
 }
 \description{
 The number of observations in a \code{psis_loo_ss} object.

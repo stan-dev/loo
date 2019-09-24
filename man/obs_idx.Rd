@@ -2,26 +2,21 @@
 % Please edit documentation in R/loo_subsample.R
 \name{obs_idx}
 \alias{obs_idx}
-\title{The observations indecies in the original data}
+\title{Get observation indices used in subsampling}
 \usage{
 obs_idx(x, rep = TRUE)
 }
 \arguments{
-\item{x}{a \code{psis_loo_ss} object.}
+\item{x}{A \code{psis_loo_ss} object.}
 
-\item{rep}{should multiple samples of same observations be returned?}
+\item{rep}{If sampling with replacement is used, an observation can have
+multiple samples and these are then repeated in the returned object if
+\code{rep=TRUE} (e.g., a vector \code{c(1,1,2)} indicates that observation 1 has been
+subampled two times). If \code{rep=FALSE} only the unique indices are returned.}
 }
 \value{
-an integer lector of length \code{nobs}.
+An integer vector.
 }
 \description{
-The observations indecies in the original data
-}
-\details{
-Returns a vector of the same length as the number of observations
-(if \code{rep = TRUE})
-If sampling with replacement is used, an observation can have multiples
-samples, these are then repeated (ie a vector c(1,1,2) indicate that
-observation 1 has been ssubampled two times.
-If \code{rep = FALSE} only the unique indecies are returned.
+Get observation indices used in subsampling
 }

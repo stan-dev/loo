@@ -14,22 +14,26 @@
 
 \item{...}{Currently not used.}
 
-\item{data}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function.}
+\item{data}{For \code{loo_subsample.function()}, these are the data,
+posterior draws, and other arguments to pass to the log-likelihood
+function.}
 
-\item{draws}{For the \code{loo_subsample.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function.}
+\item{draws}{For \code{loo_subsample.function()}, these are the data,
+posterior draws, and other arguments to pass to the log-likelihood
+function.}
 
-\item{observations}{The subsample observations to use. The argument can take four (4) types of arguments.
-If \code{NULL} is supplied, all observations are used and the algorithm just use standard loo or
-loo_approximate_posterior.
-If a single integer is supplied this is the number of observations that are subsampled.
-If a vector of integers, this will be the indecies used to subset the data.
-Note, these observations need to be subsampled with the same scheme as given by
-\code{estimator}.
-If a \code{psis_loo_ss} object is supplied, the same observations are used.}
+\item{observations}{The subsample observations to use. The argument can take
+four (4) types of arguments:
+\itemize{
+\item \code{NULL} to use all observations. The algorithm then just uses
+standard \code{loo()} or \code{loo_approximate_posterior()}.
+\item A single integer to specify the number of observations to be subsampled.
+\item A vector of integers to provide the indices used to subset the data.
+\emph{These observations need to be subsampled with the same scheme as given by
+the \code{estimator} argument}.
+\item A \code{psis_loo_ss} object to use the same observations that were used in a
+previous call to \code{loo_subsample()}.
+}}
 
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
@@ -55,10 +59,10 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{loo_approximation}{What type of approximation of the loo_i:s should be used.
-Default is \code{plpd} or log predictive density using the posterior expectation.
-There are six different methods implemented to approximate loo_i:s.
-See the references for more details.
+\item{loo_approximation}{What type of approximation of the loo_i's should be used?
+The default is \code{plpd} (the log predictive density using the posterior expectation).
+There are six different methods implemented to approximate loo_i's
+(see the references for more details):
 \describe{
 \item{\code{plpd}}{
 uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
@@ -84,32 +88,30 @@ posterior covariance to approximate \eqn{p_{waic}}
 (ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
 Require gradient and Hessian of likelihood function.}
 }
-As points estimates of \eqn{\hat{\theta}}, the expectation
-of the posterior parameters  ares used.}
+As point estimates of \eqn{\hat{\theta}}, the posterior expectations
+of the parameters are used.}
 
-\item{loo_approximation_draws}{The number of posterior draws
-used when integrating over the posterior.
-Used by loo_approximation \code{lpd} and \code{waic}.}
+\item{loo_approximation_draws}{The number of posterior draws used when
+integrating over the posterior. This is used if \code{loo_approximation="lpd"}
+or \code{loo_approximation="waic"}.}
 
-\item{llgrad}{the gradient of the log-likelihood. This is only used
-with \code{waic_grad}, \code{waic_grad_marginal} and \code{waic_hess}.
-Default is \code{NULL}.}
+\item{llgrad}{The gradient of the log-likelihood. This
+is only used when \code{loo_approximation} is \code{"waic_grad"},
+\code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{the hessian of the log-likelihood. This is only used
-with \code{waic_hess}.
-Default is \code{NULL}.}
+\item{llhess}{The hessian of the log-likelihood. This is only used
+with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
-a \code{psis_loo_ss} object
+A \code{psis_loo_ss} object
 }
 \description{
 Update \code{psis_loo_ss} objects
 }
 \details{
-If \code{observation} is updated, two approaches can be used.
-Either a vector of indecies or a \code{psis_loo_ss} object,
-the the updated object will have exactly the same observations
-as supplied.
-If an integer is supplied, new observations will be sampled to
-reach the supplied sample size.
+If \code{observation} is updated then if a vector of indices or a
+\code{psis_loo_ss} object is supplied the updated object will have exactly the
+observations indicated by the vector or \code{psis_loo_ss} object. If a single
+integer is supplied, new observations will be sampled to reach the supplied
+sample size.
 }
