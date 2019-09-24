@@ -17,8 +17,9 @@
 #' @return For developers defining a `kfold()` method for a class
 #'   `"foo"`, the `kfold.foo()` function should return a list with class
 #'   `c("kfold", "loo")` with at least the following named elements:
-#'    * `"estimates"`: A `1x2` matrix with column names `"Estimate"` and `"SE"`
-#'      containing the ELPD estimate and its standard error.
+#'    * `"estimates"`: A `1x2` matrix containing the ELPD estimate and its
+#'      standard error. The matrix must have row name "`elpd_kfold`" and column
+#'      names `"Estimate"` and `"SE"`.
 #'    * `"pointwise"`: A `Nx1` matrix with column name `"elpd_kfold"` containing
 #'      the pointwise contributions for each data point.
 #'

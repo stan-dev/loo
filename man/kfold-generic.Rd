@@ -20,8 +20,9 @@ For developers defining a \code{kfold()} method for a class
 \code{"foo"}, the \code{kfold.foo()} function should return a list with class
 \code{c("kfold", "loo")} with at least the following named elements:
 \itemize{
-\item \code{"estimates"}: A \code{1x2} matrix with column names \code{"Estimate"} and \code{"SE"}
-containing the ELPD estimate and its standard error.
+\item \code{"estimates"}: A \code{1x2} matrix containing the ELPD estimate and its
+standard error. The matrix must have row name "\code{elpd_kfold}" and column
+names \code{"Estimate"} and \code{"SE"}.
 \item \code{"pointwise"}: A \code{Nx1} matrix with column name \code{"elpd_kfold"} containing
 the pointwise contributions for each data point.
 }
