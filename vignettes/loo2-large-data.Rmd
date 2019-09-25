@@ -226,7 +226,7 @@ approximations, for example:
 
 ```{r, eval=FALSE}
 set.seed(4711)
-loo_ss_2 <-
+loo_ss_1c <-
   loo_subsample(
     x = llfun_logistic,
     draws = parameter_draws_1,
@@ -236,7 +236,7 @@ loo_ss_2 <-
     loo_approximation = "lpd", # use lpd instead of plpd
     loo_approximation_draws = 100
   )
-print(loo_ss_2)
+print(loo_ss_1c)
 ```
 
 
@@ -316,7 +316,8 @@ See help('pareto-k-diagnostic') for details.
 
 ## Combining the posterior approximation method with subsampling
 
-Posterior approximation correction can also be used together with subsampling. 
+The posterior approximation correction can also be used together with
+subsampling:
 
 ```{r, eval=FALSE}
 set.seed(4711)
@@ -373,12 +374,23 @@ fit_2 <- sampling(stan_mod, data = standata)
 parameter_draws_2 <- extract(fit_2)$beta
 stan_df_2 <- as.data.frame(standata)
 
+# recompute subsampling loo for first model for demonstration purposes
+set.seed(4711)
+loo_ss_1 <-
+  loo_subsample(
+    x = llfun_logistic,
+    draws = parameter_draws_1,
+    data = stan_df_1,
+    observations = 200
+  )
+
+# compute subsampling loo for second model (with log-arsenic)
 loo_ss_2 <-
   loo_subsample(
     x = llfun_logistic,
     draws = parameter_draws_2,
     data = stan_df_2,
-    observations = 100
+    observations = 200
   )
 
 print(loo_ss_2)
@@ -428,7 +440,7 @@ we can simply extract the observations used in `loo_ss_1` and use them in
 
 
 ```{r, eval=FALSE}
-loo_ss_2_m <-
+loo_ss_2 <-
   loo_subsample(
     x = llfun_logistic,
     draws = parameter_draws_2,
@@ -442,7 +454,7 @@ helper function:
 
 ```{r, eval=FALSE}
 idx <- obs_idx(loo_ss_1)
-loo_ss_2_m <-
+loo_ss_2 <-
   loo_subsample(
     x = llfun_logistic,
     draws = parameter_draws_2,
@@ -463,7 +475,7 @@ We can now compare the models and estimate the difference based on the the same
 subsampled observations.
 
 ```{r, eval=FALSE}
-comp <- loo_compare(loo_ss_1, loo_ss_2_m)
+comp <- loo_compare(loo_ss_1, loo_ss_2)
 print(comp) 
 ```
 
@@ -485,9 +497,9 @@ earlier.
 It is also possible to compare a subsampled loo computation with a full loo object.
 
 ```{r, eval=FALSE}
-loo_ss_2_full <- loo(x = llfun_logistic, draws = parameter_draws_2, data = stan_df_2)
-comp <- loo_compare(loo_ss_1, loo_ss_2_full)
-print(comp) 
+# use loo() instead of loo_subsample() to compute full PSIS-LOO for model 2
+loo_full_2 <- loo(x = llfun_logistic, draws = parameter_draws_2, data = stan_df_2)
+loo_compare(loo_ss_1, loo_full_2)
 ```
 
 ```
