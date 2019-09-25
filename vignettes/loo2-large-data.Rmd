@@ -48,6 +48,7 @@ Here is the Stan code for fitting the logistic regression model, which
 we save in a file called `logistic.stan`:
 
 ```
+// save in `logistic.stan`
 data {
   int<lower=0> N;             // number of data points
   int<lower=0> P;             // number of predictors (including intercept)
@@ -99,8 +100,10 @@ wells$dist100 <- with(wells, dist / 100)
 X <- model.matrix(~ dist100 + arsenic, wells)
 standata <- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
 
-# Fit model
+# Compile
 stan_mod <- stan_model("logistic.stan")
+
+# Fit model
 fit_1 <- sampling(stan_mod, data = standata, seed = 4711)
 print(fit_1, pars = "beta")
 ```
@@ -263,11 +266,11 @@ approximations, can further speed-up LOO-CV for large data. Here we demonstrate
 using a Laplace approximation in Stan.
 
 ```{r, eval=FALSE}
-library("rstan")
-fit_laplace <- optimizing(stan_mod, data = standata, draws = 2000)
-parameter_draws_laplace <- fit_laplace$theta_tilde
-log_p <- fit_laplace$log_p # The log density of the posterior
-log_g <- fit_laplace$log_g # The log density of the approximation
+fit_laplace <- optimizing(stan_mod, data = standata, draws = 2000, 
+                          importance_resampling = TRUE)
+parameter_draws_laplace <- fit_laplace$theta_tilde # draws from approximate posterior
+log_p <- fit_laplace$log_p # log density of the posterior
+log_g <- fit_laplace$log_g # log density of the approximation
 ```
 
 Using the posterior approximation we can then do LOO-CV by correcting for the
