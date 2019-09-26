@@ -4,6 +4,9 @@
 
 * `compare()` is now __deprecated__ in favor of [`loo_compare()`](https://mc-stan.org/loo/reference/loo_compare.html). (#93)
 
+* New functions `loo_subsample()` and `loo_approximate_posterior()` (and new
+vignette) for doing PSIS-LOO for large data. (#113)
+
 * Use markdown syntax in roxygen documentation wherever possible. (#108)
 
 
