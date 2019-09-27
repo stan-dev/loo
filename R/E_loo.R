@@ -62,7 +62,7 @@
 #'   weight = c(ctl, trt),
 #'   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
 #' )
-#' fit <- stan_glm(weight ~ group, data = d)
+#' fit <- stan_glm(weight ~ group, data = d, refresh = 0)
 #' yrep <- posterior_predict(fit)
 #' dim(yrep)
 #'
