@@ -6,6 +6,8 @@
 \alias{psis.matrix}
 \alias{psis.default}
 \alias{weights.psis}
+\alias{subset.psis}
+\alias{dim.psis}
 \alias{is.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
@@ -20,6 +22,10 @@ psis(log_ratios, ...)
 \method{psis}{default}(log_ratios, ..., r_eff = NULL)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
+
+\method{subset}{psis}(x, subset, ...)
+
+\method{dim}{psis}(x)
 
 is.psis(x)
 }
@@ -57,8 +63,7 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{object}{For the \code{weights()} method, an object returned by \code{psis()} (a
-list with class \code{"psis"}).}
+\item{object, x}{An object returned by \code{psis()}.}
 
 \item{log}{For the \code{weights()} method, should the weights be returned on
 the log scale? Defaults to \code{TRUE}.}
@@ -66,7 +71,10 @@ the log scale? Defaults to \code{TRUE}.}
 \item{normalize}{For the \code{weights()} method, should the weights be
 normalized? Defaults to \code{TRUE}.}
 
-\item{x}{For \code{is.psis()}, an object to check.}
+\item{subset}{For the \code{subset()} method, a vector indicating which
+observations (columns of weights) to keep. Can be a logical vector of
+length \code{ncol(x)} (for a psis object \code{x}) or a shorter integer vector
+containing only the indexes to keep.}
 }
 \value{
 The \code{psis()} methods return an object of class \code{"psis"},
@@ -111,6 +119,9 @@ The \code{weights()} method returns an object with the same dimensions as
 the \code{log_weights} component of the \code{"psis"} object. The \code{normalize} and
 \code{log} arguments control whether the returned weights are normalized and
 whether or not to return them on the log scale.
+
+The \code{subset()} method returns the input \code{"psis"} object but dropping
+the contents corresponding to the unselected indexes.
 }
 \description{
 Implementation of Pareto smoothed importance sampling (PSIS), a method for
@@ -144,7 +155,6 @@ ulw <- weights(psis_result, normalize=FALSE) # unnormalized log-weights
 
 w <- weights(psis_result, log=FALSE) # normalized weights (not log-weights)
 uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
-
 
 
 }
