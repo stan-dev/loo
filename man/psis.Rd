@@ -58,6 +58,20 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
+\item{is_method}{Importance sampling method to use. The following approaches are implemented:
+\describe{
+\item{\code{PSIS}}{
+Pareto-Smoothed Importance Sampling.
+}
+\item{\code{TIS}}{
+Truncated Importance Sampling with truncation at \code{sqrt(S)}.
+}
+\item{\code{IS}}{
+Standard Importance Sampling.
+}
+}
+Defaults to \code{"PSIS"}.}
+
 \item{object}{For the \code{weights()} method, an object returned by \code{psis()} (a
 list with class \code{"psis"}).}
 
@@ -76,7 +90,8 @@ which is a named list with the following components:
 \describe{
 \item{\code{log_weights}}{
 Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
-weights. To get normalized weights use the \code{weights} method provided
+weights, \emph{minus the largest log ratio} for numerical reasons.
+To get normalized weights use the \code{weights} method provided
 for objects of class \code{"psis"}.
 }
 \item{\code{diagnostics}}{

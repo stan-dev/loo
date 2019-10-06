@@ -23,6 +23,19 @@
 #'   draws of the `log_ratios` not obtained from MCMC then the warning
 #'   message thrown when not specifying `r_eff` can be disabled by
 #'   setting `r_eff` to `NA`.
+#' @param is_method Importance sampling method to use. The following approaches are implemented:
+#' \describe{
+#'   \item{`PSIS`}{
+#'     Pareto-Smoothed Importance Sampling.
+#'   }
+#'  \item{`TIS`}{
+#'    Truncated Importance Sampling with truncation at \code{sqrt(S)}.
+#'  }
+#'  \item{`IS`}{
+#'    Standard Importance Sampling.
+#'  }
+#' }
+#' Defaults to \code{"PSIS"}.
 #'
 #' @return The `psis()` methods return an object of class `"psis"`,
 #'   which is a named list with the following components:
@@ -30,7 +43,8 @@
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights. To get normalized weights use the `weights` method provided
+#'     weights, *minus the largest log ratio* for numerical reasons.
+#'     To get normalized weights use the `weights` method provided
 #'     for objects of class `"psis"`.
 #'   }
 #'  \item{`diagnostics`}{
@@ -196,6 +210,12 @@ is.psis <- function(x) {
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
 #' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
+#' @param is_method
+#'   Importance sampling method to use. The following approaches are implemented:
+#'   * Pareto-Smoothed Importance Sampling (\code{"PSIS"}).
+#'   * Truncated Importance Sampling with truncation at \code{sqrt(S)} (\code{"TIS"}).
+#'   * Standard Importance Sampling  (\code{"IS"}).
+#'   Deafults to \code{"PSIS"}.
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
 #'
@@ -234,7 +254,7 @@ psis_object <-
 #' @param lr Matrix of log ratios (`-loglik`)
 #' @param r_eff Vector of relative effective sample sizes
 #' @param cores User's integer `cores` argument
-#' @param is_method Importance sampling method to use. Deafults to PSIS, but also IS and TIS are implemented.
+#' @param is_method Importance sampling method to use. Deafults to \code{"PSIS"}, but also \code{"TIS"} and \code{"IS"} are implemented.
 #' @return A list with class `"psis"` and structure described in the main doc at
 #'   the top of this file.
 #'
