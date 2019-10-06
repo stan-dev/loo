@@ -83,21 +83,15 @@ loo_compare.default <- function(x, ...) {
     loos <- x
   }
 
+  # If subsampling is used
+  if(any(sapply(loos, inherits, "psis_loo_ss"))) {
+    return(loo_compare.psis_loo_ss_list(loos))
+  }
+
   loo_compare_checks(loos)
 
-  tmp <- sapply(loos, function(x) {
-    est <- x$estimates
-    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
-  })
-  colnames(tmp) <- find_model_names(loos)
-  rnms <- rownames(tmp)
-  comp <- tmp
-  ord <- order(tmp[grep("^elpd", rnms), ], decreasing = TRUE)
-  comp <- t(comp)[ord, ]
-  patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
-  col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
-                    use.names = FALSE)
-  comp <- comp[, col_ord]
+  comp <- loo_compare_matrix(loos)
+  ord <- loo_compare_order(loos)
 
   # compute elpd_diff and se_elpd_diff relative to best model
   rnms <- rownames(comp)
@@ -229,4 +223,41 @@ find_model_names <- function(x) {
   }
 
   return(out_names)
+}
+
+
+#' Compute the loo_compare matrix
+#' @keywords internal
+#' @noRd
+#' @param loos List of `"loo"` objects.
+loo_compare_matrix <- function(loos){
+  tmp <- sapply(loos, function(x) {
+    est <- x$estimates
+    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
+  })
+  colnames(tmp) <- find_model_names(loos)
+  rnms <- rownames(tmp)
+  comp <- tmp
+  ord <- loo_compare_order(loos)
+  comp <- t(comp)[ord, ]
+  patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
+  col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
+                    use.names = FALSE)
+  comp <- comp[, col_ord]
+  comp
+}
+
+#' Computes the order of loos for comparison
+#' @noRd
+#' @keywords internal
+#' @param loos List of `"loo"` objects.
+loo_compare_order <- function(loos){
+  tmp <- sapply(loos, function(x) {
+    est <- x$estimates
+    setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
+  })
+  colnames(tmp) <- find_model_names(loos)
+  rnms <- rownames(tmp)
+  ord <- order(tmp[grep("^elpd", rnms), ], decreasing = TRUE)
+  ord
 }

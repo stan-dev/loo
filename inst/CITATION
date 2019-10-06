@@ -1,13 +1,11 @@
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
+authors <- as.personList(meta$Author)
+authors <- grep("\\[cre|\\[aut", authors, value = TRUE)
 
 bibentry(bibtype = "Misc",
          title = "loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models",
-         author = c(person("Aki", "Vehtari"),
-                    person("Jonah", "Gabry"),
-                    person("Yuling", "Yao"),
-                    person("Andrew", "Gelman")
-                    ),
+         author = authors,
          year = year,
          note = note,
          url = "https://mc-stan.org/loo",

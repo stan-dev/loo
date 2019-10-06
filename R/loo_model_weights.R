@@ -345,7 +345,7 @@ pseudobma_weights <-
 dirichlet_rng <- function(n, alpha) {
   K <- length(alpha)
   gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
-  return(gamma_sim / rowSums(gamma_sim))
+  gamma_sim / rowSums(gamma_sim)
 }
 
 #' @export
@@ -417,7 +417,7 @@ validate_log_lik_list <- function(log_lik_list) {
      length(unique(sapply(log_lik_list, nrow))) != 1) {
     stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }
 
 validate_psis_loo_list <- function(psis_loo_list) {
@@ -434,5 +434,5 @@ validate_psis_loo_list <- function(psis_loo_list) {
       length(unique(dims[2, ])) != 1) {
     stop("Each object in the list must have the same dimensions.", call. = FALSE)
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }

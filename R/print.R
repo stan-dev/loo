@@ -29,7 +29,7 @@ print.loo <- function(x, digits = 1, ...) {
 #' @rdname print.loo
 print.waic <- function(x, digits = 1, ...) {
   print.loo(x, digits = digits, ...)
-  throw_pwaic_warnings(x$pointwise[, "p_waic"], digits = digits)
+  throw_pwaic_warnings(x$pointwise[, "p_waic"], digits = digits, warn = FALSE)
   invisible(x)
 }
 
@@ -38,6 +38,24 @@ print.waic <- function(x, digits = 1, ...) {
 print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
+  print_mcse_summary(x, digits = digits)
+  if (length(pareto_k_ids(x, threshold = 0.5))) {
+    cat("\n")
+  }
+  print(pareto_k_table(x), digits = digits)
+  cat(.k_help())
+  if (plot_k) {
+    plot(x, ...)
+  }
+  invisible(x)
+}
+
+#' @export
+#' @rdname print.loo
+print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.loo(x, digits = digits, ...)
+  cat("------\n")
+  cat("Posterior approximation correction used.\n")
   print_mcse_summary(x, digits = digits)
   if (length(pareto_k_ids(x, threshold = 0.5))) {
     cat("\n")
@@ -112,6 +130,18 @@ print_dims.kfold <- function(x, ...) {
   if (!is.null(K)) {
     cat("Based on", paste0(K, "-fold"), "cross-validation\n")
   }
+}
+
+#' @rdname print_dims
+#' @export
+print_dims.psis_loo_ss <- function(x, ...) {
+  cat(
+    "Computed from",
+    paste(c(dim(x)[1], nobs(x)) , collapse = " by "),
+    "subsampled log-likelihood\nvalues from",
+    length(x$loo_subsampling$elpd_loo_approx),
+    "total observations.\n"
+  )
 }
 
 
