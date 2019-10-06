@@ -12,12 +12,13 @@
 psis(log_ratios, ...)
 
 \method{psis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+  cores = getOption("mc.cores", 1), is_method = "PSIS")
 
 \method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+  cores = getOption("mc.cores", 1), is_method = "PSIS")
 
-\method{psis}{default}(log_ratios, ..., r_eff = NULL)
+\method{psis}{default}(log_ratios, ..., r_eff = NULL,
+  is_method = "PSIS")
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 
