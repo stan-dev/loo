@@ -501,6 +501,7 @@ list2psis <- function(objects) {
     tail_len = psis_apply(objects, "tail_len", fun = "attr"),
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
+    is_method = psis_apply(objects, "is_method", fun = "attr", fun_val = character(1)),
     class = c("psis", "list")
   )
 }

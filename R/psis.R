@@ -93,14 +93,18 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 psis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
+           cores = getOption("mc.cores", 1),
+           is_method = "PSIS") {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
+    stopifnot(is_method %in% implemented_is_methods())
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores)
+    do_psis(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
   }
+
+
 
 #' @export
 #' @templateVar fn psis
@@ -110,11 +114,13 @@ psis.matrix <-
   function(log_ratios,
            ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
+           cores = getOption("mc.cores", 1),
+           is_method = "PSIS") {
     cores <- loo_cores(cores)
+    stopifnot(is_method %in% implemented_is_methods())
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores)
+    do_psis(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
   }
 
 #' @export
@@ -122,11 +128,13 @@ psis.matrix <-
 #' @template vector
 #'
 psis.default <-
-  function(log_ratios, ..., r_eff = NULL) {
+  function(log_ratios, ..., r_eff = NULL,
+           is_method = "PSIS") {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
+    stopifnot(is_method %in% implemented_is_methods())
     dim(log_ratios) <- c(length(log_ratios), 1)
     r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    psis.matrix(log_ratios, r_eff = r_eff, cores = 1)
+    psis.matrix(log_ratios, r_eff = r_eff, cores = 1, is_method = is_method)
   }
 
 #' @rdname psis
@@ -195,7 +203,8 @@ psis_object <-
   function(unnormalized_log_weights,
            pareto_k,
            tail_len,
-           r_eff) {
+           r_eff,
+           is_method = "PSIS") {
     stopifnot(is.matrix(unnormalized_log_weights))
     norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
     out <- structure(
@@ -208,6 +217,7 @@ psis_object <-
       tail_len = tail_len,
       r_eff = r_eff,
       dims = dim(unnormalized_log_weights),
+      is_method = is_method,
       class = c("psis", "list")
     )
 
@@ -224,26 +234,32 @@ psis_object <-
 #' @param lr Matrix of log ratios (`-loglik`)
 #' @param r_eff Vector of relative effective sample sizes
 #' @param cores User's integer `cores` argument
+#' @param is_method Importance sampling method to use. Deafults to PSIS, but also IS and TIS are implemented.
 #' @return A list with class `"psis"` and structure described in the main doc at
 #'   the top of this file.
 #'
-do_psis <- function(log_ratios, r_eff, cores) {
+do_psis <- function(log_ratios, r_eff, cores, is_method = "PSIS") {
   stopifnot(cores == as.integer(cores))
+  stopifnot(is_method %in% implemented_is_methods())
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
   throw_tail_length_warnings(tail_len)
 
+  if(is_method == "PSIS") is_fun <- do_psis_i
+  if(is_method == "TIS") is_fun <- do_tis_i
+  if(is_method == "IS") is_fun <- do_tis_i
+
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
-      do_psis_i(log_ratios[, i], tail_len[i]))
+      is_fun(log_ratios[, i], tail_len[i]))
   } else {
     if (.Platform$OS.type != "windows") {
       lw_list <- parallel::mclapply(
         X = seq_len(N),
         mc.cores = cores,
         FUN = function(i)
-          do_psis_i(log_ratios[, i], tail_len[i])
+          is_fun(log_ratios[, i], tail_len[i])
       )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -253,7 +269,7 @@ do_psis <- function(log_ratios, r_eff, cores) {
           cl = cl,
           X = seq_len(N),
           fun = function(i)
-            do_psis_i(log_ratios[, i], tail_len[i])
+            is_fun(log_ratios[, i], tail_len[i])
         )
     }
   }
@@ -266,7 +282,8 @@ do_psis <- function(log_ratios, r_eff, cores) {
     unnormalized_log_weights = log_weights,
     pareto_k = pareto_k,
     tail_len = tail_len,
-    r_eff = r_eff
+    r_eff = r_eff,
+    is_method = rep(is_method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
 }
 
@@ -329,6 +346,48 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
 
   list(log_weights = lw_i, pareto_k = khat)
 }
+
+#' TIS on a single vector
+#'
+#' @noRd
+#' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
+#'   log likelihoods).
+#' @param tail_len_i Not used. Included to conform to PSIS API.
+#'
+#' @details Implementation of Truncated importance sampling (PSIS), a method for
+#' stabilizing importance ratios. The version of TIS implemented here
+#' corresponds to the algorithm presented in Ionides (2008) with truncation at
+#' sqrt(S).
+#'
+#' @return A named list containing:
+#' * `lw`: vector of unnormalized log weights
+#' * `pareto_k`: scalar Pareto k estimate. For TIS, this defaults  to 0.
+#'
+do_tis_i <- function(log_ratios_i, tail_len_i) {
+  S <- length(log_ratios_i)
+  lw_i <- pmin(log_ratios_i, 0.5 * log(S))
+  lw_i <- lw_i - max(lw_i)
+  list(log_weights = lw_i, pareto_k = 0)
+}
+
+#' Standard IS on a single vector
+#'
+#' @noRd
+#' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
+#'   log likelihoods).
+#' @param tail_len_i Not used. Included to conform to PSIS API.
+#'
+#' @details Implementation standard importance sampling.
+#' @return A named list containing:
+#' * `lw`: vector of unnormalized log weights
+#' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
+do_is_i <- function(log_ratios_i, tail_len_i) {
+  S <- length(log_ratios_i)
+  lw_i <- log_ratios_i - max(log_ratios_i)
+  list(log_weights = lw_i, pareto_k = 0)
+}
+
+implemented_is_methods <- function() c("PSIS", "TIS", "IS")
 
 
 #' PSIS tail smoothing for a single vector
