@@ -244,11 +244,13 @@ do_psis <- function(log_ratios, r_eff, cores, is_method = "PSIS") {
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
-  throw_tail_length_warnings(tail_len)
 
-  if(is_method == "PSIS") is_fun <- do_psis_i
+  if(is_method == "PSIS") {
+    is_fun <- do_psis_i
+    throw_tail_length_warnings(tail_len)
+  }
   if(is_method == "TIS") is_fun <- do_tis_i
-  if(is_method == "IS") is_fun <- do_tis_i
+  if(is_method == "IS") is_fun <- do_is_i
 
   if (cores == 1) {
     lw_list <- lapply(seq_len(N), function(i)
