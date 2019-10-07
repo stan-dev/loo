@@ -92,8 +92,8 @@ As point estimates of \eqn{\hat{\theta}}, the posterior expectations
 of the parameters are used.}
 
 \item{loo_approximation_draws}{The number of posterior draws used when
-integrating over the posterior. This is used if \code{loo_approximation="lpd"}
-or \code{loo_approximation="waic"}.}
+integrating over the posterior. This is used if \code{loo_approximation} is set
+to \code{lpd}, \code{waic}, or \code{tis}.}
 
 \item{llgrad}{The gradient of the log-likelihood. This
 is only used when \code{loo_approximation} is \code{"waic_grad"},
