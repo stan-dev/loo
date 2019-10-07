@@ -16,8 +16,9 @@ tis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr, is_method = "TIS")
 is1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr, is_method = "IS")
 
 test_that("tis and is runs", {
-  expect_silent(tis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr, is_method = "TIS"))
-  expect_silent(is1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr, is_method = "IS"))
+  LLvec[1] <- -10
+  expect_silent(tis1 <- psis(log_ratios = -LLvec, r_eff = r_eff_vec, is_method = "TIS"))
+  expect_silent(is1 <- psis(log_ratios = -LLvec, r_eff = r_eff_vec, is_method = "IS"))
   expect_failure(expect_equal(tis1$log_weights, is1$log_weights))
   expect_failure(expect_equal(tis1$log_weights, psis1$log_weights))
 })
@@ -131,18 +132,17 @@ test_that("explict test of values for IS and TIS", {
   # With TIS values greater than 0.5*log(length(lw)) i.e. 1.386294, should be truncated to 10
   expect_silent(tis_true <- psis(log_ratios = lw, r_eff = NA, is_method = "TIS"))
   expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               c(-0.386294,rep(0,15)), tol = 0.00001)
+               c(-14.0723, -13.0723, -12.0723, -11.0723, -10.0723, -9.0723, -8.0723, -7.0723, -6.0723, -5.0723, -4.0723, -3.0723, -2.0723, -1.0723, -0.0723, 0.), tol = 0.001)
   expect_silent(is_true <- psis(log_ratios = lw, r_eff = NA, is_method = "IS"))
   expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
                c(-15:0), tol = 0.00001)
 
   lw <- c(0.7609420, 1.3894140, 0.4158346, 2.5307927, 4.3379119, 2.4159240, 2.2462172, 0.8057697, 0.9333107, 1.5599302)
-  lw_tis_true <- lw
-  lw_tis_true[lw_tis_true > 0.5 * log(length(lw))] <- 0.5 * log(length(lw))
 
   expect_silent(tis_true <- psis(log_ratios = lw, r_eff = NA, is_method = "TIS"))
   expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               lw_tis_true-max(lw_tis_true), tol = 0.00001)
+               c(-2.931, -2.303, -3.276, -1.161,  0, -1.276, -1.446, -2.886, -2.759, -2.132),
+               tol = 0.001)
   expect_silent(is_true <- psis(log_ratios = lw, r_eff = NA, is_method = "IS"))
   expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
                lw-max(lw), tol = 0.00001)

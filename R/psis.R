@@ -391,7 +391,9 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
 #'
 do_tis_i <- function(log_ratios_i, tail_len_i) {
   S <- length(log_ratios_i)
-  lw_i <- pmin(log_ratios_i, 0.5 * log(S))
+  log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
+  log_cutpoint <- log_Z + 0.5 * log(S)
+  lw_i <- pmin(log_ratios_i, log_cutpoint)
   lw_i <- lw_i - max(lw_i)
   list(log_weights = lw_i, pareto_k = 0)
 }
