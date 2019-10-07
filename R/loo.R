@@ -341,7 +341,8 @@ loo_i <-
            data,
            draws,
            r_eff = NULL,
-           save_psis = FALSE) {
+           save_psis = FALSE,
+           is_method = "PSIS") {
 
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
@@ -351,7 +352,7 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- psis.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
+    psis_out <- psis.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, is_method = is_method)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),

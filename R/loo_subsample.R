@@ -91,8 +91,8 @@ loo_subsample <- function(x, ...) {
 #'  of the parameters are used.
 #'
 #' @param loo_approximation_draws The number of posterior draws used when
-#'   integrating over the posterior. This is used if `loo_approximation="lpd"`
-#'   or `loo_approximation="waic"`.
+#'   integrating over the posterior. This is used if `loo_approximation` is set
+#'   to `lpd`, `waic`, or `tis`.
 #'
 #' @param estimator How should `elpd_loo`, `p_loo` and `looic` be estimated?
 #'  The default is `diff_srs`.
@@ -455,7 +455,7 @@ nobs.psis_loo_ss <- function(object, ...){
 #' @param api the choices available in the loo API or all possible choices.
 #' @return a character vector of allowed choices
 loo_approximation_choices <- function(api = TRUE) {
-  lac <- c("plpd", "lpd", "waic", "waic_grad_marginal", "waic_grad", "waic_hess", "none")
+  lac <- c("plpd", "lpd", "waic", "waic_grad_marginal", "waic_grad", "waic_hess", "tis", "none")
   if(!api) lac <- c(lac, "psis")
   lac
 }
@@ -495,6 +495,13 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   N <- dim(data)[1]
 
   if(loo_approximation == "none") return(rep(1L,N))
+
+  if(loo_approximation == "tis"){
+    draws <- .thin_draws(draws, loo_approximation_draws)
+    tis_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = "TIS"))
+    #psis_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = "PSIS"))
+    return(tis_values$pointwise[, "elpd_loo"])
+  }
 
   if(loo_approximation == "waic"){
     draws <- .thin_draws(draws, loo_approximation_draws)
