@@ -310,7 +310,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
     ord <- sort.int(lw_i, index.return = TRUE)
     tail_ids <- seq(S - tail_len_i + 1, S)
     lw_tail <- ord$x[tail_ids]
-    if (abs(max(lw_tail) - min(lw_tail)) < sqrt(.Machine$double.eps)) {
+    if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps/100) {
       warning(
         "Can't fit generalized Pareto distribution ",
         "because all tail values are the same.",
