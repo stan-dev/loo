@@ -129,7 +129,7 @@ importance_sampling.array <-
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
   }
 
 
@@ -161,7 +161,7 @@ importance_sampling.matrix <-
     stopifnot(is_method %in% implemented_is_methods())
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
   }
 
 #' @export
@@ -283,17 +283,16 @@ psis_object <-
   }
 
 
-#' Do PSIS given matrix of log weights
+#' Do importance sampling given matrix of log weights
 #'
 #' @noRd
 #' @param lr Matrix of log ratios (`-loglik`)
 #' @param r_eff Vector of relative effective sample sizes
 #' @param cores User's integer `cores` argument
-#' @param is_method Importance sampling method to use. Deafults to \code{"PSIS"}, but also \code{"TIS"} and \code{"IS"} are implemented.
 #' @return A list with class `"psis"` and structure described in the main doc at
 #'   the top of this file.
 #'
-do_psis <- function(log_ratios, r_eff, cores, is_method = "PSIS") {
+do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
   stopifnot(cores == as.integer(cores))
   stopifnot(is_method %in% implemented_is_methods())
   N <- ncol(log_ratios)
@@ -346,6 +345,15 @@ do_psis <- function(log_ratios, r_eff, cores, is_method = "PSIS") {
     r_eff = r_eff,
     is_method = rep(is_method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
+}
+
+#' @noRd
+#' @seealso do_importance_sampling
+do_psis <- function(log_ratios, r_eff, cores, is_method){
+  do_importance_sampling(log_ratios = log_ratios,
+                         r_eff = r_eff,
+                         cores = cores,
+                         is_method = "PSIS")
 }
 
 #' Extract named components from each list in the list of lists obtained by

@@ -193,7 +193,7 @@ loo.array <-
            r_eff = NULL,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-
+    # TODO: Implement is_method here
     if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
     ll <- llarray_to_matrix(x)
@@ -216,7 +216,7 @@ loo.matrix <-
            r_eff = NULL,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-
+    # TODO: Implement is_method here
     if (is.null(r_eff)) throw_loo_r_eff_warning()
     psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
     pointwise <- pointwise_loo_calcs(x, psis_out)
