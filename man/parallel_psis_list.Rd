@@ -2,10 +2,14 @@
 % Please edit documentation in R/loo.R
 \name{parallel_psis_list}
 \alias{parallel_psis_list}
+\alias{parallel_importance_sampling_list}
 \title{Parallel psis list computations}
 \usage{
 parallel_psis_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores,
   ...)
+
+parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff,
+  save_psis, cores, ..., is_method)
 }
 \arguments{
 \item{N}{the total number of observations (i.e. \code{nrow(data)}).}

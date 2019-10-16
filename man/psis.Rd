@@ -2,23 +2,37 @@
 % Please edit documentation in R/psis.R
 \name{psis}
 \alias{psis}
+\alias{importance_sampling}
 \alias{psis.array}
+\alias{importance_sampling.array}
 \alias{psis.matrix}
+\alias{importance_sampling.matrix}
 \alias{psis.default}
+\alias{importance_sampling.default}
 \alias{weights.psis}
 \alias{is.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
 psis(log_ratios, ...)
 
+importance_sampling(log_ratios, ...)
+
 \method{psis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1), is_method = "PSIS")
+  cores = getOption("mc.cores", 1))
+
+\method{importance_sampling}{array}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("mc.cores", 1), is_method)
 
 \method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1), is_method = "PSIS")
+  cores = getOption("mc.cores", 1))
 
-\method{psis}{default}(log_ratios, ..., r_eff = NULL,
-  is_method = "PSIS")
+\method{importance_sampling}{matrix}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("mc.cores", 1), is_method)
+
+\method{psis}{default}(log_ratios, ..., r_eff = NULL)
+
+\method{importance_sampling}{default}(log_ratios, ..., r_eff = NULL,
+  is_method)
 
 \method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
 

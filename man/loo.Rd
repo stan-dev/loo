@@ -19,9 +19,11 @@ loo(x, ...)
   cores = getOption("mc.cores", 1))
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL,
-  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1))
+  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1),
+  is_method = "PSIS")
 
-loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
+loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL,
+  is_method = "PSIS")
 
 is.loo(x)
 

@@ -100,6 +100,9 @@
 #'
 psis <- function(log_ratios, ...) UseMethod("psis")
 
+#' @rdname psis
+importance_sampling <- function(log_ratios, ...) UseMethod("importance_sampling")
+
 #' @export
 #' @templateVar fn psis
 #' @template array
@@ -107,8 +110,19 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 psis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
+  importance_sampling.array(log_ratios = log_ratios, ...,
+                            r_eff = r_eff,
+                            cores = cores,
+                            is_method = "PSIS")
+  }
+
+#' @rdname psis
+importance_sampling.array <-
+  function(log_ratios, ...,
+           r_eff = NULL,
            cores = getOption("mc.cores", 1),
-           is_method = "PSIS") {
+           is_method) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
     stopifnot(is_method %in% implemented_is_methods())
@@ -128,8 +142,21 @@ psis.matrix <-
   function(log_ratios,
            ...,
            r_eff = NULL,
+           cores = getOption("mc.cores", 1)) {
+    importance_sampling.matrix(log_ratios,
+                               ...,
+                               r_eff = r_eff,
+                               cores = cores,
+                               is_method = "PSIS")
+  }
+
+#' @rdname psis
+importance_sampling.matrix <-
+  function(log_ratios,
+           ...,
+           r_eff = NULL,
            cores = getOption("mc.cores", 1),
-           is_method = "PSIS") {
+           is_method) {
     cores <- loo_cores(cores)
     stopifnot(is_method %in% implemented_is_methods())
     log_ratios <- validate_ll(log_ratios)
@@ -142,14 +169,22 @@ psis.matrix <-
 #' @template vector
 #'
 psis.default <-
+  function(log_ratios, ..., r_eff = NULL) {
+    importance_sampling.default(log_ratios = log_ratios, ...,
+                                r_eff = r_eff, is_method = "PSIS")
+  }
+
+#' @rdname psis
+importance_sampling.default <-
   function(log_ratios, ..., r_eff = NULL,
-           is_method = "PSIS") {
+           is_method) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     stopifnot(is_method %in% implemented_is_methods())
     dim(log_ratios) <- c(length(log_ratios), 1)
     r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    psis.matrix(log_ratios, r_eff = r_eff, cores = 1, is_method = is_method)
+    importance_sampling.matrix(log_ratios, r_eff = r_eff, cores = 1, is_method = is_method)
   }
+
 
 #' @rdname psis
 #' @export

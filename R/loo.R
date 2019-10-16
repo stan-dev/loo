@@ -243,10 +243,12 @@ loo.function <-
            draws = NULL,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+           cores = getOption("mc.cores", 1),
+           is_method = "PSIS") {
 
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
+    stopifnot(is_method %in% implemented_is_methods())
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
@@ -256,7 +258,8 @@ loo.function <-
       r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
 
-    psis_list <- parallel_psis_list(N = N,
+    psis_list <- parallel_importance_sampling_list(
+                                    N = N,
                                     .loo_i = .loo_i,
                                     .llfun = .llfun,
                                     data = data,
@@ -264,7 +267,8 @@ loo.function <-
                                     r_eff = r_eff,
                                     save_psis = save_psis,
                                     cores = cores,
-                                    ...)
+                                    ...,
+                                    is_method = is_method)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -311,13 +315,16 @@ loo_i <-
            ...,
            data = NULL,
            draws = NULL,
-           r_eff = NULL) {
+           r_eff = NULL,
+           is_method = "PSIS"
+           ) {
     stopifnot(
       i == as.integer(i),
       is.function(llfun) || is.character(llfun),
       is.data.frame(data) || is.matrix(data),
       i <= dim(data)[1],
-      !is.null(draws)
+      !is.null(draws),
+      is_method %in% implemented_is_methods()
     )
     .loo_i(
       i = as.integer(i),
@@ -326,6 +333,7 @@ loo_i <-
       draws = draws,
       r_eff = r_eff[i],
       save_psis = FALSE,
+      is_method = is_method,
       ...
     )
   }
@@ -342,7 +350,7 @@ loo_i <-
            draws,
            r_eff = NULL,
            save_psis = FALSE,
-           is_method = "PSIS") {
+           is_method) {
 
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
@@ -352,7 +360,7 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- psis.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, is_method = is_method)
+    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, is_method = is_method)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -595,6 +603,11 @@ NULL
 #' @param N the total number of observations (i.e. \code{nrow(data)}).
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
+  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., is_method = "PSIS")
+}
+
+#' @rdname parallel_psis_list
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., is_method){
   if (cores == 1) {
     psis_list <-
       lapply(
@@ -605,6 +618,7 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
         draws = draws,
         r_eff = r_eff,
         save_psis = save_psis,
+        is_method = is_method,
         ...
       )
   } else {
@@ -620,6 +634,7 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
+          is_method = is_method,
           ...
         )
     } else {
@@ -636,10 +651,9 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
+          is_method = is_method,
           ...
         )
     }
   }
 }
-
-
