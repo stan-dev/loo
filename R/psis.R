@@ -254,12 +254,12 @@ is.psis <- function(x) {
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
 #'
-psis_object <-
+importance_sampling_object <-
   function(unnormalized_log_weights,
            pareto_k,
            tail_len,
            r_eff,
-           is_method = "PSIS") {
+           is_method) {
     stopifnot(is.matrix(unnormalized_log_weights))
     norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
     out <- structure(
@@ -282,6 +282,19 @@ psis_object <-
     return(out)
   }
 
+#' @noRd
+#' @seealso importance_sampling_object
+psis_object <-
+  function(unnormalized_log_weights,
+           pareto_k,
+           tail_len,
+           r_eff) {
+    importance_sampling_object(unnormalized_log_weights = unnormalized_log_weights,
+                               pareto_k = pareto_k,
+                               tail_len = tail_len,
+                               r_eff = r_eff,
+                               is_method = "PSIS")
+  }
 
 #' Do importance sampling given matrix of log weights
 #'
@@ -338,7 +351,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
   pareto_k <- psis_apply(lw_list, "pareto_k")
   throw_pareto_warnings(pareto_k)
 
-  psis_object(
+  importance_sampling_object(
     unnormalized_log_weights = log_weights,
     pareto_k = pareto_k,
     tail_len = tail_len,
