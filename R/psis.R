@@ -273,7 +273,7 @@ importance_sampling_object <-
       r_eff = r_eff,
       dims = dim(unnormalized_log_weights),
       is_method = is_method,
-      class = c("psis", "list")
+      class = c("psis", "importance_sampling", "list")
     )
 
     # need normalized weights (not on log scale) for psis_n_eff

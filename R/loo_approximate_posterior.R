@@ -143,7 +143,7 @@ loo_approximate_posterior.function <-
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
       psis_object_list <- lapply(psis_list, "[[", "psis_object")
-      psis_out <- list2psis(psis_object_list)
+      psis_out <- list2importance_sampling(psis_object_list)
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")

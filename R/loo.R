@@ -273,7 +273,7 @@ loo.function <-
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
       psis_object_list <- lapply(psis_list, "[[", "psis_object")
-      psis_out <- list2psis(psis_object_list)
+      psis_out <- list2importance_sampling(psis_object_list)
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
@@ -495,7 +495,7 @@ throw_loo_r_eff_warning <- function() {
 #' @param objects List of `"psis"` objects, each for a single observation.
 #' @return A single `"psis"` object.
 #'
-list2psis <- function(objects) {
+list2importance_sampling <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
   diagnostics <- lapply(objects, "[[", "diagnostics")
   structure(
@@ -511,7 +511,7 @@ list2psis <- function(objects) {
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
     is_method = psis_apply(objects, "is_method", fun = "attr", fun_val = character(1)),
-    class = c("psis", "list")
+    class = c("psis", "importance_sampling", "list")
   )
 }
 
