@@ -410,7 +410,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
     ll <- as.matrix(ll)
   }
-  lw <- weights.psis(psis_object, normalize = TRUE, log = TRUE)
+  lw <- weights(psis_object, normalize = TRUE, log = TRUE)
   elpd_loo <- matrixStats::colLogSumExps(ll + lw)
   lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
@@ -498,6 +498,16 @@ throw_loo_r_eff_warning <- function() {
 list2importance_sampling <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
   diagnostics <- lapply(objects, "[[", "diagnostics")
+
+  is_method <- psis_apply(objects, "is_method", fun = "attr", fun_val = character(1))
+  is_methods <- unique(is_method)
+  if(length(is_methods) == 1) {
+    is_method <- is_methods
+    classes <- c(tolower(is_methods), "importance_sampling", "list")
+  } else {
+    classes <- c("importance_sampling", "list")
+  }
+
   structure(
     list(
       log_weights = log_weights,
@@ -510,8 +520,8 @@ list2importance_sampling <- function(objects) {
     tail_len = psis_apply(objects, "tail_len", fun = "attr"),
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
-    is_method = psis_apply(objects, "is_method", fun = "attr", fun_val = character(1)),
-    class = c("psis", "importance_sampling", "list")
+    is_method = is_method,
+    class = classes
   )
 }
 

@@ -188,8 +188,8 @@ importance_sampling.default <-
 
 #' @rdname psis
 #' @export
-#' @export weights.psis
-#' @method weights psis
+#' @export weights.importance_sampling
+#' @method weights importance_sampling
 #' @param object For the `weights()` method, an object returned by `psis()` (a
 #'   list with class `"psis"`).
 #' @param log For the `weights()` method, should the weights be returned on
@@ -202,7 +202,7 @@ importance_sampling.default <-
 #'   `log` arguments control whether the returned weights are normalized and
 #'   whether or not to return them on the log scale.
 #'
-weights.psis <-
+weights.importance_sampling <-
   function(object,
            ...,
            log = TRUE,
@@ -261,6 +261,15 @@ importance_sampling_object <-
            r_eff,
            is_method) {
     stopifnot(is.matrix(unnormalized_log_weights))
+    is_methods <- unique(is_method)
+    stopifnot(all(is_methods %in% implemented_is_methods()))
+    if(length(is_methods) == 1) {
+      is_method <- is_methods
+      classes <- c(tolower(is_methods), "importance_sampling", "list")
+    } else {
+      classes <- c("importance_sampling", "list")
+    }
+
     norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
     out <- structure(
       list(
@@ -273,11 +282,11 @@ importance_sampling_object <-
       r_eff = r_eff,
       dims = dim(unnormalized_log_weights),
       is_method = is_method,
-      class = c("psis", "importance_sampling", "list")
+      class = classes
     )
 
     # need normalized weights (not on log scale) for psis_n_eff
-    w <- weights.psis(out, normalize = TRUE, log = FALSE)
+    w <- weights(out, normalize = TRUE, log = FALSE)
     out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
     return(out)
   }

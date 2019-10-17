@@ -145,9 +145,10 @@ relative_eff.function <-
 #' @describeIn relative_eff
 #'   If `x` is an object of class `"psis"`, `relative_eff()` simply returns
 #'   the `r_eff` attribute of `x`.
-relative_eff.psis <- function(x, ...) {
+relative_eff.importance_sampling <- function(x, ...) {
   attr(x, "r_eff")
 }
+
 
 # internal ----------------------------------------------------------------
 

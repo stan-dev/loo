@@ -9,7 +9,7 @@
 \alias{importance_sampling.matrix}
 \alias{psis.default}
 \alias{importance_sampling.default}
-\alias{weights.psis}
+\alias{weights.importance_sampling}
 \alias{is.psis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
@@ -34,7 +34,8 @@ importance_sampling(log_ratios, ...)
 \method{importance_sampling}{default}(log_ratios, ..., r_eff = NULL,
   is_method)
 
-\method{weights}{psis}(object, ..., log = TRUE, normalize = TRUE)
+\method{weights}{importance_sampling}(object, ..., log = TRUE,
+  normalize = TRUE)
 
 is.psis(x)
 }
