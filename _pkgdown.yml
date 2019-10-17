@@ -1,5 +1,7 @@
 url: https://mc-stan.org/loo
 
+destination: "."
+
 template:
   params:
     bootswatch: cosmo
