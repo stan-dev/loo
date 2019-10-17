@@ -326,7 +326,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
     throw_tail_length_warnings(tail_len)
   } else if(is_method == "TIS") {
     is_fun <- do_tis_i
-  } else if(is_method == "IS") {
+  } else if(is_method == "SIS") {
     is_fun <- do_is_i
   } else {
     stop("Incorrect IS method.")
@@ -438,49 +438,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
   list(log_weights = lw_i, pareto_k = khat)
 }
 
-#' TIS on a single vector
-#'
-#' @noRd
-#' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
-#'   log likelihoods).
-#' @param tail_len_i Not used. Included to conform to PSIS API.
-#'
-#' @details Implementation of Truncated importance sampling (PSIS), a method for
-#' stabilizing importance ratios. The version of TIS implemented here
-#' corresponds to the algorithm presented in Ionides (2008) with truncation at
-#' sqrt(S).
-#'
-#' @return A named list containing:
-#' * `lw`: vector of unnormalized log weights
-#' * `pareto_k`: scalar Pareto k estimate. For TIS, this defaults  to 0.
-#'
-do_tis_i <- function(log_ratios_i, tail_len_i) {
-  S <- length(log_ratios_i)
-  log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
-  log_cutpoint <- log_Z + 0.5 * log(S)
-  lw_i <- pmin(log_ratios_i, log_cutpoint)
-  lw_i <- lw_i - max(lw_i)
-  list(log_weights = lw_i, pareto_k = 0)
-}
-
-#' Standard IS on a single vector
-#'
-#' @noRd
-#' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
-#'   log likelihoods).
-#' @param tail_len_i Not used. Included to conform to PSIS API.
-#'
-#' @details Implementation standard importance sampling.
-#' @return A named list containing:
-#' * `lw`: vector of unnormalized log weights
-#' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
-do_is_i <- function(log_ratios_i, tail_len_i) {
-  S <- length(log_ratios_i)
-  lw_i <- log_ratios_i - max(log_ratios_i)
-  list(log_weights = lw_i, pareto_k = 0)
-}
-
-implemented_is_methods <- function() c("PSIS", "TIS", "IS")
+implemented_is_methods <- function() c("PSIS", "TIS", "SIS")
 
 
 #' PSIS tail smoothing for a single vector

@@ -81,6 +81,15 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   invisible(x)
 }
 
+#' @export
+#' @rdname print.loo
+print.importance_sampling <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print_dims(x)
+  if (plot_k) {
+    plot(x, ...)
+  }
+  invisible(x)
+}
 
 # internal ----------------------------------------------------------------
 
@@ -95,7 +104,7 @@ print_dims <- function(x, ...) UseMethod("print_dims")
 
 #' @rdname print_dims
 #' @export
-print_dims.psis <- function(x, ...) {
+print_dims.importance_sampling <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),

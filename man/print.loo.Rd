@@ -6,6 +6,7 @@
 \alias{print.psis_loo}
 \alias{print.psis_loo_ap}
 \alias{print.psis}
+\alias{print.importance_sampling}
 \title{Print methods}
 \usage{
 \method{print}{loo}(x, digits = 1, ...)
@@ -17,6 +18,8 @@
 \method{print}{psis_loo_ap}(x, digits = 1, plot_k = FALSE, ...)
 
 \method{print}{psis}(x, digits = 1, plot_k = FALSE, ...)
+
+\method{print}{importance_sampling}(x, digits = 1, plot_k = FALSE, ...)
 }
 \arguments{
 \item{x}{An object returned by \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, or \code{\link[=waic]{waic()}}.}
