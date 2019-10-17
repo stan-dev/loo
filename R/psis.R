@@ -327,7 +327,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
   } else if(is_method == "TIS") {
     is_fun <- do_tis_i
   } else if(is_method == "SIS") {
-    is_fun <- do_is_i
+    is_fun <- do_sis_i
   } else {
     stop("Incorrect IS method.")
   }

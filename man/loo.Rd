@@ -13,10 +13,10 @@
 loo(x, ...)
 
 \method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1))
+  cores = getOption("mc.cores", 1), is_method = "PSIS")
 
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1))
+  cores = getOption("mc.cores", 1), is_method = "PSIS")
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL,
   r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1),

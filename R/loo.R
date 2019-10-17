@@ -192,10 +192,10 @@ loo.array <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-    # TODO: Implement is_method here
+           cores = getOption("mc.cores", 1),
+           is_method = "PSIS") {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
@@ -215,10 +215,10 @@ loo.matrix <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-    # TODO: Implement is_method here
+           cores = getOption("mc.cores", 1),
+           is_method = "PSIS") {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
+    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,

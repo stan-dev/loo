@@ -68,10 +68,8 @@ is.sis <- function(x) {
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
 #' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
-do_is_i <- function(log_ratios_i, tail_len_i) {
+do_sis_i <- function(log_ratios_i, tail_len_i) {
   S <- length(log_ratios_i)
   lw_i <- log_ratios_i - max(log_ratios_i)
   list(log_weights = lw_i, pareto_k = 0)
 }
-
-# TODO: rename do_is to do_sis
