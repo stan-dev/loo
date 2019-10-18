@@ -42,10 +42,6 @@ tis.default <-
                                 r_eff = r_eff, is_method = "TIS")
   }
 
-#' @export
-dim.tis <- function(x) {
-  attr(x, "dims")
-}
 
 #' @rdname psis
 #' @export

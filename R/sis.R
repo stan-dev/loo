@@ -42,11 +42,6 @@ sis.default <-
                                 r_eff = r_eff, is_method = "SIS")
   }
 
-#' @export
-dim.sis <- function(x) {
-  attr(x, "dims")
-}
-
 #' @rdname psis
 #' @export
 is.sis <- function(x) {

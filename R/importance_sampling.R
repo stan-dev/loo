@@ -48,6 +48,11 @@ importance_sampling.default <-
   }
 
 
+#' @export
+dim.importance_sampling <- function(x) {
+  attr(x, "dims")
+}
+
 #' @rdname psis
 #' @export
 #' @export weights.importance_sampling

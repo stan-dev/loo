@@ -142,11 +142,6 @@ psis.default <-
   }
 
 
-#' @export
-dim.psis <- function(x) {
-  attr(x, "dims")
-}
-
 #' @rdname psis
 #' @export
 #' @param x For `is.psis()`, an object to check.
