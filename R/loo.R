@@ -614,7 +614,7 @@ NULL
 #' @param .loo_i The function used to compute individual loo contributions.
 #' @param .llfun See llfun in \code{loo.function()}.
 #' @param N the total number of observations (i.e. \code{nrow(data)}).
-#' @template is_method
+#' @param method See is_method for \code{loo()}
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
   parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., method = "psis")
