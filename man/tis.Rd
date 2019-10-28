@@ -45,11 +45,12 @@ which is a named list with the following components:
 Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
 weights, \emph{minus the largest log ratio} for numerical reasons.
 To get normalized weights use the \code{weights} method provided
-for objects of class \code{"psis"/"tis"/"sis"}.
+for objects of class \code{tis}.
 }
 \item{\code{diagnostics}}{
 A named list containing one vector:
 \itemize{
+\item \code{pareto_k}: Not used in \code{tis}, all set to 0.
 \item \code{n_eff}: effective sample size estimates.
 }
 }
@@ -63,6 +64,9 @@ used internally by the \code{weights} method to normalize the log weights.
 }
 \item{\code{r_eff}}{
 If specified, the user's \code{r_eff} argument.
+}
+\item{\code{tail_len}}{
+Not used for \code{tis}.
 }
 \item{\code{dims}}{
 Integer vector of length 2 containing \code{S} (posterior sample size)

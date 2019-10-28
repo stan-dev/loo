@@ -25,10 +25,11 @@
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
 #'     weights, *minus the largest log ratio* for numerical reasons.
 #'     To get normalized weights use the `weights` method provided
-#'     for objects of class `"psis"/"tis"/"sis"`.
+#'     for objects of class `sis`.
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
+#'    * `pareto_k`: Not used in \code{sis}, all set to 0.
 #'    * `n_eff`: effective sample size estimates.
 #'  }
 #' }
@@ -41,6 +42,9 @@
 #'   }
 #'   \item{`r_eff`}{
 #'     If specified, the user's `r_eff` argument.
+#'   }
+#'   \item{`tail_len`}{
+#'     Not used for `sis`.
 #'   }
 #'   \item{`dims`}{
 #'     Integer vector of length 2 containing `S` (posterior sample size)
