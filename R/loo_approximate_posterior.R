@@ -153,11 +153,12 @@ loo_approximate_posterior.function <-
       )
     }
 
-    ap_psis <- psis_loo_object(
+    ap_psis <- importance_sampling_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = "psis",
+      is_object = if (save_psis) psis_out else NULL
     )
 
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)

@@ -898,10 +898,11 @@ as.psis_loo.psis_loo_ss <- function(x){
     x$estimates <- x$estimates[, 1:2]
     x$pointwise <- x$pointwise[, 1:4]
     x$loo_subsampling <- NULL
-    plo <- psis_loo_object(pointwise = x$pointwise[, 1:4],
+    plo <- importance_sampling_loo_object(pointwise = x$pointwise[, 1:4],
                            diagnostics = x$diagnostics,
                            dims = attr(x, "dims"),
-                           psis_object = x$psis_object)
+                           is_method = "psis",
+                           is_object = x$psis_object)
     if(inherits(x, "psis_loo_ap")){
       plo$approximate_posterior <- list(log_p = x$approximate_posterior$log_p,
                                         log_g = x$approximate_posterior$log_g)

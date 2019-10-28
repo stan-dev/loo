@@ -50,11 +50,12 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   }
 
   pointwise <- pointwise_loo_calcs(log_liks, psis_out)
-  psis_loo_object(
+  importance_sampling_loo_object(
     pointwise = pointwise,
     diagnostics = psis_out$diagnostics,
     dims = dim(psis_out),
-    psis_object = if (save_psis) psis_out else NULL
+    is_method = "psis",
+    is_object = if (save_psis) psis_out else NULL
   )
 }
 

@@ -200,11 +200,12 @@ loo.array <-
     psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -223,11 +224,12 @@ loo.matrix <-
     is_method <- match.arg(is_method)
     psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -286,11 +288,12 @@ loo.function <-
       )
     }
 
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -429,18 +432,26 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #'   looic.
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
-#' @param psis_object An object of class `"psis"`, as returned by the [psis()] function.
-#' @return A `'psis_loo'` object as described in the Value section of the [loo()]
+#' @template is_method
+#' @param is_object An object of class `"psis"/"tis"/"sis"`, as returned by the [psis()/tis()/sis()] function.
+#' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
+importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
   if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+  assert_is_method_is_implemented(is_method)
 
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
-  out <- nlist(estimates, pointwise, diagnostics, psis_object)
+  out <- nlist(estimates, pointwise, diagnostics)
+  if(is.null(is_object)) {
+    out[paste0(is_method, "_object")] <- list(NULL)
+  } else {
+    out[[paste0(is_method, "_object")]] <- is_object
+  }
+
   # maintain backwards compatibility
   old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
   out <- c(out, setNames(as.list(estimates), old_nms))
@@ -448,7 +459,7 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   structure(
     out,
     dims = dims,
-    class = c("psis_loo", "loo")
+    class = c(paste0(is_method, "_loo"), "importance_sampling_loo", "loo")
   )
 }
 
