@@ -5,7 +5,7 @@ importance_sampling <- function(log_ratios, ...) UseMethod("importance_sampling"
 #' @noRd
 #' @description
 #' Currently implemented importance sampling methods
-implemented_is_methods <- function() c("PSIS", "TIS", "SIS")
+implemented_is_methods <- function() c("psis", "tis", "sis")
 
 #' @rdname psis
 importance_sampling.array <-
@@ -100,10 +100,10 @@ weights.importance_sampling <-
 #' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
 #' @param is_method
 #'   Importance sampling method to use. The following approaches are implemented:
-#'   * Pareto-Smoothed Importance Sampling (\code{"PSIS"}).
-#'   * Truncated Importance Sampling with truncation at \code{sqrt(S)} (\code{"TIS"}).
-#'   * Standard Importance Sampling  (\code{"IS"}).
-#'   Deafults to \code{"PSIS"}.
+#'   * Pareto-Smoothed Importance Sampling (\code{"psis"}).
+#'   * Truncated Importance Sampling with truncation at \code{sqrt(S)} (\code{"tis"}).
+#'   * Standard Importance Sampling  (\code{"sis"}).
+#'   Defaults to \code{"psis"}.
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
 #'
@@ -160,12 +160,12 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
 
-  if(is_method == "PSIS") {
+  if(is_method == "psis") {
     is_fun <- do_psis_i
     throw_tail_length_warnings(tail_len)
-  } else if(is_method == "TIS") {
+  } else if(is_method == "tis") {
     is_fun <- do_tis_i
-  } else if(is_method == "SIS") {
+  } else if(is_method == "sis") {
     is_fun <- do_sis_i
   } else {
     stop("Incorrect IS method.")

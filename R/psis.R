@@ -25,17 +25,17 @@
 #'   setting `r_eff` to `NA`.
 #' @param is_method Importance sampling method to use. The following approaches are implemented:
 #' \describe{
-#'   \item{`PSIS`}{
+#'   \item{`psis`}{
 #'     Pareto-Smoothed Importance Sampling.
 #'   }
-#'  \item{`TIS`}{
+#'  \item{`tis`}{
 #'    Truncated Importance Sampling with truncation at \code{sqrt(S)}.
 #'  }
-#'  \item{`IS`}{
+#'  \item{`sis`}{
 #'    Standard Importance Sampling.
 #'  }
 #' }
-#' Defaults to \code{"PSIS"}.
+#' Defaults to \code{"psis"}.
 #'
 #' @return The `psis()` methods return an object of class `"psis"`,
 #'   which is a named list with the following components:
@@ -111,7 +111,7 @@ psis.array <-
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             cores = cores,
-                            is_method = "PSIS")
+                            is_method = "psis")
   }
 
 
@@ -128,7 +128,7 @@ psis.matrix <-
                                ...,
                                r_eff = r_eff,
                                cores = cores,
-                               is_method = "PSIS")
+                               is_method = "psis")
   }
 
 #' @export
@@ -138,7 +138,7 @@ psis.matrix <-
 psis.default <-
   function(log_ratios, ..., r_eff = NULL) {
     importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, is_method = "PSIS")
+                                r_eff = r_eff, is_method = "psis")
   }
 
 
@@ -163,7 +163,7 @@ psis_object <-
                                pareto_k = pareto_k,
                                tail_len = tail_len,
                                r_eff = r_eff,
-                               is_method = "PSIS")
+                               is_method = "psis")
   }
 
 
@@ -173,7 +173,7 @@ do_psis <- function(log_ratios, r_eff, cores, is_method){
   do_importance_sampling(log_ratios = log_ratios,
                          r_eff = r_eff,
                          cores = cores,
-                         is_method = "PSIS")
+                         is_method = "psis")
 }
 
 #' Extract named components from each list in the list of lists obtained by

@@ -13,7 +13,7 @@ tis.array <-
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             cores = cores,
-                            is_method = "TIS")
+                            is_method = "tis")
   }
 
 #' @export
@@ -29,7 +29,7 @@ tis.matrix <-
                                ...,
                                r_eff = r_eff,
                                cores = cores,
-                               is_method = "TIS")
+                               is_method = "tis")
   }
 
 #' @export
@@ -39,7 +39,7 @@ tis.matrix <-
 tis.default <-
   function(log_ratios, ..., r_eff = NULL) {
     importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, is_method = "TIS")
+                                r_eff = r_eff, is_method = "tis")
   }
 
 
@@ -52,21 +52,21 @@ is.tis <- function(x) {
 
 # internal ----------------------------------------------------------------
 
-#' TIS on a single vector
+#' Truncated Importance Sampling on a single vector
 #'
 #' @noRd
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
 #' @param tail_len_i Not used. Included to conform to PSIS API.
 #'
-#' @details Implementation of Truncated importance sampling (PSIS), a method for
+#' @details Implementation of Truncated importance sampling (TIS), a method for
 #' stabilizing importance ratios. The version of TIS implemented here
 #' corresponds to the algorithm presented in Ionides (2008) with truncation at
 #' sqrt(S).
 #'
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
-#' * `pareto_k`: scalar Pareto k estimate. For TIS, this defaults  to 0.
+#' * `pareto_k`: scalar Pareto k estimate. For 'tis', this defaults  to 0.
 #'
 do_tis_i <- function(log_ratios_i, tail_len_i) {
   S <- length(log_ratios_i)

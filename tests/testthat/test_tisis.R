@@ -24,7 +24,7 @@ test_that("tis and is runs", {
   expect_failure(expect_equal(tis1$log_weights, psis1$log_weights))
 })
 
-test_that("tis() and sis() returns object with correct structure for TIS/IS", {
+test_that("tis() and sis() returns object with correct structure for tis/sis", {
 
   expect_false(is.psis(tis1))
   expect_false(is.psis(is1))
@@ -54,9 +54,9 @@ test_that("tis() and sis() returns object with correct structure for TIS/IS", {
   expect_length(tis1$diagnostics$n_eff, dim(psis1)[2])
   expect_length(is1$diagnostics$n_eff, dim(psis1)[2])
 
-  expect_equal(attr(psis1, "is_method")[1], "PSIS")
-  expect_equal(attr(tis1, "is_method")[1], "TIS")
-  expect_equal(attr(is1, "is_method")[1], "SIS")
+  expect_equal(attr(psis1, "is_method")[1], "psis")
+  expect_equal(attr(tis1, "is_method")[1], "tis")
+  expect_equal(attr(is1, "is_method")[1], "sis")
 })
 
 
@@ -123,9 +123,8 @@ test_that("psis throws correct errors and warnings", {
 })
 
 
-test_that("explict test of values for IS and TIS", {
+test_that("explict test of values for 'sis' and 'tis'", {
   lw <- 1:16
-  # With TIS values greater than 0.5*log(length(lw)) i.e. 1.386294, should be truncated to 10
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
   expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
                c(-14.0723, -13.0723, -12.0723, -11.0723, -10.0723, -9.0723, -8.0723, -7.0723, -6.0723, -5.0723, -4.0723, -3.0723, -2.0723, -1.0723, -0.0723, 0.), tol = 0.001)

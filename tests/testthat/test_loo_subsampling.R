@@ -1067,7 +1067,7 @@ test_that("loo_compare_subsample", {
 })
 
 
-test_that("Test TIS and IS", {
+test_that("Test 'tis' and 'sis'", {
   skip_if_not_installed("checkmate")
 
   set.seed(123)
@@ -1083,10 +1083,14 @@ test_that("Test TIS and IS", {
   }
 
   expect_silent(loo_ss_full <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1000, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_plpd <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss_tis_S1000 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss_tis_S100 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", loo_approximation_draws = 100, r_eff = rep(1, nrow(fake_data))))
   expect_silent(loo_ss_tis_S10 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", loo_approximation_draws = 10, r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_plpd <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S1000 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S100 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", loo_approximation_draws = 100, r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S10 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", loo_approximation_draws = 10, r_eff = rep(1, nrow(fake_data))))
+
 
   SEs <- 4
   expect_gt(loo_ss_tis_S1000$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_tis_S1000$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
@@ -1095,6 +1099,13 @@ test_that("Test TIS and IS", {
   expect_lt(loo_ss_tis_S100$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_tis_S100$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
   expect_gt(loo_ss_tis_S10$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_tis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
   expect_lt(loo_ss_tis_S10$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_tis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+
+  expect_gt(loo_ss_sis_S1000$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_sis_S1000$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_lt(loo_ss_sis_S1000$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_sis_S1000$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_gt(loo_ss_sis_S100$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_sis_S100$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_lt(loo_ss_sis_S100$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_sis_S100$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_gt(loo_ss_sis_S10$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_sis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
+  expect_lt(loo_ss_sis_S10$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_sis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
 })
 
 

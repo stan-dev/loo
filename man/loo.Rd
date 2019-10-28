@@ -13,17 +13,17 @@
 loo(x, ...)
 
 \method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1), is_method = "PSIS")
+  cores = getOption("mc.cores", 1), is_method = "psis")
 
 \method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1), is_method = "PSIS")
+  cores = getOption("mc.cores", 1), is_method = "psis")
 
 \method{loo}{function}(x, ..., data = NULL, draws = NULL,
   r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1),
-  is_method = "PSIS")
+  is_method = "psis")
 
 loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL,
-  is_method = "PSIS")
+  is_method = "psis")
 
 is.loo(x)
 

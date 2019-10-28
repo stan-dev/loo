@@ -182,7 +182,7 @@ loo_approximate_posterior.function <-
            is_method) {
 
     if(!is.null(r_eff)) warning("r_eff not implemented for aploo.")
-    if(is_method != "PSIS") stop(is_method, " not implemented for aploo.")
+    if(is_method != "psis") stop(is_method, " not implemented for aploo.")
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
     if (!is.matrix(ll_i)) {

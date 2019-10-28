@@ -110,17 +110,17 @@ setting \code{mc.cores} interactively or in a script is fine).
 
 \item{is_method}{Importance sampling method to use. The following approaches are implemented:
 \describe{
-\item{\code{PSIS}}{
+\item{\code{psis}}{
 Pareto-Smoothed Importance Sampling.
 }
-\item{\code{TIS}}{
+\item{\code{tis}}{
 Truncated Importance Sampling with truncation at \code{sqrt(S)}.
 }
-\item{\code{IS}}{
+\item{\code{sis}}{
 Standard Importance Sampling.
 }
 }
-Defaults to \code{"PSIS"}.}
+Defaults to \code{"psis"}.}
 
 \item{object}{For the \code{weights()} method, an object returned by \code{psis()} (a
 list with class \code{"psis"}).}

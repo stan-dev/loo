@@ -455,7 +455,7 @@ nobs.psis_loo_ss <- function(object, ...){
 #' @param api the choices available in the loo API or all possible choices.
 #' @return a character vector of allowed choices
 loo_approximation_choices <- function(api = TRUE) {
-  lac <- c("plpd", "lpd", "waic", "waic_grad_marginal", "waic_grad", "waic_hess", "tis", "none")
+  lac <- c("plpd", "lpd", "waic", "waic_grad_marginal", "waic_grad", "waic_hess", "tis", "sis", "none")
   if(!api) lac <- c(lac, "psis")
   lac
 }
@@ -496,11 +496,10 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
   if(loo_approximation == "none") return(rep(1L,N))
 
-  if(loo_approximation == "tis"){
+  if(loo_approximation %in% c("tis", "sis")){
     draws <- .thin_draws(draws, loo_approximation_draws)
-    tis_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = "TIS"))
-    #psis_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = "PSIS"))
-    return(tis_values$pointwise[, "elpd_loo"])
+    is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation))
+    return(is_values$pointwise[, "elpd_loo"])
   }
 
   if(loo_approximation == "waic"){
