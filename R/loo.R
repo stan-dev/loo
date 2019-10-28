@@ -193,8 +193,9 @@ loo.array <-
            r_eff = NULL,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
-           is_method = "psis") {
+           is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
+    is_method <- match.arg(is_method)
     psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
@@ -216,8 +217,9 @@ loo.matrix <-
            r_eff = NULL,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
-           is_method = "psis") {
+           is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
+    is_method <- match.arg(is_method)
     psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
@@ -244,11 +246,11 @@ loo.function <-
            r_eff = NULL,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
-           is_method = "psis") {
-
+           is_method = c("psis", "tis", "sis")) {
+    is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    stopifnot(is_method %in% implemented_is_methods())
+    assert_is_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
