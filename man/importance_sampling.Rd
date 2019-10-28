@@ -4,7 +4,7 @@
 \alias{importance_sampling}
 \title{A parent class for different importance sampling methods.}
 \usage{
-importance_sampling(log_ratios, ...)
+importance_sampling(log_ratios, method, ...)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log

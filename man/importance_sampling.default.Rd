@@ -4,8 +4,8 @@
 \alias{importance_sampling.default}
 \title{Importance sampling (default)}
 \usage{
-\method{importance_sampling}{default}(log_ratios, ..., r_eff = NULL,
-  method)
+\method{importance_sampling}{default}(log_ratios, method, ...,
+  r_eff = NULL)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log

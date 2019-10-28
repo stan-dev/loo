@@ -2,7 +2,7 @@
 #' @inheritParams psis
 #' @template is_method
 #' @keywords internal
-importance_sampling <- function(log_ratios, ...) UseMethod("importance_sampling")
+importance_sampling <- function(log_ratios, method, ...) UseMethod("importance_sampling")
 
 #' @noRd
 #' @keywords internal
@@ -18,10 +18,10 @@ implemented_is_methods <- function() c("psis", "tis", "sis")
 #' @template is_method
 #' @keywords internal
 importance_sampling.array <-
-  function(log_ratios, ...,
+  function(log_ratios, method,
+           ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1),
-           method) {
+           cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
     assert_is_method_is_implemented(method)
@@ -36,11 +36,10 @@ importance_sampling.array <-
 #' @template is_method
 #' @keywords internal
 importance_sampling.matrix <-
-  function(log_ratios,
+  function(log_ratios, method,
            ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1),
-           method) {
+           cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     assert_is_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
@@ -53,8 +52,7 @@ importance_sampling.matrix <-
 #' @template is_method
 #' @keywords internal
 importance_sampling.default <-
-  function(log_ratios, ..., r_eff = NULL,
-           method) {
+  function(log_ratios, method, ..., r_eff = NULL) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     assert_is_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)

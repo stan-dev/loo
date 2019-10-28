@@ -4,8 +4,8 @@
 \alias{importance_sampling.array}
 \title{Importance sampling of array}
 \usage{
-\method{importance_sampling}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1), method)
+\method{importance_sampling}{array}(log_ratios, method, ...,
+  r_eff = NULL, cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
