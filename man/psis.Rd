@@ -8,12 +8,10 @@
 \alias{psis.matrix}
 \alias{psis.default}
 \alias{is.psis}
-\alias{sis}
 \alias{sis.array}
 \alias{sis.matrix}
 \alias{sis.default}
 \alias{is.sis}
-\alias{tis}
 \alias{tis.array}
 \alias{tis.matrix}
 \alias{tis.default}
@@ -35,8 +33,6 @@ psis(log_ratios, ...)
 
 is.psis(x)
 
-sis(log_ratios, ...)
-
 \method{sis}{array}(log_ratios, ..., r_eff = NULL,
   cores = getOption("mc.cores", 1))
 
@@ -46,8 +42,6 @@ sis(log_ratios, ...)
 \method{sis}{default}(log_ratios, ..., r_eff = NULL)
 
 is.sis(x)
-
-tis(log_ratios, ...)
 
 \method{tis}{array}(log_ratios, ..., r_eff = NULL,
   cores = getOption("mc.cores", 1))
@@ -146,6 +140,9 @@ If specified, the user's \code{r_eff} argument.
 \item{\code{dims}}{
 Integer vector of length 2 containing \code{S} (posterior sample size)
 and \code{N} (number of observations).
+}
+\item{\code{method}}{
+Method used for importance sampling, here \code{psis}.
 }
 }
 }

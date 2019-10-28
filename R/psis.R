@@ -59,6 +59,9 @@
 #'     Integer vector of length 2 containing `S` (posterior sample size)
 #'     and `N` (number of observations).
 #'   }
+#'   \item{`method`}{
+#'     Method used for importance sampling, here `psis`.
+#'   }
 #' }
 #'
 #' @seealso
