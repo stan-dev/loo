@@ -13,7 +13,7 @@ tis.array <-
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             cores = cores,
-                            is_method = "tis")
+                            method = "tis")
   }
 
 #' @export
@@ -29,7 +29,7 @@ tis.matrix <-
                                ...,
                                r_eff = r_eff,
                                cores = cores,
-                               is_method = "tis")
+                               method = "tis")
   }
 
 #' @export
@@ -39,7 +39,7 @@ tis.matrix <-
 tis.default <-
   function(log_ratios, ..., r_eff = NULL) {
     importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, is_method = "tis")
+                                r_eff = r_eff, method = "tis")
   }
 
 

@@ -197,7 +197,7 @@ loo.array <-
            is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
     is_method <- match.arg(is_method)
-    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     psis_loo_object(
@@ -221,7 +221,7 @@ loo.matrix <-
            is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
     is_method <- match.arg(is_method)
-    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, is_method = is_method)
+    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     psis_loo_object(
       pointwise = pointwise,
@@ -271,7 +271,7 @@ loo.function <-
                                     save_psis = save_psis,
                                     cores = cores,
                                     ...,
-                                    is_method = is_method)
+                                    method = is_method)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -363,7 +363,7 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, is_method = is_method)
+    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, method = is_method)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -502,11 +502,11 @@ list2importance_sampling <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
   diagnostics <- lapply(objects, "[[", "diagnostics")
 
-  is_method <- psis_apply(objects, "is_method", fun = "attr", fun_val = character(1))
-  is_methods <- unique(is_method)
-  if(length(is_methods) == 1) {
-    is_method <- is_methods
-    classes <- c(tolower(is_methods), "importance_sampling", "list")
+  method <- psis_apply(objects, "method", fun = "attr", fun_val = character(1))
+  methods <- unique(method)
+  if(length(methods) == 1) {
+    method <- methods
+    classes <- c(methods, "importance_sampling", "list")
   } else {
     classes <- c("importance_sampling", "list")
   }
@@ -523,7 +523,7 @@ list2importance_sampling <- function(objects) {
     tail_len = psis_apply(objects, "tail_len", fun = "attr"),
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
-    is_method = is_method,
+    method = method,
     class = classes
   )
 }
@@ -617,11 +617,11 @@ NULL
 #' @template is_method
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., is_method = "psis")
+  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., method = "psis")
 }
 
 #' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., is_method){
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., method){
   if (cores == 1) {
     psis_list <-
       lapply(
@@ -632,7 +632,7 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_
         draws = draws,
         r_eff = r_eff,
         save_psis = save_psis,
-        is_method = is_method,
+        is_method = method,
         ...
       )
   } else {
@@ -648,7 +648,7 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
-          is_method = is_method,
+          is_method = method,
           ...
         )
     } else {
@@ -665,7 +665,7 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
-          is_method = is_method,
+          is_method = method,
           ...
         )
     }

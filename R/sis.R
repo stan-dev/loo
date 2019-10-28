@@ -13,7 +13,7 @@ sis.array <-
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             cores = cores,
-                            is_method = "sis")
+                            method = "sis")
   }
 
 #' @export
@@ -29,7 +29,7 @@ sis.matrix <-
                                ...,
                                r_eff = r_eff,
                                cores = cores,
-                               is_method = "sis")
+                               method = "sis")
   }
 
 #' @export
@@ -39,7 +39,8 @@ sis.matrix <-
 sis.default <-
   function(log_ratios, ..., r_eff = NULL) {
     importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, is_method = "sis")
+                                r_eff = r_eff,
+                                method = "sis")
   }
 
 #' @rdname psis

@@ -23,19 +23,6 @@
 #'   draws of the `log_ratios` not obtained from MCMC then the warning
 #'   message thrown when not specifying `r_eff` can be disabled by
 #'   setting `r_eff` to `NA`.
-#' @param is_method Importance sampling method to use. The following approaches are implemented:
-#' \describe{
-#'   \item{`psis`}{
-#'     Pareto-Smoothed Importance Sampling.
-#'   }
-#'  \item{`tis`}{
-#'    Truncated Importance Sampling with truncation at \code{sqrt(S)}.
-#'  }
-#'  \item{`sis`}{
-#'    Standard Importance Sampling.
-#'  }
-#' }
-#' Defaults to \code{"psis"}.
 #'
 #' @return The `psis()` methods return an object of class `"psis"`,
 #'   which is a named list with the following components:
@@ -111,7 +98,7 @@ psis.array <-
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             cores = cores,
-                            is_method = "psis")
+                            method = "psis")
   }
 
 
@@ -128,7 +115,7 @@ psis.matrix <-
                                ...,
                                r_eff = r_eff,
                                cores = cores,
-                               is_method = "psis")
+                               method = "psis")
   }
 
 #' @export
@@ -138,7 +125,8 @@ psis.matrix <-
 psis.default <-
   function(log_ratios, ..., r_eff = NULL) {
     importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, is_method = "psis")
+                                r_eff = r_eff,
+                                method = "psis")
   }
 
 
@@ -163,17 +151,17 @@ psis_object <-
                                pareto_k = pareto_k,
                                tail_len = tail_len,
                                r_eff = r_eff,
-                               is_method = "psis")
+                               method = "psis")
   }
 
 
 #' @noRd
 #' @seealso do_importance_sampling
-do_psis <- function(log_ratios, r_eff, cores, is_method){
+do_psis <- function(log_ratios, r_eff, cores, method){
   do_importance_sampling(log_ratios = log_ratios,
                          r_eff = r_eff,
                          cores = cores,
-                         is_method = "psis")
+                         method = "psis")
 }
 
 #' Extract named components from each list in the list of lists obtained by

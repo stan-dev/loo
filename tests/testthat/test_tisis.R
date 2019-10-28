@@ -54,9 +54,9 @@ test_that("tis() and sis() returns object with correct structure for tis/sis", {
   expect_length(tis1$diagnostics$n_eff, dim(psis1)[2])
   expect_length(is1$diagnostics$n_eff, dim(psis1)[2])
 
-  expect_equal(attr(psis1, "is_method")[1], "psis")
-  expect_equal(attr(tis1, "is_method")[1], "tis")
-  expect_equal(attr(is1, "is_method")[1], "sis")
+  expect_equal(attr(psis1, "method")[1], "psis")
+  expect_equal(attr(tis1, "method")[1], "tis")
+  expect_equal(attr(is1, "method")[1], "sis")
 })
 
 

@@ -1,8 +1,11 @@
-
-#' @rdname psis
+#' A parent class for different importance sampling methods.
+#' @inheritParams psis
+#' @template is_method
+#' @keywords internal
 importance_sampling <- function(log_ratios, ...) UseMethod("importance_sampling")
 
 #' @noRd
+#' @keywords internal
 #' @description
 #' Currently implemented importance sampling methods
 assert_is_method_is_implemented <- function(x){
@@ -10,44 +13,53 @@ assert_is_method_is_implemented <- function(x){
 }
 implemented_is_methods <- function() c("psis", "tis", "sis")
 
-#' @rdname psis
+#' Importance sampling of array
+#' @inheritParams psis
+#' @template is_method
+#' @keywords internal
 importance_sampling.array <-
   function(log_ratios, ...,
            r_eff = NULL,
            cores = getOption("mc.cores", 1),
-           is_method) {
+           method) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
-    assert_is_method_is_implemented(is_method)
+    assert_is_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' @rdname psis
+#' Importance sampling of matrices
+#' @inheritParams psis
+#' @template is_method
+#' @keywords internal
 importance_sampling.matrix <-
   function(log_ratios,
            ...,
            r_eff = NULL,
            cores = getOption("mc.cores", 1),
-           is_method) {
+           method) {
     cores <- loo_cores(cores)
-    assert_is_method_is_implemented(is_method)
+    assert_is_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, is_method = is_method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' @rdname psis
+#' Importance sampling (default)
+#' @inheritParams psis
+#' @template is_method
+#' @keywords internal
 importance_sampling.default <-
   function(log_ratios, ..., r_eff = NULL,
-           is_method) {
+           method) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
-    assert_is_method_is_implemented(is_method)
+    assert_is_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)
     r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    importance_sampling.matrix(log_ratios, r_eff = r_eff, cores = 1, is_method = is_method)
+    importance_sampling.matrix(log_ratios, r_eff = r_eff, cores = 1, method = method)
   }
 
 
@@ -58,20 +70,19 @@ dim.importance_sampling <- function(x) {
 
 #' @rdname psis
 #' @export
-#' @export weights.importance_sampling
 #' @method weights importance_sampling
-#' @param object For the `weights()` method, an object returned by `psis()` (a
-#'   list with class `"psis"`).
+#' @param object For the `weights()` method, an object returned by `psis()/tis()/sis()`
+#' (a list with same class name `"psis"/"tis"/"sis"`.).
 #' @param log For the `weights()` method, should the weights be returned on
 #'   the log scale? Defaults to `TRUE`.
 #' @param normalize For the `weights()` method, should the weights be
 #'   normalized? Defaults to `TRUE`.
 #'
 #' @return The `weights()` method returns an object with the same dimensions as
-#'   the `log_weights` component of the `"psis"` object. The `normalize` and
+#'   the `log_weights` component of the `"psis"/"tis"/"sis"` object. The `normalize` and
 #'   `log` arguments control whether the returned weights are normalized and
 #'   whether or not to return them on the log scale.
-#'
+#' @export weights.importance_sampling
 weights.importance_sampling <-
   function(object,
            ...,
@@ -110,13 +121,13 @@ importance_sampling_object <-
            pareto_k,
            tail_len,
            r_eff,
-           is_method) {
+           method) {
     stopifnot(is.matrix(unnormalized_log_weights))
-    is_methods <- unique(is_method)
-    stopifnot(all(is_methods %in% implemented_is_methods()))
-    if(length(is_methods) == 1) {
-      is_method <- is_methods
-      classes <- c(tolower(is_methods), "importance_sampling", "list")
+    methods <- unique(method)
+    stopifnot(all(methods %in% implemented_is_methods()))
+    if(length(methods) == 1) {
+      method <- methods
+      classes <- c(tolower(method), "importance_sampling", "list")
     } else {
       classes <- c("importance_sampling", "list")
     }
@@ -132,7 +143,7 @@ importance_sampling_object <-
       tail_len = tail_len,
       r_eff = r_eff,
       dims = dim(unnormalized_log_weights),
-      is_method = is_method,
+      method = method,
       class = classes
     )
 
@@ -151,19 +162,19 @@ importance_sampling_object <-
 #' @return A list with class `"psis"` and structure described in the main doc at
 #'   the top of this file.
 #'
-do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
+do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   stopifnot(cores == as.integer(cores))
-  assert_is_method_is_implemented(is_method)
+  assert_is_method_is_implemented(method)
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
 
-  if(is_method == "psis") {
+  if(method == "psis") {
     is_fun <- do_psis_i
     throw_tail_length_warnings(tail_len)
-  } else if(is_method == "tis") {
+  } else if(method == "tis") {
     is_fun <- do_tis_i
-  } else if(is_method == "sis") {
+  } else if(method == "sis") {
     is_fun <- do_sis_i
   } else {
     stop("Incorrect IS method.")
@@ -202,6 +213,6 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, is_method) {
     pareto_k = pareto_k,
     tail_len = tail_len,
     r_eff = r_eff,
-    is_method = rep(is_method, length(pareto_k)) # Conform to other attr that exist per obs.
+    method = rep(method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
 }
