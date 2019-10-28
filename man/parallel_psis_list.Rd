@@ -64,6 +64,20 @@ setting \code{mc.cores} interactively or in a script is fine).
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
 below for details on how to specify these arguments.}
+
+\item{is_method}{Importance sampling method to use. The following methods are implemented:
+\describe{
+\item{\code{psis}}{
+Pareto-Smoothed Importance Sampling (PSIS). Default method.
+}
+\item{\code{tis}}{
+Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
+where \code{S} is the number of posterior draws.
+}
+\item{\code{sis}}{
+Standard Importance Sampling (SIS).
+}
+}}
 }
 \description{
 Parallel psis list computations

@@ -28,6 +28,7 @@
 #'   this is only needed if you plan to use the [E_loo()] function to compute
 #'   weighted expectations after running `loo`.
 #' @template cores
+#' @template is_method
 #'
 #' @details The `loo()` function is an S3 generic and methods are provided for
 #'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
@@ -613,6 +614,7 @@ NULL
 #' @param .loo_i The function used to compute individual loo contributions.
 #' @param .llfun See llfun in \code{loo.function()}.
 #' @param N the total number of observations (i.e. \code{nrow(data)}).
+#' @template is_method
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
   parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., is_method = "psis")

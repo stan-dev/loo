@@ -68,6 +68,20 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
+\item{is_method}{Importance sampling method to use. The following methods are implemented:
+\describe{
+\item{\code{psis}}{
+Pareto-Smoothed Importance Sampling (PSIS). Default method.
+}
+\item{\code{tis}}{
+Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
+where \code{S} is the number of posterior draws.
+}
+\item{\code{sis}}{
+Standard Importance Sampling (SIS).
+}
+}}
+
 \item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section

@@ -101,12 +101,7 @@ weights.importance_sampling <-
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
 #' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
-#' @param is_method
-#'   Importance sampling method to use. The following approaches are implemented:
-#'   * Pareto-Smoothed Importance Sampling (\code{"psis"}).
-#'   * Truncated Importance Sampling with truncation at \code{sqrt(S)} (\code{"tis"}).
-#'   * Standard Importance Sampling  (\code{"sis"}).
-#'   Defaults to \code{"psis"}.
+#' @template is_method
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
 #'
