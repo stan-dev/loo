@@ -9,7 +9,7 @@ importance_sampling <- function(log_ratios, method, ...) UseMethod("importance_s
 #' @description
 #' Currently implemented importance sampling methods
 assert_is_method_is_implemented <- function(x){
-  if(!x %in% implemented_is_methods()) stop("Importance sampling method '", x, "' is not implemented. Implemented methods: '", paste0(implemented_is_methods, collapse = "', '"), "'")
+  if (!x %in% implemented_is_methods()) stop("Importance sampling method '", x, "' is not implemented. Implemented methods: '", paste0(implemented_is_methods, collapse = "', '"), "'")
 }
 implemented_is_methods <- function() c("psis", "tis", "sis")
 
@@ -126,7 +126,7 @@ importance_sampling_object <-
     stopifnot(is.matrix(unnormalized_log_weights))
     methods <- unique(method)
     stopifnot(all(methods %in% implemented_is_methods()))
-    if(length(methods) == 1) {
+    if (length(methods) == 1) {
       method <- methods
       classes <- c(tolower(method), "importance_sampling", "list")
     } else {
@@ -170,12 +170,12 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   S <- nrow(log_ratios)
   tail_len <- n_pareto(r_eff, S)
 
-  if(method == "psis") {
+  if (method == "psis") {
     is_fun <- do_psis_i
     throw_tail_length_warnings(tail_len)
-  } else if(method == "tis") {
+  } else if (method == "tis") {
     is_fun <- do_tis_i
-  } else if(method == "sis") {
+  } else if (method == "sis") {
     is_fun <- do_sis_i
   } else {
     stop("Incorrect IS method.")

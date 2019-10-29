@@ -8,7 +8,7 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
   for(i in seq_along(x)){
-    if(!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
+    if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
   }
 
   loo_compare_checks.psis_loo_ss_list(x)
@@ -49,26 +49,26 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   compare_subset_of_ref <- base::setequal(intersect_idx, compare_idx)
 
   # Using HH estimation
-  if(ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
+  if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
     warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 
   # Same observations in both
-  if(compare_subset_of_ref & ref_subset_of_compare){
+  if (compare_subset_of_ref & ref_subset_of_compare){
     return(loo_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # Use subset
-  if(compare_subset_of_ref | ref_subset_of_compare){
-    if(compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
-    if(ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
+  if (compare_subset_of_ref | ref_subset_of_compare){
+    if (compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
+    if (ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
     message("Estimated elpd_diff using observations included in loo calculations for all models.")
     return(loo_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # If different samples
-  if(!compare_subset_of_ref & !ref_subset_of_compare){
+  if (!compare_subset_of_ref & !ref_subset_of_compare){
     warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
             "'. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))

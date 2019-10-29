@@ -25,7 +25,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   if (!requireNamespace("checkmate", quietly=TRUE)) {
     stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
   }
-  if(!is.null(log_q)){
+  if (!is.null(log_q)){
     .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
     log_g <- log_q
   }

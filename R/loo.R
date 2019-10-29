@@ -446,7 +446,7 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_meth
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
   out <- nlist(estimates, pointwise, diagnostics)
-  if(is.null(is_object)) {
+  if (is.null(is_object)) {
     out[paste0(is_method, "_object")] <- list(NULL)
   } else {
     out[[paste0(is_method, "_object")]] <- is_object
@@ -515,7 +515,7 @@ list2importance_sampling <- function(objects) {
 
   method <- psis_apply(objects, "method", fun = "attr", fun_val = character(1))
   methods <- unique(method)
-  if(length(methods) == 1) {
+  if (length(methods) == 1) {
     method <- methods
     classes <- c(methods, "importance_sampling", "list")
   } else {

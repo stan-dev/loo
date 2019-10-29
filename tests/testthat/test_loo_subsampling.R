@@ -429,7 +429,7 @@ test_that("Test loo_approximation_draws", {
 test_that("waic using delta method and gradient", {
   skip_if_not_installed("checkmate")
 
-  if(FALSE){
+  if (FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
     set.seed(123)
     N <- 400; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
@@ -485,7 +485,7 @@ test_that("waic using delta method and gradient", {
 test_that("waic using delta 2nd order method", {
   skip_if_not_installed("checkmate")
 
-  if(FALSE){
+  if (FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
     set.seed(123)
     N <- 100; beta <- c(1,2); X_full <- matrix(rep(1,N), ncol = 1); X_full <- cbind(X_full, runif(N)); S <- 1000
@@ -837,7 +837,7 @@ test_that("Test the vignette", {
   # NOTE
   # If any of these test fails, the vignette probably needs to be updated
 
-  if(FALSE){
+  if (FALSE){
     # Generate vignett test case
     library("rstan")
     stan_code <- "
