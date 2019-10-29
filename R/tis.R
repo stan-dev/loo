@@ -8,6 +8,7 @@
 #'   **Methods (by class)** section below for a detailed description of how
 #'   to specify the inputs for each method.
 #' @template cores
+#' @param ... Arguments passed on to the various methods.
 #' @param r_eff Vector of relative effective sample size estimates containing
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of `1/exp(log_ratios)` (i.e., `1/ratios`).
@@ -84,7 +85,7 @@
 tis <- function(log_ratios, ...) UseMethod("tis")
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn tis
 #' @template array
 #'
 tis.array <-
@@ -98,7 +99,7 @@ tis.array <-
   }
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn tis
 #' @template matrix
 #'
 tis.matrix <-
@@ -114,7 +115,7 @@ tis.matrix <-
   }
 
 #' @export
-#' @templateVar fn psis
+#' @templateVar fn tis
 #' @template vector
 #'
 tis.default <-

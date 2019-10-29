@@ -2,15 +2,38 @@
 % Please edit documentation in R/sis.R
 \name{sis}
 \alias{sis}
+\alias{sis.array}
+\alias{sis.matrix}
+\alias{sis.default}
 \title{Standard importance sampling (SIS)}
 \usage{
 sis(log_ratios, ...)
+
+\method{sis}{array}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("mc.cores", 1))
+
+\method{sis}{matrix}(log_ratios, ..., r_eff = NULL,
+  cores = getOption("mc.cores", 1))
+
+\method{sis}{default}(log_ratios, ..., r_eff = NULL)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
 scale (for Importance sampling LOO, these are \emph{negative} log-likelihood values). See the
 \strong{Methods (by class)} section below for a detailed description of how
 to specify the inputs for each method.}
+
+\item{...}{Arguments passed on to the various methods.}
+
+\item{r_eff}{Vector of relative effective sample size estimates containing
+one element per observation. The values provided should be the relative
+effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
+This is related to the relative efficiency of estimating the normalizing
+term in self-normalizing importance sampling. See the \code{\link[=relative_eff]{relative_eff()}}
+helper function for computing \code{r_eff}. If using \code{psis} with
+draws of the \code{log_ratios} not obtained from MCMC then the warning
+message thrown when not specifying \code{r_eff} can be disabled by
+setting \code{r_eff} to \code{NA}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -25,16 +48,6 @@ recommend using as many (or close to as many) cores as possible.
 the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
 setting \code{mc.cores} interactively or in a script is fine).
 }}
-
-\item{r_eff}{Vector of relative effective sample size estimates containing
-one element per observation. The values provided should be the relative
-effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
-This is related to the relative efficiency of estimating the normalizing
-term in self-normalizing importance sampling. See the \code{\link[=relative_eff]{relative_eff()}}
-helper function for computing \code{r_eff}. If using \code{psis} with
-draws of the \code{log_ratios} not obtained from MCMC then the warning
-message thrown when not specifying \code{r_eff} can be disabled by
-setting \code{r_eff} to \code{NA}.}
 }
 \value{
 The \code{sis()} methods return an object of class \code{"sis"},
@@ -80,6 +93,19 @@ Method used for importance sampling, here \code{sis}.
 \description{
 Implementation of standard importance sampling (SIS).
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+is the number of MCMC iterations per chain, \eqn{C} is the number of
+chains, and \eqn{N} is the number of data points.
+
+\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+of the posterior sample (with all chains merged) and \eqn{N} is the number
+of data points.
+
+\item \code{default}: A vector of length \eqn{S} (posterior sample size).
+}}
+
 \examples{
 log_ratios <- -1 * example_loglik_array()
 r_eff <- relative_eff(exp(-log_ratios))

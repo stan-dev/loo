@@ -8,13 +8,7 @@
 \alias{psis.matrix}
 \alias{psis.default}
 \alias{is.psis}
-\alias{sis.array}
-\alias{sis.matrix}
-\alias{sis.default}
 \alias{is.sis}
-\alias{tis.array}
-\alias{tis.matrix}
-\alias{tis.default}
 \alias{is.tis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
@@ -33,23 +27,7 @@ psis(log_ratios, ...)
 
 is.psis(x)
 
-\method{sis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
-
-\method{sis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
-
-\method{sis}{default}(log_ratios, ..., r_eff = NULL)
-
 is.sis(x)
-
-\method{tis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
-
-\method{tis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
-
-\method{tis}{default}(log_ratios, ..., r_eff = NULL)
 
 is.tis(x)
 }
@@ -154,26 +132,6 @@ For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
-is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points.
-
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
-of the posterior sample (with all chains merged) and \eqn{N} is the number
-of data points.
-
-\item \code{default}: A vector of length \eqn{S} (posterior sample size).
-
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
-is the number of MCMC iterations per chain, \eqn{C} is the number of
-chains, and \eqn{N} is the number of data points.
-
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
-of the posterior sample (with all chains merged) and \eqn{N} is the number
-of data points.
-
-\item \code{default}: A vector of length \eqn{S} (posterior sample size).
-
 \item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
