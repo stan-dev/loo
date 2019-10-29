@@ -52,6 +52,14 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
 
 #' @export
 #' @rdname print.loo
+print.importance_sampling_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.loo(x, digits = digits, ...)
+  cat("------\n")
+  invisible(x)
+}
+
+#' @export
+#' @rdname print.loo
 print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
@@ -119,6 +127,16 @@ print_dims.psis_loo <- function(x, ...) {
     "Computed from",
     paste(dim(x), collapse = " by "),
     "log-likelihood matrix\n"
+  )
+}
+
+#' @rdname print_dims
+#' @export
+print_dims.importance_sampling_loo <- function(x, ...) {
+  cat(
+    "Computed from",
+    paste(dim(x), collapse = " by "),
+    "log-likelihood matrix using", class(x)[1], "\n"
   )
 }
 

@@ -144,3 +144,17 @@ test_that("explict test of values for 'sis' and 'tis'", {
 })
 
 
+test_that("tis_loo and sis_loo are returned", {
+  LLmat <- example_loglik_matrix()
+  loo_psis <- suppressWarnings(loo(LLmat, r_eff = NA, is_method = "psis"))
+  loo_tis <- suppressWarnings(loo(LLmat, r_eff = NA, is_method = "tis"))
+  loo_sis <- suppressWarnings(loo(LLmat, r_eff = NA, is_method = "sis"))
+
+  expect_s3_class(loo_tis, "tis_loo")
+  expect_s3_class(loo_sis, "sis_loo")
+  expect_s3_class(loo_tis, "importance_sampling_loo")
+  expect_s3_class(loo_sis, "importance_sampling_loo")
+
+  expect_output(print(loo_tis), regexp = "tis_loo")
+  expect_output(print(loo_sis), regexp = "sis_loo")
+})
