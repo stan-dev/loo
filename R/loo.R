@@ -253,7 +253,7 @@ loo.function <-
     is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    assert_is_method_is_implemented(is_method)
+    assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
@@ -272,8 +272,8 @@ loo.function <-
                                     r_eff = r_eff,
                                     save_psis = save_psis,
                                     cores = cores,
-                                    ...,
-                                    method = is_method)
+                                    method = is_method,
+                                    ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -440,7 +440,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
   if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
-  assert_is_method_is_implemented(is_method)
+  assert_importance_sampling_method_is_implemented(is_method)
 
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
@@ -628,11 +628,11 @@ NULL
 #' @param method See is_method for \code{loo()}
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., method = "psis")
+  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method = "psis", ...)
 }
 
 #' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ..., method){
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method, ...){
   if (cores == 1) {
     psis_list <-
       lapply(

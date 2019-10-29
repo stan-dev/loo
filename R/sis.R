@@ -137,13 +137,13 @@ is.sis <- function(x) {
 #' @noRd
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
-#' @param tail_len_i Not used. Included to conform to PSIS API.
+#' @param ... Not used. Included to conform to PSIS API.
 #'
 #' @details Implementation standard importance sampling.
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
 #' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
-do_sis_i <- function(log_ratios_i, tail_len_i) {
+do_sis_i <- function(log_ratios_i, ...) {
   S <- length(log_ratios_i)
   lw_i <- log_ratios_i - max(log_ratios_i)
   list(log_weights = lw_i, pareto_k = 0)

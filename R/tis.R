@@ -139,7 +139,7 @@ is.tis <- function(x) {
 #' @noRd
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
-#' @param tail_len_i Not used. Included to conform to PSIS API.
+#' @param ... Not used. Included to conform to PSIS API.
 #'
 #' @details Implementation of Truncated importance sampling (TIS), a method for
 #' stabilizing importance ratios. The version of TIS implemented here
@@ -150,7 +150,7 @@ is.tis <- function(x) {
 #' * `lw`: vector of unnormalized log weights
 #' * `pareto_k`: scalar Pareto k estimate. For 'tis', this defaults  to 0.
 #'
-do_tis_i <- function(log_ratios_i, tail_len_i) {
+do_tis_i <- function(log_ratios_i, ...) {
   S <- length(log_ratios_i)
   log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
   log_cutpoint <- log_Z + 0.5 * log(S)

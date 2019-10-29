@@ -188,6 +188,7 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
 #' @param tail_len_i An integer tail length.
+#' @param ... Not used. Included to conform to API for differen IS methods.
 #'
 #' @details
 #' * The maximum of the log ratios is subtracted from each of them
@@ -198,7 +199,7 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' * `lw`: vector of unnormalized log weights
 #' * `pareto_k`: scalar Pareto k estimate.
 #'
-do_psis_i <- function(log_ratios_i, tail_len_i) {
+do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   lw_i <- log_ratios_i - max(log_ratios_i)
   khat <- Inf

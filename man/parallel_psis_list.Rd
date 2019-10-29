@@ -9,7 +9,7 @@ parallel_psis_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores,
   ...)
 
 parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff,
-  save_psis, cores, ..., method)
+  save_psis, cores, method, ...)
 }
 \arguments{
 \item{N}{the total number of observations (i.e. \code{nrow(data)}).}

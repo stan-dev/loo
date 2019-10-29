@@ -384,7 +384,12 @@ test_that("elpd_loo_approximation works as expected", {
   expect_true(sum(pi_vals) - sum(pi_vals_waic) < 1)
 
   # Compute tis approximation
-  expect_silent(pi_vals_tis <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "tis", loo_approximation_draws = 100, cores = 1))
+  expect_silent(pi_vals_tis <- loo:::elpd_loo_approximation(.llfun = llfun_test,
+                                                            data = fake_data,
+                                                            draws = fake_posterior,
+                                                            loo_approximation = "tis",
+                                                            loo_approximation_draws = 100,
+                                                            cores = 1))
   expect_true(all(pi_vals > pi_vals_tis))
   expect_true(sum(pi_vals) - sum(pi_vals_tis) < 1)
 })
@@ -1082,14 +1087,66 @@ test_that("Test 'tis' and 'sis'", {
     dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
   }
 
-  expect_silent(loo_ss_full <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 1000, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_plpd <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "plpd", r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_tis_S1000 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_tis_S100 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", loo_approximation_draws = 100, r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_tis_S10 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "tis", loo_approximation_draws = 10, r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_sis_S1000 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_sis_S100 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", loo_approximation_draws = 100, r_eff = rep(1, nrow(fake_data))))
-  expect_silent(loo_ss_sis_S10 <- loo_subsample(x = llfun_test, draws = fake_posterior, data = fake_data, observations = 100, loo_approximation = "sis", loo_approximation_draws = 10, r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_full <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 1000,
+                                loo_approximation = "plpd",
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_plpd <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "plpd",
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_tis_S1000 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "tis",
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_tis_S100 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "tis",
+                                loo_approximation_draws = 100,
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_tis_S10 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "tis",
+                                loo_approximation_draws = 10,
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S1000 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "sis",
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S100 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "sis",
+                                loo_approximation_draws = 100,
+                                r_eff = rep(1, nrow(fake_data))))
+  expect_silent(loo_ss_sis_S10 <-
+                  loo_subsample(x = llfun_test,
+                                draws = fake_posterior,
+                                data = fake_data,
+                                observations = 100,
+                                loo_approximation = "sis",
+                                loo_approximation_draws = 10,
+                                r_eff = rep(1, nrow(fake_data))))
 
 
   SEs <- 4
