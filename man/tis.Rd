@@ -78,7 +78,8 @@ Method used for importance sampling, here \code{tis}.
 }
 }
 \description{
-Implementation of truncated importance sampling (SIS).
+Implementation of Truncated (self-normalized) importance sampling (TIS),
+truncated at S^(1/2) as recommended by Ionides (2008).
 }
 \examples{
 log_ratios <- -1 * example_loglik_array()
@@ -95,15 +96,8 @@ uw <- weights(tis_result, log=FALSE, normalize = FALSE) # unnormalized weights
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
-\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
-
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
-\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
+Ionides, Edward L. (2008). Truncated importance sampling.
+\emph{Journal of Computational and Graphical Statistics} 17(2): 295--311.
 }
 \seealso{
 \itemize{

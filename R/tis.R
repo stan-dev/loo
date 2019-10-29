@@ -1,6 +1,7 @@
 #' Truncated importance sampling (TIS)
 #'
-#' Implementation of truncated importance sampling (SIS).
+#' Implementation of Truncated (self-normalized) importance sampling (TIS),
+#' truncated at S^(1/2) as recommended by Ionides (2008).
 #'
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
 #'   scale (for Importance sampling LOO, these are *negative* log-likelihood values). See the
@@ -62,7 +63,9 @@
 #' \item [pareto-k-diagnostic] for PSIS diagnostics.
 #' }
 #'
-#' @template loo-and-psis-references
+#' @references
+#' Ionides, Edward L. (2008). Truncated importance sampling.
+#' *Journal of Computational and Graphical Statistics* 17(2): 295--311.
 #'
 #' @examples
 #' log_ratios <- -1 * example_loglik_array()

@@ -17,6 +17,7 @@ implemented_is_methods <- function() c("psis", "tis", "sis")
 #' @inheritParams psis
 #' @template is_method
 #' @keywords internal
+#' @export
 importance_sampling.array <-
   function(log_ratios, method,
            ...,
@@ -35,6 +36,7 @@ importance_sampling.array <-
 #' @inheritParams psis
 #' @template is_method
 #' @keywords internal
+#' @export
 importance_sampling.matrix <-
   function(log_ratios, method,
            ...,
@@ -51,6 +53,7 @@ importance_sampling.matrix <-
 #' @inheritParams psis
 #' @template is_method
 #' @keywords internal
+#' @export
 importance_sampling.default <-
   function(log_ratios, method, ..., r_eff = NULL) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
