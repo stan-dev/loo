@@ -9,11 +9,9 @@
 \usage{
 tis(log_ratios, ...)
 
-\method{tis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{tis}{array}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
-\method{tis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{tis}{matrix}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
 \method{tis}{default}(log_ratios, ..., r_eff = NULL)
 }

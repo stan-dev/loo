@@ -30,7 +30,7 @@
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
-#'    * `pareto_k`: Not used in \code{sis}, all set to 0.
+#'    * `pareto_k`: Not used in `sis`, all set to 0.
 #'    * `n_eff`: effective sample size estimates.
 #'  }
 #' }

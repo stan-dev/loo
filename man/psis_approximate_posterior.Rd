@@ -4,8 +4,15 @@
 \alias{psis_approximate_posterior}
 \title{Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo}
 \usage{
-psis_approximate_posterior(log_p = NULL, log_g = NULL,
-  log_liks = NULL, cores, save_psis, ..., log_q = NULL)
+psis_approximate_posterior(
+  log_p = NULL,
+  log_g = NULL,
+  log_liks = NULL,
+  cores,
+  save_psis,
+  ...,
+  log_q = NULL
+)
 }
 \arguments{
 \item{log_p}{The log-posterior (target) evaluated at S samples from the

@@ -16,8 +16,7 @@
 
 \method{print}{psis_loo}(x, digits = 1, plot_k = FALSE, ...)
 
-\method{print}{importance_sampling_loo}(x, digits = 1, plot_k = FALSE,
-  ...)
+\method{print}{importance_sampling_loo}(x, digits = 1, plot_k = FALSE, ...)
 
 \method{print}{psis_loo_ap}(x, digits = 1, plot_k = FALSE, ...)
 

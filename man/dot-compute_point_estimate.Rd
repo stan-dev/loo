@@ -7,10 +7,10 @@
 .compute_point_estimate(draws)
 }
 \arguments{
-\item{draws}{a draws object with draws from the posterior.}
+\item{draws}{A draws object with draws from the posterior.}
 }
 \value{
-a 1 by P matrix with poin estimates from a draws object
+A 1 by P matrix with point estimates from a draws object.
 }
 \description{
 Compute a point estimate from a draws object

@@ -12,20 +12,44 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1), is_method = c("psis", "tis",
-  "sis"))
+\method{loo}{array}(
+  x,
+  ...,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-\method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1), is_method = c("psis", "tis",
-  "sis"))
+\method{loo}{matrix}(
+  x,
+  ...,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-\method{loo}{function}(x, ..., data = NULL, draws = NULL,
-  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1),
-  is_method = c("psis", "tis", "sis"))
+\method{loo}{`function`}(
+  x,
+  ...,
+  data = NULL,
+  draws = NULL,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL,
-  is_method = "psis")
+loo_i(
+  i,
+  llfun,
+  ...,
+  data = NULL,
+  draws = NULL,
+  r_eff = NULL,
+  is_method = "psis"
+)
 
 is.loo(x)
 
@@ -68,18 +92,13 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{is_method}{Importance sampling method to use. The following methods are implemented:
-\describe{
-\item{\code{psis}}{
-Pareto-Smoothed Importance Sampling (PSIS). Default method.
-}
-\item{\code{tis}}{
-Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
-where \code{S} is the number of posterior draws.
-}
-\item{\code{sis}}{
-Standard Importance Sampling (SIS).
-}
+\item{is_method}{The importance sampling method to use.
+The following methods are implemented:
+\itemize{
+\item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+\item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
+\code{sqrt(S)}, where \code{S} is the number of posterior draws.
+\item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
 }}
 
 \item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}

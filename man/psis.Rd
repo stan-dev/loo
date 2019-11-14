@@ -12,16 +12,13 @@
 \alias{is.tis}
 \title{Pareto smoothed importance sampling (PSIS)}
 \usage{
-\method{weights}{importance_sampling}(object, ..., log = TRUE,
-  normalize = TRUE)
+\method{weights}{importance_sampling}(object, ..., log = TRUE, normalize = TRUE)
 
 psis(log_ratios, ...)
 
-\method{psis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{psis}{array}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
-\method{psis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{psis}{matrix}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
 \method{psis}{default}(log_ratios, ..., r_eff = NULL)
 

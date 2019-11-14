@@ -9,11 +9,9 @@
 \usage{
 sis(log_ratios, ...)
 
-\method{sis}{array}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{sis}{array}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
-\method{sis}{matrix}(log_ratios, ..., r_eff = NULL,
-  cores = getOption("mc.cores", 1))
+\method{sis}{matrix}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
 
 \method{sis}{default}(log_ratios, ..., r_eff = NULL)
 }

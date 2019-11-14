@@ -4,8 +4,7 @@
 \alias{importance_sampling.default}
 \title{Importance sampling (default)}
 \usage{
-\method{importance_sampling}{default}(log_ratios, method, ...,
-  r_eff = NULL)
+\method{importance_sampling}{default}(log_ratios, method, ..., r_eff = NULL)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
@@ -27,18 +26,13 @@ draws of the \code{log_ratios} not obtained from MCMC then the warning
 message thrown when not specifying \code{r_eff} can be disabled by
 setting \code{r_eff} to \code{NA}.}
 
-\item{is_method}{Importance sampling method to use. The following methods are implemented:
-\describe{
-\item{\code{psis}}{
-Pareto-Smoothed Importance Sampling (PSIS). Default method.
-}
-\item{\code{tis}}{
-Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
-where \code{S} is the number of posterior draws.
-}
-\item{\code{sis}}{
-Standard Importance Sampling (SIS).
-}
+\item{is_method}{The importance sampling method to use.
+The following methods are implemented:
+\itemize{
+\item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+\item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
+\code{sqrt(S)}, where \code{S} is the number of posterior draws.
+\item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
 }}
 }
 \description{

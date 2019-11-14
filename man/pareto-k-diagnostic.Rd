@@ -22,11 +22,21 @@ psis_n_eff_values(x)
 
 mcse_loo(x, threshold = 0.7)
 
-\method{plot}{psis_loo}(x, diagnostic = c("k", "n_eff"), ...,
-  label_points = FALSE, main = "PSIS diagnostic plot")
+\method{plot}{psis_loo}(
+  x,
+  diagnostic = c("k", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+)
 
-\method{plot}{psis}(x, diagnostic = c("k", "n_eff"), ...,
-  label_points = FALSE, main = "PSIS diagnostic plot")
+\method{plot}{psis}(
+  x,
+  diagnostic = c("k", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+)
 }
 \arguments{
 \item{x}{An object created by \code{\link[=loo]{loo()}} or \code{\link[=psis]{psis()}}.}

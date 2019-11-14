@@ -618,14 +618,16 @@ NULL
 
 
 #' Parallel psis list computations
+#'
 #' @details Refactored function to handle parallel computations
 #' for psis_list
 #'
+#' @keywords internal
 #' @inheritParams loo.function
 #' @param .loo_i The function used to compute individual loo contributions.
-#' @param .llfun See llfun in \code{loo.function()}.
-#' @param N the total number of observations (i.e. \code{nrow(data)}).
-#' @param method See is_method for \code{loo()}
+#' @param .llfun See `llfun` in [loo.function()].
+#' @param N The total number of observations (i.e. `nrow(data)`).
+#' @param method See `is_method` for [loo()]
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
   parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method = "psis", ...)

@@ -13,13 +13,18 @@ relative_eff(x, ...)
 
 \method{relative_eff}{default}(x, chain_id, ...)
 
-\method{relative_eff}{matrix}(x, chain_id, ...,
-  cores = getOption("mc.cores", 1))
+\method{relative_eff}{matrix}(x, chain_id, ..., cores = getOption("mc.cores", 1))
 
 \method{relative_eff}{array}(x, ..., cores = getOption("mc.cores", 1))
 
-\method{relative_eff}{function}(x, chain_id, ...,
-  cores = getOption("mc.cores", 1), data = NULL, draws = NULL)
+\method{relative_eff}{`function`}(
+  x,
+  chain_id,
+  ...,
+  cores = getOption("mc.cores", 1),
+  data = NULL,
+  draws = NULL
+)
 
 \method{relative_eff}{importance_sampling}(x, ...)
 }

@@ -14,18 +14,13 @@ to specify the inputs for each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
-\item{is_method}{Importance sampling method to use. The following methods are implemented:
-\describe{
-\item{\code{psis}}{
-Pareto-Smoothed Importance Sampling (PSIS). Default method.
-}
-\item{\code{tis}}{
-Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
-where \code{S} is the number of posterior draws.
-}
-\item{\code{sis}}{
-Standard Importance Sampling (SIS).
-}
+\item{is_method}{The importance sampling method to use.
+The following methods are implemented:
+\itemize{
+\item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+\item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
+\code{sqrt(S)}, where \code{S} is the number of posterior draws.
+\item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
 }}
 }
 \description{

@@ -4,15 +4,22 @@
 \alias{psislw}
 \title{Pareto smoothed importance sampling (deprecated, old version)}
 \usage{
-psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("mc.cores", 1),
-  llfun = NULL, llargs = NULL, ...)
+psislw(
+  lw,
+  wcp = 0.2,
+  wtrunc = 3/4,
+  cores = getOption("mc.cores", 1),
+  llfun = NULL,
+  llargs = NULL,
+  ...
+)
 }
 \arguments{
 \item{lw}{A matrix or vector of log weights. For computing LOO, \code{lw = -log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
 points) pointwise log-likelihood matrix.}
 
 \item{wcp}{The proportion of importance weights to use for the generalized
-Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
+Pareto fit. The \code{100*wcp}\\% largest weights are used as the sample
 from which to estimate the parameters of the generalized Pareto
 distribution.}
 
@@ -38,7 +45,7 @@ A named list with components \code{lw_smooth} (modified log weights) and
 \code{pareto_k} (estimated generalized Pareto shape parameter(s) k).
 }
 \description{
-As of version \code{2.0.0} this function is \strong{deprecated}. Please use the
+As of version \verb{2.0.0} this function is \strong{deprecated}. Please use the
 \code{\link[=psis]{psis()}} function for the new PSIS algorithm.
 }
 \references{

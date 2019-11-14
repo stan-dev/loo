@@ -1,16 +1,7 @@
-#' @param is_method
-#'   Importance sampling method to use. The following methods are implemented:
-#' \describe{
-#'  \item{\code{psis}}{
-#'    Pareto-Smoothed Importance Sampling (PSIS). Default method.
-#'  }
-#'  \item{\code{tis}}{
-#'    Truncated Importance Sampling (TIS) with truncation at \code{sqrt(S)},
-#'     where \code{S} is the number of posterior draws.
-#'  }
-#'  \item{\code{sis}}{
-#'    Standard Importance Sampling (SIS).
-#'  }
-#' }
+#' @param is_method The importance sampling method to use.
+#' The following methods are implemented:
+#' * [`"psis"`][psis]: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+#' * [`"tis"`][tis]: Truncated Importance Sampling (TIS) with truncation at
+#'   `sqrt(S)`, where `S` is the number of posterior draws.
+#' * [`"sis"`][sis]: Standard Importance Sampling (SIS).
 #'
-
