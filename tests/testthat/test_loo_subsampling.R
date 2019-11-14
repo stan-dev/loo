@@ -722,10 +722,6 @@ test_that("srs_est works as expected", {
 
 
 
-
-
-
-
 context("loo_subsampling cases")
 
 test_that("Test loo_subsampling and loo_approx with radon data", {

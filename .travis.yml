@@ -15,6 +15,6 @@ env:
 - _R_CHECK_FORCE_SUGGESTS_=false NOT_CRAN=true MAKEFLAGS=-j2
 
 after_success:
-  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/extract_log_lik.R", "R/psislw.R", "R/effective_sample_sizes.R" = c(74:81, 126:136), "R/loo.R" = c(695:708)))'
+  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/zzz.R", "R/extract_log_lik.R", "R/psislw.R", "R/effective_sample_sizes.R" = c(74:81, 126:136), "R/loo.R" = c(695:708)))'
 
 
