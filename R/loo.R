@@ -220,9 +220,17 @@ loo.matrix <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
-    if (is.null(r_eff)) throw_loo_r_eff_warning()
     is_method <- match.arg(is_method)
-    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
+    if (is.null(r_eff)) {
+      throw_loo_r_eff_warning()
+    }
+    psis_out <-
+      importance_sampling.matrix(
+        log_ratios = -x,
+        r_eff = r_eff,
+        cores = cores,
+        method = is_method
+      )
     pointwise <- pointwise_loo_calcs(x, psis_out)
     importance_sampling_loo_object(
       pointwise = pointwise,
@@ -263,17 +271,19 @@ loo.function <-
       r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
 
-    psis_list <- parallel_importance_sampling_list(
-                                    N = N,
-                                    .loo_i = .loo_i,
-                                    .llfun = .llfun,
-                                    data = data,
-                                    draws = draws,
-                                    r_eff = r_eff,
-                                    save_psis = save_psis,
-                                    cores = cores,
-                                    method = is_method,
-                                    ...)
+    psis_list <-
+      parallel_importance_sampling_list(
+        N = N,
+        .loo_i = .loo_i,
+        .llfun = .llfun,
+        data = data,
+        draws = draws,
+        r_eff = r_eff,
+        save_psis = save_psis,
+        cores = cores,
+        method = is_method,
+        ...
+      )
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -366,7 +376,13 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, method = is_method)
+    psis_out <-
+      importance_sampling.matrix(
+        log_ratios = -ll_i,
+        r_eff = r_eff,
+        cores = 1,
+        method = is_method
+      )
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -437,7 +453,8 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_method, is_object = NULL) {
+importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
+                                           is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
   if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
   assert_importance_sampling_method_is_implemented(is_method)
@@ -629,12 +646,21 @@ NULL
 #' @param N The total number of observations (i.e. `nrow(data)`).
 #' @param method See `is_method` for [loo()]
 #'
-parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method = "psis", ...)
+parallel_psis_list <- function(N, .loo_i, .llfun,
+                               data, draws, r_eff,
+                               save_psis, cores,
+                               ...){
+  parallel_importance_sampling_list(N, .loo_i, .llfun,
+                                    data, draws, r_eff,
+                                    save_psis, cores,
+                                    method = "psis", ...)
 }
 
 #' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method, ...){
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
+                                              data, draws, r_eff,
+                                              save_psis, cores,
+                                              method, ...){
   if (cores == 1) {
     psis_list <-
       lapply(

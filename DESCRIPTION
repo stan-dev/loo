@@ -40,11 +40,11 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
-    rstan, 
+    rstan,
     rstanarm (>= 2.17.4),
     rstantools,
     spdep,
-    testthat
+    testthat (>= 2.1.0)
 VignetteBuilder: knitr
 Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
