@@ -30,7 +30,8 @@
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights. To get normalized weights use the `weights` method provided
+#'     weights, *minus the largest log ratio* for numerical reasons.
+#'     To get normalized weights use the `weights` method provided
 #'     for objects of class `"psis"`.
 #'   }
 #'  \item{`diagnostics`}{
@@ -57,6 +58,9 @@
 #'   \item{`dims`}{
 #'     Integer vector of length 2 containing `S` (posterior sample size)
 #'     and `N` (number of observations).
+#'   }
+#'   \item{`method`}{
+#'     Method used for importance sampling, here `psis`.
 #'   }
 #' }
 #'
@@ -94,13 +98,12 @@ psis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
-    stopifnot(length(dim(log_ratios)) == 3)
-    log_ratios <- validate_ll(log_ratios)
-    log_ratios <- llarray_to_matrix(log_ratios)
-    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores)
+  importance_sampling.array(log_ratios = log_ratios, ...,
+                            r_eff = r_eff,
+                            cores = cores,
+                            method = "psis")
   }
+
 
 #' @export
 #' @templateVar fn psis
@@ -111,10 +114,11 @@ psis.matrix <-
            ...,
            r_eff = NULL,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
-    log_ratios <- validate_ll(log_ratios)
-    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_psis(log_ratios, r_eff = r_eff, cores = cores)
+    importance_sampling.matrix(log_ratios,
+                               ...,
+                               r_eff = r_eff,
+                               cores = cores,
+                               method = "psis")
   }
 
 #' @export
@@ -123,52 +127,11 @@ psis.matrix <-
 #'
 psis.default <-
   function(log_ratios, ..., r_eff = NULL) {
-    stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
-    dim(log_ratios) <- c(length(log_ratios), 1)
-    r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    psis.matrix(log_ratios, r_eff = r_eff, cores = 1)
+    importance_sampling.default(log_ratios = log_ratios, ...,
+                                r_eff = r_eff,
+                                method = "psis")
   }
 
-#' @rdname psis
-#' @export
-#' @export weights.psis
-#' @method weights psis
-#' @param object For the `weights()` method, an object returned by `psis()` (a
-#'   list with class `"psis"`).
-#' @param log For the `weights()` method, should the weights be returned on
-#'   the log scale? Defaults to `TRUE`.
-#' @param normalize For the `weights()` method, should the weights be
-#'   normalized? Defaults to `TRUE`.
-#'
-#' @return The `weights()` method returns an object with the same dimensions as
-#'   the `log_weights` component of the `"psis"` object. The `normalize` and
-#'   `log` arguments control whether the returned weights are normalized and
-#'   whether or not to return them on the log scale.
-#'
-weights.psis <-
-  function(object,
-           ...,
-           log = TRUE,
-           normalize = TRUE) {
-    out <- object[["log_weights"]] # smoothed but unnormalized log weights
-    if (normalize) {
-      out <- sweep(out,
-                   MARGIN = 2,
-                   STATS = attr(object, "norm_const_log"), # colLogSumExp(log_weights)
-                   check.margin = FALSE)
-    }
-    if (!log) {
-      out <- exp(out)
-    }
-
-    return(out)
-  }
-
-
-#' @export
-dim.psis <- function(x) {
-  attr(x, "dims")
-}
 
 #' @rdname psis
 #' @export
@@ -180,94 +143,28 @@ is.psis <- function(x) {
 
 # internal ----------------------------------------------------------------
 
-#' Structure the object returned by the psis methods
-#'
 #' @noRd
-#' @param unnormalized_log_weights Smoothed and possibly truncated log weights,
-#'   but unnormalized.
-#' @param pareto_k Vector of GPD k estimates.
-#' @param tail_len Vector of tail lengths used to fit GPD.
-#' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
-#' @return A list of class `"psis"` with structure described in the main doc at
-#'   the top of this file.
-#'
+#' @seealso importance_sampling_object
 psis_object <-
   function(unnormalized_log_weights,
            pareto_k,
            tail_len,
            r_eff) {
-    stopifnot(is.matrix(unnormalized_log_weights))
-    norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
-    out <- structure(
-      list(
-        log_weights = unnormalized_log_weights,
-        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
-      ),
-      # attributes
-      norm_const_log = norm_const_log,
-      tail_len = tail_len,
-      r_eff = r_eff,
-      dims = dim(unnormalized_log_weights),
-      class = c("psis", "list")
-    )
-
-    # need normalized weights (not on log scale) for psis_n_eff
-    w <- weights.psis(out, normalize = TRUE, log = FALSE)
-    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
-    return(out)
+    importance_sampling_object(unnormalized_log_weights = unnormalized_log_weights,
+                               pareto_k = pareto_k,
+                               tail_len = tail_len,
+                               r_eff = r_eff,
+                               method = "psis")
   }
 
 
-#' Do PSIS given matrix of log weights
-#'
 #' @noRd
-#' @param lr Matrix of log ratios (`-loglik`)
-#' @param r_eff Vector of relative effective sample sizes
-#' @param cores User's integer `cores` argument
-#' @return A list with class `"psis"` and structure described in the main doc at
-#'   the top of this file.
-#'
-do_psis <- function(log_ratios, r_eff, cores) {
-  stopifnot(cores == as.integer(cores))
-  N <- ncol(log_ratios)
-  S <- nrow(log_ratios)
-  tail_len <- n_pareto(r_eff, S)
-  throw_tail_length_warnings(tail_len)
-
-  if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      do_psis_i(log_ratios[, i], tail_len[i]))
-  } else {
-    if (.Platform$OS.type != "windows") {
-      lw_list <- parallel::mclapply(
-        X = seq_len(N),
-        mc.cores = cores,
-        FUN = function(i)
-          do_psis_i(log_ratios[, i], tail_len[i])
-      )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      lw_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = function(i)
-            do_psis_i(log_ratios[, i], tail_len[i])
-        )
-    }
-  }
-
-  log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
-  pareto_k <- psis_apply(lw_list, "pareto_k")
-  throw_pareto_warnings(pareto_k)
-
-  psis_object(
-    unnormalized_log_weights = log_weights,
-    pareto_k = pareto_k,
-    tail_len = tail_len,
-    r_eff = r_eff
-  )
+#' @seealso do_importance_sampling
+do_psis <- function(log_ratios, r_eff, cores, method){
+  do_importance_sampling(log_ratios = log_ratios,
+                         r_eff = r_eff,
+                         cores = cores,
+                         method = "psis")
 }
 
 #' Extract named components from each list in the list of lists obtained by
@@ -291,6 +188,7 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
 #' @param tail_len_i An integer tail length.
+#' @param ... Not used. Included to conform to API for differen IS methods.
 #'
 #' @details
 #' * The maximum of the log ratios is subtracted from each of them
@@ -301,7 +199,7 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' * `lw`: vector of unnormalized log weights
 #' * `pareto_k`: scalar Pareto k estimate.
 #'
-do_psis_i <- function(log_ratios_i, tail_len_i) {
+do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   lw_i <- log_ratios_i - max(log_ratios_i)
   khat <- Inf
@@ -329,7 +227,6 @@ do_psis_i <- function(log_ratios_i, tail_len_i) {
 
   list(log_weights = lw_i, pareto_k = khat)
 }
-
 
 #' PSIS tail smoothing for a single vector
 #'

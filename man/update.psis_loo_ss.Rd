@@ -4,10 +4,19 @@
 \alias{update.psis_loo_ss}
 \title{Update \code{psis_loo_ss} objects}
 \usage{
-\method{update}{psis_loo_ss}(object, ..., data = NULL, draws = NULL,
-  observations = NULL, r_eff = NULL, cores = getOption("mc.cores",
-  1), loo_approximation = NULL, loo_approximation_draws = NULL,
-  llgrad = NULL, llhess = NULL)
+\method{update}{psis_loo_ss}(
+  object,
+  ...,
+  data = NULL,
+  draws = NULL,
+  observations = NULL,
+  r_eff = NULL,
+  cores = getOption("mc.cores", 1),
+  loo_approximation = NULL,
+  loo_approximation_draws = NULL,
+  llgrad = NULL,
+  llhess = NULL
+)
 }
 \arguments{
 \item{object}{A \code{psis_loo_ss} object to update.}
@@ -60,40 +69,34 @@ setting \code{mc.cores} interactively or in a script is fine).
 }}
 
 \item{loo_approximation}{What type of approximation of the loo_i's should be used?
-The default is \code{plpd} (the log predictive density using the posterior expectation).
+The default is \code{"plpd"} (the log predictive density using the posterior expectation).
 There are six different methods implemented to approximate loo_i's
 (see the references for more details):
-\describe{
-\item{\code{plpd}}{
-uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
-\item{\code{lpd}}{
-uses the lpds (ie. \eqn{p(y_i|y)})}
-\item{\code{tis}}{
-uses truncated importance sampling to approximate PSIS-LOO}
-\item{\code{waic}}{
-uses waic (ie. \eqn{p(y_i|y) - p_{waic}})}
-\item{\code{waic_grad_marginal}}{
-uses waic approximation using first order delta method and
-posterior marginal variances to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad_marginal).
-Require gradient of likelihood function.}
-\item{\code{waic_grad}}{
-uses waic approximation using first order delta method and
-posterior covariance to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
-Require gradient of likelihood function.}
-\item{\code{waic_grad}}{
-uses waic approximation using second order delta method and
-posterior covariance to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
-Require gradient and Hessian of likelihood function.}
+\itemize{
+\item \code{"plpd"}: uses the lpd based on point estimates (i.e., \eqn{p(y_i|\hat{\theta})}).
+\item \code{"lpd"}: uses the lpds (i,e., \eqn{p(y_i|y)}).
+\item \code{"tis"}: uses truncated importance sampling to approximate PSIS-LOO.
+\item \code{"waic"}: uses waic (i.e., \eqn{p(y_i|y) - p_{waic}}).
+\item \code{"waic_grad_marginal"}: uses waic approximation using first order delta
+method and posterior marginal variances to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad_marginal). Requires gradient of
+likelihood function.
+\item \code{"waic_grad"}: uses waic approximation using first order delta method and
+posterior covariance to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad). Requires gradient of likelihood
+function.
+\item \code{"waic_hess"}: uses waic approximation using second order delta method and
+posterior covariance to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad). Requires gradient and Hessian of
+likelihood function.
 }
+
 As point estimates of \eqn{\hat{\theta}}, the posterior expectations
 of the parameters are used.}
 
 \item{loo_approximation_draws}{The number of posterior draws used when
-integrating over the posterior. This is used if \code{loo_approximation="lpd"}
-or \code{loo_approximation="waic"}.}
+integrating over the posterior. This is used if \code{loo_approximation} is set
+to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 
 \item{llgrad}{The gradient of the log-likelihood. This
 is only used when \code{loo_approximation} is \code{"waic_grad"},
@@ -103,15 +106,14 @@ is only used when \code{loo_approximation} is \code{"waic_grad"},
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
-A \code{psis_loo_ss} object
+A \code{psis_loo_ss} object.
 }
 \description{
 Update \code{psis_loo_ss} objects
 }
 \details{
-If \code{observation} is updated then if a vector of indices or a
-\code{psis_loo_ss} object is supplied the updated object will have exactly the
-observations indicated by the vector or \code{psis_loo_ss} object. If a single
-integer is supplied, new observations will be sampled to reach the supplied
-sample size.
+If \code{observations} is updated then if a vector of indices or a \code{psis_loo_ss}
+object is supplied the updated object will have exactly the observations
+indicated by the vector or \code{psis_loo_ss} object. If a single integer is
+supplied, new observations will be sampled to reach the supplied sample size.
 }

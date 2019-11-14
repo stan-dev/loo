@@ -2,10 +2,20 @@
 
 (GitHub issue/PR number in parentheses)
 
-* `compare()` is now __deprecated__ in favor of [`loo_compare()`](https://mc-stan.org/loo/reference/loo_compare.html). (#93)
-
 * New functions `loo_subsample()` and `loo_approximate_posterior()` (and new
 vignette) for doing PSIS-LOO for large data. (#113)
+
+* Added support for standard importance sampling and truncated importance
+sampling (functions `sis()` and `tis()`). (#125)
+
+* Added Mans Magnusson as a coauthor.
+
+* `compare()` now throws a deprecation warning suggesting `loo_compare()`. (#93)
+
+* Smaller threshold is used when checking uniqueness of tail values. (#124)
+
+* For WAIC, warnings are only thrown when running `waic()` not when printing
+a `waic` object. (#117, @mcol)
 
 * Use markdown syntax in roxygen documentation wherever possible. (#108)
 

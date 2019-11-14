@@ -7,11 +7,23 @@
 \usage{
 loo_subsample(x, ...)
 
-\method{loo_subsample}{function}(x, ..., data = NULL, draws = NULL,
-  observations = 400, log_p = NULL, log_g = NULL, r_eff = NULL,
-  save_psis = FALSE, cores = getOption("mc.cores", 1),
-  loo_approximation = "plpd", loo_approximation_draws = NULL,
-  estimator = "diff_srs", llgrad = NULL, llhess = NULL)
+\method{loo_subsample}{`function`}(
+  x,
+  ...,
+  data = NULL,
+  draws = NULL,
+  observations = 400,
+  log_p = NULL,
+  log_g = NULL,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  loo_approximation = "plpd",
+  loo_approximation_draws = NULL,
+  estimator = "diff_srs",
+  llgrad = NULL,
+  llhess = NULL
+)
 }
 \arguments{
 \item{x}{A function. The \strong{Methods (by class)} section, below, has detailed
@@ -67,52 +79,43 @@ setting \code{mc.cores} interactively or in a script is fine).
 }}
 
 \item{loo_approximation}{What type of approximation of the loo_i's should be used?
-The default is \code{plpd} (the log predictive density using the posterior expectation).
+The default is \code{"plpd"} (the log predictive density using the posterior expectation).
 There are six different methods implemented to approximate loo_i's
 (see the references for more details):
-\describe{
-\item{\code{plpd}}{
-uses the lpd based on point estimates (ie. \eqn{p(y_i|\hat{\theta})})}
-\item{\code{lpd}}{
-uses the lpds (ie. \eqn{p(y_i|y)})}
-\item{\code{tis}}{
-uses truncated importance sampling to approximate PSIS-LOO}
-\item{\code{waic}}{
-uses waic (ie. \eqn{p(y_i|y) - p_{waic}})}
-\item{\code{waic_grad_marginal}}{
-uses waic approximation using first order delta method and
-posterior marginal variances to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad_marginal).
-Require gradient of likelihood function.}
-\item{\code{waic_grad}}{
-uses waic approximation using first order delta method and
-posterior covariance to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
-Require gradient of likelihood function.}
-\item{\code{waic_grad}}{
-uses waic approximation using second order delta method and
-posterior covariance to approximate \eqn{p_{waic}}
-(ie. \eqn{p(y_i|\hat{\theta})}-p_waic_grad).
-Require gradient and Hessian of likelihood function.}
+\itemize{
+\item \code{"plpd"}: uses the lpd based on point estimates (i.e., \eqn{p(y_i|\hat{\theta})}).
+\item \code{"lpd"}: uses the lpds (i,e., \eqn{p(y_i|y)}).
+\item \code{"tis"}: uses truncated importance sampling to approximate PSIS-LOO.
+\item \code{"waic"}: uses waic (i.e., \eqn{p(y_i|y) - p_{waic}}).
+\item \code{"waic_grad_marginal"}: uses waic approximation using first order delta
+method and posterior marginal variances to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad_marginal). Requires gradient of
+likelihood function.
+\item \code{"waic_grad"}: uses waic approximation using first order delta method and
+posterior covariance to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad). Requires gradient of likelihood
+function.
+\item \code{"waic_hess"}: uses waic approximation using second order delta method and
+posterior covariance to approximate \eqn{p_{waic}} (ie.
+\eqn{p(y_i|\hat{\theta})}-p_waic_grad). Requires gradient and Hessian of
+likelihood function.
 }
+
 As point estimates of \eqn{\hat{\theta}}, the posterior expectations
 of the parameters are used.}
 
 \item{loo_approximation_draws}{The number of posterior draws used when
-integrating over the posterior. This is used if \code{loo_approximation="lpd"}
-or \code{loo_approximation="waic"}.}
+integrating over the posterior. This is used if \code{loo_approximation} is set
+to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 
 \item{estimator}{How should \code{elpd_loo}, \code{p_loo} and \code{looic} be estimated?
-The default is \code{diff_srs}.
-\describe{
-\item{\code{diff_srs}}{
-uses the difference estimator with simple random sampling (srs).
-\code{p_loo} is estimated using standard srs.}
-\item{\code{hh}}{
-uses the Hansen-Hurwitz estimator with sampling proportional
-to size, where \code{abs} of loo_approximation is used as size.}
-\item{\code{srs}}{
-uses simple random sampling and ordinary estimation.}
+The default is \code{"diff_srs"}.
+\itemize{
+\item \code{"diff_srs"}: uses the difference estimator with simple random sampling
+(srs). \code{p_loo} is estimated using standard srs.
+\item \code{"hh"}: uses the Hansen-Hurwitz estimator with sampling proportional to
+size, where \code{abs} of loo_approximation is used as size.
+\item \code{"srs"}: uses simple random sampling and ordinary estimation.
 }}
 
 \item{llgrad}{The gradient of the log-likelihood. This
@@ -123,15 +126,12 @@ is only used when \code{loo_approximation} is \code{"waic_grad"},
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
-\code{loo_subsample()} returns a named list with class
-\code{c("psis_loo_ss", "psis_loo", "loo")}. This has the same structure
-as objects returned by \code{\link[=loo]{loo()}} but with the additional slot:
-\describe{
-\item{\code{loo_subsampling}}{
-A list with two vectors, \code{log_p} and \code{log_g} of the same length
-containing the posterior density and the approximation density
+\code{loo_subsample()} returns a named list with class \code{c("psis_loo_ss", "psis_loo", "loo")}. This has the same structure as objects returned by
+\code{\link[=loo]{loo()}} but with the additional slot:
+\itemize{
+\item \code{loo_subsampling}: A list with two vectors, \code{log_p} and \code{log_g}, of the
+same length containing the posterior density and the approximation density
 for the individual draws.
-}
 }
 }
 \description{

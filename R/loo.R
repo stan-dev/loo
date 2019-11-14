@@ -28,6 +28,7 @@
 #'   this is only needed if you plan to use the [E_loo()] function to compute
 #'   weighted expectations after running `loo`.
 #' @template cores
+#' @template is_method
 #'
 #' @details The `loo()` function is an S3 generic and methods are provided for
 #'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
@@ -192,17 +193,19 @@ loo.array <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
+    is_method <- match.arg(is_method)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -215,16 +218,18 @@ loo.matrix <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
+    is_method <- match.arg(is_method)
+    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -243,10 +248,12 @@ loo.function <-
            draws = NULL,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
+    is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
+    assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
@@ -256,7 +263,8 @@ loo.function <-
       r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
 
-    psis_list <- parallel_psis_list(N = N,
+    psis_list <- parallel_importance_sampling_list(
+                                    N = N,
                                     .loo_i = .loo_i,
                                     .llfun = .llfun,
                                     data = data,
@@ -264,12 +272,13 @@ loo.function <-
                                     r_eff = r_eff,
                                     save_psis = save_psis,
                                     cores = cores,
+                                    method = is_method,
                                     ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
       psis_object_list <- lapply(psis_list, "[[", "psis_object")
-      psis_out <- list2psis(psis_object_list)
+      psis_out <- list2importance_sampling(psis_object_list)
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
@@ -279,11 +288,12 @@ loo.function <-
       )
     }
 
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -311,13 +321,16 @@ loo_i <-
            ...,
            data = NULL,
            draws = NULL,
-           r_eff = NULL) {
+           r_eff = NULL,
+           is_method = "psis"
+           ) {
     stopifnot(
       i == as.integer(i),
       is.function(llfun) || is.character(llfun),
       is.data.frame(data) || is.matrix(data),
       i <= dim(data)[1],
-      !is.null(draws)
+      !is.null(draws),
+      is_method %in% implemented_is_methods()
     )
     .loo_i(
       i = as.integer(i),
@@ -326,6 +339,7 @@ loo_i <-
       draws = draws,
       r_eff = r_eff[i],
       save_psis = FALSE,
+      is_method = is_method,
       ...
     )
   }
@@ -341,7 +355,8 @@ loo_i <-
            data,
            draws,
            r_eff = NULL,
-           save_psis = FALSE) {
+           save_psis = FALSE,
+           is_method) {
 
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
@@ -351,7 +366,7 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- psis.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
+    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, method = is_method)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -401,7 +416,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
     ll <- as.matrix(ll)
   }
-  lw <- weights.psis(psis_object, normalize = TRUE, log = TRUE)
+  lw <- weights(psis_object, normalize = TRUE, log = TRUE)
   elpd_loo <- matrixStats::colLogSumExps(ll + lw)
   lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
@@ -417,18 +432,26 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #'   looic.
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
-#' @param psis_object An object of class `"psis"`, as returned by the [psis()] function.
-#' @return A `'psis_loo'` object as described in the Value section of the [loo()]
+#' @template is_method
+#' @param is_object An object of class `"psis"/"tis"/"sis"`, as returned by the [psis()/tis()/sis()] function.
+#' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
+importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
   if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+  assert_importance_sampling_method_is_implemented(is_method)
 
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
-  out <- nlist(estimates, pointwise, diagnostics, psis_object)
+  out <- nlist(estimates, pointwise, diagnostics)
+  if (is.null(is_object)) {
+    out[paste0(is_method, "_object")] <- list(NULL)
+  } else {
+    out[[paste0(is_method, "_object")]] <- is_object
+  }
+
   # maintain backwards compatibility
   old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
   out <- c(out, setNames(as.list(estimates), old_nms))
@@ -436,7 +459,7 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   structure(
     out,
     dims = dims,
-    class = c("psis_loo", "loo")
+    class = c(paste0(is_method, "_loo"), "importance_sampling_loo", "loo")
   )
 }
 
@@ -486,9 +509,19 @@ throw_loo_r_eff_warning <- function() {
 #' @param objects List of `"psis"` objects, each for a single observation.
 #' @return A single `"psis"` object.
 #'
-list2psis <- function(objects) {
+list2importance_sampling <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
   diagnostics <- lapply(objects, "[[", "diagnostics")
+
+  method <- psis_apply(objects, "method", fun = "attr", fun_val = character(1))
+  methods <- unique(method)
+  if (length(methods) == 1) {
+    method <- methods
+    classes <- c(methods, "importance_sampling", "list")
+  } else {
+    classes <- c("importance_sampling", "list")
+  }
+
   structure(
     list(
       log_weights = log_weights,
@@ -501,7 +534,8 @@ list2psis <- function(objects) {
     tail_len = psis_apply(objects, "tail_len", fun = "attr"),
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
-    class = c("psis", "list")
+    method = method,
+    class = classes
   )
 }
 
@@ -584,15 +618,23 @@ NULL
 
 
 #' Parallel psis list computations
+#'
 #' @details Refactored function to handle parallel computations
 #' for psis_list
 #'
+#' @keywords internal
 #' @inheritParams loo.function
 #' @param .loo_i The function used to compute individual loo contributions.
-#' @param .llfun See llfun in \code{loo.function()}.
-#' @param N the total number of observations (i.e. \code{nrow(data)}).
+#' @param .llfun See `llfun` in [loo.function()].
+#' @param N The total number of observations (i.e. `nrow(data)`).
+#' @param method See `is_method` for [loo()]
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
+  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method = "psis", ...)
+}
+
+#' @rdname parallel_psis_list
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method, ...){
   if (cores == 1) {
     psis_list <-
       lapply(
@@ -603,6 +645,7 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
         draws = draws,
         r_eff = r_eff,
         save_psis = save_psis,
+        is_method = method,
         ...
       )
   } else {
@@ -618,6 +661,7 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
+          is_method = method,
           ...
         )
     } else {
@@ -634,10 +678,9 @@ parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis,
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
+          is_method = method,
           ...
         )
     }
   }
 }
-
-

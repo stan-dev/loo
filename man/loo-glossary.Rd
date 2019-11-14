@@ -73,7 +73,7 @@ individual leave-one-out distribution is from the full distribution. If
 leaving out an observation changes the posterior too much then importance
 sampling is not able to give reliable estimate. If \code{k<0.5}, then the
 corresponding component of \code{elpd_loo} is estimated with high accuracy.
-If \code{0.5<k<0.7} the accuracy is lower, but still ok. If \code{k>0.7},
+If \verb{0.5<k<0.7} the accuracy is lower, but still ok. If \code{k>0.7},
 then importance sampling is not able to provide useful estimate for that
 component/observation. Pareto k is also useful as a measure of influence of
 an observation. Highly influential observations have high k values. Very high
@@ -85,7 +85,7 @@ If \code{k > 0.7} then we can also look at the \code{p_loo} estimate for
 some additional information about the problem:
 
 \itemize{
-\item If \code{p_loo << p} (the total number of parameters in the model),
+\item If \verb{p_loo << p} (the total number of parameters in the model),
 then the model is likely to be misspecified. Posterior predictive checks
 (PPCs) are then likely to also detect the problem. Try using an overdispersed
 model, or add more structural information (nonlinearity, mixture model,
@@ -100,7 +100,7 @@ effect models with a few observations per random effect, and Gaussian
 processes and spatial models with short correlation lengths.
 
 \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
-If the number of parameters \code{p<<N}, then PPCs are also likely to detect the
+If the number of parameters \verb{p<<N}, then PPCs are also likely to detect the
 problem. See the case study at
 \url{https://avehtari.github.io/modelselection/roaches.html} for an example.
 If \code{p} is relatively large compared to the number of

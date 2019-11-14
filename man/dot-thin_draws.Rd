@@ -7,12 +7,12 @@
 .thin_draws(draws, loo_approximation_draws)
 }
 \arguments{
-\item{draws}{a draws object with posterior draws.}
+\item{draws}{A draws object with posterior draws.}
 
-\item{loo_approximation_draws}{the number of posterior draws to return (ie after thinning)}
+\item{loo_approximation_draws}{The number of posterior draws to return (ie after thinning).}
 }
 \value{
-a thinned draws object
+A thinned draws object.
 }
 \description{
 Thin a draws object
@@ -20,6 +20,6 @@ Thin a draws object
 \details{
 This is a generic function to thin draws from arbitrary draws
 objects. The function is internal and should only be used by developers to
-enable loo_subsample() for arbitrary draws objects.
+enable \code{\link[=loo_subsample]{loo_subsample()}} for arbitrary draws objects.
 }
 \keyword{internal}

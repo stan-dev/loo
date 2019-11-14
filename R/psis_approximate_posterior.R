@@ -25,7 +25,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   if (!requireNamespace("checkmate", quietly=TRUE)) {
     stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
   }
-  if(!is.null(log_q)){
+  if (!is.null(log_q)){
     .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
     log_g <- log_q
   }
@@ -50,11 +50,12 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   }
 
   pointwise <- pointwise_loo_calcs(log_liks, psis_out)
-  psis_loo_object(
+  importance_sampling_loo_object(
     pointwise = pointwise,
     diagnostics = psis_out$diagnostics,
     dims = dim(psis_out),
-    psis_object = if (save_psis) psis_out else NULL
+    is_method = "psis",
+    is_object = if (save_psis) psis_out else NULL
   )
 }
 

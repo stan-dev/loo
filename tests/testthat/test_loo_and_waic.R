@@ -159,7 +159,7 @@ test_that("loo.function runs with multiple cores", {
 })
 
 test_that("save_psis option to loo.function makes correct psis object", {
-  loo_with_fn2 <- loo(llfun, data = data, draws = draws,
+  loo_with_fn2 <- loo.function(llfun, data = data, draws = draws,
                       r_eff = rep(1, nrow(data)), save_psis = TRUE)
   expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })

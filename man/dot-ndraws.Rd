@@ -7,10 +7,10 @@
 .ndraws(x)
 }
 \arguments{
-\item{x}{a draws object with posterior draws.}
+\item{x}{A draws object with posterior draws.}
 }
 \value{
-an integer with the number of draws.
+An integer with the number of draws.
 }
 \description{
 The number of posterior draws in a draws object.

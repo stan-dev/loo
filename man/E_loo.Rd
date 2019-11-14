@@ -8,11 +8,23 @@
 \usage{
 E_loo(x, psis_object, ...)
 
-\method{E_loo}{default}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{default}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 
-\method{E_loo}{matrix}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{matrix}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 }
 \arguments{
 \item{x}{A numeric vector or matrix.}
@@ -82,7 +94,7 @@ d <- data.frame(
   weight = c(ctl, trt),
   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
 )
-fit <- stan_glm(weight ~ group, data = d)
+fit <- stan_glm(weight ~ group, data = d, refresh = 0)
 yrep <- posterior_predict(fit)
 dim(yrep)
 

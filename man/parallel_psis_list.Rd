@@ -2,17 +2,40 @@
 % Please edit documentation in R/loo.R
 \name{parallel_psis_list}
 \alias{parallel_psis_list}
+\alias{parallel_importance_sampling_list}
 \title{Parallel psis list computations}
 \usage{
-parallel_psis_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores,
-  ...)
+parallel_psis_list(
+  N,
+  .loo_i,
+  .llfun,
+  data,
+  draws,
+  r_eff,
+  save_psis,
+  cores,
+  ...
+)
+
+parallel_importance_sampling_list(
+  N,
+  .loo_i,
+  .llfun,
+  data,
+  draws,
+  r_eff,
+  save_psis,
+  cores,
+  method,
+  ...
+)
 }
 \arguments{
-\item{N}{the total number of observations (i.e. \code{nrow(data)}).}
+\item{N}{The total number of observations (i.e. \code{nrow(data)}).}
 
 \item{.loo_i}{The function used to compute individual loo contributions.}
 
-\item{.llfun}{See llfun in \code{loo.function()}.}
+\item{.llfun}{See \code{llfun} in \code{\link[=loo.function]{loo.function()}}.}
 
 \item{data}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
@@ -60,6 +83,8 @@ setting \code{mc.cores} interactively or in a script is fine).
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
 below for details on how to specify these arguments.}
+
+\item{method}{See \code{is_method} for \code{\link[=loo]{loo()}}}
 }
 \description{
 Parallel psis list computations
@@ -68,3 +93,4 @@ Parallel psis list computations
 Refactored function to handle parallel computations
 for psis_list
 }
+\keyword{internal}
