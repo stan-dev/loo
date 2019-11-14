@@ -220,19 +220,20 @@ loo_subsample.function <-
   }
 
 
-#' Update `psis_loo_ss} objects
+#' Update `psis_loo_ss` objects
 #'
 #' @details
-#' If `observation` is updated then if a vector of indices or a `psis_loo_ss`
+#' If `observations` is updated then if a vector of indices or a `psis_loo_ss`
 #' object is supplied the updated object will have exactly the observations
 #' indicated by the vector or `psis_loo_ss` object. If a single integer is
 #' supplied, new observations will be sampled to reach the supplied sample size.
+#'
+#' @export
 #' @inheritParams loo_subsample.function
 #' @param object A `psis_loo_ss` object to update.
 #' @param ... Currently not used.
-#' @return A `psis_loo_ss` object
+#' @return A `psis_loo_ss` object.
 #' @importFrom stats update
-#' @export
 update.psis_loo_ss <- function(object, ...,
                                data = NULL,
                                draws = NULL,

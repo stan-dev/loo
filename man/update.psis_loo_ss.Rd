@@ -2,7 +2,7 @@
 % Please edit documentation in R/loo_subsample.R
 \name{update.psis_loo_ss}
 \alias{update.psis_loo_ss}
-\title{Update `psis_loo_ss} objects}
+\title{Update \code{psis_loo_ss} objects}
 \usage{
 \method{update}{psis_loo_ss}(
   object,
@@ -106,13 +106,13 @@ is only used when \code{loo_approximation} is \code{"waic_grad"},
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
-A \code{psis_loo_ss} object
+A \code{psis_loo_ss} object.
 }
 \description{
-Update `psis_loo_ss} objects
+Update \code{psis_loo_ss} objects
 }
 \details{
-If \code{observation} is updated then if a vector of indices or a \code{psis_loo_ss}
+If \code{observations} is updated then if a vector of indices or a \code{psis_loo_ss}
 object is supplied the updated object will have exactly the observations
 indicated by the vector or \code{psis_loo_ss} object. If a single integer is
 supplied, new observations will be sampled to reach the supplied sample size.
