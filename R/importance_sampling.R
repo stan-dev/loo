@@ -1,7 +1,13 @@
 #' A parent class for different importance sampling methods.
-#' @inheritParams psis
-#' @template is_method
 #' @keywords internal
+#' @inheritParams psis
+#' @param method The importance sampling method to use. The following methods
+#'   are implemented:
+#' * [`"psis"`][psis]: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+#' * [`"tis"`][tis]: Truncated Importance Sampling (TIS) with truncation at
+#'   `sqrt(S)`, where `S` is the number of posterior draws.
+#' * [`"sis"`][sis]: Standard Importance Sampling (SIS).
+#'
 importance_sampling <- function(log_ratios, method, ...) UseMethod("importance_sampling")
 
 #' @noRd

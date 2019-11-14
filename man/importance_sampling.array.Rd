@@ -46,8 +46,8 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{is_method}{The importance sampling method to use.
-The following methods are implemented:
+\item{is_method}{The importance sampling method to use. The following methods
+are implemented:
 \itemize{
 \item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
 \item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at

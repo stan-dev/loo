@@ -12,16 +12,16 @@ scale (for PSIS-LOO these are \emph{negative} log-likelihood values). See the
 \strong{Methods (by class)} section below for a detailed description of how
 to specify the inputs for each method.}
 
-\item{...}{Arguments passed on to the various methods.}
-
-\item{is_method}{The importance sampling method to use.
-The following methods are implemented:
+\item{method}{The importance sampling method to use. The following methods
+are implemented:
 \itemize{
 \item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
 \item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
 \code{sqrt(S)}, where \code{S} is the number of posterior draws.
 \item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
 }}
+
+\item{...}{Arguments passed on to the various methods.}
 }
 \description{
 A parent class for different importance sampling methods.

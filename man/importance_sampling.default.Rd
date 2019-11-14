@@ -26,8 +26,8 @@ draws of the \code{log_ratios} not obtained from MCMC then the warning
 message thrown when not specifying \code{r_eff} can be disabled by
 setting \code{r_eff} to \code{NA}.}
 
-\item{is_method}{The importance sampling method to use.
-The following methods are implemented:
+\item{is_method}{The importance sampling method to use. The following methods
+are implemented:
 \itemize{
 \item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
 \item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
