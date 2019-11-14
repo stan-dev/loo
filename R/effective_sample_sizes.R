@@ -102,6 +102,8 @@ relative_eff.function <-
     f_i <- validate_llfun(x) # not really an llfun, should return exp(ll) or exp(-ll)
     N <- dim(data)[1]
 
+    draws <- force(draws)
+
     if (cores == 1) {
       n_eff_list <-
         lapply(
