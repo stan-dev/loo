@@ -63,7 +63,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   if (cores == 1) {
     n_eff_vec <- apply(x, 3, ess_rfun)
   } else {
-    if (.Platform$OS.type != "windows") {
+    if (!os_is_windows()) {
       n_eff_list <-
         parallel::mclapply(
           mc.cores = cores,
@@ -112,7 +112,7 @@ relative_eff.function <-
           }
         )
     } else {
-      if (.Platform$OS.type != "windows") {
+      if (!os_is_windows()) {
         n_eff_list <-
           parallel::mclapply(
             X = seq_len(N),

@@ -197,7 +197,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     lw_list <- lapply(seq_len(N), function(i)
       is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i]))
   } else {
-    if (.Platform$OS.type != "windows") {
+    if (!os_is_windows()) {
       lw_list <- parallel::mclapply(
         X = seq_len(N),
         mc.cores = cores,

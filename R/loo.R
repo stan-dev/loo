@@ -675,7 +675,7 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
         ...
       )
   } else {
-    if (.Platform$OS.type != "windows") {
+    if (!os_is_windows()) {
       # On Mac or Linux use mclapply() for multiple cores
       psis_list <-
         parallel::mclapply(
