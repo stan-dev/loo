@@ -9,7 +9,7 @@ init:
 
 install:
   - ps: Bootstrap
-  - Rscript -e "install.packages('covr')"
+  - Rscript -e "install.packages('covr', repos = 'https://cloud.r-project.org')"
 
 cache:
   - C:\RLibrary
