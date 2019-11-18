@@ -9,7 +9,7 @@ init:
 
 install:
   - ps: Bootstrap
-  - Rscript -e "remotes::install_github('r-lib/covr', type='win.binary')"
+  - Rscript -e "install.packages('covr')"
 
 cache:
   - C:\RLibrary
