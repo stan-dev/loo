@@ -34,7 +34,7 @@ test_script:
   - travis-tool.sh run_tests
 
 on_success:
-  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/zzz.R", "R/extract_log_lik.R", "R/psislw.R"))'
+  - Rscript -e "covr::codecov(quiet = FALSE)"
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
