@@ -9,6 +9,7 @@ init:
 
 install:
   ps: Bootstrap
+  - Rscript -e "remotes::install_github('r-lib/covr', type='win.binary')"
 
 cache:
   - C:\RLibrary
@@ -31,6 +32,9 @@ build_script:
 
 test_script:
   - travis-tool.sh run_tests
+
+on_success:
+  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/zzz.R", "R/extract_log_lik.R", "R/psislw.R"))'
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
