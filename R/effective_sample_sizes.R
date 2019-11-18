@@ -124,6 +124,7 @@ relative_eff.function <-
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
+        parallel::clusterExport(cl, "draws")
         on.exit(parallel::stopCluster(cl))
         n_eff_list <-
           parallel::parLapply(
