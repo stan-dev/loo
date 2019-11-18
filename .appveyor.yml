@@ -8,7 +8,7 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: Bootstrap
+  - ps: Bootstrap
   - Rscript -e "remotes::install_github('r-lib/covr', type='win.binary')"
 
 cache:
