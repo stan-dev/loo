@@ -40,17 +40,16 @@
 #'   zero and bias can be large with practical sample sizes.
 #'
 #' \subsection{What if the estimated tail shape parameter \eqn{k} exceeds
-#' \eqn{0.5}}{ If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-#' should be warned, although in practice we have observed good performance for
-#' values of \eqn{k} up to 0.7. (Note: If \eqn{k} is greater than \eqn{0.5}
+#' \eqn{0.5}}{ Importance sampling is likely to work less well if the
+#' marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
+#' \eqn{p(\theta^s | y_{-i})} are very different, which is more likely to
+#' happen with a non-robust model and highly influential observations.
+#' If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+#' should be warned. (Note: If \eqn{k} is greater than \eqn{0.5}
 #' then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
-#'
-#' Importance
-#' sampling is likely to work less well if the marginal posterior
-#' \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are very
-#' different, which is more likely to happen with a non-robust model and highly
-#' influential observations. When using PSIS in the context of approximate
-#' LOO-CV, we recommend one of the following actions when \eqn{k > 0.7}:
+#' In practice, we have observed good performance for values of \eqn{k} up to 0.7.
+#' When using PSIS in the context of approximate LOO-CV, we recommend one of
+#' the following actions when \eqn{k > 0.7}:
 #'
 #' * With some additional computations, it is possible to transform the MCMC
 #'   draws from the posterior distribution to obtain more reliable importance
