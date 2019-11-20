@@ -1,0 +1,566 @@
+#' Moment matching for efficient approximate leave-one-out cross-validation (LOO)
+#'
+#' Moment matching algorithm for updating a loo object when Pareto k estimates
+#' are large.
+#'
+#'
+#'
+#'
+#' @export mmloo mmloo.default
+#' @param x A fitted model object.
+#' @param loo A loo object that is modified.
+#' @param post_draws A function the takes \code{x} as the first argument and
+#'   returns a matrix of posterior draws of the model parameters.
+#' @param log_lik A function that takes \code{x} and \code{i} and returns a
+#'   matrix (one column per chain) or a vector (all chains stacked) of
+#'   log-likeliood draws of the \code{i}th observation based on the
+#'   model \code{x}. If the draws are obtained using MCMC, the
+#'   matrix with MCMC chains separated is preferred.
+#' @param unconstrain_pars A function that takes arguments \code{x}, and
+#'   \code{pars} and returns posterior draws on the unconstrained space based on
+#'   the posterior draws on the constrained space passed via \code{pars}.
+#' @param log_prob_upars A function that takes arguments \code{x} and
+#'   \code{upars} and returns a matrix of log-posterior density values of the
+#'   unconstrained posterior draws passed via \code{upars}.
+#' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
+#'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
+#'   observation based on the unconstrained posterior draws passed via
+#'   \code{upars}.
+#' @param max_iters Maximum number of moment matching iterations. Usually this
+#' does not need to be modified. If the maximum number of iterations is reached,
+#' there will be a warning, and increasing \code{max_iters} may improve accuracy.
+#' @param k_thres Threshold value for Pareto k values above which the moment
+#'   matching algorithm is used. The default value is 0.5.
+#' @param split Logical; Indicate whether to do the split transformation or not
+#'   at the end of moment matching for each LOO fold.
+#' @param cov Logical; Indicate whether to match the covariance matrix of the
+#' samples or not.
+#'   If \code{FALSE}, only the mean and marginal variances are matched.
+#' @template cores
+#' @param ... Further arguments passed to the custom functions documented above.
+#'
+#' @return The `mmloo()` methods return an updated \code{loo} object.
+#' The structure of the updated \code{loo} object is similar, but the
+#' method also stores the original Pareto k diagnostic values in
+#' the diagnostics field.
+#'
+#' @details The `mmloo()` function is an S3 generic and we provide a default
+#' method that takes as arguments user-specified functions \code{post_draws},
+#' \code{log_lik}, \code{unconstrain_pars}, \code{log_prob_upars}, and
+#' \code{log_lik_upars}.
+#'
+#' @section Defining `mmloo()` methods in a package: Package developers can
+#' define `mmloo()` methods for fitted models objects. The
+#' `mmloo.stanfit()` method in the **Examples** section provides an example.
+#'
+#' @seealso [loo()], [split_mmloo()]
+#' @template moment-matching-references
+#'
+#' @examples
+#' \dontrun{
+#' ### For package developers: defining mmloo methods
+#'
+#' # An example of a possible mmloo method for a 'stanfit' objects
+#' # (from package rstan). The example is just a wrapper of mmloo.stanfit
+#' # with user-defined functions post_draws_stanfit, log_lik_stanfit,
+#' # unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_upars_stanfit.
+#' #
+#' mmloo.stanfit <- function(x, loo, ...) {
+#' loo::mmloo.default(
+#'   x, loo = loo,
+#'   post_draws = post_draws_stanfit,
+#'   log_lik = log_lik_stanfit,
+#'   unconstrain_pars = unconstrain_pars_stanfit,
+#'   log_prob_upars = log_prob_upars_stanfit,
+#'   log_lik_upars = log_lik_upars_stanfit,
+#'   ...)
+#' }
+#' }
+#'
+#'
+
+
+
+
+#' @export
+mmloo <- function(x, ...) {
+  UseMethod("mmloo")
+}
+
+
+#' @describeIn mmloo A default method that takes as arguments
+#' a user-specified model object \code{x}, a \code{loo} object and
+#' user-specified functions \code{post_draws}, \code{log_lik},
+#' \code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_upars}.
+#' @export
+mmloo.default <- function(x, loo, post_draws, log_lik,
+                          unconstrain_pars, log_prob_upars,
+                          log_lik_upars, max_iters = 30L,
+                          k_thres = 0.5, split = TRUE,
+                          cov = TRUE, cores = getOption("mc.cores", 1),
+                          ...) {
+
+  # input checks
+  checkmate::assertClass(loo,classes = "loo")
+  checkmate::assertFunction(post_draws)
+  checkmate::assertFunction(log_lik)
+  checkmate::assertFunction(unconstrain_pars)
+  checkmate::assertFunction(log_prob_upars)
+  checkmate::assertFunction(log_lik_upars)
+  checkmate::assertNumber(max_iters)
+  checkmate::assertNumber(k_thres)
+  checkmate::assertLogical(split)
+  checkmate::assertLogical(cov)
+  checkmate::assertNumber(cores)
+
+
+  if ("psis_loo" %in% class(loo)) {
+    is_method <- "psis"
+  }
+  # else if ("sis_loo" %in% class(loo)) {
+  #   is_method <- "sis"
+  # }
+  # else if ("tis_loo" %in% class(loo)) {
+  #   is_method <- "tis"
+  # }
+  # else {
+  #   stop("The importance sampling class of the loo object is unknown.
+  #        Known classes are \"psis\", \"sis\", \"tis\".")
+  # }
+  else {
+    stop("mmloo currently supports only the \"psis\" importance sampling class.")
+  }
+
+
+  S <- dim(loo)[1]
+  N <- dim(loo)[2]
+  pars <- post_draws(x, ...)
+  # transform the model parameters to unconstrained space
+  upars <- unconstrain_pars(x, pars = pars, ...)
+  # number of parameters in the **parameters** block only
+  npars <- dim(upars)[2]
+  # if more parameters than samples, do not do Cholesky transformation
+  cov <- cov && S >= 10 * npars
+  # compute log-probabilities of the original parameter values
+  orig_log_prob <- log_prob_upars(x, upars = upars, ...)
+
+  # loop over all observations whose Pareto k is high
+  ks <- loo$diagnostics$pareto_k
+  kfs <- rep(0,N)
+  I <- which(ks > k_thres)
+  for (i in I) {
+    message("Moment matching observation ", i)
+    # initialize values for this LOO-fold
+    uparsi <- upars
+    ki <- ks[i]
+    kfi <- 0
+    log_liki <- log_lik(x, i, ...)
+    S_per_chain <- NROW(log_liki)
+    N_chains <- NCOL(log_liki)
+    dim(log_liki) <- c(S_per_chain, N_chains, 1)
+    r_effi <- loo::relative_eff(exp(log_liki), cores = cores)
+    dim(log_liki) <- NULL
+
+    is_obj <- suppressWarnings(importance_sampling.default(-log_liki,
+                                                           method = is_method,
+                                                           r_eff = r_effi,
+                                                           cores = cores))
+    lwi <- as.vector(weights(is_obj))
+    lwfi <- rep(-matrixStats::logSumExp(rep(0, S)),S)
+
+    # initialize objects that keep track of the total transformation
+    total_shift <- rep(0, npars)
+    total_scaling <- rep(1, npars)
+    total_mapping <- diag(npars)
+
+    # try several transformations one by one
+    # if one does not work, do not apply it and try another one
+    # to accept the transformation, Pareto k needs to improve
+    # when transformation succeeds, start again from the first one
+    iterind <- 1
+    while (iterind <= max_iters && ki > k_thres) {
+
+      if (iterind == max_iters) {
+        throw_moment_match_max_iters_warning()
+      }
+
+      # 1. match means
+      trans <- shift(x, uparsi, lwi)
+      # gather updated quantities
+      quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+                                          orig_log_prob = orig_log_prob,
+                                          log_prob_upars = log_prob_upars,
+                                          log_lik_upars = log_lik_upars,
+                                          r_effi = r_effi,
+                                          cores = cores,
+                                          is_method = is_method,
+                                          ...)
+      if (quantities_i$ki < ki) {
+        uparsi <- trans$upars
+        total_shift <- total_shift + trans$shift
+
+        lwi <- quantities_i$lwi
+        lwfi <- quantities_i$lwfi
+        ki <- quantities_i$ki
+        kfi <- quantities_i$kfi
+        log_liki <- quantities_i$log_liki
+        iterind <- iterind + 1
+        next
+      }
+
+      # 2. match means and marginal variances
+      trans <- shift_and_scale(x, uparsi, lwi)
+      # gather updated quantities
+      quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+                                          orig_log_prob = orig_log_prob,
+                                          log_prob_upars = log_prob_upars,
+                                          log_lik_upars = log_lik_upars,
+                                          r_effi = r_effi,
+                                          cores = cores,
+                                          is_method = is_method,
+                                          ...)
+      if (quantities_i$ki < ki) {
+        uparsi <- trans$upars
+        total_shift <- total_shift + trans$shift
+        total_scaling <- total_scaling * trans$scaling
+
+        lwi <- quantities_i$lwi
+        lwfi <- quantities_i$lwfi
+        ki <- quantities_i$ki
+        kfi <- quantities_i$kfi
+        log_liki <- quantities_i$log_liki
+        iterind <- iterind + 1
+        next
+      }
+
+      # 3. match means and covariances
+      if (cov) {
+        trans <- shift_and_cov(x, uparsi, lwi)
+        # gather updated quantities
+        quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+                                            orig_log_prob = orig_log_prob,
+                                            log_prob_upars = log_prob_upars,
+                                            log_lik_upars = log_lik_upars,
+                                            r_effi = r_effi,
+                                            cores = cores,
+                                            is_method = is_method,
+                                            ...)
+
+        if (quantities_i$ki < ki) {
+          uparsi <- trans$upars
+          total_shift <- total_shift + trans$shift
+          total_mapping <- trans$mapping %*% total_mapping
+
+          lwi <- quantities_i$lwi
+          lwfi <- quantities_i$lwfi
+          ki <- quantities_i$ki
+          kfi <- quantities_i$kfi
+          log_liki <- quantities_i$log_liki
+          iterind <- iterind + 1
+          next
+        }
+      }
+      # none of the transformations improved khat
+      # so there is no need to try further
+      break
+    }
+
+    # transformations are now done
+    # if we don't do split transform, or
+    # if no transformations were successful
+    # stop and collect values
+    if (split && (iterind > 1)) {
+      # compute split transformation
+      split_obj <- split_mmloo(
+        x, upars, cov, total_shift, total_scaling, total_mapping, i,
+        log_prob_upars = log_prob_upars, log_lik_upars = log_lik_upars,
+        cores = cores, r_effi = r_effi, is_method = is_method
+      )
+      log_liki <- split_obj$log_liki
+      lwi <- split_obj$lwi
+      lwfi <- split_obj$lwfi
+      r_effi <- split_obj$r_effi
+    }
+    else {
+      dim(log_liki) <- c(S_per_chain, N_chains, 1)
+      r_effi <- loo::relative_eff(exp(log_liki), cores = cores)
+      dim(log_liki) <- NULL
+    }
+
+
+
+    # pointwise estimates
+    elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
+    # p_loo: use original p_loo, add original elpd, subtract new elpd
+    loo$pointwise[i, 3] <- loo$pointwise[i, 3] +
+      loo$pointwise[i, 1] - elpd_loo_i
+    # elpd_loo
+    loo$pointwise[i, 1] <- elpd_loo_i
+    # mcse_elpd_loo
+    loo$pointwise[i, 2] <- mcse_elpd(as.matrix(log_liki),as.matrix(lwi),
+                                     exp(elpd_loo_i), r_effi)
+    # looic
+    loo$pointwise[i, 4] <- -2 * elpd_loo_i
+
+    # diagnostics
+    loo$diagnostics$pareto_k[i] <- ki
+    loo$diagnostics$n_eff[i] <- min(1.0 / sum(exp(2 * lwi)),
+                                    1.0 / sum(exp(2 * lwfi))) * r_effi
+    kfs[i] <- kfi
+
+    # update psis object
+    if (!is.null(loo$psis_object)) {
+      loo$psis_object$log_weights[, i] <- lwi
+      loo$psis_object$diagnostics <- loo$diagnostics
+    }
+
+    if (!split) {
+      throw_large_kf_warning(kfs)
+    }
+
+  }
+  # combined estimates
+  cols_to_summarize <- !(colnames(loo$pointwise) %in% "mcse_elpd_loo")
+  loo$estimates <- table_of_estimates(loo$pointwise[, cols_to_summarize,
+                                                    drop = FALSE])
+
+  # these will be deprecated at some point
+  loo$elpd_loo <- loo$estimates[1, 1]
+  loo$p_loo <- loo$estimates[2, 1]
+  loo$looic <- loo$estimates[3, 1]
+  loo$se_elpd_loo <- loo$estimates[1, 2]
+  loo$se_p_loo <- loo$estimates[2, 2]
+  loo$se_looic <- loo$estimates[3, 2]
+
+  # Warn if some Pareto ks are still high
+  psislw_warnings(loo$diagnostics$pareto_k)
+
+  loo
+}
+
+
+
+
+
+
+
+
+
+# Internal functions ---------------
+
+
+
+
+
+#' Update the importance weights, Pareto diagnostic and log-likelihood
+#' for observation \code{i} based on model \code{x}.
+#'
+#' @noRd
+#' @param x A fitted model object.
+#' @param upars A matrix representing a sample of vector-valued parameters in
+#' the unconstrained space.
+#' @param i observation number.
+#' @param orig_log_prob log probability densities of the original draws from
+#' the model \code{x}.
+#' @param log_prob_upars A function that takes arguments \code{x} and
+#'   \code{upars} and returns a matrix of log-posterior density values of the
+#'   unconstrained posterior draws passed via \code{upars}.
+#' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
+#'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
+#'   observation based on the unconstrained posterior draws passed via
+#'   \code{upars}.
+#' @param r_effi MCMC effective sample size divided by the total sample size
+#' for 1/exp(log_ratios) for observation i.
+#' @template cores
+#' @template is_method
+#' @return List with the updated importance weights, Pareto diagnostics and
+#' log-likelihood values.
+#'
+update_quantities_i <- function(x, upars, i, orig_log_prob,
+                                log_prob_upars, log_lik_upars,
+                                r_effi, cores, is_method, ...) {
+  log_prob_new <- log_prob_upars(x, upars = upars, ...)
+  log_liki_new <- log_lik_upars(x, upars = upars, i = i, ...)
+  # compute new log importance weights
+
+  is_obj_new <- suppressWarnings(importance_sampling.default(-log_liki_new +
+                                                               log_prob_new -
+                                                               orig_log_prob,
+                                                             method = is_method,
+                                                             r_eff = r_effi,
+                                                             cores = cores))
+  lwi_new <- as.vector(weights(is_obj_new))
+  ki_new <- is_obj_new$diagnostics$pareto_k
+
+  is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new -
+                                                                 orig_log_prob,
+                                                               method = is_method,
+                                                               r_eff = r_effi,
+                                                               cores = cores))
+  lwfi_new <- as.vector(weights(is_obj_f_new))
+  kfi_new <- is_obj_f_new$diagnostics$pareto_k
+
+  # gather results
+  list(
+    lwi = lwi_new,
+    lwfi = lwfi_new,
+    ki = ki_new,
+    kfi = kfi_new,
+    log_liki = log_liki_new
+  )
+}
+
+
+
+#' Shift a matrix of parameters to their weighted mean.
+#' Also calls update_quantities_i which updates the importance weights based on
+#' the supplied model object.
+#'
+#' @noRd
+#' @param x A fitted model object.
+#' @param upars A matrix representing a sample of vector-valued parameters in
+#' the unconstrained space
+#' @param lwi A vector representing the log-weight of each parameter
+#' @return List with the shift that was performed, and the new parameter matrix.
+#'
+shift <- function(x, upars, lwi) {
+  # compute moments using log weights
+  mean_original <- colMeans(upars)
+  mean_weighted <- colSums(exp(lwi) * upars)
+  shift <- mean_weighted - mean_original
+  # transform posterior draws
+  upars_new <- sweep(upars, 2, shift, "+")
+  list(
+    upars = upars_new,
+    shift = shift
+  )
+}
+
+
+
+
+#' Shift a matrix of parameters to their weighted mean and scale the marginal
+#' variances to match the weighted marginal variances. Also calls
+#' update_quantities_i which updates the importance weights based on
+#' the supplied model object.
+#'
+#' @noRd
+#' @param x A fitted model object.
+#' @param upars A matrix representing a sample of vector-valued parameters in
+#' the unconstrained space
+#' @param lwi A vector representing the log-weight of each parameter
+#' @return List with the shift and scaling that were performed, and the new
+#' parameter matrix.
+#'
+#'
+shift_and_scale <- function(x, upars, lwi) {
+  # compute moments using log weights
+  S <- dim(upars)[1]
+  mean_original <- colMeans(upars)
+  mean_weighted <- colSums(exp(lwi) * upars)
+  shift <- mean_weighted - mean_original
+  mii <- exp(lwi)* upars^2
+  mii <- colSums(mii) - mean_weighted^2
+  mii <- mii*S/(S-1)
+  scaling <- sqrt(mii / matrixStats::colVars(upars))
+  # transform posterior draws
+  upars_new <- sweep(upars, 2, mean_original, "-")
+  upars_new <- sweep(upars_new, 2, scaling, "*")
+  upars_new <- sweep(upars_new, 2, mean_weighted, "+")
+
+  list(
+    upars = upars_new,
+    shift = shift,
+    scaling = scaling
+  )
+}
+
+#' Shift a matrix of parameters to their weighted mean and scale the covariance
+#' to match the weighted covariance.
+#' Also calls update_quantities_i which updates the importance weights based on
+#' the supplied model object.
+#'
+#' @noRd
+#' @param x A fitted model object.
+#' @param upars A matrix representing a sample of vector-valued parameters in
+#' the unconstrained space
+#' @param lwi A vector representing the log-weight of each parameter
+#' @return List with the shift and mapping that were performed, and the new
+#' parameter matrix.
+#'
+shift_and_cov <- function(x, upars, lwi, ...) {
+  # compute moments using log weights
+  mean_original <- colMeans(upars)
+  mean_weighted <- colSums(exp(lwi) * upars)
+  shift <- mean_weighted - mean_original
+  covv <- stats::cov(upars)
+  wcovv <- stats::cov.wt(upars, wt = exp(lwi))$cov
+  chol1 <- tryCatch(
+    {
+      chol(wcovv)
+    },
+    error = function(cond)
+    {
+      return(NULL)
+    }
+  )
+  if (is.null(chol1)) {
+    mapping <- diag(length(mean_original))
+  }
+  else {
+    chol2 <- chol(covv)
+    mapping <- t(chol1) %*% solve(t(chol2))
+  }
+  # transform posterior draws
+  upars_new <- sweep(upars, 2, mean_original, "-")
+  upars_new <- tcrossprod(upars_new, mapping)
+  upars_new <- sweep(upars_new, 2, mean_weighted, "+")
+  colnames(upars_new) <- colnames(upars)
+
+  list(
+    upars = upars_new,
+    shift = shift,
+    mapping = mapping
+  )
+}
+
+
+#' Warning message if max_iters is reached
+#' @noRd
+throw_moment_match_max_iters_warning <- function() {
+  warning(
+    "The maximum number of moment matching iterations ('max_iters' argument)
+    was reached.\n",
+    "Increasing the value may improve accuracy.",
+    call. = FALSE
+  )
+}
+
+#' Warning message if not using split transformation and accuracy is compromised
+#' @noRd
+throw_large_kf_warning <- function(kf) {
+  if (any(kf > 0.5)) {
+    warning(
+      "The accuracy of self-normalized importance sampling may be bad.\n",
+      "Setting the argument 'split' to 'TRUE' will likely improve accuracy.",
+      call. = FALSE
+    )
+  }
+
+}
+
+#' warnings about pareto k values ------------------------------------------
+#' @noRd
+psislw_warnings <- function(k) {
+  if (any(k > 0.7)) {
+    .warn(
+      "Some Pareto k diagnostic values are too high. ",
+      .k_help()
+    )
+  } else if (any(k > 0.5)) {
+    .warn(
+      "Some Pareto k diagnostic values are slightly high. ",
+      .k_help()
+    )
+  }
+}
