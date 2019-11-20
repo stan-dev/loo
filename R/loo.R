@@ -438,7 +438,8 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   p_loo <- lpd - elpd_loo
   mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
   looic <- -2 * elpd_loo
-  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
+  leverage_pareto_k <- psis_object$diagnostics$pareto_k
+  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, leverage_pareto_k)
 }
 
 #' Structure the object returned by the loo methods
@@ -459,7 +460,7 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
   if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
   assert_importance_sampling_method_is_implemented(is_method)
 
-  cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
+  cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "leverage_pareto_k"))
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
   out <- nlist(estimates, pointwise, diagnostics)
