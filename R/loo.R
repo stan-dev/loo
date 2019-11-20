@@ -47,26 +47,34 @@
 #'   `c("psis_loo", "loo")` and components:
 #' \describe{
 #'  \item{`estimates`}{
-#'   A matrix with two columns (`Estimate`, `SE`) and four rows
-#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`). This
+#'   A matrix with two columns (`Estimate`, `SE`) and three rows
+#'   (`elpd_loo`, `p_loo`, `looic`). This
 #'   contains point estimates and standard errors of the expected log pointwise
-#'   predictive density (`elpd_loo`), the Monte Carlo standard error of
-#'   `elpd_loo` (`mcse_elpd_loo`), the effective number of parameters
+#'   predictive density (`elpd_loo`), the effective number of parameters
 #'   (`p_loo`) and the LOO information criterion `looic` (which is
 #'   just `-2 * elpd_loo`, i.e., converted to deviance scale).
 #'  }
 #'
 #'  \item{`pointwise`}{
-#'   A matrix with four columns (and number of rows equal to the number of
-#'   observations) containing the pointwise contributions of each of the above
-#'   measures (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`).
+#'   A matrix with five columns (and number of rows equal to the number of
+#'   observations) containing the pointwise contributions of the measures
+#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`, `leverage_pareto_k`).
+#'   in addition to the three measures in \code{estimates}, we also report
+#'   pointwise values of the Monte Carlo standard error of \code{elpd_loo}
+#'   (\code{mcse_elpd_loo}), and statistics describing the influence of
+#'   each observation on the posterior distribution (\code{leverage_pareto_k}).
+#'   These are the estimates of the shape parameter \eqn{k} of the
+#'   generalized Pareto fit to the importance ratios for each leave-one-out
+#'   distribution. See the [pareto-k-diagnostic] page for details.
 #'  }
+#'
 #'
 #'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
-#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
-#'      generalized Pareto fit to the importance ratios for each leave-one-out
-#'      distribution. See the [pareto-k-diagnostic] page for details.
+#'    * `pareto_k`: Importance sampling reliability diagnostics. By default,
+#'      these are equal to the \code{leverage_pareto_k} in \code{pointwise}.
+#'      Some algorithms can improve importance sampling reliability and
+#'      modify these diagnostics. See the [pareto-k-diagnostic] page for details.
 #'    * `n_eff`: PSIS effective sample size estimates.
 #'  }
 #'
@@ -220,17 +228,9 @@ loo.matrix <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
+    if (is.null(r_eff)) throw_loo_r_eff_warning()
     is_method <- match.arg(is_method)
-    if (is.null(r_eff)) {
-      throw_loo_r_eff_warning()
-    }
-    psis_out <-
-      importance_sampling.matrix(
-        log_ratios = -x,
-        r_eff = r_eff,
-        cores = cores,
-        method = is_method
-      )
+    psis_out <- importance_sampling.matrix(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     pointwise <- pointwise_loo_calcs(x, psis_out)
     importance_sampling_loo_object(
       pointwise = pointwise,
@@ -271,19 +271,17 @@ loo.function <-
       r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
 
-    psis_list <-
-      parallel_importance_sampling_list(
-        N = N,
-        .loo_i = .loo_i,
-        .llfun = .llfun,
-        data = data,
-        draws = draws,
-        r_eff = r_eff,
-        save_psis = save_psis,
-        cores = cores,
-        method = is_method,
-        ...
-      )
+    psis_list <- parallel_importance_sampling_list(
+                                    N = N,
+                                    .loo_i = .loo_i,
+                                    .llfun = .llfun,
+                                    data = data,
+                                    draws = draws,
+                                    r_eff = r_eff,
+                                    save_psis = save_psis,
+                                    cores = cores,
+                                    method = is_method,
+                                    ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -376,13 +374,7 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <-
-      importance_sampling.matrix(
-        log_ratios = -ll_i,
-        r_eff = r_eff,
-        cores = 1,
-        method = is_method
-      )
+    psis_out <- importance_sampling.matrix(log_ratios = -ll_i, r_eff = r_eff, cores = 1, method = is_method)
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -426,7 +418,8 @@ is.psis_loo <- function(x) {
 #' @noRd
 #' @param ll Log-likelihood matrix.
 #' @param psis_object The object returned by `psis()`.
-#' @return Named list with pointwise elpd_loo, p_loo, and looic.
+#' @return Named list with pointwise elpd_loo, mcse_elpd_loo, p_loo, looic,
+#' and leverage_pareto_k.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
@@ -446,7 +439,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #'
 #' @noRd
 #' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
-#'   looic.
+#'   looic, leverage_pareto_k.
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
 #' @template is_method
@@ -454,10 +447,9 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
-                                           is_method, is_object = NULL) {
+importance_sampling_loo_object <- function(pointwise, diagnostics, dims, is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
-  if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+  if (!is.list(diagnostics)) stop("Internal error ('diagnostics' must be a list)")
   assert_importance_sampling_method_is_implemented(is_method)
 
   cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "leverage_pareto_k"))
@@ -636,32 +628,21 @@ NULL
 
 
 #' Parallel psis list computations
-#'
 #' @details Refactored function to handle parallel computations
 #' for psis_list
 #'
-#' @keywords internal
 #' @inheritParams loo.function
 #' @param .loo_i The function used to compute individual loo contributions.
-#' @param .llfun See `llfun` in [loo.function()].
-#' @param N The total number of observations (i.e. `nrow(data)`).
-#' @param method See `is_method` for [loo()]
+#' @param .llfun See llfun in \code{loo.function()}.
+#' @param N the total number of observations (i.e. \code{nrow(data)}).
+#' @param method See is_method for \code{loo()}
 #'
-parallel_psis_list <- function(N, .loo_i, .llfun,
-                               data, draws, r_eff,
-                               save_psis, cores,
-                               ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun,
-                                    data, draws, r_eff,
-                                    save_psis, cores,
-                                    method = "psis", ...)
+parallel_psis_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, ...){
+  parallel_importance_sampling_list(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method = "psis", ...)
 }
 
 #' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
-                                              data, draws, r_eff,
-                                              save_psis, cores,
-                                              method, ...){
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun, data, draws, r_eff, save_psis, cores, method, ...){
   if (cores == 1) {
     psis_list <-
       lapply(
@@ -676,7 +657,7 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
         ...
       )
   } else {
-    if (!os_is_windows()) {
+    if (.Platform$OS.type != "windows") {
       # On Mac or Linux use mclapply() for multiple cores
       psis_list <-
         parallel::mclapply(
