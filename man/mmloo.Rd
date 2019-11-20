@@ -48,7 +48,7 @@ the posterior draws on the constrained space passed via \code{pars}.}
 unconstrained posterior draws passed via \code{upars}.}
 
 \item{log_lik_upars}{A function that takes arguments \code{x}, \code{upars},
-and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
+and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
 observation based on the unconstrained posterior draws passed via
 \code{upars}.}
 
