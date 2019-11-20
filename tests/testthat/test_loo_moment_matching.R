@@ -197,7 +197,6 @@ test_that("mmloo.default without split works", {
                                                 k_thres = 100, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-
   expect_equal(loo_manual,mmloo_object4)
 
 })

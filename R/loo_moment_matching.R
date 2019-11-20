@@ -288,19 +288,18 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
     }
 
 
-
     # pointwise estimates
-    elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
-    # p_loo: use original p_loo, add original elpd, subtract new elpd
-    loo$pointwise[i, 3] <- loo$pointwise[i, 3] +
-      loo$pointwise[i, 1] - elpd_loo_i
     # elpd_loo
-    loo$pointwise[i, 1] <- elpd_loo_i
+    elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
+    loo$pointwise[i, "elpd_loo"] <- elpd_loo_i
+    # p_loo
+    lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
+    loo$pointwise[i, "p_loo"] <- lpd - elpd_loo_i
     # mcse_elpd_loo
-    loo$pointwise[i, 2] <- mcse_elpd(as.matrix(log_liki),as.matrix(lwi),
+    loo$pointwise[i, "mcse_elpd_loo"] <- mcse_elpd(as.matrix(log_liki),as.matrix(lwi),
                                      exp(elpd_loo_i), r_effi)
     # looic
-    loo$pointwise[i, 4] <- -2 * elpd_loo_i
+    loo$pointwise[i, "looic"] <- -2 * elpd_loo_i
 
     # diagnostics
     loo$diagnostics$pareto_k[i] <- ki
@@ -320,17 +319,17 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
 
   }
   # combined estimates
-  cols_to_summarize <- !(colnames(loo$pointwise) %in% "mcse_elpd_loo")
+  cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo", "leverage_pareto_k"))
   loo$estimates <- table_of_estimates(loo$pointwise[, cols_to_summarize,
                                                     drop = FALSE])
 
   # these will be deprecated at some point
-  loo$elpd_loo <- loo$estimates[1, 1]
-  loo$p_loo <- loo$estimates[2, 1]
-  loo$looic <- loo$estimates[3, 1]
-  loo$se_elpd_loo <- loo$estimates[1, 2]
-  loo$se_p_loo <- loo$estimates[2, 2]
-  loo$se_looic <- loo$estimates[3, 2]
+  loo$elpd_loo <- loo$estimates["elpd_loo","Estimate"]
+  loo$p_loo <- loo$estimates["p_loo","Estimate"]
+  loo$looic <- loo$estimates["looic","Estimate"]
+  loo$se_elpd_loo <- loo$estimates["elpd_loo","SE"]
+  loo$se_p_loo <- loo$estimates["p_loo","SE"]
+  loo$se_looic <- loo$estimates["looic","SE"]
 
   # Warn if some Pareto ks are still high
   psislw_warnings(loo$diagnostics$pareto_k)
