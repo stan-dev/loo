@@ -23,7 +23,7 @@
 #'   \code{upars} and returns a matrix of log-posterior density values of the
 #'   unconstrained posterior draws passed via \code{upars}.
 #' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
-#'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
+#'   and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
 #' @param max_iters Maximum number of moment matching iterations. Usually this
