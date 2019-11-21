@@ -169,7 +169,7 @@ test_that("mmloo.default warnings work", {
 
 
 
-test_that("mmloo.default without split works", {
+test_that("mmloo.default works", {
 
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
@@ -215,9 +215,39 @@ test_that("mmloo.default without split works", {
 
   expect_equal(mmloo_object5$diagnostics,mmloo_object5$psis_object$diagnostics)
 
+
 })
 
+test_that("variance and covariance transformations work", {
+  S <- 15
 
+  draws_full_posterior_sigma2 <- rinvchisq(S, n - 1, s2)
+  draws_full_posterior_mu <- rnorm(S, ymean, sqrt(draws_full_posterior_sigma2/n))
+
+  x$draws <- data.frame(
+    mu = draws_full_posterior_mu,
+    sigma = sqrt(draws_full_posterior_sigma2)
+  )
+  loglik <- matrix(0,S,n)
+  for (j in seq(n)) {
+    loglik[,j] <- log_lik_test(x, j)
+  }
+
+  upars <- unconstrain_pars_test(x, x$draws)
+  lwi_1 <- -loglik[,1]
+  lwi_1 <- lwi_1 - matrixStats::logSumExp(lwi_1)
+
+  loo_manual <- suppressWarnings(loo(loglik))
+
+  mmloo_object <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_test,
+                                         unconstrain_pars_test, log_prob_upars_test,
+                                         log_lik_upars_test, max_iters = 30L,
+                                         k_thres = 0.3, split = FALSE,
+                                         cov = TRUE, cores = 1))
+
+  expect_equal_to_reference(mmloo_object, "reference-results/moment_match_var_and_cov.rds")
+
+})
 
 test_that("mmloo.default works with multiple cores", {
 
@@ -271,85 +301,3 @@ test_that("split_mmloo works", {
 
 })
 
-
-# TODO add this test when mmloo.stanfit is merged in RStan
-#
-# test_that("mmloo with Stan model works", {
-#
-#   model_code <- "data {
-#   int<lower=0> N;
-#   int<lower=0> K;
-#   matrix[N, K] x;
-#   vector[N] y;
-#   real<lower=0> beta_prior_scale;
-#   real<lower=0> alpha_prior_scale;
-#
-# }
-#   parameters {
-#   real alpha;
-#   vector[K] beta;
-#   real<lower=0> sigma; // error scale
-#   }
-#   model {
-#   y ~ normal(x * beta + alpha, sigma); // likelihood
-#   beta ~ normal(0,beta_prior_scale);
-#   alpha ~ normal(0,alpha_prior_scale);
-#   sigma ~ exponential(1);
-#   }
-#   generated quantities {
-#   vector[N] log_lik;
-#   for (n in 1:N)
-#   log_lik[n] = normal_lpdf(y[n] | x[n] * beta + alpha, sigma);
-#   }
-#
-#
-#   "
-#
-#   normalize_matrix <- function(a) {
-#     b = sweep(a,MARGIN = 2,(apply(a,MARGIN = 2,FUN = mean)),`-`)
-#     return(sweep(b,MARGIN = 2,(apply(b,MARGIN = 2,FUN = sd)),`/`))
-#   }
-#
-#   normalize_vector <- function(a) {
-#     b = a - mean(a)
-#     return(b/sd(b))
-#   }
-#
-#
-#   SEED = 1234
-#   set.seed(SEED)
-#
-#   # generate data
-#   n = as.integer(60)
-#   k = as.integer(50)
-#   rho <- 0.8
-#   Sigma <- rho*array(1, c(k,k)) + (1 - rho)*diag(k)
-#   x <- MASS::mvrnorm(n, rep(0,k), Sigma)
-#   w <- c(c(-1, 1, 2), rep(0,k - 3))
-#   y <- x %*% w + rnorm(n)*2
-#
-#   y = normalize_vector(y)
-#   x = normalize_matrix(x)
-#
-#
-#   beta_prior_scale = 2.5
-#   alpha_prior_scale = 5.0
-#
-#   stanmodel = stan_model(model_code = model_code)
-#   standata = list(N = n, K = k, x = as.matrix(x), y = c(y),beta_prior_scale = beta_prior_scale, alpha_prior_scale = alpha_prior_scale)
-#
-#
-#
-#   fit <- suppressWarnings(sampling(stanmodel,standata, chains = 1,refresh = 0))
-#
-#   loo2 <- suppressWarnings(loo(fit,moment_match = TRUE))
-#
-#   expect_equal_to_reference(loo2, "reference-results/moment_match_loo_Stan_1.rds")
-#
-#
-#
-#
-#
-#
-#
-# })
