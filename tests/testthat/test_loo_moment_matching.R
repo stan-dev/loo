@@ -219,7 +219,7 @@ test_that("mmloo.default works", {
 })
 
 test_that("variance and covariance transformations work", {
-  S <- 15
+  S <- 2000
 
   draws_full_posterior_sigma2 <- rinvchisq(S, n - 1, s2)
   draws_full_posterior_mu <- rnorm(S, ymean, sqrt(draws_full_posterior_sigma2/n))
@@ -242,7 +242,7 @@ test_that("variance and covariance transformations work", {
   mmloo_object <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_test,
                                          unconstrain_pars_test, log_prob_upars_test,
                                          log_lik_upars_test, max_iters = 30L,
-                                         k_thres = 0.3, split = FALSE,
+                                         k_thres = 0.0, split = FALSE,
                                          cov = TRUE, cores = 1))
 
   expect_equal_to_reference(mmloo_object, "reference-results/moment_match_var_and_cov.rds")
