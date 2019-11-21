@@ -313,13 +313,12 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
       loo$psis_object$diagnostics <- loo$diagnostics
     }
 
-    if (!split) {
-      throw_large_kf_warning(kfs)
-    }
 
   }
+
   # combined estimates
-  cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo", "leverage_pareto_k"))
+  cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo",
+                                                        "leverage_pareto_k"))
   loo$estimates <- table_of_estimates(loo$pointwise[, cols_to_summarize,
                                                     drop = FALSE])
 
@@ -333,6 +332,10 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
 
   # Warn if some Pareto ks are still high
   psislw_warnings(loo$diagnostics$pareto_k)
+  # if we don't split, accuracy may be compromised
+  if (!split) {
+    throw_large_kf_warning(kfs)
+  }
 
   loo
 }
