@@ -74,6 +74,15 @@ test_that("pareto_k_values works for psis_loo and psis objects, errors for waic"
   expect_error(pareto_k_values(waic1), "No Pareto k estimates found")
 })
 
+test_that("pareto_k_leverage_values works for psis_loo objects, errors for psis waic", {
+  kloo <- pareto_k_leverage_values(loo1)
+  kloo2 <- pareto_k_values(loo1)
+  expect_identical(kloo, kloo2)
+
+  expect_error(pareto_k_leverage_values(psis1), "No Pareto k leverage estimates found")
+  expect_error(pareto_k_leverage_values(waic1), "No Pareto k leverage estimates found")
+})
+
 test_that("pareto_k_ids identifies correct observations", {
   for (j in 1:5) {
     loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, .25, 1.25)

@@ -168,17 +168,11 @@ pareto_k_values <- function(x) {
 #'   \eqn{k} parameters. These represent influence of the observations on the
 #'   model posterior distribution.
 pareto_k_leverage_values <- function(x) {
-  k <- x$pointwise[,"leverage_pareto_k"]
-  if (is.null(k)) {
-    # for compatibility with objects from loo <=2.1.0
-    k <- x$diagnostics[["pareto_k"]]
+  if ("leverage_pareto_k" %in% colnames(x$pointwise)) {
+    k <- x$pointwise[,"leverage_pareto_k"]
   }
-  if (is.null(k)) {
-    # for compatibility with objects from loo < 2.0.0
-    k <- x[["pareto_k"]]
-  }
-  if (is.null(k)) {
-    stop("No Pareto k estimates found.", call. = FALSE)
+  else {
+    stop("No Pareto k leverage estimates found.", call. = FALSE)
   }
   return(k)
 }
