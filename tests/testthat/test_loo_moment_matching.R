@@ -218,7 +218,7 @@ test_that("mmloo.default works with multiple cores", {
                                                  unconstrain_pars_test, log_prob_upars_test,
                                                  log_lik_upars_test, max_iters = 30L,
                                                  k_thres = 0.5, split = FALSE,
-                                                 cov = TRUE, cores = 4))
+                                                 cov = TRUE, cores = 2))
 
   expect_equal(mmloo_manual3$diagnostics$pareto_k, mmloo_manual4$diagnostics$pareto_k)
   expect_equal(mmloo_manual3$diagnostics$n_eff, mmloo_manual4$diagnostics$n_eff)
