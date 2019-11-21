@@ -138,6 +138,7 @@ test_that("log_prob_upars_test works", {
 test_that("mmloo.default warnings work", {
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
+  loo_manual_tis <- suppressWarnings(loo(loglik, is_method = "tis"))
 
 
   expect_warning(mmloo(x, loo_manual, post_draws_test, log_lik_test,
@@ -154,9 +155,15 @@ test_that("mmloo.default warnings work", {
 
   expect_warning(mmloo(x, loo_manual, post_draws_test, log_lik_test,
                               unconstrain_pars_test, log_prob_upars_test,
-                              log_lik_upars_test, max_iters = 2,
+                              log_lik_upars_test, max_iters = 1,
                               k_thres = 0.5, split = TRUE,
                               cov = TRUE, cores = 1), "The maximum number of moment matching iterations")
+
+  expect_error(mmloo(x, loo_manual_tis, post_draws_test, log_lik_test,
+                       unconstrain_pars_test, log_prob_upars_test,
+                       log_lik_upars_test, max_iters = 30L,
+                       k_thres = 0.5, split = TRUE,
+                       cov = TRUE, cores = 1), "mmloo currently supports only")
 })
 
 
@@ -199,6 +206,15 @@ test_that("mmloo.default without split works", {
 
   expect_equal(loo_manual,mmloo_object4)
 
+  loo_manual_with_psis <- suppressWarnings(loo(loglik, save_psis = TRUE))
+  mmloo_object5 <- suppressWarnings(mmloo(x, loo_manual_with_psis, post_draws_test, log_lik_test,
+                                          unconstrain_pars_test, log_prob_upars_test,
+                                          log_lik_upars_test, max_iters = 30L,
+                                          k_thres = 0.8, split = FALSE,
+                                          cov = TRUE, cores = 1))
+
+  expect_equal(mmloo_object5$diagnostics,mmloo_object5$psis_object$diagnostics)
+
 })
 
 
@@ -225,7 +241,7 @@ test_that("mmloo.default works with multiple cores", {
 
   expect_equal(mmloo_manual3$estimates, mmloo_manual4$estimates)
 
-  expect_equal(mmloo_manual3$pointwise, mmloo_manual4$pointwise, tolerance=1e-4)
+  expect_equal(mmloo_manual3$pointwise, mmloo_manual4$pointwise, tolerance=5e-4)
 
 })
 
