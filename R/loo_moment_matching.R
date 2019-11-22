@@ -286,8 +286,9 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
     lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
     loo$pointwise[i, "p_loo"] <- lpd - elpd_loo_i
     # mcse_elpd_loo
-    loo$pointwise[i, "mcse_elpd_loo"] <- mcse_elpd(as.matrix(log_liki),as.matrix(lwi),
-                                     exp(elpd_loo_i), r_effi)
+    loo$pointwise[i, "mcse_elpd_loo"] <- mcse_elpd(
+      as.matrix(log_liki),as.matrix(lwi), exp(elpd_loo_i), r_effi
+    )
     # looic
     loo$pointwise[i, "looic"] <- -2 * elpd_loo_i
 
@@ -530,8 +531,8 @@ throw_moment_match_max_iters_warning <- function() {
 
 #' Warning message if not using split transformation and accuracy is compromised
 #' @noRd
-throw_large_kf_warning <- function(kf) {
-  if (any(kf > 0.5)) {
+throw_large_kf_warning <- function(kf, k_threshold = 0.5) {
+  if (any(kf > k_threshold)) {
     warning(
       "The accuracy of self-normalized importance sampling may be bad.\n",
       "Setting the argument 'split' to 'TRUE' will likely improve accuracy.",

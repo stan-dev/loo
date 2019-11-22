@@ -5,7 +5,6 @@
 #' of the draws, and computes a single elpd using multiple importance sampling.
 #'
 #'
-#' @export split_mmloo
 #'
 #'
 #' @param x A fitted model object.
