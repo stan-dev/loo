@@ -288,7 +288,8 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
     loo$pointwise[i, "p_loo"] <- lpd - elpd_loo_i
     # mcse_elpd_loo
     loo$pointwise[i, "mcse_elpd_loo"] <- mcse_elpd(
-      as.matrix(log_liki),as.matrix(lwi), exp(elpd_loo_i), r_effi
+      ll = as.matrix(log_liki), lw = as.matrix(lwi),
+      E_elpd = exp(elpd_loo_i), r_eff = r_effi
     )
     # looic
     loo$pointwise[i, "looic"] <- -2 * elpd_loo_i

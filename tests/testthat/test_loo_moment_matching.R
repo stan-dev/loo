@@ -5,7 +5,7 @@ options(mc.cores = 1)
 
 context("moment matching")
 set.seed(123)
-S <- 40000
+S <- 4000
 
 # helper functions for sampling from the posterior distribution
 rinvchisq <- function(n, df, scale = 1/df, ...)
@@ -295,7 +295,7 @@ test_that("split_mmloo works", {
 
   expect_named(split,c("lwi", "lwfi", "log_liki", "r_effi"))
 
-  expect_equal(lwi_1_ps,split$lwi,tolerance = 1e-4)
+  expect_equal(lwi_1_ps,split$lwi)
 
   split2 <- split_mmloo(
     x, upars, cov = FALSE, total_shift = c(-0.1,-0.2), total_scaling = c(0.7,0.7),

@@ -85,20 +85,6 @@ split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
   log_prob_half_trans_inv <- log_prob_upars(x, upars = upars_trans_half_inv, ...)
   log_liki_half <- log_lik_upars(x, upars = upars_trans_half, i = i, ...)
 
-  # relative_eff recomputation
-  # currently ignores chain information
-  # since we have two proposal distributions
-  # compute S_eff separately from both and take the smaller
-  take <- seq_len(S)[-seq_len(S_half)]
-  log_liki_half_1 <- log_liki_half[take, drop = FALSE]
-  dim(log_liki_half_1) <- c(length(take), 1, 1)
-  take <- seq_len(S)[-seq_len(S_half)]
-  log_liki_half_2 <- log_liki_half[take, drop = FALSE]
-  dim(log_liki_half_2) <- c(length(take), 1, 1)
-  r_effi1 <- loo::relative_eff(exp(log_liki_half_1), cores = cores)
-  r_effi2 <- loo::relative_eff(exp(log_liki_half_2), cores = cores)
-  r_effi <- min(r_effi1,r_effi2)
-
   # compute weights
   lwi_half <- -log_liki_half + log_prob_half_trans -
     (log_prob_half_trans +
@@ -117,6 +103,20 @@ split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
                                                                 r_eff = r_effi,
                                                                 cores = cores))
   lwfi_half <- as.vector(weights(is_obj_f_half))
+
+  # relative_eff recomputation
+  # currently ignores chain information
+  # since we have two proposal distributions
+  # compute S_eff separately from both and take the smaller
+  take <- seq_len(S)[-seq_len(S_half)]
+  log_liki_half_1 <- log_liki_half[take, drop = FALSE]
+  dim(log_liki_half_1) <- c(length(take), 1, 1)
+  take <- seq_len(S)[-seq_len(S_half)]
+  log_liki_half_2 <- log_liki_half[take, drop = FALSE]
+  dim(log_liki_half_2) <- c(length(take), 1, 1)
+  r_effi1 <- loo::relative_eff(exp(log_liki_half_1), cores = cores)
+  r_effi2 <- loo::relative_eff(exp(log_liki_half_2), cores = cores)
+  r_effi <- min(r_effi1,r_effi2)
 
   list(
     lwi = lwi_half,
