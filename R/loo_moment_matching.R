@@ -47,7 +47,8 @@
 #' @details The `mmloo()` function is an S3 generic and we provide a default
 #' method that takes as arguments user-specified functions \code{post_draws},
 #' \code{log_lik}, \code{unconstrain_pars}, \code{log_prob_upars}, and
-#' \code{log_lik_upars}.
+#' \code{log_lik_upars}. All of these functions should take \code{...}
+#' as an argument in addition to those specified for each function.
 #'
 #' @section Defining `mmloo()` methods in a package: Package developers can
 #' define `mmloo()` methods for fitted models objects. The

@@ -8,7 +8,7 @@ set.seed(123)
 S <- 40000
 
 # helper functions for sampling from the posterior distribution
-rinvchisq <- function(n, df, scale = 1/df)
+rinvchisq <- function(n, df, scale = 1/df, ...)
 {
   if ((length(scale) != 1) & (length(scale) != n))
     stop("scale should be a scalar or a vector of the same length as x")
@@ -19,7 +19,7 @@ rinvchisq <- function(n, df, scale = 1/df)
   return((df*scale)/rchisq(n, df = df))
 }
 
-dinvchisq <- function(x, df, scale=1/df, log = FALSE)
+dinvchisq <- function(x, df, scale=1/df, log = FALSE, ...)
 {
   if (df <= 0)
     stop("df must be greater than zero")
@@ -77,12 +77,12 @@ x$draws <- data.frame(
 
 
 # extract original posterior draws
-post_draws_test <- function(x) {
+post_draws_test <- function(x, ...) {
   as.matrix(x$draws)
 }
 
 # extract original log lik draws
-log_lik_test <- function(x, i) {
+log_lik_test <- function(x, i, ...) {
   -0.5*log(2*pi) - log(x$draws$sigma) - 1.0/(2*x$draws$sigma^2)*(x$data$y[i] - x$draws$mu)^2
 }
 
@@ -95,18 +95,19 @@ for (j in seq(n)) {
 
 
 # mu, log(sigma)
-unconstrain_pars_test <- function(x, pars) {
+unconstrain_pars_test <- function(x, pars, ...) {
   upars <- as.matrix(pars)
   upars[,2] <- log(upars[,2])
   upars
 }
 
-log_prob_upars_test <- function(x, upars) {
-  dinvchisq(exp(upars[,2])^2,x$data$n - 1,x$data$s2, log = TRUE) + dnorm(upars[,1],x$data$ymean,exp(upars[,2])/sqrt(x$data$n), log = TRUE)
+log_prob_upars_test <- function(x, upars, ...) {
+  dinvchisq(exp(upars[,2])^2,x$data$n - 1,x$data$s2, log = TRUE) +
+    dnorm(upars[,1],x$data$ymean,exp(upars[,2])/sqrt(x$data$n), log = TRUE)
 }
 
 # compute log_lik values based on the unconstrained parameters
-log_lik_upars_test <- function(x, upars, i) {
+log_lik_upars_test <- function(x, upars, i, ...) {
   -0.5*log(2*pi) - upars[,2] - 1.0/(2*exp(upars[,2])^2)*(x$data$y[i] - upars[,1])^2
 }
 
@@ -179,6 +180,11 @@ test_that("mmloo.default works", {
                                                 log_lik_upars_test, max_iters = 30L,
                                                 k_thres = 0.8, split = FALSE,
                                                 cov = TRUE, cores = 1))
+
+  # diagnostic pareto k decreases but leverage pareto k stays the same
+  expect_lt(mmloo_object$diagnostics$pareto_k[1], mmloo_object$pointwise[1,"leverage_pareto_k"])
+  expect_equal(mmloo_object$pointwise[,"leverage_pareto_k"],loo_manual$pointwise[,"leverage_pareto_k"])
+  expect_equal(mmloo_object$pointwise[,"leverage_pareto_k"],loo_manual$diagnostics$pareto_k)
 
   expect_equal_to_reference(mmloo_object, "reference-results/moment_match_loo_1.rds")
 
