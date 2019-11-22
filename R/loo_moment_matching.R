@@ -29,7 +29,7 @@
 #' @param max_iters Maximum number of moment matching iterations. Usually this
 #' does not need to be modified. If the maximum number of iterations is reached,
 #' there will be a warning, and increasing \code{max_iters} may improve accuracy.
-#' @param k_thres Threshold value for Pareto k values above which the moment
+#' @param k_threshold Threshold value for Pareto k values above which the moment
 #'   matching algorithm is used. The default value is 0.5.
 #' @param split Logical; Indicate whether to do the split transformation or not
 #'   at the end of moment matching for each LOO fold.
@@ -96,7 +96,7 @@ mmloo <- function(x, ...) {
 mmloo.default <- function(x, loo, post_draws, log_lik,
                           unconstrain_pars, log_prob_upars,
                           log_lik_upars, max_iters = 30L,
-                          k_thres = 0.5, split = TRUE,
+                          k_threshold = 0.7, split = TRUE,
                           cov = TRUE, cores = getOption("mc.cores", 1),
                           ...) {
 
@@ -108,7 +108,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
   checkmate::assertFunction(log_prob_upars)
   checkmate::assertFunction(log_lik_upars)
   checkmate::assertNumber(max_iters)
-  checkmate::assertNumber(k_thres)
+  checkmate::assertNumber(k_threshold)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
   checkmate::assertNumber(cores)
@@ -117,16 +117,6 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
   if ("psis_loo" %in% class(loo)) {
     is_method <- "psis"
   }
-  # else if ("sis_loo" %in% class(loo)) {
-  #   is_method <- "sis"
-  # }
-  # else if ("tis_loo" %in% class(loo)) {
-  #   is_method <- "tis"
-  # }
-  # else {
-  #   stop("The importance sampling class of the loo object is unknown.
-  #        Known classes are \"psis\", \"sis\", \"tis\".")
-  # }
   else {
     stop("mmloo currently supports only the \"psis\" importance sampling class.")
   }
@@ -147,7 +137,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
   # loop over all observations whose Pareto k is high
   ks <- loo$diagnostics$pareto_k
   kfs <- rep(0,N)
-  I <- which(ks > k_thres)
+  I <- which(ks > k_threshold)
   for (i in I) {
     message("Moment matching observation ", i)
     # initialize values for this LOO-fold
@@ -178,7 +168,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
     # to accept the transformation, Pareto k needs to improve
     # when transformation succeeds, start again from the first one
     iterind <- 1
-    while (iterind <= max_iters && ki > k_thres) {
+    while (iterind <= max_iters && ki > k_threshold) {
 
       if (iterind == max_iters) {
         throw_moment_match_max_iters_warning()

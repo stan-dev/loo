@@ -16,7 +16,7 @@ mmloo(x, ...)
   log_prob_upars,
   log_lik_upars,
   max_iters = 30L,
-  k_thres = 0.5,
+  k_threshold = 0.7,
   split = TRUE,
   cov = TRUE,
   cores = getOption("mc.cores", 1),
@@ -56,7 +56,7 @@ observation based on the unconstrained posterior draws passed via
 does not need to be modified. If the maximum number of iterations is reached,
 there will be a warning, and increasing \code{max_iters} may improve accuracy.}
 
-\item{k_thres}{Threshold value for Pareto k values above which the moment
+\item{k_threshold}{Threshold value for Pareto k values above which the moment
 matching algorithm is used. The default value is 0.5.}
 
 \item{split}{Logical; Indicate whether to do the split transformation or not
