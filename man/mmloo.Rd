@@ -11,10 +11,10 @@ mmloo(x, ...)
   x,
   loo,
   post_draws,
-  log_lik,
+  log_lik_i,
   unconstrain_pars,
   log_prob_upars,
-  log_lik_upars,
+  log_lik_i_upars,
   max_iters = 30L,
   k_threshold = 0.7,
   split = TRUE,
@@ -33,7 +33,7 @@ mmloo(x, ...)
 \item{post_draws}{A function the takes \code{x} as the first argument and
 returns a matrix of posterior draws of the model parameters.}
 
-\item{log_lik}{A function that takes \code{x} and \code{i} and returns a
+\item{log_lik_i}{A function that takes \code{x} and \code{i} and returns a
 matrix (one column per chain) or a vector (all chains stacked) of
 log-likeliood draws of the \code{i}th observation based on the
 model \code{x}. If the draws are obtained using MCMC, the
@@ -47,7 +47,7 @@ the posterior draws on the constrained space passed via \code{pars}.}
 \code{upars} and returns a matrix of log-posterior density values of the
 unconstrained posterior draws passed via \code{upars}.}
 
-\item{log_lik_upars}{A function that takes arguments \code{x}, \code{upars},
+\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars},
 and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
 observation based on the unconstrained posterior draws passed via
 \code{upars}.}
@@ -93,16 +93,16 @@ are large.
 \details{
 The \code{mmloo()} function is an S3 generic and we provide a default
 method that takes as arguments user-specified functions \code{post_draws},
-\code{log_lik}, \code{unconstrain_pars}, \code{log_prob_upars}, and
-\code{log_lik_upars}. All of these functions should take \code{...}
+\code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
+\code{log_lik_i_upars}. All of these functions should take \code{...}
 as an argument in addition to those specified for each function.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{default}: A default method that takes as arguments
 a user-specified model object \code{x}, a \code{loo} object and
-user-specified functions \code{post_draws}, \code{log_lik},
-\code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_upars}.
+user-specified functions \code{post_draws}, \code{log_lik_i},
+\code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_i_upars}.
 }}
 
 \section{Defining \code{mmloo()} methods in a package}{
@@ -117,17 +117,17 @@ define \code{mmloo()} methods for fitted models objects. The
 
 # An example of a possible mmloo method for a 'stanfit' objects
 # (from package rstan). The example is just a wrapper of mmloo.stanfit
-# with user-defined functions post_draws_stanfit, log_lik_stanfit,
-# unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_upars_stanfit.
+# with user-defined functions post_draws_stanfit, log_lik_i_stanfit,
+# unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_i_upars_stanfit.
 #
 mmloo.stanfit <- function(x, loo, ...) {
 loo::mmloo.default(
   x, loo = loo,
   post_draws = post_draws_stanfit,
-  log_lik = log_lik_stanfit,
+  log_lik_i = log_lik_i_stanfit,
   unconstrain_pars = unconstrain_pars_stanfit,
   log_prob_upars = log_prob_upars_stanfit,
-  log_lik_upars = log_lik_upars_stanfit,
+  log_lik_i_upars = log_lik_i_upars_stanfit,
   ...)
 }
 }

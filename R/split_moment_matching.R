@@ -23,7 +23,7 @@
 #' @param log_prob_upars A function that takes arguments \code{x} and
 #'   \code{upars} and returns a matrix of log-posterior density values of the
 #'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
+#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
 #'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
@@ -44,7 +44,7 @@
 #'
 split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
                      total_mapping, i, log_prob_upars,
-                     log_lik_upars, r_effi, cores,
+                     log_lik_i_upars, r_effi, cores,
                      is_method, ...) {
   S <- dim(upars)[1]
   S_half <- as.integer(0.5 * S)
@@ -83,7 +83,7 @@ split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
   # compute log likelihoods and log probabilities
   log_prob_half_trans <- log_prob_upars(x, upars = upars_trans_half, ...)
   log_prob_half_trans_inv <- log_prob_upars(x, upars = upars_trans_half_inv, ...)
-  log_liki_half <- log_lik_upars(x, upars = upars_trans_half, i = i, ...)
+  log_liki_half <- log_lik_i_upars(x, upars = upars_trans_half, i = i, ...)
 
   # compute weights
   lwi_half <- -log_liki_half + log_prob_half_trans -

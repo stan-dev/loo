@@ -13,7 +13,7 @@ split_mmloo(
   total_mapping,
   i,
   log_prob_upars,
-  log_lik_upars,
+  log_lik_i_upars,
   r_effi,
   cores,
   is_method,
@@ -45,7 +45,7 @@ transformation made by the moment matching algorithm.}
 \code{upars} and returns a matrix of log-posterior density values of the
 unconstrained posterior draws passed via \code{upars}.}
 
-\item{log_lik_upars}{A function that takes arguments \code{x}, \code{upars},
+\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars},
 and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 observation based on the unconstrained posterior draws passed via
 \code{upars}.}

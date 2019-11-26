@@ -11,7 +11,7 @@
 #' @param loo A loo object that is modified.
 #' @param post_draws A function the takes \code{x} as the first argument and
 #'   returns a matrix of posterior draws of the model parameters.
-#' @param log_lik A function that takes \code{x} and \code{i} and returns a
+#' @param log_lik_i A function that takes \code{x} and \code{i} and returns a
 #'   matrix (one column per chain) or a vector (all chains stacked) of
 #'   log-likeliood draws of the \code{i}th observation based on the
 #'   model \code{x}. If the draws are obtained using MCMC, the
@@ -22,7 +22,7 @@
 #' @param log_prob_upars A function that takes arguments \code{x} and
 #'   \code{upars} and returns a matrix of log-posterior density values of the
 #'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
+#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
 #'   and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
@@ -46,8 +46,8 @@
 #'
 #' @details The `mmloo()` function is an S3 generic and we provide a default
 #' method that takes as arguments user-specified functions \code{post_draws},
-#' \code{log_lik}, \code{unconstrain_pars}, \code{log_prob_upars}, and
-#' \code{log_lik_upars}. All of these functions should take \code{...}
+#' \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
+#' \code{log_lik_i_upars}. All of these functions should take \code{...}
 #' as an argument in addition to those specified for each function.
 #'
 #' @section Defining `mmloo()` methods in a package: Package developers can
@@ -63,17 +63,17 @@
 #'
 #' # An example of a possible mmloo method for a 'stanfit' objects
 #' # (from package rstan). The example is just a wrapper of mmloo.stanfit
-#' # with user-defined functions post_draws_stanfit, log_lik_stanfit,
-#' # unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_upars_stanfit.
+#' # with user-defined functions post_draws_stanfit, log_lik_i_stanfit,
+#' # unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_i_upars_stanfit.
 #' #
 #' mmloo.stanfit <- function(x, loo, ...) {
 #' loo::mmloo.default(
 #'   x, loo = loo,
 #'   post_draws = post_draws_stanfit,
-#'   log_lik = log_lik_stanfit,
+#'   log_lik_i = log_lik_i_stanfit,
 #'   unconstrain_pars = unconstrain_pars_stanfit,
 #'   log_prob_upars = log_prob_upars_stanfit,
-#'   log_lik_upars = log_lik_upars_stanfit,
+#'   log_lik_i_upars = log_lik_i_upars_stanfit,
 #'   ...)
 #' }
 #' }
@@ -91,12 +91,12 @@ mmloo <- function(x, ...) {
 
 #' @describeIn mmloo A default method that takes as arguments
 #' a user-specified model object \code{x}, a \code{loo} object and
-#' user-specified functions \code{post_draws}, \code{log_lik},
-#' \code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_upars}.
+#' user-specified functions \code{post_draws}, \code{log_lik_i},
+#' \code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_i_upars}.
 #' @export
-mmloo.default <- function(x, loo, post_draws, log_lik,
+mmloo.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
-                          log_lik_upars, max_iters = 30L,
+                          log_lik_i_upars, max_iters = 30L,
                           k_threshold = 0.7, split = TRUE,
                           cov = TRUE, cores = getOption("mc.cores", 1),
                           ...) {
@@ -104,10 +104,10 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
   # input checks
   checkmate::assertClass(loo,classes = "loo")
   checkmate::assertFunction(post_draws)
-  checkmate::assertFunction(log_lik)
+  checkmate::assertFunction(log_lik_i)
   checkmate::assertFunction(unconstrain_pars)
   checkmate::assertFunction(log_prob_upars)
-  checkmate::assertFunction(log_lik_upars)
+  checkmate::assertFunction(log_lik_i_upars)
   checkmate::assertNumber(max_iters)
   checkmate::assertNumber(k_threshold)
   checkmate::assertLogical(split)
@@ -145,7 +145,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
     uparsi <- upars
     ki <- ks[i]
     kfi <- 0
-    log_liki <- log_lik(x, i, ...)
+    log_liki <- log_lik_i(x, i, ...)
     S_per_chain <- NROW(log_liki)
     N_chains <- NCOL(log_liki)
     dim(log_liki) <- c(S_per_chain, N_chains, 1)
@@ -181,7 +181,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
       quantities_i <- update_quantities_i(x, trans$upars,  i = i,
                                           orig_log_prob = orig_log_prob,
                                           log_prob_upars = log_prob_upars,
-                                          log_lik_upars = log_lik_upars,
+                                          log_lik_i_upars = log_lik_i_upars,
                                           r_effi = r_effi,
                                           cores = cores,
                                           is_method = is_method,
@@ -205,7 +205,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
       quantities_i <- update_quantities_i(x, trans$upars,  i = i,
                                           orig_log_prob = orig_log_prob,
                                           log_prob_upars = log_prob_upars,
-                                          log_lik_upars = log_lik_upars,
+                                          log_lik_i_upars = log_lik_i_upars,
                                           r_effi = r_effi,
                                           cores = cores,
                                           is_method = is_method,
@@ -231,7 +231,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
         quantities_i <- update_quantities_i(x, trans$upars,  i = i,
                                             orig_log_prob = orig_log_prob,
                                             log_prob_upars = log_prob_upars,
-                                            log_lik_upars = log_lik_upars,
+                                            log_lik_i_upars = log_lik_i_upars,
                                             r_effi = r_effi,
                                             cores = cores,
                                             is_method = is_method,
@@ -264,7 +264,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
       # compute split transformation
       split_obj <- split_mmloo(
         x, upars, cov, total_shift, total_scaling, total_mapping, i,
-        log_prob_upars = log_prob_upars, log_lik_upars = log_lik_upars,
+        log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
         cores = cores, r_effi = r_effi, is_method = is_method
       )
       log_liki <- split_obj$log_liki
@@ -360,7 +360,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
 #' @param log_prob_upars A function that takes arguments \code{x} and
 #'   \code{upars} and returns a matrix of log-posterior density values of the
 #'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_upars A function that takes arguments \code{x}, \code{upars},
+#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
 #'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
@@ -372,10 +372,10 @@ mmloo.default <- function(x, loo, post_draws, log_lik,
 #' log-likelihood values.
 #'
 update_quantities_i <- function(x, upars, i, orig_log_prob,
-                                log_prob_upars, log_lik_upars,
+                                log_prob_upars, log_lik_i_upars,
                                 r_effi, cores, is_method, ...) {
   log_prob_new <- log_prob_upars(x, upars = upars, ...)
-  log_liki_new <- log_lik_upars(x, upars = upars, i = i, ...)
+  log_liki_new <- log_lik_i_upars(x, upars = upars, i = i, ...)
   # compute new log importance weights
 
   is_obj_new <- suppressWarnings(importance_sampling.default(-log_liki_new +
