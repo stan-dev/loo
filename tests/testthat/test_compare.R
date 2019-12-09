@@ -59,7 +59,10 @@ test_that("loo_compare returns expected results (2 models)", {
 
   comp2 <- loo_compare(w1, w2)
   expect_s3_class(comp2, "compare.loo")
-  expect_equal_to_reference(comp2, "reference-results/loo_compare_two_models.rds")
+
+  # expect_equal_to_reference(comp2, "reference-results/loo_compare_two_models.rds")
+  comp2_ref <- readRDS(test_path("reference-results/loo_compare_two_models.rds"))
+  expect_equivalent(comp2, comp2_ref)
   expect_equal(colnames(comp2), comp_colnames)
 
   # specifying objects via ... and via arg x gives equal results
@@ -76,7 +79,10 @@ test_that("loo_compare returns expected result (3 models)", {
   expect_equal(comp1[1,1], 0)
   expect_s3_class(comp1, "compare.loo")
   expect_s3_class(comp1, "matrix")
-  expect_equal_to_reference(comp1, "reference-results/loo_compare_three_models.rds")
+
+  # expect_equal_to_reference(comp1, "reference-results/loo_compare_three_models.rds")
+  comp1_ref <- readRDS(test_path("reference-results/loo_compare_three_models.rds"))
+  expect_equivalent(comp1, comp1_ref)
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
@@ -96,7 +102,7 @@ test_that("compare returns expected result (2 models)", {
   expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
 
   comp2 <- expect_warning(loo::compare(w1, w2), "Deprecated")
-  expect_equal_to_reference(comp2, "reference-results/compare_two_models.rds")
+  # expect_equal_to_reference(comp2, "reference-results/compare_two_models.rds")
   expect_named(comp2, c("elpd_diff", "se"))
   expect_s3_class(comp2, "compare.loo")
 
@@ -119,7 +125,7 @@ test_that("compare returns expected result (3 models)", {
   expect_equal(comp1[1,1], 0)
   expect_s3_class(comp1, "compare.loo")
   expect_s3_class(comp1, "matrix")
-  expect_equal_to_reference(comp1, "reference-results/compare_three_models.rds")
+  # expect_equal_to_reference(comp1, "reference-results/compare_three_models.rds")
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
