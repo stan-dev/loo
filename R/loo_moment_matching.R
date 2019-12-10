@@ -5,7 +5,6 @@
 #'
 #'
 #'
-#'
 #' @export mmloo mmloo.default
 #' @param x A fitted model object.
 #' @param loo A loo object that is modified.
