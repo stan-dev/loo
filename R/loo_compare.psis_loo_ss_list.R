@@ -172,7 +172,6 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 
 #' @rdname loo_compare
 #' @export
-#' @inheritParams print.compare.loo
 print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
