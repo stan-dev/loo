@@ -45,7 +45,7 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
@@ -71,7 +71,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
@@ -84,7 +84,7 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
@@ -94,7 +94,7 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
 print.importance_sampling <- function(x, digits = 1, plot_k = FALSE, ...) {
   print_dims(x)
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
