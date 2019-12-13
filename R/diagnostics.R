@@ -236,35 +236,37 @@ plot.psis <- function(x, diagnostic = c("k", "n_eff"), ...,
 
 # internal ----------------------------------------------------------------
 
-#' @importFrom graphics abline axis plot points text
 plot_diagnostic <-
   function(k,
            n_eff = NULL,
            ...,
            label_points = FALSE,
            main = "PSIS diagnostic plot") {
-    inrange <- function(a, rr) a >= rr[1L] & a <= rr[2L]
-    n_eff_plot <- !is.null(n_eff)
-    plot(
-      if (n_eff_plot) n_eff else k,
+    use_n_eff <- !is.null(n_eff)
+    graphics::plot(
+      x = if (use_n_eff) n_eff else k,
       xlab = "Data point",
-      ylab = if (n_eff_plot) "PSIS n_eff" else "Pareto shape k",
+      ylab = if (use_n_eff) "PSIS n_eff" else "Pareto shape k",
       type = "n",
       bty = "l",
       yaxt = "n",
       main = main
     )
-    axis(side = 2, las = 1)
+    graphics::axis(side = 2, las = 1)
 
-    if (!n_eff_plot) {
+    in_range <- function(x, lb_ub) {
+      x >= lb_ub[1L] & x <= lb_ub[2L]
+    }
+
+    if (!use_n_eff) {
       krange <- range(k, na.rm = TRUE)
       breaks <- c(0, 0.5, 0.7, 1)
       hex_clrs <- c("#C79999", "#A25050", "#7C0000")
       ltys <- c(3, 4, 2, 1)
       for (j in seq_along(breaks)) {
         val <- breaks[j]
-        if (inrange(val, krange))
-          abline(
+        if (in_range(val, krange))
+          graphics::abline(
             h = val,
             col = ifelse(val == 0, "darkgray", hex_clrs[j - 1]),
             lty = ltys[j],
@@ -276,24 +278,23 @@ plot_diagnostic <-
     breaks <- c(-Inf, 0.5, 1)
     hex_clrs <- c("#6497b1", "#005b96", "#03396c")
     clrs <- ifelse(
-      inrange(k, breaks[1:2]),
+      in_range(k, breaks[1:2]),
       hex_clrs[1],
-      ifelse(inrange(k, breaks[2:3]), hex_clrs[2], hex_clrs[3])
+      ifelse(in_range(k, breaks[2:3]), hex_clrs[2], hex_clrs[3])
     )
     if (all(k < 0.5) || !label_points) {
-      points(if (n_eff_plot) n_eff else k, col = clrs, pch = 3, cex = .6)
+      graphics::points(x = if (use_n_eff) n_eff else k,
+                       col = clrs, pch = 3, cex = .6)
       return(invisible())
     } else {
-      points(if (n_eff_plot) n_eff[k < 0.5] else k[k < 0.5],
-             col = clrs[k < 0.5],
-             pch = 3,
-             cex = .6)
-      sel <- !inrange(k, breaks[1:2])
+      graphics::points(x = if (use_n_eff) n_eff[k < 0.5] else k[k < 0.5],
+                       col = clrs[k < 0.5], pch = 3, cex = .6)
+      sel <- !in_range(k, breaks[1:2])
       dots <- list(...)
       txt_args <- c(
         list(
           x = seq_along(k)[sel],
-          y = if (n_eff_plot) n_eff[sel] else k[sel],
+          y = if (use_n_eff) n_eff[sel] else k[sel],
           labels = seq_along(k)[sel]
         ),
         if (length(dots)) dots
@@ -302,7 +303,7 @@ plot_diagnostic <-
       if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
       if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
 
-      do.call("text", txt_args)
+      do.call(graphics::text, txt_args)
     }
   }
 
