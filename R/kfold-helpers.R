@@ -1,28 +1,28 @@
 #' Helper functions for K-fold cross-validation
 #'
 #' @description These functions can be used to generate indexes for use with
-#'   K-fold cross-validation. See the \strong{Details} section for explanations.
+#'   K-fold cross-validation. See the **Details** section for explanations.
 #'
 #' @name kfold-helpers
 #' @param K The number of folds to use.
 #' @param N The number of observations in the data.
-#' @param x A discrete variable of length \code{N} with at least \code{K} levels
-#'   (unique values). Will be coerced to \code{\link{factor}}.
-#' 
-#' @return An integer vector of length \code{N} where each element is an index in \code{1:K}.
+#' @param x A discrete variable of length `N` with at least `K` levels (unique
+#'   values). Will be coerced to a [factor][factor()].
+#'
+#' @return An integer vector of length `N` where each element is an index in `1:K`.
 #'
 #' @details
-#' \code{kfold_split_random} splits the data into \code{K} groups
+#' `kfold_split_random()` splits the data into `K` groups
 #' of equal size (or roughly equal size).
 #'
-#' For a categorical variable \code{x} \code{kfold_split_stratified}
-#' splits the observations into \code{K} groups ensuring that relative
+#' For a categorical variable `x` `kfold_split_stratified()`
+#' splits the observations into `K` groups ensuring that relative
 #' category frequencies are approximately preserved.
 #'
-#' For a grouping variable \code{x}, \code{kfold_split_grouped} places
-#' all observations in \code{x} from the same group/level together in
+#' For a grouping variable `x`, `kfold_split_grouped()` places
+#' all observations in `x` from the same group/level together in
 #' the same fold. The selection of which groups/levels go into which
-#' fold (relevant when when there are more folds than groups) is
+#' fold (relevant when when there are more groups than folds) is
 #' randomized.
 #'
 #' @examples

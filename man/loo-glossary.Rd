@@ -5,7 +5,7 @@
 \title{LOO package glossary}
 \description{
 Note: VGG2017a refers to Vehtari, Gelman, and Gabry (2017a). See
-  \strong{References}, below.
+\strong{References}, below.
 }
 \section{ELPD and \code{elpd_loo}}{
 
@@ -73,7 +73,7 @@ individual leave-one-out distribution is from the full distribution. If
 leaving out an observation changes the posterior too much then importance
 sampling is not able to give reliable estimate. If \code{k<0.5}, then the
 corresponding component of \code{elpd_loo} is estimated with high accuracy.
-If \code{0.5<k<0.7} the accuracy is lower, but still ok. If \code{k>0.7},
+If \verb{0.5<k<0.7} the accuracy is lower, but still ok. If \code{k>0.7},
 then importance sampling is not able to provide useful estimate for that
 component/observation. Pareto k is also useful as a measure of influence of
 an observation. Highly influential observations have high k values. Very high
@@ -85,7 +85,7 @@ If \code{k > 0.7} then we can also look at the \code{p_loo} estimate for
 some additional information about the problem:
 
 \itemize{
-\item If \code{p_loo << p} (the total number of parameters in the model),
+\item If \verb{p_loo << p} (the total number of parameters in the model),
 then the model is likely to be misspecified. Posterior predictive checks
 (PPCs) are then likely to also detect the problem. Try using an overdispersed
 model, or add more structural information (nonlinearity, mixture model,
@@ -100,7 +100,7 @@ effect models with a few observations per random effect, and Gaussian
 processes and spatial models with short correlation lengths.
 
 \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
-If the number of parameters \code{p<<N}, then PPCs are also likely to detect the
+If the number of parameters \verb{p<<N}, then PPCs are also likely to detect the
 problem. See the case study at
 \url{https://avehtari.github.io/modelselection/roaches.html} for an example.
 If \code{p} is relatively large compared to the number of
@@ -129,19 +129,20 @@ and some more difficult to predict for all models).
 }
 
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
-  Gelman, A. (2019), Visualization in Bayesian workflow. \emph{J. R. Stat.
-  Soc. A}, 182: 389-402. doi:10.1111/rssa.12378,
-  (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal},
-  \href{https://arxiv.org/abs/1709.01449}{arXiv preprint})
+Gelman, A. (2019), Visualization in Bayesian workflow.
+\emph{J. R. Stat. Soc. A}, 182: 389-402. doi:10.1111/rssa.12378
+(\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal version},
+\href{https://arxiv.org/abs/1709.01449}{preprint arXiv:1709.01449},
+\href{https://github.com/jgabry/bayes-vis-paper}{code on GitHub})
 }

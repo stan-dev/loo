@@ -14,7 +14,7 @@ r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
 
 test_that("psis results haven't changed", {
-  expect_equal_to_reference(psis1, "psis.rds")
+  expect_equal_to_reference(psis1, "reference-results/psis.rds")
 })
 
 test_that("psis returns object with correct structure", {
@@ -125,5 +125,19 @@ test_that("psis_n_eff methods works properly", {
   )
   expect_warning(psis_n_eff.default(w[, 1]), "not adjusted based on MCMC n_eff")
   expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
+})
+
+
+test_that("do_psis_i throws warning if all tail values the same", {
+  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
+  val <- expect_warning(do_psis_i(xx, tail_len_i = 6), "all tail values are the same")
+  expect_equal(val$pareto_k, Inf)
+})
+
+test_that("psis_smooth_tail returns original tail values if k is infinite", {
+  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
+  val <- suppressWarnings(psis_smooth_tail(xx, 3))
+  expect_equal(val$tail, xx)
+  expect_equal(val$k, Inf)
 })
 

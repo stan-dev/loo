@@ -15,8 +15,7 @@ A named list.
 \description{
 Create a named list using specified names or, if names are omitted, using the
 names of the objects in the list. The code \code{list(a = a, b = b)} becomes
-\code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b =
-2)}, etc.
+\code{nlist(a,b)} and \code{list(a = a, b = 2)} becomes \code{nlist(a, b = 2)}, etc.
 }
 \examples{
 

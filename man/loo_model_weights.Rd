@@ -9,42 +9,49 @@
 \usage{
 loo_model_weights(x, ...)
 
-\method{loo_model_weights}{default}(x, ..., method = c("stacking",
-  "pseudobma"), optim_method = "BFGS", optim_control = list(),
-  BB = TRUE, BB_n = 1000, alpha = 1, r_eff_list = NULL,
-  cores = getOption("mc.cores", 1))
+\method{loo_model_weights}{default}(
+  x,
+  ...,
+  method = c("stacking", "pseudobma"),
+  optim_method = "BFGS",
+  optim_control = list(),
+  BB = TRUE,
+  BB_n = 1000,
+  alpha = 1,
+  r_eff_list = NULL,
+  cores = getOption("mc.cores", 1)
+)
 
-stacking_weights(lpd_point, optim_method = "BFGS",
-  optim_control = list())
+stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
 
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
 \arguments{
-\item{x}{A list of pointwise log-likelihood matrices or "psis_loo" objects
-(objects returned by \code{\link{loo}}), one for each model. Each
+\item{x}{A list of pointwise log-likelihood matrices or \code{"psis_loo"} objects
+(objects returned by \code{\link[=loo]{loo()}}), one for each model. Each
 matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
 the size of the posterior sample (with all chains merged) and \eqn{N} is
 the number of data points. If \code{x} is a list of log-likelihood matrices
-then \code{\link{loo}} is called internally on each matrix. Currently the
-\code{loo_model_weights} function is not implemented to be used with
+then \code{\link[=loo]{loo()}} is called internally on each matrix. Currently the
+\code{loo_model_weights()} function is not implemented to be used with
 results from K-fold CV, but you can still obtain weights using K-fold CV
-results by calling the \code{stacking_weights} function directly.}
+results by calling the \code{stacking_weights()} function directly.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
 
-\item{method}{Either \code{"stacking"} or \code{"pseudobma"}, indicating
-which method to use for obtaining the weights. \code{"stacking"} refers to
-stacking of predictive distributions and  \code{"pseudobma"} refers to
-pseudo-BMA+ weighting (or plain pseudo-BMA weighting if \code{BB} is
-\code{FALSE}).}
+\item{method}{Either \code{"stacking"} (the default) or \code{"pseudobma"}, indicating which method
+to use for obtaining the weights. \code{"stacking"} refers to stacking of
+predictive distributions and  \code{"pseudobma"} refers to pseudo-BMA+ weighting
+(or plain pseudo-BMA weighting if argument \code{BB} is \code{FALSE}).}
 
-\item{optim_method}{The optimization method to use if
-\code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
-"CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".}
+\item{optim_method}{If \code{method="stacking"}, a string passed to the \code{method}
+argument of \code{\link[stats:constrOptim]{stats::constrOptim()}} to specify the optimization algorithm.
+The default is \code{optim_method="BFGS"}, but other options are available (see
+\code{\link[stats:optim]{stats::optim()}}).}
 
-\item{optim_control}{If \code{method="stacking"}, a list of control
-parameters for optimization. See \code{\link{constrOptim}} for details.}
+\item{optim_control}{If \code{method="stacking"}, a list of control parameters for
+optimization passed to the \code{control} argument of \code{\link[stats:constrOptim]{stats::constrOptim()}}.}
 
 \item{BB}{Logical used when \code{"method"}=\code{"pseudobma"}. If
 \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust
@@ -52,16 +59,16 @@ the pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps
 regularize the weight away from 0 and 1, so as to reduce the variance.}
 
 \item{BB_n}{For pseudo-BMA+ weighting only, the number of samples to use for
-the Bayesian bootstrap. The default is 1000.}
+the Bayesian bootstrap. The default is \code{BB_n=1000}.}
 
 \item{alpha}{Positive scalar shape parameter in the Dirichlet distribution
-used for the Bayesian bootstrap. The default is 1, which corresponds to a
-uniform distribution on the simplex space.}
+used for the Bayesian bootstrap. The default is \code{alpha=1}, which
+corresponds to a uniform distribution on the simplex space.}
 
 \item{r_eff_list}{Optionally, a list of relative effective sample size
 estimates for the likelihood \code{(exp(log_lik))} of each observation in
-each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
-function for computing \code{r_eff}. If \code{x} is a list of "psis_loo"
+each model. See \code{\link[=psis]{psis()}} and  \code{\link[=relative_eff]{relative_eff()}} helper
+function for computing \code{r_eff}. If \code{x} is a list of \code{"psis_loo"}
 objects then \code{r_eff_list} is ignored.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
@@ -69,18 +76,22 @@ the option \code{mc.cores} which can be set for an entire R session by
 \code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
 deprecated but will be given precedence over \code{mc.cores} until
 \code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
-recommend using as many (or close to as many) cores as possible.}
-Note for Windows 10 users: it is recommended to avoid using the
-\code{.Rprofile} file to set \code{mc.cores} (using the \code{cores}
-argument or setting \code{mc.cores} interactively or in a script is fine).}
+2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
+recommend using as many (or close to as many) cores as possible.
+\itemize{
+\item Note for Windows 10 users: it is \strong{strongly}
+\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
+the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
+setting \code{mc.cores} interactively or in a script is fine).
+}}
 
-\item{lpd_point}{A matrix of pointwise leave-one-out (or K-fold) log
-likelihoods evaluated for different models. It should be a \eqn{N} by
-\eqn{K}  matrix where \eqn{N} is sample size and \eqn{K} is the number of
-models. Each column corresponds to one model. These values can be
-calculated approximately using \code{\link{loo}} or by running exact
-leave-one-out or K-fold cross-validation.}
+\item{lpd_point}{If calling \code{stacking_weights()} or \code{pseudobma_weights()}
+directly, a matrix of pointwise leave-one-out (or K-fold) log likelihoods
+evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
+where \eqn{N} is sample size and \eqn{K} is the number of models. Each
+column corresponds to one model. These values can be calculated
+approximately using \code{\link[=loo]{loo()}} or by running exact leave-one-out or K-fold
+cross-validation.}
 }
 \value{
 A numeric vector containing one weight for each model.
@@ -91,16 +102,16 @@ weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
 al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 }
 \details{
-\code{loo_model_weights} is a wrapper around the \code{stacking_weights} and
-\code{pseudobma_weights} functions that implements stacking, pseudo-BMA, and
+\code{loo_model_weights()} is a wrapper around the \code{stacking_weights()} and
+\code{pseudobma_weights()} functions that implements stacking, pseudo-BMA, and
 pseudo-BMA+ weighting for combining multiple predictive distributions. We can
 use approximate or exact leave-one-out cross-validation (LOO-CV) or K-fold CV
 to estimate the expected log predictive density (ELPD).
 
-The stacking method (\code{method="stacking"}) combines all models by
-maximizing the leave-one-out predictive density of the combination
-distribution. That is, it finds the optimal linear combining weights for
-maximizing the leave-one-out log score.
+The stacking method (\code{method="stacking"}), which is the default for
+\code{loo_model_weights()}, combines all models by maximizing the leave-one-out
+predictive density of the combination distribution. That is, it finds the
+optimal linear combining weights for maximizing the leave-one-out log score.
 
 The pseudo-BMA method (\code{method="pseudobma"}) finds the relative weights
 proportional to the ELPD of each model. However, when
@@ -193,26 +204,27 @@ pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
-  stacking to average Bayesian predictive distributions. \emph{Bayesian
-  Analysis}, advance publication,  doi:10.1214/17-BA1091.
-  (\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
+stacking to average Bayesian predictive distributions.
+\emph{Bayesian Analysis}, advance publication,  doi:10.1214/17-BA1091.
+(\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
 }
 \seealso{
 \itemize{
-\item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
-\item \code{\link{loo}} for details on leave-one-out ELPD estimation.
-\item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
-\item \code{\link{relative_eff}} for computing \code{r_eff}.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes}, particularly
+\href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights using the \strong{loo} package}.
+\item \code{\link[=loo]{loo()}} for details on leave-one-out ELPD estimation.
+\item \code{\link[=constrOptim]{constrOptim()}} for the choice of optimization methods and control-parameters.
+\item \code{\link[=relative_eff]{relative_eff()}} for computing \code{r_eff}.
 }
 }

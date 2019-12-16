@@ -8,16 +8,28 @@
 \usage{
 E_loo(x, psis_object, ...)
 
-\method{E_loo}{default}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{default}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 
-\method{E_loo}{matrix}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{matrix}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 }
 \arguments{
 \item{x}{A numeric vector or matrix.}
 
-\item{psis_object}{An object returned by \code{\link{psis}}.}
+\item{psis_object}{An object returned by \code{\link[=psis]{psis()}}.}
 
 \item{...}{Arguments passed to individual methods.}
 
@@ -26,46 +38,46 @@ E_loo(x, psis_object, ...)
 
 \item{probs}{For computing quantiles, a vector of probabilities.}
 
-\item{log_ratios}{Optionally, a vector or matrix (the same dimensions as
-\code{x}) of raw (not smoothed) log ratios. If working with log-likelihood
-values, the log ratios are the \strong{negative} of those values. If
-\code{log_ratios} is specified we are able to compute
-\link[=pareto-k-diagnostic]{Pareto k} diagnostics specific to \code{E_loo}.}
+\item{log_ratios}{Optionally, a vector or matrix (the same dimensions as \code{x})
+of raw (not smoothed) log ratios. If working with log-likelihood values,
+the log ratios are the \strong{negative} of those values. If \code{log_ratios} is
+specified we are able to compute \link[=pareto-k-diagnostic]{Pareto k}
+diagnostics specific to \code{E_loo()}.}
 }
 \value{
 A named list with the following components:
 \describe{
-  \item{\code{value}}{
-  The result of the computation.
+\item{\code{value}}{
+The result of the computation.
 
-  For the matrix method, \code{value} is a vector with \code{ncol(x)}
-  elements, with one exception: when \code{type} is \code{"quantile"} and
-  multiple values are specified in \code{probs} the \code{value} component of
-  the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
+For the matrix method, \code{value} is a vector with \code{ncol(x)}
+elements, with one exception: when \code{type="quantile"} and
+multiple values are specified in \code{probs} the \code{value} component of
+the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 
-  For the default/vector method the \code{value} component is scalar, with
-  one exception: when \code{type} is \code{"quantile"} and multiple values
-  are specified in \code{probs} the \code{value} component is a vector with
-  \code{length(probs)} elements.
-  }
- \item{\code{pareto_k}}{
-  Function-specific diagnostic.
+For the default/vector method the \code{value} component is scalar, with
+one exception: when \code{type} is \code{"quantile"} and multiple values
+are specified in \code{probs} the \code{value} component is a vector with
+\code{length(probs)} elements.
+}
+\item{\code{pareto_k}}{
+Function-specific diagnostic.
 
-  If \code{log_ratios} is not specified when calling \code{E_loo},
-  \code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
-  will be a vector of length \code{ncol(x)} containing estimates of the shape
-  parameter \eqn{k} of the generalized Pareto distribution. For the
-  default/vector method, the estimate is a scalar.
- }
+If \code{log_ratios} is not specified when calling \code{E_loo()},
+\code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
+will be a vector of length \code{ncol(x)} containing estimates of the shape
+parameter \eqn{k} of the generalized Pareto distribution. For the
+default/vector method, the estimate is a scalar.
+}
 }
 }
 \description{
-The \code{E_loo} function computes weighted expectations (means, variances,
+The \code{E_loo()} function computes weighted expectations (means, variances,
 quantiles) using the importance weights obtained from the
 \link[=psis]{PSIS} smoothing procedure. The expectations estimated by the
-\code{E_loo} function assume that the PSIS approximation is working well.
+\code{E_loo()} function assume that the PSIS approximation is working well.
 \strong{A small \link[=pareto-k-diagnostic]{Pareto k} estimate is necessary,
-but not sufficient, for \code{E_loo} to give reliable estimates.} Additional
+but not sufficient, for \code{E_loo()} to give reliable estimates.} Additional
 diagnostic checks for gauging the reliability of the estimates are in
 development and will be added in a future release.
 }
@@ -82,7 +94,7 @@ d <- data.frame(
   weight = c(ctl, trt),
   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
 )
-fit <- stan_glm(weight ~ group, data = d)
+fit <- stan_glm(weight ~ group, data = d, refresh = 0)
 yrep <- posterior_predict(fit)
 dim(yrep)
 

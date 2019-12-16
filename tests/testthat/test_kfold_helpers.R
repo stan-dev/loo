@@ -44,7 +44,7 @@ test_that("kfold_split_grouped works", {
   expect_equal(fold_group, as.integer(as.factor(grp)))
 })
 
-test_that("kfold helper errors", {
+test_that("kfold helpers throw correct errors", {
   expect_error(kfold_split_random(10), "!is.null(N) is not TRUE", fixed = TRUE)
   expect_error(kfold_split_random(10.5, 100), "K == as.integer(K) is not TRUE", fixed = TRUE)
   expect_error(kfold_split_random(10, 100.5), "N == as.integer(N) is not TRUE", fixed = TRUE)
@@ -66,5 +66,14 @@ test_that("kfold helper errors", {
   expect_error(kfold_split_grouped(10.5, grp), "K == as.integer(K) is not TRUE", fixed = TRUE)
   expect_error(kfold_split_grouped(K = c(1,1), grp), "length(K) == 1 is not TRUE", fixed = TRUE)
   expect_error(kfold_split_grouped(K = 1, grp), "K > 1 is not TRUE", fixed = TRUE)
+})
+
+
+test_that("print_dims.kfold works", {
+  xx <- structure(list(), K = 17, class = c("kfold", "loo"))
+  expect_output(print_dims(xx), "Based on 17-fold cross-validation")
+
+  attr(xx, "K") <- NULL
+  expect_silent(print_dims(xx))
 })
 

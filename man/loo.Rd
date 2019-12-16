@@ -12,25 +12,53 @@
 \usage{
 loo(x, ...)
 
-\method{loo}{array}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1))
+\method{loo}{array}(
+  x,
+  ...,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-\method{loo}{matrix}(x, ..., r_eff = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1))
+\method{loo}{matrix}(
+  x,
+  ...,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-\method{loo}{function}(x, ..., data = NULL, draws = NULL,
-  r_eff = NULL, save_psis = FALSE, cores = getOption("mc.cores", 1))
+\method{loo}{`function`}(
+  x,
+  ...,
+  data = NULL,
+  draws = NULL,
+  r_eff = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1),
+  is_method = c("psis", "tis", "sis")
+)
 
-loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = NULL)
+loo_i(
+  i,
+  llfun,
+  ...,
+  data = NULL,
+  draws = NULL,
+  r_eff = NULL,
+  is_method = "psis"
+)
 
 is.loo(x)
 
 is.psis_loo(x)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description of how to specify the
-inputs for each method.}
+\item{x}{A log-likelihood array, matrix, or function. The \strong{Methods (by class)}
+section, below, has detailed descriptions of how to specify the inputs for
+each method.}
 
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
@@ -39,99 +67,111 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
-helper function for computing \code{r_eff}.}
+\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
+helper functions for computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by
-\code{loo} be saved in the returned object? The \code{loo} function calls
-\code{\link{psis}} internally but by default discards the (potentially
-large) \code{"psis"} object after using it to compute the LOO-CV summaries.
-Setting \code{save_psis} to \code{TRUE} will add a \code{psis_object}
-component to the list returned by \code{loo}. Currently this is only needed
-if you plan to use the \code{\link{E_loo}} function to compute weighted
-expectations after running \code{loo}.}
+\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
+internally but by default discards the (potentially large) \code{"psis"} object
+after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
+will add a \code{psis_object} component to the list returned by \code{loo}. Currently
+this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
 \code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
 deprecated but will be given precedence over \code{mc.cores} until
 \code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set, but we
-recommend using as many (or close to as many) cores as possible.}
-Note for Windows 10 users: it is recommended to avoid using the
-\code{.Rprofile} file to set \code{mc.cores} (using the \code{cores}
-argument or setting \code{mc.cores} interactively or in a script is fine).}
+2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
+recommend using as many (or close to as many) cores as possible.
+\itemize{
+\item Note for Windows 10 users: it is \strong{strongly}
+\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
+the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
+setting \code{mc.cores} interactively or in a script is fine).
+}}
 
-\item{data, draws, ...}{For the \code{loo} function method and the \code{loo_i}
-function, the data, posterior draws, and other arguments to pass to the
-log-likelihood function. See the \strong{Methods (by class)} section below
-for details on how to specify these arguments.}
+\item{is_method}{The importance sampling method to use. The following methods
+are implemented:
+\itemize{
+\item \code{\link[=psis]{"psis"}}: Pareto-Smoothed Importance Sampling (PSIS). Default method.
+\item \code{\link[=tis]{"tis"}}: Truncated Importance Sampling (TIS) with truncation at
+\code{sqrt(S)}, where \code{S} is the number of posterior draws.
+\item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
+}}
 
-\item{i}{For \code{loo_i}, an integer in \code{1:N}.}
+\item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function. See the \strong{Methods (by class)} section
+below for details on how to specify these arguments.}
 
-\item{llfun}{For \code{loo_i}, the same as \code{x} for the
-\code{loo.function} method. A log-likelihood function as described in the
+\item{i}{For \code{loo_i()}, an integer in \code{1:N}.}
+
+\item{llfun}{For \code{loo_i()}, the same as \code{x} for the
+\code{loo.function()} method. A log-likelihood function as described in the
 \strong{Methods (by class)} section.}
 }
 \value{
-The \code{loo} methods return a named list with class
-  \code{c("psis_loo", "loo")} and components:
+The \code{loo()} methods return a named list with class
+\code{c("psis_loo", "loo")} and components:
 \describe{
- \item{\code{estimates}}{
-  A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
-  (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
-  contains point estimates and standard errors of the expected log pointwise
-  predictive density (\code{elpd_loo}), the Monte Carlo standard error of
-  \code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
-  (\code{p_loo}) and the LOO information criterion \code{looic} (which is
-  just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
- }
- \item{\code{pointwise}}{
-  A matrix with four columns (and number of rows equal to the number of
-  observations) containing the pointwise contributions of each of the above
-  measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo},
-  \code{looic}).
- }
- \item{\code{diagnostics}}{
- A named list containing two vectors:
-  \itemize{
-   \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-   generalized Pareto fit to the importance ratios for each leave-one-out
-   distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
-   \item \code{n_eff}: PSIS effective sample size estimates.
-  }
- }
- \item{\code{psis_object}}{
- This component will be \code{NULL} unless the \code{save_psis} argument is
- set to \code{TRUE} when calling \code{loo}. In that case \code{psis_object}
- will be the object of class \code{"psis"} that is created when the
- \code{loo} function calls \code{\link{psis}} internally to do the PSIS
- procedure.
- }
+\item{\code{estimates}}{
+A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
+(\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+contains point estimates and standard errors of the expected log pointwise
+predictive density (\code{elpd_loo}), the Monte Carlo standard error of
+\code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
+(\code{p_loo}) and the LOO information criterion \code{looic} (which is
+just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
 }
 
-The \code{loo_i} function returns a named list with components
-  \code{pointwise} and \code{diagnostics}. These components have the same
-  structure as the \code{pointwise} and \code{diagnostics} components of the
-  object returned by \code{loo} except they contain results for only a single
-  observation.
+\item{\code{pointwise}}{
+A matrix with four columns (and number of rows equal to the number of
+observations) containing the pointwise contributions of each of the above
+measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}).
+}
+
+\item{\code{diagnostics}}{
+A named list containing two vectors:
+\itemize{
+\item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+generalized Pareto fit to the importance ratios for each leave-one-out
+distribution. See the \link{pareto-k-diagnostic} page for details.
+\item \code{n_eff}: PSIS effective sample size estimates.
+}
+}
+
+\item{\code{psis_object}}{
+This component will be \code{NULL} unless the \code{save_psis} argument is set to
+\code{TRUE} when calling \code{loo()}. In that case \code{psis_object} will be the object
+of class \code{"psis"} that is created when the \code{loo()} function calls \code{\link[=psis]{psis()}}
+internally to do the PSIS procedure.
+}
+}
+
+The \code{loo_i()} function returns a named list with components
+\code{pointwise} and \code{diagnostics}. These components have the same
+structure as the \code{pointwise} and \code{diagnostics} components of the
+object returned by \code{loo()} except they contain results for only a single
+observation.
 }
 \description{
-The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-models using Pareto smoothed importance sampling (PSIS). This is an
+models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is an
 implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
 2017b).
 
-The \code{loo_i} function enables testing log-likelihood
-  functions for use with the \code{loo.function} method.
+The \code{loo_i()} function enables testing log-likelihood
+functions for use with the \code{loo.function()} method.
 }
 \details{
-The \code{loo} function is an S3 generic and methods are provided
-  for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-  log-likelihood matrices, and log-likelihood functions. The array and matrix
-  methods are most convenient, but for models fit to very large datasets the
-  \code{loo.function} method is more memory efficient and may be preferable.
+The \code{loo()} function is an S3 generic and methods are provided for
+3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
+log-likelihood functions. The array and matrix methods are the most
+convenient, but for models fit to very large datasets the \code{loo.function()}
+method is more memory efficient and may be preferable.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -143,45 +183,45 @@ chains, and \eqn{N} is the number of data points.
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
-  returns a vector containing the log-likelihood for a single observation
-  \code{i} evaluated at each posterior draw. The function should be written
-  such that, for each observation \code{i} in \code{1:N}, evaluating
-  \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
-  of length \code{S} (size of posterior sample). The log-likelihood function
-  can also have additional arguments but \code{data_i} and \code{draws} are
-  required.
+\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+vector containing the log-likelihood for a single observation \code{i} evaluated
+at each posterior draw. The function should be written such that, for each
+observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}
 
- If using the function method then the arguments \code{data}
- and \code{draws} must also be specified in the call to \code{loo}:
- \itemize{
-   \item \code{data}: A data frame or matrix containing the data (e.g.
-   observed outcome and predictors) needed to compute the pointwise
-   log-likelihood. For each observation \code{i}, the \code{i}th row of
-   \code{data} will be passed to the \code{data_i} argument of the
-   log-likelihood function.
-   \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood. Unlike
-   \code{data}, which is indexed by observation, for each observation the
-   entire object \code{draws} will be passed to the \code{draws} argument of
-   the log-likelihood function.
-   \item The \code{...} can be used to pass additional arguments to your
-   log-likelihood function. These arguments are used like the \code{draws}
-   argument in that they are recycled for each observation.
- }
+results in a vector of length \code{S} (size of posterior sample). The
+log-likelihood function can also have additional arguments but \code{data_i} and
+\code{draws} are required.
+
+If using the function method then the arguments \code{data} and \code{draws} must also
+be specified in the call to \code{loo()}:
+\itemize{
+\item \code{data}: A data frame or matrix containing the data (e.g.
+observed outcome and predictors) needed to compute the pointwise
+log-likelihood. For each observation \code{i}, the \code{i}th row of
+\code{data} will be passed to the \code{data_i} argument of the
+log-likelihood function.
+\item \code{draws}: An object containing the posterior draws for any
+parameters needed to compute the pointwise log-likelihood. Unlike
+\code{data}, which is indexed by observation, for each observation the
+entire object \code{draws} will be passed to the \code{draws} argument of
+the log-likelihood function.
+\item The \code{...} can be used if your log-likelihood function takes additional
+arguments. These arguments are used like the \code{draws} argument in that they
+are recycled for each observation.
+}
 }}
 
-\section{Defining \code{loo} methods in a package}{
- Package developers can
-  define \code{loo} methods for fitted models objects. See the example
-  \code{loo.stanfit} method in the \strong{Examples} section below for an
-  example of defining a method that calls \code{loo.array}. The
-  \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
-  method that calls \code{loo.function}.
+\section{Defining \code{loo()} methods in a package}{
+ Package developers can define
+\code{loo()} methods for fitted models objects. See the example \code{loo.stanfit()}
+method in the \strong{Examples} section below for an example of defining a
+method that calls \code{loo.array()}. The \code{loo.stanreg()} method in the
+\strong{rstanarm} package is an example of defining a method that calls
+\code{loo.function()}.
 }
 
 \examples{
-
 ### Array and matrix methods (using example objects included with loo package)
 # Array method
 LLarr <- example_loglik_array()
@@ -274,23 +314,23 @@ loo.stanfit <-
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{
 \itemize{
- \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
- \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
- Sampling (PSIS) procedure used in the LOO-CV approximation.
- \item \link{pareto-k-diagnostic} for convenience functions for looking at
- diagnostics.
- \item \code{\link{compare}} for model comparison.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
+for demonstrations.
+\item \code{\link[=psis]{psis()}} for the underlying Pareto Smoothed Importance Sampling (PSIS)
+procedure used in the LOO-CV approximation.
+\item \link{pareto-k-diagnostic} for convenience functions for looking at diagnostics.
+\item \code{\link[=loo_compare]{loo_compare()}} for model comparison.
 }
 }

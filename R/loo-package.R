@@ -4,22 +4,21 @@
 #' @name loo-package
 #'
 #' @importFrom stats sd var quantile setNames weights rnorm
-#' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars
+#' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
 #' @description
 #' \if{html}{
 #'   \figure{stanlogo.png}{options: width="50px" alt="mc-stan.org"}
-#'   \emph{Stan Development Team}
 #' }
+#' *Stan Development Team*
 #'
 #' This package implements the methods described in Vehtari, Gelman, and Gabry
-#' (2017a, 2017b) and Yao et al. (2018). To get started see the \pkg{loo}
-#' package vignettes
-#' \href{https://mc-stan.org/loo/articles/index.html}{vignettes},
-#' \code{\link{loo}} function for efficient approximate leave-one-out
-#' cross-validation (LOO-CV), the \code{\link{psis}} function for the Pareto
+#' (2017a, 2017b) and Yao et al. (2018). To get started see the **loo**
+#' package [vignettes](https://mc-stan.org/loo/articles/index.html), the
+#' [loo()] function for efficient approximate leave-one-out
+#' cross-validation (LOO-CV), the [psis()] function for the Pareto
 #' smoothed importance sampling (PSIS) algorithm, or
-#' \code{\link{loo_model_weights}} for an implementation of Bayesian stacking of
+#' [loo_model_weights()] for an implementation of Bayesian stacking of
 #' predictive distributions from multiple models.
 #'
 #'
@@ -45,47 +44,48 @@
 #'
 #' @template loo-and-psis-references
 #' @template stacking-references
+#' @template loo-large-data-references
 #'
 #' @references
 #' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 #' importance sampling estimators: Central limit theorems and related results.
-#' \emph{Electronic Journal of Statistics} \strong{2}, 774-806.
+#' *Electronic Journal of Statistics* **2**, 774-806.
 #'
 #' Gelfand, A. E. (1996). Model determination using sampling-based methods. In
-#' \emph{Markov Chain Monte Carlo in Practice}, ed. W. R. Gilks, S. Richardson,
+#' *Markov Chain Monte Carlo in Practice*, ed. W. R. Gilks, S. Richardson,
 #' D. J. Spiegelhalter, 145-162. London: Chapman and Hall.
 #'
 #' Gelfand, A. E., Dey, D. K., and Chang, H. (1992). Model determination using
 #' predictive distributions with implementation via sampling-based methods. In
-#' \emph{Bayesian Statistics 4}, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
+#' *Bayesian Statistics 4*, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
 #' and A. F. M. Smith, 147-167. Oxford University Press.
 #'
 #' Gelman, A., Hwang, J., and Vehtari, A. (2014). Understanding predictive
-#' information criteria for Bayesian models. \emph{Statistics and Computing}
-#' \strong{24}, 997-1016.
+#' information criteria for Bayesian models. *Statistics and Computing*
+#' **24**, 997-1016.
 #'
-#' Ionides, E. L. (2008). Truncated importance sampling. \emph{Journal of
-#' Computational and Graphical Statistics} \strong{17}, 295-311.
+#' Ionides, E. L. (2008). Truncated importance sampling. *Journal of
+#' Computational and Graphical Statistics* **17**, 295-311.
 #'
 #' Koopman, S. J., Shephard, N., and Creal, D. (2009). Testing the assumptions
-#' behind importance sampling. \emph{Journal of Econometrics} \strong{149}, 2-11.
+#' behind importance sampling. *Journal of Econometrics* **149**, 2-11.
 #'
 #' Peruggia, M. (1997). On the variability of case-deletion importance sampling
-#' weights in the Bayesian linear model. \emph{Journal of the American
-#' Statistical Association} \strong{92}, 199-207.
+#' weights in the Bayesian linear model. *Journal of the American
+#' Statistical Association* **92**, 199-207.
 #'
 #' Stan Development Team (2017). The Stan C++ Library, Version 2.17.0.
-#' \url{http://mc-stan.org}.
+#' <https://mc-stan.org>.
 #'
 #' Stan Development Team (2018). RStan: the R interface to Stan, Version 2.17.3.
-#' \url{http://mc-stan.org}.
+#' <https://mc-stan.org>.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 #' widely application information criterion in singular learning theory.
-#' \emph{Journal of Machine Learning Research} \strong{11}, 3571-3594.
+#' *Journal of Machine Learning Research* **11**, 3571-3594.
 #'
 #' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
-#' for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
+#' for the generalized Pareto distribution. *Technometrics* **51**,
 #' 316-325.
 #'
 NULL

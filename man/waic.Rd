@@ -14,41 +14,41 @@ waic(x, ...)
 
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{function}(x, ..., data = NULL, draws = NULL)
+\method{waic}{`function`}(x, ..., data = NULL, draws = NULL)
 
 is.waic(x)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or function. See the \strong{Methods
-(by class)} section below for a detailed description of how to specify the
-inputs for each method.}
+\item{x}{A log-likelihood array, matrix, or function. The \strong{Methods (by class)}
+section, below, has detailed descriptions of how to specify the inputs for
+each method.}
 
-\item{draws, data, ...}{For the function method only. See the \strong{Methods
-(by class)} section below for details on these arguments.}
+\item{draws, data, ...}{For the function method only. See the
+\strong{Methods (by class)} section below for details on these arguments.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:
 
 \describe{
- \item{\code{estimates}}{
- A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
- rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
- point estimates and standard errors of the expected log pointwise predictive
- density (\code{elpd_waic}), the effective number of parameters
- (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
- \code{-2 * elpd_waic}, i.e., converted to deviance scale).
- }
- \item{\code{pointwise}}{
- A matrix with three columns (and number of rows equal to the number of
- observations) containing the pointwise contributions of each of the above
- measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
- }
+\item{\code{estimates}}{
+A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
+rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+point estimates and standard errors of the expected log pointwise predictive
+density (\code{elpd_waic}), the effective number of parameters
+(\code{p_waic}) and the information criterion \code{waic} (which is just
+\code{-2 * elpd_waic}, i.e., converted to deviance scale).
+}
+\item{\code{pointwise}}{
+A matrix with three columns (and number of rows equal to the number of
+observations) containing the pointwise contributions of each of the above
+measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+}
 }
 }
 \description{
-The \code{waic} methods can be used to compute WAIC from the pointwise
+The \code{waic()} methods can be used to compute WAIC from the pointwise
 log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-the \code{\link{loo}} function) because PSIS provides useful diagnostics and
+the \code{\link[=loo]{loo()}} function) because PSIS provides useful diagnostics as well as
 effective sample size and Monte Carlo estimates.
 }
 \section{Methods (by class)}{
@@ -61,32 +61,33 @@ chains, and \eqn{N} is the number of data points.
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{function}: A function \code{f} that takes arguments \code{data_i} and \code{draws} and
-  returns a vector containing the log-likelihood for a single observation
-  \code{i} evaluated at each posterior draw. The function should be written
-  such that, for each observation \code{i} in \code{1:N}, evaluating
-  \code{f(data_i = data[i,, drop=FALSE], draws = draws)} results in a vector
-  of length \code{S} (size of posterior sample). The log-likelihood function
-  can also have additional arguments but \code{data_i} and \code{draws} are
-  required.
+\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+vector containing the log-likelihood for a single observation \code{i} evaluated
+at each posterior draw. The function should be written such that, for each
+observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}
 
- If using the function method then the arguments \code{data}
- and \code{draws} must also be specified in the call to \code{loo}:
- \itemize{
-   \item \code{data}: A data frame or matrix containing the data (e.g.
-   observed outcome and predictors) needed to compute the pointwise
-   log-likelihood. For each observation \code{i}, the \code{i}th row of
-   \code{data} will be passed to the \code{data_i} argument of the
-   log-likelihood function.
-   \item \code{draws}: An object containing the posterior draws for any
-   parameters needed to compute the pointwise log-likelihood. Unlike
-   \code{data}, which is indexed by observation, for each observation the
-   entire object \code{draws} will be passed to the \code{draws} argument of
-   the log-likelihood function.
-   \item The \code{...} can be used to pass additional arguments to your
-   log-likelihood function. These arguments are used like the \code{draws}
-   argument in that they are recycled for each observation.
- }
+results in a vector of length \code{S} (size of posterior sample). The
+log-likelihood function can also have additional arguments but \code{data_i} and
+\code{draws} are required.
+
+If using the function method then the arguments \code{data} and \code{draws} must also
+be specified in the call to \code{loo()}:
+\itemize{
+\item \code{data}: A data frame or matrix containing the data (e.g.
+observed outcome and predictors) needed to compute the pointwise
+log-likelihood. For each observation \code{i}, the \code{i}th row of
+\code{data} will be passed to the \code{data_i} argument of the
+log-likelihood function.
+\item \code{draws}: An object containing the posterior draws for any
+parameters needed to compute the pointwise log-likelihood. Unlike
+\code{data}, which is indexed by observation, for each observation the
+entire object \code{draws} will be passed to the \code{draws} argument of
+the log-likelihood function.
+\item The \code{...} can be used if your log-likelihood function takes additional
+arguments. These arguments are used like the \code{draws} argument in that they
+are recycled for each observation.
+}
 }}
 
 \examples{
@@ -111,9 +112,26 @@ print(compare(waic1, waic2), digits = 2)
 }
 
 }
+\references{
+Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
+widely application information criterion in singular learning theory.
+\emph{Journal of Machine Learning Research} \strong{11}, 3571-3594.
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
+}
 \seealso{
 \itemize{
-\item \code{\link{loo}} for approximate LOO-CV.
-\item \code{\link{compare}} for comparing models on LOOIC or WAIC.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes} and
+Vehtari, Gelman, and Gabry (2017a, 2017b) for more details on why we
+usually prefer \code{loo()} to \code{waic()}.
+\item \code{\link[=loo_compare]{loo_compare()}} for comparing models on approximate LOO-CV or WAIC.
 }
 }

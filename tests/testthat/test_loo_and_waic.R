@@ -23,8 +23,8 @@ test_that("using loo.cores is deprecated", {
 })
 
 test_that("loo and waic results haven't changed", {
-  expect_equal_to_reference(loo1, "loo.rds")
-  expect_equal_to_reference(waic1, "waic.rds")
+  expect_equal_to_reference(loo1, "reference-results/loo.rds")
+  expect_equal_to_reference(waic1, "reference-results/waic.rds")
 })
 
 test_that("loo with cores=1 and cores=2 gives same results", {
@@ -159,7 +159,7 @@ test_that("loo.function runs with multiple cores", {
 })
 
 test_that("save_psis option to loo.function makes correct psis object", {
-  loo_with_fn2 <- loo(llfun, data = data, draws = draws,
+  loo_with_fn2 <- loo.function(llfun, data = data, draws = draws,
                       r_eff = rep(1, nrow(data)), save_psis = TRUE)
   expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })

@@ -4,16 +4,22 @@
 \alias{psislw}
 \title{Pareto smoothed importance sampling (deprecated, old version)}
 \usage{
-psislw(lw, wcp = 0.2, wtrunc = 3/4, cores = getOption("mc.cores", 1),
-  llfun = NULL, llargs = NULL, ...)
+psislw(
+  lw,
+  wcp = 0.2,
+  wtrunc = 3/4,
+  cores = getOption("mc.cores", 1),
+  llfun = NULL,
+  llargs = NULL,
+  ...
+)
 }
 \arguments{
-\item{lw}{A matrix or vector of log weights. For computing LOO, \code{lw =
--log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
+\item{lw}{A matrix or vector of log weights. For computing LOO, \code{lw = -log_lik}, the \emph{negative} of an \eqn{S} (simulations) by \eqn{N} (data
 points) pointwise log-likelihood matrix.}
 
 \item{wcp}{The proportion of importance weights to use for the generalized
-Pareto fit. The \code{100*wcp}\% largest weights are used as the sample
+Pareto fit. The \code{100*wcp}\\% largest weights are used as the sample
 from which to estimate the parameters of the generalized Pareto
 distribution.}
 
@@ -28,32 +34,31 @@ removed. \strong{As of version 2.0.0, the default is now 1 core if
 \code{mc.cores} is not set, but we recommend using as many (or close to as
 many) cores as possible.}}
 
-\item{llfun, llargs}{See \code{\link{loo.function}}.}
+\item{llfun, llargs}{See \code{\link[=loo.function]{loo.function()}}.}
 
-\item{...}{Ignored when \code{psislw} is called directly. The \code{...} is
-only used internally when \code{psislw} is called by the \code{\link{loo}}
+\item{...}{Ignored when \code{psislw()} is called directly. The \code{...} is
+only used internally when \code{psislw()} is called by the \code{\link[=loo]{loo()}}
 function.}
 }
 \value{
-A named list with components \code{lw_smooth} (modified log weights)
-  and \code{pareto_k} (estimated generalized
-  Pareto \link[=pareto-k-diagnostic]{shape parameter(s) k}).
+A named list with components \code{lw_smooth} (modified log weights) and
+\code{pareto_k} (estimated generalized Pareto shape parameter(s) k).
 }
 \description{
-As of version \code{2.0.0} this function is deprecated. Please use the
-\code{\link{psis}} function for the new PSIS algorithm.
+As of version \verb{2.0.0} this function is \strong{deprecated}. Please use the
+\code{\link[=psis]{psis()}} function for the new PSIS algorithm.
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{
-\code{\link{pareto-k-diagnostic}} for PSIS diagnostics.
+\link{pareto-k-diagnostic} for PSIS diagnostics.
 }

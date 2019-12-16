@@ -22,55 +22,66 @@ psis_n_eff_values(x)
 
 mcse_loo(x, threshold = 0.7)
 
-\method{plot}{psis_loo}(x, diagnostic = c("k", "n_eff"), ...,
-  label_points = FALSE, main = "PSIS diagnostic plot")
+\method{plot}{psis_loo}(
+  x,
+  diagnostic = c("k", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+)
 
-\method{plot}{psis}(x, diagnostic = c("k", "n_eff"), ...,
-  label_points = FALSE, main = "PSIS diagnostic plot")
+\method{plot}{psis}(
+  x,
+  diagnostic = c("k", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+)
 }
 \arguments{
-\item{x}{An object created by \code{\link{loo}} or \code{\link{psis}}.}
+\item{x}{An object created by \code{\link[=loo]{loo()}} or \code{\link[=psis]{psis()}}.}
 
-\item{threshold}{For \code{pareto_k_ids}, \code{threshold} is the minimum
-\eqn{k} value to flag (default is 0.5). For \code{mcse_loo}, if any \eqn{k}
-estimates are greater than \code{threshold} the MCSE estimate is returned
-as \code{NA} (default is 0.7).}
+\item{threshold}{For \code{pareto_k_ids()}, \code{threshold} is the minimum \eqn{k}
+value to flag (default is \code{0.5}). For \code{mcse_loo()}, if any \eqn{k}
+estimates are greater than \code{threshold} the MCSE estimate is returned as
+\code{NA} (default is \code{0.7}). See \strong{Details} for the motivation behind these
+defaults.}
 
 \item{diagnostic}{For the \code{plot} method, which diagnostic should be
 plotted? The options are \code{"k"} for Pareto \eqn{k} estimates (the
 default) or \code{"n_eff"} for PSIS effective sample size estimates.}
 
-\item{label_points, ...}{For the \code{plot} method, if \code{label_points} is
+\item{label_points, ...}{For the \code{plot()} method, if \code{label_points} is
 \code{TRUE} the observation numbers corresponding to any values of \eqn{k}
 greater than 0.5 will be displayed in the plot. Any arguments specified in
-\code{...} will be passed to \code{\link[graphics]{text}} and can be used
+\code{...} will be passed to \code{\link[graphics:text]{graphics::text()}} and can be used
 to control the appearance of the labels.}
 
-\item{main}{For the \code{plot} method, a title for the plot.}
+\item{main}{For the \code{plot()} method, a title for the plot.}
 }
 \value{
-\code{pareto_k_table} returns an object of class
-  \code{"pareto_k_table"}, which is a matrix with columns \code{"Count"},
-  \code{"Proportion"}, and \code{"Min. n_eff"}, and has its own print method.
+\code{pareto_k_table()} returns an object of class
+\code{"pareto_k_table"}, which is a matrix with columns \code{"Count"},
+\code{"Proportion"}, and \code{"Min. n_eff"}, and has its own print method.
 
-\code{pareto_k_ids} returns an integer vector indicating which
+\code{pareto_k_ids()} returns an integer vector indicating which
 observations have Pareto \eqn{k} estimates above \code{threshold}.
 
-\code{pareto_k_values} returns a vector of the estimated Pareto
-  \eqn{k} parameters.
+\code{pareto_k_values()} returns a vector of the estimated Pareto
+\eqn{k} parameters.
 
-\code{psis_n_eff_values} returns a vector of the estimated PSIS
-  effective sample sizes.
+\code{psis_n_eff_values()} returns a vector of the estimated PSIS
+effective sample sizes.
 
-\code{mcse_loo} returns the Monte Carlo standard error (MCSE)
-  estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
-  above \code{threshold}.
+\code{mcse_loo()} returns the Monte Carlo standard error (MCSE)
+estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
+above \code{threshold}.
 
-The \code{plot} method is called for its side effect and does not
-  return anything. If \code{x} is the result of a call to \code{\link{loo}}
-  or \code{\link{psis}} then \code{plot(x, diagnostic)} produces a plot of
-  the estimates of the Pareto shape parameters (\code{diagnostic = "k"}) or
-  estimates of the PSIS effective sample sizes (\code{diagnostic = "n_eff"}).
+The \code{plot()} method is called for its side effect and does not
+return anything. If \code{x} is the result of a call to \code{\link[=loo]{loo()}}
+or \code{\link[=psis]{psis()}} then \code{plot(x, diagnostic)} produces a plot of
+the estimates of the Pareto shape parameters (\code{diagnostic = "k"}) or
+estimates of the PSIS effective sample sizes (\code{diagnostic = "n_eff"}).
 }
 \description{
 Print a diagnostic table summarizing the estimated Pareto shape parameters
@@ -85,73 +96,58 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 The reliability and approximate convergence rate of the PSIS-based estimates
 can be assessed using the estimates for the shape parameter \eqn{k} of the
 generalized Pareto distribution:
-
 \itemize{
-  \item If \eqn{k < 0.5} then the distribution of raw importance ratios has
-  finite variance and the central limit theorem holds. However, as \eqn{k}
-  approaches \eqn{0.5} the RMSE of plain importance sampling (IS) increases
-  significantly while PSIS has lower RMSE.
-
-  \item If \eqn{0.5 \leq k < 1}{0.5 <= k < 1} then the variance of the raw
-  importance ratios is infinite, but the mean exists. TIS and PSIS estimates
-  have finite variance by accepting some bias. The convergence of the
-  estimate is slower with increasing \eqn{k}.
-  If \eqn{k} is between 0.5 and approximately 0.7 then
-  we observe practically useful convergence rates and Monte Carlo error
-  estimates with PSIS (the bias of TIS increases faster than the bias of
-  PSIS). If \eqn{k > 0.7} we observe impractical convergence rates and
-  unreliable Monte Carlo error estimates.
-
-  \item If \eqn{k \geq 1}{k >= 1} then neither the variance nor the mean of
-  the raw importance ratios exists. The convergence rate is close to zero and
-  bias can be large with practical sample sizes.
+\item If \eqn{k < 0.5} then the distribution of raw importance ratios has
+finite variance and the central limit theorem holds. However, as \eqn{k}
+approaches \eqn{0.5} the RMSE of plain importance sampling (IS) increases
+significantly while PSIS has lower RMSE.
+\item If \eqn{0.5 \leq k < 1}{0.5 <= k < 1} then the variance of the raw
+importance ratios is infinite, but the mean exists. TIS and PSIS estimates
+have finite variance by accepting some bias. The convergence of the
+estimate is slower with increasing \eqn{k}.
+If \eqn{k} is between 0.5 and approximately 0.7 then we observe practically
+useful convergence rates and Monte Carlo error estimates with PSIS (the
+bias of TIS increases faster than the bias of PSIS). If \eqn{k > 0.7} we
+observe impractical convergence rates and unreliable Monte Carlo error
+estimates.
+\item If \eqn{k \geq 1}{k >= 1} then neither the variance nor the mean of
+the raw importance ratios exists. The convergence rate is close to
+zero and bias can be large with practical sample sizes.
 }
 
-\strong{If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the
-user should be warned, although in practice we have observed good performance
-for values of \eqn{k} up to 0.7.} (If \eqn{k} is greater than \eqn{0.5} then
-WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
+\strong{If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+should be warned, although in practice we have observed good performance for
+values of \eqn{k} up to 0.7.} (Note: If \eqn{k} is greater than \eqn{0.5}
+then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
+When using PSIS in the context of approximate LOO-CV, then even if the PSIS
+estimate has a finite variance the user should consider sampling directly
+from \eqn{p(\theta^s | y_{-i})} for any problematic observations \eqn{i}, use
+\eqn{k}-fold cross-validation, or use a more robust model. Importance
+sampling is likely to work less well if the marginal posterior
+\eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
+different, which is more likely to happen with a non-robust model and highly
+influential observations.
 
-If using PSIS in the context of approximate
-LOO-CV, even if the PSIS estimate has a finite variance the user should
-consider sampling directly from \eqn{p(\theta^s | y_{-i})} for any
-problematic observations \eqn{i}, use \eqn{K}-fold cross-validation, or use a
-more robust model. Importance sampling is likely to work less well if the
-marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
-\eqn{p(\theta^s | y_{-i})} are much different, which is more likely to happen
-with a non-robust model and highly influential observations. A robust model
-may reduce the sensitivity to highly influential observations.
-
-\subsection{Effective sample size and error estimates}{
- In the case that we obtain the samples from the proposal distribution via
- MCMC we can also compute estimates for the Monte Carlo error and the
- effective sample size for importance sampling, which are more accurate for
- PSIS than for IS and TIS (see Vehtari et al (2017b) for details). However,
- the PSIS effective sample size estimate will be \strong{over-optimistic when
- the estimate of \eqn{k} is greater than 0.7.}
-
- We can also compute estimates for the Monte Carlo error and the effective
- sample size for importance sampling. However, the PSIS effective sample size
- estimate will be \strong{over-optimistic when the estimate of \eqn{k} is
- greater than 0.7}. In the case that we obtain the samples from the proposal
- distribution via MCMC, we need to take into account also the relative
- efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
- Following the notation in Stan, the PSIS effective sample size is denoted
- here with \eqn{n_{eff}}, instead of \eqn{S_{eff}} used by Vehtari et al
- (2017b).
+\subsection{Effective sample size and error estimates}{ In the case that we
+obtain the samples from the proposal distribution via MCMC the \strong{loo}
+package also computes estimates for the Monte Carlo error and the effective
+sample size for importance sampling, which are more accurate for PSIS than
+for IS and TIS (see Vehtari et al (2017b) for details). However, the PSIS
+effective sample size estimate will be
+\strong{over-optimistic when the estimate of \eqn{k} is greater than 0.7}.
 }
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{
-\code{\link{psis}} for the implementation of the PSIS algorithm.
+\code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.
 }

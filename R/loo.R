@@ -1,97 +1,94 @@
 #' Efficient approximate leave-one-out cross-validation (LOO)
 #'
-#' The \code{loo} methods for arrays, matrices, and functions compute PSIS-LOO
+#' The `loo()` methods for arrays, matrices, and functions compute PSIS-LOO
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-#' models using Pareto smoothed importance sampling (PSIS). This is an
+#' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is an
 #' implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
 #' 2017b).
 #'
 #' @export loo loo.array loo.matrix loo.function
-#' @param x A log-likelihood array, matrix, or function. See the \strong{Methods
-#'   (by class)} section below for a detailed description of how to specify the
-#'   inputs for each method.
+#' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
+#'   section, below, has detailed descriptions of how to specify the inputs for
+#'   each method.
 #' @param r_eff Vector of relative effective sample size estimates for the
-#'   likelihood (\code{exp(log_lik)}) of each observation. This is related to
+#'   likelihood (`exp(log_lik)`) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
 #'   self-normalizing importance sampling when using posterior draws obtained
-#'   with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
+#'   with MCMC. If MCMC draws are used and `r_eff` is not provided then
 #'   the reported PSIS effective sample sizes and Monte Carlo error estimates
 #'   will be over-optimistic. If the posterior draws are independent then
-#'   \code{r_eff=1} and can be omitted. See the \code{\link{relative_eff}}
-#'   helper function for computing \code{r_eff}.
+#'   `r_eff=1` and can be omitted. See the [relative_eff()]
+#'   helper functions for computing `r_eff`.
 #'
-#' @param save_psis Should the \code{"psis"} object created internally by
-#'   \code{loo} be saved in the returned object? The \code{loo} function calls
-#'   \code{\link{psis}} internally but by default discards the (potentially
-#'   large) \code{"psis"} object after using it to compute the LOO-CV summaries.
-#'   Setting \code{save_psis} to \code{TRUE} will add a \code{psis_object}
-#'   component to the list returned by \code{loo}. Currently this is only needed
-#'   if you plan to use the \code{\link{E_loo}} function to compute weighted
-#'   expectations after running \code{loo}.
+#' @param save_psis Should the `"psis"` object created internally by `loo()` be
+#'   saved in the returned object? The `loo()` function calls [psis()]
+#'   internally but by default discards the (potentially large) `"psis"` object
+#'   after using it to compute the LOO-CV summaries. Setting `save_psis=TRUE`
+#'   will add a `psis_object` component to the list returned by `loo`. Currently
+#'   this is only needed if you plan to use the [E_loo()] function to compute
+#'   weighted expectations after running `loo`.
 #' @template cores
+#' @template is_method
 #'
-#' @details The \code{loo} function is an S3 generic and methods are provided
-#'   for computing LOO from 3-D pointwise log-likelihood arrays, pointwise
-#'   log-likelihood matrices, and log-likelihood functions. The array and matrix
-#'   methods are most convenient, but for models fit to very large datasets the
-#'   \code{loo.function} method is more memory efficient and may be preferable.
+#' @details The `loo()` function is an S3 generic and methods are provided for
+#'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
+#'   log-likelihood functions. The array and matrix methods are the most
+#'   convenient, but for models fit to very large datasets the `loo.function()`
+#'   method is more memory efficient and may be preferable.
 #'
-#' @section Defining \code{loo} methods in a package: Package developers can
-#'   define \code{loo} methods for fitted models objects. See the example
-#'   \code{loo.stanfit} method in the \strong{Examples} section below for an
-#'   example of defining a method that calls \code{loo.array}. The
-#'   \code{loo.stanreg} method in \pkg{rstanarm} is an example of defining a
-#'   method that calls \code{loo.function}.
+#' @section Defining `loo()` methods in a package: Package developers can define
+#'   `loo()` methods for fitted models objects. See the example `loo.stanfit()`
+#'   method in the **Examples** section below for an example of defining a
+#'   method that calls `loo.array()`. The `loo.stanreg()` method in the
+#'   **rstanarm** package is an example of defining a method that calls
+#'   `loo.function()`.
 #'
-#' @return The \code{loo} methods return a named list with class
-#'   \code{c("psis_loo", "loo")} and components:
+#' @return The `loo()` methods return a named list with class
+#'   `c("psis_loo", "loo")` and components:
 #' \describe{
-#'  \item{\code{estimates}}{
-#'   A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
-#'   (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+#'  \item{`estimates`}{
+#'   A matrix with two columns (`Estimate`, `SE`) and four rows
+#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`). This
 #'   contains point estimates and standard errors of the expected log pointwise
-#'   predictive density (\code{elpd_loo}), the Monte Carlo standard error of
-#'   \code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
-#'   (\code{p_loo}) and the LOO information criterion \code{looic} (which is
-#'   just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
+#'   predictive density (`elpd_loo`), the Monte Carlo standard error of
+#'   `elpd_loo` (`mcse_elpd_loo`), the effective number of parameters
+#'   (`p_loo`) and the LOO information criterion `looic` (which is
+#'   just `-2 * elpd_loo`, i.e., converted to deviance scale).
 #'  }
-#'  \item{\code{pointwise}}{
+#'
+#'  \item{`pointwise`}{
 #'   A matrix with four columns (and number of rows equal to the number of
 #'   observations) containing the pointwise contributions of each of the above
-#'   measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo},
-#'   \code{looic}).
+#'   measures (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`).
 #'  }
-#'  \item{\code{diagnostics}}{
+#'
+#'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
-#'   \itemize{
-#'    \item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-#'    generalized Pareto fit to the importance ratios for each leave-one-out
-#'    distribution. See the \code{\link{pareto-k-diagnostic}} page for details.
-#'    \item \code{n_eff}: PSIS effective sample size estimates.
-#'   }
+#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
+#'      generalized Pareto fit to the importance ratios for each leave-one-out
+#'      distribution. See the [pareto-k-diagnostic] page for details.
+#'    * `n_eff`: PSIS effective sample size estimates.
 #'  }
-#'  \item{\code{psis_object}}{
-#'  This component will be \code{NULL} unless the \code{save_psis} argument is
-#'  set to \code{TRUE} when calling \code{loo}. In that case \code{psis_object}
-#'  will be the object of class \code{"psis"} that is created when the
-#'  \code{loo} function calls \code{\link{psis}} internally to do the PSIS
-#'  procedure.
+#'
+#'  \item{`psis_object`}{
+#'  This component will be `NULL` unless the `save_psis` argument is set to
+#'  `TRUE` when calling `loo()`. In that case `psis_object` will be the object
+#'  of class `"psis"` that is created when the `loo()` function calls [psis()]
+#'  internally to do the PSIS procedure.
 #'  }
 #' }
 #'
 #' @seealso
-#' \itemize{
-#'  \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
-#'  \item \code{\link{psis}} for the underlying Pareto Smoothed Importance
-#'  Sampling (PSIS) procedure used in the LOO-CV approximation.
-#'  \item \link{pareto-k-diagnostic} for convenience functions for looking at
-#'  diagnostics.
-#'  \item \code{\link{compare}} for model comparison.
-#' }
+#'  * The **loo** package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'    for demonstrations.
+#'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
+#'    procedure used in the LOO-CV approximation.
+#'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.
+#'  * [loo_compare()] for model comparison.
+#'
 #' @template loo-and-psis-references
 #'
 #' @examples
-#'
 #' ### Array and matrix methods (using example objects included with loo package)
 #' # Array method
 #' LLarr <- example_loglik_array()
@@ -196,17 +193,19 @@ loo.array <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
     if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.array(log_ratios = -x, r_eff = r_eff, cores = cores)
+    is_method <- match.arg(is_method)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
@@ -219,26 +218,36 @@ loo.matrix <-
            ...,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
-    if (is.null(r_eff)) throw_loo_r_eff_warning()
-    psis_out <- psis.matrix(log_ratios = -x, r_eff = r_eff, cores = cores)
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
+    is_method <- match.arg(is_method)
+    if (is.null(r_eff)) {
+      throw_loo_r_eff_warning()
+    }
+    psis_out <-
+      importance_sampling.matrix(
+        log_ratios = -x,
+        r_eff = r_eff,
+        cores = cores,
+        method = is_method
+      )
     pointwise <- pointwise_loo_calcs(x, psis_out)
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
       dims = dim(psis_out),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
 #' @export
 #' @templateVar fn loo
 #' @template function
-#' @param data,draws,... For the \code{loo} function method and the \code{loo_i}
-#'   function, the data, posterior draws, and other arguments to pass to the
-#'   log-likelihood function. See the \strong{Methods (by class)} section below
-#'   for details on how to specify these arguments.
+#' @param data,draws,... For the `loo.function()` method and the `loo_i()`
+#'   function, these are the data, posterior draws, and other arguments to pass
+#'   to the log-likelihood function. See the **Methods (by class)** section
+#'   below for details on how to specify these arguments.
 #'
 loo.function <-
   function(x,
@@ -247,63 +256,39 @@ loo.function <-
            draws = NULL,
            r_eff = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+           cores = getOption("mc.cores", 1),
+           is_method = c("psis", "tis", "sis")) {
+    is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
-    if (is.null(r_eff)) throw_loo_r_eff_warning()
-
+    assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
-    if (cores == 1) {
-      psis_list <-
-        lapply(
-          X = seq_len(N),
-          FUN = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          ...
-        )
+    if (is.null(r_eff)) {
+      throw_loo_r_eff_warning()
     } else {
-      if (.Platform$OS.type != "windows") {
-        psis_list <-
-          parallel::mclapply(
-            mc.cores = cores,
-            X = seq_len(N),
-            FUN = .loo_i,
-            llfun = .llfun,
-            data = data,
-            draws = draws,
-            r_eff = r_eff,
-            save_psis = save_psis,
-            ...
-          )
-      } else {
-        cl <- parallel::makePSOCKcluster(cores)
-        on.exit(parallel::stopCluster(cl))
-        psis_list <-
-          parallel::parLapply(
-            cl = cl,
-            X = seq_len(N),
-            fun = .loo_i,
-            llfun = .llfun,
-            data = data,
-            draws = draws,
-            r_eff = r_eff,
-            save_psis = save_psis,
-            ...
-          )
-      }
+      r_eff <- prepare_psis_r_eff(r_eff, len = N)
     }
+
+    psis_list <-
+      parallel_importance_sampling_list(
+        N = N,
+        .loo_i = .loo_i,
+        .llfun = .llfun,
+        data = data,
+        draws = draws,
+        r_eff = r_eff,
+        save_psis = save_psis,
+        cores = cores,
+        method = is_method,
+        ...
+      )
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
       psis_object_list <- lapply(psis_list, "[[", "psis_object")
-      psis_out <- list2psis(psis_object_list)
+      psis_out <- list2importance_sampling(psis_object_list)
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
@@ -313,30 +298,31 @@ loo.function <-
       )
     }
 
-    psis_loo_object(
+    importance_sampling_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = is_method,
+      is_object = if (save_psis) psis_out else NULL
     )
   }
 
 
-#' @description The \code{loo_i} function enables testing log-likelihood
-#'   functions for use with the \code{loo.function} method.
+#' @description The `loo_i()` function enables testing log-likelihood
+#'   functions for use with the `loo.function()` method.
 #'
 #' @rdname loo
 #' @export
 #'
-#' @param i For \code{loo_i}, an integer in \code{1:N}.
-#' @param llfun For \code{loo_i}, the same as \code{x} for the
-#'   \code{loo.function} method. A log-likelihood function as described in the
-#'   \strong{Methods (by class)} section.
+#' @param i For `loo_i()`, an integer in `1:N`.
+#' @param llfun For `loo_i()`, the same as `x` for the
+#'   `loo.function()` method. A log-likelihood function as described in the
+#'   **Methods (by class)** section.
 #'
-#' @return The \code{loo_i} function returns a named list with components
-#'   \code{pointwise} and \code{diagnostics}. These components have the same
-#'   structure as the \code{pointwise} and \code{diagnostics} components of the
-#'   object returned by \code{loo} except they contain results for only a single
+#' @return The `loo_i()` function returns a named list with components
+#'   `pointwise` and `diagnostics`. These components have the same
+#'   structure as the `pointwise` and `diagnostics` components of the
+#'   object returned by `loo()` except they contain results for only a single
 #'   observation.
 #'
 loo_i <-
@@ -345,13 +331,16 @@ loo_i <-
            ...,
            data = NULL,
            draws = NULL,
-           r_eff = NULL) {
+           r_eff = NULL,
+           is_method = "psis"
+           ) {
     stopifnot(
       i == as.integer(i),
       is.function(llfun) || is.character(llfun),
       is.data.frame(data) || is.matrix(data),
       i <= dim(data)[1],
-      !is.null(draws)
+      !is.null(draws),
+      is_method %in% implemented_is_methods()
     )
     .loo_i(
       i = as.integer(i),
@@ -360,6 +349,7 @@ loo_i <-
       draws = draws,
       r_eff = r_eff[i],
       save_psis = FALSE,
+      is_method = is_method,
       ...
     )
   }
@@ -375,14 +365,24 @@ loo_i <-
            data,
            draws,
            r_eff = NULL,
-           save_psis = FALSE) {
+           save_psis = FALSE,
+           is_method) {
 
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
     }
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
-    psis_out <- psis(log_ratios = -ll_i, r_eff = r_eff, cores = 1)
+    if (!is.matrix(ll_i)) {
+      ll_i <- as.matrix(ll_i)
+    }
+    psis_out <-
+      importance_sampling.matrix(
+        log_ratios = -ll_i,
+        r_eff = r_eff,
+        cores = 1,
+        method = is_method
+      )
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),
@@ -396,15 +396,19 @@ loo_i <-
 
 
 #' @export
-dim.psis_loo <- function(x) {
+dim.loo <- function(x) {
   attr(x, "dims")
 }
-
 
 #' @rdname loo
 #' @export
 is.loo <- function(x) {
   inherits(x, "loo")
+}
+
+#' @export
+dim.psis_loo <- function(x) {
+  attr(x, "dims")
 }
 
 #' @rdname loo
@@ -421,7 +425,7 @@ is.psis_loo <- function(x) {
 #'
 #' @noRd
 #' @param ll Log-likelihood matrix.
-#' @param psis_object The object returned by psis.
+#' @param psis_object The object returned by `psis()`.
 #' @return Named list with pointwise elpd_loo, p_loo, and looic.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
@@ -429,11 +433,11 @@ pointwise_loo_calcs <- function(ll, psis_object) {
     ll <- as.matrix(ll)
   }
   lw <- weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- colLogSumExps(ll + lw)
-  looic <- -2 * elpd_loo
-  lpd <- colLogMeanExps(ll)
+  elpd_loo <- matrixStats::colLogSumExps(ll + lw)
+  lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
-  mcse_elpd_loo <- mcse_elpd(ll, elpd_loo, psis_object)
+  mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
+  looic <- -2 * elpd_loo
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
 }
 
@@ -442,18 +446,29 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @noRd
 #' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
 #'   looic.
-#' @param diagnostics Named list containing vector 'pareto_k' and vector 'n_eff'
-#' @param dims Log likelihood matrix dimensions (attribute of psis object).
-#' @param psis_object PSIS object.
-#' @return A 'psis_loo' object as described in the Value section of the loo
+#' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
+#' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
+#' @template is_method
+#' @param is_object An object of class `"psis"/"tis"/"sis"`, as returned by the [psis()/tis()/sis()] function.
+#' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
-  stopifnot(is.matrix(pointwise), is.list(diagnostics))
+importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
+                                           is_method, is_object = NULL) {
+  if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
+  if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+  assert_importance_sampling_method_is_implemented(is_method)
+
   cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
-  out <- nlist(estimates, pointwise, diagnostics, psis_object)
+  out <- nlist(estimates, pointwise, diagnostics)
+  if (is.null(is_object)) {
+    out[paste0(is_method, "_object")] <- list(NULL)
+  } else {
+    out[[paste0(is_method, "_object")]] <- is_object
+  }
+
   # maintain backwards compatibility
   old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
   out <- c(out, setNames(as.list(estimates), old_nms))
@@ -461,7 +476,7 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
   structure(
     out,
     dims = dims,
-    class = c("psis_loo", "loo")
+    class = c(paste0(is_method, "_loo"), "importance_sampling_loo", "loo")
   )
 }
 
@@ -471,22 +486,28 @@ psis_loo_object <- function(pointwise, diagnostics, dims, psis_object = NULL) {
 #' @noRd
 #' @param ll Log-likelihood matrix.
 #' @param E_elpd elpd_loo column of pointwise matrix.
-#' @param psis_object Object returned by psis.
-#' @param n_samples Number of draws to take from N(E[epd_i], SD[epd_i]).
+#' @param psis_object Object returned by [psis()].
+#' @param n_samples Number of draws to take from `Normal(E[epd_i], SD[epd_i])`.
 #' @return Vector of standard error estimates.
 #'
-mcse_elpd <- function(ll, E_elpd, psis_object, n_samples = 1000) {
+mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
+  lik <- exp(ll)
+  w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
-  w <- weights(psis_object, log = FALSE)
-  r_eff <- attr(psis_object, "r_eff")
-  var_elpd <- sapply(seq_len(ncol(w)), function(i) {
-    var_epd_i <- sum(w[, i]^2 * (exp(ll[, i]) - E_epd[i])^2)
-    sd_epd_i <- sqrt(var_epd_i)
-    z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
-    var(log(z))
-  })
+  var_elpd <-
+    vapply(
+      seq_len(ncol(w2)),
+      FUN.VALUE = numeric(1),
+      FUN = function(i) {
+        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2)
+        sd_epd_i <- sqrt(var_epd_i)
+        z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
+        var(log(z[z > 0]))
+      }
+    )
   sqrt(var_elpd / r_eff)
 }
+
 
 #' Warning message if r_eff not specified
 #' @noRd
@@ -502,12 +523,22 @@ throw_loo_r_eff_warning <- function() {
 #' Combine many psis objects into a single psis object
 #'
 #' @noRd
-#' @param objects List of psis objects, each for a single observation.
-#' @return A single psis object.
+#' @param objects List of `"psis"` objects, each for a single observation.
+#' @return A single `"psis"` object.
 #'
-list2psis <- function(objects) {
+list2importance_sampling <- function(objects) {
   log_weights <- sapply(objects, "[[", "log_weights")
   diagnostics <- lapply(objects, "[[", "diagnostics")
+
+  method <- psis_apply(objects, "method", fun = "attr", fun_val = character(1))
+  methods <- unique(method)
+  if (length(methods) == 1) {
+    method <- methods
+    classes <- c(methods, "importance_sampling", "list")
+  } else {
+    classes <- c("importance_sampling", "list")
+  }
+
   structure(
     list(
       log_weights = log_weights,
@@ -520,7 +551,8 @@ list2psis <- function(objects) {
     tail_len = psis_apply(objects, "tail_len", fun = "attr"),
     r_eff = psis_apply(objects, "r_eff", fun = "attr"),
     dims = dim(log_weights),
-    class = c("psis", "list")
+    method = method,
+    class = classes
   )
 }
 
@@ -528,8 +560,8 @@ list2psis <- function(objects) {
 #'
 #' These are only defined in order to deprecate with a warning (rather than
 #' remove and break backwards compatibility) the old way of accessing the point
-#' estimates in a \code{"psis_loo"} or \code{"psis"} object. The new way as of
-#' v2.0.0 is to get them from the \code{"estimates"} component of the object.
+#' estimates in a `"psis_loo"` or `"psis"` object. The new way as of
+#' v2.0.0 is to get them from the `"estimates"` component of the object.
 #'
 #' @name old-extractors
 #' @keywords internal
@@ -599,4 +631,82 @@ NULL
     )
   }
   NextMethod()
+}
+
+
+#' Parallel psis list computations
+#'
+#' @details Refactored function to handle parallel computations
+#' for psis_list
+#'
+#' @keywords internal
+#' @inheritParams loo.function
+#' @param .loo_i The function used to compute individual loo contributions.
+#' @param .llfun See `llfun` in [loo.function()].
+#' @param N The total number of observations (i.e. `nrow(data)`).
+#' @param method See `is_method` for [loo()]
+#'
+parallel_psis_list <- function(N, .loo_i, .llfun,
+                               data, draws, r_eff,
+                               save_psis, cores,
+                               ...){
+  parallel_importance_sampling_list(N, .loo_i, .llfun,
+                                    data, draws, r_eff,
+                                    save_psis, cores,
+                                    method = "psis", ...)
+}
+
+#' @rdname parallel_psis_list
+parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
+                                              data, draws, r_eff,
+                                              save_psis, cores,
+                                              method, ...){
+  if (cores == 1) {
+    psis_list <-
+      lapply(
+        X = seq_len(N),
+        FUN = .loo_i,
+        llfun = .llfun,
+        data = data,
+        draws = draws,
+        r_eff = r_eff,
+        save_psis = save_psis,
+        is_method = method,
+        ...
+      )
+  } else {
+    if (!os_is_windows()) {
+      # On Mac or Linux use mclapply() for multiple cores
+      psis_list <-
+        parallel::mclapply(
+          mc.cores = cores,
+          X = seq_len(N),
+          FUN = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          is_method = method,
+          ...
+        )
+    } else {
+      # On Windows use makePSOCKcluster() and parLapply() for multiple cores
+      cl <- parallel::makePSOCKcluster(cores)
+      on.exit(parallel::stopCluster(cl))
+      psis_list <-
+        parallel::parLapply(
+          cl = cl,
+          X = seq_len(N),
+          fun = .loo_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          r_eff = r_eff,
+          save_psis = save_psis,
+          is_method = method,
+          ...
+        )
+    }
+  }
 }

@@ -13,8 +13,7 @@ gpdfit(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE)
 informative Gaussian prior centered on 0.5. Defaults to \code{TRUE}.}
 
 \item{min_grid_pts}{The minimum number of grid points used in the fitting
-algorithm. The actual number used is \code{min_grid_pts +
-floor(sqrt(length(x)))}.}
+algorithm. The actual number used is \code{min_grid_pts + floor(sqrt(length(x)))}.}
 
 \item{sort_x}{If \code{TRUE} (the default), the first step in the fitting
 algorithm is to sort the elements of \code{x}. If \code{x} is already
@@ -25,23 +24,21 @@ skip the initial sorting step.}
 A named list with components \code{k} and \code{sigma}.
 }
 \description{
-Estimate the parameters \eqn{k} and \eqn{\sigma} of the generalized Pareto
-distribution (assuming location parameter is 0), given a sample \eqn{x}. By
-default the Pareto fit uses a prior for \eqn{k}, which will stabilize
-estimates for very small sample sizes and low effective sample sizes in the
-case of MCMC samples. The weakly informative prior is a Gaussian prior
+Given a sample \eqn{x}, Estimate the parameters \eqn{k} and \eqn{\sigma} of
+the generalized Pareto distribution (GPD), assuming the location parameter is
+0. By default the fit uses a prior for \eqn{k}, which will stabilize
+estimates for very small sample sizes (and low effective sample sizes in the
+case of MCMC samples). The weakly informative prior is a Gaussian prior
 centered at 0.5.
 }
 \details{
 Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
-  Stephens (2009).
+Stephens (2009).
 }
 \references{
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
-for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
-316-325.
+for the generalized Pareto distribution. \emph{Technometrics} \strong{51}, 316-325.
 }
 \seealso{
-\code{\link{psis}}, \code{\link{pareto-k-diagnostic}},
-  \code{\link{loo-package}}
+\code{\link[=psis]{psis()}}, \link{pareto-k-diagnostic}
 }

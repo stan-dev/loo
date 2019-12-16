@@ -125,7 +125,7 @@ re-used later.
 loo1 <- loo(fit1, save_psis = TRUE)
 ```
 
-`loo` gives us warnings about the Pareto diagnostics, which indicates that for
+`loo` gives us warnings about the Pareto diagnostics, which indicate that for
 some observations the leave-one-out posteriors are different enough from the
 full posterior that importance-sampling is not able to correct the difference.
 We can see more details by printing the `loo` object.
@@ -153,7 +153,7 @@ misspecification.
 
 ### Plotting Pareto $k$ diagnostics
 
-Using the `plot` method on our `loo1` object produces a plot the $k$ values 
+Using the `plot` method on our `loo1` object produces a plot of the $k$ values
 (in the same order as the observations in the dataset used to fit the model) 
 with horizontal lines corresponding to the same categories as in the
 printed output above.
@@ -183,7 +183,6 @@ standard uniform distribution (thin curves).
 ```{r}
 yrep <- posterior_predict(fit1)
 
-# requires bayesplot version >= 1.5.0
 ppc_loo_pit_overlay(
   y = roaches$y,
   yrep = yrep,
@@ -220,7 +219,7 @@ Using the `label_points` argument will label any $k$ values larger than 0.7 with
 the index of the corresponding data point. These high values are often the
 result of model misspecification and frequently correspond to data points that
 would be considered ``outliers'' in the data and surprising according to the
-model [Gabry et al (2018)](http://arxiv.org/abs/1709.01449). Unfortunately,
+model [Gabry et al (2019)](http://arxiv.org/abs/1709.01449). Unfortunately,
 while large $k$ values are a useful indicator of model misspecification, small
 $k$ values are not a guarantee that a model is well-specified.
 
@@ -260,31 +259,31 @@ the data.
 
 ## Comparing the models on expected log predictive density
 
-We can use the `compare_models` function in __rstanarm__, which is a wrapper
-around __loo__'s `compare` function that also does some checks to ensure that
-the __rstanarm__ models from which `loo1` and `loo2` were created are suitable
-for comparison.
+We can use the `loo_compare` function to compare our two models on 
+expected log predictive density (ELPD) for new data:
 
 ```{r, count-roaches-loo}
-compare_models(loo1, loo2)  # use loo::compare(loo1, loo2) if not using rstanarm
+loo_compare(loo1, loo2)
 ```
 
-The difference in ELPD is much larger than twice the estimated standard error
-again indicating that the negative-binomial model is expected to have better
-predictive performance than the Poisson model. However, according to the LOO-PIT
-checks there is still some misspecification, and a reasonable guess is that a
-hurdle or zero-inflated model would be an improvement (we leave that for another
-case study).
+The difference in ELPD is much larger than several times the estimated standard
+error of the difference again indicating that the negative-binomial model is
+expected to have better predictive performance than the Poisson model. However,
+according to the LOO-PIT checks there is still some misspecification, and a
+reasonable guess is that a hurdle or zero-inflated model would be an improvement
+(we leave that for another case study).
 
 
 <br>
 
 # References
 
-Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., and Gelman,
-A. (2018). Visualization in Bayesian workflow. Journal of the Royal
-Statistical Society Series A, accepted for publication. [arXiv preprint
-arXiv:1709.01449](http://arxiv.org/abs/1709.01449)
+Gabry, J., Simpson, D., Vehtari, A., Betancourt, M. and Gelman, A. (2019),
+Visualization in Bayesian workflow. _J. R. Stat. Soc. A_, 182: 389-402. 
+\doi:10.1111/rssa.12378. ([journal version](https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378), 
+[arXiv preprint](https://arxiv.org/abs/1709.01449), 
+[code on GitHub](https://github.com/jgabry/bayes-vis-paper))
+<a id="gabry2019"></a>
 
 Gelman, A. and Hill, J. (2007). _Data Analysis Using Regression and
 Multilevel/Hierarchical Models._ Cambridge University Press, Cambridge, UK.

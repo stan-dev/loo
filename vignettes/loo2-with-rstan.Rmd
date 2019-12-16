@@ -112,14 +112,18 @@ approximation to exact LOO-CV:
 ```{r, eval=FALSE}
 library("loo")
 
-# Extract pointwise log-likelihood and compute LOO
+# Extract pointwise log-likelihood
+# using merge_chains=FALSE returns an array, which is easier to 
+# use with relative_eff()
 log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
 
 # as of loo v2.0.0 we can optionally provide relative effective sample sizes
 # when calling loo, which allows for better estimates of the PSIS effective
 # sample sizes and Monte Carlo error
-r_eff <- relative_eff(exp(log_lik_1)) 
+r_eff <- relative_eff(exp(log_lik_1), cores = 2) 
 
+# preferably use more than 2 cores (as many cores as possible)
+# will use value of 'mc.cores' option if cores is not specified
 loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
 print(loo_1)
 ```
@@ -145,14 +149,14 @@ $\widehat{p}_{\rm loo}$ (effective number of parameters), and ${\rm looic} =-2\,
 
 The line at the bottom of the printed output provides information about the
 reliability of the LOO approximation (the interpretation of the $k$ parameter is
-explained in the PSIS-LOO section in `help("loo-package")` and in greater detail
+explained in `help('pareto-k-diagnostic')` and in greater detail
 in Vehtari, Gelman, and Gabry (2017)). In this case the message tells us that
 all of the estimates for $k$ are fine.
 
 ## Comparing models
 
 To compare this model to an alternative model for the same data we can use the 
-`compare` function in the **loo** package. First we'll fit a second model to the
+`loo_compare` function in the **loo** package. First we'll fit a second model to the
 well-switching data, using `log(arsenic)` instead of `arsenic` as a predictor:
 
 ```{r, eval=FALSE}
@@ -179,11 +183,11 @@ All Pareto k estimates are good (k < 0.5).
 See help('pareto-k-diagnostic') for details.
 ```
 
-We can now compare the models on LOO using the `compare` function:
+We can now compare the models on LOO using the `loo_compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-comp <- compare(loo_1, loo_2)
+comp <- loo_compare(loo_1, loo_2)
 ```
 
 This new object, `comp`, contains the estimated difference of expected 
@@ -191,15 +195,18 @@ leave-one-out prediction errors between the two models, along with the standard
 error:
 
 ```{r, eval=FALSE}
-print(comp)
+print(comp) # can set simplify=FALSE for more detailed print output
 ```
 ```
-elpd_diff        se 
-     16.2       4.4 
+       elpd_diff se_diff
+model2   0.0       0.0  
+model1 -16.3       4.4  
 ```
 
-The positive difference in `elpd` (and its scale relative to the standard error)
-indicates a preference for the _second_ model.
+The first column shows the difference in ELPD relative to the model with 
+the largest ELPD. In this case, the difference in `elpd` and its scale relative 
+to the approximate standard error of the difference) indicates a 
+preference for the second model (`model2`).
 
 
 # References

@@ -5,40 +5,40 @@
 #' al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
 #'
 #' @export
-#' @param x A list of pointwise log-likelihood matrices or "psis_loo" objects
-#'   (objects returned by \code{\link{loo}}), one for each model. Each
+#' @param x A list of pointwise log-likelihood matrices or `"psis_loo"` objects
+#'   (objects returned by [loo()]), one for each model. Each
 #'   matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
 #'   the size of the posterior sample (with all chains merged) and \eqn{N} is
-#'   the number of data points. If \code{x} is a list of log-likelihood matrices
-#'   then \code{\link{loo}} is called internally on each matrix. Currently the
-#'   \code{loo_model_weights} function is not implemented to be used with
+#'   the number of data points. If `x` is a list of log-likelihood matrices
+#'   then [loo()] is called internally on each matrix. Currently the
+#'   `loo_model_weights()` function is not implemented to be used with
 #'   results from K-fold CV, but you can still obtain weights using K-fold CV
-#'   results by calling the \code{stacking_weights} function directly.
+#'   results by calling the `stacking_weights()` function directly.
 #'
-#' @param method Either \code{"stacking"} or \code{"pseudobma"}, indicating
-#'   which method to use for obtaining the weights. \code{"stacking"} refers to
-#'   stacking of predictive distributions and  \code{"pseudobma"} refers to
-#'   pseudo-BMA+ weighting (or plain pseudo-BMA weighting if \code{BB} is
-#'   \code{FALSE}).
-#' @param BB Logical used when \code{"method"}=\code{"pseudobma"}. If
-#'   \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust
+#' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
+#'   to use for obtaining the weights. `"stacking"` refers to stacking of
+#'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
+#'   (or plain pseudo-BMA weighting if argument `BB` is `FALSE`).
+#' @param BB Logical used when `"method"`=`"pseudobma"`. If
+#'   `TRUE` (the default), the Bayesian bootstrap will be used to adjust
 #'   the pseudo-BMA weighting, which is called pseudo-BMA+ weighting. It helps
 #'   regularize the weight away from 0 and 1, so as to reduce the variance.
 #' @param BB_n For pseudo-BMA+ weighting only, the number of samples to use for
-#'   the Bayesian bootstrap. The default is 1000.
+#'   the Bayesian bootstrap. The default is `BB_n=1000`.
 #' @param alpha Positive scalar shape parameter in the Dirichlet distribution
-#'   used for the Bayesian bootstrap. The default is 1, which corresponds to a
-#'   uniform distribution on the simplex space.
-#' @param optim_method The optimization method to use if
-#'   \code{method="stacking"}. It can be chosen from "Nelder-Mead", "BFGS",
-#'   "CG", "L-BFGS-B", "SANN" and "Brent". The default method is "BFGS".
-#' @param optim_control If \code{method="stacking"}, a list of control
-#'   parameters for optimization. See \code{\link{constrOptim}} for details.
+#'   used for the Bayesian bootstrap. The default is `alpha=1`, which
+#'   corresponds to a uniform distribution on the simplex space.
+#' @param optim_method If `method="stacking"`, a string passed to the `method`
+#'   argument of [stats::constrOptim()] to specify the optimization algorithm.
+#'   The default is `optim_method="BFGS"`, but other options are available (see
+#'   [stats::optim()]).
+#' @param optim_control If `method="stacking"`, a list of control parameters for
+#'   optimization passed to the `control` argument of [stats::constrOptim()].
 #' @param r_eff_list Optionally, a list of relative effective sample size
-#'   estimates for the likelihood \code{(exp(log_lik))} of each observation in
-#'   each model. See \code{\link{psis}} and  \code{\link{relative_eff}} helper
-#'   function for computing \code{r_eff}. If \code{x} is a list of "psis_loo"
-#'   objects then \code{r_eff_list} is ignored.
+#'   estimates for the likelihood `(exp(log_lik))` of each observation in
+#'   each model. See [psis()] and  [relative_eff()] helper
+#'   function for computing `r_eff`. If `x` is a list of `"psis_loo"`
+#'   objects then `r_eff_list` is ignored.
 #' @template cores
 #' @param ... Unused, except for the generic to pass arguments to individual
 #'   methods.
@@ -46,21 +46,21 @@
 #' @return A numeric vector containing one weight for each model.
 #'
 #' @details
-#' \code{loo_model_weights} is a wrapper around the \code{stacking_weights} and
-#' \code{pseudobma_weights} functions that implements stacking, pseudo-BMA, and
+#' `loo_model_weights()` is a wrapper around the `stacking_weights()` and
+#' `pseudobma_weights()` functions that implements stacking, pseudo-BMA, and
 #' pseudo-BMA+ weighting for combining multiple predictive distributions. We can
 #' use approximate or exact leave-one-out cross-validation (LOO-CV) or K-fold CV
 #' to estimate the expected log predictive density (ELPD).
 #'
-#' The stacking method (\code{method="stacking"}) combines all models by
-#' maximizing the leave-one-out predictive density of the combination
-#' distribution. That is, it finds the optimal linear combining weights for
-#' maximizing the leave-one-out log score.
+#' The stacking method (`method="stacking"`), which is the default for
+#' `loo_model_weights()`, combines all models by maximizing the leave-one-out
+#' predictive density of the combination distribution. That is, it finds the
+#' optimal linear combining weights for maximizing the leave-one-out log score.
 #'
-#' The pseudo-BMA method (\code{method="pseudobma"}) finds the relative weights
+#' The pseudo-BMA method (`method="pseudobma"`) finds the relative weights
 #' proportional to the ELPD of each model. However, when
-#' \code{method="pseudobma"}, the default is to also use the Bayesian bootstrap
-#' (\code{BB=TRUE}), which corresponds to the pseudo-BMA+ method. The Bayesian
+#' `method="pseudobma"`, the default is to also use the Bayesian bootstrap
+#' (`BB=TRUE`), which corresponds to the pseudo-BMA+ method. The Bayesian
 #' bootstrap  takes into account the uncertainty of finite data points and
 #' regularizes the weights away from the extremes of 0 and 1.
 #'
@@ -68,12 +68,11 @@
 #' while pseudo-BMA+ can serve as a computationally easier alternative.
 #'
 #' @seealso
-#' \itemize{
-#' \item The \pkg{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes} for demonstrations.
-#' \item \code{\link{loo}} for details on leave-one-out ELPD estimation.
-#' \item \code{\link{constrOptim}} for the choice of optimization methods and control-parameters.
-#' \item \code{\link{relative_eff}} for computing \code{r_eff}.
-#' }
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/), particularly
+#'   [Bayesian Stacking and Pseudo-BMA weights using the __loo__ package](https://mc-stan.org/loo/articles/loo2-weights.html).
+#' * [loo()] for details on leave-one-out ELPD estimation.
+#' * [constrOptim()] for the choice of optimization methods and control-parameters.
+#' * [relative_eff()] for computing `r_eff`.
 #'
 #' @template loo-and-psis-references
 #' @template stacking-references
@@ -228,12 +227,13 @@ loo_model_weights.default <-
 
 #' @rdname loo_model_weights
 #' @export
-#' @param lpd_point A matrix of pointwise leave-one-out (or K-fold) log
-#'   likelihoods evaluated for different models. It should be a \eqn{N} by
-#'   \eqn{K}  matrix where \eqn{N} is sample size and \eqn{K} is the number of
-#'   models. Each column corresponds to one model. These values can be
-#'   calculated approximately using \code{\link{loo}} or by running exact
-#'   leave-one-out or K-fold cross-validation.
+#' @param lpd_point If calling `stacking_weights()` or `pseudobma_weights()`
+#'   directly, a matrix of pointwise leave-one-out (or K-fold) log likelihoods
+#'   evaluated for different models. It should be a \eqn{N} by \eqn{K}  matrix
+#'   where \eqn{N} is sample size and \eqn{K} is the number of models. Each
+#'   column corresponds to one model. These values can be calculated
+#'   approximately using [loo()] or by running exact leave-one-out or K-fold
+#'   cross-validation.
 #'
 #' @importFrom stats constrOptim
 #'
@@ -345,7 +345,7 @@ pseudobma_weights <-
 dirichlet_rng <- function(n, alpha) {
   K <- length(alpha)
   gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
-  return(gamma_sim / rowSums(gamma_sim))
+  gamma_sim / rowSums(gamma_sim)
 }
 
 #' @export
@@ -376,10 +376,10 @@ print_weight_vector <- function(x, digits) {
 #' Validate r_eff_list argument if provided
 #'
 #' @noRd
-#' @param r_eff_list User's r_eff_list argument
-#' @param K Required length of r_eff_list (number of models).
-#' @param N Required length of each element of r_eff_list (number of data points).
-#' @return Either throws an error or returns \code{TRUE} invisibly.
+#' @param r_eff_list User's `r_eff_list` argument
+#' @param K Required length of `r_eff_list` (number of models).
+#' @param N Required length of each element of `r_eff_list` (number of data points).
+#' @return Either throws an error or returns `TRUE` invisibly.
 #'
 validate_r_eff_list <- function(r_eff_list, K, N) {
   if (is.null(r_eff_list)) return(invisible(TRUE))
@@ -404,9 +404,9 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 #' has the same dimensions.
 #'
 #' @noRd
-#' @param log_lik_list User's list of log-likelihood matrices (the 'x' argument
+#' @param log_lik_list User's list of log-likelihood matrices (the `x` argument
 #'   to loo_model_weights).
-#' @return Either throws an error or returns \code{TRUE} invisibly.
+#' @return Either throws an error or returns `TRUE` invisibly.
 #'
 validate_log_lik_list <- function(log_lik_list) {
   stopifnot(is.list(log_lik_list))
@@ -417,7 +417,7 @@ validate_log_lik_list <- function(log_lik_list) {
      length(unique(sapply(log_lik_list, nrow))) != 1) {
     stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }
 
 validate_psis_loo_list <- function(psis_loo_list) {
@@ -434,5 +434,5 @@ validate_psis_loo_list <- function(psis_loo_list) {
       length(unique(dims[2, ])) != 1) {
     stop("Each object in the list must have the same dimensions.", call. = FALSE)
   }
-  return(invisible(TRUE))
+  invisible(TRUE)
 }

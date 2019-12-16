@@ -1,37 +1,43 @@
 #' Widely applicable information criterion (WAIC)
 #'
-#' The \code{waic} methods can be used to compute WAIC from the pointwise
+#' The `waic()` methods can be used to compute WAIC from the pointwise
 #' log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-#' the \code{\link{loo}} function) because PSIS provides useful diagnostics and
+#' the [loo()] function) because PSIS provides useful diagnostics as well as
 #' effective sample size and Monte Carlo estimates.
 #'
 #' @export waic waic.array waic.matrix waic.function
 #' @inheritParams loo
 #'
-#' @return A named list (of class \code{c("waic", "loo")}) with components:
+#' @return A named list (of class `c("waic", "loo")`) with components:
 #'
 #' \describe{
-#'  \item{\code{estimates}}{
-#'  A matrix with two columns (\code{"Estimate"}, \code{"SE"}) and three
-#'  rows (\code{"elpd_waic"}, \code{"p_waic"}, \code{"waic"}). This contains
+#'  \item{`estimates`}{
+#'  A matrix with two columns (`"Estimate"`, `"SE"`) and three
+#'  rows (`"elpd_waic"`, `"p_waic"`, `"waic"`). This contains
 #'  point estimates and standard errors of the expected log pointwise predictive
-#'  density (\code{elpd_waic}), the effective number of parameters
-#'  (\code{p_waic}) and the LOO information criterion \code{waic} (which is just
-#'  \code{-2 * elpd_waic}, i.e., converted to deviance scale).
+#'  density (`elpd_waic`), the effective number of parameters
+#'  (`p_waic`) and the information criterion `waic` (which is just
+#'  `-2 * elpd_waic`, i.e., converted to deviance scale).
 #'  }
-#'  \item{\code{pointwise}}{
+#'  \item{`pointwise`}{
 #'  A matrix with three columns (and number of rows equal to the number of
 #'  observations) containing the pointwise contributions of each of the above
-#'  measures (\code{elpd_waic}, \code{p_waic}, \code{waic}).
+#'  measures (`elpd_waic`, `p_waic`, `waic`).
 #'  }
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item \code{\link{loo}} for approximate LOO-CV.
-#' \item \code{\link{compare}} for comparing models on LOOIC or WAIC.
-#' }
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) and
+#'   Vehtari, Gelman, and Gabry (2017a, 2017b) for more details on why we
+#'   usually prefer `loo()` to `waic()`.
+#' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
 #'
+#' @references
+#' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
+#' widely application information criterion in singular learning theory.
+#' *Journal of Machine Learning Research* **11**, 3571-3594.
+#'
+#' @template loo-and-psis-references
 #'
 #' @examples
 #' ### Array and matrix methods
@@ -73,7 +79,7 @@ waic.array <- function(x, ...) {
 waic.matrix <- function(x, ...) {
   ll <- validate_ll(x)
   lldim <- dim(ll)
-  lpd <- colLogMeanExps(ll)
+  lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_waic <- matrixStats::colVars(ll)
   elpd_waic <- lpd - p_waic
   waic <- -2 * elpd_waic
@@ -87,8 +93,8 @@ waic.matrix <- function(x, ...) {
 #' @export
 #' @templateVar fn waic
 #' @template function
-#' @param draws,data,... For the function method only. See the \strong{Methods
-#'   (by class)} section below for details on these arguments.
+#' @param draws,data,... For the function method only. See the
+#' **Methods (by class)** section below for details on these arguments.
 #'
 waic.function <-
   function(x,
@@ -146,14 +152,15 @@ waic_object <- function(pointwise, dims) {
 
 # waic warnings
 # @param p 'p_waic' estimates
-throw_pwaic_warnings <- function(p, digits = 1) {
+throw_pwaic_warnings <- function(p, digits = 1, warn = TRUE) {
   badp <- p > 0.4
   if (any(badp)) {
     count <- sum(badp)
     prop <- count / length(badp)
-    .warn(paste0(count, " (", .fr(100 * prop, digits),
-                 "%) p_waic estimates greater than 0.4. "),
-          "We recommend trying loo instead.")
+    msg <- paste0("\n", count, " (", .fr(100 * prop, digits),
+                  "%) p_waic estimates greater than 0.4. ",
+                  "We recommend trying loo instead.")
+    if (warn) .warn(msg) else cat(msg, "\n")
   }
   invisible(NULL)
 }

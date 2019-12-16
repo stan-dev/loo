@@ -18,28 +18,28 @@ kfold_split_grouped(K = 10, x = NULL)
 
 \item{N}{The number of observations in the data.}
 
-\item{x}{A discrete variable of length \code{N} with at least \code{K} levels
-(unique values). Will be coerced to \code{\link{factor}}.}
+\item{x}{A discrete variable of length \code{N} with at least \code{K} levels (unique
+values). Will be coerced to a \link[=factor]{factor}.}
 }
 \value{
 An integer vector of length \code{N} where each element is an index in \code{1:K}.
 }
 \description{
 These functions can be used to generate indexes for use with
-  K-fold cross-validation. See the \strong{Details} section for explanations.
+K-fold cross-validation. See the \strong{Details} section for explanations.
 }
 \details{
-\code{kfold_split_random} splits the data into \code{K} groups
+\code{kfold_split_random()} splits the data into \code{K} groups
 of equal size (or roughly equal size).
 
-For a categorical variable \code{x} \code{kfold_split_stratified}
+For a categorical variable \code{x} \code{kfold_split_stratified()}
 splits the observations into \code{K} groups ensuring that relative
 category frequencies are approximately preserved.
 
-For a grouping variable \code{x}, \code{kfold_split_grouped} places
+For a grouping variable \code{x}, \code{kfold_split_grouped()} places
 all observations in \code{x} from the same group/level together in
 the same fold. The selection of which groups/levels go into which
-fold (relevant when when there are more folds than groups) is
+fold (relevant when when there are more groups than folds) is
 randomized.
 }
 \examples{

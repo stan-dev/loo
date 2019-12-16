@@ -6,13 +6,13 @@ test_that("gpdfit returns correct result", {
   set.seed(123)
   x <- rexp(100)
   gpdfit_val_old <- unlist(gpdfit(x, wip=FALSE, min_grid_pts = 80))
-  expect_equal_to_reference(gpdfit_val_old, "gpdfit_old.rds")
+  expect_equal_to_reference(gpdfit_val_old, "reference-results/gpdfit_old.rds")
 
   gpdfit_val_wip <- unlist(gpdfit(x, wip=TRUE, min_grid_pts = 80))
-  expect_equal_to_reference(gpdfit_val_wip, "gpdfit.rds")
+  expect_equal_to_reference(gpdfit_val_wip, "reference-results/gpdfit.rds")
 
   gpdfit_val_wip_default_grid <- unlist(gpdfit(x, wip=TRUE))
-  expect_equal_to_reference(gpdfit_val_wip_default_grid, "gpdfit_default_grid.rds")
+  expect_equal_to_reference(gpdfit_val_wip_default_grid, "reference-results/gpdfit_default_grid.rds")
 })
 
 test_that("qgpd returns the correct result ", {

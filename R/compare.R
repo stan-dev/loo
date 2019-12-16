@@ -1,44 +1,42 @@
-#' Model comparison
+#' Model comparison (deprecated, old version)
 #'
-#' \strong{This function will be deprecated in a future release}. We
-#' recommend using the new \code{\link{loo_compare}} function instead.
+#' **This function will be deprecated in a future release**. Please
+#' use the new [loo_compare()] function instead.
 #'
 #' @export
-#' @param ... At least two objects returned by \code{\link{loo}} (or
-#'   \code{\link{waic}}).
-#' @param x A list of at least two objects returned by \code{\link{loo}} (or
-#'   \code{\link{waic}}). This argument can be used as an alternative to
-#'   specifying the objects in \code{...}.
+#' @param ... At least two objects returned by [loo()] (or [waic()]).
+#' @param x A list of at least two objects returned by [loo()] (or
+#'   [waic()]). This argument can be used as an alternative to
+#'   specifying the objects in `...`.
 #'
-#' @return A vector or matrix with class \code{'compare.loo'} that has its own
-#'   print method. If exactly two objects are provided in \code{...} or
-#'   \code{x}, then the difference in expected predictive accuracy and the
+#' @return A vector or matrix with class `'compare.loo'` that has its own
+#'   print method. If exactly two objects are provided in `...` or
+#'   `x`, then the difference in expected predictive accuracy and the
 #'   standard error of the difference are returned. If more than two objects are
-#'   provided then a matrix of summary information is returned (see
-#'   \strong{Details}).
+#'   provided then a matrix of summary information is returned (see **Details**).
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
-#'   expected predictive accuracy by the difference in \code{elpd_loo} or
-#'   \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
+#'   expected predictive accuracy by the difference in `elpd_loo` or
+#'   `elpd_waic` (or multiplied by -2, if desired, to be on the
 #'   deviance scale).
 #'
-#'   \emph{When that difference, \code{elpd_diff}, is positive then the expected
+#'   *When that difference, `elpd_diff`, is positive then the expected
 #'   predictive accuracy for the second model is higher. A negative
-#'   \code{elpd_diff} favors the first model.}
+#'   `elpd_diff` favors the first model.*
 #'
-#'   When using \code{compare()} with more than two models, the values in the
-#'   \code{elpd_diff} and \code{se_diff} columns of the returned matrix are
+#'   When using `compare()` with more than two models, the values in the
+#'   `elpd_diff` and `se_diff` columns of the returned matrix are
 #'   computed by making pairwise comparisons between each model and the model
 #'   with the best ELPD (i.e., the model in the first row).
-#'   Although the \code{elpd_diff} column is equal to the difference in
-#'   \code{elpd_loo}, do not expect the \code{se_diff} column to be equal to the
-#'   the difference in \code{se_elpd_loo}.
+#'   Although the `elpd_diff` column is equal to the difference in
+#'   `elpd_loo`, do not expect the `se_diff` column to be equal to the
+#'   the difference in `se_elpd_loo`.
 #'
 #'   To compute the standard error of the difference in ELPD we use a
-#'   paired estimate to take advantage of the fact that the same set of \eqn{N}
+#'   paired estimate to take advantage of the fact that the same set of _N_
 #'   data points was used to fit both models. These calculations should be most
-#'   useful when \eqn{N} is large, because then non-normality of the
+#'   useful when _N_ is large, because then non-normality of the
 #'   distribution is not such an issue when estimating the uncertainty in these
 #'   sums. These standard errors, for all their flaws, should give a better
 #'   sense of uncertainty than what is obtained using the current standard
@@ -61,7 +59,7 @@
 #' }
 #'
 compare <- function(..., x = list()) {
-  # .Deprecated("loo_compare")
+  .Deprecated("loo_compare")
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {
@@ -130,8 +128,7 @@ compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), chec
   if (check_dims) {
     if (dim(loo_a$pointwise)[1] != dim(loo_b$pointwise)[1]) {
       stop(paste("Models don't have the same number of data points.",
-                 "\nFound N_1 =", dim(loo_a$pointwise)[1],
-                 "and N_2 =", dim(loo_b$pointwise)[1]), call. = FALSE)
+                 "\nFound N_1 =", dim(loo_a$pointwise)[1], "and N_2 =", dim(loo_b$pointwise)[1]), call. = FALSE)
     }
   }
 

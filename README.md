@@ -2,10 +2,13 @@
 
 # loo
 
-[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=master)](https://travis-ci.org/stan-dev/loo)
+<!-- badges: start -->
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
+[![RStudio_CRAN_mirror_downloads_badge](https://cranlogs.r-pkg.org/badges/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
 [![codecov](https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg)](https://codecov.io/github/stan-dev/loo?branch=master)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
-[![RStudio_CRAN_mirror_downloads_badge](http://cranlogs.r-pkg.org/badges/grand-total/loo?color=blue)](http://cran.r-project.org/web/packages/loo)
+[![Travis-CI Build Status](https://travis-ci.org/stan-dev/loo.svg?branch=master)](https://travis-ci.org/stan-dev/loo)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/stan-dev/loo?branch=master&svg=true)](https://ci.appveyor.com/project/jgabry/loo)
+<!-- badges: end -->
 
 ### Efficient approximate leave-one-out cross-validation for fitted Bayesian models
 
@@ -21,16 +24,16 @@ LOO and WAIC have various advantages over simpler estimates of predictive error
 such as AIC and DIC but are less used in practice because they involve
 additional computational steps.
 
-The __loo__ R package package implements the fast and stable computations 
+The __loo__ R package package implements the fast and stable computations
 for approximate LOO-CV and WAIC from
 
-* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model 
-evaluation using leave-one-out cross-validation and WAIC. 
-_Statistics and Computing_. 27(5), 1413--1432. 
-doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+_Statistics and Computing_. 27(5), 1413--1432.
+doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4),
 [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. 
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling.
 [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
 
 From existing posterior simulation draws, we compute approximate LOO-CV using
@@ -48,7 +51,7 @@ distributions. For details on stacking and model weighting see:
 
 * Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using
 stacking to average Bayesian predictive distributions. In Bayesian
-Analysis, doi:10.1214/17-BA1091. 
+Analysis, doi:10.1214/17-BA1091.
 [Online](https://projecteuclid.org/euclid.ba/1516093227),
 [arXiv preprint arXiv:1704.02030](https://arxiv.org/abs/1704.02030).
 
@@ -76,9 +79,8 @@ devtools::install_github("stan-dev/loo")
 ```
 We do _not_ recommend setting `build_vignettes=TRUE` when installing from GitHub
 because the vignettes take a long time to build and are always available
-online at [mc-stan.org/loo/articles/](http://mc-stan.org/loo/articles/).
+online at [mc-stan.org/loo/articles/](https://mc-stan.org/loo/articles/).
 
 ### Python and Matlab/Octave Code
 Corresponding Python and Matlab/Octave code can be found at the
 [avehtari/PSIS](https://github.com/avehtari/PSIS) repository.
-

@@ -4,16 +4,16 @@
 #' matrix or array from a fitted Stan model.
 #'
 #' @export
-#' @param stanfit A \code{stanfit} object (\pkg{rstan} package).
+#' @param stanfit A `stanfit` object (\pkg{rstan} package).
 #' @param parameter_name A character string naming the parameter (or generated
 #'   quantity) in the Stan model corresponding to the log-likelihood.
-#' @param merge_chains If \code{TRUE} (the default), all Markov chains are
-#'   merged together (i.e., stacked) and a matrix is returned. If \code{FALSE}
+#' @param merge_chains If `TRUE` (the default), all Markov chains are
+#'   merged together (i.e., stacked) and a matrix is returned. If `FALSE`
 #'   they are kept separate and an array is returned.
-#' @return If \code{merge_chains=TRUE}, an \eqn{S} by \eqn{N} matrix of
+#' @return If `merge_chains=TRUE`, an \eqn{S} by \eqn{N} matrix of
 #'   (post-warmup) extracted draws, where \eqn{S} is the size of the posterior
 #'   sample and \eqn{N} is the number of data points. If
-#'   \code{merge_chains=FALSE}, an \eqn{I} by \eqn{C} by \eqn{N} array, where
+#'   `merge_chains=FALSE`, an \eqn{I} by \eqn{C} by \eqn{N} array, where
 #'   \eqn{I \times C = S}{I * C = S}.
 #'
 #'
@@ -26,40 +26,37 @@
 #'   block so that the computations are carried out only once per iteration
 #'   rather than once per HMC leapfrog step.
 #'
-#'   For example, the following is the \code{generated quantities} block for
+#'   For example, the following is the `generated quantities` block for
 #'   computing and saving the log-likelihood for a linear regression model with
-#'   \code{N} data points, outcome \code{y}, predictor matrix \code{X},
-#'   coefficients \code{beta}, and standard deviation \code{sigma}:
+#'   `N` data points, outcome `y`, predictor matrix `X`,
+#'   coefficients `beta`, and standard deviation `sigma`:
 #'
-#'  \code{vector[N] log_lik;}
+#'  `vector[N] log_lik;`
 #'
-#'  \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);}
+#'  `for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);`
 #'
 #' @references
 #' Stan Development Team (2017). The Stan C++ Library, Version 2.16.0.
-#' \url{http://mc-stan.org/}
+#' <https://mc-stan.org/>
 #'
 #' Stan Development Team (2017). RStan: the R interface to Stan, Version 2.16.1.
-#' \url{http://mc-stan.org/}
+#' <https://mc-stan.org/>
 #'
 extract_log_lik <-
   function(stanfit,
            parameter_name = "log_lik",
            merge_chains = TRUE) {
     if (!inherits(stanfit, "stanfit"))
-      stop("Not a stanfit object.")
+      stop("Not a stanfit object.", call. = FALSE)
     if (stanfit@mode != 0)
-      stop("Stan model does not contain posterior draws.")
-
-    # nocov start
+      stop("Stan model does not contain posterior draws.", call. = FALSE)
     if (!requireNamespace("rstan", quietly = TRUE))
-      stop("Please load the 'rstan' package.")
+      stop("Please load the 'rstan' package.", call. = FALSE)
 
     if (merge_chains) {
       log_lik <- as.matrix(stanfit, pars = parameter_name)
     } else {
       log_lik <- as.array(stanfit, pars = parameter_name)
     }
-
-    return(unname(log_lik))
-  } # nocov end
+    unname(log_lik)
+  }

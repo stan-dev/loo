@@ -2,58 +2,56 @@
 % Please edit documentation in R/compare.R
 \name{compare}
 \alias{compare}
-\title{Model comparison}
+\title{Model comparison (deprecated, old version)}
 \usage{
 compare(..., x = list())
 }
 \arguments{
-\item{...}{At least two objects returned by \code{\link{loo}} (or
-\code{\link{waic}}).}
+\item{...}{At least two objects returned by \code{\link[=loo]{loo()}} (or \code{\link[=waic]{waic()}}).}
 
-\item{x}{A list of at least two objects returned by \code{\link{loo}} (or
-\code{\link{waic}}). This argument can be used as an alternative to
+\item{x}{A list of at least two objects returned by \code{\link[=loo]{loo()}} (or
+\code{\link[=waic]{waic()}}). This argument can be used as an alternative to
 specifying the objects in \code{...}.}
 }
 \value{
 A vector or matrix with class \code{'compare.loo'} that has its own
-  print method. If exactly two objects are provided in \code{...} or
-  \code{x}, then the difference in expected predictive accuracy and the
-  standard error of the difference are returned. If more than two objects are
-  provided then a matrix of summary information is returned (see
-  \strong{Details}).
+print method. If exactly two objects are provided in \code{...} or
+\code{x}, then the difference in expected predictive accuracy and the
+standard error of the difference are returned. If more than two objects are
+provided then a matrix of summary information is returned (see \strong{Details}).
 }
 \description{
-\strong{This function will be deprecated in a future release}. We
-recommend using the new \code{\link{loo_compare}} function instead.
+\strong{This function will be deprecated in a future release}. Please
+use the new \code{\link[=loo_compare]{loo_compare()}} function instead.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
-  expected predictive accuracy by the difference in \code{elpd_loo} or
-  \code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
-  deviance scale).
+expected predictive accuracy by the difference in \code{elpd_loo} or
+\code{elpd_waic} (or multiplied by -2, if desired, to be on the
+deviance scale).
 
-  \emph{When that difference, \code{elpd_diff}, is positive then the expected
-  predictive accuracy for the second model is higher. A negative
-  \code{elpd_diff} favors the first model.}
+\emph{When that difference, \code{elpd_diff}, is positive then the expected
+predictive accuracy for the second model is higher. A negative
+\code{elpd_diff} favors the first model.}
 
-  When using \code{compare()} with more than two models, the values in the
-  \code{elpd_diff} and \code{se_diff} columns of the returned matrix are
-  computed by making pairwise comparisons between each model and the model
-  with the best ELPD (i.e., the model in the first row).
-  Although the \code{elpd_diff} column is equal to the difference in
-  \code{elpd_loo}, do not expect the \code{se_diff} column to be equal to the
-  the difference in \code{se_elpd_loo}.
+When using \code{compare()} with more than two models, the values in the
+\code{elpd_diff} and \code{se_diff} columns of the returned matrix are
+computed by making pairwise comparisons between each model and the model
+with the best ELPD (i.e., the model in the first row).
+Although the \code{elpd_diff} column is equal to the difference in
+\code{elpd_loo}, do not expect the \code{se_diff} column to be equal to the
+the difference in \code{se_elpd_loo}.
 
-  To compute the standard error of the difference in ELPD we use a
-  paired estimate to take advantage of the fact that the same set of \eqn{N}
-  data points was used to fit both models. These calculations should be most
-  useful when \eqn{N} is large, because then non-normality of the
-  distribution is not such an issue when estimating the uncertainty in these
-  sums. These standard errors, for all their flaws, should give a better
-  sense of uncertainty than what is obtained using the current standard
-  approach of comparing differences of deviances to a Chi-squared
-  distribution, a practice derived for Gaussian linear models or
-  asymptotically, and which only applies to nested models in any case.
+To compute the standard error of the difference in ELPD we use a
+paired estimate to take advantage of the fact that the same set of \emph{N}
+data points was used to fit both models. These calculations should be most
+useful when \emph{N} is large, because then non-normality of the
+distribution is not such an issue when estimating the uncertainty in these
+sums. These standard errors, for all their flaws, should give a better
+sense of uncertainty than what is obtained using the current standard
+approach of comparing differences of deviances to a Chi-squared
+distribution, a practice derived for Gaussian linear models or
+asymptotically, and which only applies to nested models in any case.
 }
 \examples{
 \dontrun{
@@ -69,13 +67,13 @@ compare(waic1, waic2)
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  \emph{Statistics and Computing}. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{
-  journal}, \href{http://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
+Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+\emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+\href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: \url{http://arxiv.org/abs/1507.02646/}
+importance sampling.
+\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
