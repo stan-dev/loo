@@ -183,7 +183,6 @@ standard uniform distribution (thin curves).
 ```{r}
 yrep <- posterior_predict(fit1)
 
-# requires bayesplot version >= 1.5.0
 ppc_loo_pit_overlay(
   y = roaches$y,
   yrep = yrep,
