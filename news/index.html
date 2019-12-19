@@ -76,7 +76,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -100,6 +100,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="https://mc-stan.org/rstan">rstan</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
     </li>
     <li>
       <a href="https://mc-stan.org/rstanarm">rstanarm</a>
@@ -158,6 +161,21 @@
       
     </div>
 
+    <div id="loo-2-2-0" class="section level1">
+<h1 class="page-header">
+<a href="#loo-2-2-0" class="anchor"></a>loo 2.2.0<small> 2019-12-19 </small>
+</h1>
+<p>(GitHub issue/PR number in parentheses)</p>
+<ul>
+<li><p>Added Mans Magnusson as a coauthor.</p></li>
+<li><p>New functions <code><a href="../reference/loo_subsample.html">loo_subsample()</a></code> and <code><a href="../reference/loo_approximate_posterior.html">loo_approximate_posterior()</a></code> (and new vignette) for doing PSIS-LOO with large data. (#113)</p></li>
+<li><p>Added support for standard importance sampling and truncated importance sampling (functions <code><a href="../reference/sis.html">sis()</a></code> and <code><a href="../reference/tis.html">tis()</a></code>). (#125)</p></li>
+<li><p><code><a href="../reference/compare.html">compare()</a></code> now throws a deprecation warning suggesting <code><a href="../reference/loo_compare.html">loo_compare()</a></code>. (#93)</p></li>
+<li><p>A smaller threshold is used when checking the uniqueness of tail values. (#124)</p></li>
+<li><p>For WAIC, warnings are only thrown when running <code><a href="../reference/waic.html">waic()</a></code> and not when printing a <code>waic</code> object. (#117, <a href='https://github.com/mcol'>@mcol</a>)</p></li>
+<li><p>Use markdown syntax in roxygen documentation wherever possible. (#108)</p></li>
+</ul>
+</div>
     <div id="loo-2-1-0" class="section level1">
 <h1 class="page-header">
 <a href="#loo-2-1-0" class="anchor"></a>loo 2.1.0<small> 2019-03-13 </small>
@@ -299,6 +317,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#loo-2-2-0">2.2.0</a></li>
         <li><a href="#loo-2-1-0">2.1.0</a></li>
         <li><a href="#loo-2-0-0">2.0.0</a></li>
         <li><a href="#loo-1-1-0">1.1.0</a></li>
@@ -319,7 +338,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">

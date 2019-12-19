@@ -8,21 +8,32 @@
 
 <title>Diagnostics for Pareto smoothed importance sampling (PSIS) — pareto-k-diagnostic • loo</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,8 +41,8 @@
 
 
 
-<meta property="og:title" content="Diagnostics for Pareto smoothed importance sampling (PSIS) — pareto-k-diagnostic" />
 
+<meta property="og:title" content="Diagnostics for Pareto smoothed importance sampling (PSIS) — pareto-k-diagnostic" />
 <meta property="og:description" content="Print a diagnostic table summarizing the estimated Pareto shape parameters
 and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \(k\) is larger than some
@@ -39,9 +50,9 @@ threshold value, or plot observation indexes vs. diagnostic estimates.
 The Details section below provides a brief overview of the
 diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 2017b) for full details." />
-
-<meta property="og:image" content="/logo.png" />
+<meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -53,6 +64,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -71,7 +83,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -94,30 +106,32 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="http://mc-stan.org/rstan">rstan</a>
+      <a href="https://mc-stan.org/rstan">rstan</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/rstanarm">rstanarm</a>
+      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/bayesplot">bayesplot</a>
+      <a href="https://mc-stan.org/rstanarm">rstanarm</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/shinystan">shinystan</a>
+      <a href="https://mc-stan.org/bayesplot">bayesplot</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/projpred">projpred</a>
+      <a href="https://mc-stan.org/shinystan">shinystan</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/rstantools">rstantools</a>
+      <a href="https://mc-stan.org/projpred">projpred</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/rstantools">rstantools</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="http://mc-stan.org">Stan</a>
+  <a href="https://mc-stan.org">Stan</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://twitter.com/mcmc_stan">
@@ -132,7 +146,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
   </a>
 </li>
 <li>
-  <a href="http://discourse.mc-stan.org/">
+  <a href="https://discourse.mc-stan.org/">
     <span class="fa fa-users"></span>
      
   </a>
@@ -144,6 +158,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -155,7 +170,6 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
     </div>
 
     <div class="ref-description">
-    
     <p>Print a diagnostic table summarizing the estimated Pareto shape parameters
 and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \(k\) is larger than some
@@ -163,7 +177,6 @@ the estimated Pareto shape parameter \(k\) is larger than some
 The <strong>Details</strong> section below provides a brief overview of the
 diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 2017b) for full details.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>pareto_k_table</span>(<span class='no'>x</span>)
@@ -177,26 +190,37 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 <span class='fu'>mcse_loo</span>(<span class='no'>x</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)
 
 <span class='co'># S3 method for psis_loo</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>), <span class='no'>...</span>,
-  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
+  <span class='no'>...</span>,
+  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
+)
 
 <span class='co'># S3 method for psis</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>), <span class='no'>...</span>,
-  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>)</pre>
-    
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
+  <span class='no'>...</span>,
+  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>An object created by <code><a href='loo.html'>loo</a></code> or <code><a href='psis.html'>psis</a></code>.</p></td>
+      <td><p>An object created by <code><a href='loo.html'>loo()</a></code> or <code><a href='psis.html'>psis()</a></code>.</p></td>
     </tr>
     <tr>
       <th>threshold</th>
-      <td><p>For <code>pareto_k_ids</code>, <code>threshold</code> is the minimum
-\(k\) value to flag (default is 0.5). For <code>mcse_loo</code>, if any \(k\)
-estimates are greater than <code>threshold</code> the MCSE estimate is returned
-as <code>NA</code> (default is 0.7).</p></td>
+      <td><p>For <code>pareto_k_ids()</code>, <code>threshold</code> is the minimum \(k\)
+value to flag (default is <code>0.5</code>). For <code>mcse_loo()</code>, if any \(k\)
+estimates are greater than <code>threshold</code> the MCSE estimate is returned as
+<code>NA</code> (default is <code>0.7</code>). See <strong>Details</strong> for the motivation behind these
+defaults.</p></td>
     </tr>
     <tr>
       <th>diagnostic</th>
@@ -206,138 +230,126 @@ default) or <code>"n_eff"</code> for PSIS effective sample size estimates.</p></
     </tr>
     <tr>
       <th>label_points, ...</th>
-      <td><p>For the <code>plot</code> method, if <code>label_points</code> is
+      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method, if <code>label_points</code> is
 <code>TRUE</code> the observation numbers corresponding to any values of \(k\)
 greater than 0.5 will be displayed in the plot. Any arguments specified in
-<code>...</code> will be passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/text'>text</a></code> and can be used
+<code>...</code> will be passed to <code><a href='https://rdrr.io/r/graphics/text.html'>graphics::text()</a></code> and can be used
 to control the appearance of the labels.</p></td>
     </tr>
     <tr>
       <th>main</th>
-      <td><p>For the <code>plot</code> method, a title for the plot.</p></td>
+      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method, a title for the plot.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>pareto_k_table</code> returns an object of class
-  <code>"pareto_k_table"</code>, which is a matrix with columns <code>"Count"</code>,
-  <code>"Proportion"</code>, and <code>"Min. n_eff"</code>, and has its own print method.</p>
-<p><code>pareto_k_ids</code> returns an integer vector indicating which
+    <p><code>pareto_k_table()</code> returns an object of class
+<code>"pareto_k_table"</code>, which is a matrix with columns <code>"Count"</code>,
+<code>"Proportion"</code>, and <code>"Min. n_eff"</code>, and has its own print method.</p>
+<p><code>pareto_k_ids()</code> returns an integer vector indicating which
 observations have Pareto \(k\) estimates above <code>threshold</code>.</p>
-<p><code>pareto_k_values</code> returns a vector of the estimated Pareto
-  \(k\) parameters.</p>
-<p><code>psis_n_eff_values</code> returns a vector of the estimated PSIS
-  effective sample sizes.</p>
-<p><code>mcse_loo</code> returns the Monte Carlo standard error (MCSE)
-  estimate for PSIS-LOO. MCSE will be NA if any Pareto \(k\) values are
-  above <code>threshold</code>.</p>
-<p>The <code>plot</code> method is called for its side effect and does not
-  return anything. If <code>x</code> is the result of a call to <code><a href='loo.html'>loo</a></code>
-  or <code><a href='psis.html'>psis</a></code> then <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot(x, diagnostic)</a></code> produces a plot of
-  the estimates of the Pareto shape parameters (<code>diagnostic = "k"</code>) or
-  estimates of the PSIS effective sample sizes (<code>diagnostic = "n_eff"</code>).</p>
-    
+<p><code>pareto_k_values()</code> returns a vector of the estimated Pareto
+\(k\) parameters.</p>
+<p><code>psis_n_eff_values()</code> returns a vector of the estimated PSIS
+effective sample sizes.</p>
+<p><code>mcse_loo()</code> returns the Monte Carlo standard error (MCSE)
+estimate for PSIS-LOO. MCSE will be NA if any Pareto \(k\) values are
+above <code>threshold</code>.</p>
+<p>The <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method is called for its side effect and does not
+return anything. If <code>x</code> is the result of a call to <code><a href='loo.html'>loo()</a></code>
+or <code><a href='psis.html'>psis()</a></code> then <code><a href='https://rdrr.io/r/graphics/plot.html'>plot(x, diagnostic)</a></code> produces a plot of
+the estimates of the Pareto shape parameters (<code>diagnostic = "k"</code>) or
+estimates of the PSIS effective sample sizes (<code>diagnostic = "n_eff"</code>).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The reliability and approximate convergence rate of the PSIS-based estimates
 can be assessed using the estimates for the shape parameter \(k\) of the
-generalized Pareto distribution:</p>
-<ul>
+generalized Pareto distribution:</p><ul>
 <li><p>If \(k &lt; 0.5\) then the distribution of raw importance ratios has
-  finite variance and the central limit theorem holds. However, as \(k\)
-  approaches \(0.5\) the RMSE of plain importance sampling (IS) increases
-  significantly while PSIS has lower RMSE.</p></li>
+finite variance and the central limit theorem holds. However, as \(k\)
+approaches \(0.5\) the RMSE of plain importance sampling (IS) increases
+significantly while PSIS has lower RMSE.</p></li>
 <li><p>If \(0.5 \leq k &lt; 1\) then the variance of the raw
-  importance ratios is infinite, but the mean exists. TIS and PSIS estimates
-  have finite variance by accepting some bias. The convergence of the
-  estimate is slower with increasing \(k\).
-  If \(k\) is between 0.5 and approximately 0.7 then
-  we observe practically useful convergence rates and Monte Carlo error
-  estimates with PSIS (the bias of TIS increases faster than the bias of
-  PSIS). If \(k &gt; 0.7\) we observe impractical convergence rates and
-  unreliable Monte Carlo error estimates.</p></li>
+importance ratios is infinite, but the mean exists. TIS and PSIS estimates
+have finite variance by accepting some bias. The convergence of the
+estimate is slower with increasing \(k\).
+If \(k\) is between 0.5 and approximately 0.7 then we observe practically
+useful convergence rates and Monte Carlo error estimates with PSIS (the
+bias of TIS increases faster than the bias of PSIS). If \(k &gt; 0.7\) we
+observe impractical convergence rates and unreliable Monte Carlo error
+estimates.</p></li>
 <li><p>If \(k \geq 1\) then neither the variance nor the mean of
-  the raw importance ratios exists. The convergence rate is close to zero and
-  bias can be large with practical sample sizes.</p></li>
+the raw importance ratios exists. The convergence rate is close to
+zero and bias can be large with practical sample sizes.</p></li>
 </ul>
-    <p><strong>If the estimated tail shape parameter \(k\) exceeds \(0.5\), the
-user should be warned, although in practice we have observed good performance
-for values of \(k\) up to 0.7.</strong> (If \(k\) is greater than \(0.5\) then
-WAIC is also likely to fail, but WAIC lacks its own diagnostic.)</p>
-<p>If using PSIS in the context of approximate
-LOO-CV, even if the PSIS estimate has a finite variance the user should
-consider sampling directly from \(p(\theta^s | y_{-i})\) for any
-problematic observations \(i\), use \(K\)-fold cross-validation, or use a
-more robust model. Importance sampling is likely to work less well if the
-marginal posterior \(p(\theta^s | y)\) and LOO posterior
-\(p(\theta^s | y_{-i})\) are much different, which is more likely to happen
-with a non-robust model and highly influential observations. A robust model
-may reduce the sensitivity to highly influential observations.</p>
+
+<p><strong>If the estimated tail shape parameter \(k\) exceeds \(0.5\), the user
+should be warned, although in practice we have observed good performance for
+values of \(k\) up to 0.7.</strong> (Note: If \(k\) is greater than \(0.5\)
+then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
+When using PSIS in the context of approximate LOO-CV, then even if the PSIS
+estimate has a finite variance the user should consider sampling directly
+from \(p(\theta^s | y_{-i})\) for any problematic observations \(i\), use
+\(k\)-fold cross-validation, or use a more robust model. Importance
+sampling is likely to work less well if the marginal posterior
+\(p(\theta^s | y)\) and LOO posterior \(p(\theta^s | y_{-i})\) are much
+different, which is more likely to happen with a non-robust model and highly
+influential observations.</p>
 <h3>Effective sample size and error estimates</h3>
-    In the case that we obtain the samples from the proposal distribution via
- MCMC we can also compute estimates for the Monte Carlo error and the
- effective sample size for importance sampling, which are more accurate for
- PSIS than for IS and TIS (see Vehtari et al (2017b) for details). However,
- the PSIS effective sample size estimate will be <strong>over-optimistic when
- the estimate of \(k\) is greater than 0.7.</strong>
-    We can also compute estimates for the Monte Carlo error and the effective
- sample size for importance sampling. However, the PSIS effective sample size
- estimate will be <strong>over-optimistic when the estimate of \(k\) is
- greater than 0.7</strong>. In the case that we obtain the samples from the proposal
- distribution via MCMC, we need to take into account also the relative
- efficiency of MCMC sampling (see Vehtari et al (2017b) for details).
- Following the notation in Stan, the PSIS effective sample size is denoted
- here with \(n_{eff}\), instead of \(S_{eff}\) used by Vehtari et al
- (2017b).
-    
+<p>In the case that we
+obtain the samples from the proposal distribution via MCMC the <strong>loo</strong>
+package also computes estimates for the Monte Carlo error and the effective
+sample size for importance sampling, which are more accurate for PSIS than
+for IS and TIS (see Vehtari et al (2017b) for details). However, the PSIS
+effective sample size estimate will be
+<strong>over-optimistic when the estimate of \(k\) is greater than 0.7</strong>.</p>
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical
-  Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-  <em>Statistics and Computing</em>. 27(5), 1413--1432.
-  doi:10.1007/s11222-016-9696-4.
-  (<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>
-  journal</a>, <a href='http://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC.
+<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
+(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+<a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling. arXiv preprint: <a href='http://arxiv.org/abs/1507.02646/'>http://arxiv.org/abs/1507.02646/</a></p>
-    
+importance sampling.
+<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='psis.html'>psis</a></code> for the implementation of the PSIS algorithm.</p></div>
-    
+    <div class='dont-index'><p><code><a href='psis.html'>psis()</a></code> for the implementation of the PSIS algorithm.</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#references">References</a></li>
-
       <li><a href="#see-also">See also</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>
 
+
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

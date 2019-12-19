@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Efficient LOO-CV and WAIC for Bayesian models — loo-package • loo</title>
+<title>Parallel psis list computations — parallel_psis_list • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,18 +42,8 @@
 
 
 
-<meta property="og:title" content="Efficient LOO-CV and WAIC for Bayesian models — loo-package" />
-<meta property="og:description" content="
-
-Stan Development Team
-This package implements the methods described in Vehtari, Gelman, and Gabry
-(2017a, 2017b) and Yao et al. (2018). To get started see the loo
-package vignettes, the
-loo() function for efficient approximate leave-one-out
-cross-validation (LOO-CV), the psis() function for the Pareto
-smoothed importance sampling (PSIS) algorithm, or
-loo_model_weights() for an implementation of Bayesian stacking of
-predictive distributions from multiple models." />
+<meta property="og:title" content="Parallel psis list computations — parallel_psis_list" />
+<meta property="og:description" content="Parallel psis list computations" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -168,102 +158,130 @@ predictive distributions from multiple models." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Efficient LOO-CV and WAIC for Bayesian models</h1>
+    <h1>Parallel psis list computations</h1>
     
-    <div class="hidden name"><code>loo-package.Rd</code></div>
+    <div class="hidden name"><code>parallel_psis_list.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><img src='figures/stanlogo.png' width="50px" alt="mc-stan.org" />
-
-<em>Stan Development Team</em></p>
-<p>This package implements the methods described in Vehtari, Gelman, and Gabry
-(2017a, 2017b) and Yao et al. (2018). To get started see the <strong>loo</strong>
-package <a href='https://mc-stan.org/loo/articles/index.html'>vignettes</a>, the
-<code><a href='loo.html'>loo()</a></code> function for efficient approximate leave-one-out
-cross-validation (LOO-CV), the <code><a href='psis.html'>psis()</a></code> function for the Pareto
-smoothed importance sampling (PSIS) algorithm, or
-<code><a href='loo_model_weights.html'>loo_model_weights()</a></code> for an implementation of Bayesian stacking of
-predictive distributions from multiple models.</p>
+    <p>Parallel psis list computations</p>
     </div>
 
+    <pre class="usage"><span class='fu'>parallel_psis_list</span>(
+  <span class='no'>N</span>,
+  <span class='no'>.loo_i</span>,
+  <span class='no'>.llfun</span>,
+  <span class='no'>data</span>,
+  <span class='no'>draws</span>,
+  <span class='no'>r_eff</span>,
+  <span class='no'>save_psis</span>,
+  <span class='no'>cores</span>,
+  <span class='no'>...</span>
+)
 
+<span class='fu'>parallel_importance_sampling_list</span>(
+  <span class='no'>N</span>,
+  <span class='no'>.loo_i</span>,
+  <span class='no'>.llfun</span>,
+  <span class='no'>data</span>,
+  <span class='no'>draws</span>,
+  <span class='no'>r_eff</span>,
+  <span class='no'>save_psis</span>,
+  <span class='no'>cores</span>,
+  <span class='no'>method</span>,
+  <span class='no'>...</span>
+)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>N</th>
+      <td><p>The total number of observations (i.e. <code><a href='https://rdrr.io/r/base/nrow.html'>nrow(data)</a></code>).</p></td>
+    </tr>
+    <tr>
+      <th>.loo_i</th>
+      <td><p>The function used to compute individual loo contributions.</p></td>
+    </tr>
+    <tr>
+      <th>.llfun</th>
+      <td><p>See <code>llfun</code> in <code><a href='loo.html'>loo.function()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>For the <code><a href='loo.html'>loo.function()</a></code> method and the <code><a href='loo.html'>loo_i()</a></code>
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function. See the <strong>Methods (by class)</strong> section
+below for details on how to specify these arguments.</p></td>
+    </tr>
+    <tr>
+      <th>draws</th>
+      <td><p>For the <code><a href='loo.html'>loo.function()</a></code> method and the <code><a href='loo.html'>loo_i()</a></code>
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function. See the <strong>Methods (by class)</strong> section
+below for details on how to specify these arguments.</p></td>
+    </tr>
+    <tr>
+      <th>r_eff</th>
+      <td><p>Vector of relative effective sample size estimates for the
+likelihood (<code><a href='https://rdrr.io/r/base/Log.html'>exp(log_lik)</a></code>) of each observation. This is related to
+the relative efficiency of estimating the normalizing term in
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. If the posterior draws are independent then
+<code>r_eff=1</code> and can be omitted. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
+helper functions for computing <code>r_eff</code>.</p></td>
+    </tr>
+    <tr>
+      <th>save_psis</th>
+      <td><p>Should the <code>"psis"</code> object created internally by <code><a href='loo.html'>loo()</a></code> be
+saved in the returned object? The <code><a href='loo.html'>loo()</a></code> function calls <code><a href='psis.html'>psis()</a></code>
+internally but by default discards the (potentially large) <code>"psis"</code> object
+after using it to compute the LOO-CV summaries. Setting <code>save_psis=TRUE</code>
+will add a <code>psis_object</code> component to the list returned by <code>loo</code>. Currently
+this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to compute
+weighted expectations after running <code>loo</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>The number of cores to use for parallelization. This defaults to
+the option <code>mc.cores</code> which can be set for an entire R session by
+<code><a href='https://rdrr.io/r/base/options.html'>options(mc.cores = NUMBER)</a></code>. The old option <code>loo.cores</code> is now
+deprecated but will be given precedence over <code>mc.cores</code> until
+<code>loo.cores</code> is removed in a future release. <strong>As of version
+2.0.0 the default is now 1 core if <code>mc.cores</code> is not set</strong>, but we
+recommend using as many (or close to as many) cores as possible.</p><ul>
+<li><p>Note for Windows 10 users: it is <strong>strongly</strong>
+<a href='https://github.com/stan-dev/loo/issues/94'>recommended</a> to avoid using
+the <code>.Rprofile</code> file to set <code>mc.cores</code> (using the <code>cores</code> argument or
+setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>For the <code><a href='loo.html'>loo.function()</a></code> method and the <code><a href='loo.html'>loo_i()</a></code>
+function, these are the data, posterior draws, and other arguments to pass
+to the log-likelihood function. See the <strong>Methods (by class)</strong> section
+below for details on how to specify these arguments.</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>See <code>is_method</code> for <code><a href='loo.html'>loo()</a></code></p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Leave-one-out cross-validation (LOO-CV) and the widely applicable
-information criterion (WAIC) are methods for estimating pointwise
-out-of-sample prediction accuracy from a fitted Bayesian model using the
-log-likelihood evaluated at the posterior simulations of the parameter
-values. LOO-CV and WAIC have various advantages over simpler estimates of
-predictive error such as AIC and DIC but are less used in practice because
-they involve additional computational steps. This package implements the
-fast and stable computations for approximate LOO-CV laid out in Vehtari,
-Gelman, and Gabry (2017a). From existing posterior simulation draws, we
-compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Gelman, and Gabry, 2017b), a new procedure for regularizing and diagnosing
-importance weights. As a byproduct of our calculations, we also obtain
-approximate standard errors for estimated predictive errors and for
-comparing of predictive errors between two models.</p>
-<p>We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
-diagnostics and effective sample size and Monte Carlo standard error
-estimates.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
-<a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
-<p>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
-stacking to average Bayesian predictive distributions.
-<em>Bayesian Analysis</em>, advance publication,  doi:10.1214/17-BA1091.
-(<a href='https://projecteuclid.org/euclid.ba/1516093227'>online</a>).</p>
-<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
-Leave-One-Out Cross-Validation for Large Data.
-In <em>International Conference on Machine Learning</em></p>
-<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
-Leave-One-Out Cross-Validation for Model Comparison in Large Data.</p>
-<p>Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
-importance sampling estimators: Central limit theorems and related results.
-<em>Electronic Journal of Statistics</em> <strong>2</strong>, 774-806.</p>
-<p>Gelfand, A. E. (1996). Model determination using sampling-based methods. In
-<em>Markov Chain Monte Carlo in Practice</em>, ed. W. R. Gilks, S. Richardson,
-D. J. Spiegelhalter, 145-162. London: Chapman and Hall.</p>
-<p>Gelfand, A. E., Dey, D. K., and Chang, H. (1992). Model determination using
-predictive distributions with implementation via sampling-based methods. In
-<em>Bayesian Statistics 4</em>, ed. J. M. Bernardo, J. O. Berger, A. P. Dawid,
-and A. F. M. Smith, 147-167. Oxford University Press.</p>
-<p>Gelman, A., Hwang, J., and Vehtari, A. (2014). Understanding predictive
-information criteria for Bayesian models. <em>Statistics and Computing</em>
-<strong>24</strong>, 997-1016.</p>
-<p>Ionides, E. L. (2008). Truncated importance sampling. <em>Journal of
-Computational and Graphical Statistics</em> <strong>17</strong>, 295-311.</p>
-<p>Koopman, S. J., Shephard, N., and Creal, D. (2009). Testing the assumptions
-behind importance sampling. <em>Journal of Econometrics</em> <strong>149</strong>, 2-11.</p>
-<p>Peruggia, M. (1997). On the variability of case-deletion importance sampling
-weights in the Bayesian linear model. <em>Journal of the American
-Statistical Association</em> <strong>92</strong>, 199-207.</p>
-<p>Stan Development Team (2017). The Stan C++ Library, Version 2.17.0.
-<a href='https://mc-stan.org'>https://mc-stan.org</a>.</p>
-<p>Stan Development Team (2018). RStan: the R interface to Stan, Version 2.17.3.
-<a href='https://mc-stan.org'>https://mc-stan.org</a>.</p>
-<p>Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-widely application information criterion in singular learning theory.
-<em>Journal of Machine Learning Research</em> <strong>11</strong>, 3571-3594.</p>
-<p>Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
-for the generalized Pareto distribution. <em>Technometrics</em> <strong>51</strong>,
-316-325.</p>
+    <p>Refactored function to handle parallel computations
+for psis_list</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#details">Details</a></li>
-      <li><a href="#references">References</a></li>
     </ul>
 
   </div>

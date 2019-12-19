@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • loo</title>
+<title>Importance sampling of array — importance_sampling.array • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,7 +42,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Importance sampling of array — importance_sampling.array" />
+<meta property="og:description" content="Importance sampling of array" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -63,7 +64,7 @@
   </head>
 
   <body>
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -157,22 +158,87 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Importance sampling of array</h1>
+    
+    <div class="hidden name"><code>importance_sampling.array.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>Getting Started</h3>
-      <p class="section-desc"><p>These vignettes demonstrate how to use the functions in the <strong>loo</strong> package to perform approximate leave-one-out cross-validation for Bayesian models fit using MCMC, compare models on estimated predictive performance on new data, and weight models for averaging predictive distributions.</p></p>
-
-      <ul>
-        <li><a href="loo2-example.html">Using the loo package (version &gt;= 2.0.0)</a></li>
-        <li><a href="loo2-weights.html">Bayesian Stacking and Pseudo-BMA weights using the loo package</a></li>
-        <li><a href="loo2-with-rstan.html">Writing Stan programs for use with the loo package</a></li>
-        <li><a href="loo2-non-factorizable.html">Leave-one-out cross-validation for non-factorizable models</a></li>
-        <li><a href="loo2-lfo.html">Approximate leave-future-out cross-validation for Bayesian time series models</a></li>
-        <li><a href="loo2-large-data.html">Using Leave-one-out cross-validation for large data</a></li>
-      </ul>
+    <div class="ref-description">
+    <p>Importance sampling of array</p>
     </div>
+
+    <pre class="usage"><span class='co'># S3 method for array</span>
+<span class='fu'><a href='importance_sampling.html'>importance_sampling</a></span>(
+  <span class='no'>log_ratios</span>,
+  <span class='no'>method</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
+)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>log_ratios</th>
+      <td><p>An array, matrix, or vector of importance ratios on the log
+scale (for PSIS-LOO these are <em>negative</em> log-likelihood values). See the
+<strong>Methods (by class)</strong> section below for a detailed description of how
+to specify the inputs for each method.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments passed on to the various methods.</p></td>
+    </tr>
+    <tr>
+      <th>r_eff</th>
+      <td><p>Vector of relative effective sample size estimates containing
+one element per observation. The values provided should be the relative
+effective sample sizes of <code>1/exp(log_ratios)</code> (i.e., <code>1/ratios</code>).
+This is related to the relative efficiency of estimating the normalizing
+term in self-normalizing importance sampling. If <code>r_eff</code> is not
+provided then the reported PSIS effective sample sizes and Monte Carlo
+error estimates will be over-optimistic. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
+helper function for computing <code>r_eff</code>. If using <code>psis</code> with
+draws of the <code>log_ratios</code> not obtained from MCMC then the warning
+message thrown when not specifying <code>r_eff</code> can be disabled by
+setting <code>r_eff</code> to <code>NA</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>The number of cores to use for parallelization. This defaults to
+the option <code>mc.cores</code> which can be set for an entire R session by
+<code><a href='https://rdrr.io/r/base/options.html'>options(mc.cores = NUMBER)</a></code>. The old option <code>loo.cores</code> is now
+deprecated but will be given precedence over <code>mc.cores</code> until
+<code>loo.cores</code> is removed in a future release. <strong>As of version
+2.0.0 the default is now 1 core if <code>mc.cores</code> is not set</strong>, but we
+recommend using as many (or close to as many) cores as possible.</p><ul>
+<li><p>Note for Windows 10 users: it is <strong>strongly</strong>
+<a href='https://github.com/stan-dev/loo/issues/94'>recommended</a> to avoid using
+the <code>.Rprofile</code> file to set <code>mc.cores</code> (using the <code>cores</code> argument or
+setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>is_method</th>
+      <td><p>The importance sampling method to use. The following methods
+are implemented:</p><ul>
+<li><p><code><a href='psis.html'>"psis"</a></code>: Pareto-Smoothed Importance Sampling (PSIS). Default method.</p></li>
+<li><p><code><a href='tis.html'>"tis"</a></code>: Truncated Importance Sampling (TIS) with truncation at
+<code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt(S)</a></code>, where <code>S</code> is the number of posterior draws.</p></li>
+<li><p><code><a href='sis.html'>"sis"</a></code>: Standard Importance Sampling (SIS).</p></li>
+</ul></td>
+    </tr>
+    </table>
+
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+    </ul>
+
   </div>
 </div>
 

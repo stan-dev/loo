@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo — psis_approximate_posterior • loo</title>
+<title>Update <code>psis_loo_ss</code> objects — update.psis_loo_ss • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,8 +42,8 @@
 
 
 
-<meta property="og:title" content="Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo — psis_approximate_posterior" />
-<meta property="og:description" content="Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo" />
+<meta property="og:title" content="Update <code>psis_loo_ss</code> objects — update.psis_loo_ss" />
+<meta property="og:description" content="Update psis_loo_ss objects" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -158,44 +158,78 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo</h1>
+    <h1>Update <code>psis_loo_ss</code> objects</h1>
     
-    <div class="hidden name"><code>psis_approximate_posterior.Rd</code></div>
+    <div class="hidden name"><code>update.psis_loo_ss.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo</p>
+    <p>Update <code>psis_loo_ss</code> objects</p>
     </div>
 
-    <pre class="usage"><span class='fu'>psis_approximate_posterior</span>(
-  <span class='kw'>log_p</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_liks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>cores</span>,
-  <span class='no'>save_psis</span>,
+    <pre class="usage"><span class='co'># S3 method for psis_loo_ss</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span>(
+  <span class='no'>object</span>,
   <span class='no'>...</span>,
-  <span class='kw'>log_q</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>observations</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
+  <span class='kw'>loo_approximation</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>loo_approximation_draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>llgrad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>llhess</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>log_p</th>
-      <td><p>The log-posterior (target) evaluated at S samples from the
-proposal distribution (g). A vector of length S.</p></td>
+      <th>object</th>
+      <td><p>A <code>psis_loo_ss</code> object to update.</p></td>
     </tr>
     <tr>
-      <th>log_g</th>
-      <td><p>The log-density (proposal) evaluated at S samples from the
-proposal distribution (g). A vector of length S.</p></td>
+      <th>...</th>
+      <td><p>Currently not used.</p></td>
     </tr>
     <tr>
-      <th>log_liks</th>
-      <td><p>A log-likelihood matrix of size S * N, where N is the number
-of observations and S is the number of samples from q. See
-<code><a href='loo.html'>loo.matrix()</a></code> for details. Default is <code>NULL</code>. Then only the
-posterior is evaluated using the k_hat diagnostic.</p></td>
+      <th>data</th>
+      <td><p>For <code><a href='loo_subsample.html'>loo_subsample.function()</a></code>, these are the data,
+posterior draws, and other arguments to pass to the log-likelihood
+function.</p></td>
+    </tr>
+    <tr>
+      <th>draws</th>
+      <td><p>For <code><a href='loo_subsample.html'>loo_subsample.function()</a></code>, these are the data,
+posterior draws, and other arguments to pass to the log-likelihood
+function.</p></td>
+    </tr>
+    <tr>
+      <th>observations</th>
+      <td><p>The subsample observations to use. The argument can take
+four (4) types of arguments:</p><ul>
+<li><p><code>NULL</code> to use all observations. The algorithm then just uses
+standard <code><a href='loo.html'>loo()</a></code> or <code><a href='loo_approximate_posterior.html'>loo_approximate_posterior()</a></code>.</p></li>
+<li><p>A single integer to specify the number of observations to be subsampled.</p></li>
+<li><p>A vector of integers to provide the indices used to subset the data.
+<em>These observations need to be subsampled with the same scheme as given by
+the <code>estimator</code> argument</em>.</p></li>
+<li><p>A <code>psis_loo_ss</code> object to use the same observations that were used in a
+previous call to <code><a href='loo_subsample.html'>loo_subsample()</a></code>.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>r_eff</th>
+      <td><p>Vector of relative effective sample size estimates for the
+likelihood (<code><a href='https://rdrr.io/r/base/Log.html'>exp(log_lik)</a></code>) of each observation. This is related to
+the relative efficiency of estimating the normalizing term in
+self-normalizing importance sampling when using posterior draws obtained
+with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
+the reported PSIS effective sample sizes and Monte Carlo error estimates
+will be over-optimistic. If the posterior draws are independent then
+<code>r_eff=1</code> and can be omitted. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
+helper functions for computing <code>r_eff</code>.</p></td>
     </tr>
     <tr>
       <th>cores</th>
@@ -213,45 +247,60 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 </ul></td>
     </tr>
     <tr>
-      <th>save_psis</th>
-      <td><p>Should the <code>"psis"</code> object created internally by <code><a href='loo.html'>loo()</a></code> be
-saved in the returned object? The <code><a href='loo.html'>loo()</a></code> function calls <code><a href='psis.html'>psis()</a></code>
-internally but by default discards the (potentially large) <code>"psis"</code> object
-after using it to compute the LOO-CV summaries. Setting <code>save_psis=TRUE</code>
-will add a <code>psis_object</code> component to the list returned by <code>loo</code>. Currently
-this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to compute
-weighted expectations after running <code>loo</code>.</p></td>
+      <th>loo_approximation</th>
+      <td><p>What type of approximation of the loo_i's should be used?
+The default is <code>"plpd"</code> (the log predictive density using the posterior expectation).
+There are six different methods implemented to approximate loo_i's
+(see the references for more details):</p><ul>
+<li><p><code>"plpd"</code>: uses the lpd based on point estimates (i.e., \(p(y_i|\hat{\theta})\)).</p></li>
+<li><p><code>"lpd"</code>: uses the lpds (i,e., \(p(y_i|y)\)).</p></li>
+<li><p><code>"tis"</code>: uses truncated importance sampling to approximate PSIS-LOO.</p></li>
+<li><p><code>"waic"</code>: uses waic (i.e., \(p(y_i|y) - p_{waic}\)).</p></li>
+<li><p><code>"waic_grad_marginal"</code>: uses waic approximation using first order delta
+method and posterior marginal variances to approximate \(p_{waic}\) (ie.
+\(p(y_i|\hat{\theta})\)-p_waic_grad_marginal). Requires gradient of
+likelihood function.</p></li>
+<li><p><code>"waic_grad"</code>: uses waic approximation using first order delta method and
+posterior covariance to approximate \(p_{waic}\) (ie.
+\(p(y_i|\hat{\theta})\)-p_waic_grad). Requires gradient of likelihood
+function.</p></li>
+<li><p><code>"waic_hess"</code>: uses waic approximation using second order delta method and
+posterior covariance to approximate \(p_{waic}\) (ie.
+\(p(y_i|\hat{\theta})\)-p_waic_grad). Requires gradient and Hessian of
+likelihood function.</p></li>
+</ul>
+
+<p>As point estimates of \(\hat{\theta}\), the posterior expectations
+of the parameters are used.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>For the <code><a href='loo.html'>loo.function()</a></code> method and the <code><a href='loo.html'>loo_i()</a></code>
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the <strong>Methods (by class)</strong> section
-below for details on how to specify these arguments.</p></td>
+      <th>loo_approximation_draws</th>
+      <td><p>The number of posterior draws used when
+integrating over the posterior. This is used if <code>loo_approximation</code> is set
+to <code>"lpd"</code>, <code>"waic"</code>, or <code>"tis"</code>.</p></td>
     </tr>
     <tr>
-      <th>log_q</th>
-      <td><p>Deprecated argument name (the same as log_g).</p></td>
+      <th>llgrad</th>
+      <td><p>The gradient of the log-likelihood. This
+is only used when <code>loo_approximation</code> is <code>"waic_grad"</code>,
+<code>"waic_grad_marginal"</code>, or <code>"waic_hess"</code>. The default is <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>llhess</th>
+      <td><p>The hessian of the log-likelihood. This is only used
+with <code>loo_approximation = "waic_hess"</code>. The default is <code>NULL</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If log likelihoods are supplied, the function returns a <code>"loo"</code> object,
-otherwise the function returns a <code>"psis"</code> object.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+    <p>A <code>psis_loo_ss</code> object.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
-<a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='loo.html'>loo()</a></code> and <code><a href='psis.html'>psis()</a></code></p></div>
+    <p>If <code>observations</code> is updated then if a vector of indices or a <code>psis_loo_ss</code>
+object is supplied the updated object will have exactly the observations
+indicated by the vector or <code>psis_loo_ss</code> object. If a single integer is
+supplied, new observations will be sampled to reach the supplied sample size.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -259,8 +308,7 @@ importance sampling.
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#references">References</a></li>
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#details">Details</a></li>
     </ul>
 
   </div>

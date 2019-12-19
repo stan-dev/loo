@@ -18,13 +18,16 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models">
 <meta property="og:description" content="Efficient approximate leave-one-out cross-validation (LOO)
-    for Bayesian models fit using Markov chain Monte Carlo. The approximation
-    uses Pareto smoothed importance sampling (PSIS), a new procedure for
-    regularizing importance weights. As a byproduct of the calculations, we also
-    obtain approximate standard errors for estimated predictive errors and for
-    the comparison of predictive errors between models. The package also 
-    provides methods for using stacking and other model weighting techniques 
-    to average Bayesian predictive distributions.">
+    for Bayesian models fit using Markov chain Monte Carlo, as 
+    described in Vehtari, Gelman, and Gabry (2017) 
+    &lt;doi:10.1007/s11222-016-9696-4&gt;. 
+    The approximation uses Pareto smoothed importance sampling (PSIS), 
+    a new procedure for regularizing importance weights. 
+    As a byproduct of the calculations, we also obtain approximate 
+    standard errors for estimated predictive errors and for the comparison 
+    of predictive errors between models. The package also provides methods 
+    for using stacking and other model weighting techniques to average 
+    Bayesian predictive distributions.">
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -45,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -69,6 +72,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="https://mc-stan.org/rstan">rstan</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
     </li>
     <li>
       <a href="https://mc-stan.org/rstanarm">rstanarm</a>
@@ -201,9 +207,10 @@
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Aki Vehtari <br><small class="roles"> Author </small>  </li>
-<li>Andrew Gelman <br><small class="roles"> Author </small>  </li>
 <li>Jonah Gabry <br><small class="roles"> Maintainer, author </small>  </li>
+<li>Mans Magnusson <br><small class="roles"> Author </small>  </li>
 <li>Yuling Yao <br><small class="roles"> Author </small>  </li>
+<li>Andrew Gelman <br><small class="roles"> Author </small>  </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
@@ -222,7 +229,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">

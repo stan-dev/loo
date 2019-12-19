@@ -60,6 +60,7 @@ articles:
       - loo2-with-rstan
       - loo2-non-factorizable
       - loo2-lfo
+      - loo2-large-data
 
 reference:
   - title: "Package description, glossary, and included data sets"
@@ -73,6 +74,8 @@ reference:
       diagnostics.
     contents:
       - loo
+      - loo_subsample
+      - loo_approximate_posterior
       - E_loo
       - psis
       - pareto-k-diagnostic

@@ -7,7 +7,19 @@
     <loc>https://mc-stan.org/loo/reference/E_loo.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/ap_psis.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/compare.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/dot-compute_point_estimate.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/dot-ndraws.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/dot-thin_draws.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/example_loglik_array.html</loc>
@@ -20,6 +32,18 @@
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/gpdfit.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/importance_sampling.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/importance_sampling.array.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/importance_sampling.default.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/importance_sampling.matrix.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/kfold-generic.html</loc>
@@ -40,16 +64,31 @@
     <loc>https://mc-stan.org/loo/reference/loo.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/loo_approximate_posterior.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/loo_compare.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/loo_model_weights.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/loo_subsample.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/nlist.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/nobs.psis_loo_ss.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/obs_idx.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/old-extractors.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/parallel_psis_list.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/pareto-k-diagnostic.html</loc>
@@ -73,10 +112,22 @@
     <loc>https://mc-stan.org/loo/reference/relative_eff.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/sis.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/tis.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/update.psis_loo_ss.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/waic.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/articles/loo2-example.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/articles/loo2-large-data.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/articles/loo2-lfo.html</loc>

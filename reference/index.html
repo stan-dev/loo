@@ -76,7 +76,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -100,6 +100,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="https://mc-stan.org/rstan">rstan</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
     </li>
     <li>
       <a href="https://mc-stan.org/rstanarm">rstanarm</a>
@@ -201,9 +204,22 @@
       <tr>
         
         <td>
-          <p><code><a href="loo.html">loo</a></code> </p>
+          <p><code><a href="loo.html">loo()</a></code> <code><a href="loo.html">loo_i()</a></code> <code><a href="loo.html">is.loo()</a></code> <code><a href="loo.html">is.psis_loo()</a></code> </p>
         </td>
         <td><p>Efficient approximate leave-one-out cross-validation (LOO)</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="loo_subsample.html">loo_subsample()</a></code> </p>
+        </td>
+        <td><p>Efficient approximate leave-one-out cross-validation (LOO) using subsampling</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="loo_approximate_posterior.html">loo_approximate_posterior()</a></code> </p>
+        </td>
+        <td><p>Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations</p></td>
       </tr><tr>
         
         <td>
@@ -213,7 +229,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="psis.html">psis()</a></code> <code><a href="psis.html">weights(<i>&lt;psis&gt;</i>)</a></code> <code><a href="psis.html">is.psis()</a></code> </p>
+          <p><code><a href="psis.html">weights(<i>&lt;importance_sampling&gt;</i>)</a></code> <code><a href="psis.html">psis()</a></code> <code><a href="psis.html">is.psis()</a></code> <code><a href="psis.html">is.sis()</a></code> <code><a href="psis.html">is.tis()</a></code> </p>
         </td>
         <td><p>Pareto smoothed importance sampling (PSIS)</p></td>
       </tr><tr>
@@ -233,7 +249,7 @@
       <tr>
         
         <td>
-          <p><code><a href="loo_compare.html">loo_compare()</a></code> <code><a href="loo_compare.html">print(<i>&lt;compare.loo&gt;</i>)</a></code> </p>
+          <p><code><a href="loo_compare.html">loo_compare()</a></code> <code><a href="loo_compare.html">print(<i>&lt;compare.loo&gt;</i>)</a></code> <code><a href="loo_compare.html">print(<i>&lt;compare.loo_ss&gt;</i>)</a></code> </p>
         </td>
         <td><p>Model comparison</p></td>
       </tr><tr>
@@ -273,7 +289,7 @@
       <tr>
         
         <td>
-          <p><code><a href="waic.html">waic</a></code> </p>
+          <p><code><a href="waic.html">waic()</a></code> <code><a href="waic.html">is.waic()</a></code> </p>
         </td>
         <td><p>Widely applicable information criterion (WAIC)</p></td>
       </tr><tr>
@@ -285,7 +301,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="relative_eff.html">relative_eff</a></code> </p>
+          <p><code><a href="relative_eff.html">relative_eff()</a></code> </p>
         </td>
         <td><p>Convenience function for computing relative efficiencies</p></td>
       </tr><tr>
@@ -303,7 +319,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="print.loo.html">print(<i>&lt;loo&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;waic&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;psis_loo&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;psis&gt;</i>)</a></code> </p>
+          <p><code><a href="print.loo.html">print(<i>&lt;loo&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;waic&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;psis_loo&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;importance_sampling_loo&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;psis_loo_ap&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;psis&gt;</i>)</a></code> <code><a href="print.loo.html">print(<i>&lt;importance_sampling&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print methods</p></td>
       </tr>
@@ -319,7 +335,7 @@
         <td>
           <p><code><a href="compare.html">compare()</a></code> </p>
         </td>
-        <td><p>Model comparison</p></td>
+        <td><p>Model comparison (deprecated, old version)</p></td>
       </tr><tr>
         
         <td>
@@ -347,7 +363,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">

@@ -5,13 +5,20 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Approximate leave-future-out cross-validation for time series models • loo</title>
+<title>Approximate leave-future-out cross-validation for Bayesian time series models • loo</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Approximate leave-future-out cross-validation for time series models">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Approximate leave-future-out cross-validation for Bayesian time series models">
 <meta property="og:description" content="">
-<meta property="og:image" content="/logo.png">
+<meta property="og:image" content="https://mc-stan.org/loo/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -31,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
       </span>
     </div>
 
@@ -54,27 +61,30 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="http://mc-stan.org/rstan">rstan</a>
+      <a href="https://mc-stan.org/rstan">rstan</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/rstanarm">rstanarm</a>
+      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/bayesplot">bayesplot</a>
+      <a href="https://mc-stan.org/rstanarm">rstanarm</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/shinystan">shinystan</a>
+      <a href="https://mc-stan.org/bayesplot">bayesplot</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/projpred">projpred</a>
+      <a href="https://mc-stan.org/shinystan">shinystan</a>
     </li>
     <li>
-      <a href="http://mc-stan.org/rstantools">rstantools</a>
+      <a href="https://mc-stan.org/projpred">projpred</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/rstantools">rstantools</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="http://mc-stan.org">Stan</a>
+  <a href="https://mc-stan.org">Stan</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -91,7 +101,7 @@
   </a>
 </li>
 <li>
-  <a href="http://discourse.mc-stan.org/">
+  <a href="https://discourse.mc-stan.org/">
     <span class="fa fa-users"></span>
      
   </a>
@@ -105,13 +115,14 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Approximate leave-future-out cross-validation for time series models</h1>
-                        <h4 class="author">Paul Bürkner, Aki Vehtari, Jonah Gabry</h4>
+      <h1>Approximate leave-future-out cross-validation for Bayesian time series models</h1>
+                        <h4 class="author">Paul Bürkner, Jonah Gabry, Aki Vehtari</h4>
             
-            <h4 class="date">2019-03-12</h4>
+            <h4 class="date">2019-12-19</h4>
       
       
       <div class="hidden name"><code>loo2-lfo.Rmd</code></div>
@@ -122,7 +133,7 @@
     
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Approximate leave-future-out cross-validation for time series models}
+%\VignetteIndexEntry{Approximate leave-future-out cross-validation for Bayesian time series models}
 -->
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
@@ -137,12 +148,13 @@
 <div id="m-step-ahead-predictions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#m-step-ahead-predictions" class="anchor"></a><span class="math inline">\(M\)</span>-step-ahead predictions</h2>
-<p>Assume we have a time series of observations <span class="math inline">\(y = (y_1, y_2, \ldots, y_N)\)</span> and let <span class="math inline">\(L\)</span> be the <em>minimum</em> number of observations from the series that we will require before making predictions for future data. Depending on the application and how informative the data is, it may not be possible to make reasonable predictions for <span class="math inline">\(y_{i}\)</span> based on <span class="math inline">\((y_1, \dots, y_{i-1})\)</span> until <span class="math inline">\(i\)</span> is large enough so that we can learn enough about the time series to predict future observations. Setting <span class="math inline">\(L=10\)</span>, for example, means that we will only assess predictive performance starting with observation <span class="math inline">\(y_{11}\)</span>, so that we always have at least 10 previous observations to condition on.</p>
+<p>Assume we have a time series of observations <span class="math inline">\(y = (y_1, y_2, \ldots, y_N)\)</span> and let <span class="math inline">\(L\)</span> be the <em>minimum</em> number of observations from the series that we will require before making predictions for future data. Depending on the application and how informative the data is, it may not be possible to make reasonable predictions for <span class="math inline">\(y_{i+1}\)</span> based on <span class="math inline">\((y_1, \dots, y_{i})\)</span> until <span class="math inline">\(i\)</span> is large enough so that we can learn enough about the time series to predict future observations. Setting <span class="math inline">\(L=10\)</span>, for example, means that we will only assess predictive performance starting with observation <span class="math inline">\(y_{11}\)</span>, so that we always have at least 10 previous observations to condition on.</p>
 <p>In order to assess <span class="math inline">\(M\)</span>-SAP performance we would like to compute the predictive densities</p>
 <p><span class="math display">\[
-p(y_{i+1:M} \,|\, y_{1:i}) = p(y_i, \ldots, y_{i + M - 1} \,|\, y_{1},...,y_{i-1}) 
+p(y_{i+1:M} \,|\, y_{1:i}) = 
+  p(y_{i+1}, \ldots, y_{i + M} \,|\, y_{1},...,y_{i}) 
 \]</span></p>
-<p>for each <span class="math inline">\(i \in \{L + 1, \ldots, N - M + 1\}\)</span>. The quantities <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> can be computed with the help of the posterior distribution <span class="math inline">\(p(\theta \,|\, y_{1:i})\)</span> of the parameters <span class="math inline">\(\theta\)</span> conditional on only the first <span class="math inline">\(i-1\)</span> observations of the time-series:</p>
+<p>for each <span class="math inline">\(i \in \{L, \ldots, N - M\}\)</span>. The quantities <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> can be computed with the help of the posterior distribution <span class="math inline">\(p(\theta \,|\, y_{1:i})\)</span> of the parameters <span class="math inline">\(\theta\)</span> conditional on only the first <span class="math inline">\(i\)</span> observations of the time-series:</p>
 <p><span class="math display">\[
 p(y_{i+1:M} \,| \, y_{1:i}) = 
   \int p(y_{i+1:M} \,| \, y_{1:i}, \theta) \, p(\theta\,|\,y_{1:i}) \,d\theta. 
@@ -156,15 +168,15 @@ p(y_{i+1:M} \,|\, y_{1:i}) \approx \frac{1}{S}\sum_{s=1}^S p(y_{i+1:M} \,|\, y_{
 p(y \,|\, \theta) = \prod_{i=1}^N p(y_i \,|\, \theta).
 \]</span></p>
 <p>In this case, <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i}, \theta)\)</span> reduces to <span class="math display">\[
-p(y_{i+1:M} \,|\, \theta) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta),
+p(y_{i+1:M} \,|\, \theta) = \prod_{j = i+1}^{i + M} p(y_j \,|\, \theta),
 \]</span> due to the assumption of conditional independence between <span class="math inline">\(y_{i+1:M}\)</span> and <span class="math inline">\(y_{1:i}\)</span> given <span class="math inline">\(\theta\)</span>.</p>
 <p>Non-factorizable models, which do not make this assumption, are discussed in a separate vignette <a href="http://mc-stan.org/loo/articles/loo2-non-factorizable.html"><em>Leave-one-out cross-validation for non-factorizable models</em></a>.</p>
 </div>
 <div id="approximate_MSAP" class="section level2">
 <h2 class="hasAnchor">
 <a href="#approximate_MSAP" class="anchor"></a>Approximate <span class="math inline">\(M\)</span>-SAP using importance-sampling</h2>
-<p>Unfortunately, the math above makes use of the posterior distributions from many different fits of the model to different subsets of the data. That is, to obtain the predictive density <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> requires fitting a model to only the first <span class="math inline">\(i-1\)</span> data points, and we will need to do this for every value of <span class="math inline">\(i\)</span> under consideration (all <span class="math inline">\(i \in \{L + 1, \ldots, N - M + 1\}\)</span>).</p>
-<p>To reduce the number of models that need to be fit for the purpose of obtaining each of the densities <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span>, we propose the following algorithm. Starting with <span class="math inline">\(i = N - M + 1\)</span>, we approximate each <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> using Pareto smoothed importance sampling (PSIS, Vehtari et al, 2017ab):</p>
+<p>Unfortunately, the math above makes use of the posterior distributions from many different fits of the model to different subsets of the data. That is, to obtain the predictive density <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> requires fitting a model to only the first <span class="math inline">\(i\)</span> data points, and we will need to do this for every value of <span class="math inline">\(i\)</span> under consideration (all <span class="math inline">\(i \in \{L, \ldots, N - M\}\)</span>).</p>
+<p>To reduce the number of models that need to be fit for the purpose of obtaining each of the densities <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span>, we propose the following algorithm. Starting with <span class="math inline">\(i = N - M\)</span>, we approximate each <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> using Pareto smoothed importance sampling (PSIS, Vehtari et al, 2017ab):</p>
 <p><span class="math display">\[
  p(y_{i+1:M} \,|\, y_{1:i}) \approx
    \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i+1:M} \,|\, \theta^{(s)})}{ \sum_{s=1}^S w_i^{(s)}},
@@ -174,7 +186,7 @@ p(y_{i+1:M} \,|\, \theta) = \prod_{j = i}^{i + M -1} p(y_j \,|\, \theta),
 r_i^{(s)} \propto \frac{1}{\prod_{j = i}^N p(y_j \,|\, \,\theta^{(s)})},
 \]</span></p>
 <p>and then stabilize them using PSIS.</p>
-<p>We then <em>decrease</em> <span class="math inline">\(i\)</span> by <span class="math inline">\(1\)</span> (i.e., we move backwards in time) and repeat the process. At some observation <span class="math inline">\(i\)</span>, the variability of importance ratios <span class="math inline">\(r_i^{(s)}\)</span> will become too large and importance sampling fails. We will refer to this particular value of <span class="math inline">\(i\)</span> as <span class="math inline">\(i^\star_1\)</span>. To identify the value of <span class="math inline">\(i^\star_1\)</span> we check for which value of <span class="math inline">\(i\)</span> does the estimated shape parameter <span class="math inline">\(k\)</span> of the generalized Pareto distribution first crosses a certain threshold. Only then do we refit the model using only observations before <span class="math inline">\(i^\star_1\)</span> and then restart the process. In some cases we may only need to refit once and in other cases we will find a value <span class="math inline">\(i^\star_2\)</span> that requires a second refitting, maybe an <span class="math inline">\(i^\star_3\)</span> that requires a third refitting, and so on. We repeat the refitting as few times as is required (only if <span class="math inline">\(k &gt; \text{threshold}\)</span>) until we arrive at <span class="math inline">\(i = L+1\)</span>. Recall that <span class="math inline">\(L\)</span> is the minimum number of observations we have deemed acceptable for making predictions (setting <span class="math inline">\(L=0\)</span> means predictions of all observations should be computed).</p>
+<p>We then <em>decrease</em> <span class="math inline">\(i\)</span> by <span class="math inline">\(1\)</span> (i.e., we move backwards in time) and repeat the process. At some observation <span class="math inline">\(i\)</span>, the variability of importance ratios <span class="math inline">\(r_i^{(s)}\)</span> will become too large and importance sampling fails. We will refer to this particular value of <span class="math inline">\(i\)</span> as <span class="math inline">\(i^\star_1\)</span>. To identify the value of <span class="math inline">\(i^\star_1\)</span> we check for which value of <span class="math inline">\(i\)</span> does the estimated shape parameter <span class="math inline">\(k\)</span> of the generalized Pareto distribution first crosses a certain threshold. Only then do we refit the model using only observations before <span class="math inline">\(i^\star_1\)</span> and then restart the process. In some cases we may only need to refit once and in other cases we will find a value <span class="math inline">\(i^\star_2\)</span> that requires a second refitting, maybe an <span class="math inline">\(i^\star_3\)</span> that requires a third refitting, and so on. We repeat the refitting as few times as is required (only if <span class="math inline">\(k &gt; \text{threshold}\)</span>) until we arrive at <span class="math inline">\(i = L\)</span>. Recall that <span class="math inline">\(L\)</span> is the minimum number of observations we have deemed acceptable for making predictions (setting <span class="math inline">\(L=0\)</span> means predictions of all observations should be computed).</p>
 <p>For LOO, we recommend to use a threshold of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017ab), but for LFO, the threshold should be smaller as influential observations will affect all pointwise LFO approximations until the next refit and thus much stronger than in LOO. For the present case study, we choose a threshold of <span class="math inline">\(0.6\)</span>, which also seems to be generally reasonable threshold for LFO (Bürkner et al. 2019).</p>
 </div>
 <div id="autoregressive-models" class="section level2">
@@ -191,21 +203,21 @@ y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
 <a href="#case-study-annual-measurements-of-the-level-of-lake-huron" class="anchor"></a>Case Study: Annual measurements of the level of Lake Huron</h2>
 <p>To illustrate the application of PSIS-LFO-CV for estimating expected <span class="math inline">\(M\)</span>-SAP performance, we will fit a model for 98 annual measurements of the water level (in feet) of <a href="https://en.wikipedia.org/wiki/Lake_Huron">Lake Huron</a> from the years 1875–1972. This data set is found in the <strong>datasets</strong> R package, which is installed automatically with <strong>R</strong>.</p>
 <p>In addition to the <strong>loo</strong> package, for this analysis we will use the <strong>brms</strong> interface to Stan to generate a Stan program and fit the model, and also the <strong>bayesplot</strong> and <strong>ggplot2</strong> packages for plotting.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"loo"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"brms"</span>)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"bayesplot"</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"ggplot2"</span>)</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/bayesplot/topics/bayesplot-colors">color_scheme_set</a></span>(<span class="st">"brightblue"</span>)</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html">theme_set</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/theme_default">theme_default</a></span>())</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"loo"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"brms"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"bayesplot"</span>)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"ggplot2"</span>)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-colors.html">color_scheme_set</a></span>(<span class="st">"brightblue"</span>)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html">theme_set</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/brms/man/theme_default.html">theme_default</a></span>())</a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"></a>
 <a class="sourceLine" id="cb1-8" data-line-number="8">CHAINS &lt;-<span class="st"> </span><span class="dv">4</span></a>
 <a class="sourceLine" id="cb1-9" data-line-number="9">SEED &lt;-<span class="st"> </span><span class="dv">1234</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(SEED)</a></code></pre></div>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(SEED)</a></code></pre></div>
 <p>Before fitting a model, we will first put the data into a data frame and then look at the time series.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">N &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(LakeHuron)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(LakeHuron),</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">year =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/time">time</a></span>(LakeHuron)),</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">N &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(LakeHuron)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">y =</span> <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(LakeHuron),</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">year =</span> <span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/time.html">time</a></span>(LakeHuron)),</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5">  <span class="dt">time =</span> <span class="dv">1</span><span class="op">:</span>N</a>
 <a class="sourceLine" id="cb2-6" data-line-number="6">)</a>
 <a class="sourceLine" id="cb2-7" data-line-number="7"></a>
@@ -222,25 +234,25 @@ y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
 <p><img src="loo2-lfo_files/figure-html/hurondata-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The above plot shows rather strong autocorrelation of the time-series as well as some trend towards lower levels for later points in time.</p>
 <p>We can specify an AR(4) model for these data using the <strong>brms</strong> package as follows:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">control &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">adapt_delta =</span> <span class="fl">0.95</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">fit &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/brm">brm</a></span>(</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">control &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">adapt_delta =</span> <span class="fl">0.95</span>)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">fit &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span>(</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">  y <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, </a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">data =</span> df, </a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">autocor =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/cor_ar">cor_ar</a></span>(<span class="op">~</span>time, <span class="dt">p =</span> <span class="dv">4</span>), </a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="dt">prior =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/set_prior">prior</a></span>(<span class="kw">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="dt">class =</span> <span class="st">"ar"</span>),</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">autocor =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/cor_ar.html">cor_ar</a></span>(<span class="op">~</span>time, <span class="dt">p =</span> <span class="dv">4</span>), </a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="dt">prior =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/set_prior.html">prior</a></span>(<span class="kw">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="dt">class =</span> <span class="st">"ar"</span>),</a>
 <a class="sourceLine" id="cb3-7" data-line-number="7">  <span class="dt">control =</span> control, </a>
 <a class="sourceLine" id="cb3-8" data-line-number="8">  <span class="dt">seed =</span> SEED, </a>
 <a class="sourceLine" id="cb3-9" data-line-number="9">  <span class="dt">chains =</span> CHAINS</a>
 <a class="sourceLine" id="cb3-10" data-line-number="10">)</a></code></pre></div>
 <p>The model implied predictions along with the observed values can be plotted, which reveals a rather good fit to the data.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">preds &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/predict.brmsfit">posterior_predict</a></span>(fit)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">preds &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">Estimate =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">colMeans</a></span>(preds), </a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">Q5 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(preds, <span class="dv">2</span>, quantile, <span class="dt">probs =</span> <span class="fl">0.05</span>),</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="dt">Q95 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(preds, <span class="dv">2</span>, quantile, <span class="dt">probs =</span> <span class="fl">0.95</span>)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">preds &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/predict.brmsfit.html">posterior_predict</a></span>(fit)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">preds &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">Estimate =</span> <span class="kw"><a href="https://rdrr.io/r/base/colSums.html">colMeans</a></span>(preds), </a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">Q5 =</span> <span class="kw"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(preds, <span class="dv">2</span>, quantile, <span class="dt">probs =</span> <span class="fl">0.05</span>),</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="dt">Q95 =</span> <span class="kw"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(preds, <span class="dv">2</span>, quantile, <span class="dt">probs =</span> <span class="fl">0.95</span>)</a>
 <a class="sourceLine" id="cb4-6" data-line-number="6">)</a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(df, preds), <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> year, <span class="dt">y =</span> Estimate)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(df, preds), <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> year, <span class="dt">y =</span> Estimate)) <span class="op">+</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">ymin =</span> Q5, <span class="dt">ymax =</span> Q95), <span class="dt">stat =</span> <span class="st">"identity"</span>, <span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">y =</span> y)) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">subtitle =</span> <span class="st">"Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"</span>) <span class="op">+</span></a>
@@ -249,15 +261,15 @@ y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
 <p>To allow for reasonable predictions of future values, we will require at least <span class="math inline">\(L = 20\)</span> historical observations (20 years) to make predictions.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">L &lt;-<span class="st"> </span><span class="dv">20</span></a></code></pre></div>
 <p>We first perform approximate leave-one-out cross-validation (LOO-CV) for the purpose of later comparison with exact and approximate LFO-CV for the 1-SAP case.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">loo_cv &lt;-<span class="st"> </span><span class="kw"><a href="../reference/loo.html">loo</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit)[, (L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>N])</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(loo_cv)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">loo_cv &lt;-<span class="st"> </span><span class="kw"><a href="../reference/loo.html">loo</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit)[, (L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>N])</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(loo_cv)</a></code></pre></div>
 <pre><code>
 Computed from 4000 by 78 log-likelihood matrix
 
          Estimate   SE
-elpd_loo    -89.0  6.5
-p_loo         4.3  0.9
-looic       178.1 12.9
+elpd_loo    -88.5  6.3
+p_loo         4.6  0.9
+looic       177.1 12.7
 ------
 Monte Carlo SE of elpd_loo is 0.0.
 
@@ -272,136 +284,140 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <h3 class="hasAnchor">
 <a href="#exact-1-step-ahead-predictions" class="anchor"></a>Exact 1-step-ahead predictions</h3>
 <p>Before we compute approximate LFO-CV using PSIS we will first compute exact LFO-CV for the 1-SAP case so we can use it as a benchmark later. The initial step for the exact computation is to calculate the log-predictive densities by refitting the model many times:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">loglik_exact &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/nsamples">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="cf">for</span> (i <span class="cf">in</span> N<span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">2</span>)) {</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">  fit_i &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(fit, <span class="dt">newdata =</span> df[<span class="op">-</span>(i<span class="op">:</span>N), ], <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">  loglik_exact[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_i, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>i, ])[, i]</a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">}</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">loglik_exact &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/nsamples.brmsfit.html">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>L) {</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">  past &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>i</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">  oos &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">  df_past &lt;-<span class="st"> </span>df[past, , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">  df_oos &lt;-<span class="st"> </span>df[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(past, oos), , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">  fit_i &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(fit, <span class="dt">newdata =</span> df_past, <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">  loglik_exact[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_i, <span class="dt">newdata =</span> df_oos, <span class="dt">oos =</span> oos)[, oos]</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">}</a></code></pre></div>
 <p>Then we compute the exact expected log predictive density (ELPD):</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># some helper functions we'll use throughout</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co"># more stable than log(sum(exp(x))) </span></a>
 <a class="sourceLine" id="cb9-4" data-line-number="4">log_sum_exp &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">  max_x &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(x)  </a>
-<a class="sourceLine" id="cb9-6" data-line-number="6">  max_x <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(x <span class="op">-</span><span class="st"> </span>max_x)))</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">  max_x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(x)  </a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">  max_x <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(x <span class="op">-</span><span class="st"> </span>max_x)))</a>
 <a class="sourceLine" id="cb9-7" data-line-number="7">}</a>
 <a class="sourceLine" id="cb9-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co"># more stable than log(mean(exp(x)))</span></a>
 <a class="sourceLine" id="cb9-10" data-line-number="10">log_mean_exp &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11">  <span class="kw">log_sum_exp</span>(x) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x))</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">  <span class="kw">log_sum_exp</span>(x) <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(x))</a>
 <a class="sourceLine" id="cb9-12" data-line-number="12">}</a>
 <a class="sourceLine" id="cb9-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co"># compute log of raw importance ratios</span></a>
 <a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co"># sums over observations *not* over posterior samples</span></a>
 <a class="sourceLine" id="cb9-16" data-line-number="16">sum_log_ratios &lt;-<span class="st"> </span><span class="cf">function</span>(ll, <span class="dt">ids =</span> <span class="ot">NULL</span>) {</a>
-<a class="sourceLine" id="cb9-17" data-line-number="17">  <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NULL">is.null</a></span>(ids)) ll &lt;-<span class="st"> </span>ll[, ids, drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
-<a class="sourceLine" id="cb9-18" data-line-number="18">  <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">rowSums</a></span>(ll)</a>
+<a class="sourceLine" id="cb9-17" data-line-number="17">  <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(ids)) ll &lt;-<span class="st"> </span>ll[, ids, drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">  <span class="op">-</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(ll)</a>
 <a class="sourceLine" id="cb9-19" data-line-number="19">}</a>
 <a class="sourceLine" id="cb9-20" data-line-number="20"></a>
 <a class="sourceLine" id="cb9-21" data-line-number="21"><span class="co"># for printing comparisons later</span></a>
 <a class="sourceLine" id="cb9-22" data-line-number="22">rbind_print &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</a>
-<a class="sourceLine" id="cb9-23" data-line-number="23">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(...), <span class="dt">digits =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb9-23" data-line-number="23">  <span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(...), <span class="dt">digits =</span> <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb9-24" data-line-number="24">}</a></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">exact_elpds_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(loglik_exact, <span class="dv">2</span>, log_mean_exp)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">exact_elpd_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(exact_elpds_1sap[<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span>L)]))</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">exact_elpds_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(loglik_exact, <span class="dv">2</span>, log_mean_exp)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">exact_elpd_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(exact_elpds_1sap[<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span>L)]))</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw">rbind_print</span>(</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5">  <span class="st">"LOO"</span> =<span class="st"> </span>loo_cv<span class="op">$</span>estimates[<span class="st">"elpd_loo"</span>, <span class="st">"Estimate"</span>],</a>
 <a class="sourceLine" id="cb10-6" data-line-number="6">  <span class="st">"LFO"</span> =<span class="st"> </span>exact_elpd_1sap</a>
 <a class="sourceLine" id="cb10-7" data-line-number="7">)</a></code></pre></div>
 <pre><code>      ELPD
-LOO -89.04
-LFO -93.65</code></pre>
+LOO -88.54
+LFO -92.67</code></pre>
 <p>We see that the ELPD from LFO-CV for 1-step-ahead predictions is lower than the ELPD estimate from LOO-CV, which should be expected since LOO-CV is making use of more of the time series. That is, since the LFO-CV approach only uses observations from before the left-out data point but LOO-CV uses <em>all</em> data points other than the left-out observation, we should expect to see the larger ELPD from LOO-CV.</p>
 </div>
 <div id="approximate-1-step-ahead-predictions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#approximate-1-step-ahead-predictions" class="anchor"></a>Approximate 1-step-ahead predictions</h3>
 <p>For illustrative purposes, we will first compute approximate 1-SAP without any refitting, even when the Pareto <span class="math inline">\(k\)</span> estimate is too large. This will of course be a poor approximation to exact 1-SAP, in particular if the Pareto <span class="math inline">\(k\)</span> estimates increase rather quickly beyond the threshold up to which PSIS tends to produce stable results.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">approx_elpds_1sap_no_refit &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA</span>, N)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit)</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">ids &lt;-<span class="st"> </span>N<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="cf">for</span> (i <span class="cf">in</span> ids) {</a>
-<a class="sourceLine" id="cb12-7" data-line-number="7">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, i<span class="op">:</span>N)</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8">  psis_part &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/warning">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
-<a class="sourceLine" id="cb12-9" data-line-number="9">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ks, <span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_part))</a>
-<a class="sourceLine" id="cb12-10" data-line-number="10">  lw_i &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/weights">weights</a></span>(psis_part, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb12-11" data-line-number="11">  approx_elpds_1sap_no_refit[i] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw_i <span class="op">+</span><span class="st"> </span>loglik[, i])</a>
-<a class="sourceLine" id="cb12-12" data-line-number="12">}</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">approx_elpds_1sap_no_refit &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="ot">NA</span>, N)</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>L) {</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, (i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>N)</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">  psis_obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(ks, <span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_obj))</a>
+<a class="sourceLine" id="cb12-9" data-line-number="9">  lw &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span>(psis_obj, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">  approx_elpds_1sap_no_refit[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw <span class="op">+</span><span class="st"> </span>loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb12-11" data-line-number="11">}</a></code></pre></div>
 <p>If we plot the Pareto <span class="math inline">\(k\)</span> estimates we can see that they do start to increase quickly and that once we work backwards to about halfway through the data points we get <span class="math inline">\(k &gt; 0.6\)</span>. This is indicated by the vertical line in the plot below, which corresponds to the point <span class="math inline">\(i^\star_1\)</span> discussed in Section <a href="#approximate_MSAP">Approximate <span class="math inline">\(M\)</span>-SAP using importance-sampling</a> above.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">plot_ks &lt;-<span class="st"> </span><span class="cf">function</span>(ks, ids, <span class="dt">thres =</span> <span class="fl">0.6</span>) {</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2">  dat_ks &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">ks =</span> ks, <span class="dt">ids =</span> ids)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">  dat_ks &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">ks =</span> ks, <span class="dt">ids =</span> ids)</a>
 <a class="sourceLine" id="cb13-3" data-line-number="3">  <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(dat_ks, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> ids, <span class="dt">y =</span> ks)) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-4" data-line-number="4"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> ks <span class="op">&gt;</span><span class="st"> </span>thres), <span class="dt">shape =</span> <span class="dv">3</span>, <span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-5" data-line-number="5"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="dt">yintercept =</span> thres, <span class="dt">linetype =</span> <span class="dv">2</span>, <span class="dt">color =</span> <span class="st">"red2"</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"cornflowerblue"</span>, <span class="st">"darkblue"</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"cornflowerblue"</span>, <span class="st">"darkblue"</span>)) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">x =</span> <span class="st">"Data point"</span>, <span class="dt">y =</span> <span class="st">"Pareto k"</span>) <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-8" data-line-number="8"><span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span>(<span class="op">-</span><span class="fl">0.5</span>, <span class="fl">1.5</span>)</a>
 <a class="sourceLine" id="cb13-9" data-line-number="9">}</a></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, ids)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, N<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>))</a></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/plotk1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>Consequently, it is not surprising that the resulting approximate ELPD for 1-SAP is far away from the exact ELPD we computed above:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">approx_elpd_1sap_no_refit &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(approx_elpds_1sap_no_refit, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(approx_elpds_1sap_no_refit, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">rbind_print</span>(</a>
 <a class="sourceLine" id="cb15-4" data-line-number="4">  <span class="st">"approx LFO (no refit)"</span> =<span class="st"> </span>approx_elpd_1sap_no_refit,</a>
 <a class="sourceLine" id="cb15-5" data-line-number="5">  <span class="st">"exact LFO"</span> =<span class="st"> </span>exact_elpd_1sap</a>
 <a class="sourceLine" id="cb15-6" data-line-number="6">)</a></code></pre></div>
 <pre><code>                        ELPD
-approx LFO (no refit) -88.71
-exact LFO             -93.65</code></pre>
+approx LFO (no refit) -88.22
+exact LFO             -92.67</code></pre>
 <p>Next, we compute approximate 1-SAP with refit at observations where the Pareto <span class="math inline">\(k\)</span> estimate exceeds the threshold of <span class="math inline">\(0.6\)</span>.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">k_thres &lt;-<span class="st"> </span><span class="fl">0.6</span></a></code></pre></div>
 <p>The code becomes a little bit more involved to handle the refitting procedure. Note that we can compute exact 1-SAP at the refitting points, which comes with no additional computational costs since we had to refit the model anyway.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/nsamples">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2">approx_elpds_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA</span>, N)</a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4">fit_part &lt;-<span class="st"> </span>fit</a>
-<a class="sourceLine" id="cb18-5" data-line-number="5">ids &lt;-<span class="st"> </span>N<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb18-6" data-line-number="6">i_refit &lt;-<span class="st"> </span>N</a>
-<a class="sourceLine" id="cb18-7" data-line-number="7">refits &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb18-8" data-line-number="8">ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb18-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="cf">for</span> (i <span class="cf">in</span> ids) {</a>
-<a class="sourceLine" id="cb18-11" data-line-number="11">  loglik[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_part)[, i]</a>
-<a class="sourceLine" id="cb18-12" data-line-number="12">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, i<span class="op">:</span>i_refit)</a>
-<a class="sourceLine" id="cb18-13" data-line-number="13">  psis_part &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/warning">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
-<a class="sourceLine" id="cb18-14" data-line-number="14">  k &lt;-<span class="st"> </span><span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_part)</a>
-<a class="sourceLine" id="cb18-15" data-line-number="15">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ks, k)</a>
-<a class="sourceLine" id="cb18-16" data-line-number="16">  <span class="cf">if</span> (k <span class="op">&gt;</span><span class="st"> </span>k_thres) {</a>
-<a class="sourceLine" id="cb18-17" data-line-number="17">    <span class="co"># refit the model based on the first i-1 observations</span></a>
-<a class="sourceLine" id="cb18-18" data-line-number="18">    i_refit &lt;-<span class="st"> </span>i <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb18-19" data-line-number="19">    refits &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(refits, i)</a>
-<a class="sourceLine" id="cb18-20" data-line-number="20">    fit_part &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(fit_part, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), ], <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb18-21" data-line-number="21">    loglik[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_part, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>i, ])[, i]</a>
-<a class="sourceLine" id="cb18-22" data-line-number="22">    approx_elpds_1sap[i] &lt;-<span class="st"> </span><span class="kw">log_mean_exp</span>(loglik[, i])</a>
-<a class="sourceLine" id="cb18-23" data-line-number="23">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb18-24" data-line-number="24">    lw_i &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/weights">weights</a></span>(psis_part, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb18-25" data-line-number="25">    approx_elpds_1sap[i] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw_i <span class="op">+</span><span class="st"> </span>loglik[, i])</a>
-<a class="sourceLine" id="cb18-26" data-line-number="26">  }</a>
-<a class="sourceLine" id="cb18-27" data-line-number="27">} </a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/nsamples.brmsfit.html">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">approx_elpds_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="ot">NA</span>, N)</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">fit_past &lt;-<span class="st"> </span>fit</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">i_refit &lt;-<span class="st"> </span>N</a>
+<a class="sourceLine" id="cb18-5" data-line-number="5">refits &lt;-<span class="st"> </span>ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb18-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>L) {</a>
+<a class="sourceLine" id="cb18-8" data-line-number="8">  loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past)[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb18-9" data-line-number="9">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, (i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>i_refit)</a>
+<a class="sourceLine" id="cb18-10" data-line-number="10">  psis_obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
+<a class="sourceLine" id="cb18-11" data-line-number="11">  k &lt;-<span class="st"> </span><span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_obj)</a>
+<a class="sourceLine" id="cb18-12" data-line-number="12">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(ks, k)</a>
+<a class="sourceLine" id="cb18-13" data-line-number="13">  <span class="cf">if</span> (k <span class="op">&gt;</span><span class="st"> </span>k_thres) {</a>
+<a class="sourceLine" id="cb18-14" data-line-number="14">    <span class="co"># refit the model based on the first i observations</span></a>
+<a class="sourceLine" id="cb18-15" data-line-number="15">    i_refit &lt;-<span class="st"> </span>i</a>
+<a class="sourceLine" id="cb18-16" data-line-number="16">    refits &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(refits, i)</a>
+<a class="sourceLine" id="cb18-17" data-line-number="17">    past &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>i</a>
+<a class="sourceLine" id="cb18-18" data-line-number="18">    oos &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb18-19" data-line-number="19">    df_past &lt;-<span class="st"> </span>df[past, , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb18-20" data-line-number="20">    df_oos &lt;-<span class="st"> </span>df[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(past, oos), , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb18-21" data-line-number="21">    fit_past &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(fit_past, <span class="dt">newdata =</span> df_past, <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb18-22" data-line-number="22">    loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past, <span class="dt">newdata =</span> df_oos)[, oos]</a>
+<a class="sourceLine" id="cb18-23" data-line-number="23">    approx_elpds_1sap[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">log_mean_exp</span>(loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb18-24" data-line-number="24">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb18-25" data-line-number="25">    lw &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span>(psis_obj, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb18-26" data-line-number="26">    approx_elpds_1sap[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw <span class="op">+</span><span class="st"> </span>loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb18-27" data-line-number="27">  }</a>
+<a class="sourceLine" id="cb18-28" data-line-number="28">} </a></code></pre></div>
 <p>We see that the final Pareto-<span class="math inline">\(k\)</span>-estimates are mostly well below the threshold and that we only needed to refit the model a few times:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cat">cat</a></span>(<span class="st">"Using threshold "</span>, k_thres, </a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">    <span class="st">", model was refit "</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(refits), </a>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Using threshold "</span>, k_thres, </a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">    <span class="st">", model was refit "</span>, <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(refits), </a>
 <a class="sourceLine" id="cb19-3" data-line-number="3">    <span class="st">" times, at observations"</span>, refits)</a></code></pre></div>
-<pre><code>Using threshold  0.6 , model was refit  8  times, at observations 84 61 57 55 45 38 24 21</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, ids)</a></code></pre></div>
+<pre><code>Using threshold  0.6 , model was refit  8  times, at observations 63 58 55 53 46 39 22 20</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, N<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>))</a></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP ELPD computed above, which indicates our algorithm to compute approximate 1-SAP worked well for the present data and model.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">approx_elpd_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(approx_elpds_1sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">approx_elpd_1sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(approx_elpds_1sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">rbind_print</span>(</a>
 <a class="sourceLine" id="cb22-3" data-line-number="3">  <span class="st">"approx LFO (no refits)"</span> =<span class="st"> </span>approx_elpd_1sap_no_refit,</a>
 <a class="sourceLine" id="cb22-4" data-line-number="4">  <span class="st">"approx LFO (with refits)"</span> =<span class="st"> </span>approx_elpd_1sap,</a>
 <a class="sourceLine" id="cb22-5" data-line-number="5">  <span class="st">"exact LFO"</span> =<span class="st"> </span>exact_elpd_1sap</a>
 <a class="sourceLine" id="cb22-6" data-line-number="6">)</a></code></pre></div>
 <pre><code>                           ELPD
-approx LFO (no refits)   -88.71
-approx LFO (with refits) -93.41
-exact LFO                -93.65</code></pre>
+approx LFO (no refits)   -88.22
+approx LFO (with refits) -92.27
+exact LFO                -92.67</code></pre>
 <p>Plotting exact against approximate predictions, we see that no approximation value deviates far from its exact counterpart, providing further evidence for the good quality of our approximation.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">dat_elpd &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">dat_elpd &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
 <a class="sourceLine" id="cb24-2" data-line-number="2">  <span class="dt">approx_elpd =</span> approx_elpds_1sap,</a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">  <span class="dt">exact_elpd =</span> exact_elpds_1sap</a>
 <a class="sourceLine" id="cb24-4" data-line-number="4">)</a>
@@ -412,15 +428,15 @@ exact LFO                -93.65</code></pre>
 <a class="sourceLine" id="cb24-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">x =</span> <span class="st">"Approximate ELPDs"</span>, <span class="dt">y =</span> <span class="st">"Exact ELPDs"</span>)</a></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/plot1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also look at the maximum difference and average difference between the approximate and exact ELPD calculations, which also indicate a ver close approximation:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">max_diff &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat_elpd, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">abs</a></span>(approx_elpd <span class="op">-</span><span class="st"> </span>exact_elpd), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb25-2" data-line-number="2">mean_diff &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat_elpd, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">abs</a></span>(approx_elpd <span class="op">-</span><span class="st"> </span>exact_elpd), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">max_diff &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/with.html">with</a></span>(dat_elpd, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(approx_elpd <span class="op">-</span><span class="st"> </span>exact_elpd), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">mean_diff &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/with.html">with</a></span>(dat_elpd, <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(approx_elpd <span class="op">-</span><span class="st"> </span>exact_elpd), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
 <a class="sourceLine" id="cb25-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb25-4" data-line-number="4"><span class="kw">rbind_print</span>(</a>
-<a class="sourceLine" id="cb25-5" data-line-number="5">  <span class="st">"Max diff"</span> =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(max_diff, <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb25-6" data-line-number="6">  <span class="st">"Mean diff"</span> =<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(mean_diff, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb25-5" data-line-number="5">  <span class="st">"Max diff"</span> =<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(max_diff, <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb25-6" data-line-number="6">  <span class="st">"Mean diff"</span> =<span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(mean_diff, <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb25-7" data-line-number="7">)</a></code></pre></div>
 <pre><code>          [,1]
-Max diff  0.06
+Max diff  0.14
 Mean diff 0.01</code></pre>
 </div>
 </div>
@@ -433,75 +449,76 @@ Mean diff 0.01</code></pre>
 <a href="#exact-m-step-ahead-predictions" class="anchor"></a>Exact <span class="math inline">\(M\)</span>-step-ahead predictions</h3>
 <p>The necessary steps are the same as for 1-SAP with the exception that the log-density values of interest are now the sums of the log predictive densities of four consecutive observations. Further, the stability of the PSIS approximation actually stays the same for all <span class="math inline">\(M\)</span> as it only depends on the number of observations we leave out, not on the number of observations we predict.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">M &lt;-<span class="st"> </span><span class="dv">4</span></a>
-<a class="sourceLine" id="cb27-2" data-line-number="2">loglikm &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/nsamples">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
-<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">2</span>)) {</a>
-<a class="sourceLine" id="cb27-4" data-line-number="4">  fit_i &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(fit, <span class="dt">newdata =</span> df[<span class="op">-</span>(i<span class="op">:</span>N), ], <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb27-5" data-line-number="5">  ll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_i, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), ], <span class="dt">oos =</span> i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb27-6" data-line-number="6">  loglikm[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">rowSums</a></span>(ll[, i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
-<a class="sourceLine" id="cb27-7" data-line-number="7">}</a></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">exact_elpds_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(loglikm, <span class="dv">2</span>, log_mean_exp)</a>
-<a class="sourceLine" id="cb28-2" data-line-number="2">(exact_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(exact_elpds_4sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))</a></code></pre></div>
+<a class="sourceLine" id="cb27-2" data-line-number="2">loglikm &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/nsamples.brmsfit.html">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span>M)<span class="op">:</span>L) {</a>
+<a class="sourceLine" id="cb27-4" data-line-number="4">  past &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>i</a>
+<a class="sourceLine" id="cb27-5" data-line-number="5">  oos &lt;-<span class="st"> </span>(i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M)</a>
+<a class="sourceLine" id="cb27-6" data-line-number="6">  df_past &lt;-<span class="st"> </span>df[past, , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb27-7" data-line-number="7">  df_oos &lt;-<span class="st"> </span>df[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(past, oos), , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb27-8" data-line-number="8">  fit_past &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(fit, <span class="dt">newdata =</span> df_past, <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb27-9" data-line-number="9">  ll &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past, <span class="dt">newdata =</span> df_oos, <span class="dt">oos =</span> oos)</a>
+<a class="sourceLine" id="cb27-10" data-line-number="10">  loglikm[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(ll[, oos])</a>
+<a class="sourceLine" id="cb27-11" data-line-number="11">}</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">exact_elpds_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(loglikm, <span class="dv">2</span>, log_mean_exp)</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2">(exact_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dt">ELPD =</span> <span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(exact_elpds_4sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))</a></code></pre></div>
 <pre><code>     ELPD 
--356.2244 </code></pre>
+-532.4023 </code></pre>
 </div>
 <div id="approximate-m-step-ahead-predictions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#approximate-m-step-ahead-predictions" class="anchor"></a>Approximate <span class="math inline">\(M\)</span>-step-ahead predictions</h3>
 <p>Computing the approximate PSIS-LFO-CV for the 4-SAP case is a little bit more involved than the approximate version for the 1-SAP case, although the underlying principles remain the same.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">loglikm &lt;-<span class="st"> </span>loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/nsamples">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
-<a class="sourceLine" id="cb30-2" data-line-number="2">approx_elpds_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA</span>, N)</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3">fit_part &lt;-<span class="st"> </span>fit</a>
-<a class="sourceLine" id="cb30-4" data-line-number="4">ids &lt;-<span class="st"> </span>(N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb30-5" data-line-number="5">i_refit &lt;-<span class="st"> </span>N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb30-6" data-line-number="6">refits &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb30-7" data-line-number="7">ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb30-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb30-9" data-line-number="9">loglik[, (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)<span class="op">:</span>N] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_part)[, (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)<span class="op">:</span>N]</a>
-<a class="sourceLine" id="cb30-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb30-11" data-line-number="11"><span class="cf">for</span> (i <span class="cf">in</span> ids) {</a>
-<a class="sourceLine" id="cb30-12" data-line-number="12">  oos &lt;-<span class="st"> </span>i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb30-13" data-line-number="13">  ll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_part, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), ], <span class="dt">oos =</span> oos)</a>
-<a class="sourceLine" id="cb30-14" data-line-number="14">  loglikm[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">rowSums</a></span>(ll[, i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
-<a class="sourceLine" id="cb30-15" data-line-number="15">  loglik[, i] &lt;-<span class="st"> </span>ll[, i]</a>
-<a class="sourceLine" id="cb30-16" data-line-number="16">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, i<span class="op">:</span>i_refit)</a>
-<a class="sourceLine" id="cb30-17" data-line-number="17">  psis_part &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/warning">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
-<a class="sourceLine" id="cb30-18" data-line-number="18">  k &lt;-<span class="st"> </span><span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_part)</a>
-<a class="sourceLine" id="cb30-19" data-line-number="19">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(ks, k)</a>
-<a class="sourceLine" id="cb30-20" data-line-number="20">  <span class="cf">if</span> (k <span class="op">&gt;</span><span class="st"> </span>k_thres) {</a>
-<a class="sourceLine" id="cb30-21" data-line-number="21">    <span class="co"># refit the model based on the first i-1 observations</span></a>
-<a class="sourceLine" id="cb30-22" data-line-number="22">    i_refit &lt;-<span class="st"> </span>i <span class="op">-</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb30-23" data-line-number="23">    refits &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(refits, i)</a>
-<a class="sourceLine" id="cb30-24" data-line-number="24">    fit_part &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(</a>
-<a class="sourceLine" id="cb30-25" data-line-number="25">      fit_part, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), ], </a>
-<a class="sourceLine" id="cb30-26" data-line-number="26">      <span class="dt">recompile =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb30-27" data-line-number="27">    )</a>
-<a class="sourceLine" id="cb30-28" data-line-number="28">    ll &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/brms/topics/log_lik.brmsfit">log_lik</a></span>(fit_part, <span class="dt">newdata =</span> df[<span class="dv">1</span><span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>), ], <span class="dt">oos =</span> oos)</a>
-<a class="sourceLine" id="cb30-29" data-line-number="29">    loglik[, i] &lt;-<span class="st"> </span>ll[, i]</a>
-<a class="sourceLine" id="cb30-30" data-line-number="30">    loglikm[, i] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colSums">rowSums</a></span>(ll[, i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)])</a>
-<a class="sourceLine" id="cb30-31" data-line-number="31">    approx_elpds_4sap[i] &lt;-<span class="st"> </span><span class="kw">log_mean_exp</span>(loglikm[, i])</a>
-<a class="sourceLine" id="cb30-32" data-line-number="32">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb30-33" data-line-number="33">    lw_i &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/weights">weights</a></span>(psis_part, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb30-34" data-line-number="34">    approx_elpds_4sap[i] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw_i <span class="op">+</span><span class="st"> </span>loglikm[, i])</a>
-<a class="sourceLine" id="cb30-35" data-line-number="35">  }</a>
-<a class="sourceLine" id="cb30-36" data-line-number="36">} </a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">loglikm &lt;-<span class="st"> </span>loglik &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/pkg/brms/man/nsamples.brmsfit.html">nsamples</a></span>(fit), <span class="dt">ncol =</span> N)</a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">approx_elpds_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="ot">NA</span>, N)</a>
+<a class="sourceLine" id="cb30-3" data-line-number="3">fit_past &lt;-<span class="st"> </span>fit</a>
+<a class="sourceLine" id="cb30-4" data-line-number="4">i_refit &lt;-<span class="st"> </span>N</a>
+<a class="sourceLine" id="cb30-5" data-line-number="5">refits &lt;-<span class="st"> </span>ks &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb30-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb30-7" data-line-number="7">loglik[, (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)<span class="op">:</span>N] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past)[, (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)<span class="op">:</span>N]</a>
+<a class="sourceLine" id="cb30-8" data-line-number="8"><span class="cf">for</span> (i <span class="cf">in</span> (N <span class="op">-</span><span class="st"> </span>M)<span class="op">:</span>L) {</a>
+<a class="sourceLine" id="cb30-9" data-line-number="9">  past &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>i</a>
+<a class="sourceLine" id="cb30-10" data-line-number="10">  oos &lt;-<span class="st"> </span>(i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span>M)</a>
+<a class="sourceLine" id="cb30-11" data-line-number="11">  df_oos &lt;-<span class="st"> </span>df[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(past, oos), , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb30-12" data-line-number="12">  ll &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past, <span class="dt">newdata =</span> df_oos, <span class="dt">oos =</span> oos)</a>
+<a class="sourceLine" id="cb30-13" data-line-number="13">  loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span>ll[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb30-14" data-line-number="14">  logratio &lt;-<span class="st"> </span><span class="kw">sum_log_ratios</span>(loglik, (i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>i_refit)</a>
+<a class="sourceLine" id="cb30-15" data-line-number="15">  psis_obj &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw"><a href="../reference/psis.html">psis</a></span>(logratio))</a>
+<a class="sourceLine" id="cb30-16" data-line-number="16">  k &lt;-<span class="st"> </span><span class="kw"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(psis_obj)</a>
+<a class="sourceLine" id="cb30-17" data-line-number="17">  ks &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(ks, k)</a>
+<a class="sourceLine" id="cb30-18" data-line-number="18">  <span class="cf">if</span> (k <span class="op">&gt;</span><span class="st"> </span>k_thres) {</a>
+<a class="sourceLine" id="cb30-19" data-line-number="19">    <span class="co"># refit the model based on the first i observations</span></a>
+<a class="sourceLine" id="cb30-20" data-line-number="20">    i_refit &lt;-<span class="st"> </span>i</a>
+<a class="sourceLine" id="cb30-21" data-line-number="21">    refits &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(refits, i)</a>
+<a class="sourceLine" id="cb30-22" data-line-number="22">    df_past &lt;-<span class="st"> </span>df[past, , drop =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb30-23" data-line-number="23">    fit_past &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(fit, <span class="dt">newdata =</span> df_past, <span class="dt">recompile =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb30-24" data-line-number="24">    ll &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/brms/man/log_lik.brmsfit.html">log_lik</a></span>(fit_past, <span class="dt">newdata =</span> df_oos, <span class="dt">oos =</span> oos)</a>
+<a class="sourceLine" id="cb30-25" data-line-number="25">    loglikm[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(ll[, oos])</a>
+<a class="sourceLine" id="cb30-26" data-line-number="26">    loglik[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span>ll[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb30-27" data-line-number="27">    approx_elpds_4sap[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">log_mean_exp</span>(loglikm[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb30-28" data-line-number="28">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb30-29" data-line-number="29">    lw &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span>(psis_obj, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)[, <span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb30-30" data-line-number="30">    loglikm[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(ll[, oos])</a>
+<a class="sourceLine" id="cb30-31" data-line-number="31">    approx_elpds_4sap[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">log_sum_exp</span>(lw <span class="op">+</span><span class="st"> </span>loglikm[, i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb30-32" data-line-number="32">  }</a>
+<a class="sourceLine" id="cb30-33" data-line-number="33">} </a></code></pre></div>
 <p>Again, we see that the final Pareto-<span class="math inline">\(k\)</span>-estimates are mostly well below the threshold and that we only needed to refit the model a few times:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cat">cat</a></span>(<span class="st">"Using threshold "</span>, k_thres, </a>
-<a class="sourceLine" id="cb31-2" data-line-number="2">    <span class="st">", model was refit "</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(refits), </a>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Using threshold "</span>, k_thres, </a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">    <span class="st">", model was refit "</span>, <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(refits), </a>
 <a class="sourceLine" id="cb31-3" data-line-number="3">    <span class="st">" times, at observations"</span>, refits)</a></code></pre></div>
-<pre><code>Using threshold  0.6 , model was refit  6  times, at observations 84 64 57 53 40 21</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, ids)</a></code></pre></div>
+<pre><code>Using threshold  0.6 , model was refit  8  times, at observations 63 57 55 54 48 39 22 20</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">plot_ks</span>(ks, (N <span class="op">-</span><span class="st"> </span>M <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(L <span class="op">+</span><span class="st"> </span><span class="dv">1</span>))</a></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate ELPD computed for the 4-SAP case is not as close to its exact counterpart as in the 1-SAP case.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">approx_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(approx_elpds_4sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">approx_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(approx_elpds_4sap, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb34-2" data-line-number="2"><span class="kw">rbind_print</span>(</a>
 <a class="sourceLine" id="cb34-3" data-line-number="3">  <span class="st">"Approx LFO"</span> =<span class="st"> </span>approx_elpd_4sap,</a>
 <a class="sourceLine" id="cb34-4" data-line-number="4">  <span class="st">"Exact LFO"</span> =<span class="st"> </span>exact_elpd_4sap</a>
 <a class="sourceLine" id="cb34-5" data-line-number="5">)</a></code></pre></div>
 <pre><code>              ELPD
-Approx LFO -354.42
-Exact LFO  -356.22</code></pre>
+Approx LFO -529.38
+Exact LFO  -532.40</code></pre>
 <p>Plotting exact against approximate pointwise predictions confirms that, for a few specific data points, the approximate predictions underestimate the exact predictions.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">dat_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">dat_elpd_4sap &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(</a>
 <a class="sourceLine" id="cb36-2" data-line-number="2">  <span class="dt">approx_elpd =</span> approx_elpds_4sap,</a>
 <a class="sourceLine" id="cb36-3" data-line-number="3">  <span class="dt">exact_elpd =</span> exact_elpds_4sap</a>
 <a class="sourceLine" id="cb36-4" data-line-number="4">)</a>
@@ -533,14 +550,14 @@ Exact LFO  -356.22</code></pre>
 <div id="appendix-session-information" class="section level3">
 <h3 class="hasAnchor">
 <a href="#appendix-session-information" class="anchor"></a>Appendix: Session information</h3>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/sessionInfo">sessionInfo</a></span>()</a></code></pre></div>
-<pre><code>R version 3.5.2 (2018-12-20)
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
+<pre><code>R version 3.6.1 (2019-07-05)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
 Running under: macOS Sierra 10.12.6
 
 Matrix products: default
-BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -549,53 +566,53 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] bayesplot_1.6.0.9000 brms_2.5.0           ggplot2_3.1.0       
-[4] Rcpp_1.0.0           loo_2.1.0            knitr_1.21          
+[1] ggplot2_3.2.1   bayesplot_1.7.1 brms_2.10.0     Rcpp_1.0.2     
+[5] loo_2.2.0       knitr_1.25     
 
 loaded via a namespace (and not attached):
- [1] Brobdingnag_1.2-5    gtools_3.8.1         StanHeaders_2.18.1  
- [4] threejs_0.3.1        shiny_1.2.0          assertthat_0.2.0    
- [7] stats4_3.5.2         yaml_2.2.0           pillar_1.3.1        
-[10] backports_1.1.3      lattice_0.20-38      glue_1.3.0          
-[13] digest_0.6.18        promises_1.0.1       colorspace_1.4-0    
-[16] htmltools_0.3.6      httpuv_1.4.5.1       Matrix_1.2-15       
-[19] plyr_1.8.4           dygraphs_1.1.1.6     pkgconfig_2.0.2     
-[22] rstan_2.18.2         purrr_0.3.1          xtable_1.8-3        
-[25] mvtnorm_1.0-10       scales_1.0.0         processx_3.3.0      
-[28] later_0.8.0          tibble_2.0.1         DT_0.5              
-[31] shinyjs_1.0          withr_2.1.2          lazyeval_0.2.1      
-[34] cli_1.0.1            magrittr_1.5         crayon_1.3.4        
-[37] mime_0.6             ps_1.3.0             memoise_1.1.0       
-[40] evaluate_0.13        fs_1.2.6             nlme_3.1-137        
-[43] MASS_7.3-51.1        xts_0.11-2           xml2_1.2.0          
-[46] pkgbuild_1.0.2       colourpicker_1.0     prettyunits_1.0.2   
-[49] rsconnect_0.8.13     tools_3.5.2          matrixStats_0.54.0  
-[52] stringr_1.4.0        munsell_0.5.0        callr_3.1.1         
-[55] compiler_3.5.2       pkgdown_1.3.0        rlang_0.3.1         
-[58] grid_3.5.2           ggridges_0.5.1       rstudioapi_0.9.0    
-[61] htmlwidgets_1.3      crosstalk_1.0.0      igraph_1.2.4        
-[64] miniUI_0.1.1.1       labeling_0.3         base64enc_0.1-3     
-[67] rmarkdown_1.11       codetools_0.2-15     gtable_0.2.0        
-[70] inline_0.3.15        abind_1.4-5          roxygen2_6.1.1      
-[73] markdown_0.9         reshape2_1.4.3       R6_2.4.0            
-[76] gridExtra_2.3        rstantools_1.5.1     zoo_1.8-4           
-[79] bridgesampling_0.4-0 dplyr_0.8.0.1        shinythemes_1.1.2   
-[82] shinystan_2.5.0      commonmark_1.4       rprojroot_1.3-2     
-[85] desc_1.2.0           stringi_1.3.1        parallel_3.5.2      
-[88] tidyselect_0.2.5     xfun_0.5             coda_0.19-2         </code></pre>
+ [1] Brobdingnag_1.2-6    gtools_3.8.1         StanHeaders_2.19.0  
+ [4] threejs_0.3.1        shiny_1.3.2          assertthat_0.2.1    
+ [7] stats4_3.6.1         yaml_2.2.0           pillar_1.4.2        
+[10] backports_1.1.5      lattice_0.20-38      glue_1.3.1          
+[13] digest_0.6.22        promises_1.0.1       checkmate_1.9.4     
+[16] colorspace_1.4-1     htmltools_0.3.6      httpuv_1.5.2        
+[19] Matrix_1.2-17        plyr_1.8.4           dygraphs_1.1.1.6    
+[22] pkgconfig_2.0.3      rstan_2.19.2         purrr_0.3.3         
+[25] xtable_1.8-4         scales_1.0.0         processx_3.4.1      
+[28] later_0.8.0          tibble_2.1.3         DT_0.8              
+[31] withr_2.1.2          shinyjs_1.0          lazyeval_0.2.2      
+[34] cli_1.1.0            magrittr_1.5         crayon_1.3.4        
+[37] mime_0.7             ps_1.3.0             memoise_1.1.0       
+[40] evaluate_0.14        fs_1.3.1             nlme_3.1-140        
+[43] MASS_7.3-51.4        xts_0.11-0           pkgbuild_1.0.5      
+[46] colourpicker_1.0     prettyunits_1.0.2    rsconnect_0.8.15    
+[49] tools_3.6.1          matrixStats_0.54.0   stringr_1.4.0       
+[52] munsell_0.5.0        callr_3.3.1          compiler_3.6.1      
+[55] pkgdown_1.4.1        rlang_0.4.1          grid_3.6.1          
+[58] ggridges_0.5.0       rstudioapi_0.10      htmlwidgets_1.3     
+[61] crosstalk_1.0.0      igraph_1.2.4.1       miniUI_0.1.1.1      
+[64] labeling_0.3         base64enc_0.1-3      rmarkdown_1.15      
+[67] codetools_0.2-16     gtable_0.3.0         inline_0.3.15       
+[70] abind_1.4-5          markdown_0.8         reshape2_1.4.3      
+[73] R6_2.4.1             gridExtra_2.3        rstantools_2.0.0    
+[76] zoo_1.8-3            bridgesampling_0.7-2 dplyr_0.8.3         
+[79] shinystan_2.5.0      shinythemes_1.1.1    rprojroot_1.3-2     
+[82] desc_1.2.0           stringi_1.4.3        parallel_3.6.1      
+[85] tidyselect_0.2.5     xfun_0.9             coda_0.19-1         </code></pre>
 </div>
 <div id="appendix-licenses" class="section level3">
 <h3 class="hasAnchor">
 <a href="#appendix-licenses" class="anchor"></a>Appendix: Licenses</h3>
 <ul>
-<li>Code © 2018, Paul Bürkner, Aki Vehtari, Jonah Gabry (licensed under BSD-3).</li>
-<li>Text © 2018, Paul Bürkner, Aki Vehtari, Jonah Gabry (licensed under CC-BY-NC 4.0).</li>
+<li>Code © 2018, Paul Bürkner, Jonah Gabry, Aki Vehtari (licensed under BSD-3).</li>
+<li>Text © 2018, Paul Bürkner, Jonah Gabry, Aki Vehtari (licensed under CC-BY-NC 4.0).</li>
 </ul>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -617,17 +634,20 @@ loaded via a namespace (and not attached):
 </div>
 
 
+
       <footer><div class="copyright">
-  <p>Developed by Aki Vehtari, Andrew Gelman, Jonah Gabry, Yuling Yao.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

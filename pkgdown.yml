@@ -3,6 +3,7 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   loo2-example: loo2-example.html
+  loo2-large-data: loo2-large-data.html
   loo2-lfo: loo2-lfo.html
   loo2-non-factorizable: loo2-non-factorizable.html
   loo2-weights: loo2-weights.html

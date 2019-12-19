@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Widely applicable information criterion (WAIC) — waic • loo</title>
+<title>Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations — loo_approximate_posterior • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,11 +43,10 @@
 
 
 
-<meta property="og:title" content="Widely applicable information criterion (WAIC) — waic" />
-<meta property="og:description" content="The waic() methods can be used to compute WAIC from the pointwise
-log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-the loo() function) because PSIS provides useful diagnostics as well as
-effective sample size and Monte Carlo estimates." />
+<meta property="og:title" content="Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations — loo_approximate_posterior" />
+<meta property="og:description" content="Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -161,63 +161,118 @@ effective sample size and Monte Carlo estimates." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Widely applicable information criterion (WAIC)</h1>
+    <h1>Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations</h1>
     
-    <div class="hidden name"><code>waic.Rd</code></div>
+    <div class="hidden name"><code>loo_approximate_posterior.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>waic()</code> methods can be used to compute WAIC from the pointwise
-log-likelihood. However, we recommend LOO-CV using PSIS (as implemented by
-the <code><a href='loo.html'>loo()</a></code> function) because PSIS provides useful diagnostics as well as
-effective sample size and Monte Carlo estimates.</p>
+    <p>Efficient approximate leave-one-out cross-validation (LOO) for posterior
+approximations</p>
     </div>
 
-    <pre class="usage"><span class='fu'>waic</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo_approximate_posterior</span>(<span class='no'>x</span>, <span class='no'>log_p</span>, <span class='no'>log_g</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for array</span>
-<span class='fu'>waic</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>loo_approximate_posterior</span>(
+  <span class='no'>x</span>,
+  <span class='no'>log_p</span>,
+  <span class='no'>log_g</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
+)
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>waic</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>loo_approximate_posterior</span>(
+  <span class='no'>x</span>,
+  <span class='no'>log_p</span>,
+  <span class='no'>log_g</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
+)
 
 <span class='co'># S3 method for `function`</span>
-<span class='fu'>waic</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
-
-<span class='fu'>is.waic</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>loo_approximate_posterior</span>(
+  <span class='no'>x</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>log_p</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>log_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A log-likelihood array, matrix, or function. The <strong>Methods (by class)</strong>
-section, below, has detailed descriptions of how to specify the inputs for
-each method.</p></td>
+      <td><p>A log-likelihood array, matrix, or function.
+The <strong>Methods (by class)</strong> section, below, has detailed descriptions of how
+to specify the inputs for each method.</p></td>
     </tr>
     <tr>
-      <th>draws, data, ...</th>
-      <td><p>For the function method only. See the
-<strong>Methods (by class)</strong> section below for details on these arguments.</p></td>
+      <th>log_p</th>
+      <td><p>The log-posterior (target) evaluated at S samples from the
+proposal distribution (g). A vector of length S.</p></td>
+    </tr>
+    <tr>
+      <th>log_g</th>
+      <td><p>The log-density (proposal) evaluated at S samples from the
+proposal distribution (g). A vector of length S.</p></td>
+    </tr>
+    <tr>
+      <th>save_psis</th>
+      <td><p>Should the <code>"psis"</code> object created internally by
+<code>loo_approximate_posterior()</code> be saved in the returned object? See
+<code><a href='loo.html'>loo()</a></code> for details.</p></td>
+    </tr>
+    <tr>
+      <th>cores</th>
+      <td><p>The number of cores to use for parallelization. This defaults to
+the option <code>mc.cores</code> which can be set for an entire R session by
+<code><a href='https://rdrr.io/r/base/options.html'>options(mc.cores = NUMBER)</a></code>. The old option <code>loo.cores</code> is now
+deprecated but will be given precedence over <code>mc.cores</code> until
+<code>loo.cores</code> is removed in a future release. <strong>As of version
+2.0.0 the default is now 1 core if <code>mc.cores</code> is not set</strong>, but we
+recommend using as many (or close to as many) cores as possible.</p><ul>
+<li><p>Note for Windows 10 users: it is <strong>strongly</strong>
+<a href='https://github.com/stan-dev/loo/issues/94'>recommended</a> to avoid using
+the <code>.Rprofile</code> file to set <code>mc.cores</code> (using the <code>cores</code> argument or
+setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>data, draws, ...</th>
+      <td><p>For the <code>loo_approximate_posterior.function()</code> method,
+these are the data, posterior draws, and other arguments to pass to the
+log-likelihood function. See the <strong>Methods (by class)</strong> section below for
+details on how to specify these arguments.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list (of class <code><a href='https://rdrr.io/r/base/c.html'>c("waic", "loo")</a></code>) with components:</p>
-<dl class='dl-horizontal'>
-<dt><code>estimates</code></dt><dd><p>A matrix with two columns (<code>"Estimate"</code>, <code>"SE"</code>) and three
-rows (<code>"elpd_waic"</code>, <code>"p_waic"</code>, <code>"waic"</code>). This contains
-point estimates and standard errors of the expected log pointwise predictive
-density (<code>elpd_waic</code>), the effective number of parameters
-(<code>p_waic</code>) and the information criterion <code>waic</code> (which is just
-<code>-2 * elpd_waic</code>, i.e., converted to deviance scale).</p></dd>
-<dt><code>pointwise</code></dt><dd><p>A matrix with three columns (and number of rows equal to the number of
-observations) containing the pointwise contributions of each of the above
-measures (<code>elpd_waic</code>, <code>p_waic</code>, <code>waic</code>).</p></dd>
+    <p>The <code>loo_approximate_posterior()</code> methods return a named list with
+class <code><a href='https://rdrr.io/r/base/c.html'>c("psis_loo_ap", "psis_loo", "loo")</a></code>. It has the same structure
+as the objects returned by <code><a href='loo.html'>loo()</a></code> but with the additional slot:</p><dl class='dl-horizontal'>
+<dt><code>posterior_approximation</code></dt><dd><p>A list with two vectors, <code>log_p</code> and <code>log_g</code> of the same length
+containing the posterior density and the approximation density
+for the individual draws.</p></dd>
 
 </dl>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The <code>loo_approximate_posterior()</code> function is an S3 generic and
+methods are provided for 3-D pointwise log-likelihood arrays, pointwise
+log-likelihood matrices, and log-likelihood functions. The implementation
+works for posterior approximations where it is possible to compute the log
+density for the posterior approximation.</p>
     <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
 
     
@@ -256,54 +311,25 @@ are recycled for each observation.</p></li>
 </ul>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-widely application information criterion in singular learning theory.
-<em>Journal of Machine Learning Research</em> <strong>11</strong>, 3571-3594.</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
-evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
-<a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+    <p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Leave-One-Out Cross-Validation for Large Data.
+In <em>International Conference on Machine Learning</em></p>
+<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Leave-One-Out Cross-Validation for Model Comparison in Large Data.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'>
-<ul>
-<li><p>The <strong>loo</strong> package <a href='https://mc-stan.org/loo/articles/'>vignettes</a> and
-Vehtari, Gelman, and Gabry (2017a, 2017b) for more details on why we
-usually prefer <code><a href='loo.html'>loo()</a></code> to <code>waic()</code>.</p></li>
-<li><p><code><a href='loo_compare.html'>loo_compare()</a></code> for comparing models on approximate LOO-CV or WAIC.</p></li>
-</ul>
-</div>
+    <div class='dont-index'><p><code><a href='loo.html'>loo()</a></code>, <code><a href='psis.html'>psis()</a></code>, <code><a href='loo_compare.html'>loo_compare()</a></code></p></div>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>### Array and matrix methods</span>
-<span class='no'>LLarr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>LLarr</span>)</div><div class='output co'>#&gt; [1] 500   2  32</div><div class='input'>
-<span class='no'>LLmat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_matrix</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>LLmat</span>)</div><div class='output co'>#&gt; [1] 1000   32</div><div class='input'>
-<span class='no'>waic_arr</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>LLarr</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: </span>
-#&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='input'><span class='no'>waic_mat</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>LLmat</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: </span>
-#&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>waic_arr</span>, <span class='no'>waic_mat</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
-
-<span class='co'># \dontrun{</span>
-<span class='no'>log_lik1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_log_lik(stanfit1): object 'stanfit1' not found</span></div><div class='input'><span class='no'>log_lik2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_log_lik(stanfit2): object 'stanfit2' not found</span></div><div class='input'>(<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik1</span>))</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik1): object 'log_lik1' not found</span></div><div class='input'>(<span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik2</span>))</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik2): object 'log_lik2' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='compare.html'>compare</a></span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'compare' is deprecated.</span>
-#&gt; <span class='warning'>Use 'loo_compare' instead.</span>
-#&gt; <span class='warning'>See help("Deprecated")</span></div><div class='output co'>#&gt; <span class='error'>Error in compare(waic1, waic2): object 'waic1' not found</span></div><div class='input'># }
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#methods-by-class-">Methods (by class)</a></li>
       <li><a href="#references">References</a></li>
       <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
