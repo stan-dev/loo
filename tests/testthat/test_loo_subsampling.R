@@ -4,8 +4,6 @@ options(mc.cores = 1)
 context("loo_subsampling")
 
 test_that("overall loo_subampling works as expected (compared with loo) for diff_est", {
-  skip_if_not_installed("checkmate")
-
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -91,8 +89,6 @@ test_that("overall loo_subampling works as expected (compared with loo) for diff
 })
 
 test_that("loo with subsampling of all observations works as ordinary loo.", {
-  skip_if_not_installed("checkmate")
-
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -122,8 +118,6 @@ test_that("loo with subsampling of all observations works as ordinary loo.", {
 })
 
 test_that("overall loo_subsample works with diff_srs as expected (compared with loo)", {
-  skip_if_not_installed("checkmate")
-
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -143,8 +137,6 @@ test_that("overall loo_subsample works with diff_srs as expected (compared with 
 })
 
 test_that("Test the srs estimator with 'none' approximation", {
-  skip_if_not_installed("checkmate")
-
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -186,8 +178,6 @@ test_that("Test the srs estimator with 'none' approximation", {
 })
 
 test_that("Test the Hansen-Hurwitz estimator", {
-  skip_if_not_installed("checkmate")
-
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
@@ -245,7 +235,7 @@ test_that("Test the Hansen-Hurwitz estimator", {
 
 
 test_that("update.psis_loo_ss works as expected (compared with loo)", {
-  skip_if_not_installed("checkmate")
+
 
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
@@ -344,7 +334,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 context("loo_subsampling_approximations")
 
 test_that("elpd_loo_approximation works as expected", {
-  skip_if_not_installed("checkmate")
+
 
   set.seed(123)
   N <- 10; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
@@ -396,7 +386,7 @@ test_that("elpd_loo_approximation works as expected", {
 
 
 test_that("Test loo_approximation_draws", {
-  skip_if_not_installed("checkmate")
+
 
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
@@ -432,7 +422,7 @@ test_that("Test loo_approximation_draws", {
 
 
 test_that("waic using delta method and gradient", {
-  skip_if_not_installed("checkmate")
+
 
   if (FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of mvtnorm
@@ -488,7 +478,7 @@ test_that("waic using delta method and gradient", {
 })
 
 test_that("waic using delta 2nd order method", {
-  skip_if_not_installed("checkmate")
+
 
   if (FALSE){
     # Code to generate testdata - saved and loaded to avoid dependency of MCMCPack
@@ -575,7 +565,7 @@ test_that("waic using delta 2nd order method", {
 context("loo_subsampling_estimation")
 
 test_that("whhest works as expected", {
-  skip_if_not_installed("checkmate")
+
 
   N <- 100
   m <- 10
@@ -636,7 +626,7 @@ test_that("whhest works as expected", {
 
 
 test_that("srs_diff_est works as expected", {
-  skip_if_not_installed("checkmate")
+
 
   set.seed(1234)
   N <- 1000
@@ -672,7 +662,7 @@ test_that("srs_diff_est works as expected", {
 })
 
 test_that("srs_est works as expected", {
-  skip_if_not_installed("checkmate")
+
 
   set.seed(1234)
   # Cochran 1976 example Table 2.2
@@ -725,7 +715,8 @@ test_that("srs_est works as expected", {
 context("loo_subsampling cases")
 
 test_that("Test loo_subsampling and loo_approx with radon data", {
-  skip_if_not_installed("checkmate")
+  skip_on_cran() # avoid going over time limit for tests
+
   load(test_path("test_radon_laplace_loo.rda"))
   # Rename to spot variable leaking errors
   llfun_test <- llfun
@@ -833,13 +824,14 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
 
 
 test_that("Test the vignette", {
-  skip_if_not_installed("checkmate")
+  skip_on_cran()
+
 
   # NOTE
   # If any of these test fails, the vignette probably needs to be updated
 
-  if (FALSE){
-    # Generate vignett test case
+  if (FALSE) {
+    # Generate vignette test case
     library("rstan")
     stan_code <- "
     data {
@@ -986,7 +978,7 @@ test_that("Test the vignette", {
 context("loo_compare_subsample")
 
 test_that("loo_compare_subsample", {
-  skip_if_not_installed("checkmate")
+  skip_on_cran() # to get under cran check time limit
 
   set.seed(123)
   N <- 1000
@@ -1067,9 +1059,10 @@ test_that("loo_compare_subsample", {
 
 })
 
+context("subsample with tis, sis")
 
 test_that("Test 'tis' and 'sis'", {
-  skip_if_not_installed("checkmate")
+  skip_on_cran()
 
   set.seed(123)
   N <- 1000; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
@@ -1160,6 +1153,3 @@ test_that("Test 'tis' and 'sis'", {
   expect_gt(loo_ss_sis_S10$estimates["elpd_loo", "Estimate"] + SEs*loo_ss_sis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
   expect_lt(loo_ss_sis_S10$estimates["elpd_loo", "Estimate"] - SEs*loo_ss_sis_S10$estimates["elpd_loo", "subsampling SE"], loo_ss_full$estimates["elpd_loo", "Estimate"])
 })
-
-
-
