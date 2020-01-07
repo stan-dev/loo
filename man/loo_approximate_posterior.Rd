@@ -10,15 +10,34 @@ approximations}
 \usage{
 loo_approximate_posterior(x, log_p, log_g, ...)
 
-\method{loo_approximate_posterior}{array}(x, log_p, log_g, ...,
-  save_psis = FALSE, cores = getOption("mc.cores", 1))
+\method{loo_approximate_posterior}{array}(
+  x,
+  log_p,
+  log_g,
+  ...,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1)
+)
 
-\method{loo_approximate_posterior}{matrix}(x, log_p, log_g, ...,
-  save_psis = FALSE, cores = getOption("mc.cores", 1))
+\method{loo_approximate_posterior}{matrix}(
+  x,
+  log_p,
+  log_g,
+  ...,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1)
+)
 
-\method{loo_approximate_posterior}{function}(x, ..., data = NULL,
-  draws = NULL, log_p = NULL, log_g = NULL, save_psis = FALSE,
-  cores = getOption("mc.cores", 1))
+\method{loo_approximate_posterior}{`function`}(
+  x,
+  ...,
+  data = NULL,
+  draws = NULL,
+  log_p = NULL,
+  log_g = NULL,
+  save_psis = FALSE,
+  cores = getOption("mc.cores", 1)
+)
 }
 \arguments{
 \item{x}{A log-likelihood array, matrix, or function.

@@ -84,7 +84,7 @@ loo_compare.default <- function(x, ...) {
   }
 
   # If subsampling is used
-  if(any(sapply(loos, inherits, "psis_loo_ss"))) {
+  if (any(sapply(loos, inherits, "psis_loo_ss"))) {
     return(loo_compare.psis_loo_ss_list(loos))
   }
 
@@ -145,6 +145,9 @@ elpd_diffs <- function(loo_a, loo_b) {
 #' @param diffs Vector of pointwise elpd differences
 se_elpd_diff <- function(diffs) {
   N <- length(diffs)
+  # As `elpd_diff` is defined as the sum of N independent components,
+  # we can compute the standard error by using the standard deviation
+  # of the N components and multiplying by `sqrt(N)`.
   sqrt(N) * sd(diffs)
 }
 

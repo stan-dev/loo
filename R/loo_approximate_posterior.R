@@ -47,9 +47,6 @@ loo_approximate_posterior.array <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-    if (!requireNamespace("checkmate", quietly=TRUE)) {
-      stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
-    }
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
@@ -78,9 +75,6 @@ loo_approximate_posterior.matrix <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-    if (!requireNamespace("checkmate", quietly=TRUE)) {
-      stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
-    }
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_numeric(log_p, len = nrow(x))
@@ -143,7 +137,7 @@ loo_approximate_posterior.function <-
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
       psis_object_list <- lapply(psis_list, "[[", "psis_object")
-      psis_out <- list2psis(psis_object_list)
+      psis_out <- list2importance_sampling(psis_object_list)
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
@@ -153,11 +147,12 @@ loo_approximate_posterior.function <-
       )
     }
 
-    ap_psis <- psis_loo_object(
+    ap_psis <- importance_sampling_loo_object(
       pointwise = do.call(rbind, pointwise),
       diagnostics = diagnostics,
       dims = c(attr(psis_list[[1]], "S"), N),
-      psis_object = if (save_psis) psis_out else NULL
+      is_method = "psis",
+      is_object = if (save_psis) psis_out else NULL
     )
 
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
@@ -178,9 +173,11 @@ loo_approximate_posterior.function <-
            log_p,
            log_g,
            r_eff = NULL,
-           save_psis = FALSE) {
+           save_psis = FALSE,
+           is_method) {
 
-    if(!is.null(r_eff)) warning("r_eff not implemented for aploo")
+    if (!is.null(r_eff)) warning("r_eff not implemented for aploo.")
+    if (is_method != "psis") stop(is_method, " not implemented for aploo.")
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
     if (!is.matrix(ll_i)) {
@@ -200,7 +197,7 @@ loo_approximate_posterior.function <-
   }
 
 
-assert_psis_loo_ap <- function(x){
+assert_psis_loo_ap <- function(x) {
   checkmate::assert_class(x, "psis_loo_ap")
   checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "approximate_posterior"))
   checkmate::assert_names(names(x$approximate_posterior), must.include = c("log_p", "log_g"))

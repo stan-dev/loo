@@ -1,14 +1,14 @@
-#' Compare \code{psis_loo_ss} objects
+#' Compare `psis_loo_ss` objects
 #' @noRd
-#' @param x a list with \code{psis_loo} objects
-#' @param ... currently ignored.
-#' @return a compare.loo_ss object
+#' @param x A list with `psis_loo` objects.
+#' @param ... Currently ignored.
+#' @return A `compare.loo_ss` object.
 #' @author Mans Magnusson
 loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
   for(i in seq_along(x)){
-    if(!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
+    if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
   }
 
   loo_compare_checks.psis_loo_ss_list(x)
@@ -32,9 +32,9 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
 
 #' Compare a reference loo object with a comaprison loo object
 #' @noRd
-#' @param ref_loo a named list with a \code{psis_loo_ss} object
-#' @param compare_loo a named list with a  \code{psis_loo_ss} object
-#' @return a 1 by 3 elpd_diff estimation
+#' @param ref_loo A named list with a `psis_loo_ss` object.
+#' @param compare_loo A named list with a  `psis_loo_ss` object.
+#' @return A 1 by 3 elpd_diff estimation.
 loo_compare_ss <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
@@ -49,26 +49,26 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   compare_subset_of_ref <- base::setequal(intersect_idx, compare_idx)
 
   # Using HH estimation
-  if(ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
+  if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
     warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 
   # Same observations in both
-  if(compare_subset_of_ref & ref_subset_of_compare){
+  if (compare_subset_of_ref & ref_subset_of_compare){
     return(loo_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # Use subset
-  if(compare_subset_of_ref | ref_subset_of_compare){
-    if(compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
-    if(ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
+  if (compare_subset_of_ref | ref_subset_of_compare){
+    if (compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
+    if (ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
     message("Estimated elpd_diff using observations included in loo calculations for all models.")
     return(loo_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # If different samples
-  if(!compare_subset_of_ref & !ref_subset_of_compare){
+  if (!compare_subset_of_ref & !ref_subset_of_compare){
     warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
             "'. Naive diff SE is used.", call. = FALSE)
     return(loo_compare_ss_naive(ref_loo, compare_loo))
@@ -123,13 +123,13 @@ loo_compare_ss_diff <- function(ref_loo, compare_loo){
 }
 
 
-#' Check list of \code{psis_loo} objects
-#' @details Similar to loo_compare_checks but checks dim size rather than
-#' pointwise dim since different pointwise sizes of \code{psis_loo_ss} will work.
-#' Can probably be removed by refactoring \code{loo_compare_checks()}
+#' Check list of `psis_loo` objects
+#' @details Similar to `loo_compare_checks()` but checks dim size rather than
+#' pointwise dim since different pointwise sizes of `psis_loo_ss` will work.
+#' Can probably be removed by refactoring `loo_compare_checks()`.
 #' @noRd
 #' @inheritParams loo_compare_ss
-#' @return a 1 by 3 elpd_diff estimation
+#' @return A 1 by 3 elpd_diff estimation.
 loo_compare_checks.psis_loo_ss_list <- function(loos) {
   ## errors
   if (length(loos) <= 1L) {
@@ -172,7 +172,6 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 
 #' @rdname loo_compare
 #' @export
-#' @inheritParams print.compare.loo
 print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
@@ -188,11 +187,11 @@ print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
 }
 
 
-#' Compute comparison matrix for \code{psis_loo_ss} objects
+#' Compute comparison matrix for `psis_loo_ss` objects
 #' @noRd
 #' @keywords internal
-#' @param loos List of \code{psis_loo_ss} objects.
-#' @return a \code{compare.loo_ss} matrix
+#' @param loos List of `psis_loo_ss` objects.
+#' @return A `compare.loo_ss` matrix.
 loo_compare_matrix.psis_loo_ss_list <- function(loos){
   tmp <- sapply(loos, function(x) {
     est <- x$estimates

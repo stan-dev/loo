@@ -8,11 +8,23 @@
 \usage{
 E_loo(x, psis_object, ...)
 
-\method{E_loo}{default}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{default}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 
-\method{E_loo}{matrix}(x, psis_object, ..., type = c("mean", "variance",
-  "quantile"), probs = NULL, log_ratios = NULL)
+\method{E_loo}{matrix}(
+  x,
+  psis_object,
+  ...,
+  type = c("mean", "variance", "quantile"),
+  probs = NULL,
+  log_ratios = NULL
+)
 }
 \arguments{
 \item{x}{A numeric vector or matrix.}

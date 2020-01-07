@@ -10,11 +10,9 @@ using approximate posteriors}
 \usage{
 ap_psis(log_ratios, log_p, log_g, ...)
 
-\method{ap_psis}{array}(log_ratios, log_p, log_g, ...,
-  cores = getOption("mc.cores", 1))
+\method{ap_psis}{array}(log_ratios, log_p, log_g, ..., cores = getOption("mc.cores", 1))
 
-\method{ap_psis}{matrix}(log_ratios, log_p, log_g, ...,
-  cores = getOption("mc.cores", 1))
+\method{ap_psis}{matrix}(log_ratios, log_p, log_g, ..., cores = getOption("mc.cores", 1))
 
 \method{ap_psis}{default}(log_ratios, log_p, log_g, ...)
 }

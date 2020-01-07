@@ -9,13 +9,20 @@
 \usage{
 loo_model_weights(x, ...)
 
-\method{loo_model_weights}{default}(x, ..., method = c("stacking",
-  "pseudobma"), optim_method = "BFGS", optim_control = list(),
-  BB = TRUE, BB_n = 1000, alpha = 1, r_eff_list = NULL,
-  cores = getOption("mc.cores", 1))
+\method{loo_model_weights}{default}(
+  x,
+  ...,
+  method = c("stacking", "pseudobma"),
+  optim_method = "BFGS",
+  optim_control = list(),
+  BB = TRUE,
+  BB_n = 1000,
+  alpha = 1,
+  r_eff_list = NULL,
+  cores = getOption("mc.cores", 1)
+)
 
-stacking_weights(lpd_point, optim_method = "BFGS",
-  optim_control = list())
+stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
 
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
@@ -215,7 +222,7 @@ stacking to average Bayesian predictive distributions.
 \seealso{
 \itemize{
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes}, particularly
-\href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights using the loo package}.
+\href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights using the \strong{loo} package}.
 \item \code{\link[=loo]{loo()}} for details on leave-one-out ELPD estimation.
 \item \code{\link[=constrOptim]{constrOptim()}} for the choice of optimization methods and control-parameters.
 \item \code{\link[=relative_eff]{relative_eff()}} for computing \code{r_eff}.

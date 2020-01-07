@@ -63,7 +63,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   if (cores == 1) {
     n_eff_vec <- apply(x, 3, ess_rfun)
   } else {
-    if (.Platform$OS.type != "windows") {
+    if (!os_is_windows()) {
       n_eff_list <-
         parallel::mclapply(
           mc.cores = cores,
@@ -112,7 +112,7 @@ relative_eff.function <-
           }
         )
     } else {
-      if (.Platform$OS.type != "windows") {
+      if (!os_is_windows()) {
         n_eff_list <-
           parallel::mclapply(
             X = seq_len(N),
@@ -124,6 +124,7 @@ relative_eff.function <-
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
+        parallel::clusterExport(cl, "draws")
         on.exit(parallel::stopCluster(cl))
         n_eff_list <-
           parallel::parLapply(
@@ -145,9 +146,10 @@ relative_eff.function <-
 #' @describeIn relative_eff
 #'   If `x` is an object of class `"psis"`, `relative_eff()` simply returns
 #'   the `r_eff` attribute of `x`.
-relative_eff.psis <- function(x, ...) {
+relative_eff.importance_sampling <- function(x, ...) {
   attr(x, "r_eff")
 }
+
 
 # internal ----------------------------------------------------------------
 

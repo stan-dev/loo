@@ -183,7 +183,6 @@ standard uniform distribution (thin curves).
 ```{r}
 yrep <- posterior_predict(fit1)
 
-# requires bayesplot version >= 1.5.0
 ppc_loo_pit_overlay(
   y = roaches$y,
   yrep = yrep,
@@ -220,7 +219,7 @@ Using the `label_points` argument will label any $k$ values larger than 0.7 with
 the index of the corresponding data point. These high values are often the
 result of model misspecification and frequently correspond to data points that
 would be considered ``outliers'' in the data and surprising according to the
-model [Gabry et al (2018)](http://arxiv.org/abs/1709.01449). Unfortunately,
+model [Gabry et al (2019)](http://arxiv.org/abs/1709.01449). Unfortunately,
 while large $k$ values are a useful indicator of model misspecification, small
 $k$ values are not a guarantee that a model is well-specified.
 
@@ -279,10 +278,12 @@ reasonable guess is that a hurdle or zero-inflated model would be an improvement
 
 # References
 
-Gabry, J., Simpson, D., Vehtari, A., Betancourt, M., and Gelman,
-A. (2018). Visualization in Bayesian workflow. Journal of the Royal
-Statistical Society Series A, accepted for publication. [arXiv preprint
-arXiv:1709.01449](http://arxiv.org/abs/1709.01449)
+Gabry, J., Simpson, D., Vehtari, A., Betancourt, M. and Gelman, A. (2019),
+Visualization in Bayesian workflow. _J. R. Stat. Soc. A_, 182: 389-402. 
+\doi:10.1111/rssa.12378. ([journal version](https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378), 
+[arXiv preprint](https://arxiv.org/abs/1709.01449), 
+[code on GitHub](https://github.com/jgabry/bayes-vis-paper))
+<a id="gabry2019"></a>
 
 Gelman, A. and Hill, J. (2007). _Data Analysis Using Regression and
 Multilevel/Hierarchical Models._ Cambridge University Press, Cambridge, UK.

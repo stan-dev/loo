@@ -14,7 +14,7 @@ waic(x, ...)
 
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{function}(x, ..., data = NULL, draws = NULL)
+\method{waic}{`function`}(x, ..., data = NULL, draws = NULL)
 
 is.waic(x)
 }

@@ -4,8 +4,7 @@
 \alias{extract_log_lik}
 \title{Extract pointwise log-likelihood from a Stan model}
 \usage{
-extract_log_lik(stanfit, parameter_name = "log_lik",
-  merge_chains = TRUE)
+extract_log_lik(stanfit, parameter_name = "log_lik", merge_chains = TRUE)
 }
 \arguments{
 \item{stanfit}{A \code{stanfit} object (\pkg{rstan} package).}
@@ -38,12 +37,12 @@ generated quantities block. We recommend using the generated quantities
 block so that the computations are carried out only once per iteration
 rather than once per HMC leapfrog step.
 
-For example, the following is the \code{generated quantities} block for
+For example, the following is the \verb{generated quantities} block for
 computing and saving the log-likelihood for a linear regression model with
 \code{N} data points, outcome \code{y}, predictor matrix \code{X},
 coefficients \code{beta}, and standard deviation \code{sigma}:
 
-\code{vector[N] log_lik;}
+\verb{vector[N] log_lik;}
 
 \code{for (n in 1:N) log_lik[n] = normal_lpdf(y[n] | X[n, ] * beta, sigma);}
 }

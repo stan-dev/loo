@@ -55,6 +55,13 @@ stacking to average Bayesian predictive distributions.
 \emph{Bayesian Analysis}, advance publication,  doi:10.1214/17-BA1091.
 (\href{https://projecteuclid.org/euclid.ba/1516093227}{online}).
 
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Leave-One-Out Cross-Validation for Large Data.
+In \emph{International Conference on Machine Learning}
+
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
 \emph{Electronic Journal of Statistics} \strong{2}, 774-806.

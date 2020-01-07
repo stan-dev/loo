@@ -2,8 +2,9 @@
 % Please edit documentation in R/print.R
 \name{print_dims}
 \alias{print_dims}
-\alias{print_dims.psis}
+\alias{print_dims.importance_sampling}
 \alias{print_dims.psis_loo}
+\alias{print_dims.importance_sampling_loo}
 \alias{print_dims.waic}
 \alias{print_dims.kfold}
 \alias{print_dims.psis_loo_ss}
@@ -11,9 +12,11 @@
 \usage{
 print_dims(x, ...)
 
-\method{print_dims}{psis}(x, ...)
+\method{print_dims}{importance_sampling}(x, ...)
 
 \method{print_dims}{psis_loo}(x, ...)
+
+\method{print_dims}{importance_sampling_loo}(x, ...)
 
 \method{print_dims}{waic}(x, ...)
 

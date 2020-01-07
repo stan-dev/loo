@@ -45,8 +45,16 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
+  invisible(x)
+}
+
+#' @export
+#' @rdname print.loo
+print.importance_sampling_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.loo(x, digits = digits, ...)
+  cat("------\n")
   invisible(x)
 }
 
@@ -63,7 +71,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
@@ -76,11 +84,20 @@ print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
-    plot(x, ...)
+    graphics::plot(x, ...)
   }
   invisible(x)
 }
 
+#' @export
+#' @rdname print.loo
+print.importance_sampling <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print_dims(x)
+  if (plot_k) {
+    graphics::plot(x, ...)
+  }
+  invisible(x)
+}
 
 # internal ----------------------------------------------------------------
 
@@ -95,7 +112,7 @@ print_dims <- function(x, ...) UseMethod("print_dims")
 
 #' @rdname print_dims
 #' @export
-print_dims.psis <- function(x, ...) {
+print_dims.importance_sampling <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
@@ -110,6 +127,16 @@ print_dims.psis_loo <- function(x, ...) {
     "Computed from",
     paste(dim(x), collapse = " by "),
     "log-likelihood matrix\n"
+  )
+}
+
+#' @rdname print_dims
+#' @export
+print_dims.importance_sampling_loo <- function(x, ...) {
+  cat(
+    "Computed from",
+    paste(dim(x), collapse = " by "),
+    "log-likelihood matrix using", class(x)[1], "\n"
   )
 }
 

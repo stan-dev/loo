@@ -108,7 +108,7 @@ E_loo.default <-
       r_eff <- relative_eff(psis_object)
     }
 
-    w <- as.vector(weights.psis(psis_object, log = FALSE))
+    w <- as.vector(weights(psis_object, log = FALSE))
     x <- as.vector(x)
     out <- E_fun(x, w, probs, r_eff)
 
@@ -151,7 +151,7 @@ E_loo.matrix <-
       )
       fun_val <- numeric(length(probs))
     }
-    w <- weights.psis(psis_object, log = FALSE)
+    w <- weights(psis_object, log = FALSE)
 
     out <- vapply(seq_len(ncol(x)), function(i) {
       E_fun(x[, i], w[, i], probs = probs, r_eff = r_eff[i])

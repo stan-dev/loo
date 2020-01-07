@@ -6,22 +6,27 @@
 \alias{relative_eff.matrix}
 \alias{relative_eff.array}
 \alias{relative_eff.function}
-\alias{relative_eff.psis}
+\alias{relative_eff.importance_sampling}
 \title{Convenience function for computing relative efficiencies}
 \usage{
 relative_eff(x, ...)
 
 \method{relative_eff}{default}(x, chain_id, ...)
 
-\method{relative_eff}{matrix}(x, chain_id, ...,
-  cores = getOption("mc.cores", 1))
+\method{relative_eff}{matrix}(x, chain_id, ..., cores = getOption("mc.cores", 1))
 
 \method{relative_eff}{array}(x, ..., cores = getOption("mc.cores", 1))
 
-\method{relative_eff}{function}(x, chain_id, ...,
-  cores = getOption("mc.cores", 1), data = NULL, draws = NULL)
+\method{relative_eff}{`function`}(
+  x,
+  chain_id,
+  ...,
+  cores = getOption("mc.cores", 1),
+  data = NULL,
+  draws = NULL
+)
 
-\method{relative_eff}{psis}(x, ...)
+\method{relative_eff}{importance_sampling}(x, ...)
 }
 \arguments{
 \item{x}{A vector, matrix, 3-D array, or function. See the
@@ -91,7 +96,7 @@ arguments. These arguments are used like the \code{draws} argument in that they
 are recycled for each observation.
 }
 
-\item \code{psis}: If \code{x} is an object of class \code{"psis"}, \code{relative_eff()} simply returns
+\item \code{importance_sampling}: If \code{x} is an object of class \code{"psis"}, \code{relative_eff()} simply returns
 the \code{r_eff} attribute of \code{x}.
 }}
 

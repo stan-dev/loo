@@ -47,18 +47,16 @@ extract_log_lik <-
            parameter_name = "log_lik",
            merge_chains = TRUE) {
     if (!inherits(stanfit, "stanfit"))
-      stop("Not a stanfit object.")
+      stop("Not a stanfit object.", call. = FALSE)
     if (stanfit@mode != 0)
-      stop("Stan model does not contain posterior draws.")
-
+      stop("Stan model does not contain posterior draws.", call. = FALSE)
     if (!requireNamespace("rstan", quietly = TRUE))
-      stop("Please load the 'rstan' package.")
+      stop("Please load the 'rstan' package.", call. = FALSE)
 
     if (merge_chains) {
       log_lik <- as.matrix(stanfit, pars = parameter_name)
     } else {
       log_lik <- as.array(stanfit, pars = parameter_name)
     }
-
-    return(unname(log_lik))
+    unname(log_lik)
   }

@@ -16,7 +16,7 @@
 generate_lr_data <- function(D = 10, N = 1000, off_diag_cov = 0.7, seed = 4711, scaled = FALSE, sigma_noise = 0.01, round.digits = 7){
   set.seed(seed)
   x <- mvtnorm::rmvnorm(n = N, mean = rep(0, D), sigma = solve(diag(D) + off_diag_cov - diag(D)*off_diag_cov)/N)
-  if(scaled) x <- scale(x); attr(x,"scaled:scale") <- attr(x,"scaled:center") <- NULL
+  if (scaled) x <- scale(x); attr(x,"scaled:scale") <- attr(x,"scaled:center") <- NULL
   x <- round(x, digits = round.digits)
   b <- as.matrix(rep(1.0, D))
   y <- as.vector(x%*%b + rnorm(N, sd = sigma_noise))
@@ -44,7 +44,7 @@ log_lik_blinreg <- function(b, x, y, sigma, par_unconstrained = FALSE){
 
   bx <- b %*% t(x)
   log_lik <- matrix(0, nrow = nrow(b), ncol = nrow(x))
-  if(par_unconstrained) sigma <- exp(sigma)
+  if (par_unconstrained) sigma <- exp(sigma)
   for(s in 1:nrow(b)){
     for(i in 1:nrow(x)){
       log_lik[s,i] <-

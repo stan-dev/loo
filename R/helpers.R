@@ -1,3 +1,9 @@
+#' Detect if OS is Windows
+#' @noRd
+os_is_windows <- function() {
+  checkmate::test_os("windows")
+}
+
 #' More stable version of `log(mean(exp(x)))`
 #'
 #' @noRd

@@ -49,7 +49,6 @@ for(j in 1:N){
 
 
 test_that("loo_approximate_posterior.array works as loo_approximate_posterior.matrix", {
-  skip_if_not_installed("checkmate")
 
   # Create array with two "chains"
   log_p_mat <- matrix(log_p, nrow = (S/2), ncol = 2)
@@ -86,7 +85,7 @@ test_that("loo_approximate_posterior.array works as loo_approximate_posterior.ma
 })
 
 test_that("loo_approximate_posterior.function works as loo_approximate_posterior.matrix", {
-  skip_if_not_installed("checkmate")
+
 
   # Compute aploo
   expect_silent(aploo1 <- loo_approximate_posterior.matrix(x = ll, log_p = log_p, log_g = log_g))
