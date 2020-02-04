@@ -44,6 +44,7 @@
 #'
 #' @template loo-and-psis-references
 #' @template stacking-references
+#' @template loo-large-data-references
 #'
 #' @references
 #' Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion

@@ -5,7 +5,6 @@ context("psis_approximate_posterior")
 load(test_path("test_data_psis_approximate_posterior.rda"))
 
 test_that("Laplace approximation, independent posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$laplace_independent$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_independent$log_q
   ll <- test_data_psis_approximate_posterior$laplace_independent$log_liks
@@ -26,7 +25,6 @@ test_that("Laplace approximation, independent posterior", {
 
 
 test_that("Laplace approximation, correlated posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$laplace_correlated$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_correlated$log_q
   ll <- test_data_psis_approximate_posterior$laplace_correlated$log_liks
@@ -46,7 +44,6 @@ test_that("Laplace approximation, correlated posterior", {
 })
 
 test_that("Laplace approximation, normal model", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$laplace_normal$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_normal$log_q
   ll <- test_data_psis_approximate_posterior$laplace_normal$log_liks
@@ -68,7 +65,6 @@ test_that("Laplace approximation, normal model", {
 
 
 test_that("ADVI fullrank approximation, independent posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$fullrank_independent$log_p
   log_g <- test_data_psis_approximate_posterior$fullrank_independent$log_q
   ll <- test_data_psis_approximate_posterior$fullrank_independent$log_liks
@@ -89,7 +85,6 @@ test_that("ADVI fullrank approximation, independent posterior", {
 
 
 test_that("ADVI fullrank approximation, correlated posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$fullrank_correlated$log_p
   log_g <- test_data_psis_approximate_posterior$fullrank_correlated$log_q
   ll <- test_data_psis_approximate_posterior$fullrank_correlated$log_liks
@@ -109,7 +104,6 @@ test_that("ADVI fullrank approximation, correlated posterior", {
 })
 
 test_that("ADVI fullrank approximation, correlated posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$fullrank_normal$log_p
   log_g <- test_data_psis_approximate_posterior$fullrank_normal$log_q
   ll <- test_data_psis_approximate_posterior$fullrank_normal$log_liks
@@ -130,7 +124,6 @@ test_that("ADVI fullrank approximation, correlated posterior", {
 
 
 test_that("ADVI meanfield approximation, independent posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$meanfield_independent$log_p
   log_g <- test_data_psis_approximate_posterior$meanfield_independent$log_q
   ll <- test_data_psis_approximate_posterior$meanfield_independent$log_liks
@@ -151,7 +144,6 @@ test_that("ADVI meanfield approximation, independent posterior", {
 
 
 test_that("ADVI meanfield approximation, correlated posterior", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$meanfield_correlated$log_p
   log_g <- test_data_psis_approximate_posterior$meanfield_correlated$log_q
   ll <- test_data_psis_approximate_posterior$meanfield_correlated$log_liks
@@ -172,7 +164,6 @@ test_that("ADVI meanfield approximation, correlated posterior", {
 })
 
 test_that("ADVI meanfield approximation, normal model", {
-  skip_if_not_installed("checkmate")
   log_p <- test_data_psis_approximate_posterior$meanfield_normal$log_p
   log_g <- test_data_psis_approximate_posterior$meanfield_normal$log_q
   ll <- test_data_psis_approximate_posterior$meanfield_normal$log_liks
@@ -193,7 +184,7 @@ test_that("ADVI meanfield approximation, normal model", {
 
 
 test_that("ADVI meanfield approximation, normal model", {
-  skip_if_not_installed("checkmate")
+
   log_p <- test_data_psis_approximate_posterior$meanfield_normal$log_p
   log_g <- test_data_psis_approximate_posterior$meanfield_normal$log_q
   ll <- test_data_psis_approximate_posterior$meanfield_normal$log_liks
@@ -214,7 +205,7 @@ test_that("ADVI meanfield approximation, normal model", {
 
 
 test_that("Deprecation of log_q argument", {
-  skip_if_not_installed("checkmate")
+
   log_p <- test_data_psis_approximate_posterior$laplace_independent$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_independent$log_q
   ll <- test_data_psis_approximate_posterior$laplace_independent$log_liks

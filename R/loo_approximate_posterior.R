@@ -47,9 +47,6 @@ loo_approximate_posterior.array <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-    if (!requireNamespace("checkmate", quietly=TRUE)) {
-      stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
-    }
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
@@ -78,9 +75,6 @@ loo_approximate_posterior.matrix <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
-    if (!requireNamespace("checkmate", quietly=TRUE)) {
-      stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
-    }
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_numeric(log_p, len = nrow(x))
@@ -203,7 +197,7 @@ loo_approximate_posterior.function <-
   }
 
 
-assert_psis_loo_ap <- function(x){
+assert_psis_loo_ap <- function(x) {
   checkmate::assert_class(x, "psis_loo_ap")
   checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "approximate_posterior"))
   checkmate::assert_names(names(x$approximate_posterior), must.include = c("log_p", "log_g"))

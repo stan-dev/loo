@@ -21,11 +21,9 @@
 #'
 #' @keywords internal
 #'
-psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL, cores, save_psis, ..., log_q = NULL){
-  if (!requireNamespace("checkmate", quietly=TRUE)) {
-    stop("Please install the 'checkmate' package to use this function.", call. = FALSE)
-  }
-  if (!is.null(log_q)){
+psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL,
+                                       cores, save_psis, ..., log_q = NULL) {
+  if (!is.null(log_q)) {
     .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
     log_g <- log_q
   }
@@ -35,7 +33,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   checkmate::assert_integerish(cores)
   checkmate::assert_flag(save_psis)
 
-  if (is.null(log_liks)){
+  if (is.null(log_liks)) {
     approx_correction <- log_p - log_g
     # Handle underflow/overflow
     approx_correction <- approx_correction - max(approx_correction)
@@ -67,7 +65,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
 #' @inheritParams ap_psis
 #' @noRd
 #' @keywords internal
-correct_log_ratios <- function(log_ratios, log_p, log_g){
+correct_log_ratios <- function(log_ratios, log_p, log_g) {
   approx_correction <- log_p - log_g
   log_ratios <- log_ratios + approx_correction
   # Handle underflow/overflow
