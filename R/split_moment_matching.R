@@ -27,7 +27,7 @@
 #'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
-#' @param r_effi MCMC relative effective sample size of the \code{i}'th
+#' @param r_eff_i MCMC relative effective sample size of the \code{i}'th
 #' log likelihood draws.
 #' @template cores
 #' @template is_method
@@ -44,7 +44,7 @@
 #'
 split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
                      total_mapping, i, log_prob_upars,
-                     log_lik_i_upars, r_effi, cores,
+                     log_lik_i_upars, r_eff_i, cores,
                      is_method, ...) {
   S <- dim(upars)[1]
   S_half <- as.integer(0.5 * S)
@@ -93,14 +93,14 @@ split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
 
   is_obj_half <- suppressWarnings(importance_sampling.default(lwi_half,
                                                               method = is_method,
-                                                              r_eff = r_effi,
+                                                              r_eff = r_eff_i,
                                                               cores = cores))
   lwi_half <- as.vector(weights(is_obj_half))
 
   is_obj_f_half <- suppressWarnings(importance_sampling.default(lwi_half +
                                                                   log_liki_half,
                                                                 method = is_method,
-                                                                r_eff = r_effi,
+                                                                r_eff = r_eff_i,
                                                                 cores = cores))
   lwfi_half <- as.vector(weights(is_obj_f_half))
 
@@ -114,14 +114,14 @@ split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
   take <- seq_len(S)[-seq_len(S_half)]
   log_liki_half_2 <- log_liki_half[take, drop = FALSE]
   dim(log_liki_half_2) <- c(length(take), 1, 1)
-  r_effi1 <- loo::relative_eff(exp(log_liki_half_1), cores = cores)
-  r_effi2 <- loo::relative_eff(exp(log_liki_half_2), cores = cores)
-  r_effi <- min(r_effi1,r_effi2)
+  r_eff_i1 <- loo::relative_eff(exp(log_liki_half_1), cores = cores)
+  r_eff_i2 <- loo::relative_eff(exp(log_liki_half_2), cores = cores)
+  r_eff_i <- min(r_eff_i1,r_eff_i2)
 
   list(
     lwi = lwi_half,
     lwfi = lwfi_half,
     log_liki = log_liki_half,
-    r_effi = r_effi
+    r_eff_i = r_eff_i
   )
 }

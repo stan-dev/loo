@@ -148,12 +148,12 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
     S_per_chain <- NROW(log_liki)
     N_chains <- NCOL(log_liki)
     dim(log_liki) <- c(S_per_chain, N_chains, 1)
-    r_effi <- loo::relative_eff(exp(log_liki), cores = cores)
+    r_eff_i <- loo::relative_eff(exp(log_liki), cores = cores)
     dim(log_liki) <- NULL
 
     is_obj <- suppressWarnings(importance_sampling.default(-log_liki,
                                                            method = is_method,
-                                                           r_eff = r_effi,
+                                                           r_eff = r_eff_i,
                                                            cores = cores))
     lwi <- as.vector(weights(is_obj))
     lwfi <- rep(-matrixStats::logSumExp(rep(0, S)),S)
@@ -181,7 +181,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
                                           orig_log_prob = orig_log_prob,
                                           log_prob_upars = log_prob_upars,
                                           log_lik_i_upars = log_lik_i_upars,
-                                          r_effi = r_effi,
+                                          r_eff_i = r_eff_i,
                                           cores = cores,
                                           is_method = is_method,
                                           ...)
@@ -205,7 +205,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
                                           orig_log_prob = orig_log_prob,
                                           log_prob_upars = log_prob_upars,
                                           log_lik_i_upars = log_lik_i_upars,
-                                          r_effi = r_effi,
+                                          r_eff_i = r_eff_i,
                                           cores = cores,
                                           is_method = is_method,
                                           ...)
@@ -231,7 +231,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
                                             orig_log_prob = orig_log_prob,
                                             log_prob_upars = log_prob_upars,
                                             log_lik_i_upars = log_lik_i_upars,
-                                            r_effi = r_effi,
+                                            r_eff_i = r_eff_i,
                                             cores = cores,
                                             is_method = is_method,
                                             ...)
@@ -264,16 +264,16 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
       split_obj <- split_mmloo(
         x, upars, cov, total_shift, total_scaling, total_mapping, i,
         log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
-        cores = cores, r_effi = r_effi, is_method = is_method
+        cores = cores, r_eff_i = r_eff_i, is_method = is_method
       )
       log_liki <- split_obj$log_liki
       lwi <- split_obj$lwi
       lwfi <- split_obj$lwfi
-      r_effi <- split_obj$r_effi
+      r_eff_i <- split_obj$r_eff_i
     }
     else {
       dim(log_liki) <- c(S_per_chain, N_chains, 1)
-      r_effi <- loo::relative_eff(exp(log_liki), cores = cores)
+      r_eff_i <- loo::relative_eff(exp(log_liki), cores = cores)
       dim(log_liki) <- NULL
     }
 
@@ -288,7 +288,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
     # mcse_elpd_loo
     loo$pointwise[i, "mcse_elpd_loo"] <- mcse_elpd(
       ll = as.matrix(log_liki), lw = as.matrix(lwi),
-      E_elpd = exp(elpd_loo_i), r_eff = r_effi
+      E_elpd = exp(elpd_loo_i), r_eff = r_eff_i
     )
     # looic
     loo$pointwise[i, "looic"] <- -2 * elpd_loo_i
@@ -296,7 +296,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
     # diagnostics
     loo$diagnostics$pareto_k[i] <- ki
     loo$diagnostics$n_eff[i] <- min(1.0 / sum(exp(2 * lwi)),
-                                    1.0 / sum(exp(2 * lwfi))) * r_effi
+                                    1.0 / sum(exp(2 * lwfi))) * r_eff_i
     kfs[i] <- kfi
 
     # update psis object
@@ -363,7 +363,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
 #'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 #'   observation based on the unconstrained posterior draws passed via
 #'   \code{upars}.
-#' @param r_effi MCMC effective sample size divided by the total sample size
+#' @param r_eff_i MCMC effective sample size divided by the total sample size
 #' for 1/exp(log_ratios) for observation i.
 #' @template cores
 #' @template is_method
@@ -372,7 +372,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
 #'
 update_quantities_i <- function(x, upars, i, orig_log_prob,
                                 log_prob_upars, log_lik_i_upars,
-                                r_effi, cores, is_method, ...) {
+                                r_eff_i, cores, is_method, ...) {
   log_prob_new <- log_prob_upars(x, upars = upars, ...)
   log_liki_new <- log_lik_i_upars(x, upars = upars, i = i, ...)
   # compute new log importance weights
@@ -381,7 +381,7 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
                                                                log_prob_new -
                                                                orig_log_prob,
                                                              method = is_method,
-                                                             r_eff = r_effi,
+                                                             r_eff = r_eff_i,
                                                              cores = cores))
   lwi_new <- as.vector(weights(is_obj_new))
   ki_new <- is_obj_new$diagnostics$pareto_k
@@ -389,7 +389,7 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
   is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new -
                                                                  orig_log_prob,
                                                                method = is_method,
-                                                               r_eff = r_effi,
+                                                               r_eff = r_eff_i,
                                                                cores = cores))
   lwfi_new <- as.vector(weights(is_obj_f_new))
   kfi_new <- is_obj_f_new$diagnostics$pareto_k

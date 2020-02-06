@@ -14,7 +14,7 @@ split_mmloo(
   i,
   log_prob_upars,
   log_lik_i_upars,
-  r_effi,
+  r_eff_i,
   cores,
   is_method,
   ...
@@ -50,7 +50,7 @@ and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
 observation based on the unconstrained posterior draws passed via
 \code{upars}.}
 
-\item{r_effi}{MCMC relative effective sample size of the \code{i}'th
+\item{r_eff_i}{MCMC relative effective sample size of the \code{i}'th
 log likelihood draws.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to

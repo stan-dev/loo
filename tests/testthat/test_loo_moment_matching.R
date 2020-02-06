@@ -291,9 +291,9 @@ test_that("split_mmloo works", {
   split <- split_mmloo(
     x, upars, cov = FALSE, total_shift = c(0,0), total_scaling = c(1,1), total_mapping = diag(c(1,1)), i = 1,
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars_test,
-    cores = 1, r_effi = 1, is_method = "psis")
+    cores = 1, r_eff_i = 1, is_method = "psis")
 
-  expect_named(split,c("lwi", "lwfi", "log_liki", "r_effi"))
+  expect_named(split,c("lwi", "lwfi", "log_liki", "r_eff_i"))
 
   expect_equal(lwi_1_ps,split$lwi)
 
@@ -301,7 +301,7 @@ test_that("split_mmloo works", {
     x, upars, cov = FALSE, total_shift = c(-0.1,-0.2), total_scaling = c(0.7,0.7),
     total_mapping = matrix(c(1,0.1,0.1,1),2,2), i = 1,
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars_test,
-    cores = 1, r_effi = 1, is_method = "psis")
+    cores = 1, r_eff_i = 1, is_method = "psis")
 
   expect_equal_to_reference(split2, "reference-results/moment_match_split.rds")
 
