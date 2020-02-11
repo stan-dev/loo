@@ -5,7 +5,7 @@
 #'
 #'
 #'
-#' @export mmloo mmloo.default
+#' @export loo_moment_match loo_moment_match.default
 #' @param x A fitted model object.
 #' @param loo A loo object that is modified.
 #' @param post_draws A function the takes \code{x} as the first argument and
@@ -38,35 +38,35 @@
 #' @template cores
 #' @param ... Further arguments passed to the custom functions documented above.
 #'
-#' @return The `mmloo()` methods return an updated \code{loo} object.
+#' @return The `loo_moment_match()` methods return an updated \code{loo} object.
 #' The structure of the updated \code{loo} object is similar, but the
 #' method also stores the original Pareto k diagnostic values in
 #' the diagnostics field.
 #'
-#' @details The `mmloo()` function is an S3 generic and we provide a default
+#' @details The `loo_moment_match()` function is an S3 generic and we provide a default
 #' method that takes as arguments user-specified functions \code{post_draws},
 #' \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
 #' \code{log_lik_i_upars}. All of these functions should take \code{...}
 #' as an argument in addition to those specified for each function.
 #'
-#' @section Defining `mmloo()` methods in a package: Package developers can
-#' define `mmloo()` methods for fitted models objects. The
-#' `mmloo.stanfit()` method in the **Examples** section provides an example.
+#' @section Defining `loo_moment_match()` methods in a package: Package developers can
+#' define `loo_moment_match()` methods for fitted models objects. The
+#' `loo_moment_match.stanfit()` method in the **Examples** section provides an example.
 #'
-#' @seealso [loo()], [split_mmloo()]
+#' @seealso [loo()], [loo_moment_match_split()]
 #' @template moment-matching-references
 #'
 #' @examples
 #' \dontrun{
-#' ### For package developers: defining mmloo methods
+#' ### For package developers: defining loo_moment_match methods
 #'
-#' # An example of a possible mmloo method for a 'stanfit' objects
-#' # (from package rstan). The example is just a wrapper of mmloo.stanfit
+#' # An example of a possible loo_moment_match method for a 'stanfit' objects
+#' # (from package rstan). The example is just a wrapper of loo_moment_match.default
 #' # with user-defined functions post_draws_stanfit, log_lik_i_stanfit,
 #' # unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_i_upars_stanfit.
 #' #
-#' mmloo.stanfit <- function(x, loo, ...) {
-#' loo::mmloo.default(
+#' loo_moment_match.stanfit <- function(x, loo, ...) {
+#' loo::loo_moment_match.default(
 #'   x, loo = loo,
 #'   post_draws = post_draws_stanfit,
 #'   log_lik_i = log_lik_i_stanfit,
@@ -83,17 +83,17 @@
 
 
 #' @export
-mmloo <- function(x, ...) {
-  UseMethod("mmloo")
+loo_moment_match <- function(x, ...) {
+  UseMethod("loo_moment_match")
 }
 
 
-#' @describeIn mmloo A default method that takes as arguments
+#' @describeIn loo_moment_match A default method that takes as arguments
 #' a user-specified model object \code{x}, a \code{loo} object and
 #' user-specified functions \code{post_draws}, \code{log_lik_i},
 #' \code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_i_upars}.
 #' @export
-mmloo.default <- function(x, loo, post_draws, log_lik_i,
+loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
                           log_lik_i_upars, max_iters = 30L,
                           k_threshold = 0.7, split = TRUE,
@@ -118,7 +118,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
     is_method <- "psis"
   }
   else {
-    stop("mmloo currently supports only the \"psis\" importance sampling class.")
+    stop("loo_moment_match currently supports only the \"psis\" importance sampling class.")
   }
 
 
@@ -261,7 +261,7 @@ mmloo.default <- function(x, loo, post_draws, log_lik_i,
     # stop and collect values
     if (split && (iterind > 1)) {
       # compute split transformation
-      split_obj <- split_mmloo(
+      split_obj <- loo_moment_match_split(
         x, upars, cov, total_shift, total_scaling, total_mapping, i,
         log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
         cores = cores, r_eff_i = r_eff_i, is_method = is_method

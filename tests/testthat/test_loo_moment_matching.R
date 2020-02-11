@@ -1,5 +1,4 @@
 library(loo)
-library(rstan)
 options(mc.cores = 1)
 
 
@@ -136,90 +135,90 @@ test_that("log_prob_upars_test works", {
 })
 
 
-test_that("mmloo.default warnings work", {
+test_that("loo_moment_match.default warnings work", {
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
   loo_manual_tis <- suppressWarnings(loo(loglik, is_method = "tis"))
 
 
-  expect_warning(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 30L,
                               k_thres = 100, split = FALSE,
                               cov = TRUE, cores = 1), "Some Pareto k")
 
-  expect_warning(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 30L,
                               k_thres = 0.5, split = FALSE,
                               cov = TRUE, cores = 1), "The accuracy of self-normalized importance sampling")
 
-  expect_warning(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 1,
                               k_thres = 0.5, split = TRUE,
                               cov = TRUE, cores = 1), "The maximum number of moment matching iterations")
 
-  expect_error(mmloo(x, loo_manual_tis, post_draws_test, log_lik_i_test,
+  expect_error(loo_moment_match(x, loo_manual_tis, post_draws_test, log_lik_i_test,
                        unconstrain_pars_test, log_prob_upars_test,
                        log_lik_i_upars_test, max_iters = 30L,
                        k_thres = 0.5, split = TRUE,
-                       cov = TRUE, cores = 1), "mmloo currently supports only")
+                       cov = TRUE, cores = 1), "loo_moment_match currently supports only")
 })
 
 
 
 
-test_that("mmloo.default works", {
+test_that("loo_moment_match.default works", {
 
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
 
-  mmloo_object <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_object <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
                                                 log_lik_i_upars_test, max_iters = 30L,
                                                 k_thres = 0.8, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
   # diagnostic pareto k decreases but leverage pareto k stays the same
-  expect_lt(mmloo_object$diagnostics$pareto_k[1], mmloo_object$pointwise[1,"leverage_pareto_k"])
-  expect_equal(mmloo_object$pointwise[,"leverage_pareto_k"],loo_manual$pointwise[,"leverage_pareto_k"])
-  expect_equal(mmloo_object$pointwise[,"leverage_pareto_k"],loo_manual$diagnostics$pareto_k)
+  expect_lt(loo_moment_match_object$diagnostics$pareto_k[1], loo_moment_match_object$pointwise[1,"leverage_pareto_k"])
+  expect_equal(loo_moment_match_object$pointwise[,"leverage_pareto_k"],loo_manual$pointwise[,"leverage_pareto_k"])
+  expect_equal(loo_moment_match_object$pointwise[,"leverage_pareto_k"],loo_manual$diagnostics$pareto_k)
 
-  expect_equal_to_reference(mmloo_object, "reference-results/moment_match_loo_1.rds")
+  expect_equal_to_reference(loo_moment_match_object, "reference-results/moment_match_loo_1.rds")
 
-  mmloo_object2 <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_object2 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
                                                 log_lik_i_upars_test, max_iters = 30L,
                                                 k_thres = 0.5, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(mmloo_object2, "reference-results/moment_match_loo_2.rds")
+  expect_equal_to_reference(loo_moment_match_object2, "reference-results/moment_match_loo_2.rds")
 
-  mmloo_object3 <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_object3 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
                                                 log_lik_i_upars_test, max_iters = 30L,
                                                 k_thres = 0.5, split = TRUE,
                                                 cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(mmloo_object3, "reference-results/moment_match_loo_3.rds")
+  expect_equal_to_reference(loo_moment_match_object3, "reference-results/moment_match_loo_3.rds")
 
-  mmloo_object4 <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_object4 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
                                                 log_lik_i_upars_test, max_iters = 30L,
                                                 k_thres = 100, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-  expect_equal(loo_manual,mmloo_object4)
+  expect_equal(loo_manual,loo_moment_match_object4)
 
   loo_manual_with_psis <- suppressWarnings(loo(loglik, save_psis = TRUE))
-  mmloo_object5 <- suppressWarnings(mmloo(x, loo_manual_with_psis, post_draws_test, log_lik_i_test,
+  loo_moment_match_object5 <- suppressWarnings(loo_moment_match(x, loo_manual_with_psis, post_draws_test, log_lik_i_test,
                                           unconstrain_pars_test, log_prob_upars_test,
                                           log_lik_i_upars_test, max_iters = 30L,
                                           k_thres = 0.8, split = FALSE,
                                           cov = TRUE, cores = 1))
 
-  expect_equal(mmloo_object5$diagnostics,mmloo_object5$psis_object$diagnostics)
+  expect_equal(loo_moment_match_object5$diagnostics,loo_moment_match_object5$psis_object$diagnostics)
 
 
 })
@@ -245,50 +244,50 @@ test_that("variance and covariance transformations work", {
 
   loo_manual <- suppressWarnings(loo(loglik))
 
-  mmloo_object <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_object <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                          unconstrain_pars_test, log_prob_upars_test,
                                          log_lik_i_upars_test, max_iters = 30L,
                                          k_thres = 0.0, split = FALSE,
                                          cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(mmloo_object, "reference-results/moment_match_var_and_cov.rds")
+  expect_equal_to_reference(loo_moment_match_object, "reference-results/moment_match_var_and_cov.rds")
 
 })
 
-test_that("mmloo.default works with multiple cores", {
+test_that("loo_moment_match.default works with multiple cores", {
 
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
 
-  mmloo_manual3 <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_manual3 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                  unconstrain_pars_test, log_prob_upars_test,
                                                  log_lik_i_upars_test, max_iters = 30L,
                                                  k_thres = 0.5, split = FALSE,
                                                  cov = TRUE, cores = 1))
 
-  mmloo_manual4 <- suppressWarnings(mmloo(x, loo_manual, post_draws_test, log_lik_i_test,
+  loo_moment_match_manual4 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                  unconstrain_pars_test, log_prob_upars_test,
                                                  log_lik_i_upars_test, max_iters = 30L,
                                                  k_thres = 0.5, split = FALSE,
                                                  cov = TRUE, cores = 2))
 
-  expect_equal(mmloo_manual3$diagnostics$pareto_k, mmloo_manual4$diagnostics$pareto_k)
-  expect_equal(mmloo_manual3$diagnostics$n_eff, mmloo_manual4$diagnostics$n_eff)
+  expect_equal(loo_moment_match_manual3$diagnostics$pareto_k, loo_moment_match_manual4$diagnostics$pareto_k)
+  expect_equal(loo_moment_match_manual3$diagnostics$n_eff, loo_moment_match_manual4$diagnostics$n_eff)
 
-  expect_equal(mmloo_manual3$estimates, mmloo_manual4$estimates)
+  expect_equal(loo_moment_match_manual3$estimates, loo_moment_match_manual4$estimates)
 
-  expect_equal(mmloo_manual3$pointwise, mmloo_manual4$pointwise, tolerance=5e-4)
+  expect_equal(loo_moment_match_manual3$pointwise, loo_moment_match_manual4$pointwise, tolerance=5e-4)
 
 })
 
 
 
-test_that("split_mmloo works", {
+test_that("loo_moment_match_split works", {
 
   is_obj_1 <- suppressWarnings(importance_sampling.default(lwi_1, method = "psis", r_eff = 1, cores = 1))
   lwi_1_ps <- as.vector(weights(is_obj_1))
 
-  split <- split_mmloo(
+  split <- loo_moment_match_split(
     x, upars, cov = FALSE, total_shift = c(0,0), total_scaling = c(1,1), total_mapping = diag(c(1,1)), i = 1,
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars_test,
     cores = 1, r_eff_i = 1, is_method = "psis")
@@ -297,7 +296,7 @@ test_that("split_mmloo works", {
 
   expect_equal(lwi_1_ps,split$lwi)
 
-  split2 <- split_mmloo(
+  split2 <- loo_moment_match_split(
     x, upars, cov = FALSE, total_shift = c(-0.1,-0.2), total_scaling = c(0.7,0.7),
     total_mapping = matrix(c(1,0.1,0.1,1),2,2), i = 1,
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars_test,

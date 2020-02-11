@@ -54,7 +54,7 @@
 #' * With some additional computations, it is possible to transform the MCMC
 #'   draws from the posterior distribution to obtain more reliable importance
 #'   sampling estimates. This results in a smaller shape parameter \eqn{k}.
-#'   See [mmloo()] for an example of this.
+#'   See [loo_moment_match()] for an example of this.
 #'
 #' * Sampling directly from \eqn{p(\theta^s | y_{-i})} for the problematic
 #'   observations \eqn{i}, or using \eqn{k}-fold cross-validation will generally

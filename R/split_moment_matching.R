@@ -38,11 +38,11 @@
 #' and the integrand-specific log-importance weights.
 #'
 #'
-#' @seealso [loo()], [mmloo()]
+#' @seealso [loo()], [loo_moment_match()]
 #' @template moment-matching-references
 #'
 #'
-split_mmloo <- function(x, upars, cov, total_shift, total_scaling,
+loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
                      total_mapping, i, log_prob_upars,
                      log_lik_i_upars, r_eff_i, cores,
                      is_method, ...) {
