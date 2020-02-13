@@ -310,7 +310,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   # combined estimates
   cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo",
-                                                        "leverage_pareto_k"))
+                                                        "influence_pareto_k"))
   loo$estimates <- table_of_estimates(loo$pointwise[, cols_to_summarize,
                                                     drop = FALSE])
 

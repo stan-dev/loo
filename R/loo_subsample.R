@@ -923,7 +923,7 @@ add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx) 
   checkmate::assert_matrix(pointwise,
                            any.missing = FALSE,
                            min.cols = 5)
-  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo","mcse_elpd_loo","p_loo","looic", "leverage_pareto_k"))
+  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo","mcse_elpd_loo","p_loo","looic", "influence_pareto_k"))
   assert_subsample_idxs(idxs)
   checkmate::assert_numeric(elpd_loo_approx)
 
@@ -1280,7 +1280,7 @@ assert_subsampling_pointwise <- function(x) {
   checkmate::assert_matrix(x,
                            any.missing = FALSE,
                            ncols = 8)
-  checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "leverage_pareto_k", "idx", "m_i", "elpd_loo_approx"))
+  checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k", "idx", "m_i", "elpd_loo_approx"))
   x
 }
 

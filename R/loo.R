@@ -58,11 +58,11 @@
 #'  \item{`pointwise`}{
 #'   A matrix with five columns (and number of rows equal to the number of
 #'   observations) containing the pointwise contributions of the measures
-#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`, `leverage_pareto_k`).
+#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`, `influence_pareto_k`).
 #'   in addition to the three measures in \code{estimates}, we also report
 #'   pointwise values of the Monte Carlo standard error of \code{elpd_loo}
 #'   (\code{mcse_elpd_loo}), and statistics describing the influence of
-#'   each observation on the posterior distribution (\code{leverage_pareto_k}).
+#'   each observation on the posterior distribution (\code{influence_pareto_k}).
 #'   These are the estimates of the shape parameter \eqn{k} of the
 #'   generalized Pareto fit to the importance ratios for each leave-one-out
 #'   distribution. See the [pareto-k-diagnostic] page for details.
@@ -72,7 +72,7 @@
 #'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
 #'    * `pareto_k`: Importance sampling reliability diagnostics. By default,
-#'      these are equal to the \code{leverage_pareto_k} in \code{pointwise}.
+#'      these are equal to the \code{influence_pareto_k} in \code{pointwise}.
 #'      Some algorithms can improve importance sampling reliability and
 #'      modify these diagnostics. See the [pareto-k-diagnostic] page for details.
 #'    * `n_eff`: PSIS effective sample size estimates.
@@ -435,7 +435,7 @@ is.psis_loo <- function(x) {
 #' @param ll Log-likelihood matrix.
 #' @param psis_object The object returned by `psis()`.
 #' @return Named list with pointwise elpd_loo, mcse_elpd_loo, p_loo, looic,
-#' and leverage_pareto_k.
+#' and influence_pareto_k.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
@@ -447,15 +447,15 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   p_loo <- lpd - elpd_loo
   mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
   looic <- -2 * elpd_loo
-  leverage_pareto_k <- psis_object$diagnostics$pareto_k
-  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, leverage_pareto_k)
+  influence_pareto_k <- psis_object$diagnostics$pareto_k
+  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, influence_pareto_k)
 }
 
 #' Structure the object returned by the loo methods
 #'
 #' @noRd
 #' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
-#'   looic, leverage_pareto_k.
+#'   looic, influence_pareto_k.
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
 #' @template is_method
@@ -469,7 +469,7 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
   if (!is.list(diagnostics)) stop("Internal error ('diagnostics' must be a list)")
   assert_importance_sampling_method_is_implemented(is_method)
 
-  cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "leverage_pareto_k"))
+  cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "influence_pareto_k"))
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
   out <- nlist(estimates, pointwise, diagnostics)
