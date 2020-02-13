@@ -74,13 +74,13 @@ test_that("pareto_k_values works for psis_loo and psis objects, errors for waic"
   expect_error(pareto_k_values(waic1), "No Pareto k estimates found")
 })
 
-test_that("pareto_k_leverage_values works for psis_loo objects, errors for psis waic", {
-  kloo <- pareto_k_leverage_values(loo1)
+test_that("pareto_k_influence_values works for psis_loo objects, errors for psis waic", {
+  kloo <- pareto_k_influence_values(loo1)
   kloo2 <- pareto_k_values(loo1)
   expect_identical(kloo, kloo2)
 
-  expect_error(pareto_k_leverage_values(psis1), "No Pareto k leverage estimates found")
-  expect_error(pareto_k_leverage_values(waic1), "No Pareto k leverage estimates found")
+  expect_error(pareto_k_influence_values(psis1), "No Pareto k influence estimates found")
+  expect_error(pareto_k_influence_values(waic1), "No Pareto k influence estimates found")
 })
 
 test_that("pareto_k_ids identifies correct observations", {

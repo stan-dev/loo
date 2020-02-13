@@ -180,7 +180,7 @@ test_that("loo_moment_match.default works", {
                                                 k_thres = 0.8, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-  # diagnostic pareto k decreases but leverage pareto k stays the same
+  # diagnostic pareto k decreases but influence pareto k stays the same
   expect_lt(loo_moment_match_object$diagnostics$pareto_k[1], loo_moment_match_object$pointwise[1,"influence_pareto_k"])
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$pointwise[,"influence_pareto_k"])
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$diagnostics$pareto_k)

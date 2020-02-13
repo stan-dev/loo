@@ -5,7 +5,7 @@
 \alias{pareto_k_table}
 \alias{pareto_k_ids}
 \alias{pareto_k_values}
-\alias{pareto_k_leverage_values}
+\alias{pareto_k_influence_values}
 \alias{psis_n_eff_values}
 \alias{mcse_loo}
 \alias{plot.psis_loo}
@@ -19,7 +19,7 @@ pareto_k_ids(x, threshold = 0.5)
 
 pareto_k_values(x)
 
-pareto_k_leverage_values(x)
+pareto_k_influence_values(x)
 
 psis_n_eff_values(x)
 
@@ -73,7 +73,7 @@ observations have Pareto \eqn{k} estimates above \code{threshold}.
 \code{pareto_k_values()} returns a vector of the estimated Pareto
 \eqn{k} parameters. These represent the reliability of sampling.
 
-\code{pareto_k_leverage_values()} returns a vector of the estimated Pareto
+\code{pareto_k_influence_values()} returns a vector of the estimated Pareto
 \eqn{k} parameters. These represent influence of the observations on the
 model posterior distribution.
 
@@ -150,7 +150,7 @@ generally make approximate LOO-CV more stable.
 \subsection{Observation influence statistics}{ The estimated shape parameter
 \eqn{k} for each observation can be used as a measure of the observation's
 influence on posterior distribution of the model. These can be obtained with
-\code{pareto_k_leverage_values()}.
+\code{pareto_k_influence_values()}.
 }
 
 \subsection{Effective sample size and error estimates}{ In the case that we

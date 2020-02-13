@@ -68,7 +68,7 @@
 #' \subsection{Observation influence statistics}{ The estimated shape parameter
 #' \eqn{k} for each observation can be used as a measure of the observation's
 #' influence on posterior distribution of the model. These can be obtained with
-#' `pareto_k_leverage_values()`.
+#' `pareto_k_influence_values()`.
 #' }
 #'
 #' \subsection{Effective sample size and error estimates}{ In the case that we
@@ -164,15 +164,15 @@ pareto_k_values <- function(x) {
 
 #' @rdname pareto-k-diagnostic
 #' @export
-#' @return `pareto_k_leverage_values()` returns a vector of the estimated Pareto
+#' @return `pareto_k_influence_values()` returns a vector of the estimated Pareto
 #'   \eqn{k} parameters. These represent influence of the observations on the
 #'   model posterior distribution.
-pareto_k_leverage_values <- function(x) {
+pareto_k_influence_values <- function(x) {
   if ("influence_pareto_k" %in% colnames(x$pointwise)) {
     k <- x$pointwise[,"influence_pareto_k"]
   }
   else {
-    stop("No Pareto k leverage estimates found.", call. = FALSE)
+    stop("No Pareto k influence estimates found.", call. = FALSE)
   }
   return(k)
 }
