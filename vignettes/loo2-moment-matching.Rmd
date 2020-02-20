@@ -124,8 +124,8 @@ loo1 <- loo(fit)
 loo1
 ```
 
-We notice that the `loo()` output warns us that there are some observations
-which are very influential, and thus the
+The `loo()` function output warnings that there are some observations
+which are highly influential, and thus the
 accuracy of importance sampling is compromised as indicated by the large Pareto $k$
 diagnostic values (> 0.7). As discussed in the demo
 [_Bayesian data analysis - roaches cross-validation demo_](https://avehtari.github.io/modelselection/roaches.html),
@@ -136,13 +136,13 @@ to be able to evaluate the predictive performance of the model accurately.
 
 To improve the accuracy of the `loo()` result above, we could perform
 leave-one-out cross-validation by explicitly leaving out single observations
-and refitting the model repeatedly. However, the Pareto $k$ diagnostics
+and refitting the model using MCMC repeatedly. However, the Pareto $k$ diagnostics
 indicate that there are 19 observations which are problematic. This would
-require 19 model refits which requires lots of computation time.
+require 19 model refits which may require lot of computation time.
 
-Instead of refitting, we can perform a moment matching correction to
-the importance sampling for the problematic observations, avoiding refitting
-the model. This can be done with the `loo_moment_match()` function from the
+Instead of refitting with MCMC, we can perform a faster moment matching correction to
+the importance sampling for the problematic observations. 
+This can be done with the `loo_moment_match()` function in the
 __loo__ package, which takes our existing `loo` object as input
 and modifies it. The moment matching requires some evaluations of the model
 posterior density. For models fitted with __rstan__, this can be conveniently
@@ -157,29 +157,28 @@ By default, it operates
 on all observations whose Pareto $k$ value is larger than 0.7.
 (NOTE: Using moment matching directly using the `loo()` function is currently
 available in the development version of __rstan__ in
-[https://github.com/topipa/rstan](https://github.com/topipa/rstan), but will
+[ ](https://github.com/topipa/rstan), but will
 be available in the CRAN release eventually).
 
 ```{r, message=FALSE}
-loo2 <- loo(fit,moment_match = TRUE)
+loo2 <- loo(fit, moment_match = TRUE)
 loo2
 ```
 
-We notice that after moment matching, all observations have the diagnostic
-Pareto $k$ less than 0.7, meaning that the estimates are now more reliable.
-The `elpd_loo` estimate also changed from `-5457.8` to `-5478.5`, showing
+After the moment matching, all observations have the diagnostic
+Pareto $k$ less than 0.7, meaning that the estimates are now reliable.
+The total `elpd_loo` estimate also changed from `-5457.8` to `-5478.5`, showing
 that before moment matching, `loo()` overestimated the predictive
 performance of the model.
 
-In addition to the Pareto $k$ diagnostics, moment matching also updates
-the effective sample size estimates. The updated Pareto $k$ values stored in
+The updated Pareto $k$ values stored in
 `loo2$diagnostics$pareto_k` are considered algorithmic diagnostic values that
-indicate the sampling accuracy. In addition to that,
-the original Pareto $k$ values are
+indicate the sampling accuracy. The original Pareto $k$ values are
 stored in `loo2$pointwise[,"influence_pareto_k"]` and these are not modified
 by the moment matching. These can be considered as diagnostics
-indicating the influence of each observation on the posterior distribution.
-
+for how big influence each observation has on the posterior distribution.
+In addition to the Pareto $k$ diagnostics, moment matching also updates
+the effective sample size estimates. 
 
 # Using `loo_moment_match()` directly
 
