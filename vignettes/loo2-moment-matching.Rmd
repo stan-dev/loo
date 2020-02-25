@@ -97,7 +97,6 @@ and the __rstanarm__ package for the data.
 ```{r, setup, message=FALSE}
 library("rstan")
 library("loo")
-library("rstanarm")
 seed <- 9547
 set.seed(seed)
 ```
@@ -108,15 +107,15 @@ Next we fit the model in Stan using the __rstan__ package:
 
 ```{r, modelfit}
 # Prepare data
-data(roaches)
+data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
 y <- roaches$y
-x <- roaches[,2:4]
-offset <- log(roaches[,5])
+x <- roaches[,c("roach1", "treatment", "senior")]
+offset <- log(roaches[,"exposure2"])
 n <- dim(x)[1]
 k <- dim(x)[2]
 
-standata <- list(N = n, K = k, x = as.matrix(x), y = y,offset = offset,beta_prior_scale = 2.5,alpha_prior_scale = 5.0)
+standata <- list(N = n, K = k, x = as.matrix(x), y = y, offset = offset, beta_prior_scale = 2.5, alpha_prior_scale = 5.0)
 
 # Compile
 stanmodel <- stan_model(model_code = stancode)
@@ -193,23 +192,33 @@ the effective sample size estimates.
 
 The moment matching can also be performed by explicitly calling the function
 `loo_moment_match()`. This enables its use also for models that
-are not using __rstan__.
+are not using __rstan__ or another package with built-in support for
+`loo_moment_match()`.
 To use `loo_moment_match()`, the user must give the model object `x`, the `loo`
 object, and 5 helper functions as arguments to
 `loo_moment_match()`.
-These helper functions, in turn, take `x` as an argument.
 The helper functions are
 
 * `post_draws`	
-    + A function the takes `x` as the first argument and returns a matrix of posterior draws of the model parameters, `pars`.
+    + A function the takes `x` as the first argument and returns a matrix of
+    posterior draws of the model parameters, `pars`.
 * `log_lik_i`	
-    + A function that takes `x` and `i` and returns a matrix (one column per chain) or a vector (all chains stacked) of log-likeliood draws of the ith observation based on the model x. If the draws are obtained using MCMC, the matrix with MCMC chains separated is preferred.
+    + A function that takes `x` and `i` and returns a matrix
+    (one column per chain) or a vector (all chains stacked) of log-likeliood
+    draws of the ith observation based on the model `x`. If the draws are
+    obtained using MCMC, the matrix with MCMC chains separated is preferred.
 * `unconstrain_pars`	
-    + A function that takes arguments `x` and `pars`, and returns posterior draws on the unconstrained space based on the posterior draws on the constrained space passed via `pars`.
+    + A function that takes arguments `x` and `pars`, and returns posterior
+    draws on the unconstrained space based on the posterior draws on the
+    constrained space passed via `pars`.
 * `log_prob_upars`	
-    + A function that takes arguments `x` and `upars`, and returns a matrix of log-posterior density values of the unconstrained posterior draws passed via `upars`.
+    + A function that takes arguments `x` and `upars`, and returns a matrix of
+    log-posterior density values of the unconstrained posterior draws passed
+    via `upars`.
 * `log_lik_i_upars`	
-    + A function that takes arguments `x`, `upars`, and `i` and returns a vector of log-likelihood draws of the `i`th observation based on the unconstrained posterior draws passed via `upars`.
+    + A function that takes arguments `x`, `upars`, and `i` and returns a
+    vector of log-likelihood draws of the `i`th observation based on the
+    unconstrained posterior draws passed via `upars`.
 
 Next, we show how the helper functions look like for RStan objects, and
 show an example of using `loo_moment_match()` directly. For __rstan__ objects, the
@@ -290,7 +299,8 @@ loo3 <- loo::loo_moment_match.default(x = fit, loo = loo1,
 loo3
 ```
 
-
+As expected, the result is identical to the previous result of
+`loo2 <- loo(fit, moment_match = TRUE)`.
 
 # References
 
