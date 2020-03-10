@@ -151,7 +151,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   }
 
   if (cores == 1) {
-    mm_list <- lapply(I, function(i) loo_moment_match_i_fun(i))
+    mm_list <- lapply(X = I, FUN = function(i) loo_moment_match_i_fun(i))
   }
   else {
     if (!os_is_windows()) {
