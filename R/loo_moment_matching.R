@@ -162,7 +162,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
       cl <- parallel::makePSOCKcluster(cores)
       on.exit(parallel::stopCluster(cl))
       mm_list <- parallel::parLapply(cl = cl, X = I,
-                                    FUN = function(i) loo_moment_match_i_fun(i))
+                                    fun = function(i) loo_moment_match_i_fun(i))
     }
   }
 
