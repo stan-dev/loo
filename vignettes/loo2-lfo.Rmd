@@ -51,7 +51,7 @@ leave-one-out cross-validation (LOO-CV). For a data set with $N$ observations,
 we refit the model $N$ times, each time leaving out one of the $N$ observations
 and assessing how well the model predicts the left-out observation. LOO-CV is
 very expensive computationally in most realistic settings, but the Pareto
-smoothed importance sampling (PSIS, Vehtari et al, 2017ab) algorithm provided by
+smoothed importance sampling (PSIS, Vehtari et al, 2017, 2019) algorithm provided by
 the *loo* package allows for approximating exact LOO-CV with PSIS-LOO-CV.
 PSIS-LOO-CV requires only a single fit of the full model and comes with
 diagnostics for assessing the validity of the approximation.
@@ -153,7 +153,7 @@ To reduce the number of models that need to be fit for the purpose of obtaining
 each of the densities $p(y_{i+1:M} \,|\, y_{1:i})$, we propose the following
 algorithm. Starting with $i = N - M$, we approximate each 
 $p(y_{i+1:M} \,|\, y_{1:i})$ using Pareto smoothed importance sampling (PSIS,
-Vehtari et al, 2017ab):
+Vehtari et al, 2017, 2019):
 
 $$
  p(y_{i+1:M} \,|\, y_{1:i}) \approx
@@ -185,7 +185,7 @@ arrive at $i = L$. Recall that $L$ is the minimum number of observations we
 have deemed acceptable for making predictions (setting $L=0$ means predictions
 of all observations should be computed).
 
-For LOO, we recommend to use a threshold of $0.7$ (Vehtari et al, 2017ab), but
+For LOO, we recommend to use a threshold of $0.7$ (Vehtari et al, 2017, 2019), but
 for LFO, the threshold should be smaller as influential observations will affect
 all pointwise LFO approximations until the next refit and thus much stronger
 than in LOO. For the present case study, we choose a threshold of $0.6$, 
@@ -659,9 +659,9 @@ many times. For more details on approximate LFO-CV, we refer to Bürkner et al. 
 
 Bürkner P. C., Gabry J., & Vehtari A. (2019). Approximate leave-future-out cross-validation for time series models. [arXiv preprint](https://arxiv.org/abs/1902.06281). 
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
 
 <br />
 

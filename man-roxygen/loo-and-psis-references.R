@@ -5,7 +5,7 @@
 #' ([journal version](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4),
 #'  [preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544)).
 #'
-#' Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-#' importance sampling.
+#' Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+#' Pareto smoothed importance sampling.
 #' [preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646/)
 #'

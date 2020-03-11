@@ -5,8 +5,8 @@
 #' the estimated Pareto shape parameter \eqn{k} is larger than some
 #' `threshold` value, or plot observation indexes vs. diagnostic estimates.
 #' The **Details** section below provides a brief overview of the
-#' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-#' 2017b) for full details.
+#' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+#' and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.
 #'
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
