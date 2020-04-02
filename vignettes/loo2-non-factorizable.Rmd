@@ -138,14 +138,14 @@ $$
 $$
 
 and then stabilize them using Pareto smoothed importance sampling (PSIS, Vehtari
-et al, 2017b) to obtain the weights $w_i^{(s)}$. The resulting approximation is
-referred to as PSIS-LOO (Vehtari et al, 2017a).
+et al, 2019) to obtain the weights $w_i^{(s)}$. The resulting approximation is
+referred to as PSIS-LOO (Vehtari et al, 2017).
 
 ## Exact LOO-CV with re-fitting
 
 In order to validate the approximate LOO procedure, and also in order to allow
 exact computations to be made for a small number of leave-one-out folds for
-which the Pareto $k$ diagnostic (Vehtari et al, 2017b) indicates an unstable
+which the Pareto $k$ diagnostic (Vehtari et al, 2019) indicates an unstable
 approximation, we need to consider how we might to do _exact_ leave-one-out CV
 for a non-factorizable model. In the case of a Gaussian process that has the
 marginalization property, we could just drop the one row and column of $C$
@@ -380,7 +380,7 @@ psis_result <- psis(log_ratios)
 The quality of the PSIS-LOO approximation can be investigated graphically by
 plotting the Pareto-k estimate for each observation. Ideally, they should not
 exceed $0.5$, but in practice the algorithm turns out to be robust up to values
-of $0.7$ (Vehtari et al, 2017ab). In the plot below, we see that the fourth
+of $0.7$ (Vehtari et al, 2017, 2019). In the plot below, we see that the fourth
 observation is problematic and so may reduce the accuracy of the LOO-CV
 approximation.
 
@@ -674,6 +674,6 @@ Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyper
 
 Vehtari A., Mononen T., Tolvanen V., Sivula T., & Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. *Journal of Machine Learning Research*, 17(103), 1--38. [Online](http://jmlr.org/papers/v17/14-540.html).
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
