@@ -96,8 +96,8 @@ and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \eqn{k} is larger than some
 \code{threshold} value, or plot observation indexes vs. diagnostic estimates.
 The \strong{Details} section below provides a brief overview of the
-diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-2017b) for full details.
+diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.
 }
 \details{
 The reliability and approximate convergence rate of the PSIS-based estimates
@@ -169,8 +169,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{

@@ -124,7 +124,8 @@ Method used for importance sampling, here \code{psis}.
 \description{
 Implementation of Pareto smoothed importance sampling (PSIS), a method for
 stabilizing importance ratios. The version of PSIS implemented here
-corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
+and Gabry (2019).
 For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
@@ -164,8 +165,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{

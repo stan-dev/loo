@@ -31,8 +31,8 @@ not changed. They can be used as a diagnostic of how much
 each observation influences the posterior distribution.
 The methodology presented is based on the paper
 
-* Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2019).
-Pushing the Limits of Importance Sampling through Iterative Moment Matching.
+* Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
+Implicitly Adaptive Importance Sampling.
 [arXiv preprint arXiv:1906.08850](http://arxiv.org/abs/1906.08850).
 
 More information about the Pareto $k$ diagnostics is given in the following
@@ -331,8 +331,8 @@ Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://m
 
 Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
 
-Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2019).
-Pushing the limits of importance sampling through iterative moment matching.
+Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
+Implicitly Adaptive Importance Sampling.
 [arXiv preprint arXiv:1906.08850](http://arxiv.org/abs/1906.08850).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | [arXiv preprint](http://arxiv.org/abs/1507.04544).

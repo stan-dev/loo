@@ -4,16 +4,16 @@
 \alias{loo-glossary}
 \title{LOO package glossary}
 \description{
-Note: VGG2017a refers to Vehtari, Gelman, and Gabry (2017a). See
+Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 \strong{References}, below.
 }
 \section{ELPD and \code{elpd_loo}}{
 
 
 The ELPD is the theoretical expected log pointwise predictive density for a new
-dataset (Eq 1 in VGG2017a), which can be estimated, e.g., using
+dataset (Eq 1 in VGG2017), which can be estimated, e.g., using
 cross-validation. \code{elpd_loo} is the Bayesian LOO estimate of the
-expected log pointwise predictive density (Eq 4 in VGG2017a) and
+expected log pointwise predictive density (Eq 4 in VGG2017) and
 is a sum of N individual pointwise log predictive densities. Probability
 densities can be smaller or larger than 1, and thus log predictive densities
 can be negative or positive. For simplicity the ELPD acronym is used also for
@@ -26,8 +26,8 @@ probabilities are 0 or negative.
 
 
 As \code{elpd_loo} is defined as the sum of N independent components (Eq 4 in
-VGG2017a), we can compute the standard error by using the standard deviation
-of the N components and multiplying by \code{sqrt(N)} (Eq 23 in VGG2017a).
+VGG2017), we can compute the standard error by using the standard deviation
+of the N components and multiplying by \code{sqrt(N)} (Eq 23 in VGG2017).
 This standard error is a coarse description of our uncertainty about the
 predictive performance for unknown future data. When N is small or there is
 severe model misspecification, the current SE estimate is overoptimistic and
@@ -35,7 +35,7 @@ the actual SE can even be twice as large. Even for moderate N, when the SE
 estimate is an accurate estimate for the scale, it ignores the skewness. When
 making model comparisons, the SE of the component-wise (pairwise) differences
 should be used instead (see the \code{se_diff} section below and Eq 24 in
-VGG2017a).
+VGG2017).
 }
 
 \section{Monte Carlo SE of elpd_loo}{
@@ -44,7 +44,7 @@ VGG2017a).
 The Monte Carlo standard error is the estimate for the computational accuracy
 of MCMC and importance sampling used to compute \code{elpd_loo}. Usually this
 is negligible compared to the standard describing the uncertainty due to
-finite number of observations (Eq 23 in VGG2017a).
+finite number of observations (Eq 23 in VGG2017).
 }
 
 \section{\code{p_loo} (effective number of parameters)}{
@@ -95,7 +95,7 @@ etc.).
 large compared to the number of observations (e.g., \code{p>N/5}), it is
 likely that the model is so flexible or the population prior so weak that it’s
 difficult to predict the left out observation (even for the true model).
-This happens, for example, in the simulated 8 schools (in VGG2017a), random
+This happens, for example, in the simulated 8 schools (in VGG2017), random
 effect models with a few observations per random effect, and Gaussian
 processes and spatial models with short correlation lengths.
 
@@ -123,7 +123,7 @@ model with highest \code{elpd_loo}.
 
 
 The standard error of component-wise differences of elpd_loo (Eq 24 in
-VGG2017a) between two models. This SE is \emph{smaller} than the SE for
+VGG2017) between two models. This SE is \emph{smaller} than the SE for
 individual models due to correlation (i.e., if some observations are easier
 and some more difficult to predict for all models).
 }
@@ -135,8 +135,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
