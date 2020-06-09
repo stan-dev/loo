@@ -166,9 +166,9 @@ observation.
 \description{
 The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is an
-implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
-2017b).
+models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is
+an implementation of the methods described in Vehtari, Gelman, and Gabry
+(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
 
 The \code{loo_i()} function enables testing log-likelihood
 functions for use with the \code{loo.function()} method.
@@ -327,8 +327,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{

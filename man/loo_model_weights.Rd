@@ -99,7 +99,8 @@ A numeric vector containing one weight for each model.
 \description{
 Model averaging via stacking of predictive distributions, pseudo-BMA
 weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
-al. (2018) and  Vehtari, Gelman, and Gabry (2017a,2017b) for background.
+al. (2018), Vehtari, Gelman, and Gabry (2017), and Vehtari, Simpson,
+Gelman, Yao, and Gabry (2019) for background.
 }
 \details{
 \code{loo_model_weights()} is a wrapper around the \code{stacking_weights()} and
@@ -210,8 +211,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using

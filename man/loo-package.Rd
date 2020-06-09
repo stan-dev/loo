@@ -10,9 +10,10 @@
 }
 \emph{Stan Development Team}
 
-This package implements the methods described in Vehtari, Gelman, and Gabry
-(2017a, 2017b) and Yao et al. (2018). To get started see the \strong{loo}
-package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}, the
+This package implements the methods described in Vehtari, Gelman, and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+Yao et al. (2018). To get started see the \strong{loo} package
+\href{https://mc-stan.org/loo/articles/index.html}{vignettes}, the
 \code{\link[=loo]{loo()}} function for efficient approximate leave-one-out
 cross-validation (LOO-CV), the \code{\link[=psis]{psis()}} function for the Pareto
 smoothed importance sampling (PSIS) algorithm, or
@@ -30,10 +31,10 @@ they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
 Gelman, and Gabry (2017a). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Gelman, and Gabry, 2017b), a new procedure for regularizing and diagnosing
-importance weights. As a byproduct of our calculations, we also obtain
-approximate standard errors for estimated predictive errors and for
-comparing of predictive errors between two models.
+Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
+and diagnosing importance weights. As a byproduct of our calculations,
+we also obtain approximate standard errors for estimated predictive
+errors and for comparing of predictive errors between two models.
 
 We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
 diagnostics and effective sample size and Monte Carlo standard error
@@ -46,8 +47,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
