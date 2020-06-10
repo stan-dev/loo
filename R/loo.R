@@ -5,7 +5,7 @@
 #' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is
 #' an implementation of the methods described in Vehtari, Gelman, and Gabry
 #' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
-#' 
+#'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
 #'   section, below, has detailed descriptions of how to specify the inputs for
@@ -506,10 +506,10 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
   E_epd <- exp(E_elpd)
   # zn is approximate ordered statistics of unit normal distribution with offset
   # recommended by Blom (1958)
-  S <- n_samples;
-  c<-3/8;
-  r=1:n_samples;
-  zn <- qnorm((r - c) / (S - 2 * c + 1));
+  S <- n_samples
+  c <- 3/8
+  r <- 1:n_samples
+  zn <- qnorm((r - c) / (S - 2 * c + 1))
   var_elpd <-
     vapply(
       seq_len(ncol(w2)),
