@@ -505,7 +505,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
   w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
   # zn is approximate ordered statistics of unit normal distribution with offset
-  # recommended by Bloom (1985)
+  # recommended by Blom (1958)
   S <- n_samples;
   c<-3/8;
   r=1:n_samples;
