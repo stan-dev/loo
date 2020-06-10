@@ -25,8 +25,7 @@
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights, *minus the largest log ratio* for numerical reasons.
-#'     To get normalized weights use the `weights` method provided
+#'     weights. To get normalized weights use the `weights` method provided
 #'     for objects of class `tis`.
 #'   }
 #'  \item{`diagnostics`}{
@@ -155,7 +154,6 @@ do_tis_i <- function(log_ratios_i, ...) {
   log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
   log_cutpoint <- log_Z + 0.5 * log(S)
   lw_i <- pmin(log_ratios_i, log_cutpoint)
-  lw_i <- lw_i - max(lw_i)
   list(log_weights = lw_i, pareto_k = 0)
 }
 
