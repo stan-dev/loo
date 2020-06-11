@@ -127,20 +127,20 @@ test_that("explict test of values for 'sis' and 'tis'", {
   lw <- 1:16
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
   expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               c(-14.0723, -13.0723, -12.0723, -11.0723, -10.0723, -9.0723, -8.0723, -7.0723, -6.0723, -5.0723, -4.0723, -3.0723, -2.0723, -1.0723, -0.0723, 0.), tol = 0.001)
+               c(-14.0723, -13.0723, -12.0723, -11.0723, -10.0723, -9.0723, -8.0723, -7.0723, -6.0723, -5.0723, -4.0723, -3.0723, -2.0723, -1.0723, -0.0723, 0.) + 15.07238, tol = 0.001)
   expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
   expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
-               c(-15:0), tol = 0.00001)
+               lw, tol = 0.00001)
 
   lw <- c(0.7609420, 1.3894140, 0.4158346, 2.5307927, 4.3379119, 2.4159240, 2.2462172, 0.8057697, 0.9333107, 1.5599302)
 
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
   expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               c(-2.931, -2.303, -3.276, -1.161,  0, -1.276, -1.446, -2.886, -2.759, -2.132),
+               c(-2.931, -2.303, -3.276, -1.161,  0, -1.276, -1.446, -2.886, -2.759, -2.132) + 3.692668,
                tol = 0.001)
   expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
   expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
-               lw-max(lw), tol = 0.00001)
+               lw, tol = 0.00001)
 })
 
 
