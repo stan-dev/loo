@@ -1034,11 +1034,11 @@ test_that("loo_compare_subsample", {
   expect_message(lcssf1 <- loo:::loo_compare.psis_loo_ss_list(x = list(loo:::as.psis_loo_ss.psis_loo(l1), lss2o1, lss3o1)))
   expect_message(lcssf2 <- loo:::loo_compare.psis_loo_ss_list(x = list(loo:::as.psis_loo_ss.psis_loo(l1), lss2o1, loo:::as.psis_loo_ss.psis_loo(l3))))
 
-  expect_equal(round(lcss[,1]), round(lcsso[,1]))
-  expect_equal(round(lcss2[,1]), round(lcsso[,1]))
-  expect_equal(round(lcssohh[,1]), round(lcsso[,1]))
-  expect_equal(round(lcssf1[,1]), round(lcsso[,1]))
-  expect_equal(round(lcssf2[,1]), round(lcsso[,1]))
+  expect_equal(lcss[,1], lcsso[,1], tolerance = 1)
+  expect_equal(lcss2[,1], lcsso[,1], tolerance = 1)
+  expect_equal(lcssohh[,1], lcsso[,1], tolerance = 1)
+  expect_equal(lcssf1[,1], lcsso[,1], tolerance = 1)
+  expect_equal(lcssf2[,1], lcsso[,1], tolerance = 1)
 
   expect_gt(lcss[,2][2], lcsso[,2][2])
   expect_gt(lcss[,2][3], lcsso[,2][3])

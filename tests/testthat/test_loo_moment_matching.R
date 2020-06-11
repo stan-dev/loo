@@ -226,6 +226,7 @@ test_that("loo_moment_match.default works", {
 test_that("variance and covariance transformations work", {
   S <- 2000
 
+  set.seed(8493874)
   draws_full_posterior_sigma2 <- rinvchisq(S, n - 1, s2)
   draws_full_posterior_mu <- rnorm(S, ymean, sqrt(draws_full_posterior_sigma2/n))
 
