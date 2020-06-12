@@ -31,9 +31,9 @@
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights, *minus the largest log ratio* for numerical reasons.
-#'     To get normalized weights use the `weights` method provided
-#'     for objects of class `"psis"`.
+#'     weights. To get normalized weights use the
+#'     [`weights()`][weights.importance_sampling] method provided for objects of
+#'     class `"psis"`.
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing two vectors:
@@ -66,10 +66,8 @@
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item [loo()] for approximate LOO-CV using PSIS.
-#' \item [pareto-k-diagnostic] for PSIS diagnostics.
-#' }
+#' * [loo()] for approximate LOO-CV using PSIS.
+#' * [pareto-k-diagnostic] for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
 #'
@@ -228,7 +226,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   lw_i[lw_i > 0] <- 0
   # shift log weights back so that the smallest log weights remain unchanged
   lw_i <- lw_i + max(log_ratios_i)
-  
+
   list(log_weights = lw_i, pareto_k = khat)
 }
 

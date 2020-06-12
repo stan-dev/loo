@@ -3,84 +3,53 @@
 #' Moment matching algorithm for updating a loo object when Pareto k estimates
 #' are large.
 #'
-#'
-#'
 #' @export loo_moment_match loo_moment_match.default
 #' @param x A fitted model object.
-#' @param loo A loo object that is modified.
-#' @param post_draws A function the takes \code{x} as the first argument and
-#'   returns a matrix of posterior draws of the model parameters.
-#' @param log_lik_i A function that takes \code{x} and \code{i} and returns a
-#'   matrix (one column per chain) or a vector (all chains stacked) of
-#'   log-likeliood draws of the \code{i}th observation based on the
-#'   model \code{x}. If the draws are obtained using MCMC, the
-#'   matrix with MCMC chains separated is preferred.
-#' @param unconstrain_pars A function that takes arguments \code{x}, and
-#'   \code{pars} and returns posterior draws on the unconstrained space based on
-#'   the posterior draws on the constrained space passed via \code{pars}.
-#' @param log_prob_upars A function that takes arguments \code{x} and
-#'   \code{upars} and returns a matrix of log-posterior density values of the
-#'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
-#'   and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
-#'   observation based on the unconstrained posterior draws passed via
-#'   \code{upars}.
+#' @param loo A loo object to be modified.
+#' @param post_draws A function the takes `x` as the first argument and returns
+#'   a matrix of posterior draws of the model parameters.
+#' @param log_lik_i A function that takes `x` and `i` and returns a matrix (one
+#'   column per chain) or a vector (all chains stacked) of log-likelihood draws
+#'   of the `i`th observation based on the model `x`. If the draws are obtained
+#'   using MCMC, the matrix with MCMC chains separated is preferred.
+#' @param unconstrain_pars A function that takes arguments `x`, and `pars` and
+#'   returns posterior draws on the unconstrained space based on the posterior
+#'   draws on the constrained space passed via `pars`.
+#' @param log_prob_upars A function that takes arguments `x` and `upars` and
+#'   returns a matrix of log-posterior density values of the unconstrained
+#'   posterior draws passed via `upars`.
+#' @param log_lik_i_upars A function that takes arguments `x`, `upars`, and `i`
+#'   and returns a vector of log-likelihood draws of the `i`th observation based
+#'   on the unconstrained posterior draws passed via `upars`.
 #' @param max_iters Maximum number of moment matching iterations. Usually this
-#' does not need to be modified. If the maximum number of iterations is reached,
-#' there will be a warning, and increasing \code{max_iters} may improve accuracy.
+#'   does not need to be modified. If the maximum number of iterations is
+#'   reached, there will be a warning, and increasing `max_iters` may improve
+#'   accuracy.
 #' @param k_threshold Threshold value for Pareto k values above which the moment
 #'   matching algorithm is used. The default value is 0.5.
 #' @param split Logical; Indicate whether to do the split transformation or not
 #'   at the end of moment matching for each LOO fold.
 #' @param cov Logical; Indicate whether to match the covariance matrix of the
-#' samples or not.
-#'   If \code{FALSE}, only the mean and marginal variances are matched.
+#'   samples or not. If `FALSE`, only the mean and marginal variances are
+#'   matched.
 #' @template cores
 #' @param ... Further arguments passed to the custom functions documented above.
 #'
-#' @return The `loo_moment_match()` methods return an updated \code{loo} object.
-#' The structure of the updated \code{loo} object is similar, but the
-#' method also stores the original Pareto k diagnostic values in
-#' the diagnostics field.
+#' @return The `loo_moment_match()` methods return an updated `loo` object. The
+#'   structure of the updated `loo` object is similar, but the method also
+#'   stores the original Pareto k diagnostic values in the diagnostics field.
 #'
-#' @details The `loo_moment_match()` function is an S3 generic and we provide a default
-#' method that takes as arguments user-specified functions \code{post_draws},
-#' \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
-#' \code{log_lik_i_upars}. All of these functions should take \code{...}
-#' as an argument in addition to those specified for each function.
-#'
-#' @section Defining `loo_moment_match()` methods in a package: Package developers can
-#' define `loo_moment_match()` methods for fitted models objects. The
-#' `loo_moment_match.stanfit()` method in the **Examples** section provides an example.
+#' @details The `loo_moment_match()` function is an S3 generic and we provide a
+#'   default method that takes as arguments user-specified functions
+#'   `post_draws`, `log_lik_i`, `unconstrain_pars`, `log_prob_upars`, and
+#'   `log_lik_i_upars`. All of these functions should take `...`. as an argument
+#'   in addition to those specified for each function.
 #'
 #' @seealso [loo()], [loo_moment_match_split()]
 #' @template moment-matching-references
 #'
 #' @examples
-#' \dontrun{
-#' ### For package developers: defining loo_moment_match methods
-#'
-#' # An example of a possible loo_moment_match method for a 'stanfit' objects
-#' # (from package rstan). The example is just a wrapper of loo_moment_match.default
-#' # with user-defined functions post_draws_stanfit, log_lik_i_stanfit,
-#' # unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_i_upars_stanfit.
-#' #
-#' loo_moment_match.stanfit <- function(x, loo, ...) {
-#' loo::loo_moment_match.default(
-#'   x, loo = loo,
-#'   post_draws = post_draws_stanfit,
-#'   log_lik_i = log_lik_i_stanfit,
-#'   unconstrain_pars = unconstrain_pars_stanfit,
-#'   log_prob_upars = log_prob_upars_stanfit,
-#'   log_lik_i_upars = log_lik_i_upars_stanfit,
-#'   ...)
-#' }
-#' }
-#'
-#'
-
-
-
+#' # See the vignette for loo_moment_match()
 
 #' @export
 loo_moment_match <- function(x, ...) {
@@ -88,10 +57,10 @@ loo_moment_match <- function(x, ...) {
 }
 
 
-#' @describeIn loo_moment_match A default method that takes as arguments
-#' a user-specified model object \code{x}, a \code{loo} object and
-#' user-specified functions \code{post_draws}, \code{log_lik_i},
-#' \code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_i_upars}.
+#' @describeIn loo_moment_match A default method that takes as arguments a
+#'   user-specified model object `x`, a `loo` object and user-specified
+#'   functions `post_draws`, `log_lik_i`, `unconstrain_pars`, `log_prob_upars`,
+#'   and `log_lik_i_upars`.
 #' @export
 loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
@@ -116,8 +85,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   if ("psis_loo" %in% class(loo)) {
     is_method <- "psis"
-  }
-  else {
+  } else {
     stop("loo_moment_match currently supports only the \"psis\" importance sampling class.")
   }
 
@@ -213,14 +181,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
 
 
-
-
-
-
-
 # Internal functions ---------------
-
-
 
 
 #' Do moment matching for a single observation.
@@ -228,37 +189,36 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @noRd
 #' @param i observation number.
 #' @param x A fitted model object.
-#' @param log_lik_i A function that takes \code{x} and \code{i} and returns a
-#'   matrix (one column per chain) or a vector (all chains stacked) of
-#'   log-likeliood draws of the \code{i}th observation based on the
-#'   model \code{x}. If the draws are obtained using MCMC, the
-#'   matrix with MCMC chains separated is preferred.
-#' @param unconstrain_pars A function that takes arguments \code{x}, and
-#'   \code{pars} and returns posterior draws on the unconstrained space based on
-#'   the posterior draws on the constrained space passed via \code{pars}.
-#' @param log_prob_upars A function that takes arguments \code{x} and
-#'   \code{upars} and returns a matrix of log-posterior density values of the
-#'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
-#'   and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
-#'   observation based on the unconstrained posterior draws passed via
-#'   \code{upars}.
+#' @param log_lik_i A function that takes `x` and `i` and returns a matrix (one
+#'   column per chain) or a vector (all chains stacked) of log-likeliood draws
+#'   of the `i`th observation based on the model `x`. If the draws are obtained
+#'   using MCMC, the matrix with MCMC chains separated is preferred.
+#' @param unconstrain_pars A function that takes arguments `x`, and `pars` and
+#'   returns posterior draws on the unconstrained space based on the posterior
+#'   draws on the constrained space passed via `pars`.
+#' @param log_prob_upars A function that takes arguments `x` and `upars` and
+#'   returns a matrix of log-posterior density values of the unconstrained
+#'   posterior draws passed via `upars`.
+#' @param log_lik_i_upars A function that takes arguments `x`, `upars`, and `i`
+#'   and returns a vector of log-likelihood draws of the `i`th observation based
+#'   on the unconstrained posterior draws passed via `upars`.
 #' @param max_iters Maximum number of moment matching iterations. Usually this
-#' does not need to be modified. If the maximum number of iterations is reached,
-#' there will be a warning, and increasing \code{max_iters} may improve accuracy.
+#'   does not need to be modified. If the maximum number of iterations is
+#'   reached, there will be a warning, and increasing `max_iters` may improve
+#'   accuracy.
 #' @param k_threshold Threshold value for Pareto k values above which the moment
 #'   matching algorithm is used. The default value is 0.5.
 #' @param split Logical; Indicate whether to do the split transformation or not
 #'   at the end of moment matching for each LOO fold.
 #' @param cov Logical; Indicate whether to match the covariance matrix of the
-#' samples or not.
-#'   If \code{FALSE}, only the mean and marginal variances are matched.
+#'   samples or not. If `FALSE`, only the mean and marginal variances are
+#'   matched.
 #' @param N Number of observations.
 #' @param S number of MCMC draws.
 #' @param upars A matrix representing a sample of vector-valued parameters in
-#' the unconstrained space.
-#' @param orig_log_prob log probability densities of the original draws from
-#' the model \code{x}.
+#'   the unconstrained space.
+#' @param orig_log_prob log probability densities of the original draws from the
+#'   model `x`.
 #' @param k Pareto k value before moment matching
 #' @template is_method
 #' @param npars Number of parameters in the model
@@ -445,7 +405,7 @@ loo_moment_match_i <- function(i,
 
 
 #' Update the importance weights, Pareto diagnostic and log-likelihood
-#' for observation \code{i} based on model \code{x}.
+#' for observation `i` based on model `x`.
 #'
 #' @noRd
 #' @param x A fitted model object.
@@ -453,14 +413,14 @@ loo_moment_match_i <- function(i,
 #' the unconstrained space.
 #' @param i observation number.
 #' @param orig_log_prob log probability densities of the original draws from
-#' the model \code{x}.
-#' @param log_prob_upars A function that takes arguments \code{x} and
-#'   \code{upars} and returns a matrix of log-posterior density values of the
-#'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
-#'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
+#' the model `x`.
+#' @param log_prob_upars A function that takes arguments `x` and
+#'   `upars` and returns a matrix of log-posterior density values of the
+#'   unconstrained posterior draws passed via `upars`.
+#' @param log_lik_i_upars A function that takes arguments `x`, `upars`,
+#'   and `i` and returns a vector of log-likeliood draws of the `i`th
 #'   observation based on the unconstrained posterior draws passed via
-#'   \code{upars}.
+#'   `upars`.
 #' @param r_eff_i MCMC effective sample size divided by the total sample size
 #' for 1/exp(log_ratios) for observation i.
 #' @template is_method

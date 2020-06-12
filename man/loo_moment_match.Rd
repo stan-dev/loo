@@ -28,33 +28,32 @@ loo_moment_match(x, ...)
 
 \item{...}{Further arguments passed to the custom functions documented above.}
 
-\item{loo}{A loo object that is modified.}
+\item{loo}{A loo object to be modified.}
 
-\item{post_draws}{A function the takes \code{x} as the first argument and
-returns a matrix of posterior draws of the model parameters.}
+\item{post_draws}{A function the takes \code{x} as the first argument and returns
+a matrix of posterior draws of the model parameters.}
 
-\item{log_lik_i}{A function that takes \code{x} and \code{i} and returns a
-matrix (one column per chain) or a vector (all chains stacked) of
-log-likeliood draws of the \code{i}th observation based on the
-model \code{x}. If the draws are obtained using MCMC, the
-matrix with MCMC chains separated is preferred.}
+\item{log_lik_i}{A function that takes \code{x} and \code{i} and returns a matrix (one
+column per chain) or a vector (all chains stacked) of log-likelihood draws
+of the \code{i}th observation based on the model \code{x}. If the draws are obtained
+using MCMC, the matrix with MCMC chains separated is preferred.}
 
-\item{unconstrain_pars}{A function that takes arguments \code{x}, and
-\code{pars} and returns posterior draws on the unconstrained space based on
-the posterior draws on the constrained space passed via \code{pars}.}
+\item{unconstrain_pars}{A function that takes arguments \code{x}, and \code{pars} and
+returns posterior draws on the unconstrained space based on the posterior
+draws on the constrained space passed via \code{pars}.}
 
-\item{log_prob_upars}{A function that takes arguments \code{x} and
-\code{upars} and returns a matrix of log-posterior density values of the
-unconstrained posterior draws passed via \code{upars}.}
+\item{log_prob_upars}{A function that takes arguments \code{x} and \code{upars} and
+returns a matrix of log-posterior density values of the unconstrained
+posterior draws passed via \code{upars}.}
 
-\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars},
-and \code{i} and returns a vector of log-likelihood draws of the \code{i}th
-observation based on the unconstrained posterior draws passed via
-\code{upars}.}
+\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars}, and \code{i}
+and returns a vector of log-likelihood draws of the \code{i}th observation based
+on the unconstrained posterior draws passed via \code{upars}.}
 
 \item{max_iters}{Maximum number of moment matching iterations. Usually this
-does not need to be modified. If the maximum number of iterations is reached,
-there will be a warning, and increasing \code{max_iters} may improve accuracy.}
+does not need to be modified. If the maximum number of iterations is
+reached, there will be a warning, and increasing \code{max_iters} may improve
+accuracy.}
 
 \item{k_threshold}{Threshold value for Pareto k values above which the moment
 matching algorithm is used. The default value is 0.5.}
@@ -63,8 +62,8 @@ matching algorithm is used. The default value is 0.5.}
 at the end of moment matching for each LOO fold.}
 
 \item{cov}{Logical; Indicate whether to match the covariance matrix of the
-samples or not.
-If \code{FALSE}, only the mean and marginal variances are matched.}
+samples or not. If \code{FALSE}, only the mean and marginal variances are
+matched.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -81,58 +80,31 @@ setting \code{mc.cores} interactively or in a script is fine).
 }}
 }
 \value{
-The \code{loo_moment_match()} methods return an updated \code{loo} object.
-The structure of the updated \code{loo} object is similar, but the
-method also stores the original Pareto k diagnostic values in
-the diagnostics field.
+The \code{loo_moment_match()} methods return an updated \code{loo} object. The
+structure of the updated \code{loo} object is similar, but the method also
+stores the original Pareto k diagnostic values in the diagnostics field.
 }
 \description{
 Moment matching algorithm for updating a loo object when Pareto k estimates
 are large.
 }
 \details{
-The \code{loo_moment_match()} function is an S3 generic and we provide a default
-method that takes as arguments user-specified functions \code{post_draws},
-\code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
-\code{log_lik_i_upars}. All of these functions should take \code{...}
-as an argument in addition to those specified for each function.
+The \code{loo_moment_match()} function is an S3 generic and we provide a
+default method that takes as arguments user-specified functions
+\code{post_draws}, \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars}, and
+\code{log_lik_i_upars}. All of these functions should take \code{...}. as an argument
+in addition to those specified for each function.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: A default method that takes as arguments
-a user-specified model object \code{x}, a \code{loo} object and
-user-specified functions \code{post_draws}, \code{log_lik_i},
-\code{unconstrain_pars}, \code{log_prob_upars}, and \code{log_lik_i_upars}.
+\item \code{default}: A default method that takes as arguments a
+user-specified model object \code{x}, a \code{loo} object and user-specified
+functions \code{post_draws}, \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars},
+and \code{log_lik_i_upars}.
 }}
 
-\section{Defining \code{loo_moment_match()} methods in a package}{
- Package developers can
-define \code{loo_moment_match()} methods for fitted models objects. The
-\code{loo_moment_match.stanfit()} method in the \strong{Examples} section provides an example.
-}
-
 \examples{
-\dontrun{
-### For package developers: defining loo_moment_match methods
-
-# An example of a possible loo_moment_match method for a 'stanfit' objects
-# (from package rstan). The example is just a wrapper of loo_moment_match.default
-# with user-defined functions post_draws_stanfit, log_lik_i_stanfit,
-# unconstrain_pars_stanfit, log_prob_upars_stanfit, and log_lik_i_upars_stanfit.
-#
-loo_moment_match.stanfit <- function(x, loo, ...) {
-loo::loo_moment_match.default(
-  x, loo = loo,
-  post_draws = post_draws_stanfit,
-  log_lik_i = log_lik_i_stanfit,
-  unconstrain_pars = unconstrain_pars_stanfit,
-  log_prob_upars = log_prob_upars_stanfit,
-  log_lik_i_upars = log_lik_i_upars_stanfit,
-  ...)
-}
-}
-
-
+# See the vignette for loo_moment_match()
 }
 \references{
 Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).

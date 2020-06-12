@@ -3,7 +3,7 @@
 #' @docType package
 #' @name loo-package
 #'
-#' @importFrom stats sd var quantile setNames weights rnorm
+#' @importFrom stats sd var quantile setNames weights rnorm qnorm
 #' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
 #' @description

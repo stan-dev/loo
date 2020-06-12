@@ -17,9 +17,9 @@ sis(log_ratios, ...)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
-scale (for Importance sampling LOO, these are \emph{negative} log-likelihood values). See the
-\strong{Methods (by class)} section below for a detailed description of how
-to specify the inputs for each method.}
+scale (for Importance sampling LOO, these are \emph{negative} log-likelihood
+values). See the \strong{Methods (by class)} section below for a detailed
+description of how to specify the inputs for each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
@@ -53,10 +53,10 @@ which is a named list with the following components:
 
 \describe{
 \item{\code{log_weights}}{
-Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
-weights, \emph{minus the largest log ratio} for numerical reasons.
-To get normalized weights use the \code{weights} method provided
-for objects of class \code{sis}.
+Vector or matrix of smoothed but \emph{unnormalized} log
+weights. To get normalized weights use the
+\code{\link[=weights.importance_sampling]{weights()}} method provided for objects of
+class \code{sis}.
 }
 \item{\code{diagnostics}}{
 A named list containing one vector:

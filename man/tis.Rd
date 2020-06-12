@@ -17,9 +17,9 @@ tis(log_ratios, ...)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
-scale (for Importance sampling LOO, these are \emph{negative} log-likelihood values). See the
-\strong{Methods (by class)} section below for a detailed description of how
-to specify the inputs for each method.}
+scale (for Importance sampling LOO, these are \emph{negative} log-likelihood
+values). See the \strong{Methods (by class)} section below for a detailed
+description of how to specify the inputs for each method.}
 
 \item{...}{Arguments passed on to the various methods.}
 
@@ -48,21 +48,21 @@ setting \code{mc.cores} interactively or in a script is fine).
 }}
 }
 \value{
-The \code{tis()} methods return an object of class \code{"sis"},
+The \code{tis()} methods return an object of class \code{"tis"},
 which is a named list with the following components:
 
 \describe{
 \item{\code{log_weights}}{
 Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
-weights, \emph{minus the largest log ratio} for numerical reasons.
-To get normalized weights use the \code{weights} method provided
-for objects of class \code{tis}.
+weights. To get normalized weights use the
+\code{\link[=weights.importance_sampling]{weights()}} method provided for objects of
+class \code{tis}.
 }
 \item{\code{diagnostics}}{
 A named list containing one vector:
 \itemize{
 \item \code{pareto_k}: Not used in \code{tis}, all set to 0.
-\item \code{n_eff}: effective sample size estimates.
+\item \code{n_eff}: Effective sample size estimates.
 }
 }
 }
@@ -71,7 +71,7 @@ Objects of class \code{"tis"} also have the following \link[=attributes]{attribu
 \describe{
 \item{\code{norm_const_log}}{
 Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
-used internally by the \code{weights} method to normalize the log weights.
+used internally by the \code{\link[=weights]{weights()}}method to normalize the log weights.
 }
 \item{\code{r_eff}}{
 If specified, the user's \code{r_eff} argument.
@@ -89,7 +89,7 @@ Method used for importance sampling, here \code{tis}.
 }
 }
 \description{
-Implementation of Truncated (self-normalized) importance sampling (TIS),
+Implementation of truncated (self-normalized) importance sampling (TIS),
 truncated at S^(1/2) as recommended by Ionides (2008).
 }
 \section{Methods (by class)}{

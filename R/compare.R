@@ -1,7 +1,7 @@
 #' Model comparison (deprecated, old version)
 #'
-#' **This function will be deprecated in a future release**. Please
-#' use the new [loo_compare()] function instead.
+#' **This function is deprecated**. Please use the new [loo_compare()] function
+#' instead.
 #'
 #' @export
 #' @param ... At least two objects returned by [loo()] (or [waic()]).

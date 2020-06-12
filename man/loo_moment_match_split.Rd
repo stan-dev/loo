@@ -27,8 +27,8 @@ loo_moment_match_split(
 where they can have any real value.}
 
 \item{cov}{Logical; Indicate whether to match the covariance matrix of the
-samples or not. If \code{FALSE}, only the mean and marginal variances
-are matched.}
+samples or not. If \code{FALSE}, only the mean and marginal variances are
+matched.}
 
 \item{total_shift}{A vector representing the total shift made by the moment
 matching algorithm.}
@@ -41,17 +41,16 @@ transformation made by the moment matching algorithm.}
 
 \item{i}{Observation index.}
 
-\item{log_prob_upars}{A function that takes arguments \code{x} and
-\code{upars} and returns a matrix of log-posterior density values of the
-unconstrained posterior draws passed via \code{upars}.}
+\item{log_prob_upars}{A function that takes arguments \code{x} and \code{upars} and
+returns a matrix of log-posterior density values of the unconstrained
+posterior draws passed via \code{upars}.}
 
-\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars},
-and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
-observation based on the unconstrained posterior draws passed via
-\code{upars}.}
+\item{log_lik_i_upars}{A function that takes arguments \code{x}, \code{upars}, and \code{i}
+and returns a vector of log-likeliood draws of the \code{i}th observation based
+on the unconstrained posterior draws passed via \code{upars}.}
 
-\item{r_eff_i}{MCMC relative effective sample size of the \code{i}'th
-log likelihood draws.}
+\item{r_eff_i}{MCMC relative effective sample size of the \code{i}'th log
+likelihood draws.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by

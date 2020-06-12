@@ -4,31 +4,27 @@
 #' Takes in the moment matching total transformation, transforms only half
 #' of the draws, and computes a single elpd using multiple importance sampling.
 #'
-#'
-#'
-#'
 #' @param x A fitted model object.
 #' @param upars A matrix containing the model parameters in unconstrained space
-#' where they can have any real value.
+#'   where they can have any real value.
 #' @param cov Logical; Indicate whether to match the covariance matrix of the
-#' samples or not. If \code{FALSE}, only the mean and marginal variances
-#' are matched.
+#'   samples or not. If `FALSE`, only the mean and marginal variances are
+#'   matched.
 #' @param total_shift A vector representing the total shift made by the moment
-#' matching algorithm.
+#'   matching algorithm.
 #' @param total_scaling A vector representing the total scaling of marginal
-#' variance made by the moment matching algorithm.
+#'   variance made by the moment matching algorithm.
 #' @param total_mapping A vector representing the total covariance
-#' transformation made by the moment matching algorithm.
+#'   transformation made by the moment matching algorithm.
 #' @param i Observation index.
-#' @param log_prob_upars A function that takes arguments \code{x} and
-#'   \code{upars} and returns a matrix of log-posterior density values of the
-#'   unconstrained posterior draws passed via \code{upars}.
-#' @param log_lik_i_upars A function that takes arguments \code{x}, \code{upars},
-#'   and \code{i} and returns a vector of log-likeliood draws of the \code{i}th
-#'   observation based on the unconstrained posterior draws passed via
-#'   \code{upars}.
-#' @param r_eff_i MCMC relative effective sample size of the \code{i}'th
-#' log likelihood draws.
+#' @param log_prob_upars A function that takes arguments `x` and `upars` and
+#'   returns a matrix of log-posterior density values of the unconstrained
+#'   posterior draws passed via `upars`.
+#' @param log_lik_i_upars A function that takes arguments `x`, `upars`, and `i`
+#'   and returns a vector of log-likeliood draws of the `i`th observation based
+#'   on the unconstrained posterior draws passed via `upars`.
+#' @param r_eff_i MCMC relative effective sample size of the `i`'th log
+#'   likelihood draws.
 #' @template cores
 #' @template is_method
 #' @param ... Further arguments passed to the custom functions documented above.
