@@ -91,6 +91,7 @@ dim.importance_sampling <- function(x) {
 #' @param log Should the weights be returned on the log scale? Defaults to
 #'   `TRUE`.
 #' @param normalize Should the weights be normalized? Defaults to `TRUE`.
+#' @param ... Ignored.
 #'
 #' @return The `weights()` method returns an object with the same dimensions as
 #'   the `log_weights` component of `object`. The `normalize` and `log`

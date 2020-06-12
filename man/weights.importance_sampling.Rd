@@ -9,6 +9,8 @@
 \arguments{
 \item{object}{An object returned by \code{\link[=psis]{psis()}}, \code{\link[=tis]{tis()}}, or \code{\link[=sis]{sis()}}.}
 
+\item{...}{Ignored.}
+
 \item{log}{Should the weights be returned on the log scale? Defaults to
 \code{TRUE}.}
 
