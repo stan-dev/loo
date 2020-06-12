@@ -9,6 +9,8 @@ template:
 navbar:
   title: "loo"
   left:
+    - icon: fa-home fa-lg
+      href: index.html
     - text: "Vignettes"
       href: articles/index.html
     - text: "Functions"
@@ -31,6 +33,8 @@ navbar:
           href: https://mc-stan.org/projpred
         - text: "rstantools"
           href: https://mc-stan.org/rstantools
+        - text: "posterior"
+          href: https://mc-stan.org/posterior
     - text: "Stan"
       href: https://mc-stan.org
   right:
@@ -61,6 +65,7 @@ articles:
       - loo2-non-factorizable
       - loo2-lfo
       - loo2-large-data
+      - loo2-moment-matching
 
 reference:
   - title: "Package description, glossary, and included data sets"
@@ -76,6 +81,7 @@ reference:
       - loo
       - loo_subsample
       - loo_approximate_posterior
+      - loo_moment_match
       - E_loo
       - psis
       - pareto-k-diagnostic
