@@ -145,6 +145,5 @@ is.sis <- function(x) {
 #' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
 do_sis_i <- function(log_ratios_i, ...) {
   S <- length(log_ratios_i)
-  lw_i <- log_ratios_i - max(log_ratios_i)
-  list(log_weights = lw_i, pareto_k = 0)
+  list(log_weights = log_ratios_i, pareto_k = 0)
 }
