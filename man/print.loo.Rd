@@ -27,7 +27,7 @@
 \arguments{
 \item{x}{An object returned by \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, or \code{\link[=waic]{waic()}}.}
 
-\item{digits}{An integer passed to \code{\link[base:round]{base::round()}}.}
+\item{digits}{An integer passed to \code{\link[base:Round]{base::round()}}.}
 
 \item{...}{Arguments passed to \code{\link[=plot.psis_loo]{plot.psis_loo()}} if \code{plot_k} is
 \code{TRUE}.}

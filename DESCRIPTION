@@ -50,5 +50,5 @@ Suggests:
 VignetteBuilder: knitr
 Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
