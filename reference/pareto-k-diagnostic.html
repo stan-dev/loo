@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -48,10 +52,9 @@ and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \(k\) is larger than some
 threshold value, or plot observation indexes vs. diagnostic estimates.
 The Details section below provides a brief overview of the
-diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-2017b) for full details." />
+diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -69,7 +72,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -83,13 +86,19 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -125,6 +134,9 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -165,7 +177,7 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Diagnostics for Pareto smoothed importance sampling (PSIS)</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/diagnostics.R'><code>R/diagnostics.R</code></a></small>
     <div class="hidden name"><code>pareto-k-diagnostic.Rd</code></div>
     </div>
 
@@ -175,8 +187,8 @@ and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \(k\) is larger than some
 <code>threshold</code> value, or plot observation indexes vs. diagnostic estimates.
 The <strong>Details</strong> section below provides a brief overview of the
-diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-2017b) for full details.</p>
+diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.</p>
     </div>
 
     <pre class="usage"><span class='fu'>pareto_k_table</span>(<span class='no'>x</span>)
@@ -184,6 +196,8 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
 <span class='fu'>pareto_k_ids</span>(<span class='no'>x</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
 
 <span class='fu'>pareto_k_values</span>(<span class='no'>x</span>)
+
+<span class='fu'>pareto_k_influence_values</span>(<span class='no'>x</span>)
 
 <span class='fu'>psis_n_eff_values</span>(<span class='no'>x</span>)
 
@@ -250,7 +264,10 @@ to control the appearance of the labels.</p></td>
 <p><code>pareto_k_ids()</code> returns an integer vector indicating which
 observations have Pareto \(k\) estimates above <code>threshold</code>.</p>
 <p><code>pareto_k_values()</code> returns a vector of the estimated Pareto
-\(k\) parameters.</p>
+\(k\) parameters. These represent the reliability of sampling.</p>
+<p><code>pareto_k_influence_values()</code> returns a vector of the estimated Pareto
+\(k\) parameters. These represent influence of the observations on the
+model posterior distribution.</p>
 <p><code>psis_n_eff_values()</code> returns a vector of the estimated PSIS
 effective sample sizes.</p>
 <p><code>mcse_loo()</code> returns the Monte Carlo standard error (MCSE)
@@ -284,18 +301,37 @@ the raw importance ratios exists. The convergence rate is close to
 zero and bias can be large with practical sample sizes.</p></li>
 </ul>
 
-<p><strong>If the estimated tail shape parameter \(k\) exceeds \(0.5\), the user
-should be warned, although in practice we have observed good performance for
-values of \(k\) up to 0.7.</strong> (Note: If \(k\) is greater than \(0.5\)
+<h3>What if the estimated tail shape parameter \(k\) exceeds
+\(0.5\)</h3>
+<p>Importance sampling is likely to work less well if the
+marginal posterior \(p(\theta^s | y)\) and LOO posterior
+\(p(\theta^s | y_{-i})\) are very different, which is more likely to
+happen with a non-robust model and highly influential observations.
+If the estimated tail shape parameter \(k\) exceeds \(0.5\), the user
+should be warned. (Note: If \(k\) is greater than \(0.5\)
 then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
-When using PSIS in the context of approximate LOO-CV, then even if the PSIS
-estimate has a finite variance the user should consider sampling directly
-from \(p(\theta^s | y_{-i})\) for any problematic observations \(i\), use
-\(k\)-fold cross-validation, or use a more robust model. Importance
-sampling is likely to work less well if the marginal posterior
-\(p(\theta^s | y)\) and LOO posterior \(p(\theta^s | y_{-i})\) are much
-different, which is more likely to happen with a non-robust model and highly
-influential observations.</p>
+In practice, we have observed good performance for values of \(k\) up to 0.7.
+When using PSIS in the context of approximate LOO-CV, we recommend one of
+the following actions when \(k &gt; 0.7\):</p><ul>
+<li><p>With some additional computations, it is possible to transform the MCMC
+draws from the posterior distribution to obtain more reliable importance
+sampling estimates. This results in a smaller shape parameter \(k\).
+See <code><a href='loo_moment_match.html'>loo_moment_match()</a></code> for an example of this.</p></li>
+<li><p>Sampling directly from \(p(\theta^s | y_{-i})\) for the problematic
+observations \(i\), or using \(k\)-fold cross-validation will generally
+be more stable.</p></li>
+<li><p>Using a model that is more robust to anomalous observations will
+generally make approximate LOO-CV more stable.</p></li>
+</ul>
+
+
+
+<h3>Observation influence statistics</h3>
+<p>The estimated shape parameter
+\(k\) for each observation can be used as a measure of the observation's
+influence on posterior distribution of the model. These can be obtained with
+<code>pareto_k_influence_values()</code>.</p>
+
 <h3>Effective sample size and error estimates</h3>
 <p>In the case that we
 obtain the samples from the proposal distribution via MCMC the <strong>loo</strong>
@@ -312,35 +348,29 @@ evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 <a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='psis.html'>psis()</a></code> for the implementation of the PSIS algorithm.</p></div>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#references">References</a></li>
-      <li><a href="#see-also">See also</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -52,7 +56,6 @@ but not sufficient, for E_loo() to give reliable estimates. Additional
 diagnostic checks for gauging the reliability of the estimates are in
 development and will be added in a future release." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -70,7 +73,7 @@ development and will be added in a future release." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -84,13 +87,19 @@ development and will be added in a future release." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -126,6 +135,9 @@ development and will be added in a future release." />
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -166,7 +178,7 @@ development and will be added in a future release." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute weighted expectations</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/E_loo.R'><code>R/E_loo.R</code></a></small>
     <div class="hidden name"><code>E_loo.Rd</code></div>
     </div>
 
@@ -239,7 +251,7 @@ diagnostics specific to <code>E_loo()</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named list with the following components:</p><dl class='dl-horizontal'>
+    <p>A named list with the following components:</p><dl'>
 <dt><code>value</code></dt><dd><p>The result of the computation.For the matrix method, <code>value</code> is a vector with <code><a href='https://rdrr.io/r/base/nrow.html'>ncol(x)</a></code>
 elements, with one exception: when <code>type="quantile"</code> and
 multiple values are specified in <code>probs</code> the <code>value</code> component of
@@ -260,9 +272,7 @@ default/vector method, the estimate is a scalar.</p></dd>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
 <span class='co'># matrix and draws from the posterior predictive distribution</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>Registered S3 method overwritten by 'xts':</span>
-#&gt; <span class='message'>  method     from</span>
-#&gt; <span class='message'>  as.zoo.xts zoo </span></div><div class='output co'>#&gt; <span class='message'>rstanarm (Version 2.19.3, packaged: )</span></div><div class='output co'>#&gt; <span class='message'>- Do not expect the default priors to remain the same in future rstanarm versions.</span></div><div class='output co'>#&gt; <span class='message'>Thus, R scripts should specify priors explicitly, even if they are just the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>options(mc.cores = parallel::detectCores())</span></div><div class='output co'>#&gt; <span class='message'>- bayesplot theme set to bayesplot::theme_default()</span></div><div class='output co'>#&gt; <span class='message'>   * Does _not_ affect other ggplot2 plots</span></div><div class='output co'>#&gt; <span class='message'>   * See ?bayesplot_theme_set for details on theme setting</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>This is rstanarm version 2.19.3</span></div><div class='output co'>#&gt; <span class='message'>- See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span></div><div class='output co'>#&gt; <span class='message'>- Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>  options(mc.cores = parallel::detectCores())</span></div><div class='input'>
 <span class='co'># data from help("lm")</span>
 <span class='no'>ctl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4.17</span>,<span class='fl'>5.58</span>,<span class='fl'>5.18</span>,<span class='fl'>6.11</span>,<span class='fl'>4.50</span>,<span class='fl'>4.61</span>,<span class='fl'>5.17</span>,<span class='fl'>4.53</span>,<span class='fl'>5.33</span>,<span class='fl'>5.14</span>)
 <span class='no'>trt</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4.81</span>,<span class='fl'>4.17</span>,<span class='fl'>4.41</span>,<span class='fl'>3.59</span>,<span class='fl'>5.87</span>,<span class='fl'>3.83</span>,<span class='fl'>6.03</span>,<span class='fl'>4.89</span>,<span class='fl'>4.32</span>,<span class='fl'>4.69</span>)
@@ -279,37 +289,37 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.125699 4.957090 5.027723 4.901066 5.077694 5.067100 5.005037 5.101876
-#&gt;  [9] 5.001453 5.008510 4.630159 4.737338 4.695085 4.776057 4.527644 4.741270
-#&gt; [17] 4.511924 4.645113 4.712650 4.648726
+#&gt;  [1] 5.130161 4.942460 5.023006 4.889126 5.079624 5.057261 4.993542 5.100044
+#&gt;  [9] 4.991074 5.000810 4.634745 4.742161 4.694916 4.797833 4.541844 4.734143
+#&gt; [17] 4.511471 4.659041 4.715469 4.663138
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"var"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 0.0001758090 0.0001929221 0.0002846390 0.0002322068 0.0002045981
-#&gt;  [6] 0.0002301491 0.0003099407 0.0002048676 0.0002484030 0.0003357314
-#&gt; [11] 0.0003004722 0.0001929832 0.0002825810 0.0001927456 0.0002933647
-#&gt; [16] 0.0001840801 0.0003831361 0.0002629442 0.0002561911 0.0003289782
+#&gt;  [1] 0.0001817459 0.0002085514 0.0002874214 0.0002135392 0.0002086019
+#&gt;  [6] 0.0002452564 0.0003097210 0.0002085195 0.0002753723 0.0003525226
+#&gt; [11] 0.0002709946 0.0002145444 0.0002599368 0.0002203694 0.0003086298
+#&gt; [16] 0.0001806339 0.0004536805 0.0002728438 0.0002478241 0.0002778719
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fl'>0.5</span>) <span class='co'># median</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.137205 4.949528 5.024313 4.907747 5.075786 5.064358 5.010031 5.116541
-#&gt;  [9] 4.996308 5.009588 4.623399 4.731390 4.696351 4.756020 4.523384 4.735937
-#&gt; [17] 4.521804 4.650145 4.714856 4.639187
+#&gt;  [1] 5.137362 4.946344 5.030535 4.892565 5.076470 5.063158 4.987480 5.101923
+#&gt;  [9] 4.994185 5.025377 4.625960 4.739336 4.706874 4.791667 4.563775 4.741163
+#&gt; [17] 4.522306 4.653584 4.720618 4.652127
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.9</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
 #&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
-#&gt; [1,] 4.205287 3.959167 4.057398 3.973357 4.095659 4.096927 3.989554 4.124568
-#&gt; [2,] 6.039962 5.957049 5.989300 5.824918 6.059539 6.068418 6.015977 6.092703
-#&gt;          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]   [,16]
-#&gt; [1,] 4.019989 3.970864 3.651567 3.756684 3.709367 3.886955 3.597137 3.79381
-#&gt; [2,] 5.980762 6.049186 5.608002 5.734082 5.682718 5.688905 5.446165 5.70192
-#&gt;         [,17]    [,18]    [,19]    [,20]
-#&gt; [1,] 3.651192 3.686134 3.710400 3.666609
-#&gt; [2,] 5.377819 5.637251 5.749822 5.648830
+#&gt; [1,] 4.191633 3.914375 4.039848 3.942529 4.072185 4.054182 3.985790 4.100668
+#&gt; [2,] 6.065339 5.954295 5.994522 5.805594 6.074038 6.050066 5.982853 6.071363
+#&gt;          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]
+#&gt; [1,] 3.974670 3.947726 3.638488 3.773463 3.704672 3.872623 3.615117 3.776612
+#&gt; [2,] 6.004577 6.033418 5.644392 5.738865 5.682099 5.734365 5.455974 5.690030
+#&gt;        [,17]    [,18]    [,19]    [,20]
+#&gt; [1,] 3.66190 3.689718 3.724255 3.687103
+#&gt; [2,] 5.38953 5.650770 5.745351 5.679150
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
@@ -317,38 +327,34 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class='co'># To get Pareto k diagnostic with E_loo we also need to provide the negative</span>
 <span class='co'># log-likelihood values using the log_ratios argument.</span>
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> <span class='no'>log_ratios</span>)</div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.125699 4.957090 5.027723 4.901066 5.077694 5.067100 5.005037 5.101876
-#&gt;  [9] 5.001453 5.008510 4.630159 4.737338 4.695085 4.776057 4.527644 4.741270
-#&gt; [17] 4.511924 4.645113 4.712650 4.648726
+#&gt;  [1] 5.130161 4.942460 5.023006 4.889126 5.079624 5.057261 4.993542 5.100044
+#&gt;  [9] 4.991074 5.000810 4.634745 4.742161 4.694916 4.797833 4.541844 4.734143
+#&gt; [17] 4.511471 4.659041 4.715469 4.663138
 #&gt; 
 #&gt; $pareto_k
-#&gt;  [1]  0.310077357  0.119040882  0.027743035  0.308682529  0.145106471
-#&gt;  [6]  0.078710510  0.158699038  0.044389923 -0.051546216  0.048681679
-#&gt; [11]  0.088539247 -0.005486665  0.166370883  0.274525487  0.200213915
-#&gt; [16]  0.178168756  0.230236697  0.082111462  0.083460675  0.149581692
+#&gt;  [1]  0.17330278  0.21427164  0.16604684  0.27986236  0.10064752  0.09979168
+#&gt;  [7]  0.17187747  0.23472381  0.21594104  0.15597476  0.10347666  0.12778891
+#&gt; [13]  0.05270634  0.21715028  0.41637775  0.16749605  0.47254928  0.21880378
+#&gt; [19]  0.06410958 -0.01645188
 #&gt; </div><div class='input'># }
 
 </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

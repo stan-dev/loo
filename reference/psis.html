@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pareto smoothed importance sampling (PSIS) — weights.importance_sampling • loo</title>
+<title>Pareto smoothed importance sampling (PSIS) — psis • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,13 +46,13 @@
 
 
 
-<meta property="og:title" content="Pareto smoothed importance sampling (PSIS) — weights.importance_sampling" />
+<meta property="og:title" content="Pareto smoothed importance sampling (PSIS) — psis" />
 <meta property="og:description" content="Implementation of Pareto smoothed importance sampling (PSIS), a method for
 stabilizing importance ratios. The version of PSIS implemented here
-corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
+and Gabry (2019).
 For PSIS diagnostics see the pareto-k-diagnostic page." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -66,7 +70,7 @@ For PSIS diagnostics see the pareto-k-diagnostic page." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -80,13 +84,19 @@ For PSIS diagnostics see the pareto-k-diagnostic page." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -122,6 +132,9 @@ For PSIS diagnostics see the pareto-k-diagnostic page." />
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -162,21 +175,19 @@ For PSIS diagnostics see the pareto-k-diagnostic page." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Pareto smoothed importance sampling (PSIS)</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/psis.R'><code>R/psis.R</code></a>, <a href='https://github.com/stan-dev/loo/blob/master/R/sis.R'><code>R/sis.R</code></a>, <a href='https://github.com/stan-dev/loo/blob/master/R/tis.R'><code>R/tis.R</code></a></small>
     <div class="hidden name"><code>psis.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Implementation of Pareto smoothed importance sampling (PSIS), a method for
 stabilizing importance ratios. The version of PSIS implemented here
-corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
+and Gabry (2019).
 For PSIS diagnostics see the <a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> page.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for importance_sampling</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>object</span>, <span class='no'>...</span>, <span class='kw'>log</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for array</span>
 <span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>))
@@ -197,30 +208,15 @@ For PSIS diagnostics see the <a href='pareto-k-diagnostic.html'>pareto-k-diagnos
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/stats/weights.html'>weights()</a></code> method, an object returned by <code>psis()/tis()/sis()</code>
-(a list with same class name <code>"psis"/"tis"/"sis"</code>.).</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Arguments passed on to the various methods.</p></td>
-    </tr>
-    <tr>
-      <th>log</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/stats/weights.html'>weights()</a></code> method, should the weights be returned on
-the log scale? Defaults to <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>normalize</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/stats/weights.html'>weights()</a></code> method, should the weights be
-normalized? Defaults to <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
       <th>log_ratios</th>
       <td><p>An array, matrix, or vector of importance ratios on the log
 scale (for PSIS-LOO these are <em>negative</em> log-likelihood values). See the
 <strong>Methods (by class)</strong> section below for a detailed description of how
 to specify the inputs for each method.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments passed on to the various methods.</p></td>
     </tr>
     <tr>
       <th>r_eff</th>
@@ -259,17 +255,13 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The <code><a href='https://rdrr.io/r/stats/weights.html'>weights()</a></code> method returns an object with the same dimensions as
-the <code>log_weights</code> component of the <code>"psis"/"tis"/"sis"</code> object. The <code>normalize</code> and
-<code>log</code> arguments control whether the returned weights are normalized and
-whether or not to return them on the log scale.</p>
-<p>The <code>psis()</code> methods return an object of class <code>"psis"</code>,
+    <p>The <code>psis()</code> methods return an object of class <code>"psis"</code>,
 which is a named list with the following components:</p>
-<dl class='dl-horizontal'>
+<dl'>
 <dt><code>log_weights</code></dt><dd><p>Vector or matrix of smoothed (and truncated) but <em>unnormalized</em> log
-weights, <em>minus the largest log ratio</em> for numerical reasons.
-To get normalized weights use the <code>weights</code> method provided
-for objects of class <code>"psis"</code>.</p></dd>
+weights. To get normalized weights use the
+<code><a href='weights.importance_sampling.html'>weights()</a></code> method provided for objects of
+class <code>"psis"</code>.</p></dd>
 <dt><code>diagnostics</code></dt><dd><p>A named list containing two vectors:
 <ul>
 <li><p><code>pareto_k</code>: Estimates of the shape parameter \(k\) of the
@@ -280,7 +272,7 @@ page for details.</p></li>
 
 </dl>
 
-<p>Objects of class <code>"psis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl class='dl-horizontal'>
+<p>Objects of class <code>"psis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl'>
 <dt><code>norm_const_log</code></dt><dd><p>Vector of precomputed values of <code>colLogSumExps(log_weights)</code> that are
 used internally by the <code>weights</code> method to normalize the log weights.</p></dd>
 <dt><code>tail_len</code></dt><dd><p>Vector of tail lengths used for fitting the generalized Pareto distribution.</p></dd>
@@ -310,8 +302,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 <a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -327,11 +319,11 @@ importance sampling.
 <span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_ratios</span>))
 <span class='no'>psis_result</span> <span class='kw'>&lt;-</span> <span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>psis_result</span>)</div><div class='output co'>#&gt; List of 2
-#&gt;  $ log_weights: num [1:1000, 1:32] -0.694 -0.941 -0.818 -0.649 -0.816 ...
+#&gt;  $ log_weights: num [1:1000, 1:32] 2.37 2.12 2.24 2.41 2.25 ...
 #&gt;  $ diagnostics:List of 2
 #&gt;   ..$ pareto_k: num [1:32] 0.0447 -0.0593 0.0696 -0.052 -0.1159 ...
 #&gt;   ..$ n_eff   : num [1:32] 901 923 929 896 895 ...
-#&gt;  - attr(*, "norm_const_log")= num [1:32] 6.22 6.47 6.17 6.47 6.52 ...
+#&gt;  - attr(*, "norm_const_log")= num [1:32] 9.28 9.04 9.25 9.09 9 ...
 #&gt;  - attr(*, "tail_len")= num [1:32] 99 98 97 100 100 102 99 100 103 98 ...
 #&gt;  - attr(*, "r_eff")= num [1:32] 0.933 0.939 0.968 0.913 0.911 ...
 #&gt;  - attr(*, "dims")= int [1:2] 1000 32
@@ -344,28 +336,21 @@ importance sampling.
 <span class='no'>w</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>) <span class='co'># normalized weights (not log-weights)</span>
 <span class='no'>uw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) <span class='co'># unnormalized weights</span></div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#methods-by-class-">Methods (by class)</a></li>
-      <li><a href="#references">References</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

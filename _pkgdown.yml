@@ -62,7 +62,7 @@ articles:
       - loo2-example
       - loo2-weights
       - loo2-with-rstan
-      - loo2-non-factorizable
+      - loo2-non-factorized
       - loo2-lfo
       - loo2-large-data
       - loo2-moment-matching
@@ -84,6 +84,9 @@ reference:
       - loo_moment_match
       - E_loo
       - psis
+      - tis
+      - sis
+      - weights.importance_sampling
       - pareto-k-diagnostic
   - title: "Model comparison and weighting/averaging"
     desc: >

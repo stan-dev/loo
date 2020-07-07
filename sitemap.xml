@@ -73,6 +73,12 @@
     <loc>https://mc-stan.org/loo/reference/loo_model_weights.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/loo_moment_match.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/reference/loo_moment_match_split.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/loo_subsample.html</loc>
   </url>
   <url>
@@ -124,6 +130,9 @@
     <loc>https://mc-stan.org/loo/reference/waic.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/weights.importance_sampling.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/articles/loo2-example.html</loc>
   </url>
   <url>
@@ -133,7 +142,10 @@
     <loc>https://mc-stan.org/loo/articles/loo2-lfo.html</loc>
   </url>
   <url>
-    <loc>https://mc-stan.org/loo/articles/loo2-non-factorizable.html</loc>
+    <loc>https://mc-stan.org/loo/articles/loo2-moment-matching.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/articles/loo2-non-factorized.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/articles/loo2-weights.html</loc>

@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -43,10 +47,9 @@
 
 
 <meta property="og:title" content="Truncated importance sampling (TIS) — tis" />
-<meta property="og:description" content="Implementation of Truncated (self-normalized) importance sampling (TIS),
+<meta property="og:description" content="Implementation of truncated (self-normalized) importance sampling (TIS),
 truncated at S^(1/2) as recommended by Ionides (2008)." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -64,7 +67,7 @@ truncated at S^(1/2) as recommended by Ionides (2008)." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -78,13 +81,19 @@ truncated at S^(1/2) as recommended by Ionides (2008)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -120,6 +129,9 @@ truncated at S^(1/2) as recommended by Ionides (2008)." />
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -160,12 +172,12 @@ truncated at S^(1/2) as recommended by Ionides (2008)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Truncated importance sampling (TIS)</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/tis.R'><code>R/tis.R</code></a></small>
     <div class="hidden name"><code>tis.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Implementation of Truncated (self-normalized) importance sampling (TIS),
+    <p>Implementation of truncated (self-normalized) importance sampling (TIS),
 truncated at S^(1/2) as recommended by Ionides (2008).</p>
     </div>
 
@@ -186,9 +198,9 @@ truncated at S^(1/2) as recommended by Ionides (2008).</p>
     <tr>
       <th>log_ratios</th>
       <td><p>An array, matrix, or vector of importance ratios on the log
-scale (for Importance sampling LOO, these are <em>negative</em> log-likelihood values). See the
-<strong>Methods (by class)</strong> section below for a detailed description of how
-to specify the inputs for each method.</p></td>
+scale (for Importance sampling LOO, these are <em>negative</em> log-likelihood
+values). See the <strong>Methods (by class)</strong> section below for a detailed
+description of how to specify the inputs for each method.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -225,24 +237,24 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The <code>tis()</code> methods return an object of class <code>"sis"</code>,
+    <p>The <code>tis()</code> methods return an object of class <code>"tis"</code>,
 which is a named list with the following components:</p>
-<dl class='dl-horizontal'>
+<dl'>
 <dt><code>log_weights</code></dt><dd><p>Vector or matrix of smoothed (and truncated) but <em>unnormalized</em> log
-weights, <em>minus the largest log ratio</em> for numerical reasons.
-To get normalized weights use the <code>weights</code> method provided
-for objects of class <code>tis</code>.</p></dd>
+weights. To get normalized weights use the
+<code><a href='weights.importance_sampling.html'>weights()</a></code> method provided for objects of
+class <code>tis</code>.</p></dd>
 <dt><code>diagnostics</code></dt><dd><p>A named list containing one vector:
 <ul>
 <li><p><code>pareto_k</code>: Not used in <code>tis</code>, all set to 0.</p></li>
-<li><p><code>n_eff</code>: effective sample size estimates.</p></li>
+<li><p><code>n_eff</code>: Effective sample size estimates.</p></li>
 </ul></p></dd>
 
 </dl>
 
-<p>Objects of class <code>"tis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl class='dl-horizontal'>
+<p>Objects of class <code>"tis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl'>
 <dt><code>norm_const_log</code></dt><dd><p>Vector of precomputed values of <code>colLogSumExps(log_weights)</code> that are
-used internally by the <code>weights</code> method to normalize the log weights.</p></dd>
+used internally by the <code><a href='https://rdrr.io/r/stats/weights.html'>weights()</a></code>method to normalize the log weights.</p></dd>
 <dt><code>r_eff</code></dt><dd><p>If specified, the user's <code>r_eff</code> argument.</p></dd>
 <dt><code>tail_len</code></dt><dd><p>Not used for <code>tis</code>.</p></dd>
 <dt><code>dims</code></dt><dd><p>Integer vector of length 2 containing <code>S</code> (posterior sample size)
@@ -282,11 +294,11 @@ of data points.</p></li>
 <span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_ratios</span>))
 <span class='no'>tis_result</span> <span class='kw'>&lt;-</span> <span class='fu'>tis</span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>tis_result</span>)</div><div class='output co'>#&gt; List of 2
-#&gt;  $ log_weights: num [1:1000, 1:32] -0.694 -0.941 -0.818 -0.649 -0.816 ...
+#&gt;  $ log_weights: num [1:1000, 1:32] 2.37 2.12 2.24 2.41 2.25 ...
 #&gt;  $ diagnostics:List of 2
 #&gt;   ..$ pareto_k: num [1:32] 0 0 0 0 0 0 0 0 0 0 ...
 #&gt;   ..$ n_eff   : num [1:32] 901 923 930 896 896 ...
-#&gt;  - attr(*, "norm_const_log")= num [1:32] 6.22 6.47 6.17 6.47 6.52 ...
+#&gt;  - attr(*, "norm_const_log")= num [1:32] 9.28 9.04 9.24 9.09 9 ...
 #&gt;  - attr(*, "tail_len")= num [1:32] 99 98 97 100 100 102 99 100 103 98 ...
 #&gt;  - attr(*, "r_eff")= num [1:32] 0.933 0.939 0.968 0.913 0.911 ...
 #&gt;  - attr(*, "dims")= int [1:2] 1000 32
@@ -299,28 +311,21 @@ of data points.</p></li>
 <span class='no'>w</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>tis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>) <span class='co'># normalized weights (not log-weights)</span>
 <span class='no'>uw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>tis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) <span class='co'># unnormalized weights</span></div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#methods-by-class-">Methods (by class)</a></li>
-      <li><a href="#references">References</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

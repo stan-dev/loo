@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -47,7 +51,6 @@
 names of the objects in the list. The code list(a = a, b = b) becomes
 nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -65,7 +68,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -79,13 +82,19 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -121,6 +130,9 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -161,7 +173,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Named lists</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/helpers.R'><code>R/helpers.R</code></a></small>
     <div class="hidden name"><code>nlist.Rd</code></div>
     </div>
 
@@ -192,26 +204,23 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>)
 <span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/mat.or.vec.html'>mat.or.vec</a></span>(<span class='fl'>10</span>, <span class='fl'>3</span>)
 <span class='fu'>nlist</span>(<span class='no'>a</span>,<span class='no'>b</span>)</div><div class='output co'>#&gt; $a
-#&gt;   [1]  0.632021803 -0.691559915 -0.698551147 -2.126358177 -0.189012752
-#&gt;   [6]  0.205477737 -1.338316688 -1.155834491  0.185828351 -0.953053705
-#&gt;  [11]  1.035186689 -0.380511294 -0.804927356 -0.278846749  0.283314615
-#&gt;  [16]  1.065870044  0.284305792  1.499735240 -1.193944998 -0.299988252
-#&gt;  [21]  0.423484063 -0.475867734  2.043626802  0.008833826 -0.597469553
-#&gt;  [26]  0.893984469  0.145662593  0.159455138 -2.349083183  0.864750814
-#&gt;  [31] -0.044704628  1.108497705  0.365317198  0.067778239 -2.258293294
-#&gt;  [36] -0.307612797 -1.608490159 -1.172991402  1.116213939 -0.451311914
-#&gt;  [41]  1.139423503  0.147087735  0.223140303 -1.797794624 -0.257989149
-#&gt;  [46] -1.456310534  0.553609616 -1.424251381  1.181560514  0.070606527
-#&gt;  [51] -0.756952757  0.241751422 -1.403953767 -0.857843438  0.680878516
-#&gt;  [56]  0.386717490 -0.017351591  0.742628998  0.122158832  0.464960495
-#&gt;  [61]  0.583173121  0.908634725  1.187806790  0.281681625  0.409972221
-#&gt;  [66] -0.377847579  1.512293051  0.305171657  0.783658887 -1.002398433
-#&gt;  [71]  0.154517932 -0.357176388 -0.886066561  1.722138057  1.548826542
-#&gt;  [76] -1.997303984 -1.250570822  0.243245442 -0.062933774  0.433954306
-#&gt;  [81]  0.330368843  2.014090990  1.334869510  0.289405385 -1.911123690
-#&gt;  [86]  0.207172110 -0.932657425  1.180645865 -0.150137100  0.690575370
-#&gt;  [91]  0.828056940 -1.582978576 -0.666862907  1.435314867  0.488300066
-#&gt;  [96] -0.024997797 -0.100409758 -0.358671367 -0.840410777 -0.704907535
+#&gt;   [1]  1.10811958 -0.87829676 -1.65681593 -1.69063570 -0.27132048 -1.15584660
+#&gt;   [7]  0.20405452  0.04701523 -0.51550139  0.01153985  0.55204616  1.32149314
+#&gt;  [13]  1.94724115 -0.57149695 -0.69384290 -1.96580236 -0.08385387  0.27190962
+#&gt;  [19] -2.46672879 -1.88824979  0.76100617 -1.31066493 -0.50296899  0.09770720
+#&gt;  [25]  0.69068959  1.30879828  0.46884941 -0.83426786  1.10167012 -1.48977164
+#&gt;  [31] -1.05975718 -0.24901157  0.64253085 -1.13949482 -0.53850692 -0.85775871
+#&gt;  [37] -0.73824100  0.60811926 -2.00208705 -0.56113495  0.42204447  0.56755715
+#&gt;  [43]  1.18565339 -1.19922441  0.52796943  2.57753602  0.19146928 -0.12950747
+#&gt;  [49] -0.47049674 -0.47124834 -0.45861253  0.88321666  2.17935234  0.78069654
+#&gt;  [55] -0.38664165  0.11466462  0.14008793  0.78055139 -0.63465685 -0.79332921
+#&gt;  [61] -0.85237504  0.55025138 -0.03166208 -1.80540296  0.37736434 -1.01891590
+#&gt;  [67] -0.45123629  1.03551642 -2.98295122 -1.34937026  1.50652682  1.33540584
+#&gt;  [73]  0.67021191 -0.97962549  1.07984518  1.49631601  0.02567140  0.07393076
+#&gt;  [79]  0.08410629 -0.54413205 -2.01570102 -1.57668200 -0.49772961 -0.28488772
+#&gt;  [85] -0.32997572  0.74003464  1.03634277  1.78561146  0.82658104  1.75847216
+#&gt;  [91]  2.00654139  0.17887677 -0.19350366  1.24979887 -1.58308710 -1.78250532
+#&gt;  [97]  0.58171191  0.27160900 -1.68228269 -1.53966793
 #&gt; 
 #&gt; $b
 #&gt;       [,1] [,2] [,3]
@@ -228,26 +237,23 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 #&gt; </div><div class='input'>
 <span class='co'># Define some variables in the call and take the rest from the environment</span>
 <span class='fu'>nlist</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='kw'>veggies</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lettuce"</span>, <span class='st'>"spinach"</span>), <span class='kw'>fruits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"banana"</span>, <span class='st'>"papaya"</span>))</div><div class='output co'>#&gt; $a
-#&gt;   [1]  0.632021803 -0.691559915 -0.698551147 -2.126358177 -0.189012752
-#&gt;   [6]  0.205477737 -1.338316688 -1.155834491  0.185828351 -0.953053705
-#&gt;  [11]  1.035186689 -0.380511294 -0.804927356 -0.278846749  0.283314615
-#&gt;  [16]  1.065870044  0.284305792  1.499735240 -1.193944998 -0.299988252
-#&gt;  [21]  0.423484063 -0.475867734  2.043626802  0.008833826 -0.597469553
-#&gt;  [26]  0.893984469  0.145662593  0.159455138 -2.349083183  0.864750814
-#&gt;  [31] -0.044704628  1.108497705  0.365317198  0.067778239 -2.258293294
-#&gt;  [36] -0.307612797 -1.608490159 -1.172991402  1.116213939 -0.451311914
-#&gt;  [41]  1.139423503  0.147087735  0.223140303 -1.797794624 -0.257989149
-#&gt;  [46] -1.456310534  0.553609616 -1.424251381  1.181560514  0.070606527
-#&gt;  [51] -0.756952757  0.241751422 -1.403953767 -0.857843438  0.680878516
-#&gt;  [56]  0.386717490 -0.017351591  0.742628998  0.122158832  0.464960495
-#&gt;  [61]  0.583173121  0.908634725  1.187806790  0.281681625  0.409972221
-#&gt;  [66] -0.377847579  1.512293051  0.305171657  0.783658887 -1.002398433
-#&gt;  [71]  0.154517932 -0.357176388 -0.886066561  1.722138057  1.548826542
-#&gt;  [76] -1.997303984 -1.250570822  0.243245442 -0.062933774  0.433954306
-#&gt;  [81]  0.330368843  2.014090990  1.334869510  0.289405385 -1.911123690
-#&gt;  [86]  0.207172110 -0.932657425  1.180645865 -0.150137100  0.690575370
-#&gt;  [91]  0.828056940 -1.582978576 -0.666862907  1.435314867  0.488300066
-#&gt;  [96] -0.024997797 -0.100409758 -0.358671367 -0.840410777 -0.704907535
+#&gt;   [1]  1.10811958 -0.87829676 -1.65681593 -1.69063570 -0.27132048 -1.15584660
+#&gt;   [7]  0.20405452  0.04701523 -0.51550139  0.01153985  0.55204616  1.32149314
+#&gt;  [13]  1.94724115 -0.57149695 -0.69384290 -1.96580236 -0.08385387  0.27190962
+#&gt;  [19] -2.46672879 -1.88824979  0.76100617 -1.31066493 -0.50296899  0.09770720
+#&gt;  [25]  0.69068959  1.30879828  0.46884941 -0.83426786  1.10167012 -1.48977164
+#&gt;  [31] -1.05975718 -0.24901157  0.64253085 -1.13949482 -0.53850692 -0.85775871
+#&gt;  [37] -0.73824100  0.60811926 -2.00208705 -0.56113495  0.42204447  0.56755715
+#&gt;  [43]  1.18565339 -1.19922441  0.52796943  2.57753602  0.19146928 -0.12950747
+#&gt;  [49] -0.47049674 -0.47124834 -0.45861253  0.88321666  2.17935234  0.78069654
+#&gt;  [55] -0.38664165  0.11466462  0.14008793  0.78055139 -0.63465685 -0.79332921
+#&gt;  [61] -0.85237504  0.55025138 -0.03166208 -1.80540296  0.37736434 -1.01891590
+#&gt;  [67] -0.45123629  1.03551642 -2.98295122 -1.34937026  1.50652682  1.33540584
+#&gt;  [73]  0.67021191 -0.97962549  1.07984518  1.49631601  0.02567140  0.07393076
+#&gt;  [79]  0.08410629 -0.54413205 -2.01570102 -1.57668200 -0.49772961 -0.28488772
+#&gt;  [85] -0.32997572  0.74003464  1.03634277  1.78561146  0.82658104  1.75847216
+#&gt;  [91]  2.00654139  0.17887677 -0.19350366  1.24979887 -1.58308710 -1.78250532
+#&gt;  [97]  0.58171191  0.27160900 -1.68228269 -1.53966793
 #&gt; 
 #&gt; $b
 #&gt;       [,1] [,2] [,3]
@@ -270,25 +276,21 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 #&gt; </div><div class='input'>
 </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

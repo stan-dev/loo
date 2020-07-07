@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -44,7 +48,6 @@
 
 <meta property="og:title" content="Changelog" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -62,7 +65,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,13 +79,19 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="../index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/index.html">Vignettes</a>
 </li>
 <li>
@@ -118,6 +127,9 @@
     </li>
     <li>
       <a href="https://mc-stan.org/rstantools">rstantools</a>
+    </li>
+    <li>
+      <a href="https://mc-stan.org/posterior">posterior</a>
     </li>
   </ul>
 </li>
@@ -157,45 +169,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      
+      <h1 data-toc-skip>Changelog <small></small></h1>
+      <small>Source: <a href='https://github.com/stan-dev/loo/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="loo-2-2-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-2-2-0" class="anchor"></a>loo 2.2.0<small> 2019-12-19 </small>
+    <div id="loo-230" class="section level1">
+<h1 class="page-header" data-toc-text="2.3.0">
+<a href="#loo-230" class="anchor"></a>loo 2.3.0<small> 2020-07-07 </small>
+</h1>
+<p>(GitHub issue/PR number in parentheses)</p>
+<ul>
+<li><p>Added Topi Paananen and Paul Bürkner as coauthors.</p></li>
+<li><p>New function <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> (and new vignette), which can be used to update a <code>loo</code> object when Pareto k estimates are large. (<a href='https://github.com/stan-dev/loo/issues/130'>#130</a>)</p></li>
+<li><p>The log weights provided by the importance sampling functions <code><a href="../reference/psis.html">psis()</a></code>, <code><a href="../reference/tis.html">tis()</a></code>, and <code><a href="../reference/sis.html">sis()</a></code> no longer have the largest log ratio subtracted from them when returned to the user. This should be less confusing for anyone using the <code><a href="https://rdrr.io/r/stats/weights.html">weights()</a></code> method to make an importance sampler. (<a href='https://github.com/stan-dev/loo/issues/112'>#112</a>, <a href='https://github.com/stan-dev/loo/issues/146'>#146</a>)</p></li>
+<li><p>MCSE calculation is now deterministic (<a href='https://github.com/stan-dev/loo/issues/116'>#116</a>, <a href='https://github.com/stan-dev/loo/issues/147'>#147</a>)</p></li>
+</ul>
+</div>
+    <div id="loo-220" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.0">
+<a href="#loo-220" class="anchor"></a>loo 2.2.0<small> 2019-12-19 </small>
 </h1>
 <p>(GitHub issue/PR number in parentheses)</p>
 <ul>
 <li><p>Added Mans Magnusson as a coauthor.</p></li>
-<li><p>New functions <code><a href="../reference/loo_subsample.html">loo_subsample()</a></code> and <code><a href="../reference/loo_approximate_posterior.html">loo_approximate_posterior()</a></code> (and new vignette) for doing PSIS-LOO with large data. (#113)</p></li>
-<li><p>Added support for standard importance sampling and truncated importance sampling (functions <code><a href="../reference/sis.html">sis()</a></code> and <code><a href="../reference/tis.html">tis()</a></code>). (#125)</p></li>
-<li><p><code><a href="../reference/compare.html">compare()</a></code> now throws a deprecation warning suggesting <code><a href="../reference/loo_compare.html">loo_compare()</a></code>. (#93)</p></li>
-<li><p>A smaller threshold is used when checking the uniqueness of tail values. (#124)</p></li>
-<li><p>For WAIC, warnings are only thrown when running <code><a href="../reference/waic.html">waic()</a></code> and not when printing a <code>waic</code> object. (#117, <a href='https://github.com/mcol'>@mcol</a>)</p></li>
-<li><p>Use markdown syntax in roxygen documentation wherever possible. (#108)</p></li>
+<li><p>New functions <code><a href="../reference/loo_subsample.html">loo_subsample()</a></code> and <code><a href="../reference/loo_approximate_posterior.html">loo_approximate_posterior()</a></code> (and new vignette) for doing PSIS-LOO with large data. (<a href='https://github.com/stan-dev/loo/issues/113'>#113</a>)</p></li>
+<li><p>Added support for standard importance sampling and truncated importance sampling (functions <code><a href="../reference/sis.html">sis()</a></code> and <code><a href="../reference/tis.html">tis()</a></code>). (<a href='https://github.com/stan-dev/loo/issues/125'>#125</a>)</p></li>
+<li><p><code><a href="../reference/compare.html">compare()</a></code> now throws a deprecation warning suggesting <code><a href="../reference/loo_compare.html">loo_compare()</a></code>. (<a href='https://github.com/stan-dev/loo/issues/93'>#93</a>)</p></li>
+<li><p>A smaller threshold is used when checking the uniqueness of tail values. (<a href='https://github.com/stan-dev/loo/issues/124'>#124</a>)</p></li>
+<li><p>For WAIC, warnings are only thrown when running <code><a href="../reference/waic.html">waic()</a></code> and not when printing a <code>waic</code> object. (<a href='https://github.com/stan-dev/loo/issues/117'>#117</a>, <a href='https://github.com/mcol'>@mcol</a>)</p></li>
+<li><p>Use markdown syntax in roxygen documentation wherever possible. (<a href='https://github.com/stan-dev/loo/issues/108'>#108</a>)</p></li>
 </ul>
 </div>
-    <div id="loo-2-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-2-1-0" class="anchor"></a>loo 2.1.0<small> 2019-03-13 </small>
+    <div id="loo-210" class="section level1">
+<h1 class="page-header" data-toc-text="2.1.0">
+<a href="#loo-210" class="anchor"></a>loo 2.1.0<small> 2019-03-13 </small>
 </h1>
 <p>(GitHub issue/PR number in parentheses)</p>
 <ul>
-<li><p>New function <code><a href="../reference/loo_compare.html">loo_compare()</a></code> for model comparison that will eventually replace the existing <code><a href="../reference/compare.html">compare()</a></code> function. (#93)</p></li>
-<li><p>New vignette on LOO for non-factorizable joint Gaussian models. (#75)</p></li>
-<li><p>New vignette on “leave-future-out” cross-validation for time series models. (#90)</p></li>
-<li><p>New glossary page (use <code><a href="https://rdrr.io/r/utils/help.html">help("loo-glossary")</a></code>) with definitions of key terms. (#81)</p></li>
-<li><p>New <code>se_diff</code> column in model comparison results. (#78)</p></li>
-<li><p>Improved stability of <code><a href="../reference/psis.html">psis()</a></code> when <code>log_ratios</code> are very small. (#74)</p></li>
-<li><p>Allow <code>r_eff=NA</code> to suppress warning when specifying <code>r_eff</code> is not applicable (i.e., draws not from MCMC). (#72)</p></li>
-<li><p>Update effective sample size calculations to match RStan’s version. (#85)</p></li>
-<li><p>Naming of k-fold helper functions now matches scikit-learn. (#96)</p></li>
+<li><p>New function <code><a href="../reference/loo_compare.html">loo_compare()</a></code> for model comparison that will eventually replace the existing <code><a href="../reference/compare.html">compare()</a></code> function. (<a href='https://github.com/stan-dev/loo/issues/93'>#93</a>)</p></li>
+<li><p>New vignette on LOO for non-factorizable joint Gaussian models. (<a href='https://github.com/stan-dev/loo/issues/75'>#75</a>)</p></li>
+<li><p>New vignette on “leave-future-out” cross-validation for time series models. (<a href='https://github.com/stan-dev/loo/issues/90'>#90</a>)</p></li>
+<li><p>New glossary page (use <code><a href="../reference/loo-glossary.html">help("loo-glossary")</a></code>) with definitions of key terms. (<a href='https://github.com/stan-dev/loo/issues/81'>#81</a>)</p></li>
+<li><p>New <code>se_diff</code> column in model comparison results. (<a href='https://github.com/stan-dev/loo/issues/78'>#78</a>)</p></li>
+<li><p>Improved stability of <code><a href="../reference/psis.html">psis()</a></code> when <code>log_ratios</code> are very small. (<a href='https://github.com/stan-dev/loo/issues/74'>#74</a>)</p></li>
+<li><p>Allow <code>r_eff=NA</code> to suppress warning when specifying <code>r_eff</code> is not applicable (i.e., draws not from MCMC). (<a href='https://github.com/stan-dev/loo/issues/72'>#72</a>)</p></li>
+<li><p>Update effective sample size calculations to match RStan’s version. (<a href='https://github.com/stan-dev/loo/issues/85'>#85</a>)</p></li>
+<li><p>Naming of k-fold helper functions now matches scikit-learn. (<a href='https://github.com/stan-dev/loo/issues/96'>#96</a>)</p></li>
 </ul>
 </div>
-    <div id="loo-2-0-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-2-0-0" class="anchor"></a>loo 2.0.0<small> 2018-04-11 </small>
+    <div id="loo-200" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.0">
+<a href="#loo-200" class="anchor"></a>loo 2.0.0<small> 2018-04-11 </small>
 </h1>
 <p>This is a major release with many changes. Whenever possible we have opted to deprecate rather than remove old functionality, but it is possible that old code that accesses elements inside loo objects by position rather than name may error.</p>
 <ul>
@@ -203,8 +227,8 @@
 <li><p>Updated existing vignette and added two new vignettes demonstrating how to use the package.</p></li>
 <li><p>New function <code><a href="../reference/psis.html">psis()</a></code> replaces <code><a href="../reference/psislw.html">psislw()</a></code> (now deprecated). This version implements the improvements to the PSIS algorithm described in the latest version of <a href="https://arxiv.org/abs/1507.02646" class="uri">https://arxiv.org/abs/1507.02646</a>. Additional diagnostic information is now also provided, including PSIS effective sample sizes.</p></li>
 <li><p>New <code><a href="https://rdrr.io/r/stats/weights.html">weights()</a></code> method for extracting smoothed weights from a <code>psis</code> object. Arguments <code>log</code> and <code>normalize</code> control whether the weights are returned on the log scale and whether they are normalized.</p></li>
-<li><p>Updated the interface for the <code><a href="../reference/loo.html">loo()</a></code> methods to integrate nicely with the new PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions are provided. Several arguments have changed, particularly for the <code>loo.function</code> method. The documentation at <code><a href="https://rdrr.io/r/utils/help.html">help("loo")</a></code> has been updated to describe the new behavior.</p></li>
-<li><p>The structure of the objects returned by the <code><a href="../reference/loo.html">loo()</a></code> function has also changed slightly, as described in the <strong>Value</strong> section at <code><a href="https://rdrr.io/r/utils/help.html">help("loo", package = "loo")</a></code>.</p></li>
+<li><p>Updated the interface for the <code><a href="../reference/loo.html">loo()</a></code> methods to integrate nicely with the new PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions are provided. Several arguments have changed, particularly for the <code>loo.function</code> method. The documentation at <code><a href="../reference/loo.html">help("loo")</a></code> has been updated to describe the new behavior.</p></li>
+<li><p>The structure of the objects returned by the <code><a href="../reference/loo.html">loo()</a></code> function has also changed slightly, as described in the <strong>Value</strong> section at <code><a href="../reference/loo.html">help("loo", package = "loo")</a></code>.</p></li>
 <li><p>New function <code><a href="../reference/loo_model_weights.html">loo_model_weights()</a></code> computes weights for model averaging as described in <a href="https://arxiv.org/abs/1704.02030" class="uri">https://arxiv.org/abs/1704.02030</a>. Implemented methods include stacking of predictive distributions, pseudo-BMA weighting or pseudo-BMA+ weighting with the Bayesian bootstrap.</p></li>
 <li><p>Setting <code><a href="https://rdrr.io/r/base/options.html">options(loo.cores=...)</a></code> is now deprecated in favor of <code><a href="https://rdrr.io/r/base/options.html">options(mc.cores=...)</a></code>. For now, if both the <code>loo.cores</code> and <code>mc.cores</code> options have been set, preference will be given to <code>loo.cores</code> until it is removed in a future release. (thanks to <a href='https://github.com/cfhammill'>@cfhammill</a>)</p></li>
 <li><p>New functions <code><a href="../reference/example_loglik_array.html">example_loglik_array()</a></code> and <code><a href="../reference/example_loglik_array.html">example_loglik_matrix()</a></code> that provide objects to use in examples and tests.</p></li>
@@ -212,17 +236,17 @@
 <li><p>New helper functions for splitting observations for K-fold CV: <code><a href="../reference/kfold-helpers.html">kfold_split_random()</a></code>, <code>kfold_split_balanced()</code>, <code><a href="../reference/kfold-helpers.html">kfold_split_stratified()</a></code>. Additional helper functions for implementing K-fold CV will be included in future releases.</p></li>
 </ul>
 </div>
-    <div id="loo-1-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-1-1-0" class="anchor"></a>loo 1.1.0<small> 2017-03-27 </small>
+    <div id="loo-110" class="section level1">
+<h1 class="page-header" data-toc-text="1.1.0">
+<a href="#loo-110" class="anchor"></a>loo 1.1.0<small> 2017-03-27 </small>
 </h1>
 <ul>
 <li>Introduce the <code>E_loo</code> function for computing weighted expectations (means, variances, quantiles).</li>
 </ul>
 </div>
-    <div id="loo-1-0-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-1-0-0" class="anchor"></a>loo 1.0.0<small> 2016-12-16 </small>
+    <div id="loo-100" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.0">
+<a href="#loo-100" class="anchor"></a>loo 1.0.0<small> 2016-12-16 </small>
 </h1>
 <ul>
 <li>
@@ -237,9 +261,9 @@
 <li>Update references to point to published paper</li>
 </ul>
 </div>
-    <div id="loo-0-1-6" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-6" class="anchor"></a>loo 0.1.6<small> 2016-03-23 </small>
+    <div id="loo-016" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.6">
+<a href="#loo-016" class="anchor"></a>loo 0.1.6<small> 2016-03-23 </small>
 </h1>
 <ul>
 <li>GitHub repository moved from <a href='https://github.com/jgabry'>@jgabry</a> to <a href='https://github.com/stan-dev'>@stan-dev</a></li>
@@ -248,9 +272,9 @@
 <li>Fix example code in vignette (thanks to GitHub user <a href='https://github.com/krz'>@krz</a>)</li>
 </ul>
 </div>
-    <div id="loo-0-1-5" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-5" class="anchor"></a>loo 0.1.5<small> 2016-02-12 </small>
+    <div id="loo-015" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.5">
+<a href="#loo-015" class="anchor"></a>loo 0.1.5<small> 2016-02-12 </small>
 </h1>
 <ul>
 <li>Add warnings if any p_waic estimates are greather than 0.4</li>
@@ -259,9 +283,9 @@
 <li>Remove model weights from <code>compare</code>. <br> In previous versions of <strong>loo</strong> model weights were also reported by <code>compare</code>. We have removed the weights because they were based only on the point estimate of the elpd values ignoring the uncertainty. We are currently working on something similar to these weights that also accounts for uncertainty, which will be included in future versions of <strong>loo</strong>.</li>
 </ul>
 </div>
-    <div id="loo-0-1-4" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-4" class="anchor"></a>loo 0.1.4<small> 2015-12-10 </small>
+    <div id="loo-014" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.4">
+<a href="#loo-014" class="anchor"></a>loo 0.1.4<small> 2015-12-10 </small>
 </h1>
 <p>This update makes it easier for other package authors using <strong>loo</strong> to write tests that involve running the <code>loo</code> function. It also includes minor bug fixes and additional unit tests. Highlights:</p>
 <ul>
@@ -270,9 +294,9 @@
 <li>Test coverage &gt; 80%</li>
 </ul>
 </div>
-    <div id="loo-0-1-3" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-3" class="anchor"></a>loo 0.1.3<small> 2015-09-18 </small>
+    <div id="loo-013" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.3">
+<a href="#loo-013" class="anchor"></a>loo 0.1.3<small> 2015-09-18 </small>
 </h1>
 <p>This update provides several important improvements, most notably an alternative method for specifying the pointwise log-likelihood that reduces memory usage and allows for <strong>loo</strong> to be used with larger datasets. This update also makes it easier to to incorporate <strong>loo</strong>’s functionality into other packages.</p>
 <ul>
@@ -284,17 +308,17 @@
 <li>Allow setting number of cores using <code><a href="https://rdrr.io/r/base/options.html">options(loo.cores = NUMBER)</a></code>.</li>
 </ul>
 </div>
-    <div id="loo-0-1-2" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-2" class="anchor"></a>loo 0.1.2<small> 2015-07-17 </small>
+    <div id="loo-012" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.2">
+<a href="#loo-012" class="anchor"></a>loo 0.1.2<small> 2015-07-17 </small>
 </h1>
 <ul>
 <li>Updates names in package to reflect name changes in the accompanying paper.</li>
 </ul>
 </div>
-    <div id="loo-0-1-1" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-1" class="anchor"></a>loo 0.1.1<small> Unreleased </small>
+    <div id="loo-011" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.1">
+<a href="#loo-011" class="anchor"></a>loo 0.1.1<small> Unreleased </small>
 </h1>
 <ul>
 <li>Better handling of special cases</li>
@@ -303,9 +327,9 @@
 <li>Deprecates <code>loo_and_waic_diff</code>. Use <code>compare</code> instead.</li>
 </ul>
 </div>
-    <div id="loo-0-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#loo-0-1-0" class="anchor"></a>loo 0.1.0<small> 2015-06-26 </small>
+    <div id="loo-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#loo-010" class="anchor"></a>loo 0.1.0<small> 2015-06-26 </small>
 </h1>
 <ul>
 <li>Initial release</li>
@@ -313,24 +337,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#loo-2-2-0">2.2.0</a></li>
-        <li><a href="#loo-2-1-0">2.1.0</a></li>
-        <li><a href="#loo-2-0-0">2.0.0</a></li>
-        <li><a href="#loo-1-1-0">1.1.0</a></li>
-        <li><a href="#loo-1-0-0">1.0.0</a></li>
-        <li><a href="#loo-0-1-6">0.1.6</a></li>
-        <li><a href="#loo-0-1-5">0.1.5</a></li>
-        <li><a href="#loo-0-1-4">0.1.4</a></li>
-        <li><a href="#loo-0-1-3">0.1.3</a></li>
-        <li><a href="#loo-0-1-2">0.1.2</a></li>
-        <li><a href="#loo-0-1-1">0.1.1</a></li>
-        <li><a href="#loo-0-1-0">0.1.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -338,11 +348,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Andrew Gelman.</p>
+  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
