@@ -5,6 +5,7 @@
 \alias{pareto_k_table}
 \alias{pareto_k_ids}
 \alias{pareto_k_values}
+\alias{pareto_k_influence_values}
 \alias{psis_n_eff_values}
 \alias{mcse_loo}
 \alias{plot.psis_loo}
@@ -17,6 +18,8 @@ pareto_k_table(x)
 pareto_k_ids(x, threshold = 0.5)
 
 pareto_k_values(x)
+
+pareto_k_influence_values(x)
 
 psis_n_eff_values(x)
 
@@ -68,7 +71,11 @@ to control the appearance of the labels.}
 observations have Pareto \eqn{k} estimates above \code{threshold}.
 
 \code{pareto_k_values()} returns a vector of the estimated Pareto
-\eqn{k} parameters.
+\eqn{k} parameters. These represent the reliability of sampling.
+
+\code{pareto_k_influence_values()} returns a vector of the estimated Pareto
+\eqn{k} parameters. These represent influence of the observations on the
+model posterior distribution.
 
 \code{psis_n_eff_values()} returns a vector of the estimated PSIS
 effective sample sizes.
@@ -89,8 +96,8 @@ and PSIS effective sample sizes, find the indexes of observations for which
 the estimated Pareto shape parameter \eqn{k} is larger than some
 \code{threshold} value, or plot observation indexes vs. diagnostic estimates.
 The \strong{Details} section below provides a brief overview of the
-diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-2017b) for full details.
+diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.
 }
 \details{
 The reliability and approximate convergence rate of the PSIS-based estimates
@@ -115,18 +122,36 @@ the raw importance ratios exists. The convergence rate is close to
 zero and bias can be large with practical sample sizes.
 }
 
-\strong{If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-should be warned, although in practice we have observed good performance for
-values of \eqn{k} up to 0.7.} (Note: If \eqn{k} is greater than \eqn{0.5}
+\subsection{What if the estimated tail shape parameter \eqn{k} exceeds
+\eqn{0.5}}{ Importance sampling is likely to work less well if the
+marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
+\eqn{p(\theta^s | y_{-i})} are very different, which is more likely to
+happen with a non-robust model and highly influential observations.
+If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+should be warned. (Note: If \eqn{k} is greater than \eqn{0.5}
 then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
-When using PSIS in the context of approximate LOO-CV, then even if the PSIS
-estimate has a finite variance the user should consider sampling directly
-from \eqn{p(\theta^s | y_{-i})} for any problematic observations \eqn{i}, use
-\eqn{k}-fold cross-validation, or use a more robust model. Importance
-sampling is likely to work less well if the marginal posterior
-\eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
-different, which is more likely to happen with a non-robust model and highly
-influential observations.
+In practice, we have observed good performance for values of \eqn{k} up to 0.7.
+When using PSIS in the context of approximate LOO-CV, we recommend one of
+the following actions when \eqn{k > 0.7}:
+\itemize{
+\item With some additional computations, it is possible to transform the MCMC
+draws from the posterior distribution to obtain more reliable importance
+sampling estimates. This results in a smaller shape parameter \eqn{k}.
+See \code{\link[=loo_moment_match]{loo_moment_match()}} for an example of this.
+\item Sampling directly from \eqn{p(\theta^s | y_{-i})} for the problematic
+observations \eqn{i}, or using \eqn{k}-fold cross-validation will generally
+be more stable.
+\item Using a model that is more robust to anomalous observations will
+generally make approximate LOO-CV more stable.
+}
+
+}
+
+\subsection{Observation influence statistics}{ The estimated shape parameter
+\eqn{k} for each observation can be used as a measure of the observation's
+influence on posterior distribution of the model. These can be obtained with
+\code{pareto_k_influence_values()}.
+}
 
 \subsection{Effective sample size and error estimates}{ In the case that we
 obtain the samples from the proposal distribution via MCMC the \strong{loo}
@@ -144,8 +169,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{

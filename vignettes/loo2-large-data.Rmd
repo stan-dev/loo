@@ -17,16 +17,19 @@ params:
 
 This vignette demonstrates how to do leave-one-out cross-validation for large
 data using the __loo__ package and Stan. There are two approaches covered:
-LOO with subsampling and LOO using approximatations to posterior distributions. 
+LOO with subsampling and LOO using approximations to posterior distributions. 
 Some sections from this vignette are excerpted from the papers
 
-* Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+* Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. [arXiv preprint arXiv:2001.00980](https://arxiv.org/abs/2001.00980).
 
-* Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019). Leave-One-Out Cross-Validation for Large Data. In _International Conference on Machine Learning_ 
+* Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253
+[online](http://proceedings.mlr.press/v97/magnusson19a.html), 
+[arXiv preprint arXiv:1904.10679](https://arxiv.org/abs/1904.10679).
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | [arXiv preprint](http://arxiv.org/abs/1507.04544).
 
-* Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
 
 which provide important background for understanding the methods implemented in
 the package.
@@ -182,7 +185,7 @@ to the subsampling used.
 The line at the bottom of the printed output provides information about the
 reliability of the LOO approximation (the interpretation of the $k$ parameter is
 explained in `help('pareto-k-diagnostic')` and in greater detail in Vehtari,
-Gelman, and Gabry (2017)). In this case, the message tells us that all of the
+Simpson, Gelman, Yao, and Gabry (2019)). In this case, the message tells us that all of the
 estimates for $k$ are fine _for this given subsample_.
 
 
@@ -384,7 +387,7 @@ loo_ss_1 <-
     observations = 200
   )
 
-# compute subsampling loo for second model (with log-arsenic)
+# compute subsampling loo for a second model (with log-arsenic)
 loo_ss_2 <-
   loo_subsample(
     x = llfun_logistic,
@@ -471,7 +474,7 @@ This results in a message indicating that we assume these observations to have
 been sampled with simple random sampling, which is true because we had used the
 default `"diff_srs"` estimator for `loo_ss_1`.
 
-We can now compare the models and estimate the difference based on the the same
+We can now compare the models and estimate the difference based on the same
 subsampled observations.
 
 ```{r, eval=FALSE}
@@ -485,7 +488,7 @@ model2  0.0       0.0     0.0
 model1 16.1       4.4     0.1               
 ```
 
-First notice that now the `se_diff` is now around 4 (as opposed to 20 when using
+First, notice that now the `se_diff` is now around 4 (as opposed to 20 when using
 different subsamples). The first column shows the difference in ELPD relative to
 the model with the largest ELPD. In this case, the difference in `elpd` and its
 scale relative to the approximate standard error of the difference) indicates a
@@ -529,9 +532,12 @@ Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://m
 
 Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. [arXiv preprint arXiv:2001.00980](https://arxiv.org/abs/2001.00980).
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019). Leave-One-Out Cross-Validation for Large Data. In _International Conference on Machine Learning_ 
+Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253
+[online](http://proceedings.mlr.press/v97/magnusson19a.html), 
+[arXiv preprint arXiv:1904.10679](https://arxiv.org/abs/1904.10679).
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. _Statistics and
@@ -539,5 +545,6 @@ Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
 [online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4), 
 [arXiv preprint arXiv:1507.04544](http://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance
-sampling. [arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto
+smoothed importance sampling.
+[arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).

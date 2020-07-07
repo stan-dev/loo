@@ -117,27 +117,34 @@ The \code{loo()} methods return a named list with class
 \code{c("psis_loo", "loo")} and components:
 \describe{
 \item{\code{estimates}}{
-A matrix with two columns (\code{Estimate}, \code{SE}) and four rows
-(\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}). This
+A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
+(\code{elpd_loo}, \code{p_loo}, \code{looic}). This
 contains point estimates and standard errors of the expected log pointwise
-predictive density (\code{elpd_loo}), the Monte Carlo standard error of
-\code{elpd_loo} (\code{mcse_elpd_loo}), the effective number of parameters
+predictive density (\code{elpd_loo}), the effective number of parameters
 (\code{p_loo}) and the LOO information criterion \code{looic} (which is
 just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
 }
 
 \item{\code{pointwise}}{
-A matrix with four columns (and number of rows equal to the number of
-observations) containing the pointwise contributions of each of the above
-measures (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}).
+A matrix with five columns (and number of rows equal to the number of
+observations) containing the pointwise contributions of the measures
+(\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}, \code{influence_pareto_k}).
+in addition to the three measures in \code{estimates}, we also report
+pointwise values of the Monte Carlo standard error of \code{elpd_loo}
+(\code{mcse_elpd_loo}), and statistics describing the influence of
+each observation on the posterior distribution (\code{influence_pareto_k}).
+These are the estimates of the shape parameter \eqn{k} of the
+generalized Pareto fit to the importance ratios for each leave-one-out
+distribution. See the \link{pareto-k-diagnostic} page for details.
 }
 
 \item{\code{diagnostics}}{
 A named list containing two vectors:
 \itemize{
-\item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
-generalized Pareto fit to the importance ratios for each leave-one-out
-distribution. See the \link{pareto-k-diagnostic} page for details.
+\item \code{pareto_k}: Importance sampling reliability diagnostics. By default,
+these are equal to the \code{influence_pareto_k} in \code{pointwise}.
+Some algorithms can improve importance sampling reliability and
+modify these diagnostics. See the \link{pareto-k-diagnostic} page for details.
 \item \code{n_eff}: PSIS effective sample size estimates.
 }
 }
@@ -159,9 +166,9 @@ observation.
 \description{
 The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is an
-implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
-2017b).
+models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is
+an implementation of the methods described in Vehtari, Gelman, and Gabry
+(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
 
 The \code{loo_i()} function enables testing log-likelihood
 functions for use with the \code{loo.function()} method.
@@ -320,8 +327,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }
 \seealso{

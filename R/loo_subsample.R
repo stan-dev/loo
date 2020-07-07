@@ -892,9 +892,9 @@ as.psis_loo.psis_loo <- function(x) {
 as.psis_loo.psis_loo_ss <- function(x) {
   if (x$loo_subsampling$data_dim[1] == nrow(x$pointwise)) {
     x$estimates <- x$estimates[, 1:2]
-    x$pointwise <- x$pointwise[, 1:4]
+    x$pointwise <- x$pointwise[, 1:5]
     x$loo_subsampling <- NULL
-    loo_obj <- importance_sampling_loo_object(pointwise = x$pointwise[, 1:4],
+    loo_obj <- importance_sampling_loo_object(pointwise = x$pointwise[, 1:5],
                            diagnostics = x$diagnostics,
                            dims = attr(x, "dims"),
                            is_method = "psis",
@@ -922,8 +922,8 @@ as.psis_loo.psis_loo_ss <- function(x) {
 add_subsampling_vars_to_pointwise <- function(pointwise, idxs, elpd_loo_approx) {
   checkmate::assert_matrix(pointwise,
                            any.missing = FALSE,
-                           min.cols = 4)
-  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo","mcse_elpd_loo","p_loo","looic"))
+                           min.cols = 5)
+  checkmate::assert_names(colnames(pointwise), identical.to = c("elpd_loo","mcse_elpd_loo","p_loo","looic", "influence_pareto_k"))
   assert_subsample_idxs(idxs)
   checkmate::assert_numeric(elpd_loo_approx)
 
@@ -1279,8 +1279,8 @@ assert_psis_loo_ss <- function(x) {
 assert_subsampling_pointwise <- function(x) {
   checkmate::assert_matrix(x,
                            any.missing = FALSE,
-                           ncols = 7)
-  checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "idx", "m_i", "elpd_loo_approx"))
+                           ncols = 8)
+  checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k", "idx", "m_i", "elpd_loo_approx"))
   x
 }
 

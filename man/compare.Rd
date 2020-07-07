@@ -21,8 +21,8 @@ standard error of the difference are returned. If more than two objects are
 provided then a matrix of summary information is returned (see \strong{Details}).
 }
 \description{
-\strong{This function will be deprecated in a future release}. Please
-use the new \code{\link[=loo_compare]{loo_compare()}} function instead.
+\strong{This function is deprecated}. Please use the new \code{\link[=loo_compare]{loo_compare()}} function
+instead.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
@@ -73,7 +73,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Gelman, A., and Gabry, J. (2017b). Pareto smoothed
-importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
 }

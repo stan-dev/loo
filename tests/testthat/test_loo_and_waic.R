@@ -82,8 +82,12 @@ test_that("loo returns object with correct structure", {
   expect_named(loo1$diagnostics, c("pareto_k", "n_eff"))
   expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))
-  expect_equal(colnames(loo1$pointwise), c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic"))
+  expect_equal(colnames(loo1$pointwise), c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k"))
   expect_equal(dim(loo1), dim(LLmat))
+})
+
+test_that("two pareto k values are equal", {
+  expect_identical(loo1$pointwise[,"influence_pareto_k"], loo1$diagnostics$pareto_k)
 })
 
 test_that("loo.array and loo.matrix give same result", {

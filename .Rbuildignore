@@ -17,3 +17,4 @@ vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*
 ^\.appveyor\.yml$
 ^\.codecov\.yml$
+.github/*

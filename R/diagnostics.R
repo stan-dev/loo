@@ -5,8 +5,8 @@
 #' the estimated Pareto shape parameter \eqn{k} is larger than some
 #' `threshold` value, or plot observation indexes vs. diagnostic estimates.
 #' The **Details** section below provides a brief overview of the
-#' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017a,
-#' 2017b) for full details.
+#' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
+#' and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.
 #'
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
@@ -39,18 +39,37 @@
 #'   the raw importance ratios exists. The convergence rate is close to
 #'   zero and bias can be large with practical sample sizes.
 #'
-#' **If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
-#' should be warned, although in practice we have observed good performance for
-#' values of \eqn{k} up to 0.7.** (Note: If \eqn{k} is greater than \eqn{0.5}
+#' \subsection{What if the estimated tail shape parameter \eqn{k} exceeds
+#' \eqn{0.5}}{ Importance sampling is likely to work less well if the
+#' marginal posterior \eqn{p(\theta^s | y)} and LOO posterior
+#' \eqn{p(\theta^s | y_{-i})} are very different, which is more likely to
+#' happen with a non-robust model and highly influential observations.
+#' If the estimated tail shape parameter \eqn{k} exceeds \eqn{0.5}, the user
+#' should be warned. (Note: If \eqn{k} is greater than \eqn{0.5}
 #' then WAIC is also likely to fail, but WAIC lacks its own diagnostic.)
-#' When using PSIS in the context of approximate LOO-CV, then even if the PSIS
-#' estimate has a finite variance the user should consider sampling directly
-#' from \eqn{p(\theta^s | y_{-i})} for any problematic observations \eqn{i}, use
-#' \eqn{k}-fold cross-validation, or use a more robust model. Importance
-#' sampling is likely to work less well if the marginal posterior
-#' \eqn{p(\theta^s | y)} and LOO posterior \eqn{p(\theta^s | y_{-i})} are much
-#' different, which is more likely to happen with a non-robust model and highly
-#' influential observations.
+#' In practice, we have observed good performance for values of \eqn{k} up to 0.7.
+#' When using PSIS in the context of approximate LOO-CV, we recommend one of
+#' the following actions when \eqn{k > 0.7}:
+#'
+#' * With some additional computations, it is possible to transform the MCMC
+#'   draws from the posterior distribution to obtain more reliable importance
+#'   sampling estimates. This results in a smaller shape parameter \eqn{k}.
+#'   See [loo_moment_match()] for an example of this.
+#'
+#' * Sampling directly from \eqn{p(\theta^s | y_{-i})} for the problematic
+#'   observations \eqn{i}, or using \eqn{k}-fold cross-validation will generally
+#'   be more stable.
+#'
+#' * Using a model that is more robust to anomalous observations will
+#'   generally make approximate LOO-CV more stable.
+#'
+#' }
+#'
+#' \subsection{Observation influence statistics}{ The estimated shape parameter
+#' \eqn{k} for each observation can be used as a measure of the observation's
+#' influence on posterior distribution of the model. These can be obtained with
+#' `pareto_k_influence_values()`.
+#' }
 #'
 #' \subsection{Effective sample size and error estimates}{ In the case that we
 #' obtain the samples from the proposal distribution via MCMC the **loo**
@@ -130,7 +149,7 @@ pareto_k_ids <- function(x, threshold = 0.5) {
 #' @rdname pareto-k-diagnostic
 #' @export
 #' @return `pareto_k_values()` returns a vector of the estimated Pareto
-#'   \eqn{k} parameters.
+#'   \eqn{k} parameters. These represent the reliability of sampling.
 pareto_k_values <- function(x) {
   k <- x$diagnostics[["pareto_k"]]
   if (is.null(k)) {
@@ -139,6 +158,21 @@ pareto_k_values <- function(x) {
   }
   if (is.null(k)) {
     stop("No Pareto k estimates found.", call. = FALSE)
+  }
+  return(k)
+}
+
+#' @rdname pareto-k-diagnostic
+#' @export
+#' @return `pareto_k_influence_values()` returns a vector of the estimated Pareto
+#'   \eqn{k} parameters. These represent influence of the observations on the
+#'   model posterior distribution.
+pareto_k_influence_values <- function(x) {
+  if ("influence_pareto_k" %in% colnames(x$pointwise)) {
+    k <- x$pointwise[,"influence_pareto_k"]
+  }
+  else {
+    stop("No Pareto k influence estimates found.", call. = FALSE)
   }
   return(k)
 }

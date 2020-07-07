@@ -1,10 +1,20 @@
-<!--
-# loo 2.2.0.9000
+
+# loo 2.3.0
 
 (GitHub issue/PR number in parentheses)
 
-* Items for next release 
--->
+* Added Topi Paananen and Paul Bürkner as coauthors.
+
+* New function `loo_moment_match()` (and new vignette), which can be used to
+update a `loo` object when Pareto k estimates are large. (#130)
+
+* The log weights provided by the importance sampling functions `psis()`,
+`tis()`, and `sis()` no longer have the largest log ratio subtracted from them
+when returned to the user. This should be less confusing for anyone using 
+the `weights()` method to make an importance sampler. (#112, #146)
+
+* MCSE calculation is now deterministic (#116, #147)
+
 
 # loo 2.2.0
 

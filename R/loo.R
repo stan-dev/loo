@@ -2,9 +2,9 @@
 #'
 #' The `loo()` methods for arrays, matrices, and functions compute PSIS-LOO
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
-#' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is an
-#' implementation of the methods described in Vehtari, Gelman, and Gabry (2017a,
-#' 2017b).
+#' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is
+#' an implementation of the methods described in Vehtari, Gelman, and Gabry
+#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
@@ -47,26 +47,34 @@
 #'   `c("psis_loo", "loo")` and components:
 #' \describe{
 #'  \item{`estimates`}{
-#'   A matrix with two columns (`Estimate`, `SE`) and four rows
-#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`). This
+#'   A matrix with two columns (`Estimate`, `SE`) and three rows
+#'   (`elpd_loo`, `p_loo`, `looic`). This
 #'   contains point estimates and standard errors of the expected log pointwise
-#'   predictive density (`elpd_loo`), the Monte Carlo standard error of
-#'   `elpd_loo` (`mcse_elpd_loo`), the effective number of parameters
+#'   predictive density (`elpd_loo`), the effective number of parameters
 #'   (`p_loo`) and the LOO information criterion `looic` (which is
 #'   just `-2 * elpd_loo`, i.e., converted to deviance scale).
 #'  }
 #'
 #'  \item{`pointwise`}{
-#'   A matrix with four columns (and number of rows equal to the number of
-#'   observations) containing the pointwise contributions of each of the above
-#'   measures (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`).
+#'   A matrix with five columns (and number of rows equal to the number of
+#'   observations) containing the pointwise contributions of the measures
+#'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`, `influence_pareto_k`).
+#'   in addition to the three measures in \code{estimates}, we also report
+#'   pointwise values of the Monte Carlo standard error of \code{elpd_loo}
+#'   (\code{mcse_elpd_loo}), and statistics describing the influence of
+#'   each observation on the posterior distribution (\code{influence_pareto_k}).
+#'   These are the estimates of the shape parameter \eqn{k} of the
+#'   generalized Pareto fit to the importance ratios for each leave-one-out
+#'   distribution. See the [pareto-k-diagnostic] page for details.
 #'  }
+#'
 #'
 #'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
-#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
-#'      generalized Pareto fit to the importance ratios for each leave-one-out
-#'      distribution. See the [pareto-k-diagnostic] page for details.
+#'    * `pareto_k`: Importance sampling reliability diagnostics. By default,
+#'      these are equal to the \code{influence_pareto_k} in \code{pointwise}.
+#'      Some algorithms can improve importance sampling reliability and
+#'      modify these diagnostics. See the [pareto-k-diagnostic] page for details.
 #'    * `n_eff`: PSIS effective sample size estimates.
 #'  }
 #'
@@ -426,7 +434,8 @@ is.psis_loo <- function(x) {
 #' @noRd
 #' @param ll Log-likelihood matrix.
 #' @param psis_object The object returned by `psis()`.
-#' @return Named list with pointwise elpd_loo, p_loo, and looic.
+#' @return Named list with pointwise elpd_loo, mcse_elpd_loo, p_loo, looic,
+#' and influence_pareto_k.
 #'
 pointwise_loo_calcs <- function(ll, psis_object) {
   if (!is.matrix(ll)) {
@@ -438,14 +447,15 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   p_loo <- lpd - elpd_loo
   mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
   looic <- -2 * elpd_loo
-  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic)
+  influence_pareto_k <- psis_object$diagnostics$pareto_k
+  cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, influence_pareto_k)
 }
 
 #' Structure the object returned by the loo methods
 #'
 #' @noRd
 #' @param pointwise Matrix containing columns elpd_loo, mcse_elpd_loo, p_loo,
-#'   looic.
+#'   looic, influence_pareto_k.
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
 #' @template is_method
@@ -456,10 +466,10 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
                                            is_method, is_object = NULL) {
   if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
-  if (!is.list(diagnostics)) stop("Internal error ('diagnositcs' must be a list)")
+  if (!is.list(diagnostics)) stop("Internal error ('diagnostics' must be a list)")
   assert_importance_sampling_method_is_implemented(is_method)
 
-  cols_to_summarize <- !(colnames(pointwise) %in% "mcse_elpd_loo")
+  cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "influence_pareto_k"))
   estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
 
   out <- nlist(estimates, pointwise, diagnostics)
@@ -494,6 +504,12 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
   lik <- exp(ll)
   w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
+  # zn is approximate ordered statistics of unit normal distribution with offset
+  # recommended by Blom (1958)
+  S <- n_samples
+  c <- 3/8
+  r <- 1:n_samples
+  zn <- qnorm((r - c) / (S - 2 * c + 1))
   var_elpd <-
     vapply(
       seq_len(ncol(w2)),
@@ -501,7 +517,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
       FUN = function(i) {
         var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2)
         sd_epd_i <- sqrt(var_epd_i)
-        z <- rnorm(n_samples, mean = E_epd[i], sd = sd_epd_i)
+        z <- E_epd[i] + sd_epd_i * zn
         var(log(z[z > 0]))
       }
     )

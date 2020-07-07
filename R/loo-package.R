@@ -3,7 +3,7 @@
 #' @docType package
 #' @name loo-package
 #'
-#' @importFrom stats sd var quantile setNames weights rnorm
+#' @importFrom stats sd var quantile setNames weights rnorm qnorm
 #' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
 #' @description
@@ -12,9 +12,10 @@
 #' }
 #' *Stan Development Team*
 #'
-#' This package implements the methods described in Vehtari, Gelman, and Gabry
-#' (2017a, 2017b) and Yao et al. (2018). To get started see the **loo**
-#' package [vignettes](https://mc-stan.org/loo/articles/index.html), the
+#' This package implements the methods described in Vehtari, Gelman, and
+#' Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+#' Yao et al. (2018). To get started see the **loo** package
+#' [vignettes](https://mc-stan.org/loo/articles/index.html), the
 #' [loo()] function for efficient approximate leave-one-out
 #' cross-validation (LOO-CV), the [psis()] function for the Pareto
 #' smoothed importance sampling (PSIS) algorithm, or
@@ -32,10 +33,10 @@
 #'   fast and stable computations for approximate LOO-CV laid out in Vehtari,
 #'   Gelman, and Gabry (2017a). From existing posterior simulation draws, we
 #'   compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-#'   Gelman, and Gabry, 2017b), a new procedure for regularizing and diagnosing
-#'   importance weights. As a byproduct of our calculations, we also obtain
-#'   approximate standard errors for estimated predictive errors and for
-#'   comparing of predictive errors between two models.
+#'   Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
+#'   and diagnosing importance weights. As a byproduct of our calculations,
+#'   we also obtain approximate standard errors for estimated predictive
+#'   errors and for comparing of predictive errors between two models.
 #'
 #'   We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
 #'   diagnostics and effective sample size and Monte Carlo standard error

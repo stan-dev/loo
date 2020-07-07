@@ -1,12 +1,12 @@
 #' Truncated importance sampling (TIS)
 #'
-#' Implementation of Truncated (self-normalized) importance sampling (TIS),
+#' Implementation of truncated (self-normalized) importance sampling (TIS),
 #' truncated at S^(1/2) as recommended by Ionides (2008).
 #'
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
-#'   scale (for Importance sampling LOO, these are *negative* log-likelihood values). See the
-#'   **Methods (by class)** section below for a detailed description of how
-#'   to specify the inputs for each method.
+#'   scale (for Importance sampling LOO, these are *negative* log-likelihood
+#'   values). See the **Methods (by class)** section below for a detailed
+#'   description of how to specify the inputs for each method.
 #' @template cores
 #' @param ... Arguments passed on to the various methods.
 #' @param r_eff Vector of relative effective sample size estimates containing
@@ -19,20 +19,20 @@
 #'   message thrown when not specifying `r_eff` can be disabled by
 #'   setting `r_eff` to `NA`.
 #'
-#' @return The `tis()` methods return an object of class `"sis"`,
+#' @return The `tis()` methods return an object of class `"tis"`,
 #'   which is a named list with the following components:
 #'
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights, *minus the largest log ratio* for numerical reasons.
-#'     To get normalized weights use the `weights` method provided
-#'     for objects of class `tis`.
+#'     weights. To get normalized weights use the
+#'     [`weights()`][weights.importance_sampling] method provided for objects of
+#'     class `tis`.
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
 #'    * `pareto_k`: Not used in `tis`, all set to 0.
-#'    * `n_eff`: effective sample size estimates.
+#'    * `n_eff`: Effective sample size estimates.
 #'  }
 #' }
 #'
@@ -40,7 +40,7 @@
 #' \describe{
 #'   \item{`norm_const_log`}{
 #'     Vector of precomputed values of `colLogSumExps(log_weights)` that are
-#'     used internally by the `weights` method to normalize the log weights.
+#'     used internally by the [weights()]method to normalize the log weights.
 #'   }
 #'   \item{`r_eff`}{
 #'     If specified, the user's `r_eff` argument.
@@ -58,11 +58,9 @@
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item [psis()] for approximate LOO-CV using PSIS.
-#' \item [loo()] for approximate LOO-CV.
-#' \item [pareto-k-diagnostic] for PSIS diagnostics.
-#' }
+#' * [psis()] for approximate LOO-CV using PSIS.
+#' * [loo()] for approximate LOO-CV.
+#' * [pareto-k-diagnostic] for PSIS diagnostics.
 #'
 #' @references
 #' Ionides, Edward L. (2008). Truncated importance sampling.
@@ -155,7 +153,6 @@ do_tis_i <- function(log_ratios_i, ...) {
   log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
   log_cutpoint <- log_Z + 0.5 * log(S)
   lw_i <- pmin(log_ratios_i, log_cutpoint)
-  lw_i <- lw_i - max(lw_i)
   list(log_weights = lw_i, pareto_k = 0)
 }
 

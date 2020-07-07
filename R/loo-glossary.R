@@ -5,15 +5,15 @@
 #' @template loo-and-psis-references
 #' @template bayesvis-reference
 #'
-#' @description Note: VGG2017a refers to Vehtari, Gelman, and Gabry (2017a). See
+#' @description Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 #'   **References**, below.
 #'
 #' @section ELPD and `elpd_loo`:
 #'
 #' The ELPD is the theoretical expected log pointwise predictive density for a new
-#' dataset (Eq 1 in VGG2017a), which can be estimated, e.g., using
+#' dataset (Eq 1 in VGG2017), which can be estimated, e.g., using
 #' cross-validation. `elpd_loo` is the Bayesian LOO estimate of the
-#' expected log pointwise predictive density (Eq 4 in VGG2017a) and
+#' expected log pointwise predictive density (Eq 4 in VGG2017) and
 #' is a sum of N individual pointwise log predictive densities. Probability
 #' densities can be smaller or larger than 1, and thus log predictive densities
 #' can be negative or positive. For simplicity the ELPD acronym is used also for
@@ -24,8 +24,8 @@
 #' @section Standard error of `elpd_loo`:
 #'
 #' As `elpd_loo` is defined as the sum of N independent components (Eq 4 in
-#' VGG2017a), we can compute the standard error by using the standard deviation
-#' of the N components and multiplying by `sqrt(N)` (Eq 23 in VGG2017a).
+#' VGG2017), we can compute the standard error by using the standard deviation
+#' of the N components and multiplying by `sqrt(N)` (Eq 23 in VGG2017).
 #' This standard error is a coarse description of our uncertainty about the
 #' predictive performance for unknown future data. When N is small or there is
 #' severe model misspecification, the current SE estimate is overoptimistic and
@@ -33,14 +33,14 @@
 #' estimate is an accurate estimate for the scale, it ignores the skewness. When
 #' making model comparisons, the SE of the component-wise (pairwise) differences
 #' should be used instead (see the `se_diff` section below and Eq 24 in
-#' VGG2017a).
+#' VGG2017).
 #'
 #' @section Monte Carlo SE of elpd_loo:
 #'
 #' The Monte Carlo standard error is the estimate for the computational accuracy
 #' of MCMC and importance sampling used to compute `elpd_loo`. Usually this
 #' is negligible compared to the standard describing the uncertainty due to
-#' finite number of observations (Eq 23 in VGG2017a).
+#' finite number of observations (Eq 23 in VGG2017).
 #'
 #' @section `p_loo` (effective number of parameters):
 #'
@@ -87,7 +87,7 @@
 #' large compared to the number of observations (e.g., `p>N/5`), it is
 #' likely that the model is so flexible or the population prior so weak that it’s
 #' difficult to predict the left out observation (even for the true model).
-#' This happens, for example, in the simulated 8 schools (in VGG2017a), random
+#' This happens, for example, in the simulated 8 schools (in VGG2017), random
 #' effect models with a few observations per random effect, and Gaussian
 #' processes and spatial models with short correlation lengths.
 #'
@@ -111,7 +111,7 @@
 #' @section se_diff:
 #'
 #' The standard error of component-wise differences of elpd_loo (Eq 24 in
-#' VGG2017a) between two models. This SE is *smaller* than the SE for
+#' VGG2017) between two models. This SE is *smaller* than the SE for
 #' individual models due to correlation (i.e., if some observations are easier
 #' and some more difficult to predict for all models).
 #'

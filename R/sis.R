@@ -3,9 +3,9 @@
 #' Implementation of standard importance sampling (SIS).
 #'
 #' @param log_ratios An array, matrix, or vector of importance ratios on the log
-#'   scale (for Importance sampling LOO, these are *negative* log-likelihood values). See the
-#'   **Methods (by class)** section below for a detailed description of how
-#'   to specify the inputs for each method.
+#'   scale (for Importance sampling LOO, these are *negative* log-likelihood
+#'   values). See the **Methods (by class)** section below for a detailed
+#'   description of how to specify the inputs for each method.
 #' @template cores
 #' @param ... Arguments passed on to the various methods.
 #' @param r_eff Vector of relative effective sample size estimates containing
@@ -23,10 +23,10 @@
 #'
 #' \describe{
 #'   \item{`log_weights`}{
-#'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights, *minus the largest log ratio* for numerical reasons.
-#'     To get normalized weights use the `weights` method provided
-#'     for objects of class `sis`.
+#'     Vector or matrix of smoothed but *unnormalized* log
+#'     weights. To get normalized weights use the
+#'     [`weights()`][weights.importance_sampling] method provided for objects of
+#'     class `sis`.
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
@@ -57,11 +57,9 @@
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item [psis()] for approximate LOO-CV using PSIS.
-#' \item [loo()] for approximate LOO-CV.
-#' \item [pareto-k-diagnostic] for PSIS diagnostics.
-#' }
+#' * [psis()] for approximate LOO-CV using PSIS.
+#' * [loo()] for approximate LOO-CV.
+#' * [pareto-k-diagnostic] for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
 #'
@@ -145,6 +143,5 @@ is.sis <- function(x) {
 #' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
 do_sis_i <- function(log_ratios_i, ...) {
   S <- length(log_ratios_i)
-  lw_i <- log_ratios_i - max(log_ratios_i)
-  list(log_weights = lw_i, pareto_k = 0)
+  list(log_weights = log_ratios_i, pareto_k = 0)
 }

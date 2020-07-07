@@ -1,5 +1,5 @@
 ---
-title: "Leave-one-out cross-validation for non-factorizable models"
+title: "Leave-one-out cross-validation for non-factorized models"
 author: "Aki Vehtari, Paul Bürkner and Jonah Gabry"
 date: "`r Sys.Date()`"
 output:
@@ -11,7 +11,7 @@ params:
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Leave-one-out cross-validation for non-factorizable models}
+%\VignetteIndexEntry{Leave-one-out cross-validation for non-factorized models}
 -->
 ```{r settings, child="children/SETTINGS-knitr.txt"}
 ```
@@ -25,51 +25,86 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-When computing approximate leave-one-out cross-validation (LOO-CV) after fitting
-a Bayesian model, the first step is to calculate the *pointwise* log-likelihood
-for every response value $y_i, \: i = 1, \ldots, N$. This is straightforward for
-*factorizable* models in which response values are conditionally independent
-given the model parameters $\theta$ and the likelihood can be written in the
-familiar form
+When computing ELPD-based LOO-CV for a Bayesian model we need to
+compute the log leave-one-out predictive densities $\log{p(y_i | y_{-i})}$ for
+every response value $y_i, \: i = 1, \ldots, N$, where $y_{-i}$ denotes all
+response values except observation $i$. To obtain $p(y_i | y_{-i})$, we need to
+have access to the pointwise likelihood $p(y_i\,|\, y_{-i}, \theta)$ and
+integrate over the model parameters $\theta$:
 
 $$
-p(y \,|\, \theta) = \prod_{i=1}^N p(y_i \,|\, \theta).
+p(y_i\,|\,y_{-i}) =
+  \int p(y_i\,|\, y_{-i}, \theta) \, p(\theta\,|\, y_{-i}) \,d \theta
 $$
 
-The function $p$ will be either a probability density function (PDF) or a
-probability mass function (PMF) depending on whether we have a continuous or
-discrete outcome. When $p(y)$ can be factorized in this way, the conditional
+Here, $p(\theta\,|\, y_{-i})$ is the leave-one-out posterior distribution for
+$\theta$, that is, the posterior distribution for $\theta$ obtained by fitting
+the model while holding out the $i$th observation (we will later show how
+refitting the model to data $y_{-i}$ can be avoided).
+
+If the observation model is formulated directly as the product of the
+pointwise observation models, we call it a *factorized*
+model. In this case, the likelihood is also the product of the pointwise
+likelihood contributions $p(y_i\,|\, y_{-i}, \theta)$.
+To better illustrate possible structures of the observation models, we
+formally divide $\theta$ into two parts, observation-specific latent
+variables $f = (f_1, \ldots, f_N)$ and hyperparameters $\psi$, so that
+$p(y_i\,|\, y_{-i}, \theta) = p(y_i\,|\, y_{-i}, f_i, \psi)$.
+Depending on the model, one of the two parts of $\theta$
+may also be empty. In very simple models, such as linear regression models,
+latent variables are not explicitly presented and response values are
+conditionally independent given
+$\psi$, so that $p(y_i\,|\, y_{-i}, f_i, \psi) = p(y_i \,|\, \psi)$.
+The full likelihood can then be written in the familiar form
+
+$$
+p(y \,|\, \psi) = \prod_{i=1}^N p(y_i \,|\, \psi),
+$$
+
+where $y = (y_1, \ldots, y_N)$ denotes the vector of all responses.
+When the likelihood factorizes this way, the conditional
 pointwise log-likelihood can be obtained easily by computing
-$\log p(y_i \,|\, \theta)$ for each $i$. We then save each of these individual
-contributions to the log-likelihood rather than simply summing them to obtain
-the total log-likelihood.
+$p(y_i\,|\, \psi)$ for each $i$ with computational cost $O(n)$.
 
-The situation is more complicated for *non-factorizable* models in which
-response values are not conditionally independent. When there is residual
-dependency even after accounting for the model parameters $\theta$, the
-conditional pointwise log-likelihood has the general form
-$\log p(y_i \,|\, y_{-i}, \theta)$, where $y_{-i}$ denotes all response
-values except observation $i$.
+Yet, there are several reasons why a *non-factorized* observation model
+may be necessary or preferred. In non-factorized
+models, the joint likelihood of the response values $p(y \,|\, \theta)$ is not
+factorized into observation-specific components, but rather given directly as one
+joint expression. For some models, an analytic factorized formulation is
+simply not available in which case we speak of a *non-factorizable* model. Even
+in models whose observation model can be factorized in principle, it may still be
+preferable to use a non-factorized form for reasons of efficiency
+and numerical stability (Bürkner et al. 2020).
+
+Whether a non-factorized model is used by necessity or for efficiency and
+stability, it comes at the cost of having no direct access to the leave-one-out
+predictive densities and thus to the overall leave-one-out
+predictive accuracy. In theory, we can express the observation-specific
+likelihoods in terms of the joint likelihood via
+
+$$
+p(y_i \,|\, y_{i-1}, \theta) =
+  \frac{p(y \,|\, \theta)}{p(y_{-i} \,|\, \theta)} =
+  \frac{p(y \,|\, \theta)}{\int p(y \,|\, \theta) \, d y_i},
+$$
+
+but the expression on the right-hand side may not always
+have an analytical solution. Computing $\log p(y_i \,|\, y_{-i},
+\theta)$ for non-factorized models is therefore often impossible, or at least
+inefficient and numerically unstable. However, there is a large
+class of multivariate normal and Student-$t$ models for which there are
+efficient analytical solutions available.
+
+More details can be found in our paper about LOO-CV for non-factorized models
+(Bürkner, Gabry, & Vehtari, 2020), which is available as a preprint on arXiv
+(https://arxiv.org/abs/1810.10559).
 
 # LOO-CV for multivariate normal models
 
-Although computing the pointwise log-likelihood for non-factorizable models is
-often impossible, there is a large class of multivariate normal models for which
-an analytical solution is available. These equations were initially derived by
-Sundararajan and Keerthi (2001) with a focus on the special case of a zero-mean
-Gaussian process model with prior covariance $K$ and residual standard deviation
-$\sigma$,
-
-$$
-y \sim {\mathrm N}(0, \, K+\sigma^2 I),
-$$
-
-where $I$ is the identity matrix of appropriate dimension and $C = K+\sigma^2 I$
-is the covariance matrix of the model.
-
-Sundararajan and Keerthi's results also generalize to the case of an arbitrary
-invertible covariance matrix $C$. For such models, the LOO predictive mean and
-standard deviation can be computed as follows:
+In this vignette, we will focus on non-factorized multivariate normal
+models. Based on results of Sundararajan and Keerthi (2001), Bürkner et al. (2020)
+show that, for multivariate normal models with coriance matrix $C$,
+the LOO predictive mean and standard deviation can be computed as follows:
 
 \begin{align}
   \mu_{\tilde{y},-i} &= y_i-\bar{c}_{ii}^{-1} g_i \nonumber \\
@@ -140,16 +175,16 @@ $$
 $$
 
 and then stabilize them using Pareto smoothed importance sampling (PSIS, Vehtari
-et al, 2017b) to obtain the weights $w_i^{(s)}$. The resulting approximation is
-referred to as PSIS-LOO (Vehtari et al, 2017a).
+et al, 2019) to obtain the weights $w_i^{(s)}$. The resulting approximation is
+referred to as PSIS-LOO (Vehtari et al, 2017).
 
 ## Exact LOO-CV with re-fitting
 
 In order to validate the approximate LOO procedure, and also in order to allow
 exact computations to be made for a small number of leave-one-out folds for
-which the Pareto $k$ diagnostic (Vehtari et al, 2017b) indicates an unstable
+which the Pareto $k$ diagnostic (Vehtari et al, 2019) indicates an unstable
 approximation, we need to consider how we might to do _exact_ leave-one-out CV
-for a non-factorizable model. In the case of a Gaussian process that has the
+for a non-factorized model. In the case of a Gaussian process that has the
 marginalization property, we could just drop the one row and column of $C$
 corresponding to the held out out observation. This does not hold in general for
 multivariate normal models, however, and to keep the original prior we may need
@@ -203,7 +238,7 @@ $p(\theta\,|\,y_{\mathrm{mis}(i)})$.
 
 # Lagged SAR models
 
-A common non-factorizable multivariate normal model is the simultaneously
+A common non-factorized multivariate normal model is the simultaneously
 autoregressive (SAR) model, which is frequently used for spatially correlated
 data. The lagged SAR model is defined as
 
@@ -328,9 +363,9 @@ follows.
 
 ```{r fit, results="hide"}
 fit <- brm(
-  CRIME ~ INC + HOVAL,
+  CRIME ~ INC + HOVAL + sar(COL.nb, type = "lag"),
   data = COL.OLD,
-  autocor = cor_lagsar(COL.nb),
+  data2 = list(COL.nb = COL.nb),
   chains = 4,
   seed = SEED
 )
@@ -367,7 +402,7 @@ loglik <- yloo <- sdloo <- matrix(nrow = S, ncol = N)
 for (s in 1:S) {
   p <- posterior[s, ]
   eta <- p$b_Intercept + p$b_INC * fit$data$INC + p$b_HOVAL * fit$data$HOVAL
-  W_tilde <- diag(N) - p$lagsar * fit$autocor$W
+  W_tilde <- diag(N) - p$lagsar * spdep::nb2mat(COL.nb)
   Cinv <- t(W_tilde) %*% W_tilde / p$sigma^2
   g <- Cinv %*% (y - solve(W_tilde, eta))
   cbar <- diag(Cinv)
@@ -384,7 +419,7 @@ psis_result <- psis(log_ratios)
 The quality of the PSIS-LOO approximation can be investigated graphically by
 plotting the Pareto-k estimate for each observation. Ideally, they should not
 exceed $0.5$, but in practice the algorithm turns out to be robust up to values
-of $0.7$ (Vehtari et al, 2017ab). In the plot below, we see that the fourth
+of $0.7$ (Vehtari et al, 2017, 2019). In the plot below, we see that the fourth
 observation is problematic and so may reduce the accuracy of the LOO-CV
 approximation.
 
@@ -432,9 +467,9 @@ loop over the observations.
 ```{r fit_dummy, cache = TRUE}
 # see help("mi", "brms") for details on the mi() usage
 fit_dummy <- brm(
-  CRIME | mi() ~ INC + HOVAL,
+  CRIME | mi() ~ INC + HOVAL + sar(COL.nb, type = "lag"),
   data = COL.OLD,
-  autocor = cor_lagsar(COL.nb),
+  data2 = list(COL.nb = COL.nb),
   chains = 0
 )
 ```
@@ -463,7 +498,7 @@ for (i in seq_len(N)) {
     y_miss_i <- y
     y_miss_i[i] <- p$Ymi
     eta <- p$b_Intercept + p$b_INC * fit_i$data$INC + p$b_HOVAL * fit_i$data$HOVAL
-    W_tilde <- diag(N) - p$lagsar * fit_i$autocor$W
+    W_tilde <- diag(N) - p$lagsar * spdep::nb2mat(COL.nb)
     Cinv <- t(W_tilde) %*% W_tilde / p$sigma^2
     g <- Cinv %*% (y_miss_i - solve(W_tilde, eta))
     cbar <- diag(Cinv);
@@ -552,7 +587,7 @@ LOO-CV but rather a violation of its assumptions.
 
 So far, we have specified the models in brms and only used Stan implicitely
 behind the scenes. This allowed us to focus on the primary purpose of validating
-approximate LOO-CV for non-factorizable models. However, we would also like to
+approximate LOO-CV for non-factorized models. However, we would also like to
 show how everything can be set up in Stan directly. The Stan code brms generates
 is human readable and so we can use it to learn some of the essential aspects of
 Stan and the particular model we are implementing. The Stan program below is
@@ -663,7 +698,7 @@ and `data` arguments.
 # Conclusion
 
 In summary, we have shown how to set up and validate approximate and exact
-LOO-CV for non-factorizable multivariate normal models using Stan with the
+LOO-CV for non-factorized multivariate normal models using Stan with the
 **brms** and **loo** packages. Although we focused on the particular example of
 a spatial SAR model, the presented recipe applies more generally to models that
 can be expressed in terms of a multivariate normal likelihood.
@@ -674,10 +709,12 @@ can be expressed in terms of a multivariate normal likelihood.
 
 Anselin L. (1988). *Spatial econometrics: methods and models*. Dordrecht: Kluwer Academic.
 
+Bürkner P. C., Gabry J., & Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. [ArXiv preprint](https://arxiv.org/abs/1810.10559).
+
 Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyperparameters in Gaussian processes. *Neural Computation*, 13(5), 1103--1118.
 
 Vehtari A., Mononen T., Tolvanen V., Sivula T., & Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. *Journal of Machine Learning Research*, 17(103), 1--38. [Online](http://jmlr.org/papers/v17/14-540.html).
 
-Vehtari A., Gelman A., & Gabry J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari A., Gelman A., & Gabry J. (2017b). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).

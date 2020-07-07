@@ -81,21 +81,26 @@ dim.importance_sampling <- function(x) {
   attr(x, "dims")
 }
 
-#' @rdname psis
+
+#' Extract importance sampling weights
+#'
 #' @export
+#' @export weights.importance_sampling
 #' @method weights importance_sampling
-#' @param object For the `weights()` method, an object returned by `psis()/tis()/sis()`
-#' (a list with same class name `"psis"/"tis"/"sis"`.).
-#' @param log For the `weights()` method, should the weights be returned on
-#'   the log scale? Defaults to `TRUE`.
-#' @param normalize For the `weights()` method, should the weights be
-#'   normalized? Defaults to `TRUE`.
+#' @param object An object returned by [psis()], [tis()], or [sis()].
+#' @param log Should the weights be returned on the log scale? Defaults to
+#'   `TRUE`.
+#' @param normalize Should the weights be normalized? Defaults to `TRUE`.
+#' @param ... Ignored.
 #'
 #' @return The `weights()` method returns an object with the same dimensions as
-#'   the `log_weights` component of the `"psis"/"tis"/"sis"` object. The `normalize` and
-#'   `log` arguments control whether the returned weights are normalized and
-#'   whether or not to return them on the log scale.
-#' @export weights.importance_sampling
+#'   the `log_weights` component of `object`. The `normalize` and `log`
+#'   arguments control whether the returned weights are normalized and whether
+#'   or not to return them on the log scale.
+#'
+#' @examples
+#' # See the examples at help("psis")
+#'
 weights.importance_sampling <-
   function(object,
            ...,

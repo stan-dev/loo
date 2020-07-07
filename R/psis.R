@@ -2,7 +2,8 @@
 #'
 #' Implementation of Pareto smoothed importance sampling (PSIS), a method for
 #' stabilizing importance ratios. The version of PSIS implemented here
-#' corresponds to the algorithm presented in Vehtari, Gelman and Gabry (2017b).
+#' corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
+#' and Gabry (2019).
 #' For PSIS diagnostics see the [pareto-k-diagnostic] page.
 #'
 #' @export
@@ -30,9 +31,9 @@
 #' \describe{
 #'   \item{`log_weights`}{
 #'     Vector or matrix of smoothed (and truncated) but *unnormalized* log
-#'     weights, *minus the largest log ratio* for numerical reasons.
-#'     To get normalized weights use the `weights` method provided
-#'     for objects of class `"psis"`.
+#'     weights. To get normalized weights use the
+#'     [`weights()`][weights.importance_sampling] method provided for objects of
+#'     class `"psis"`.
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing two vectors:
@@ -65,10 +66,8 @@
 #' }
 #'
 #' @seealso
-#' \itemize{
-#' \item [loo()] for approximate LOO-CV using PSIS.
-#' \item [pareto-k-diagnostic] for PSIS diagnostics.
-#' }
+#' * [loo()] for approximate LOO-CV using PSIS.
+#' * [pareto-k-diagnostic] for PSIS diagnostics.
 #'
 #' @template loo-and-psis-references
 #'
@@ -191,9 +190,9 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #' @param ... Not used. Included to conform to API for differen IS methods.
 #'
 #' @details
-#' * The maximum of the log ratios is subtracted from each of them
 #' * If there are enough tail samples then the tail is smoothed with PSIS
-#' * The log weights (or log ratios if no smoothing) larger than zero are set to 0
+#' * The log weights (or log ratios if no smoothing) larger than the largest raw
+#'   ratio are set to the largest raw ratio
 #'
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
@@ -201,6 +200,7 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 #'
 do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
+  # shift log ratios for safer exponentation
   lw_i <- log_ratios_i - max(log_ratios_i)
   khat <- Inf
 
@@ -224,6 +224,8 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
 
   # truncate at max of raw wts (i.e., 0 since max has been subtracted)
   lw_i[lw_i > 0] <- 0
+  # shift log weights back so that the smallest log weights remain unchanged
+  lw_i <- lw_i + max(log_ratios_i)
 
   list(log_weights = lw_i, pareto_k = khat)
 }
