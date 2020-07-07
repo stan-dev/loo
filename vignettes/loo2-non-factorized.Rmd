@@ -359,9 +359,9 @@ follows.
 
 ```{r fit, results="hide"}
 fit <- brm(
-  CRIME ~ INC + HOVAL, 
+  CRIME ~ INC + HOVAL + sar(COL.nb, type = "lag"), 
   data = COL.OLD,
-  autocor = cor_lagsar(COL.nb),
+  data2 = list(COL.nb = COL.nb),
   chains = 4,
   seed = SEED
 )
@@ -398,7 +398,7 @@ loglik <- yloo <- sdloo <- matrix(nrow = S, ncol = N)
 for (s in 1:S) {
   p <- posterior[s, ]
   eta <- p$b_Intercept + p$b_INC * fit$data$INC + p$b_HOVAL * fit$data$HOVAL
-  W_tilde <- diag(N) - p$lagsar * fit$autocor$W
+  W_tilde <- diag(N) - p$lagsar * spdep::nb2mat(COL.nb)
   Cinv <- t(W_tilde) %*% W_tilde / p$sigma^2
   g <- Cinv %*% (y - solve(W_tilde, eta))
   cbar <- diag(Cinv)
