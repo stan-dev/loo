@@ -1,3 +1,9 @@
+# loo 2.3.0.9000
+
+(GitHub issue/PR number in parentheses)
+
+Items for next release go here
+
 
 # loo 2.3.0
 
