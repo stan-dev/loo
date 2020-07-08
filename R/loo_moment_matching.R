@@ -367,7 +367,7 @@ loo_moment_match_i <- function(i,
     split_obj <- loo_moment_match_split(
       x, upars, cov, total_shift, total_scaling, total_mapping, i,
       log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
-      cores = 1, r_eff_i = r_eff_i, is_method = is_method
+      cores = 1, r_eff_i = r_eff_i, is_method = is_method, ...
     )
     log_liki <- split_obj$log_liki
     lwi <- split_obj$lwi
