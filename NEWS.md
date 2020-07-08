@@ -2,7 +2,8 @@
 
 (GitHub issue/PR number in parentheses)
 
-Items for next release go here
+* Fix a bug in `loo_moment_match` that prevented `...` arguments to be used
+correctly. (#149)
 
 
 # loo 2.3.0
