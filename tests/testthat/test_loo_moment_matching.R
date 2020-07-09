@@ -307,3 +307,48 @@ test_that("loo_moment_match_split works", {
 
 })
 
+test_that("passing arguments works", {
+  log_lik_i_upars_test_additional_argument <- function(x, upars, i, passed_arg = FALSE, ...) {
+    if (!passed_arg) {
+      warning("passed_arg was not passed here")
+    }
+    -0.5*log(2*pi) - upars[,2] - 1.0/(2*exp(upars[,2])^2)*(x$data$y[i] - upars[,1])^2
+
+  }
+  unconstrain_pars_test_additional_argument <- function(x, pars, passed_arg = FALSE, ...) {
+    if (!passed_arg) {
+      warning("passed_arg was not passed here")
+    }
+    upars <- as.matrix(pars)
+    upars[,2] <- log(upars[,2])
+    upars
+  }
+
+  log_prob_upars_test_additional_argument <- function(x, upars, passed_arg = FALSE, ...) {
+    if (!passed_arg) {
+      warning("passed_arg was not passed here")
+    }
+    dinvchisq(exp(upars[,2])^2,x$data$n - 1,x$data$s2, log = TRUE) +
+      dnorm(upars[,1],x$data$ymean,exp(upars[,2])/sqrt(x$data$n), log = TRUE)
+  }
+  post_draws_test_additional_argument <- function(x, passed_arg = FALSE, ...) {
+    if (!passed_arg) {
+      warning("passed_arg was not passed here")
+    }
+    as.matrix(x$draws)
+  }
+  log_lik_i_test_additional_argument <- function(x, i, passed_arg = FALSE, ...) {
+    if (!passed_arg) {
+      warning("passed_arg was not passed here")
+    }
+    -0.5*log(2*pi) - log(x$draws$sigma) - 1.0/(2*x$draws$sigma^2)*(x$data$y[i] - x$draws$mu)^2
+  }
+
+  # loo object
+  loo_manual <- suppressWarnings(loo(loglik))
+  expect_silent(loo_moment_match(x, loo_manual, post_draws_test_additional_argument, log_lik_i_test_additional_argument,
+                                 unconstrain_pars_test_additional_argument, log_prob_upars_test_additional_argument,
+                                 log_lik_i_upars_test_additional_argument, max_iters = 30L,
+                                 k_thres = 0.5, split = TRUE,
+                                 cov = TRUE, cores = 1, passed_arg = TRUE))
+})
