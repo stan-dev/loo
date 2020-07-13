@@ -1,8 +1,8 @@
-# loo 2.3.0.9000
+# loo 2.3.1
 
 (GitHub issue/PR number in parentheses)
 
-* Fix a bug in `loo_moment_match` that prevented `...` arguments to be used
+* Fix a bug in `loo_moment_match()` that prevented `...` arguments from being used
 correctly. (#149)
 
 
