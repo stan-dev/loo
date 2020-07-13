@@ -57,7 +57,7 @@ Here is the Stan code for fitting the Poisson regression model, which
 we will use for modelling the number of roaches.
 
 ```{r, stancode}
-stancode = "
+stancode <- "
 data {
   int<lower=1> K;
   int<lower=1> N;
@@ -167,30 +167,9 @@ default, it operates on all observations whose Pareto $k$ value is larger than
 available in __rstan__ > 2.19.3. Until then use
 https://github.com/stan-dev/rstan/pull/743.)
 
-```
+```{r loo_moment_match}
 loo2 <- loo(fit, moment_match = TRUE)
 loo2
-```
-
-```
-Computed from 4000 by 262 log-likelihood matrix
-
-         Estimate     SE
-elpd_loo  -5478.5  700.0
-p_loo       258.1   59.5
-looic     10957.0 1400.0
-------
-Monte Carlo SE of elpd_loo is 0.3.
-
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     250   95.4%   144       
- (0.5, 0.7]   (ok)        12    4.6%   84        
-   (0.7, 1]   (bad)        0    0.0%   <NA>      
-   (1, Inf)   (very bad)   0    0.0%   <NA>      
-
-All Pareto k estimates are ok (k < 0.7).
-See help('pareto-k-diagnostic') for details.
 ```
 
 After the moment matching, all observations have the diagnostic
@@ -239,8 +218,9 @@ functions are
     unconstrained posterior draws passed via `upars`.
 
 Next, we show how the helper functions look like for RStan objects, and show an
-example of using `loo_moment_match()` directly. For __rstan__ objects, the
-functions look like this
+example of using `loo_moment_match()` directly. For stanfit objects from 
+__rstan__ objects, the functions look like this:
+
 ```{r, stanfitfuns}
 # create a named list of draws for use with rstan methods
 .rstan_relist <- function(x, skeleton) {
@@ -307,13 +287,16 @@ log_lik_i_upars_stanfit <- function(x, upars, i, parameter_name = "log_lik",
 Using these function, we can call `loo_moment_match()` to update the existing
 `loo` object.
 
-```{r, message=FALSE}
-loo3 <- loo::loo_moment_match.default(x = fit, loo = loo1,
-                              post_draws = post_draws_stanfit,
-                              log_lik_i = log_lik_i_stanfit,
-                              unconstrain_pars = unconstrain_pars_stanfit,
-                              log_prob_upars = log_prob_upars_stanfit,
-                              log_lik_i_upars = log_lik_i_upars_stanfit)
+```{r loo_moment_match.default, message=FALSE}
+loo3 <- loo::loo_moment_match.default(
+  x = fit,
+  loo = loo1,
+  post_draws = post_draws_stanfit,
+  log_lik_i = log_lik_i_stanfit,
+  unconstrain_pars = unconstrain_pars_stanfit,
+  log_prob_upars = log_prob_upars_stanfit,
+  log_lik_i_upars = log_lik_i_upars_stanfit
+)
 loo3
 ```
 
