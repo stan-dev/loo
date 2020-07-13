@@ -163,11 +163,10 @@ __rstan__. It only requires setting the argument `moment_match` to `TRUE` in the
 `loo()` function. Optionally, you can also set the argument `k_threshold` which
 determines the Pareto $k$ threshold, above which moment matching is used. By
 default, it operates on all observations whose Pareto $k$ value is larger than
-0.7. (NOTE: using moment matching directly via the `loo()` function will be
-available in __rstan__ > 2.19.3. Until then use
-https://github.com/stan-dev/rstan/pull/743.)
+0.7.
 
 ```{r loo_moment_match}
+# available in rstan >= 2.21
 loo2 <- loo(fit, moment_match = TRUE)
 loo2
 ```
