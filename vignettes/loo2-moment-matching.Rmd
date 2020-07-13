@@ -56,7 +56,7 @@ regression model as in the case study.
 Here is the Stan code for fitting the Poisson regression model, which 
 we will use for modelling the number of roaches.
 
-```{r, stancode}
+```{r stancode}
 stancode <- "
 data {
   int<lower=1> K;
@@ -96,7 +96,7 @@ we compute the log-likelihood for each observation in the
 In addition to __loo__, we load the __rstan__ package for fitting the model,
 and the __rstanarm__ package for the data.
 
-```{r, setup, message=FALSE}
+```{r setup, message=FALSE}
 library("rstan")
 library("loo")
 seed <- 9547
@@ -107,7 +107,7 @@ set.seed(seed)
 
 Next we fit the model in Stan using the __rstan__ package:
 
-```{r, modelfit}
+```{r modelfit, message=FALSE}
 # Prepare data
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
@@ -129,7 +129,7 @@ print(fit, pars = "beta")
 
 Let us now evaluate the predictive performance of the model using `loo()`.
 
-```{r, loo1}
+```{r loo1}
 loo1 <- loo(fit)
 loo1
 ```
@@ -220,7 +220,7 @@ Next, we show how the helper functions look like for RStan objects, and show an
 example of using `loo_moment_match()` directly. For stanfit objects from 
 __rstan__ objects, the functions look like this:
 
-```{r, stanfitfuns}
+```{r stanfitfuns}
 # create a named list of draws for use with rstan methods
 .rstan_relist <- function(x, skeleton) {
   out <- utils::relist(x, skeleton)
@@ -306,9 +306,7 @@ As expected, the result is identical to the previous result of
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
-Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://mc-stan.org
-
-Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
+Stan Development Team (2020) _RStan: the R interface to Stan, Version 2.21.1_   https://mc-stan.org
 
 Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
 Implicitly Adaptive Importance Sampling.
