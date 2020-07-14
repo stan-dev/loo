@@ -54,7 +54,7 @@ regression model as in the case study.
 ## Coding the Stan model
 
 Here is the Stan code for fitting the Poisson regression model, which 
-we will use for modelling the number of roaches.
+we will use for modeling the number of roaches.
 
 ```{r stancode}
 stancode <- "
