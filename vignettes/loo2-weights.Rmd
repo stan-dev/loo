@@ -15,6 +15,9 @@ params:
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates the new functionality in __loo__ v2.0.0 for 
@@ -56,7 +59,7 @@ weights or the similar pseudo-BMA weights.
 In addition to the __loo__ package we will also load the __rstanarm__ package
 for fitting the models.
 
-```{r, setup, message=FALSE}
+```{r setup, message=FALSE}
 library(rstanarm)
 library(loo)
 ```
@@ -68,7 +71,7 @@ example as follows:
 
 > A popular hypothesis has it that primates with larger brains produce more energetic milk, so that brains can grow quickly. ... The question here is to what extent energy content of milk, measured here by kilocalories, is related to the percent of the brain mass that is neocortex. ... We'll end up needing female body mass as well, to see the masking that hides the relationships among the variables.
 
-```{r}
+```{r data}
 data(milk)
 d <- milk[complete.cases(milk),]
 d$neocortex <- d$neocortex.perc /100
@@ -78,7 +81,7 @@ str(d)
 We repeat the analysis in Chapter 6 of _Statistical Rethinking_ using the
 following four models (here we use the default weakly informative priors in __rstanarm__, while flat priors were used in _Statistical Rethinking_).
 
-```{r, results="hide"}
+```{r fits, results="hide"}
 fit1 <- stan_glm(kcal.per.g ~ 1, data = d, seed = 2030)
 fit2 <- update(fit1, formula = kcal.per.g ~ neocortex)
 fit3 <- update(fit1, formula = kcal.per.g ~ log(mass))
@@ -94,7 +97,7 @@ by the __rstanarm__ package (a wrapper around `waic` from the __loo__ package),
 which allows us to just pass in our fitted model objects instead of first 
 extracting the log-likelihood values.
 
-```{r}
+```{r waic}
 waic1 <- waic(fit1)
 waic2 <- waic(fit2)
 waic3 <- waic(fit3)
@@ -117,7 +120,7 @@ needed values to pass to the __loo__ package. (Like __rstanarm__, some other R
 packages for fitting Stan models, e.g. __brms__, also provide similar methods
 for interfacing with the __loo__ package.)
 
-```{r}
+```{r loo}
 # note: the loo function accepts a 'cores' argument that we recommend specifying
 # when working with bigger datasets
 
@@ -136,7 +139,7 @@ lpd_point <- cbind(
 With `loo` we don't get any warnings for models 3 and 4, but for illustration of
 good results, we display the diagnostic details for these models anyway.
 
-```{r}
+```{r print-loo}
 print(loo3)
 print(loo4)
 ```
@@ -149,7 +152,7 @@ Next we compute and compare 1) WAIC weights, 2) Pseudo-BMA weights without
 Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian bootstrap, and 4)
 Bayesian stacking weights.
 
-```{r}
+```{r weights}
 waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
@@ -173,7 +176,7 @@ bunch of times, but you can imagine that instead we would have ten alternative
 models with about the same predictive performance. WAIC weights for such a
 scenario would be close to the following:
 
-```{r}
+```{r waic_wts_demo}
 waic_wts_demo <- 
   exp(waics[c(1,1,1,1,1,1,1,1,1,1,2,3,4)]) /
   sum(exp(waics[c(1,1,1,1,1,1,1,1,1,1,2,3,4)]))
@@ -192,7 +195,7 @@ very similar models (in this toy example repeated models) to share their weight
 while more unique models keep their original weights. In our example 
 we can see this difference clearly: 
 
-```{r}
+```{r stacking_weights}
 stacking_weights(lpd_point[,c(1,1,1,1,1,1,1,1,1,1,2,3,4)])
 ```
 Using stacking, the weight for the best model stays essentially unchanged.
@@ -208,7 +211,7 @@ McElreath describes as follows:
 We build models predicting the total number of tools given the log
 population size and the contact rate (high vs. low).
 
-```{r}
+```{r Kline}
 data(Kline)
 d <- Kline
 d$log_pop <- log(d$population)
@@ -219,7 +222,7 @@ str(d)
 We start with a Poisson regression model with the log population size,
 the contact rate, and an interaction term between them (priors are
 informative priors as in _Statistical Rethinking_).
-```{r, results="hide"}
+```{r fit10, results="hide"}
 fit10 <-
   stan_glm(
     total_tools ~ log_pop + contact_high + log_pop * contact_high,
@@ -234,7 +237,7 @@ fit10 <-
 Before running other models, we check whether Poisson is good choice
 as the conditional observation model.
 
-```{r}
+```{r loo10}
 loo10 <- loo(fit10)
 print(loo10)
 ```
@@ -249,7 +252,7 @@ We can compute LOO more accurately by running Stan again for the
 leave-one-out folds with high $k$ estimates. When using __rstanarm__
 this can be done by specifying the `k_threshold` argument:
 
-```{r}
+```{r loo10-threshold}
 loo10 <- loo(fit10, k_threshold=0.7)
 print(loo10)
 ```
@@ -258,7 +261,7 @@ In this case we see that there is not much difference, and thus it is relatively
 safe to continue.
 
 As a comparison we also compute WAIC:
-```{r}
+```{r waic10}
 waic10 <- waic(fit10)
 print(waic10)
 ```
@@ -269,15 +272,15 @@ optimistic. We recommend using the PSIS-LOO results instead.
 To assess whether the contact rate and interaction term are useful, we can make
 a comparison to models without these terms.
 
-```{r, results="hide"}
+```{r contact_high, results="hide"}
 fit11 <- update(fit10, formula = total_tools ~ log_pop + contact_high)
 fit12 <- update(fit10, formula = total_tools ~ log_pop)
 ```
-```{r}
+```{r loo-contact_high}
 (loo11 <- loo(fit11))
 (loo12 <- loo(fit12))
 ```
-```{r}
+```{r relo-contact_high}
 loo11 <- loo(fit11, k_threshold=0.7)
 loo12 <- loo(fit12, k_threshold=0.7)
 lpd_point <- cbind(
@@ -288,7 +291,7 @@ lpd_point <- cbind(
 ```
 
 For comparison we'll also compute WAIC values for these additional models:
-```{r}
+```{r waic-contact_high}
 waic11 <- waic(fit11)
 waic12 <- waic(fit12)
 waics <- c(
@@ -304,7 +307,7 @@ Finally, we compute 1) WAIC weights, 2) Pseudo-BMA weights without
 Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian bootstrap, and
 4) Bayesian stacking weights.
 
-```{r}
+```{r weights-contact_high}
 waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
@@ -336,7 +339,7 @@ model objects from __rstanarm__) as well as fitted model objects from
 other packages (e.g. __brms__) that do the preparation work for the user
 (see, e.g., the examples at `help("loo_model_weights", package = "rstanarm")`).
 
-```{r}
+```{r loo_model_weights}
 # using list of loo objects
 loo_list <- list(loo10, loo11, loo12)
 loo_model_weights(loo_list)

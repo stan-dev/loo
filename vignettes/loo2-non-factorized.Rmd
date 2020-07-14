@@ -23,6 +23,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 When computing ELPD-based LOO-CV for a Bayesian model we need to

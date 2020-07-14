@@ -1,4 +1,4 @@
-```{r, SETTINGS-knitr, include=FALSE}
+```{r SETTINGS-knitr, include=FALSE}
 stopifnot(require(knitr))
 opts_chunk$set(
   comment=NA,

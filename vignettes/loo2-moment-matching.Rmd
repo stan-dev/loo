@@ -15,6 +15,9 @@ params:
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates how to improve the Monte Carlo sampling accuracy of
@@ -54,10 +57,10 @@ regression model as in the case study.
 ## Coding the Stan model
 
 Here is the Stan code for fitting the Poisson regression model, which 
-we will use for modelling the number of roaches.
+we will use for modeling the number of roaches.
 
-```{r, stancode}
-stancode = "
+```{r stancode}
+stancode <- "
 data {
   int<lower=1> K;
   int<lower=1> N;
@@ -96,7 +99,7 @@ we compute the log-likelihood for each observation in the
 In addition to __loo__, we load the __rstan__ package for fitting the model,
 and the __rstanarm__ package for the data.
 
-```{r, setup, message=FALSE}
+```{r setup, message=FALSE}
 library("rstan")
 library("loo")
 seed <- 9547
@@ -107,7 +110,7 @@ set.seed(seed)
 
 Next we fit the model in Stan using the __rstan__ package:
 
-```{r, modelfit}
+```{r modelfit, message=FALSE}
 # Prepare data
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
@@ -129,7 +132,7 @@ print(fit, pars = "beta")
 
 Let us now evaluate the predictive performance of the model using `loo()`.
 
-```{r, loo1}
+```{r loo1}
 loo1 <- loo(fit)
 loo1
 ```
@@ -163,34 +166,12 @@ __rstan__. It only requires setting the argument `moment_match` to `TRUE` in the
 `loo()` function. Optionally, you can also set the argument `k_threshold` which
 determines the Pareto $k$ threshold, above which moment matching is used. By
 default, it operates on all observations whose Pareto $k$ value is larger than
-0.7. (NOTE: using moment matching directly via the `loo()` function will be
-available in __rstan__ > 2.19.3. Until then use
-https://github.com/stan-dev/rstan/pull/743.)
+0.7.
 
-```
+```{r loo_moment_match}
+# available in rstan >= 2.21
 loo2 <- loo(fit, moment_match = TRUE)
 loo2
-```
-
-```
-Computed from 4000 by 262 log-likelihood matrix
-
-         Estimate     SE
-elpd_loo  -5478.5  700.0
-p_loo       258.1   59.5
-looic     10957.0 1400.0
-------
-Monte Carlo SE of elpd_loo is 0.3.
-
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     250   95.4%   144       
- (0.5, 0.7]   (ok)        12    4.6%   84        
-   (0.7, 1]   (bad)        0    0.0%   <NA>      
-   (1, Inf)   (very bad)   0    0.0%   <NA>      
-
-All Pareto k estimates are ok (k < 0.7).
-See help('pareto-k-diagnostic') for details.
 ```
 
 After the moment matching, all observations have the diagnostic
@@ -239,9 +220,10 @@ functions are
     unconstrained posterior draws passed via `upars`.
 
 Next, we show how the helper functions look like for RStan objects, and show an
-example of using `loo_moment_match()` directly. For __rstan__ objects, the
-functions look like this
-```{r, stanfitfuns}
+example of using `loo_moment_match()` directly. For stanfit objects from 
+__rstan__ objects, the functions look like this:
+
+```{r stanfitfuns}
 # create a named list of draws for use with rstan methods
 .rstan_relist <- function(x, skeleton) {
   out <- utils::relist(x, skeleton)
@@ -307,13 +289,16 @@ log_lik_i_upars_stanfit <- function(x, upars, i, parameter_name = "log_lik",
 Using these function, we can call `loo_moment_match()` to update the existing
 `loo` object.
 
-```{r, message=FALSE}
-loo3 <- loo::loo_moment_match.default(x = fit, loo = loo1,
-                              post_draws = post_draws_stanfit,
-                              log_lik_i = log_lik_i_stanfit,
-                              unconstrain_pars = unconstrain_pars_stanfit,
-                              log_prob_upars = log_prob_upars_stanfit,
-                              log_lik_i_upars = log_lik_i_upars_stanfit)
+```{r loo_moment_match.default, message=FALSE}
+loo3 <- loo::loo_moment_match.default(
+  x = fit,
+  loo = loo1,
+  post_draws = post_draws_stanfit,
+  log_lik_i = log_lik_i_stanfit,
+  unconstrain_pars = unconstrain_pars_stanfit,
+  log_prob_upars = log_prob_upars_stanfit,
+  log_lik_i_upars = log_lik_i_upars_stanfit
+)
 loo3
 ```
 
@@ -324,9 +309,7 @@ As expected, the result is identical to the previous result of
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
-Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://mc-stan.org
-
-Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
+Stan Development Team (2020) _RStan: the R interface to Stan, Version 2.21.1_   https://mc-stan.org
 
 Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
 Implicitly Adaptive Importance Sampling.

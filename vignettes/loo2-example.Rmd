@@ -15,6 +15,9 @@ params:
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates how to use the __loo__ package to carry out 
@@ -35,7 +38,7 @@ encourage readers to refer to the following papers for more details:
 In addition to the __loo__ package, we'll also be using __rstanarm__ and 
 __bayesplot__:
 
-```{r, setup, message=FALSE}
+```{r setup, message=FALSE}
 library("rstanarm")
 library("bayesplot")
 library("loo")
@@ -72,7 +75,7 @@ Because the number of days for which the roach traps were used is not the same
 for all apartments in the sample, we use the `offset` argument to specify that
 `log(exposure2)` should be added to the linear predictor.
 
-```{r}
+```{r data}
 # the 'roaches' data frame is included with the rstanarm package
 data(roaches)
 str(roaches)
@@ -86,7 +89,7 @@ roaches$roach1 <- roaches$roach1 / 100
 We'll fit a simple Poisson regression model using the `stan_glm` function from
 the __rstanarm__ package.
 
-```{r, count-roaches-mcmc, results="hide"}
+```{r count-roaches-mcmc, results="hide"}
 fit1 <-
   stan_glm(
     formula = y ~ roach1 + treatment + senior,
@@ -121,7 +124,7 @@ to the `loo` function (see, e.g. `help("loo.array", package = "loo")`). We'll
 also use the argument `save_psis = TRUE` to save some intermediate results to be
 re-used later.
 
-```{r}
+```{r loo1}
 loo1 <- loo(fit1, save_psis = TRUE)
 ```
 
@@ -130,7 +133,7 @@ some observations the leave-one-out posteriors are different enough from the
 full posterior that importance-sampling is not able to correct the difference.
 We can see more details by printing the `loo` object.
 
-```{r}
+```{r print-loo1}
 print(loo1)
 ```
 
@@ -159,7 +162,7 @@ Using the `plot` method on our `loo1` object produces a plot of the $k$ values
 with horizontal lines corresponding to the same categories as in the
 printed output above.
 
-```{r, out.width = "70%"}
+```{r plot-loo1, out.width = "70%"}
 plot(loo1)
 ```
 
@@ -181,7 +184,7 @@ the LOO-PIT values for our model (thick curve) is compared to many
 independently generated samples (each the same size as our dataset) from the
 standard uniform distribution (thin curves).
 
-```{r}
+```{r ppc_loo_pit_overlay}
 yrep <- posterior_predict(fit1)
 
 ppc_loo_pit_overlay(
@@ -202,17 +205,17 @@ regression, which is commonly used for overdispersed count data.
 Unlike the Poisson distribution, the negative binomial distribution 
 allows the conditional mean and variance of $y$ to differ.
 
-```{r, count-roaches-negbin, results="hide"}
+```{r count-roaches-negbin, results="hide"}
 fit2 <- update(fit1, family = neg_binomial_2)
 ```
 
-```{r}
+```{r loo2}
 loo2 <- loo(fit2, save_psis = TRUE, cores = 2)
 print(loo2)
 ```
 
 
-```{r}
+```{r plot-loo2}
 plot(loo2, label_points = TRUE)
 ```
 
@@ -232,7 +235,7 @@ calculations are performed exactly for that observation. The results are then
 recombined with the approximate LOO calculations already carried out for the
 observations without problematic $k$ values:
 
-```{r}
+```{r reloo}
 if (any(pareto_k_values(loo2) > 0.7)) {
   loo2 <- loo(fit2, save_psis = TRUE, k_threshold = 0.7)
 }
@@ -248,7 +251,7 @@ still some degree of model misspecification, but this is much better than the
 `p_loo` estimate for the Poisson model.
 
 For further model checking we again examine the LOO-PIT values.
-```{r}
+```{r ppc_loo_pit_overlay-negbin}
 yrep <- posterior_predict(fit2)
 ppc_loo_pit_overlay(roaches$y, yrep, lw = weights(loo2$psis_object))
 ```
@@ -263,7 +266,7 @@ the data.
 We can use the `loo_compare` function to compare our two models on 
 expected log predictive density (ELPD) for new data:
 
-```{r, count-roaches-loo}
+```{r loo_compare}
 loo_compare(loo1, loo2)
 ```
 

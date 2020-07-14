@@ -26,6 +26,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 ## Introduction
 
 One of the most common goals of a time series analysis is to use the observed
@@ -240,16 +243,13 @@ df <- data.frame(
   time = 1:N
 )
 
-# save plot labels to reuse them
-plot_labs <- labs(
-  y = "Water Level (ft)", 
-  x = "Year",
-  title = "Water Level in Lake Huron (1875-1972)"
-) 
-
 ggplot(df, aes(x = year, y = y)) + 
   geom_point(size = 1) +
-  plot_labs
+  labs(
+    y = "Water Level (ft)", 
+    x = "Year",
+    title = "Water Level in Lake Huron (1875-1972)"
+  ) 
 ```
 
 The above plot shows rather strong autocorrelation of the time-series as well as
@@ -259,12 +259,11 @@ We can specify an AR(4) model for these data using the **brms** package as
 follows:
 
 ```{r fit, results = "hide"}
-control <- list(adapt_delta = 0.99)
 fit <- brm(
   y ~ ar(time, p = 4), 
   data = df, 
   prior = prior(normal(0, 0.5), class = "ar"),
-  control = control, 
+  control = list(adapt_delta = 0.99), 
   seed = SEED, 
   chains = CHAINS
 )
@@ -284,8 +283,12 @@ preds <- cbind(
 ggplot(cbind(df, preds), aes(x = year, y = Estimate)) +
   geom_smooth(aes(ymin = Q5, ymax = Q95), stat = "identity", size = 0.5) +
   geom_point(aes(y = y)) + 
-  labs(subtitle = "Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)") +
-  plot_labs
+  labs(
+    y = "Water Level (ft)", 
+    x = "Year",
+    title = "Water Level in Lake Huron (1875-1972)",
+    subtitle = "Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"
+  ) 
 ```
 
 To allow for reasonable predictions of future values, we will require at least
@@ -632,7 +635,7 @@ many times. For more details on approximate LFO-CV, we refer to Bürkner et al. 
 
 ## References
 
-Bürkner P. C., Gabry J., & Vehtari A. (2020). Approximate leave-future-out cross-validation for Bayesian time series models. *Journal of Statistical Computation and Simulation*. [Online](https://www.tandfonline.com/doi/full/10.1080/00949655.2020.1783262). [arXiv preprint](https://arxiv.org/abs/1902.06281). 
+Bürkner P. C., Gabry J., & Vehtari A. (2020). Approximate leave-future-out cross-validation for Bayesian time series models. *Journal of Statistical Computation and Simulation*. \doi:10.1080/00949655.2020.1783262. [Online](https://www.tandfonline.com/doi/full/10.1080/00949655.2020.1783262). [arXiv preprint](https://arxiv.org/abs/1902.06281). 
 
 Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
