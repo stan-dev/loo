@@ -13,6 +13,9 @@ params:
 %\VignetteIndexEntry{Writing Stan programs for use with the loo package}
 -->
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates how to write a Stan program that computes and stores

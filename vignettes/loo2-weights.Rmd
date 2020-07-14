@@ -15,6 +15,9 @@ params:
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates the new functionality in __loo__ v2.0.0 for 
@@ -273,11 +276,11 @@ a comparison to models without these terms.
 fit11 <- update(fit10, formula = total_tools ~ log_pop + contact_high)
 fit12 <- update(fit10, formula = total_tools ~ log_pop)
 ```
-```{r}
+```{r loo-contact_high}
 (loo11 <- loo(fit11))
 (loo12 <- loo(fit12))
 ```
-```{r}
+```{r relo-contact_high}
 loo11 <- loo(fit11, k_threshold=0.7)
 loo12 <- loo(fit12, k_threshold=0.7)
 lpd_point <- cbind(

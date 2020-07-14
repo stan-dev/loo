@@ -15,6 +15,9 @@ params:
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates how to improve the Monte Carlo sampling accuracy of

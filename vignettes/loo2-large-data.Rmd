@@ -13,6 +13,9 @@ params:
 %\VignetteIndexEntry{Using Leave-one-out cross-validation for large data}
 -->
 
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
 # Introduction
 
 This vignette demonstrates how to do leave-one-out cross-validation for large
