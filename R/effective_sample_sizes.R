@@ -124,7 +124,7 @@ relative_eff.function <-
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
-        parallel::clusterExport(cl, "draws")
+        parallel::clusterExport(cl=cl, varlist=c("draws", "chain_id", "data"), envir=environment())
         on.exit(parallel::stopCluster(cl))
         n_eff_list <-
           parallel::parLapply(
