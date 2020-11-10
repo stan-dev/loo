@@ -27,8 +27,7 @@ elpd <- function(x, ...) {
 elpd.array <- function(x, ...) {
 
   ll <- llarray_to_matrix(x)
-  pointwise <- pointwise_elpd_calcs(ll)
-  elpd_object(pointwise, dim(ll))
+  elpd.matrix(ll)
 }
 
 #' @export
