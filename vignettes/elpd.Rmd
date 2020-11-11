@@ -1,0 +1,213 @@
+---
+title: "Holdout and k-fold cross-validation of Stan programs with the loo package" 
+author: "Bruno Nicenboim"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Holdout and k-fold cross-validation of Stan programs with the loo package}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+This vignette demonstrates how to do holdout and k-fold cross-validation with __loo__ for a Stan program.
+
+
+# Example: Eradication of Roaches using holdout validation approach
+
+This vignette uses the same example as in the vignettes
+[_Using the loo package (version >= 2.0.0)_](http://mc-stan.org/loo/articles/loo2-example.html) and [_Avoiding model refits in leave-one-out cross-validation with moment matching_](https://mc-stan.org/loo/articles/loo2-moment-matching.html).
+See the demo for a description of the problem and data. 
+
+
+## Coding the Stan model
+
+Here is the Stan code for fitting the Poisson regression model:
+
+```{r stancode}
+stancode <- "
+data {
+  int<lower=1> K;
+  int<lower=1> N;
+  matrix[N,K] x;
+  int y[N];
+  vector[N] offset;
+
+  real beta_prior_scale;
+  real alpha_prior_scale;
+}
+parameters {
+  vector[K] beta;
+  real intercept;
+}
+model {
+  y ~ poisson(exp(x * beta + intercept + offset));
+  beta ~ normal(0,beta_prior_scale);
+  intercept ~ normal(0,alpha_prior_scale);
+}
+generated quantities {
+  vector[N] log_lik;
+  for (n in 1:N)
+    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));
+}
+"
+```
+
+Following the usual approach recommended in 
+[_Writing Stan programs for use with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html), 
+we compute the log-likelihood for each observation in the 
+`generated quantities` block of the Stan program.
+
+
+## Setup
+
+In addition to __loo__, we load the __rstan__ package for fitting the model.
+We will also need the __rstanarm__ package for the data.
+
+```{r setup, message=FALSE}
+library("rstan")
+library("loo")
+seed <- 9547
+set.seed(seed)
+```
+
+# Holdout cross-validation
+
+For this approach, the model is first fit to the "train" data and then is evaluated on the "test" data.
+
+## Splitting the data between train and test 
+
+The data is divided between train (80% of the data) and test (20%):
+
+```{r modelfit-holdout, message=FALSE}
+# Prepare data
+data(roaches, package = "rstanarm")
+roaches$roach1 <- sqrt(roaches$roach1)
+roaches$offset <- log(roaches[,"exposure2"])
+# 20% of the data goes to the test set:
+roaches$test <- 0
+roaches$test[sample(.2 * seq_len(nrow(roaches)))] <- 1
+# data to "train" the model
+data_train <- list(y = roaches$y[roaches$test == 0],
+                   x = as.matrix(roaches[roaches$test == 0,
+                                         c("roach1", "treatment", "senior")]),
+                   N = nrow(roaches[roaches$test == 0,]),
+                   K = 3,
+                   offset = roaches$offset[roaches$test == 0],
+                   beta_prior_scale = 2.5,
+                   alpha_prior_scale = 5.0
+                   )
+# data to "test" the model
+data_test <- list(y = roaches$y[roaches$test == 1],
+                   x = as.matrix(roaches[roaches$test == 1,
+                                         c("roach1", "treatment", "senior")]),
+                   N = nrow(roaches[roaches$test == 1,]),
+                   K = 3,
+                   offset = roaches$offset[roaches$test == 1],
+                   beta_prior_scale = 2.5,
+                   alpha_prior_scale = 5.0
+                   )
+```
+
+## Fitting the model to the with RStan
+
+Next we fit the model to the "test" data in Stan using the __rstan__ package:
+
+```{r fit-train}
+# Compile
+stanmodel <- stan_model(model_code = stancode)
+# Fit model
+fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
+```
+And we draw samples from the generated quantities block based on the "train" data:
+
+```{r gen-test}
+gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
+log_lik_test <- extract_log_lik(gen_test)
+```
+
+## Computing holdout elpd:
+
+Now we evaluate the predictive performance of the model on the test data using `elpd()`.
+
+```{r elpd-holdout}
+(elpd_holdout <- elpd(log_lik_test))
+```
+
+When one wants to compare different models, the function `loo_compare()` can be used to assess the difference in performance.
+
+# K-fold cross validation
+
+For this approach the data is divided into folds, and each time one fold is tested while the rest of the data is used to fit the model (see Vehtari et al., 2017).
+
+## Splitting the data in folds
+
+We use the data that is already pre-processed and we divide it in 10 random folds using `kfold_split_random`
+
+```{r prepare-folds, message=FALSE}
+# Prepare data
+roaches$fold <- kfold_split_random(K = 10, N = nrow(roaches))
+```
+
+
+## Fitting and extracting the likelihood of each fold
+
+We now loop over the 10 folds: Each time, we fit the model to all the observations except the ones belonging to the fold, but we extract the log-likelihood from the fold. The output of this loop is a list of log-likelihood matrices.
+
+```{r}
+log_lik_list <- lapply(1:10, function(k){
+  data_train <- list(y = roaches$y[roaches$fold != k],
+                   x = as.matrix(roaches[roaches$fold != k,
+                                         c("roach1", "treatment", "senior")]),
+                   N = nrow(roaches[roaches$fold != k,]),
+                   K = 3,
+                   offset = roaches$offset[roaches$fold != k],
+                   beta_prior_scale = 2.5,
+                   alpha_prior_scale = 5.0
+                   )
+  data_test <- list(y = roaches$y[roaches$fold == k],
+                   x = as.matrix(roaches[roaches$fold == k,
+                                         c("roach1", "treatment", "senior")]),
+                   N = nrow(roaches[roaches$fold == k,]),
+                   K = 3,
+                   offset = roaches$offset[roaches$fold == k],
+                   beta_prior_scale = 2.5,
+                   alpha_prior_scale = 5.0
+                   )
+  fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
+  gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
+  log_lik_test <- extract_log_lik(gen_test)
+  log_lik_test
+})
+```
+
+## Computing k-fold elpd:
+
+Now we evaluate the predictive performance of the model on the 10 folds using `elpd()`.
+
+```{r elpd-kfold}
+# First we need to convert the list of matrices into a long matrix:
+log_lik_kfold <- do.call(cbind, log_lik_list) 
+(elpd_kfold <- elpd(log_lik_kfold))
+```
+
+If one wants to compare several models (with `loo_compare`), one should use the same folds for all the different models. (Notice that now the likelihood values in `log_lik_kfold` are not in the same order as the observations of `roaches`.) 
+
+# References
+
+Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
+
+Stan Development Team (2020) _RStan: the R interface to Stan, Version 2.21.1_   https://mc-stan.org
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4) | [arXiv preprint](http://arxiv.org/abs/1507.04544).
+
