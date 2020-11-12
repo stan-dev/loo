@@ -11,7 +11,8 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Topi", "Paananen", role = c("aut")),
              person("Andrew", "Gelman", role = c("aut")),
              person("Ben", "Goodrich", role = c("ctb")),
-             person("Juho", "Piironen", role = c("ctb")))
+             person("Juho", "Piironen", role = c("ctb")), 
+             person("Bruno", "Nicenboim", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
 URL: https://mc-stan.org/loo, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
