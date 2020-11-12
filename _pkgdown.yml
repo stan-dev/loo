@@ -66,6 +66,7 @@ articles:
       - loo2-lfo
       - loo2-large-data
       - loo2-moment-matching
+      - elpd
 
 reference:
   - title: "Package description, glossary, and included data sets"
@@ -105,6 +106,7 @@ reference:
       - kfold
   - title: "Other functions"
     contents:
+      - elpd
       - waic
       - extract_log_lik
       - relative_eff
