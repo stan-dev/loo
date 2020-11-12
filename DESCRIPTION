@@ -1,7 +1,7 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 2.3.1
+Version: 2.3.1.9000
 Date: 2020-07-14
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
@@ -11,7 +11,8 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Topi", "Paananen", role = c("aut")),
              person("Andrew", "Gelman", role = c("aut")),
              person("Ben", "Goodrich", role = c("ctb")),
-             person("Juho", "Piironen", role = c("ctb")))
+             person("Juho", "Piironen", role = c("ctb")), 
+             person("Bruno", "Nicenboim", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
 URL: https://mc-stan.org/loo, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues

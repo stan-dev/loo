@@ -82,10 +82,21 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
   log_liki_half <- log_lik_i_upars(x, upars = upars_trans_half, i = i, ...)
 
   # compute weights
-  lwi_half <- -log_liki_half + log_prob_half_trans -
-    (log_prob_half_trans +
-       log(1 + exp(log_prob_half_trans_inv - log(prod(total_scaling)) -
-                     log(det(total_mapping)) - log_prob_half_trans)))
+  log_prob_half_trans_inv <- (log_prob_half_trans_inv -
+                              log(prod(total_scaling)) -
+                              log(det(total_mapping)))
+  stable_S <- log_prob_half_trans > log_prob_half_trans_inv
+
+  lwi_half <- -log_liki_half + log_prob_half_trans
+  lwi_half[stable_S] <- lwi_half[stable_S] -
+    (log_prob_half_trans[stable_S] +
+      log1p(exp(log_prob_half_trans_inv[stable_S] -
+                  log_prob_half_trans[stable_S])))
+
+  lwi_half[!stable_S] <- lwi_half[!stable_S] -
+    (log_prob_half_trans_inv[!stable_S] +
+        log1p(exp(log_prob_half_trans[!stable_S] -
+                   log_prob_half_trans_inv[!stable_S])))
 
   is_obj_half <- suppressWarnings(importance_sampling.default(lwi_half,
                                                               method = is_method,

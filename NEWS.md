@@ -1,8 +1,23 @@
+# loo 2.3.1.9000
+
+<!-- Items for next release go here -->
+
+(GitHub issue/PR number in parentheses)
+
+* Fixed a bug in `relative_eff.function()` that caused an error on Windows when
+using multiple cores. (#152) 
+
+* New generic function `elpd()` (and methods for matrices and arrays) for 
+computing expected log predictive density of new data or log predictive density 
+of observed data. A new vignette demonstrates using this function when doing 
+K-fold CV with rstan. (#159, @bnicenboim)
+
+
 # loo 2.3.1
 
 (GitHub issue/PR number in parentheses)
 
-* Fix a bug in `loo_moment_match()` that prevented `...` arguments from being used
+* Fixed a bug in `loo_moment_match()` that prevented `...` arguments from being used
 correctly. (#149)
 
 

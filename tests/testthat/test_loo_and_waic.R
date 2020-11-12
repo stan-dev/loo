@@ -2,7 +2,7 @@ library(loo)
 options(mc.cores = 1)
 set.seed(123)
 
-context("loo and waic")
+context("loo, waic and elpd")
 
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
@@ -13,6 +13,7 @@ r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
 
 loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 waic1 <- suppressWarnings(waic(LLarr))
+elpd1 <- suppressWarnings(elpd(LLarr))
 
 test_that("using loo.cores is deprecated", {
   options(mc.cores = NULL)
@@ -22,9 +23,10 @@ test_that("using loo.cores is deprecated", {
   options(mc.cores = 1)
 })
 
-test_that("loo and waic results haven't changed", {
+test_that("loo, waic and elpd results haven't changed", {
   expect_equal_to_reference(loo1, "reference-results/loo.rds")
   expect_equal_to_reference(waic1, "reference-results/waic.rds")
+  expect_equal_to_reference(elpd1, "reference-results/elpd.rds")
 })
 
 test_that("loo with cores=1 and cores=2 gives same results", {
@@ -86,6 +88,24 @@ test_that("loo returns object with correct structure", {
   expect_equal(dim(loo1), dim(LLmat))
 })
 
+
+test_that("elpd returns object with correct structure", {
+  expect_true(is.loo(elpd1))
+  expect_named(
+    elpd1,
+    c(
+      "estimates",
+      "pointwise"
+    )
+  )
+  est_names <- dimnames(elpd1$estimates)
+  expect_equal(est_names[[1]], c("elpd", "ic"))
+  expect_equal(est_names[[2]], c("Estimate", "SE"))
+  expect_equal(colnames(elpd1$pointwise), est_names[[1]])
+  expect_equal(dim(elpd1), dim(LLmat))
+})
+
+
 test_that("two pareto k values are equal", {
   expect_identical(loo1$pointwise[,"influence_pareto_k"], loo1$diagnostics$pareto_k)
 })
@@ -111,9 +131,15 @@ test_that("waic.array and waic.matrix give same result", {
   expect_identical(waic1, waic2)
 })
 
-test_that("loo and waic error with vector input", {
+test_that("elpd.array and elpd.matrix give same result", {
+  elpd2 <- suppressWarnings(elpd(LLmat))
+  expect_identical(elpd1, elpd2)
+})
+
+test_that("loo, waic, and elpd error with vector input", {
   expect_error(loo(LLvec), regexp = "no applicable method")
   expect_error(waic(LLvec), regexp = "no applicable method")
+  expect_error(elpd(LLvec), regexp = "no applicable method")
 })
 
 
