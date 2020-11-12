@@ -164,7 +164,7 @@ roaches$fold <- kfold_split_random(K = 10, N = nrow(roaches))
 
 ## Fitting and extracting the log pointwise predictive densities for each fold
 
-We now loop over the 10 folds. In each fold we do the following. First, we fit the model to all the observations except the ones belonging to the left-out fold. Second, we compute the log pointwise predictive densities for the left-out fold. Last, we store the predictive density for the observations of the left-out fold in a matrix. The output of this loop is a matrix of the log pointwise predictive density of all the observations.
+We now loop over the 10 folds. In each fold we do the following. First, we fit the model to all the observations except the ones belonging to the left-out fold. Second, we compute the log pointwise predictive densities for the left-out fold. Last, we store the predictive density for the observations of the left-out fold in a matrix. The output of this loop is a matrix of the log pointwise predictive densities of all the observations.
 
 ```{r}
 # Prepare a matrix with the number of post-warmup iterations by number of observations:
