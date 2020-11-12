@@ -1,5 +1,5 @@
 ---
-title: "Holdout and k-fold cross-validation of Stan programs with the loo package" 
+title: "Holdout validation and K-fold cross-validation of Stan programs with the loo package" 
 author: "Bruno Nicenboim"
 date: "`r Sys.Date()`"
 output:
@@ -10,7 +10,7 @@ params:
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Holdout and k-fold cross-validation of Stan programs with the loo package}
+%\VignetteIndexEntry{Holdout validation and K-fold cross-validation of Stan programs with the loo package}
 -->
 ```{r, child="children/SETTINGS-knitr.txt"}
 ```
@@ -20,19 +20,19 @@ params:
 
 # Introduction
 
-This vignette demonstrates how to do holdout and k-fold cross-validation with __loo__ for a Stan program.
+This vignette demonstrates how to do holdout validation and K-fold cross-validation with __loo__ for a Stan program.
 
 
 # Example: Eradication of Roaches using holdout validation approach
 
 This vignette uses the same example as in the vignettes
 [_Using the loo package (version >= 2.0.0)_](http://mc-stan.org/loo/articles/loo2-example.html) and [_Avoiding model refits in leave-one-out cross-validation with moment matching_](https://mc-stan.org/loo/articles/loo2-moment-matching.html).
-See the demo for a description of the problem and data. 
+
 
 
 ## Coding the Stan model
 
-Here is the Stan code for fitting the Poisson regression model:
+Here is the Stan code for fitting a Poisson regression model:
 
 ```{r stancode}
 stancode <- "
@@ -81,9 +81,9 @@ seed <- 9547
 set.seed(seed)
 ```
 
-# Holdout cross-validation
+# Holdout validation
 
-For this approach, the model is first fit to the "train" data and then is evaluated on the "test" data.
+For this approach, the model is first fit to the "train" data and then is evaluated on the held-out "test" data.
 
 ## Splitting the data between train and test 
 
@@ -119,7 +119,8 @@ data_test <- list(y = roaches$y[roaches$test == 1],
                    )
 ```
 
-## Fitting the model to the with RStan
+
+## Fitting the model with RStan
 
 Next we fit the model to the "test" data in Stan using the __rstan__ package:
 
@@ -129,11 +130,12 @@ stanmodel <- stan_model(model_code = stancode)
 # Fit model
 fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
 ```
-And we draw samples from the generated quantities block based on the "train" data:
+
+We recompute the generated quantities using the posterior draws conditional on the training data, but we now pass in the held-out data to get the log predictive densities for the test data. Because we are using independent data, the log predictive density coincides with the log likelihood of the test data.
 
 ```{r gen-test}
 gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
-log_lik_test <- extract_log_lik(gen_test)
+log_pd <- extract_log_lik(gen_test)
 ```
 
 ## Computing holdout elpd:
@@ -141,7 +143,7 @@ log_lik_test <- extract_log_lik(gen_test)
 Now we evaluate the predictive performance of the model on the test data using `elpd()`.
 
 ```{r elpd-holdout}
-(elpd_holdout <- elpd(log_lik_test))
+(elpd_holdout <- elpd(log_pd))
 ```
 
 When one wants to compare different models, the function `loo_compare()` can be used to assess the difference in performance.
@@ -160,12 +162,15 @@ roaches$fold <- kfold_split_random(K = 10, N = nrow(roaches))
 ```
 
 
-## Fitting and extracting the likelihood of each fold
+## Fitting and extracting the log pointwise predictive densities for each fold
 
-We now loop over the 10 folds: Each time, we fit the model to all the observations except the ones belonging to the fold, but we extract the log-likelihood from the fold. The output of this loop is a list of log-likelihood matrices.
+We now loop over the 10 folds. In each fold we do the following. First, we fit the model to all the observations except the ones belonging to the left-out fold. Second, we compute the log pointwise predictive densities for the left-out fold. Last, we store the predictive density for the observations of the left-out fold in a matrix. The output of this loop is a matrix of the log pointwise predictive density of all the observations.
 
 ```{r}
-log_lik_list <- lapply(1:10, function(k){
+# Prepare a matrix with the number of post-warmup iterations by number of observations:
+log_pd_kfold <- matrix(nrow = 4000, ncol = nrow(roaches))
+# Loop over the folds
+for(k in 1:10){
   data_train <- list(y = roaches$y[roaches$fold != k],
                    x = as.matrix(roaches[roaches$fold != k,
                                          c("roach1", "treatment", "senior")]),
@@ -186,22 +191,19 @@ log_lik_list <- lapply(1:10, function(k){
                    )
   fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
   gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
-  log_lik_test <- extract_log_lik(gen_test)
-  log_lik_test
-})
+  log_pd[, roaches$fold == k] <- extract_log_lik(gen_test)
+}
 ```
 
-## Computing k-fold elpd:
+## Computing K-fold elpd:
 
 Now we evaluate the predictive performance of the model on the 10 folds using `elpd()`.
 
 ```{r elpd-kfold}
-# First we need to convert the list of matrices into a long matrix:
-log_lik_kfold <- do.call(cbind, log_lik_list) 
-(elpd_kfold <- elpd(log_lik_kfold))
+(elpd_kfold <- elpd(log_pd_kfold))
 ```
 
-If one wants to compare several models (with `loo_compare`), one should use the same folds for all the different models. (Notice that now the likelihood values in `log_lik_kfold` are not in the same order as the observations of `roaches`.) 
+If one wants to compare several models (with `loo_compare`), one should use the same folds for all the different models. 
 
 # References
 
