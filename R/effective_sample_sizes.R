@@ -209,8 +209,11 @@ ess_rfun <- function(sims) {
   if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-
-  acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
+  if (length(dim(sims)) == 3) {
+    acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i,]))
+  } else {
+   acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
+  }
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
