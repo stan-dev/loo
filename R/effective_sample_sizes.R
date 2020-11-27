@@ -70,7 +70,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::mclapply(
           mc.cores = cores,
           X = seq_len(dim(x)[3]),
-          FUN = function(i) ess_rfun(x[, , i])
+          FUN = function(i) ess_rfun(x[, , i, drop = TRUE])
         )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -79,7 +79,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(dim(x)[3]),
-          fun = function(i) ess_rfun(x[, , i])
+          fun = function(i) ess_rfun(x[, , i, drop = TRUE])
         )
     }
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
@@ -209,11 +209,7 @@ ess_rfun <- function(sims) {
   if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-  if (length(dim(sims)) == 3) {
-    acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i,]))
-  } else {
-   acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
-  }
+  acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
