@@ -191,7 +191,7 @@ for(k in 1:10){
                    )
   fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
   gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
-  log_pd[, roaches$fold == k] <- extract_log_lik(gen_test)
+  log_pd_kfold[, roaches$fold == k] <- extract_log_lik(gen_test)
 }
 ```
 
