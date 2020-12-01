@@ -25,7 +25,9 @@ sample and \eqn{N} is the number of data points. If
 }
 \description{
 Convenience function for extracting the pointwise log-likelihood
-matrix or array from a fitted Stan model.
+matrix or array from a \code{stanfit} object from the \pkg{rstan} package.
+Note: recent versions of \pkg{rstan} now include a \code{loo()} method for
+\code{stanfit} objects that handles this internally.
 }
 \details{
 Stan does not automatically compute and store the log-likelihood. It
