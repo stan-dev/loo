@@ -14,7 +14,7 @@ Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("
              person("Juho", "Piironen", role = c("ctb")), 
              person("Bruno", "Nicenboim", role = c("ctb")))
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
-URL: https://mc-stan.org/loo, https://discourse.mc-stan.org
+URL: https://mc-stan.org/loo/, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
 Description: Efficient approximate leave-one-out cross-validation (LOO)
     for Bayesian models fit using Markov chain Monte Carlo, as 

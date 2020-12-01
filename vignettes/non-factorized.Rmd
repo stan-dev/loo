@@ -684,7 +684,7 @@ reponse is observed and equal to `Ymi` if the response is missing. The latter is
 in turn defined as a parameter and thus estimated along with all other paramters
 of the model. More details about missing value imputation in Stan can be found
 in the *Missing Data & Partially Known Parameters* section of the
-[Stan manual](http://mc-stan.org/users/documentation/index.html).
+[Stan manual](https://mc-stan.org/users/documentation/index.html).
 
 The Stan code extracted from brms is not only helpful when learning Stan, but
 can also drastically speed up the specification of models that are not support
@@ -718,6 +718,6 @@ Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyper
 
 Vehtari A., Mononen T., Tolvanen V., Sivula T., & Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. *Journal of Machine Learning Research*, 17(103), 1--38. [Online](http://jmlr.org/papers/v17/14-540.html).
 
-Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
