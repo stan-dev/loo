@@ -171,7 +171,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
+\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
 \seealso{
 \code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.

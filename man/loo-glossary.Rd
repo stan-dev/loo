@@ -137,7 +137,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-\href{https://arxiv.org/abs/1507.02646/}{preprint arXiv:1507.02646}
+\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
 Gelman, A. (2019), Visualization in Bayesian workflow.
