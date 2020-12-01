@@ -1,7 +1,9 @@
 #' Extract pointwise log-likelihood from a Stan model
 #'
 #' Convenience function for extracting the pointwise log-likelihood
-#' matrix or array from a fitted Stan model.
+#' matrix or array from a `stanfit` object from the \pkg{rstan} package.
+#' Note: recent versions of \pkg{rstan} now include a `loo()` method for
+#' `stanfit` objects that handles this internally.
 #'
 #' @export
 #' @param stanfit A `stanfit` object (\pkg{rstan} package).

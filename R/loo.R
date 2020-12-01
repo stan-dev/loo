@@ -109,14 +109,6 @@
 #' loo(LLmat, r_eff = rel_n_eff, cores = 2)
 #'
 #'
-#' \dontrun{
-#' ### Usage with stanfit objects
-#' # see ?extract_log_lik
-#' log_lik1 <- extract_log_lik(stanfit1, merge_chains = FALSE)
-#' rel_n_eff <- relative_eff(exp(log_lik1))
-#' loo(log_lik1, r_eff = rel_n_eff, cores = 2)
-#' }
-#'
 #' ### Using log-likelihood function instead of array or matrix
 #' set.seed(124)
 #'
