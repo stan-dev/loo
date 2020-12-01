@@ -8,7 +8,7 @@ bibentry(bibtype = "Misc",
          author = authors,
          year = year,
          note = note,
-         url = "https://mc-stan.org/loo",
+         url = "https://mc-stan.org/loo/",
          header = "To cite the loo R package:"
 )
 

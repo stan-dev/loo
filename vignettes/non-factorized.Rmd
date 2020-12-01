@@ -680,7 +680,7 @@ reponse is observed and equal to `Ymi` if the response is missing. The latter is
 in turn defined as a parameter and thus estimated along with all other paramters
 of the model. More details about missing value imputation in Stan can be found
 in the *Missing Data & Partially Known Parameters* section of the
-[Stan manual](http://mc-stan.org/users/documentation/index.html).
+[Stan manual](https://mc-stan.org/users/documentation/index.html).
 
 The Stan code extracted from brms is not only helpful when learning Stan, but
 can also drastically speed up the specification of models that are not support

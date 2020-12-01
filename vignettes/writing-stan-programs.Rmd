@@ -216,9 +216,9 @@ preference for the second model (`model2`).
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
-Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://mc-stan.org
+Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   https://mc-stan.org/
 
-Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
+Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   https://mc-stan.org/
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. _Statistics and

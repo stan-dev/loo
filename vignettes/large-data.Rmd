@@ -531,9 +531,9 @@ better or negligible.
 
 Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
 
-Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   http://mc-stan.org
+Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   https://mc-stan.org/
 
-Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   http://mc-stan.org
+Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   https://mc-stan.org/
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. [arXiv preprint arXiv:2001.00980](https://arxiv.org/abs/2001.00980).
