@@ -1,29 +1,31 @@
-# loo 2.3.1.9000
+# loo 2.4.0
 
-<!-- Items for next release go here -->
-
-(GitHub issue/PR number in parentheses)
+### Bug fixes 
 
 * Fixed a bug in `relative_eff.function()` that caused an error on Windows when
 using multiple cores. (#152) 
 
-* New generic function `elpd()` (and methods for matrices and arrays) for 
-computing expected log predictive density of new data or log predictive density 
-of observed data. A new vignette demonstrates using this function when doing 
+* Fixed a potential numerical issue in `split_moment_matching()`. (#153)
+
+* Fixed potential integer overflow with `loo_moment_match()`. (#155, @ecmerkle)
+
+* Fixed `relative_eff()` when used with a `posterior::draws_array`. (#161, @rok-cesnovar)
+
+### New features 
+
+* New generic function `elpd()` (and methods for matrices and arrays) for
+computing expected log predictive density of new data or log predictive density
+of observed data. A new vignette demonstrates using this function when doing
 K-fold CV with rstan. (#159, @bnicenboim)
 
 
 # loo 2.3.1
 
-(GitHub issue/PR number in parentheses)
-
-* Fixed a bug in `loo_moment_match()` that prevented `...` arguments from being used
-correctly. (#149)
+* Fixed a bug in `loo_moment_match()` that prevented `...` arguments from being
+used correctly. (#149)
 
 
 # loo 2.3.0
-
-(GitHub issue/PR number in parentheses)
 
 * Added Topi Paananen and Paul Bürkner as coauthors.
 
@@ -39,8 +41,6 @@ the `weights()` method to make an importance sampler. (#112, #146)
 
 
 # loo 2.2.0
-
-(GitHub issue/PR number in parentheses)
 
 * Added Mans Magnusson as a coauthor.
 
@@ -61,8 +61,6 @@ a `waic` object. (#117, @mcol)
 
 
 # loo 2.1.0
-
-(GitHub issue/PR number in parentheses)
 
 * New function `loo_compare()` for model comparison that will eventually replace
 the existing `compare()` function. (#93)
@@ -139,52 +137,59 @@ future releases.
 
 # loo 1.1.0
 
-* Introduce the `E_loo` function for computing weighted expectations (means, variances, quantiles).
+* Introduce the `E_loo()` function for computing weighted expectations (means,
+variances, quantiles).
 
 # loo 1.0.0
 
-* `pareto_k_table` and `pareto_k_ids` convenience functions for quickly identifying problematic observations
+* `pareto_k_table()` and `pareto_k_ids()` convenience functions for quickly
+identifying problematic observations
 * pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
 `(1, Inf)` (didn't used to include 0.7)
-* warning messages are now issued by `psislw` instead of `print.loo`
-* `print.loo` shows a table of pareto k estimates (if any k > 0.7)
-* Add argument to `compare` to allow loo objects to be provided in a list rather than in `'...'`
+* warning messages are now issued by `psislw()` instead of `print.loo`
+* `print.loo()` shows a table of pareto k estimates (if any k > 0.7)
+* Add argument to `compare()` to allow loo objects to be provided in a list
+rather than in `'...'`
 * Update references to point to published paper
 
 # loo 0.1.6
+
 * GitHub repository moved from @jgabry to @stan-dev
-* Better error messages from `extract_log_lik`
+* Better error messages from `extract_log_lik()`
 * Fix example code in vignette (thanks to GitHub user @krz)
 
 # loo 0.1.5
+
 * Add warnings if any p_waic estimates are greather than 0.4
 * Improve line coverage of tests to 100%
 * Update references in documentation
-* Remove model weights from `compare`. <br>
-    In previous versions of __loo__ model
-weights were also reported by `compare`. We have removed the weights because
+* Remove model weights from `compare()`. In previous versions of __loo__ model
+weights were also reported by `compare()`. We have removed the weights because
 they were based only on the point estimate of the elpd values ignoring the
 uncertainty. We are currently working on something similar to these weights that
 also accounts for uncertainty, which will be included in future versions of
 __loo__.
 
 # loo 0.1.4
+
 This update makes it easier for other package authors using __loo__ to write
 tests that involve running the `loo` function. It also includes minor bug
 fixes and additional unit tests. Highlights:
 
 * Don't call functions from __parallel__ package if `cores=1`.
-* Return entire vector/matrix of smoothed weights rather than a summary statistic when `psislw` function is called in an interactive session.
+* Return entire vector/matrix of smoothed weights rather than a summary
+statistic when `psislw` function is called in an interactive session.
 * Test coverage > 80%
 
 # loo 0.1.3
+
 This update provides several important improvements, most notably an alternative
 method for specifying the pointwise log-likelihood that reduces memory usage 
 and allows for __loo__ to be used with larger datasets. This update also makes
 it easier to to incorporate __loo__'s functionality into other packages.
 
 * Add Ben Goodrich as contributor
-* S3 generics and `matrix` and `function` methods for both `loo` and `waic`. 
+* S3 generics and `matrix` and `function` methods for both `loo()` and `waic()`. 
 The matrix method provide the same functionality as in previous versions of 
 __loo__ (taking a log-likelihood matrix as the input). The function method 
 allows the user to provide a function for computing the log-likelihood from 
@@ -200,13 +205,16 @@ the plot.
 * Allow setting number of cores using `options(loo.cores = NUMBER)`. 
 
 # loo 0.1.2 
+
 * Updates names in package to reflect name changes in the accompanying paper.
 
 # loo 0.1.1
+
 * Better handling of special cases
 * Deprecates `loo_and_waic` function in favor of separate functions `loo` and
 `waic`
 * Deprecates `loo_and_waic_diff`. Use `compare` instead. 
 
 # loo 0.1.0
+
 * Initial release
