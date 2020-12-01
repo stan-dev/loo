@@ -208,7 +208,7 @@ pseudobma_weights(cbind(lpd1, lpd2, lpd3), BB = FALSE)
 Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(\href{http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4}{journal version},
+(\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
