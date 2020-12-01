@@ -5,7 +5,7 @@
 * Fixed a bug in `relative_eff.function()` that caused an error on Windows when
 using multiple cores. (#152) 
 
-* Fixed a potential numerical issue in `split_moment_matching()`. (#153)
+* Fixed a potential numerical issue in `loo_moment_match()` with `split=TRUE`. (#153)
 
 * Fixed potential integer overflow with `loo_moment_match()`. (#155, @ecmerkle)
 
