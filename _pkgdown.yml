@@ -110,6 +110,7 @@ reference:
       - kfold_split_stratified
       - kfold_split_grouped
       - kfold
+      - elpd
   - title: "Other functions"
     contents:
       - elpd

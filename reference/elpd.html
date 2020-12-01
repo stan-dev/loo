@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • loo</title>
+<title>Generic (expected) log-predictive density — elpd • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,10 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Generic (expected) log-predictive density — elpd" />
+<meta property="og:description" content="The elpd() methods for arrays and matrices can compute the expected log
+pointwise predictive density for a new dataset or the log pointwise
+predictive density of the observed data (an overestimate of the elpd)." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 
 
@@ -66,7 +69,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -169,39 +172,76 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Generic (expected) log-predictive density</h1>
+    <small class="dont-index">Source: <a href='https://github.com/stan-dev/loo/blob/master/R/elpd.R'><code>R/elpd.R</code></a></small>
+    <div class="hidden name"><code>elpd.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>Getting Started</h3>
-      <p class="section-desc"><p>These vignettes demonstrate how to use the <strong>loo</strong> package to perform approximate leave-one-out cross-validation or exact K-fold cross-validation for Bayesian models fit using MCMC, compare models on estimated predictive performance on new data, and weight models for averaging predictive distributions.</p></p>
-
-      <dl>
-        <dt><a href="loo-package.html">Using the loo package (version &gt;= 2.0.0)</a></dt>
-        <dd></dt>
-        <dt><a href="weights.html">Bayesian Stacking and Pseudo-BMA weights using the loo package</a></dt>
-        <dd></dt>
-        <dt><a href="writing-stan-programs.html">Writing Stan programs for use with the loo package</a></dt>
-        <dd></dt>
-        <dt><a href="elpd.html">Holdout validation and K-fold cross-validation of Stan programs with the loo package</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>The <code>elpd()</code> methods for arrays and matrices can compute the expected log
+pointwise predictive density for a new dataset or the log pointwise
+predictive density of the observed data (an overestimate of the elpd).</p>
     </div>
-    <div class="section ">
-      <h3>Advanced functionality</h3>
-      <p class="section-desc"><p>These vignettes demonstrate how to use the <strong>loo</strong> package for more complicated scenarios including models with non-factorized likelihoods, forecasting models, models fit to very large datasets, and more.</p></p>
 
-      <dl>
-        <dt><a href="non-factorized.html">Leave-one-out cross-validation for non-factorized models</a></dt>
-        <dd></dt>
-        <dt><a href="lfo.html">Approximate leave-future-out cross-validation for Bayesian time series models</a></dt>
-        <dd></dt>
-        <dt><a href="large-data.html">Using Leave-one-out cross-validation for large data</a></dt>
-        <dd></dt>
-        <dt><a href="moment-matching.html">Avoiding model refits in leave-one-out cross-validation with moment matching</a></dt>
-        <dd></dt>
-      </dl>
-    </div>
+    <pre class="usage"><span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for array</span>
+<span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for matrix</span>
+<span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A log-likelihood array or matrix. The <strong>Methods (by class)</strong>
+section, below, has detailed descriptions of how to specify the inputs for
+each method.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Currently ignored.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The <code>elpd()</code> function is an S3 generic and methods are provided for
+3-D pointwise log-likelihood arrays and matrices.</p>
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>array</code>: An \(I\) by \(C\) by \(N\) array, where \(I\)
+is the number of MCMC iterations per chain, \(C\) is the number of
+chains, and \(N\) is the number of data points.</p></li>
+<li><p><code>matrix</code>: An \(S\) by \(N\) matrix, where \(S\) is the size
+of the posterior sample (with all chains merged) and \(N\) is the number
+of data points.</p></li>
+</ul>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>The vignette <em>Holdout validation and K-fold cross-validation of Stan
+programs with the loo package</em> for demonstrations of using the <code>elpd()</code>
+methods.</p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># Calculate the lpd of the observed data</span>
+<span class='no'>LLarr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
+<span class='fu'>elpd</span>(<span class='no'>LLarr</span>)</div><div class='output co'>#&gt; 
+#&gt; Computed from 1000 by 32 log-likelihood matrix using the generic elpd function
+#&gt; 
+#&gt;      Estimate  SE
+#&gt; elpd    -80.3 3.2
+#&gt; ic      160.5 6.5</div><div class='input'>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
