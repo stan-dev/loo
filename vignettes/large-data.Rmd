@@ -37,6 +37,16 @@ Proceedings of the 23rd International Conference on Artificial Intelligence and 
 which provide important background for understanding the methods implemented in
 the package.
 
+# Setup 
+
+In addition to the __loo__ package, we'll also be using __rstan__:
+
+```{r setup, message=FALSE}
+library("rstan")
+library("loo")
+set.seed(4711)
+```
+
 
 # Example: Well water in Bangladesh
 
@@ -96,9 +106,6 @@ Below we will test that the function is working by using the `loo_i()` function.
 Next we fit the model in Stan using the **rstan** package:
 
 ```{r, eval=FALSE}
-library("rstan")
-set.seed(4711)
-
 # Prepare data
 url <- "http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"
 wells <- read.table(url)
@@ -144,7 +151,6 @@ We can then use the `loo_subsample()` function to compute the efficient PSIS-LOO
 approximation to exact LOO-CV using subsampling:
 
 ```{r, eval=FALSE}
-library("loo")
 parameter_draws_1 <- extract(fit_1)$beta
 stan_df_1 <- as.data.frame(standata)
 
