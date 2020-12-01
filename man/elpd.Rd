@@ -13,21 +13,20 @@ elpd(x, ...)
 \method{elpd}{matrix}(x, ...)
 }
 \arguments{
-\item{x}{A log-likelihood array, matrix, or function. The \strong{Methods (by class)}
+\item{x}{A log-likelihood array or matrix. The \strong{Methods (by class)}
 section, below, has detailed descriptions of how to specify the inputs for
 each method.}
 
-\item{...}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
+\item{...}{Currently ignored.}
 }
 \description{
-The \code{elpd()} methods for arrays, and matrices can compute the expected log pointwise predictive density for a new dataset or the log pointwise predictive density of the observed data (an overestimate of the elpd).
+The \code{elpd()} methods for arrays and matrices can compute the expected log
+pointwise predictive density for a new dataset or the log pointwise
+predictive density of the observed data (an overestimate of the elpd).
 }
 \details{
 The \code{elpd()} function is an S3 generic and methods are provided for
-3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices.
+3-D pointwise log-likelihood arrays and matrices.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -41,10 +40,13 @@ of data points.
 }}
 
 \examples{
-### Array methods for calculating the lpd of the observed data (using example objects included with loo package)
+# Calculate the lpd of the observed data
 LLarr <- example_loglik_array()
 elpd(LLarr)
 
-
-
+}
+\seealso{
+The vignette \emph{Holdout validation and K-fold cross-validation of Stan
+programs with the loo package} for demonstrations of using the \code{elpd()}
+methods.
 }
