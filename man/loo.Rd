@@ -294,11 +294,10 @@ all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 ### For package developers: defining loo methods
 
 # An example of a possible loo method for 'stanfit' objects (rstan package).
-# A similar method is planned for a future release of rstan (or is already
-# released, depending on when you are reading this). In order for users
-# to be able to call loo(stanfit) instead of loo.stanfit(stanfit) the
-# NAMESPACE needs to be handled appropriately (roxygen2 and devtools packages
-# are good for that).
+# A similar method is included in the rstan package.
+# In order for users to be able to call loo(stanfit) instead of
+# loo.stanfit(stanfit) the NAMESPACE needs to be handled appropriately
+# (roxygen2 and devtools packages are good for that).
 #
 loo.stanfit <-
  function(x,
