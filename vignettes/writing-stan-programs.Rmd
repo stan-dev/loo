@@ -228,4 +228,4 @@ Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto
 smoothed importance sampling.
-[arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
+[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
