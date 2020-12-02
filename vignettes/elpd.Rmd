@@ -124,7 +124,7 @@ data_test <- list(y = roaches$y[roaches$test == 1],
 
 Next we fit the model to the "test" data in Stan using the __rstan__ package:
 
-```{r fit-train}
+```{r fit-train, results = "hide"}
 # Compile
 stanmodel <- stan_model(model_code = stancode)
 # Fit model

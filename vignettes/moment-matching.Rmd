@@ -110,7 +110,7 @@ set.seed(seed)
 
 Next we fit the model in Stan using the __rstan__ package:
 
-```{r modelfit, message=FALSE}
+```{r modelfit, message=FALSE, results = "hide"}
 # Prepare data
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
