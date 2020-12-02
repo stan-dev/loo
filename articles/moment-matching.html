@@ -219,48 +219,15 @@ generated quantities {
 <span class="no">standata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">N</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">K</span> <span class="kw">=</span> <span class="no">k</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">x</span>), <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">offset</span> <span class="kw">=</span> <span class="no">offset</span>, <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>, <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>)
 
 <span class="co"># Compile</span>
-<span class="no">stanmodel</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html">stan_model</a></span>(<span class="kw">model_code</span> <span class="kw">=</span> <span class="no">stancode</span>)</pre></body></html></div>
-<pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
-clang -mmacosx-version-min=10.13 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.0/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include '/Library/Frameworks/R.framework/Versions/4.0/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/4.0/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
-In file included from /Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/Dense:1:
-In file included from /Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/Core:88:
-/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
-namespace Eigen {
-^
-/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
-namespace Eigen {
-               ^
-               ;
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/4.0/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
-In file included from /Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/Dense:1:
-/Library/Frameworks/R.framework/Versions/4.0/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
-#include &lt;complex&gt;
-         ^~~~~~~~~
-3 errors generated.
-make: *** [foo.o] Error 1</code></pre>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Fit model</span>
+<span class="no">stanmodel</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html">stan_model</a></span>(<span class="kw">model_code</span> <span class="kw">=</span> <span class="no">stancode</span>)
+
+<span class="co"># Fit model</span>
 <span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span>(<span class="no">stanmodel</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>, <span class="kw">refresh</span> <span class="kw">=</span> <span class="fl">0</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">fit</span>, <span class="kw">pars</span> <span class="kw">=</span> <span class="st">"beta"</span>)</pre></body></html></div>
-<pre><code>Inference for Stan model: 73ed397b74a7b4968fc8fce8b1300023.
-4 chains, each with iter=2000; warmup=1000; thin=1; 
-post-warmup draws per chain=1000, total post-warmup draws=4000.
-
-         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
-beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2618    1
-beta[2] -0.57       0 0.02 -0.62 -0.58 -0.57 -0.55 -0.52  2006    1
-beta[3] -0.31       0 0.03 -0.38 -0.34 -0.31 -0.29 -0.25  2408    1
-
-Samples were drawn using NUTS(diag_e) at Tue Dec  1 16:24:39 2020.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).</code></pre>
 <p>Let us now evaluate the predictive performance of the model using <code><a href="../reference/loo.html">loo()</a></code>.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">loo1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">loo1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>)</pre></body></html></div>
 <pre><code>Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">loo1</span></pre></body></html></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">loo1</span></pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
@@ -286,10 +253,10 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <p>To improve the accuracy of the <code><a href="../reference/loo.html">loo()</a></code> result above, we could perform leave-one-out cross-validation by explicitly leaving out single observations and refitting the model using MCMC repeatedly. However, the Pareto <span class="math inline">\(k\)</span> diagnostics indicate that there are 19 observations which are problematic. This would require 19 model refits which may require a lot of computation time.</p>
 <p>Instead of refitting with MCMC, we can perform a faster moment matching correction to the importance sampling for the problematic observations. This can be done with the <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> function in the <strong>loo</strong> package, which takes our existing <code>loo</code> object as input and modifies it. The moment matching requires some evaluations of the model posterior density. For models fitted with <strong>rstan</strong>, this can be conveniently done by using the existing <code>stanfit</code> object.</p>
 <p>First, we show how the moment matching can be used for a model fitted using <strong>rstan</strong>. It only requires setting the argument <code>moment_match</code> to <code>TRUE</code> in the <code><a href="../reference/loo.html">loo()</a></code> function. Optionally, you can also set the argument <code>k_threshold</code> which determines the Pareto <span class="math inline">\(k\)</span> threshold, above which moment matching is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than 0.7.</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="co"># available in rstan &gt;= 2.21</span>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># available in rstan &gt;= 2.21</span>
 <span class="no">loo2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>, <span class="kw">moment_match</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">loo2</span></pre></body></html></div>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">loo2</span></pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
@@ -350,7 +317,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 </li>
 </ul>
 <p>Next, we show how the helper functions look like for RStan objects, and show an example of using <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> directly. For stanfit objects from <strong>rstan</strong> objects, the functions look like this:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="co"># create a named list of draws for use with rstan methods</span>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># create a named list of draws for use with rstan methods</span>
 <span class="no">.rstan_relist</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">skeleton</span>) {
   <span class="no">out</span> <span class="kw">&lt;-</span> <span class="kw pkg">utils</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/utils/relist.html">relist</a></span>(<span class="no">x</span>, <span class="no">skeleton</span>)
   <span class="kw">for</span> (<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">skeleton</span>)) {
@@ -411,7 +378,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="no">out</span>
 }</pre></body></html></div>
 <p>Using these function, we can call <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> to update the existing <code>loo</code> object.</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">loo3</span> <span class="kw">&lt;-</span> <span class="kw pkg">loo</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loo_moment_match.html">loo_moment_match.default</a></span>(
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">loo3</span> <span class="kw">&lt;-</span> <span class="kw pkg">loo</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loo_moment_match.html">loo_moment_match.default</a></span>(
   <span class="kw">x</span> <span class="kw">=</span> <span class="no">fit</span>,
   <span class="kw">loo</span> <span class="kw">=</span> <span class="no">loo1</span>,
   <span class="kw">post_draws</span> <span class="kw">=</span> <span class="no">post_draws_stanfit</span>,
@@ -421,7 +388,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="kw">log_lik_i_upars</span> <span class="kw">=</span> <span class="no">log_lik_i_upars_stanfit</span>
 )</pre></body></html></div>
 <pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">loo3</span></pre></body></html></div>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">loo3</span></pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
