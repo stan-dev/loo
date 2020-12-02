@@ -4,7 +4,7 @@
 # authors <- as.personList(meta$Author)
 # authors <- grep("\\[cre|\\[aut", authors, value = TRUE)
 
-# these are just used on gh-pages branch for building website
+# used on gh-pages branch for building website
 year <- sub("-.*", "", unname(desc::desc_get("Date")))
 note <- sprintf("R package version %s", packageVersion("loo"))
 authors <- pkgdown:::data_authors()$main
