@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="loo2-non-factorized_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Leave-one-out cross-validation for non-factorized models</h1>
                         <h4 class="author">Aki Vehtari, Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 class="date">2020-07-07</h4>
+            <h4 class="date">2020-12-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-non-factorized.Rmd"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-non-factorized.Rmd</code></div>
@@ -370,7 +370,7 @@ y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\wid
 <span class="no">log_ratios</span> <span class="kw">&lt;-</span> -<span class="no">loglik</span>
 <span class="no">psis_result</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/psis.html">psis</a></span>(<span class="no">log_ratios</span>)</pre></body></html></div>
 <p>The quality of the PSIS-LOO approximation can be investigated graphically by plotting the Pareto-k estimate for each observation. Ideally, they should not exceed <span class="math inline">\(0.5\)</span>, but in practice the algorithm turns out to be robust up to values of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017, 2019). In the plot below, we see that the fourth observation is problematic and so may reduce the accuracy of the LOO-CV approximation.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">psis_result</span>, <span class="kw">label_points</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">psis_result</span>, <span class="kw">label_points</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <p><img src="loo2-non-factorized_files/figure-html/plot-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also check that the conditional leave-one-out predictive distribution equations work correctly, for instance, using the last posterior draw:</p>
 <div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">yloo_sub</span> <span class="kw">&lt;-</span> <span class="no">yloo</span>[<span class="no">S</span>, ]
@@ -396,18 +396,18 @@ y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\wid
 Computed from 4000 by 49 log-likelihood matrix
 
          Estimate   SE
-elpd_loo   -186.7 10.6
-p_loo         7.9  5.0
-looic       373.4 21.2
+elpd_loo   -187.2 11.1
+p_loo         8.3  5.4
+looic       374.3 22.1
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     47    95.9%   2439      
- (0.5, 0.7]   (ok)        1     2.0%   532       
+(-Inf, 0.5]   (good)     47    95.9%   2240      
+ (0.5, 0.7]   (ok)        1     2.0%   819       
    (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;      
-   (1, Inf)   (very bad)  1     2.0%   38        
+   (1, Inf)   (very bad)  1     2.0%   15        
 See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div id="exact-loo-cv" class="section level3">
@@ -421,29 +421,8 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="kw">data2</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">COL.nb</span> <span class="kw">=</span> <span class="no">COL.nb</span>),
   <span class="kw">chains</span> <span class="kw">=</span> <span class="fl">0</span>
 )</pre></body></html></div>
-<pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
-clang -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -D_REENTRANT  -DBOOST_DISABLE_ASSERTS -DBOOST_PENDING_INTEGER_LOG2_HPP -include stan/math/prim/mat/fun/Eigen.hpp   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include  -fPIC  -Wall -g -O2  -c foo.c -o foo.o
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:88:
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
-namespace Eigen {
-^
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
-namespace Eigen {
-               ^
-               ;
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
-#include &lt;complex&gt;
-         ^~~~~~~~~
-3 errors generated.
-make: *** [foo.o] Error 1</code></pre>
 <p>Next, we fit the model <span class="math inline">\(N\)</span> times, each time leaving out a single observation and then computing the log predictive density for that observation. For obvious reasons, this takes much longer than the approximation we computed above, but it is necessary in order to validate the approximate LOO-CV method. Thanks to the PSIS-LOO approximation, in general doing these slow exact computations can be avoided.</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">S</span> <span class="kw">&lt;-</span> <span class="fl">500</span>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">S</span> <span class="kw">&lt;-</span> <span class="fl">500</span>
 <span class="no">res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span>(<span class="st">"list"</span>, <span class="no">N</span>)
 <span class="no">loglik</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw">nrow</span> <span class="kw">=</span> <span class="no">S</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="no">N</span>)
 <span class="kw">for</span> (<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">N</span>)) {
@@ -474,13 +453,13 @@ make: *** [foo.o] Error 1</code></pre>
 }
 <span class="no">res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span>(<span class="no">rbind</span>, <span class="no">res</span>)</pre></body></html></div>
 <p>A first step in the validation of the pointwise predictive density is to compare the distribution of the implied response values for the left-out observation to the distribution of the <span class="math inline">\(y_i^{\mathrm{mis}}\)</span> posterior-predictive values estimated as part of the model. If the pointwise predictive density is correct, the two distributions should match very closely (up to sampling error). In the plot below, we overlay these two distributions for the first four observations and see that they match very closely (as is the case for all <span class="math inline">\(49\)</span> observations of in this example).</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">res_sub</span> <span class="kw">&lt;-</span> <span class="no">res</span>[<span class="no">res</span>$<span class="no">obs</span> <span class="kw">%in%</span> <span class="fl">1</span>:<span class="fl">4</span>, ]
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">res_sub</span> <span class="kw">&lt;-</span> <span class="no">res</span>[<span class="no">res</span>$<span class="no">obs</span> <span class="kw">%in%</span> <span class="fl">1</span>:<span class="fl">4</span>, ]
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">y</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">type</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.6</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="st">"obs"</span>, <span class="kw">scales</span> <span class="kw">=</span> <span class="st">"fixed"</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">4</span>)</pre></body></html></div>
 <p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>In the final step, we compute the ELPD based on the exact LOO-CV and compare it to the approximate PSIS-LOO result computed earlier.</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">log_mean_exp</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">log_mean_exp</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
   <span class="co"># more stable than log(mean(exp(x)))</span>
   <span class="no">max_x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">x</span>)
   <span class="no">max_x</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span> - <span class="no">max_x</span>))) - <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>))
@@ -488,9 +467,9 @@ make: *** [foo.o] Error 1</code></pre>
 <span class="no">exact_elpds</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">loglik</span>, <span class="fl">2</span>, <span class="no">log_mean_exp</span>)
 <span class="no">exact_elpd</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">exact_elpds</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">exact_elpd</span>, <span class="fl">1</span>)</pre></body></html></div>
-<pre><code>[1] -188.4</code></pre>
+<pre><code>[1] -189.2</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not as close as we would expect if there were no problematic observations. We can investigate this issue more closely by plotting the approximate against the exact pointwise ELPD values.</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
+<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
   <span class="kw">approx_elpd</span> <span class="kw">=</span> <span class="no">psis_loo</span>$<span class="no">pointwise</span>[, <span class="st">"elpd_loo"</span>],
   <span class="kw">exact_elpd</span> <span class="kw">=</span> <span class="no">exact_elpds</span>
 )
@@ -503,13 +482,13 @@ make: *** [foo.o] Error 1</code></pre>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span>(<span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">16</span>, -<span class="fl">3</span>), <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">16</span>, -<span class="fl">3</span>))</pre></body></html></div>
 <p><img src="loo2-non-factorized_files/figure-html/compare-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as problematic by the PSIS-LOO approximation— is colored in red and is the clear outlier. Otherwise, the correspondence between the exact and approximate values is strong. In fact, summing over the pointwise ELPD values and leaving out the fourth observation yields practically equivalent results for approximate and exact LOO-CV:</p>
-<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="no">without_pt_4</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">without_pt_4</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
   <span class="kw">approx</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">psis_loo</span>$<span class="no">pointwise</span>[-<span class="fl">4</span>, <span class="st">"elpd_loo"</span>]),
   <span class="kw">exact</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">exact_elpds</span>[-<span class="fl">4</span>])
 )
 <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">without_pt_4</span>, <span class="fl">2</span>)</pre></body></html></div>
 <pre><code> approx   exact 
--173.06 -173.12 </code></pre>
+-173.07 -172.96 </code></pre>
 <p>From this we can conclude that the difference we found when including <em>all</em> observations does not indicate a bug in our implementation of the approximate LOO-CV but rather a violation of its assumptions.</p>
 </div>
 </div>
@@ -518,7 +497,7 @@ make: *** [foo.o] Error 1</code></pre>
 <h1 class="hasAnchor">
 <a href="#working-with-stan-directly" class="anchor"></a>Working with Stan directly</h1>
 <p>So far, we have specified the models in brms and only used Stan implicitely behind the scenes. This allowed us to focus on the primary purpose of validating approximate LOO-CV for non-factorized models. However, we would also like to show how everything can be set up in Stan directly. The Stan code brms generates is human readable and so we can use it to learn some of the essential aspects of Stan and the particular model we are implementing. The Stan program below is a slightly modified version of the code extracted via <code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html">stancode(fit_dummy)</a></code>:</p>
-<div class="sourceCode" id="cb21"><html><body><pre class="r">// generated with brms 2.2.0
+<div class="sourceCode" id="cb20"><html><body><pre class="r">// generated with brms 2.2.0
 functions {
 /**
  * Normal log-pdf for spatially lagged responses
@@ -589,7 +568,7 @@ generated quantities {
   real b_Intercept = temp_Intercept - dot_product(means_X, b);
 }</pre></body></html></div>
 <p>Here we want to focus on two aspects of the Stan code. First, because there is no built-in function in Stan that calculates the log-likelihood for the lag-SAR model, we define a new <code>normal_lagsar_lpdf</code> function in the <code>functions</code> block of the Stan program. This is the same function we showed earlier in the vignette and it can be used to compute the log-likelihood in an efficient and numerically stable way. The <code>_lpdf</code> suffix used in the function name informs Stan that this is a log probability density function.</p>
-<p>Second, this Stan program nicely illustrates how to set up missing value imputation. Instead of just computing the log-likelihood for the observed responses <code>Y</code>, we define a new variable <code>Yl</code> which is equal to <code>Y</code> if the reponse is observed and equal to <code>Ymi</code> if the response is missing. The latter is in turn defined as a parameter and thus estimated along with all other paramters of the model. More details about missing value imputation in Stan can be found in the <em>Missing Data &amp; Partially Known Parameters</em> section of the <a href="http://mc-stan.org/users/documentation/index.html">Stan manual</a>.</p>
+<p>Second, this Stan program nicely illustrates how to set up missing value imputation. Instead of just computing the log-likelihood for the observed responses <code>Y</code>, we define a new variable <code>Yl</code> which is equal to <code>Y</code> if the reponse is observed and equal to <code>Ymi</code> if the response is missing. The latter is in turn defined as a parameter and thus estimated along with all other paramters of the model. More details about missing value imputation in Stan can be found in the <em>Missing Data &amp; Partially Known Parameters</em> section of the <a href="https://mc-stan.org/users/documentation/index.html">Stan manual</a>.</p>
 <p>The Stan code extracted from brms is not only helpful when learning Stan, but can also drastically speed up the specification of models that are not support by brms. If brms can fit a model similar but not identical to the desired model, we can let brms generate the Stan program for the similar model and then mold it into the program that implements the model we actually want to fit. Rather than calling <code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html">stancode()</a></code>, which requires an existing fitted model object, we recommend using <code><a href="https://rdrr.io/pkg/brms/man/make_stancode.html">make_stancode()</a></code> and specifying the <code>save_model</code> argument to write the Stan program to a file. The corresponding data can be prepared with <code><a href="https://rdrr.io/pkg/brms/man/make_standata.html">make_standata()</a></code> and then manually amended if needed. Once the code and data have been edited, they can be passed to RStan’s <code>stan()</code> function via the <code>file</code> and <code>data</code> arguments.</p>
 </div>
 <div id="conclusion" class="section level1">
@@ -604,8 +583,8 @@ generated quantities {
 <p>Anselin L. (1988). <em>Spatial econometrics: methods and models</em>. Dordrecht: Kluwer Academic.</p>
 <p>Bürkner P. C., Gabry J., &amp; Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. <a href="https://arxiv.org/abs/1810.10559">ArXiv preprint</a>.</p>
 <p>Sundararajan S. &amp; Keerthi S. S. (2001). Predictive approaches for choosing hyperparameters in Gaussian processes. <em>Neural Computation</em>, 13(5), 1103–1118.</p>
-<p>Vehtari A., Mononen T., Tolvanen V., Sivula T., &amp; Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. <em>Journal of Machine Learning Research</em>, 17(103), 1–38. <a href="http://jmlr.org/papers/v17/14-540.html">Online</a>.</p>
-<p>Vehtari A., Gelman A., &amp; Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="http://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
+<p>Vehtari A., Mononen T., Tolvanen V., Sivula T., &amp; Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. <em>Journal of Machine Learning Research</em>, 17(103), 1–38. <a href="https://jmlr.org/papers/v17/14-540.html">Online</a>.</p>
+<p>Vehtari A., Gelman A., &amp; Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
 </div>
   </div>

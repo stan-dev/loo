@@ -83,7 +83,7 @@ effective sample size and Monte Carlo estimates." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -273,11 +273,11 @@ widely application information criterion in singular learning theory.
 <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+(<a href='https://link.springer.com/article/10.1007/s11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+<a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'>
@@ -299,12 +299,13 @@ and Gabry (2019) for more details on why we prefer <code><a href='loo.html'>loo(
 #&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='input'><span class='no'>waic_mat</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>LLmat</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: </span>
 #&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span>(<span class='no'>waic_arr</span>, <span class='no'>waic_mat</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 
-<span class='co'># \dontrun{</span>
-<span class='no'>log_lik1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_log_lik(stanfit1): object 'stanfit1' not found</span></div><div class='input'><span class='no'>log_lik2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_log_lik(stanfit2): object 'stanfit2' not found</span></div><div class='input'>(<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik1</span>))</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik1): object 'log_lik1' not found</span></div><div class='input'>(<span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik2</span>))</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik2): object 'log_lik2' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='compare.html'>compare</a></span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'compare' is deprecated.</span>
-#&gt; <span class='warning'>Use 'loo_compare' instead.</span>
-#&gt; <span class='warning'>See help("Deprecated")</span></div><div class='output co'>#&gt; <span class='error'>Error in compare(waic1, waic2): object 'waic1' not found</span></div><div class='input'># }
-
-</div></pre>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>log_lik1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit1</span>)
+<span class='no'>log_lik2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit2</span>)
+(<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik1</span>))
+(<span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'>waic</span>(<span class='no'>log_lik2</span>))
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='compare.html'>compare</a></span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>2</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

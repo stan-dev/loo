@@ -22,6 +22,9 @@
     <loc>https://mc-stan.org/loo/reference/dot-thin_draws.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/elpd.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/example_loglik_array.html</loc>
   </url>
   <url>
@@ -131,6 +134,9 @@
   </url>
   <url>
     <loc>https://mc-stan.org/loo/reference/weights.importance_sampling.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/articles/loo2-elpd.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/articles/loo2-example.html</loc>

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="loo2-example_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using the loo package (version &gt;= 2.0.0)</h1>
                         <h4 class="author">Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2020-07-07</h4>
+            <h4 class="date">2020-12-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-example.Rmd"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-example.Rmd</code></div>
@@ -150,8 +150,8 @@
 <p>This vignette demonstrates how to use the <strong>loo</strong> package to carry out Pareto smoothed importance-sampling leave-one-out cross-validation (PSIS-LOO) for purposes of model checking and model comparison.</p>
 <p>In this vignette we can’t provide all necessary background information on PSIS-LOO and its diagnostics (Pareto <span class="math inline">\(k\)</span> and effective sample size), so we encourage readers to refer to the following papers for more details:</p>
 <ul>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">published</a> | <a href="http://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
-<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">published</a> | <a href="https://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
+<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
 </ul>
 </div>
 <div id="setup" class="section level1">
@@ -216,25 +216,25 @@
 <a href="#computing-psis-loo-and-checking-diagnostics" class="anchor"></a>Computing PSIS-LOO and checking diagnostics</h3>
 <p>We start by computing PSIS-LOO with the <code>loo</code> function. Since we fit our model using <strong>rstanarm</strong> we can use the <code>loo</code> method for <code>stanreg</code> objects (fitted model objects from <strong>rstanarm</strong>), which doesn’t require us to first extract the pointwise log-likelihood values. If we had written our own Stan program instead of using <strong>rstanarm</strong> we would pass an array or matrix of log-likelihood values to the <code>loo</code> function (see, e.g. <code><a href="../reference/loo.html">help("loo.array", package = "loo")</a></code>). We’ll also use the argument <code>save_psis = TRUE</code> to save some intermediate results to be re-used later.</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">loo1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit1</span>, <span class="kw">save_psis</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
-<pre><code>Warning: Found 14 observations with a pareto_k &gt; 0.7. With this many problematic observations we recommend calling 'kfold' with argument 'K=10' to perform 10-fold cross-validation rather than LOO.</code></pre>
+<pre><code>Warning: Found 17 observations with a pareto_k &gt; 0.7. With this many problematic observations we recommend calling 'kfold' with argument 'K=10' to perform 10-fold cross-validation rather than LOO.</code></pre>
 <p><code>loo</code> gives us warnings about the Pareto diagnostics, which indicate that for some observations the leave-one-out posteriors are different enough from the full posterior that importance-sampling is not able to correct the difference. We can see more details by printing the <code>loo</code> object.</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo1</span>)</pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate     SE
-elpd_loo  -6239.8  725.7
-p_loo       283.6   70.2
-looic     12479.6 1451.4
+elpd_loo  -6247.8  728.0
+p_loo       292.4   73.3
+looic     12495.5 1455.9
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     243   92.7%   126       
- (0.5, 0.7]   (ok)         5    1.9%   52        
-   (0.7, 1]   (bad)        7    2.7%   24        
-   (1, Inf)   (very bad)   7    2.7%   1         
+(-Inf, 0.5]   (good)     239   91.2%   200       
+ (0.5, 0.7]   (ok)         6    2.3%   56        
+   (0.7, 1]   (bad)        8    3.1%   25        
+   (1, Inf)   (very bad)   9    3.4%   1         
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>The table shows us a summary of Pareto <span class="math inline">\(k\)</span> diagnostic, which is used to assess the reliability of the estimates. In addition to the proportion of leave-one-out folds with <span class="math inline">\(k\)</span> values in different intervals, the minimum of the effective sample sizes in that category is shown to give idea why higher <span class="math inline">\(k\)</span> values are bad. Since we have some <span class="math inline">\(k&gt;1\)</span>, we are not able to compute an estimate for the Monte Carlo standard error (SE) of the expected log predictive density (<code>elpd_loo</code>) and <code>NA</code> is displayed. (Full details on the interpretation of the Pareto <span class="math inline">\(k\)</span> diagnostics are available in the Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) papers referenced at the top of this vignette.)</p>
 <p>In this case the <code>elpd_loo</code> estimate should not be considered reliable. If we had a well-specified model we would expect the estimated effective number of parameters (<code>p_loo</code>) to be smaller than or similar to the total number of parameters in the model. Here <code>p_loo</code> is almost 300, which is about 70 times the total number of parameters in the model, indicating severe model misspecification.</p>
@@ -243,14 +243,14 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <h3 class="hasAnchor">
 <a href="#plotting-pareto-k-diagnostics" class="anchor"></a>Plotting Pareto <span class="math inline">\(k\)</span> diagnostics</h3>
 <p>Using the <code>plot</code> method on our <code>loo1</code> object produces a plot of the <span class="math inline">\(k\)</span> values (in the same order as the observations in the dataset used to fit the model) with horizontal lines corresponding to the same categories as in the printed output above.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">loo1</span>)</pre></body></html></div>
-<p><img src="loo2-example_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">loo1</span>)</pre></body></html></div>
+<p><img src="loo2-example_files/figure-html/plot-loo1-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>This plot is useful to quickly see the distribution of <span class="math inline">\(k\)</span> values, but it’s often also possible to see structure with respect to data ordering. In our case this is mild, but there seems to be a block of data that is somewhat easier to predict (indices around 90–150). Unfortunately even for these data points we see some high <span class="math inline">\(k\)</span> values.</p>
 </div>
 <div id="marginal-posterior-predictive-checks" class="section level3">
 <h3 class="hasAnchor">
 <a href="#marginal-posterior-predictive-checks" class="anchor"></a>Marginal posterior predictive checks</h3>
-<p>The <code>loo</code> package can be used in combination with the <code>bayesplot</code> package for leave-one-out cross-validation marginal posterior predictive checks <a href="http://arxiv.org/abs/1709.01449">Gabry et al (2018)</a>. LOO-PIT values are cumulative probabilities for <span class="math inline">\(y_i\)</span> computed using the LOO marginal predictive distributions <span class="math inline">\(p(y_i|y_{-i})\)</span>. For a good model, the distribution of LOO-PIT values should be uniform. In the following plot the distribution (smoothed density estimate) of the LOO-PIT values for our model (thick curve) is compared to many independently generated samples (each the same size as our dataset) from the standard uniform distribution (thin curves).</p>
+<p>The <code>loo</code> package can be used in combination with the <code>bayesplot</code> package for leave-one-out cross-validation marginal posterior predictive checks <a href="https://arxiv.org/abs/1709.01449">Gabry et al (2018)</a>. LOO-PIT values are cumulative probabilities for <span class="math inline">\(y_i\)</span> computed using the LOO marginal predictive distributions <span class="math inline">\(p(y_i|y_{-i})\)</span>. For a good model, the distribution of LOO-PIT values should be uniform. In the following plot the distribution (smoothed density estimate) of the LOO-PIT values for our model (thick curve) is compared to many independently generated samples (each the same size as our dataset) from the standard uniform distribution (thin curves).</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">yrep</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span>(<span class="no">fit1</span>)
 
 <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html">ppc_loo_pit_overlay</a></span>(
@@ -258,7 +258,8 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="kw">yrep</span> <span class="kw">=</span> <span class="no">yrep</span>,
   <span class="kw">lw</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span>(<span class="no">loo1</span>$<span class="no">psis_object</span>)
 )</pre></body></html></div>
-<p><img src="loo2-example_files/figure-html/unnamed-chunk-6-1.png" width="60%" style="display: block; margin: auto;"></p>
+<pre><code>NOTE: The kernel density estimate assumes continuous observations and is not optimal for discrete observations.</code></pre>
+<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The excessive number of values close to 0 indicates that the model is under-dispersed compared to the data, and we should consider a model that allows for greater dispersion.</p>
 </div>
 </div>
@@ -267,67 +268,75 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <a href="#try-alternative-model-with-more-flexibility" class="anchor"></a>Try alternative model with more flexibility</h2>
 <p>Here we will try <a href="https://en.wikipedia.org/wiki/Negative_binomial_distribution">negative binomial</a> regression, which is commonly used for overdispersed count data.<br>
 Unlike the Poisson distribution, the negative binomial distribution allows the conditional mean and variance of <span class="math inline">\(y\)</span> to differ.</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">fit2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(<span class="no">fit1</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="no">neg_binomial_2</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">loo2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit2</span>, <span class="kw">save_psis</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">cores</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">fit2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(<span class="no">fit1</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="no">neg_binomial_2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">loo2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit2</span>, <span class="kw">save_psis</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">cores</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <pre><code>Warning: Found 1 observation(s) with a pareto_k &gt; 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.</code></pre>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo2</span>)</pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate   SE
-elpd_loo   -895.9 37.8
-p_loo         6.9  2.8
-looic      1791.7 75.6
+elpd_loo   -895.6 37.8
+p_loo         6.7  2.7
+looic      1791.3 75.5
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     261   99.6%   848       
- (0.5, 0.7]   (ok)         0    0.0%   &lt;NA&gt;      
-   (0.7, 1]   (bad)        1    0.4%   47        
+(-Inf, 0.5]   (good)     260   99.2%   2615      
+ (0.5, 0.7]   (ok)         1    0.4%   377       
+   (0.7, 1]   (bad)        1    0.4%   28        
    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
 See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="no">loo2</span>, <span class="kw">label_points</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
-<p><img src="loo2-example_files/figure-html/unnamed-chunk-8-1.png" width="60%" style="display: block; margin: auto;"></p>
-<p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than 0.7 with the index of the corresponding data point. These high values are often the result of model misspecification and frequently correspond to data points that would be considered ``outliers’’ in the data and surprising according to the model <a href="http://arxiv.org/abs/1709.01449">Gabry et al (2019)</a>. Unfortunately, while large <span class="math inline">\(k\)</span> values are a useful indicator of model misspecification, small <span class="math inline">\(k\)</span> values are not a guarantee that a model is well-specified.</p>
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">loo2</span>, <span class="kw">label_points</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<p><img src="loo2-example_files/figure-html/plot-loo2-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than 0.7 with the index of the corresponding data point. These high values are often the result of model misspecification and frequently correspond to data points that would be considered ``outliers’’ in the data and surprising according to the model <a href="https://arxiv.org/abs/1709.01449">Gabry et al (2019)</a>. Unfortunately, while large <span class="math inline">\(k\)</span> values are a useful indicator of model misspecification, small <span class="math inline">\(k\)</span> values are not a guarantee that a model is well-specified.</p>
 <p>If there are a small number of problematic <span class="math inline">\(k\)</span> values then we can use a feature in <strong>rstanarm</strong> that lets us refit the model once for each of these problematic observations. Each time the model is refit, one of the observations with a high <span class="math inline">\(k\)</span> value is omitted and the LOO calculations are performed exactly for that observation. The results are then recombined with the approximate LOO calculations already carried out for the observations without problematic <span class="math inline">\(k\)</span> values:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span>(<span class="fu"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(<span class="no">loo2</span>) <span class="kw">&gt;</span> <span class="fl">0.7</span>)) {
+<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span>(<span class="fu"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span>(<span class="no">loo2</span>) <span class="kw">&gt;</span> <span class="fl">0.7</span>)) {
   <span class="no">loo2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit2</span>, <span class="kw">save_psis</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">k_threshold</span> <span class="kw">=</span> <span class="fl">0.7</span>)
 }</pre></body></html></div>
 <pre><code>1 problematic observation(s) found.
 Model will be refit 1 times.</code></pre>
 <pre><code>
 Fitting model 1 out of 1 (leaving out observation 93)</code></pre>
-<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo2</span>)</pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate   SE
-elpd_loo   -895.8 37.8
-p_loo         6.8  2.7
-looic      1791.6 75.6
+elpd_loo   -895.5 37.7
+p_loo         6.6  2.6
+looic      1791.1 75.4
 ------
 Monte Carlo SE of elpd_loo is 0.2.
 
-All Pareto k estimates are good (k &lt; 0.5).
+Pareto k diagnostic values:
+                         Count Pct.    Min. n_eff
+(-Inf, 0.5]   (good)     260   99.6%   2615      
+ (0.5, 0.7]   (ok)         1    0.4%   377       
+   (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
+   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
+
+All Pareto k estimates are ok (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>In the print output we can see that the Monte Carlo SE is small compared to the other uncertainties.</p>
 <p>On the other hand, <code>p_loo</code> is about 7 and still a bit higher than the total number of parameters in the model. This indicates that there is almost certainly still some degree of model misspecification, but this is much better than the <code>p_loo</code> estimate for the Poisson model.</p>
 <p>For further model checking we again examine the LOO-PIT values.</p>
-<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="no">yrep</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span>(<span class="no">fit2</span>)
+<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="no">yrep</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/posterior_predict.stanreg.html">posterior_predict</a></span>(<span class="no">fit2</span>)
 <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html">ppc_loo_pit_overlay</a></span>(<span class="no">roaches</span>$<span class="no">y</span>, <span class="no">yrep</span>, <span class="kw">lw</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html">weights</a></span>(<span class="no">loo2</span>$<span class="no">psis_object</span>))</pre></body></html></div>
-<p><img src="loo2-example_files/figure-html/unnamed-chunk-10-1.png" width="60%" style="display: block; margin: auto;"></p>
+<pre><code>NOTE: The kernel density estimate assumes continuous observations and is not optimal for discrete observations.</code></pre>
+<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-negbin-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The plot for the negative binomial model looks better than the Poisson plot, but we still see that this model is not capturing all of the essential features in the data.</p>
 </div>
 <div id="comparing-the-models-on-expected-log-predictive-density" class="section level2">
 <h2 class="hasAnchor">
 <a href="#comparing-the-models-on-expected-log-predictive-density" class="anchor"></a>Comparing the models on expected log predictive density</h2>
 <p>We can use the <code>loo_compare</code> function to compare our two models on expected log predictive density (ELPD) for new data:</p>
-<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span>(<span class="no">loo1</span>, <span class="no">loo2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span>(<span class="no">loo1</span>, <span class="no">loo2</span>)</pre></body></html></div>
 <pre><code>     elpd_diff se_diff
 fit2     0.0       0.0
-fit1 -5344.0     706.9</code></pre>
+fit1 -5352.2     709.2</code></pre>
 <p>The difference in ELPD is much larger than several times the estimated standard error of the difference again indicating that the negative-binomial model is expected to have better predictive performance than the Poisson model. However, according to the LOO-PIT checks there is still some misspecification, and a reasonable guess is that a hurdle or zero-inflated model would be an improvement (we leave that for another case study).</p>
 <p><br></p>
 </div>
@@ -337,8 +346,8 @@ fit1 -5344.0     706.9</code></pre>
 <a href="#references" class="anchor"></a>References</h1>
 <p>Gabry, J., Simpson, D., Vehtari, A., Betancourt, M. and Gelman, A. (2019), Visualization in Bayesian workflow. <em>J. R. Stat. Soc. A</em>, 182: 389-402. :10.1111/rssa.12378. (<a href="https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378">journal version</a>, <a href="https://arxiv.org/abs/1709.01449">arXiv preprint</a>, <a href="https://github.com/jgabry/bayes-vis-paper">code on GitHub</a>) <a id="gabry2019"></a></p>
 <p>Gelman, A. and Hill, J. (2007). <em>Data Analysis Using Regression and Multilevel/Hierarchical Models.</em> Cambridge University Press, Cambridge, UK.</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">online</a>, <a href="http://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
 </div>
   </div>
 

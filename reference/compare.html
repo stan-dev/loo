@@ -81,7 +81,7 @@ instead." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -236,24 +236,23 @@ asymptotically, and which only applies to nested models in any case.</p>
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+(<a href='https://link.springer.com/article/10.1007/s11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+<a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
-<span class='no'>loo1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in loo(log_lik1): object 'log_lik1' not found</span></div><div class='input'><span class='no'>loo2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in loo(log_lik2): object 'log_lik2' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>compare</span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'compare' is deprecated.</span>
-#&gt; <span class='warning'>Use 'loo_compare' instead.</span>
-#&gt; <span class='warning'>See help("Deprecated")</span></div><div class='output co'>#&gt; <span class='error'>Error in compare(loo1, loo2): object 'loo1' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>compare</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>)))</div><div class='output co'>#&gt; <span class='warning'>Warning: 'compare' is deprecated.</span>
-#&gt; <span class='warning'>Use 'loo_compare' instead.</span>
-#&gt; <span class='warning'>See help("Deprecated")</span></div><div class='output co'>#&gt; <span class='error'>Error in compare(x = list(loo1, loo2)): object 'loo1' not found</span></div><div class='input'>
-<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik1): object 'log_lik1' not found</span></div><div class='input'><span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in waic(log_lik2): object 'log_lik2' not found</span></div><div class='input'><span class='fu'>compare</span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'compare' is deprecated.</span>
-#&gt; <span class='warning'>Use 'loo_compare' instead.</span>
-#&gt; <span class='warning'>See help("Deprecated")</span></div><div class='output co'>#&gt; <span class='error'>Error in compare(waic1, waic2): object 'waic1' not found</span></div><div class='input'># }
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>loo1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik1</span>)
+<span class='no'>loo2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik2</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>compare</span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>), <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'>compare</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>)))
 
-</div></pre>
+<span class='no'>waic1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik1</span>)
+<span class='no'>waic2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>log_lik2</span>)
+<span class='fu'>compare</span>(<span class='no'>waic1</span>, <span class='no'>waic2</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

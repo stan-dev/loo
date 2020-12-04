@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="loo2-with-rstan_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Writing Stan programs for use with the loo package</h1>
                         <h4 class="author">Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2020-07-07</h4>
+            <h4 class="date">2020-12-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-with-rstan.Rmd"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-with-rstan.Rmd</code></div>
@@ -150,8 +150,8 @@
 <p>This vignette demonstrates how to write a Stan program that computes and stores the pointwise log-likelihood required for using the <strong>loo</strong> package. The other vignettes included with the package demonstrate additional functionality.</p>
 <p>Some sections from this vignette are excerpted from our papers</p>
 <ul>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">published</a> | <a href="http://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
-<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">published</a> | <a href="https://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
+<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
 </ul>
 <p>which provide important background for understanding the methods implemented in the package.</p>
 </div>
@@ -199,7 +199,7 @@ generated quantities {
 <span class="no">standata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">wells</span>$<span class="no">switch</span>, <span class="kw">X</span> <span class="kw">=</span> <span class="no">X</span>, <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">X</span>), <span class="kw">P</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="no">X</span>))
 
 <span class="co"># Fit model</span>
-<span class="no">fit_1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan.html">stan</a></span>(<span class="st">"logistic.stan"</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
+<span class="no">fit_1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span>(<span class="st">"logistic.stan"</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">fit_1</span>, <span class="kw">pars</span> <span class="kw">=</span> <span class="st">"beta"</span>)</pre></body></html></div>
 <pre><code>         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
 beta[1]  0.00       0 0.08 -0.16 -0.05  0.00  0.05  0.15  1964    1
@@ -245,7 +245,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <a href="#comparing-models" class="anchor"></a>Comparing models</h2>
 <p>To compare this model to an alternative model for the same data we can use the <code>loo_compare</code> function in the <strong>loo</strong> package. First we’ll fit a second model to the well-switching data, using <code><a href="https://rdrr.io/r/base/Log.html">log(arsenic)</a></code> instead of <code>arsenic</code> as a predictor:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">standata</span>$<span class="no">X</span>[, <span class="st">"arsenic"</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">standata</span>$<span class="no">X</span>[, <span class="st">"arsenic"</span>])
-<span class="no">fit_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan.html">stan</a></span>(<span class="kw">fit</span> <span class="kw">=</span> <span class="no">fit_1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
+<span class="no">fit_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span>(<span class="kw">fit</span> <span class="kw">=</span> <span class="no">fit_1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
 
 <span class="no">log_lik_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span>(<span class="no">fit_2</span>, <span class="kw">merge_chains</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 <span class="no">r_eff_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">log_lik_2</span>))
@@ -277,10 +277,10 @@ model1 -16.3       4.4  </code></pre>
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
 <p>Gelman, A., and Hill, J. (2007). <em>Data Analysis Using Regression and Multilevel Hierarchical Models.</em> Cambridge University Press.</p>
-<p>Stan Development Team (2017). <em>The Stan C++ Library, Version 2.17.0.</em> <a href="http://mc-stan.org" class="uri">http://mc-stan.org</a></p>
-<p>Stan Development Team (2018) <em>RStan: the R interface to Stan, Version 2.17.3.</em> <a href="http://mc-stan.org" class="uri">http://mc-stan.org</a></p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">online</a>, <a href="http://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
+<p>Stan Development Team (2017). <em>The Stan C++ Library, Version 2.17.0.</em> <a href="https://mc-stan.org/" class="uri">https://mc-stan.org/</a></p>
+<p>Stan Development Team (2018) <em>RStan: the R interface to Stan, Version 2.17.3.</em> <a href="https://mc-stan.org/" class="uri">https://mc-stan.org/</a></p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
 </div>
   </div>
 

@@ -81,7 +81,7 @@ K-fold cross-validation. See the Details section for explanations." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -223,26 +223,26 @@ randomized.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_random</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>N</span> <span class='kw'>=</span> <span class='fl'>20</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;  [1] 5 2 2 4 4 4 3 5 4 5 2 3 1 1 3 3 1 1 2 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt; ids
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;  [1] 5 1 1 3 4 3 2 4 2 4 3 5 4 1 2 1 5 2 3 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt; ids
 #&gt; 1 2 3 4 5 
 #&gt; 4 4 4 4 4 </div><div class='input'>
 
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>), <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.05</span>, <span class='fl'>0.95</span>))
 <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; x
 #&gt;   0   1 
-#&gt;  13 187 </div><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_stratified</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;   [1] 2 5 4 2 4 3 4 1 3 1 4 5 3 4 2 1 3 1 3 3 1 3 4 3 3 1 1 5 2 1 5 2 3 2 4 3 1
-#&gt;  [38] 4 4 2 3 4 3 1 4 2 5 2 2 3 4 1 5 2 1 5 5 1 5 5 2 5 4 5 1 1 3 4 3 1 3 3 2 1
-#&gt;  [75] 5 3 1 4 4 4 2 1 2 5 2 5 2 2 3 3 2 2 1 1 4 4 4 1 3 5 4 3 4 3 3 4 1 2 5 4 1
-#&gt; [112] 5 2 5 4 3 2 4 2 4 1 4 3 3 3 1 4 4 2 5 2 1 2 2 3 5 2 3 4 5 3 1 3 2 5 5 5 5
-#&gt; [149] 5 4 1 4 4 4 2 2 1 5 5 1 5 3 5 2 3 2 4 4 5 2 5 1 5 4 5 3 5 1 3 5 2 1 4 2 2
-#&gt; [186] 2 3 4 1 1 1 1 5 3 1 1 5 2 3 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>, <span class='no'>x</span>)</div><div class='output co'>#&gt;    x
+#&gt;   7 193 </div><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_stratified</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;   [1] 2 2 3 1 2 3 1 2 5 1 1 3 3 1 5 2 5 4 1 3 2 1 2 1 5 2 2 1 4 1 1 2 4 5 3 4 4
+#&gt;  [38] 3 3 3 5 1 5 4 3 4 4 4 4 5 3 5 3 1 5 5 5 4 1 3 4 2 1 5 5 2 5 4 2 3 5 2 3 5
+#&gt;  [75] 5 1 5 4 1 2 5 5 1 3 1 4 3 3 1 2 3 3 4 5 4 3 3 5 4 3 2 3 2 5 3 4 2 5 5 4 4
+#&gt; [112] 4 1 1 1 4 5 5 2 2 3 2 5 1 5 1 2 1 2 4 4 2 1 2 4 4 1 1 2 2 4 5 4 4 2 2 1 4
+#&gt; [149] 1 3 3 2 2 4 4 2 1 5 4 3 3 4 3 1 4 5 1 3 2 2 1 5 4 1 5 3 3 4 5 3 5 2 2 2 2
+#&gt; [186] 4 3 3 5 3 1 5 4 3 1 2 3 1 1 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>, <span class='no'>x</span>)</div><div class='output co'>#&gt;    x
 #&gt; ids  0  1
-#&gt;   1  3 37
-#&gt;   2  3 37
-#&gt;   3  3 37
-#&gt;   4  2 38
-#&gt;   5  2 38</div><div class='input'>
+#&gt;   1  2 38
+#&gt;   2  2 38
+#&gt;   3  1 39
+#&gt;   4  1 39
+#&gt;   5  1 39</div><div class='input'>
 <span class='no'>grp</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='no'>state.name</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>grp</span>)</div><div class='output co'>#&gt; [1] 750</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>))</div><div class='output co'>#&gt; grp
 #&gt;    Alabama     Alaska    Arizona   Arkansas California   Colorado 
@@ -250,110 +250,110 @@ randomized.</p>
 <span class='no'>ids_10</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_grouped</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>grp</span>)
 (<span class='no'>tab_10</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>, <span class='no'>ids_10</span>))</div><div class='output co'>#&gt;                 ids_10
 #&gt; grp               1  2  3  4  5  6  7  8  9 10
-#&gt;   Alabama        15  0  0  0  0  0  0  0  0  0
-#&gt;   Alaska          0  0  0  0  0 15  0  0  0  0
-#&gt;   Arizona         0  0  0  0  0  0  0  0  0 15
-#&gt;   Arkansas        0  0  0  0  0  0 15  0  0  0
-#&gt;   California      0  0  0  0  0  0  0 15  0  0
-#&gt;   Colorado        0  0 15  0  0  0  0  0  0  0
-#&gt;   Connecticut     0 15  0  0  0  0  0  0  0  0
-#&gt;   Delaware        0 15  0  0  0  0  0  0  0  0
-#&gt;   Florida         0 15  0  0  0  0  0  0  0  0
-#&gt;   Georgia         0  0  0  0  0  0  0  0 15  0
-#&gt;   Hawaii          0  0  0  0  0  0  0  0 15  0
-#&gt;   Idaho           0  0  0  0  0  0  0 15  0  0
-#&gt;   Illinois        0  0  0  0  0  0  0 15  0  0
-#&gt;   Indiana        15  0  0  0  0  0  0  0  0  0
-#&gt;   Iowa            0  0  0  0  0  0  0  0  0 15
-#&gt;   Kansas          0  0  0  0  0  0  0  0 15  0
-#&gt;   Kentucky        0  0  0  0  0  0  0  0 15  0
-#&gt;   Louisiana      15  0  0  0  0  0  0  0  0  0
-#&gt;   Maine           0 15  0  0  0  0  0  0  0  0
-#&gt;   Maryland        0  0  0  0  0  0  0  0  0 15
-#&gt;   Massachusetts   0  0  0  0  0  0  0  0  0 15
-#&gt;   Michigan        0  0 15  0  0  0  0  0  0  0
-#&gt;   Minnesota       0  0  0  0 15  0  0  0  0  0
-#&gt;   Mississippi     0  0  0  0 15  0  0  0  0  0
-#&gt;   Missouri        0  0  0 15  0  0  0  0  0  0
-#&gt;   Montana         0  0  0  0  0 15  0  0  0  0
-#&gt;   Nebraska        0  0  0  0  0  0 15  0  0  0
-#&gt;   Nevada          0  0  0  0  0  0  0  0  0 15
-#&gt;   New Hampshire   0  0  0  0  0 15  0  0  0  0
-#&gt;   New Jersey      0  0 15  0  0  0  0  0  0  0
-#&gt;   New Mexico      0  0  0  0  0  0  0 15  0  0
-#&gt;   New York        0  0  0  0  0  0 15  0  0  0
-#&gt;   North Carolina 15  0  0  0  0  0  0  0  0  0
+#&gt;   Alabama         0  0  0  0  0 15  0  0  0  0
+#&gt;   Alaska          0 15  0  0  0  0  0  0  0  0
+#&gt;   Arizona         0  0  0  0  0  0  0 15  0  0
+#&gt;   Arkansas        0  0  0  0  0  0  0  0  0 15
+#&gt;   California      0  0  0  0 15  0  0  0  0  0
+#&gt;   Colorado        0  0  0  0 15  0  0  0  0  0
+#&gt;   Connecticut     0  0  0 15  0  0  0  0  0  0
+#&gt;   Delaware        0  0  0  0 15  0  0  0  0  0
+#&gt;   Florida         0  0  0  0  0  0  0  0 15  0
+#&gt;   Georgia         0  0 15  0  0  0  0  0  0  0
+#&gt;   Hawaii         15  0  0  0  0  0  0  0  0  0
+#&gt;   Idaho           0  0 15  0  0  0  0  0  0  0
+#&gt;   Illinois        0  0  0  0  0 15  0  0  0  0
+#&gt;   Indiana         0  0  0  0  0  0  0  0 15  0
+#&gt;   Iowa            0  0  0  0  0  0  0  0 15  0
+#&gt;   Kansas          0  0  0  0  0  0  0  0  0 15
+#&gt;   Kentucky        0  0  0  0  0  0 15  0  0  0
+#&gt;   Louisiana       0  0  0  0  0  0  0 15  0  0
+#&gt;   Maine           0  0  0  0  0  0  0  0 15  0
+#&gt;   Maryland        0 15  0  0  0  0  0  0  0  0
+#&gt;   Massachusetts   0  0  0 15  0  0  0  0  0  0
+#&gt;   Michigan       15  0  0  0  0  0  0  0  0  0
+#&gt;   Minnesota       0  0  0  0  0  0  0 15  0  0
+#&gt;   Mississippi    15  0  0  0  0  0  0  0  0  0
+#&gt;   Missouri        0  0  0  0  0  0  0 15  0  0
+#&gt;   Montana         0  0  0 15  0  0  0  0  0  0
+#&gt;   Nebraska        0  0 15  0  0  0  0  0  0  0
+#&gt;   Nevada          0 15  0  0  0  0  0  0  0  0
+#&gt;   New Hampshire   0  0  0  0  0  0  0  0  0 15
+#&gt;   New Jersey      0  0  0  0 15  0  0  0  0  0
+#&gt;   New Mexico      0  0  0  0  0  0 15  0  0  0
+#&gt;   New York        0  0  0  0  0  0  0  0  0 15
+#&gt;   North Carolina  0  0  0  0  0  0  0  0 15  0
 #&gt;   North Dakota    0  0  0  0  0  0 15  0  0  0
-#&gt;   Ohio            0  0  0  0  0  0  0  0 15  0
-#&gt;   Oklahoma        0  0  0  0 15  0  0  0  0  0
-#&gt;   Oregon          0  0  0 15  0  0  0  0  0  0
-#&gt;   Pennsylvania    0  0  0  0  0  0 15  0  0  0
-#&gt;   Rhode Island    0  0  0  0  0 15  0  0  0  0
+#&gt;   Ohio            0 15  0  0  0  0  0  0  0  0
+#&gt;   Oklahoma        0  0 15  0  0  0  0  0  0  0
+#&gt;   Oregon         15  0  0  0  0  0  0  0  0  0
+#&gt;   Pennsylvania    0  0  0  0  0 15  0  0  0  0
+#&gt;   Rhode Island    0 15  0  0  0  0  0  0  0  0
 #&gt;   South Carolina  0  0  0 15  0  0  0  0  0  0
-#&gt;   South Dakota    0  0 15  0  0  0  0  0  0  0
-#&gt;   Tennessee      15  0  0  0  0  0  0  0  0  0
+#&gt;   South Dakota    0  0  0  0  0  0 15  0  0  0
+#&gt;   Tennessee       0  0  0  0  0 15  0  0  0  0
 #&gt;   Texas           0  0  0  0 15  0  0  0  0  0
-#&gt;   Utah            0  0 15  0  0  0  0  0  0  0
-#&gt;   Vermont         0  0  0  0  0  0  0 15  0  0
-#&gt;   Virginia        0  0  0 15  0  0  0  0  0  0
-#&gt;   Washington      0 15  0  0  0  0  0  0  0  0
-#&gt;   West Virginia   0  0  0  0  0 15  0  0  0  0
-#&gt;   Wisconsin       0  0  0 15  0  0  0  0  0  0
-#&gt;   Wyoming         0  0  0  0 15  0  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_10</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 10 
+#&gt;   Utah           15  0  0  0  0  0  0  0  0  0
+#&gt;   Vermont         0  0  0  0  0  0  0  0  0 15
+#&gt;   Virginia        0  0 15  0  0  0  0  0  0  0
+#&gt;   Washington      0  0  0  0  0  0 15  0  0  0
+#&gt;   West Virginia   0  0  0 15  0  0  0  0  0  0
+#&gt;   Wisconsin       0  0  0  0  0  0  0 15  0  0
+#&gt;   Wyoming         0  0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_10</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 10 
 #&gt; 75 75 75 75 75 75 75 75 75 75 </div><div class='input'>
 <span class='no'>ids_9</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_grouped</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>9</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>grp</span>)
 (<span class='no'>tab_9</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>, <span class='no'>ids_9</span>))</div><div class='output co'>#&gt;                 ids_9
 #&gt; grp               1  2  3  4  5  6  7  8  9
-#&gt;   Alabama         0  0  0  0  0  0  0  0 15
-#&gt;   Alaska          0  0 15  0  0  0  0  0  0
-#&gt;   Arizona         0  0 15  0  0  0  0  0  0
-#&gt;   Arkansas        0  0  0  0  0  0  0 15  0
-#&gt;   California      0  0  0  0 15  0  0  0  0
-#&gt;   Colorado        0  0  0 15  0  0  0  0  0
+#&gt;   Alabama         0  0  0  0 15  0  0  0  0
+#&gt;   Alaska          0  0  0  0  0  0  0  0 15
+#&gt;   Arizona         0  0  0  0  0 15  0  0  0
+#&gt;   Arkansas        0  0 15  0  0  0  0  0  0
+#&gt;   California      0  0  0 15  0  0  0  0  0
+#&gt;   Colorado        0 15  0  0  0  0  0  0  0
 #&gt;   Connecticut     0  0  0  0  0  0 15  0  0
-#&gt;   Delaware        0  0  0  0  0  0  0 15  0
-#&gt;   Florida         0  0  0 15  0  0  0  0  0
-#&gt;   Georgia         0  0  0  0 15  0  0  0  0
-#&gt;   Hawaii          0  0  0 15  0  0  0  0  0
-#&gt;   Idaho           0  0  0  0  0  0  0  0 15
-#&gt;   Illinois       15  0  0  0  0  0  0  0  0
-#&gt;   Indiana         0  0 15  0  0  0  0  0  0
-#&gt;   Iowa            0  0 15  0  0  0  0  0  0
-#&gt;   Kansas         15  0  0  0  0  0  0  0  0
-#&gt;   Kentucky        0  0  0  0 15  0  0  0  0
-#&gt;   Louisiana       0 15  0  0  0  0  0  0  0
-#&gt;   Maine           0  0  0  0  0  0 15  0  0
+#&gt;   Delaware        0  0  0  0  0  0 15  0  0
+#&gt;   Florida         0  0  0  0  0 15  0  0  0
+#&gt;   Georgia         0  0  0  0  0  0  0 15  0
+#&gt;   Hawaii          0  0  0  0  0  0 15  0  0
+#&gt;   Idaho           0  0  0  0  0  0  0 15  0
+#&gt;   Illinois        0  0  0  0  0 15  0  0  0
+#&gt;   Indiana        15  0  0  0  0  0  0  0  0
+#&gt;   Iowa            0  0  0  0  0  0  0  0 15
+#&gt;   Kansas          0  0  0  0 15  0  0  0  0
+#&gt;   Kentucky       15  0  0  0  0  0  0  0  0
+#&gt;   Louisiana       0  0  0  0  0  0  0 15  0
+#&gt;   Maine           0  0  0  0  0  0  0 15  0
 #&gt;   Maryland        0  0 15  0  0  0  0  0  0
 #&gt;   Massachusetts   0  0  0  0 15  0  0  0  0
-#&gt;   Michigan        0  0  0  0  0 15  0  0  0
-#&gt;   Minnesota       0 15  0  0  0  0  0  0  0
-#&gt;   Mississippi    15  0  0  0  0  0  0  0  0
-#&gt;   Missouri        0  0  0  0  0  0 15  0  0
-#&gt;   Montana         0  0  0  0  0  0  0 15  0
-#&gt;   Nebraska        0  0  0 15  0  0  0  0  0
-#&gt;   Nevada          0  0  0  0 15  0  0  0  0
-#&gt;   New Hampshire   0  0  0  0  0 15  0  0  0
-#&gt;   New Jersey      0 15  0  0  0  0  0  0  0
+#&gt;   Michigan        0 15  0  0  0  0  0  0  0
+#&gt;   Minnesota       0  0  0  0  0  0 15  0  0
+#&gt;   Mississippi     0 15  0  0  0  0  0  0  0
+#&gt;   Missouri        0  0 15  0  0  0  0  0  0
+#&gt;   Montana         0  0  0 15  0  0  0  0  0
+#&gt;   Nebraska        0  0  0  0 15  0  0  0  0
+#&gt;   Nevada          0 15  0  0  0  0  0  0  0
+#&gt;   New Hampshire   0  0 15  0  0  0  0  0  0
+#&gt;   New Jersey      0  0  0  0  0  0  0  0 15
 #&gt;   New Mexico      0 15  0  0  0  0  0  0  0
 #&gt;   New York       15  0  0  0  0  0  0  0  0
-#&gt;   North Carolina  0  0  0  0  0  0 15  0  0
-#&gt;   North Dakota    0  0  0  0  0  0  0  0 15
-#&gt;   Ohio           15  0  0  0  0  0  0  0  0
-#&gt;   Oklahoma        0  0 15  0  0  0  0  0  0
+#&gt;   North Carolina  0  0 15  0  0  0  0  0  0
+#&gt;   North Dakota   15  0  0  0  0  0  0  0  0
+#&gt;   Ohio            0  0  0  0  0  0  0  0 15
+#&gt;   Oklahoma        0  0  0  0  0 15  0  0  0
 #&gt;   Oregon          0  0  0  0  0  0  0  0 15
-#&gt;   Pennsylvania    0  0  0  0  0  0  0  0 15
-#&gt;   Rhode Island    0  0  0 15  0  0  0  0  0
-#&gt;   South Carolina  0 15  0  0  0  0  0  0  0
+#&gt;   Pennsylvania    0  0  0  0 15  0  0  0  0
+#&gt;   Rhode Island    0  0  0  0  0  0 15  0  0
+#&gt;   South Carolina  0  0  0 15  0  0  0  0  0
 #&gt;   South Dakota    0 15  0  0  0  0  0  0  0
-#&gt;   Tennessee       0  0  0  0  0 15  0  0  0
+#&gt;   Tennessee       0  0  0  0  0  0  0 15  0
 #&gt;   Texas           0  0  0 15  0  0  0  0  0
-#&gt;   Utah            0  0  0  0  0  0 15  0  0
-#&gt;   Vermont         0  0  0  0  0 15  0  0  0
-#&gt;   Virginia        0  0  0  0 15  0  0  0  0
-#&gt;   Washington     15  0  0  0  0  0  0  0  0
-#&gt;   West Virginia   0  0  0  0  0  0  0 15  0
-#&gt;   Wisconsin       0  0  0  0  0  0  0 15  0
-#&gt;   Wyoming         0  0  0  0  0 15  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_9</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 
+#&gt;   Utah            0  0 15  0  0  0  0  0  0
+#&gt;   Vermont         0  0  0 15  0  0  0  0  0
+#&gt;   Virginia       15  0  0  0  0  0  0  0  0
+#&gt;   Washington      0  0  0  0  0 15  0  0  0
+#&gt;   West Virginia   0  0  0 15  0  0  0  0  0
+#&gt;   Wisconsin      15  0  0  0  0  0  0  0  0
+#&gt;   Wyoming         0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_9</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 
 #&gt; 90 90 90 90 90 75 75 75 75 </div><div class='input'>
 </div></pre>
   </div>

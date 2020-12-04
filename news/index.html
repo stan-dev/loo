@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -88,7 +88,7 @@
         <li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -103,7 +103,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -141,28 +141,28 @@
         <li>
   <a href="https://twitter.com/mcmc_stan">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -173,20 +173,40 @@
       <small>Source: <a href='https://github.com/stan-dev/loo/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="loo-240" class="section level1">
+<h1 class="page-header" data-toc-text="2.4.0">
+<a href="#loo-240" class="anchor"></a>loo 2.4.0<small> Unreleased </small>
+</h1>
+<div id="bug-fixes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h3>
+<ul>
+<li><p>Fixed a bug in <code><a href="../reference/relative_eff.html">relative_eff.function()</a></code> that caused an error on Windows when using multiple cores. (<a href='https://github.com/stan-dev/loo/issues/152'>#152</a>)</p></li>
+<li><p>Fixed a potential numerical issue in <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> with <code>split=TRUE</code>. (<a href='https://github.com/stan-dev/loo/issues/153'>#153</a>)</p></li>
+<li><p>Fixed potential integer overflow with <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code>. (<a href='https://github.com/stan-dev/loo/issues/155'>#155</a>, <a href='https://github.com/ecmerkle'>@ecmerkle</a>)</p></li>
+<li><p>Fixed <code><a href="../reference/relative_eff.html">relative_eff()</a></code> when used with a <code><a href="https://mc-stan.org/posterior/reference/draws_array.html">posterior::draws_array</a></code>. (<a href='https://github.com/stan-dev/loo/issues/161'>#161</a>, <a href='https://github.com/rok-cesnovar'>@rok-cesnovar</a>)</p></li>
+</ul>
+</div>
+<div id="new-features" class="section level3">
+<h3 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h3>
+<ul>
+<li>New generic function <code><a href="../reference/elpd.html">elpd()</a></code> (and methods for matrices and arrays) for computing expected log predictive density of new data or log predictive density of observed data. A new vignette demonstrates using this function when doing K-fold CV with rstan. (<a href='https://github.com/stan-dev/loo/issues/159'>#159</a>, <a href='https://github.com/bnicenboim'>@bnicenboim</a>)</li>
+</ul>
+</div>
+</div>
     <div id="loo-231" class="section level1">
 <h1 class="page-header" data-toc-text="2.3.1">
 <a href="#loo-231" class="anchor"></a>loo 2.3.1<small> 2020-07-14 </small>
 </h1>
-<p>(GitHub issue/PR number in parentheses)</p>
 <ul>
-<li>Fix a bug in <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> that prevented <code>...</code> arguments from being used correctly. (<a href='https://github.com/stan-dev/loo/issues/149'>#149</a>)</li>
+<li>Fixed a bug in <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> that prevented <code>...</code> arguments from being used correctly. (<a href='https://github.com/stan-dev/loo/issues/149'>#149</a>)</li>
 </ul>
 </div>
     <div id="loo-230" class="section level1">
 <h1 class="page-header" data-toc-text="2.3.0">
 <a href="#loo-230" class="anchor"></a>loo 2.3.0<small> 2020-07-07 </small>
 </h1>
-<p>(GitHub issue/PR number in parentheses)</p>
 <ul>
 <li><p>Added Topi Paananen and Paul Bürkner as coauthors.</p></li>
 <li><p>New function <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> (and new vignette), which can be used to update a <code>loo</code> object when Pareto k estimates are large. (<a href='https://github.com/stan-dev/loo/issues/130'>#130</a>)</p></li>
@@ -198,7 +218,6 @@
 <h1 class="page-header" data-toc-text="2.2.0">
 <a href="#loo-220" class="anchor"></a>loo 2.2.0<small> 2019-12-19 </small>
 </h1>
-<p>(GitHub issue/PR number in parentheses)</p>
 <ul>
 <li><p>Added Mans Magnusson as a coauthor.</p></li>
 <li><p>New functions <code><a href="../reference/loo_subsample.html">loo_subsample()</a></code> and <code><a href="../reference/loo_approximate_posterior.html">loo_approximate_posterior()</a></code> (and new vignette) for doing PSIS-LOO with large data. (<a href='https://github.com/stan-dev/loo/issues/113'>#113</a>)</p></li>
@@ -213,7 +232,6 @@
 <h1 class="page-header" data-toc-text="2.1.0">
 <a href="#loo-210" class="anchor"></a>loo 2.1.0<small> 2019-03-13 </small>
 </h1>
-<p>(GitHub issue/PR number in parentheses)</p>
 <ul>
 <li><p>New function <code><a href="../reference/loo_compare.html">loo_compare()</a></code> for model comparison that will eventually replace the existing <code><a href="../reference/compare.html">compare()</a></code> function. (<a href='https://github.com/stan-dev/loo/issues/93'>#93</a>)</p></li>
 <li><p>New vignette on LOO for non-factorizable joint Gaussian models. (<a href='https://github.com/stan-dev/loo/issues/75'>#75</a>)</p></li>
@@ -250,7 +268,7 @@
 <a href="#loo-110" class="anchor"></a>loo 1.1.0<small> 2017-03-27 </small>
 </h1>
 <ul>
-<li>Introduce the <code>E_loo</code> function for computing weighted expectations (means, variances, quantiles).</li>
+<li>Introduce the <code><a href="../reference/E_loo.html">E_loo()</a></code> function for computing weighted expectations (means, variances, quantiles).</li>
 </ul>
 </div>
     <div id="loo-100" class="section level1">
@@ -259,13 +277,13 @@
 </h1>
 <ul>
 <li>
-<code>pareto_k_table</code> and <code>pareto_k_ids</code> convenience functions for quickly identifying problematic observations</li>
+<code><a href="../reference/pareto-k-diagnostic.html">pareto_k_table()</a></code> and <code><a href="../reference/pareto-k-diagnostic.html">pareto_k_ids()</a></code> convenience functions for quickly identifying problematic observations</li>
 <li>pareto k values now grouped into <code>(-Inf, 0.5]</code>, <code>(0.5, 0.7]</code>, <code>(0.7, 1]</code>, <code>(1, Inf)</code> (didn’t used to include 0.7)</li>
-<li>warning messages are now issued by <code>psislw</code> instead of <code>print.loo</code>
+<li>warning messages are now issued by <code><a href="../reference/psislw.html">psislw()</a></code> instead of <code>print.loo</code>
 </li>
 <li>
-<code>print.loo</code> shows a table of pareto k estimates (if any k &gt; 0.7)</li>
-<li>Add argument to <code>compare</code> to allow loo objects to be provided in a list rather than in <code>'...'</code>
+<code><a href="../reference/print.loo.html">print.loo()</a></code> shows a table of pareto k estimates (if any k &gt; 0.7)</li>
+<li>Add argument to <code><a href="../reference/compare.html">compare()</a></code> to allow loo objects to be provided in a list rather than in <code>'...'</code>
 </li>
 <li>Update references to point to published paper</li>
 </ul>
@@ -276,7 +294,7 @@
 </h1>
 <ul>
 <li>GitHub repository moved from <a href='https://github.com/jgabry'>@jgabry</a> to <a href='https://github.com/stan-dev'>@stan-dev</a></li>
-<li>Better error messages from <code>extract_log_lik</code>
+<li>Better error messages from <code><a href="../reference/extract_log_lik.html">extract_log_lik()</a></code>
 </li>
 <li>Fix example code in vignette (thanks to GitHub user <a href='https://github.com/krz'>@krz</a>)</li>
 </ul>
@@ -289,7 +307,7 @@
 <li>Add warnings if any p_waic estimates are greather than 0.4</li>
 <li>Improve line coverage of tests to 100%</li>
 <li>Update references in documentation</li>
-<li>Remove model weights from <code>compare</code>. <br> In previous versions of <strong>loo</strong> model weights were also reported by <code>compare</code>. We have removed the weights because they were based only on the point estimate of the elpd values ignoring the uncertainty. We are currently working on something similar to these weights that also accounts for uncertainty, which will be included in future versions of <strong>loo</strong>.</li>
+<li>Remove model weights from <code><a href="../reference/compare.html">compare()</a></code>. In previous versions of <strong>loo</strong> model weights were also reported by <code><a href="../reference/compare.html">compare()</a></code>. We have removed the weights because they were based only on the point estimate of the elpd values ignoring the uncertainty. We are currently working on something similar to these weights that also accounts for uncertainty, which will be included in future versions of <strong>loo</strong>.</li>
 </ul>
 </div>
     <div id="loo-014" class="section level1">
@@ -310,7 +328,7 @@
 <p>This update provides several important improvements, most notably an alternative method for specifying the pointwise log-likelihood that reduces memory usage and allows for <strong>loo</strong> to be used with larger datasets. This update also makes it easier to to incorporate <strong>loo</strong>’s functionality into other packages.</p>
 <ul>
 <li>Add Ben Goodrich as contributor</li>
-<li>S3 generics and <code>matrix</code> and <code>function</code> methods for both <code>loo</code> and <code>waic</code>. The matrix method provide the same functionality as in previous versions of <strong>loo</strong> (taking a log-likelihood matrix as the input). The function method allows the user to provide a function for computing the log-likelihood from the data and posterior draws (which are also provided by the user). The function method is less memory intensive and should make it possible to use <strong>loo</strong> for models fit to larger amounts of data than before.</li>
+<li>S3 generics and <code>matrix</code> and <code>function</code> methods for both <code><a href="../reference/loo.html">loo()</a></code> and <code><a href="../reference/waic.html">waic()</a></code>. The matrix method provide the same functionality as in previous versions of <strong>loo</strong> (taking a log-likelihood matrix as the input). The function method allows the user to provide a function for computing the log-likelihood from the data and posterior draws (which are also provided by the user). The function method is less memory intensive and should make it possible to use <strong>loo</strong> for models fit to larger amounts of data than before.</li>
 <li>Separate <code>plot</code> and <code>print</code> methods. <code>plot</code> also provides <code>label_points</code> argument, which, if <code>TRUE</code>, will label any Pareto <code>k</code> points greater than 1/2 by the index number of the corresponding observation. The plot method also now warns about <code>Inf</code>/<code>NA</code>/<code>NaN</code> values of <code>k</code> that are not shown in the plot.</li>
 <li>
 <code>compare</code> now returns model weights and accepts more than two inputs.</li>
@@ -367,7 +385,7 @@
       </footer>
    </div>
 
-
+  
 
 
   </body>

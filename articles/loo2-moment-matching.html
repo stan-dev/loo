@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="loo2-moment-matching_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Avoiding model refits in leave-one-out cross-validation with moment matching</h1>
                         <h4 class="author">Topi Paananen, Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2020-07-07</h4>
+            <h4 class="date">2020-12-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-moment-matching.Rmd"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-moment-matching.Rmd</code></div>
@@ -150,23 +150,23 @@
 <p>This vignette demonstrates how to improve the Monte Carlo sampling accuracy of leave-one-out cross-validation with the <strong>loo</strong> package and Stan. The <strong>loo</strong> package automatically monitors the sampling accuracy using Pareto <span class="math inline">\(k\)</span> diagnostics for each observation. Here, we present a method for quickly improving the accuracy when the Pareto diagnostics indicate problems. This is done by performing some additional computations using the existing posterior sample. If successful, this will decrease the Pareto <span class="math inline">\(k\)</span> values, making the model assessment more reliable. <strong>loo</strong> also stores the original Pareto <span class="math inline">\(k\)</span> values with the name <code>influence_pareto_k</code> which are not changed. They can be used as a diagnostic of how much each observation influences the posterior distribution.</p>
 <p>The methodology presented is based on the paper</p>
 <ul>
-<li>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020). Implicitly Adaptive Importance Sampling. <a href="http://arxiv.org/abs/1906.08850">arXiv preprint arXiv:1906.08850</a>.</li>
+<li>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020). Implicitly Adaptive Importance Sampling. <a href="https://arxiv.org/abs/1906.08850">arXiv preprint arXiv:1906.08850</a>.</li>
 </ul>
 <p>More information about the Pareto <span class="math inline">\(k\)</span> diagnostics is given in the following papers</p>
 <ul>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">published</a> | <a href="http://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
-<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p></li>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">published</a> | <a href="https://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p></li>
+<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p></li>
 </ul>
 </div>
 <div id="example-eradication-of-roaches" class="section level1">
 <h1 class="hasAnchor">
 <a href="#example-eradication-of-roaches" class="anchor"></a>Example: Eradication of Roaches</h1>
-<p>We will use the same example as in the vignette <a href="http://mc-stan.org/loo/articles/loo2-example.html"><em>Using the loo package (version &gt;= 2.0.0)</em></a>. See the demo for a description of the problem and data. We will use the same Poisson regression model as in the case study.</p>
+<p>We will use the same example as in the vignette <a href="https://mc-stan.org/loo/articles/loo2-example.html"><em>Using the loo package (version &gt;= 2.0.0)</em></a>. See the demo for a description of the problem and data. We will use the same Poisson regression model as in the case study.</p>
 <div id="coding-the-stan-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#coding-the-stan-model" class="anchor"></a>Coding the Stan model</h2>
-<p>Here is the Stan code for fitting the Poisson regression model, which we will use for modelling the number of roaches.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="no">stancode</span> <span class="kw">=</span> <span class="st">"
+<p>Here is the Stan code for fitting the Poisson regression model, which we will use for modeling the number of roaches.</p>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="no">stancode</span> <span class="kw">&lt;-</span> <span class="st">"
 data {
   int&lt;lower=1&gt; K;
   int&lt;lower=1&gt; N;
@@ -219,89 +219,58 @@ generated quantities {
 <span class="no">standata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">N</span> <span class="kw">=</span> <span class="no">n</span>, <span class="kw">K</span> <span class="kw">=</span> <span class="no">k</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">x</span>), <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">offset</span> <span class="kw">=</span> <span class="no">offset</span>, <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>, <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>)
 
 <span class="co"># Compile</span>
-<span class="no">stanmodel</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan_model.html">stan_model</a></span>(<span class="kw">model_code</span> <span class="kw">=</span> <span class="no">stancode</span>)</pre></body></html></div>
-<pre><code>Trying to compile a simple C file</code></pre>
-<pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
-clang -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -D_REENTRANT  -DBOOST_DISABLE_ASSERTS -DBOOST_PENDING_INTEGER_LOG2_HPP -include stan/math/prim/mat/fun/Eigen.hpp   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include  -fPIC  -Wall -g -O2  -c foo.c -o foo.o
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:88:
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
-namespace Eigen {
-^
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
-namespace Eigen {
-               ^
-               ;
-In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
-In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
-/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
-#include &lt;complex&gt;
-         ^~~~~~~~~
-3 errors generated.
-make: *** [foo.o] Error 1</code></pre>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Fit model</span>
-<span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanmodel-method-sampling.html">sampling</a></span>(<span class="no">stanmodel</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>, <span class="kw">refresh</span> <span class="kw">=</span> <span class="fl">0</span>)
+<span class="no">stanmodel</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html">stan_model</a></span>(<span class="kw">model_code</span> <span class="kw">=</span> <span class="no">stancode</span>)
+
+<span class="co"># Fit model</span>
+<span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span>(<span class="no">stanmodel</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>, <span class="kw">refresh</span> <span class="kw">=</span> <span class="fl">0</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">fit</span>, <span class="kw">pars</span> <span class="kw">=</span> <span class="st">"beta"</span>)</pre></body></html></div>
-<pre><code>Inference for Stan model: 73ed397b74a7b4968fc8fce8b1300023.
-4 chains, each with iter=2000; warmup=1000; thin=1; 
-post-warmup draws per chain=1000, total post-warmup draws=4000.
-
-         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
-beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2806    1
-beta[2] -0.57       0 0.03 -0.62 -0.58 -0.57 -0.55 -0.52  2368    1
-beta[3] -0.31       0 0.03 -0.38 -0.34 -0.31 -0.29 -0.25  2575    1
-
-Samples were drawn using NUTS(diag_e) at Tue Jul  7 17:49:34 2020.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).</code></pre>
 <p>Let us now evaluate the predictive performance of the model using <code><a href="../reference/loo.html">loo()</a></code>.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">loo1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">loo1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>)</pre></body></html></div>
 <pre><code>Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">loo1</span></pre></body></html></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">loo1</span></pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate     SE
-elpd_loo  -5458.7  694.1
-p_loo       257.9   55.7
-looic     10917.3 1388.2
+elpd_loo  -5459.4  694.7
+p_loo       251.7   53.7
+looic     10918.9 1389.3
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     238   90.8%   284       
- (0.5, 0.7]   (ok)         9    3.4%   65        
-   (0.7, 1]   (bad)        7    2.7%   24        
-   (1, Inf)   (very bad)   8    3.1%   2         
+(-Inf, 0.5]   (good)     235   89.7%   270       
+ (0.5, 0.7]   (ok)        10    3.8%   65        
+   (0.7, 1]   (bad)        9    3.4%   23        
+   (1, Inf)   (very bad)   8    3.1%   1         
 See help('pareto-k-diagnostic') for details.</code></pre>
-<p>The <code><a href="../reference/loo.html">loo()</a></code> function output warnings that there are some observations which are highly influential, and thus the accuracy of importance sampling is compromised as indicated by the large Pareto <span class="math inline">\(k\)</span> diagnostic values (&gt; 0.7). As discussed in the vignette <a href="http://mc-stan.org/loo/articles/loo2-example.html"><em>Using the loo package (version &gt;= 2.0.0)</em></a>, this may be an indication of model misspecification. Despite that, it is still beneficial to be able to evaluate the predictive performance of the model accurately.</p>
+<p>The <code><a href="../reference/loo.html">loo()</a></code> function output warnings that there are some observations which are highly influential, and thus the accuracy of importance sampling is compromised as indicated by the large Pareto <span class="math inline">\(k\)</span> diagnostic values (&gt; 0.7). As discussed in the vignette <a href="https://mc-stan.org/loo/articles/loo2-example.html"><em>Using the loo package (version &gt;= 2.0.0)</em></a>, this may be an indication of model misspecification. Despite that, it is still beneficial to be able to evaluate the predictive performance of the model accurately.</p>
 </div>
 <div id="moment-matching-correction-for-importance-sampling" class="section level2">
 <h2 class="hasAnchor">
 <a href="#moment-matching-correction-for-importance-sampling" class="anchor"></a>Moment matching correction for importance sampling</h2>
 <p>To improve the accuracy of the <code><a href="../reference/loo.html">loo()</a></code> result above, we could perform leave-one-out cross-validation by explicitly leaving out single observations and refitting the model using MCMC repeatedly. However, the Pareto <span class="math inline">\(k\)</span> diagnostics indicate that there are 19 observations which are problematic. This would require 19 model refits which may require a lot of computation time.</p>
 <p>Instead of refitting with MCMC, we can perform a faster moment matching correction to the importance sampling for the problematic observations. This can be done with the <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> function in the <strong>loo</strong> package, which takes our existing <code>loo</code> object as input and modifies it. The moment matching requires some evaluations of the model posterior density. For models fitted with <strong>rstan</strong>, this can be conveniently done by using the existing <code>stanfit</code> object.</p>
-<p>First, we show how the moment matching can be used for a model fitted using <strong>rstan</strong>. It only requires setting the argument <code>moment_match</code> to <code>TRUE</code> in the <code><a href="../reference/loo.html">loo()</a></code> function. Optionally, you can also set the argument <code>k_threshold</code> which determines the Pareto <span class="math inline">\(k\)</span> threshold, above which moment matching is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than 0.7. (NOTE: using moment matching directly via the <code><a href="../reference/loo.html">loo()</a></code> function will be available in <strong>rstan</strong> &gt; 2.19.3. Until then use <a href="https://github.com/stan-dev/rstan/pull/743" class="uri">https://github.com/stan-dev/rstan/pull/743</a>.)</p>
-<pre><code>loo2 &lt;- loo(fit, moment_match = TRUE)
-loo2</code></pre>
-<pre><code>Computed from 4000 by 262 log-likelihood matrix
+<p>First, we show how the moment matching can be used for a model fitted using <strong>rstan</strong>. It only requires setting the argument <code>moment_match</code> to <code>TRUE</code> in the <code><a href="../reference/loo.html">loo()</a></code> function. Optionally, you can also set the argument <code>k_threshold</code> which determines the Pareto <span class="math inline">\(k\)</span> threshold, above which moment matching is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than 0.7.</p>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># available in rstan &gt;= 2.21</span>
+<span class="no">loo2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">fit</span>, <span class="kw">moment_match</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">loo2</span></pre></body></html></div>
+<pre><code>
+Computed from 4000 by 262 log-likelihood matrix
 
          Estimate     SE
-elpd_loo  -5478.5  700.0
-p_loo       258.1   59.5
-looic     10957.0 1400.0
+elpd_loo  -5478.5  700.2
+p_loo       253.5   57.5
+looic     10957.1 1400.3
 ------
-Monte Carlo SE of elpd_loo is 0.3.
+Monte Carlo SE of elpd_loo is 0.4.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     250   95.4%   144       
- (0.5, 0.7]   (ok)        12    4.6%   84        
+(-Inf, 0.5]   (good)     250   95.4%   127       
+ (0.5, 0.7]   (ok)        12    4.6%   65        
    (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
 
@@ -347,8 +316,8 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 </ul>
 </li>
 </ul>
-<p>Next, we show how the helper functions look like for RStan objects, and show an example of using <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> directly. For <strong>rstan</strong> objects, the functions look like this</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co"># create a named list of draws for use with rstan methods</span>
+<p>Next, we show how the helper functions look like for RStan objects, and show an example of using <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> directly. For stanfit objects from <strong>rstan</strong> objects, the functions look like this:</p>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># create a named list of draws for use with rstan methods</span>
 <span class="no">.rstan_relist</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">skeleton</span>) {
   <span class="no">out</span> <span class="kw">&lt;-</span> <span class="kw pkg">utils</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/utils/relist.html">relist</a></span>(<span class="no">x</span>, <span class="no">skeleton</span>)
   <span class="kw">for</span> (<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">skeleton</span>)) {
@@ -383,7 +352,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <span class="no">unconstrain_pars_stanfit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">pars</span>, <span class="no">...</span>) {
   <span class="no">skeleton</span> <span class="kw">&lt;-</span> <span class="fu">.create_skeleton</span>(<span class="no">x</span>@<span class="kw">sim</span>$<span class="no">pars_oi</span>, <span class="no">x</span>@<span class="kw">par_dims</span>[<span class="no">x</span>@<span class="kw">sim</span>$<span class="no">pars_oi</span>])
   <span class="no">upars</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">pars</span>, <span class="fl">1</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">theta</span>) {
-    <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html">unconstrain_pars</a></span>(<span class="no">x</span>, <span class="fu">.rstan_relist</span>(<span class="no">theta</span>, <span class="no">skeleton</span>))
+    <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html">unconstrain_pars</a></span>(<span class="no">x</span>, <span class="fu">.rstan_relist</span>(<span class="no">theta</span>, <span class="no">skeleton</span>))
   })
   <span class="co"># for one parameter models</span>
   <span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">upars</span>))) {
@@ -394,7 +363,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 
 <span class="co"># compute log_prob for each posterior draws on the unconstrained space</span>
 <span class="no">log_prob_upars_stanfit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>, <span class="no">upars</span>, <span class="no">...</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">upars</span>, <span class="fl">1</span>, <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="no"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html">log_prob</a></span>, <span class="kw">object</span> <span class="kw">=</span> <span class="no">x</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">upars</span>, <span class="fl">1</span>, <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="no"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html">log_prob</a></span>, <span class="kw">object</span> <span class="kw">=</span> <span class="no">x</span>,
         <span class="kw">adjust_transform</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">gradient</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 }
 
@@ -404,33 +373,36 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="no">S</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">upars</span>)
   <span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="no">S</span>)
   <span class="kw">for</span> (<span class="no">s</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">S</span>)) {
-    <span class="no">out</span>[<span class="no">s</span>] <span class="kw">&lt;-</span> <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html">constrain_pars</a></span>(<span class="no">x</span>, <span class="kw">upars</span> <span class="kw">=</span> <span class="no">upars</span>[<span class="no">s</span>, ])<span class="kw">[[</span><span class="no">parameter_name</span>]][<span class="no">i</span>]
+    <span class="no">out</span>[<span class="no">s</span>] <span class="kw">&lt;-</span> <span class="kw pkg">rstan</span><span class="kw ns">::</span><span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html">constrain_pars</a></span>(<span class="no">x</span>, <span class="kw">upars</span> <span class="kw">=</span> <span class="no">upars</span>[<span class="no">s</span>, ])<span class="kw">[[</span><span class="no">parameter_name</span>]][<span class="no">i</span>]
   }
   <span class="no">out</span>
 }</pre></body></html></div>
 <p>Using these function, we can call <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> to update the existing <code>loo</code> object.</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">loo3</span> <span class="kw">&lt;-</span> <span class="kw pkg">loo</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loo_moment_match.html">loo_moment_match.default</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">fit</span>, <span class="kw">loo</span> <span class="kw">=</span> <span class="no">loo1</span>,
-                              <span class="kw">post_draws</span> <span class="kw">=</span> <span class="no">post_draws_stanfit</span>,
-                              <span class="kw">log_lik_i</span> <span class="kw">=</span> <span class="no">log_lik_i_stanfit</span>,
-                              <span class="kw">unconstrain_pars</span> <span class="kw">=</span> <span class="no">unconstrain_pars_stanfit</span>,
-                              <span class="kw">log_prob_upars</span> <span class="kw">=</span> <span class="no">log_prob_upars_stanfit</span>,
-                              <span class="kw">log_lik_i_upars</span> <span class="kw">=</span> <span class="no">log_lik_i_upars_stanfit</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">loo3</span> <span class="kw">&lt;-</span> <span class="kw pkg">loo</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loo_moment_match.html">loo_moment_match.default</a></span>(
+  <span class="kw">x</span> <span class="kw">=</span> <span class="no">fit</span>,
+  <span class="kw">loo</span> <span class="kw">=</span> <span class="no">loo1</span>,
+  <span class="kw">post_draws</span> <span class="kw">=</span> <span class="no">post_draws_stanfit</span>,
+  <span class="kw">log_lik_i</span> <span class="kw">=</span> <span class="no">log_lik_i_stanfit</span>,
+  <span class="kw">unconstrain_pars</span> <span class="kw">=</span> <span class="no">unconstrain_pars_stanfit</span>,
+  <span class="kw">log_prob_upars</span> <span class="kw">=</span> <span class="no">log_prob_upars_stanfit</span>,
+  <span class="kw">log_lik_i_upars</span> <span class="kw">=</span> <span class="no">log_lik_i_upars_stanfit</span>
+)</pre></body></html></div>
 <pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">loo3</span></pre></body></html></div>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">loo3</span></pre></body></html></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix
 
          Estimate     SE
-elpd_loo  -5477.5  700.0
-p_loo       262.3   60.0
-looic     10955.1 1400.0
+elpd_loo  -5478.5  700.2
+p_loo       253.5   57.5
+looic     10957.1 1400.3
 ------
 Monte Carlo SE of elpd_loo is 0.4.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     252   96.2%   229       
- (0.5, 0.7]   (ok)        10    3.8%   65        
+(-Inf, 0.5]   (good)     250   95.4%   127       
+ (0.5, 0.7]   (ok)        12    4.6%   65        
    (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
    (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
 
@@ -442,11 +414,10 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
 <p>Gelman, A., and Hill, J. (2007). <em>Data Analysis Using Regression and Multilevel Hierarchical Models.</em> Cambridge University Press.</p>
-<p>Stan Development Team (2017). <em>The Stan C++ Library, Version 2.17.0.</em> <a href="http://mc-stan.org" class="uri">http://mc-stan.org</a></p>
-<p>Stan Development Team (2018) <em>RStan: the R interface to Stan, Version 2.17.3.</em> <a href="http://mc-stan.org" class="uri">http://mc-stan.org</a></p>
-<p>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020). Implicitly Adaptive Importance Sampling. <a href="http://arxiv.org/abs/1906.08850">arXiv preprint arXiv:1906.08850</a>.</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4">published</a> | <a href="http://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
+<p>Stan Development Team (2020) <em>RStan: the R interface to Stan, Version 2.21.1</em> <a href="https://mc-stan.org" class="uri">https://mc-stan.org</a></p>
+<p>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020). Implicitly Adaptive Importance Sampling. <a href="https://arxiv.org/abs/1906.08850">arXiv preprint arXiv:1906.08850</a>.</p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. :10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">published</a> | <a href="https://arxiv.org/abs/1507.04544">arXiv preprint</a>.</p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
 </div>
   </div>
 

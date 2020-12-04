@@ -86,7 +86,7 @@ functions for use with the loo.function() method." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -412,11 +412,11 @@ method that calls <code>loo.array()</code>. The <code>loo.stanreg()</code> metho
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+(<a href='https://link.springer.com/article/10.1007/s11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+<a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'>
@@ -463,11 +463,6 @@ procedure used in the LOO-CV approximation.</p></li>
 #&gt; All Pareto k estimates are good (k &lt; 0.5).
 #&gt; See help('pareto-k-diagnostic') for details.</div><div class='input'>
 
-<span class='co'># \dontrun{</span>
-<span class='co'>### Usage with stanfit objects</span>
-<span class='co'># see ?extract_log_lik</span>
-<span class='no'>log_lik1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>stanfit1</span>, <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_log_lik(stanfit1, merge_chains = FALSE): object 'stanfit1' not found</span></div><div class='input'><span class='no'>rel_n_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>log_lik1</span>))</div><div class='output co'>#&gt; <span class='error'>Error in relative_eff(exp(log_lik1)): object 'log_lik1' not found</span></div><div class='input'><span class='fu'>loo</span>(<span class='no'>log_lik1</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>rel_n_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in loo(log_lik1, r_eff = rel_n_eff, cores = 2): object 'log_lik1' not found</span></div><div class='input'><span class='co'># }</span>
-
 <span class='co'>### Using log-likelihood function instead of array or matrix</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>124</span>)
 
@@ -506,15 +501,14 @@ procedure used in the LOO-CV approximation.</p></li>
 <span class='no'>loo_with_mat</span> <span class='kw'>&lt;-</span> <span class='fu'>loo</span>(<span class='no'>log_lik_matrix</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='no'>loo_with_mat</span>$<span class='no'>estimates</span>, <span class='no'>loo_with_fn</span>$<span class='no'>estimates</span>) <span class='co'># should be TRUE!</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'>### For package developers: defining loo methods</span>
 
 <span class='co'># An example of a possible loo method for 'stanfit' objects (rstan package).</span>
-<span class='co'># A similar method is planned for a future release of rstan (or is already</span>
-<span class='co'># released, depending on when you are reading this). In order for users</span>
-<span class='co'># to be able to call loo(stanfit) instead of loo.stanfit(stanfit) the</span>
-<span class='co'># NAMESPACE needs to be handled appropriately (roxygen2 and devtools packages</span>
-<span class='co'># are good for that).</span>
+<span class='co'># A similar method is included in the rstan package.</span>
+<span class='co'># In order for users to be able to call loo(stanfit) instead of</span>
+<span class='co'># loo.stanfit(stanfit) the NAMESPACE needs to be handled appropriately</span>
+<span class='co'># (roxygen2 and devtools packages are good for that).</span>
 <span class='co'>#</span>
 <span class='no'>loo.stanfit</span> <span class='kw'>&lt;-</span>
  <span class='kw'>function</span>(<span class='no'>x</span>,
@@ -532,7 +526,7 @@ procedure used in the LOO-CV approximation.</p></li>
                  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='no'>cores</span>,
                  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='no'>save_psis</span>)
 }
-<span class='co'># }</span></div></pre>
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

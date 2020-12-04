@@ -48,7 +48,9 @@
 
 <meta property="og:title" content="Extract pointwise log-likelihood from a Stan model — extract_log_lik" />
 <meta property="og:description" content="Convenience function for extracting the pointwise log-likelihood
-matrix or array from a fitted Stan model." />
+matrix or array from a stanfit object from the rstan package.
+Note: recent versions of rstan now include a loo() method for
+stanfit objects that handles this internally." />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 
 
@@ -81,7 +83,7 @@ matrix or array from a fitted Stan model." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -178,7 +180,9 @@ matrix or array from a fitted Stan model." />
 
     <div class="ref-description">
     <p>Convenience function for extracting the pointwise log-likelihood
-matrix or array from a fitted Stan model.</p>
+matrix or array from a <code>stanfit</code> object from the <span class="pkg">rstan</span> package.
+Note: recent versions of <span class="pkg">rstan</span> now include a <code><a href='loo.html'>loo()</a></code> method for
+<code>stanfit</code> objects that handles this internally.</p>
     </div>
 
     <pre class="usage"><span class='fu'>extract_log_lik</span>(<span class='no'>stanfit</span>, <span class='kw'>parameter_name</span> <span class='kw'>=</span> <span class='st'>"log_lik"</span>, <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>

@@ -86,7 +86,7 @@ and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -204,7 +204,7 @@ and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.</p>
 <span class='fu'>mcse_loo</span>(<span class='no'>x</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)
 
 <span class='co'># S3 method for psis_loo</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
   <span class='no'>...</span>,
@@ -213,7 +213,7 @@ and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.</p>
 )
 
 <span class='co'># S3 method for psis</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
   <span class='no'>x</span>,
   <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
   <span class='no'>...</span>,
@@ -244,7 +244,7 @@ default) or <code>"n_eff"</code> for PSIS effective sample size estimates.</p></
     </tr>
     <tr>
       <th>label_points, ...</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method, if <code>label_points</code> is
+      <td><p>For the <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method, if <code>label_points</code> is
 <code>TRUE</code> the observation numbers corresponding to any values of \(k\)
 greater than 0.5 will be displayed in the plot. Any arguments specified in
 <code>...</code> will be passed to <code><a href='https://rdrr.io/r/graphics/text.html'>graphics::text()</a></code> and can be used
@@ -252,7 +252,7 @@ to control the appearance of the labels.</p></td>
     </tr>
     <tr>
       <th>main</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method, a title for the plot.</p></td>
+      <td><p>For the <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method, a title for the plot.</p></td>
     </tr>
     </table>
 
@@ -273,9 +273,9 @@ effective sample sizes.</p>
 <p><code>mcse_loo()</code> returns the Monte Carlo standard error (MCSE)
 estimate for PSIS-LOO. MCSE will be NA if any Pareto \(k\) values are
 above <code>threshold</code>.</p>
-<p>The <code><a href='https://rdrr.io/r/graphics/plot.html'>plot()</a></code> method is called for its side effect and does not
+<p>The <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method is called for its side effect and does not
 return anything. If <code>x</code> is the result of a call to <code><a href='loo.html'>loo()</a></code>
-or <code><a href='psis.html'>psis()</a></code> then <code><a href='https://rdrr.io/r/graphics/plot.html'>plot(x, diagnostic)</a></code> produces a plot of
+or <code><a href='psis.html'>psis()</a></code> then <code><a href='https://rdrr.io/r/base/plot.html'>plot(x, diagnostic)</a></code> produces a plot of
 the estimates of the Pareto shape parameters (<code>diagnostic = "k"</code>) or
 estimates of the PSIS effective sample sizes (<code>diagnostic = "n_eff"</code>).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -346,11 +346,11 @@ effective sample size estimate will be
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+(<a href='https://link.springer.com/article/10.1007/s11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+<a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='psis.html'>psis()</a></code> for the implementation of the PSIS algorithm.</p></div>

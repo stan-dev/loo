@@ -87,7 +87,7 @@ development and will be added in a future release." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -272,7 +272,7 @@ default/vector method, the estimate is a scalar.</p></dd>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='co'># Use rstanarm package to quickly fit a model and get both a log-likelihood</span>
 <span class='co'># matrix and draws from the posterior predictive distribution</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>This is rstanarm version 2.19.3</span></div><div class='output co'>#&gt; <span class='message'>- See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span></div><div class='output co'>#&gt; <span class='message'>- Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>  options(mc.cores = parallel::detectCores())</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"rstanarm"</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: Rcpp</span></div><div class='output co'>#&gt; <span class='message'>This is rstanarm version 2.21.1</span></div><div class='output co'>#&gt; <span class='message'>- See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span></div><div class='output co'>#&gt; <span class='message'>- Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span></div><div class='output co'>#&gt; <span class='message'>- For execution on a local, multicore CPU with excess RAM we recommend calling</span></div><div class='output co'>#&gt; <span class='message'>  options(mc.cores = parallel::detectCores())</span></div><div class='input'>
 <span class='co'># data from help("lm")</span>
 <span class='no'>ctl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4.17</span>,<span class='fl'>5.58</span>,<span class='fl'>5.18</span>,<span class='fl'>6.11</span>,<span class='fl'>4.50</span>,<span class='fl'>4.61</span>,<span class='fl'>5.17</span>,<span class='fl'>4.53</span>,<span class='fl'>5.33</span>,<span class='fl'>5.14</span>)
 <span class='no'>trt</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4.81</span>,<span class='fl'>4.17</span>,<span class='fl'>4.41</span>,<span class='fl'>3.59</span>,<span class='fl'>5.87</span>,<span class='fl'>3.83</span>,<span class='fl'>6.03</span>,<span class='fl'>4.89</span>,<span class='fl'>4.32</span>,<span class='fl'>4.69</span>)
@@ -289,37 +289,37 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class='no'>psis_object</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='psis.html'>psis</a></span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.130161 4.942460 5.023006 4.889126 5.079624 5.057261 4.993542 5.100044
-#&gt;  [9] 4.991074 5.000810 4.634745 4.742161 4.694916 4.797833 4.541844 4.734143
-#&gt; [17] 4.511471 4.659041 4.715469 4.663138
+#&gt;  [1] 5.134289 4.990779 5.063717 4.891445 5.079014 5.086955 4.994977 5.090987
+#&gt;  [9] 4.988923 5.028137 4.660947 4.726802 4.694544 4.770618 4.536826 4.731126
+#&gt; [17] 4.520809 4.651735 4.688359 4.646684
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"var"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 0.0001817459 0.0002085514 0.0002874214 0.0002135392 0.0002086019
-#&gt;  [6] 0.0002452564 0.0003097210 0.0002085195 0.0002753723 0.0003525226
-#&gt; [11] 0.0002709946 0.0002145444 0.0002599368 0.0002203694 0.0003086298
-#&gt; [16] 0.0001806339 0.0004536805 0.0002728438 0.0002478241 0.0002778719
+#&gt;  [1] 0.0001591126 0.0001974192 0.0002875142 0.0002093292 0.0001834044
+#&gt;  [6] 0.0002067876 0.0002889451 0.0001868971 0.0002756121 0.0003101232
+#&gt; [11] 0.0002808813 0.0002055900 0.0002515969 0.0002462258 0.0002536599
+#&gt; [16] 0.0001965742 0.0003447557 0.0002643714 0.0002436437 0.0002936449
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fl'>0.5</span>) <span class='co'># median</span></div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.137362 4.946344 5.030535 4.892565 5.076470 5.063158 4.987480 5.101923
-#&gt;  [9] 4.994185 5.025377 4.625960 4.739336 4.706874 4.791667 4.563775 4.741163
-#&gt; [17] 4.522306 4.653584 4.720618 4.652127
+#&gt;  [1] 5.143318 4.990419 5.045964 4.893522 5.078653 5.088694 4.995732 5.106827
+#&gt;  [9] 4.985569 5.044546 4.638359 4.719482 4.693008 4.770725 4.530231 4.727474
+#&gt; [17] 4.532588 4.644159 4.692495 4.642926
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
 #&gt; </div><div class='input'><span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"quantile"</span>, <span class='kw'>probs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.9</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: 'log_ratios' not specified. Can't compute k-hat diagnostic.</span></div><div class='output co'>#&gt; $value
 #&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
-#&gt; [1,] 4.191633 3.914375 4.039848 3.942529 4.072185 4.054182 3.985790 4.100668
-#&gt; [2,] 6.065339 5.954295 5.994522 5.805594 6.074038 6.050066 5.982853 6.071363
+#&gt; [1,] 4.202947 4.024490 4.069320 3.975519 4.072362 4.100821 3.999408 4.086386
+#&gt; [2,] 6.058854 5.971274 6.083626 5.812561 6.065001 6.079247 5.974741 6.080411
 #&gt;          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]
-#&gt; [1,] 3.974670 3.947726 3.638488 3.773463 3.704672 3.872623 3.615117 3.776612
-#&gt; [2,] 6.004577 6.033418 5.644392 5.738865 5.682099 5.734365 5.455974 5.690030
-#&gt;        [,17]    [,18]    [,19]    [,20]
-#&gt; [1,] 3.66190 3.689718 3.724255 3.687103
-#&gt; [2,] 5.38953 5.650770 5.745351 5.679150
+#&gt; [1,] 3.974495 3.985170 3.685336 3.742536 3.720220 3.838895 3.661197 3.758993
+#&gt; [2,] 6.000139 6.057105 5.667853 5.731417 5.646776 5.683174 5.429682 5.687527
+#&gt;         [,17]    [,18]    [,19]    [,20]
+#&gt; [1,] 3.652822 3.657359 3.702788 3.663643
+#&gt; [2,] 5.394626 5.655873 5.676459 5.635945
 #&gt; 
 #&gt; $pareto_k
 #&gt; NULL
@@ -327,15 +327,15 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class='co'># To get Pareto k diagnostic with E_loo we also need to provide the negative</span>
 <span class='co'># log-likelihood values using the log_ratios argument.</span>
 <span class='fu'>E_loo</span>(<span class='no'>yrep</span>, <span class='no'>psis_object</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>log_ratios</span> <span class='kw'>=</span> <span class='no'>log_ratios</span>)</div><div class='output co'>#&gt; $value
-#&gt;  [1] 5.130161 4.942460 5.023006 4.889126 5.079624 5.057261 4.993542 5.100044
-#&gt;  [9] 4.991074 5.000810 4.634745 4.742161 4.694916 4.797833 4.541844 4.734143
-#&gt; [17] 4.511471 4.659041 4.715469 4.663138
+#&gt;  [1] 5.134289 4.990779 5.063717 4.891445 5.079014 5.086955 4.994977 5.090987
+#&gt;  [9] 4.988923 5.028137 4.660947 4.726802 4.694544 4.770618 4.536826 4.731126
+#&gt; [17] 4.520809 4.651735 4.688359 4.646684
 #&gt; 
 #&gt; $pareto_k
-#&gt;  [1]  0.17330278  0.21427164  0.16604684  0.27986236  0.10064752  0.09979168
-#&gt;  [7]  0.17187747  0.23472381  0.21594104  0.15597476  0.10347666  0.12778891
-#&gt; [13]  0.05270634  0.21715028  0.41637775  0.16749605  0.47254928  0.21880378
-#&gt; [19]  0.06410958 -0.01645188
+#&gt;  [1]  0.165934606  0.097059913  0.060475294  0.327813769  0.102419271
+#&gt;  [6]  0.089764937  0.050021205  0.054601122  0.036507794  0.021942141
+#&gt; [11]  0.142268008  0.144813749  0.014798714  0.300177261  0.367277491
+#&gt; [16]  0.329422784  0.418874773  0.091796224  0.085900223 -0.009890869
 #&gt; </div><div class='input'># }
 
 </div></pre>

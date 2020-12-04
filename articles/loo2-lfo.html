@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="loo2-lfo_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Approximate leave-future-out cross-validation for Bayesian time series models</h1>
                         <h4 class="author">Paul Bürkner, Jonah Gabry, Aki Vehtari</h4>
             
-            <h4 class="date">2020-07-07</h4>
+            <h4 class="date">2020-12-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-lfo.Rmd"><code>vignettes/loo2-lfo.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-lfo.Rmd</code></div>
@@ -225,25 +225,21 @@ y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
   <span class="kw">time</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="no">N</span>
 )
 
-<span class="co"># save plot labels to reuse them</span>
-<span class="no">plot_labs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(
-  <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Water Level (ft)"</span>,
-  <span class="kw">x</span> <span class="kw">=</span> <span class="st">"Year"</span>,
-  <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span>
-)
-
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">year</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>) +
-  <span class="no">plot_labs</span></pre></body></html></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(
+    <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Water Level (ft)"</span>,
+    <span class="kw">x</span> <span class="kw">=</span> <span class="st">"Year"</span>,
+    <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span>
+  )</pre></body></html></div>
 <p><img src="loo2-lfo_files/figure-html/hurondata-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The above plot shows rather strong autocorrelation of the time-series as well as some trend towards lower levels for later points in time.</p>
 <p>We can specify an AR(4) model for these data using the <strong>brms</strong> package as follows:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">control</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">adapt_delta</span> <span class="kw">=</span> <span class="fl">0.99</span>)
-<span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span>(
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span>(
   <span class="no">y</span> ~ <span class="fu"><a href="https://rdrr.io/pkg/brms/man/ar.html">ar</a></span>(<span class="no">time</span>, <span class="kw">p</span> <span class="kw">=</span> <span class="fl">4</span>),
   <span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>,
   <span class="kw">prior</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/set_prior.html">prior</a></span>(<span class="fu">normal</span>(<span class="fl">0</span>, <span class="fl">0.5</span>), <span class="kw">class</span> <span class="kw">=</span> <span class="st">"ar"</span>),
-  <span class="kw">control</span> <span class="kw">=</span> <span class="no">control</span>,
+  <span class="kw">control</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">adapt_delta</span> <span class="kw">=</span> <span class="fl">0.99</span>),
   <span class="kw">seed</span> <span class="kw">=</span> <span class="no">SEED</span>,
   <span class="kw">chains</span> <span class="kw">=</span> <span class="no">CHAINS</span>
 )</pre></body></html></div>
@@ -258,8 +254,12 @@ y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df</span>, <span class="no">preds</span>), <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">year</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Estimate</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">ymin</span> <span class="kw">=</span> <span class="no">Q5</span>, <span class="kw">ymax</span> <span class="kw">=</span> <span class="no">Q95</span>), <span class="kw">stat</span> <span class="kw">=</span> <span class="st">"identity"</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">0.5</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">subtitle</span> <span class="kw">=</span> <span class="st">"Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"</span>) +
-  <span class="no">plot_labs</span></pre></body></html></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(
+    <span class="kw">y</span> <span class="kw">=</span> <span class="st">"Water Level (ft)"</span>,
+    <span class="kw">x</span> <span class="kw">=</span> <span class="st">"Year"</span>,
+    <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span>,
+    <span class="kw">subtitle</span> <span class="kw">=</span> <span class="st">"Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"</span>
+  )</pre></body></html></div>
 <p><img src="loo2-lfo_files/figure-html/plotpreds-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>To allow for reasonable predictions of future values, we will require at least <span class="math inline">\(L = 20\)</span> historical observations (20 years) to make predictions.</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">L</span> <span class="kw">&lt;-</span> <span class="fl">20</span></pre></body></html></div>
@@ -271,8 +271,8 @@ Computed from 4000 by 78 log-likelihood matrix
 
          Estimate   SE
 elpd_loo    -88.6  6.4
-p_loo         4.8  1.0
-looic       177.3 12.7
+p_loo         4.7  1.0
+looic       177.2 12.7
 ------
 Monte Carlo SE of elpd_loo is 0.0.
 
@@ -329,8 +329,8 @@ See help('pareto-k-diagnostic') for details.</code></pre>
   <span class="st">"LFO"</span> <span class="kw">=</span> <span class="no">exact_elpd_1sap</span>
 )</pre></body></html></div>
 <pre><code>      ELPD
-LOO -88.63
-LFO -92.44</code></pre>
+LOO -88.58
+LFO -92.45</code></pre>
 <p>We see that the ELPD from LFO-CV for 1-step-ahead predictions is lower than the ELPD estimate from LOO-CV, which should be expected since LOO-CV is making use of more of the time series. That is, since the LFO-CV approach only uses observations from before the left-out data point but LOO-CV uses <em>all</em> data points other than the left-out observation, we should expect to see the larger ELPD from LOO-CV.</p>
 </div>
 <div id="approximate-1-step-ahead-predictions" class="section level3">
@@ -390,7 +390,7 @@ LFO -92.44</code></pre>
 <div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Using threshold "</span>, <span class="no">k_thres</span>,
     <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">refits</span>),
     <span class="st">" times, at observations"</span>, <span class="no">refits</span>)</pre></body></html></div>
-<pre><code>Using threshold  0.7 , model was refit  3  times, at observations 20 48 78</code></pre>
+<pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 57</code></pre>
 <div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu">plot_ks</span>(<span class="no">ks</span>, (<span class="no">L</span> + <span class="fl">1</span>):(<span class="no">N</span> - <span class="fl">1</span>))</pre></body></html></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP ELPD computed above, which indicates our algorithm to compute approximate 1-SAP worked well for the present data and model.</p>
@@ -400,8 +400,8 @@ LFO -92.44</code></pre>
   <span class="st">"exact LFO"</span> <span class="kw">=</span> <span class="no">exact_elpd_1sap</span>
 )</pre></body></html></div>
 <pre><code>             ELPD
-approx LFO -92.54
-exact LFO  -92.44</code></pre>
+approx LFO -92.60
+exact LFO  -92.45</code></pre>
 <p>Plotting exact against approximate predictions, we see that no approximation value deviates far from its exact counterpart, providing further evidence for the good quality of our approximation.</p>
 <div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="no">dat_elpd</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
   <span class="kw">approx_elpd</span> <span class="kw">=</span> <span class="no">approx_elpds_1sap</span>,
@@ -422,7 +422,7 @@ exact LFO  -92.44</code></pre>
   <span class="st">"Mean diff"</span> <span class="kw">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">mean_diff</span>, <span class="fl">3</span>)
 )</pre></body></html></div>
 <pre><code>          [,1]
-Max diff  0.15
+Max diff  0.19
 Mean diff 0.02</code></pre>
 </div>
 </div>
@@ -448,7 +448,7 @@ Mean diff 0.02</code></pre>
 <div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="no">exact_elpds_4sap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">loglikm</span>, <span class="fl">2</span>, <span class="no">log_mean_exp</span>)
 (<span class="no">exact_elpd_4sap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">ELPD</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">exact_elpds_4sap</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>)))</pre></body></html></div>
 <pre><code>     ELPD 
--406.0006 </code></pre>
+-405.1963 </code></pre>
 </div>
 <div id="approximate-m-step-ahead-predictions" class="section level3">
 <h3 class="hasAnchor">
@@ -499,7 +499,7 @@ Mean diff 0.02</code></pre>
 <div class="sourceCode" id="cb27"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Using threshold "</span>, <span class="no">k_thres</span>,
     <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">refits</span>),
     <span class="st">" times, at observations"</span>, <span class="no">refits</span>)</pre></body></html></div>
-<pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 54</code></pre>
+<pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 57</code></pre>
 <div class="sourceCode" id="cb29"><html><body><pre class="r"><span class="fu">plot_ks</span>(<span class="no">ks</span>, (<span class="no">L</span> + <span class="fl">1</span>):(<span class="no">N</span> - <span class="no">M</span>))</pre></body></html></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate ELPD computed for the 4-SAP case is not as close to its exact counterpart as in the 1-SAP case. In general, the larger <span class="math inline">\(M\)</span>, the larger the variation of the approximate ELPD around the exact ELPD. It turns out that the ELPD estimates of AR-models with <span class="math inline">\(M&gt;1\)</span> show particular variation due to their predictions’ dependency on other predicted values. In Bürkner et al. (2020) we provide further explanation and simulations for these cases.</p>
@@ -509,8 +509,8 @@ Mean diff 0.02</code></pre>
   <span class="st">"Exact LFO"</span> <span class="kw">=</span> <span class="no">exact_elpd_4sap</span>
 )</pre></body></html></div>
 <pre><code>              ELPD
-Approx LFO -400.44
-Exact LFO  -406.00</code></pre>
+Approx LFO -401.39
+Exact LFO  -405.20</code></pre>
 <p>Plotting exact against approximate pointwise predictions confirms that, for a few specific data points, the approximate predictions underestimate the exact predictions.</p>
 <div class="sourceCode" id="cb32"><html><body><pre class="r"><span class="no">dat_elpd_4sap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
   <span class="kw">approx_elpd</span> <span class="kw">=</span> <span class="no">approx_elpds_4sap</span>,
@@ -533,8 +533,8 @@ Exact LFO  -406.00</code></pre>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Bürkner P. C., Gabry J., &amp; Vehtari A. (2020). Approximate leave-future-out cross-validation for Bayesian time series models. <em>Journal of Statistical Computation and Simulation</em>. <a href="https://www.tandfonline.com/doi/full/10.1080/00949655.2020.1783262">Online</a>. <a href="https://arxiv.org/abs/1902.06281">arXiv preprint</a>.</p>
-<p>Vehtari A., Gelman A., &amp; Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="http://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
+<p>Bürkner P. C., Gabry J., &amp; Vehtari A. (2020). Approximate leave-future-out cross-validation for Bayesian time series models. <em>Journal of Statistical Computation and Simulation</em>. :10.1080/00949655.2020.1783262. <a href="https://www.tandfonline.com/doi/full/10.1080/00949655.2020.1783262">Online</a>. <a href="https://arxiv.org/abs/1902.06281">arXiv preprint</a>.</p>
+<p>Vehtari A., Gelman A., &amp; Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p>
 <p><br></p>
 </div>
@@ -545,13 +545,13 @@ Exact LFO  -406.00</code></pre>
 <h3 class="hasAnchor">
 <a href="#appendix-session-information" class="anchor"></a>Appendix: Session information</h3>
 <div class="sourceCode" id="cb33"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</pre></body></html></div>
-<pre><code>R version 3.6.1 (2019-07-05)
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+<pre><code>R version 4.0.2 (2020-06-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Catalina 10.15.7
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -560,39 +560,48 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_3.2.1   bayesplot_1.7.1 brms_2.10.0     Rcpp_1.0.2     
-[5] loo_2.2.0       knitr_1.25     
+[1] ggplot2_3.3.2        bayesplot_1.7.2.9000 brms_2.14.4         
+[4] Rcpp_1.0.5           loo_2.4.0            knitr_1.29          
 
 loaded via a namespace (and not attached):
- [1] Brobdingnag_1.2-6    gtools_3.8.1         StanHeaders_2.19.0  
- [4] threejs_0.3.1        shiny_1.3.2          assertthat_0.2.1    
- [7] stats4_3.6.1         yaml_2.2.0           pillar_1.4.2        
-[10] backports_1.1.5      lattice_0.20-38      glue_1.3.1          
-[13] digest_0.6.22        promises_1.0.1       checkmate_1.9.4     
-[16] colorspace_1.4-1     htmltools_0.3.6      httpuv_1.5.2        
-[19] Matrix_1.2-17        plyr_1.8.4           dygraphs_1.1.1.6    
-[22] pkgconfig_2.0.3      rstan_2.19.2         purrr_0.3.3         
-[25] xtable_1.8-4         scales_1.0.0         processx_3.4.1      
-[28] later_0.8.0          tibble_2.1.3         DT_0.8              
-[31] withr_2.1.2          shinyjs_1.0          lazyeval_0.2.2      
-[34] cli_1.1.0            magrittr_1.5         crayon_1.3.4        
-[37] mime_0.7             ps_1.3.0             memoise_1.1.0       
-[40] evaluate_0.14        fs_1.3.1             nlme_3.1-140        
-[43] MASS_7.3-51.4        xts_0.11-0           pkgbuild_1.0.5      
-[46] colourpicker_1.0     prettyunits_1.0.2    rsconnect_0.8.15    
-[49] tools_3.6.1          matrixStats_0.54.0   stringr_1.4.0       
-[52] munsell_0.5.0        callr_3.3.1          compiler_3.6.1      
-[55] pkgdown_1.4.1        rlang_0.4.1          grid_3.6.1          
-[58] ggridges_0.5.0       rstudioapi_0.10      htmlwidgets_1.3     
-[61] crosstalk_1.0.0      igraph_1.2.4.1       miniUI_0.1.1.1      
-[64] labeling_0.3         base64enc_0.1-3      rmarkdown_1.15      
-[67] codetools_0.2-16     gtable_0.3.0         inline_0.3.15       
-[70] abind_1.4-5          markdown_0.8         reshape2_1.4.3      
-[73] R6_2.4.1             gridExtra_2.3        rstantools_2.0.0    
-[76] zoo_1.8-3            bridgesampling_0.7-2 dplyr_0.8.3         
-[79] shinystan_2.5.0      shinythemes_1.1.1    rprojroot_1.3-2     
-[82] desc_1.2.0           stringi_1.4.3        parallel_3.6.1      
-[85] tidyselect_0.2.5     xfun_0.9             coda_0.19-1         </code></pre>
+  [1] TH.data_1.0-10       minqa_1.2.4          colorspace_2.0-0    
+  [4] ellipsis_0.3.1       ggridges_0.5.2       rsconnect_0.8.16    
+  [7] rprojroot_2.0.2      estimability_1.3     markdown_1.1        
+ [10] base64enc_0.1-3      fs_1.4.2             rstudioapi_0.13     
+ [13] farver_2.0.3         rstan_2.21.3         DT_0.14             
+ [16] fansi_0.4.1          mvtnorm_1.1-1        codetools_0.2-16    
+ [19] bridgesampling_1.0-0 splines_4.0.2        shinythemes_1.1.2   
+ [22] projpred_2.0.2       jsonlite_1.7.1       nloptr_1.2.2.2      
+ [25] shiny_1.5.0          compiler_4.0.2       emmeans_1.4.8       
+ [28] backports_1.2.0      assertthat_0.2.1     Matrix_1.2-18       
+ [31] fastmap_1.0.1        cli_2.2.0            later_1.1.0.1       
+ [34] htmltools_0.5.0      prettyunits_1.1.1    tools_4.0.2         
+ [37] igraph_1.2.5         coda_0.19-3          gtable_0.3.0        
+ [40] glue_1.4.2           reshape2_1.4.4       dplyr_1.0.2         
+ [43] V8_3.4.0             pkgdown_1.5.1        vctrs_0.3.5         
+ [46] nlme_3.1-148         crosstalk_1.1.0.1    xfun_0.15           
+ [49] stringr_1.4.0        ps_1.4.0             lme4_1.1-23         
+ [52] mime_0.9             miniUI_0.1.1.1       lifecycle_0.2.0     
+ [55] gtools_3.8.2         statmod_1.4.34       MASS_7.3-51.6       
+ [58] zoo_1.8-8            scales_1.1.1         colourpicker_1.0    
+ [61] promises_1.1.1       Brobdingnag_1.2-6    sandwich_2.5-1      
+ [64] parallel_4.0.2       inline_0.3.17        shinystan_3.0.0     
+ [67] gamm4_0.2-6          yaml_2.2.1           curl_4.3            
+ [70] memoise_1.1.0        gridExtra_2.3        StanHeaders_2.21.0-6
+ [73] stringi_1.4.6        dygraphs_1.1.1.6     desc_1.2.0          
+ [76] checkmate_2.0.0      boot_1.3-25          pkgbuild_1.1.0      
+ [79] rlang_0.4.9          pkgconfig_2.0.3      matrixStats_0.57.0  
+ [82] evaluate_0.14        lattice_0.20-41      purrr_0.3.4         
+ [85] labeling_0.4.2       rstantools_2.1.1     htmlwidgets_1.5.1   
+ [88] tidyselect_1.1.0     processx_3.4.5       plyr_1.8.6          
+ [91] magrittr_2.0.1       R6_2.5.0             generics_0.0.2      
+ [94] multcomp_1.4-15      withr_2.3.0          pillar_1.4.7        
+ [97] mgcv_1.8-31          xts_0.12-0           survival_3.1-12     
+[100] abind_1.4-5          tibble_3.0.4         crayon_1.3.4.9000   
+[103] rmarkdown_2.3        grid_4.0.2           callr_3.5.1         
+[106] threejs_0.3.3        digest_0.6.27        xtable_1.8-4        
+[109] httpuv_1.5.4         RcppParallel_5.0.2   stats4_4.0.2        
+[112] munsell_0.5.0        shinyjs_1.1         </code></pre>
 </div>
 <div id="appendix-licenses" class="section level3">
 <h3 class="hasAnchor">

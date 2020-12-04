@@ -82,7 +82,7 @@ print(..., simplify=FALSE) to print a more detailed summary." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -252,11 +252,11 @@ asymptotically, and which only applies to nested models in any case.</p>
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
-(<a href='http://link.springer.com/article/10.1007%2Fs11222-016-9696-4'>journal version</a>,
+(<a href='https://link.springer.com/article/10.1007/s11222-016-9696-4'>journal version</a>,
 <a href='https://arxiv.org/abs/1507.04544'>preprint arXiv:1507.04544</a>).</p>
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
-<a href='https://arxiv.org/abs/1507.02646/'>preprint arXiv:1507.02646</a></p>
+<a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># very artificial example, just for demonstration!</span>
@@ -281,15 +281,10 @@ Pareto smoothed importance sampling.
 #&gt; model3   0.0       0.0  
 #&gt; model2 -32.0       0.0  
 #&gt; model1 -64.0       0.0  </div><div class='input'>
-<span class='co'># \dontrun{</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'># works for waic (and kfold) too</span>
-<span class='fu'>loo_compare</span>(<span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span>), <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span> - <span class='fl'>10</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: </span>
-#&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: </span>
-#&gt; <span class='warning'>3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span></div><div class='output co'>#&gt;        elpd_diff se_diff
-#&gt; model1    0.0       0.0 
-#&gt; model2 -320.0       0.0 </div><div class='input'># }
-
-</div></pre>
+<span class='fu'>loo_compare</span>(<span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span>), <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span> - <span class='fl'>10</span>))
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
