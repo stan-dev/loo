@@ -50,7 +50,7 @@ Pareto smoothed importance sampling.
 # Example: Eradication of Roaches
 
 We will use the same example as in the vignette
-[_Using the loo package (version >= 2.0.0)_](http://mc-stan.org/loo/articles/loo2-example.html).
+[_Using the loo package (version >= 2.0.0)_](https://mc-stan.org/loo/articles/loo2-example.html).
 See the demo for a description of the problem and data. We will use the same Poisson
 regression model as in the case study.
 
@@ -141,7 +141,7 @@ The `loo()` function output warnings that there are some observations which are
 highly influential, and thus the accuracy of importance sampling is compromised
 as indicated by the large Pareto $k$ diagnostic values (> 0.7). As discussed in
 the vignette
-[_Using the loo package (version >= 2.0.0)_](http://mc-stan.org/loo/articles/loo2-example.html),
+[_Using the loo package (version >= 2.0.0)_](https://mc-stan.org/loo/articles/loo2-example.html),
 this may be an indication of model misspecification. Despite that, it is still
 beneficial to be able to evaluate the predictive performance of the model
 accurately.
