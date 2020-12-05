@@ -12,16 +12,17 @@
 
 __loo__ is an R package that allows users to compute efficient approximate
 leave-one-out cross-validation for fitted Bayesian models, as well as model
-weights that can be used to average predictive distributions.
-
-The __loo__ R package package implements the fast and stable computations 
-for approximate LOO-CV and WAIC from
+weights that can be used to average predictive distributions. 
+The __loo__ package package implements the fast and stable computations for 
+approximate LOO-CV and WAIC from
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model 
 evaluation using leave-one-out cross-validation and WAIC. 
 _Statistics and Computing_. 27(5), 1413--1432. 
 doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
 [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+
+and computes model weights as described in
 
 * Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using
 stacking to average Bayesian predictive distributions. In Bayesian
