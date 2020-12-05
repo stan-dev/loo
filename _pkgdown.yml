@@ -63,7 +63,7 @@ articles:
       - loo2-weights
       - loo2-with-rstan
       - loo2-elpd
-  - title: "Advanced functionality"
+  - title: "Additional topics"
     desc: >
       These vignettes demonstrate how to use the **loo** package for more
       complicated scenarios including models with non-factorized likelihoods,
