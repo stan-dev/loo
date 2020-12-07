@@ -137,60 +137,57 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+<div id="loo-" class="section level1">
+<div class="page-header"><h1 class="hasAnchor">
+<a href="#loo-" class="anchor"></a>loo <img src="reference/figures/stanlogo.png" align="right" width="120">
+</h1></div>
+<!-- badges: start -->
 
-
-<p><br></p>
-<div style="text-align:left">
-<span><a href="https://mc-stan.org"> <img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo_tm.png" width="100" alt="Stan Logo"></a>
-<h2>
-<strong>loo</strong>
-</h2>
-<h4>
-Efficient approximate leave-one-out cross-validation
-</h4>
-<p></p></span>
-</div>
-<p><br></p>
-<p><strong>loo</strong> is an R package that allows users to compute efficient approximate leave-one-out cross-validation for fitted Bayesian models, as well as model weights that can be used to average predictive distributions.</p>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
-<p>If you are just getting started with <strong>loo</strong> we recommend starting with the tutorial <a href="https://mc-stan.org/loo/articles/index.html">vignettes</a>. There are also many examples throughout the package <a href="https://mc-stan.org/loo/reference/index.html">documentation</a>.</p>
-</div>
-<div id="details" class="section level2">
-<h2 class="hasAnchor">
-<a href="#details" class="anchor"></a>Details</h2>
-<p>Leave-one-out cross-validation (LOO-CV, or LOO for short) and the widely applicable information criterion (WAIC) are methods for estimating pointwise out-of-sample prediction accuracy from a fitted Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameter values. LOO and WAIC have various advantages over simpler estimates of predictive error such as AIC and DIC but are less used in practice because they involve additional computational steps.</p>
-<p>The <strong>loo</strong> R package package implements the fast and stable computations for approximate LOO-CV and WAIC from</p>
+<div id="efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models" class="section level3">
+<h3 class="hasAnchor">
+<a href="#efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models" class="anchor"></a>Efficient approximate leave-one-out cross-validation for fitted Bayesian models</h3>
+<p><strong>loo</strong> is an R package that allows users to compute efficient approximate leave-one-out cross-validation for fitted Bayesian models, as well as model weights that can be used to average predictive distributions. The <strong>loo</strong> package package implements the fast and stable computations for approximate LOO-CV and WAIC from</p>
 <ul>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p></li>
-<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646">arXiv preprint arXiv:1507.02646</a>.</p></li>
+<li>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</li>
 </ul>
-<p>From existing posterior simulation draws, we compute approximate LOO-CV using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models.</p>
-<p>We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful diagnostics and effective sample size and Monte Carlo standard error estimates.</p>
-<p>As of version <code>2.0.0</code>, the <strong>loo</strong> package also provides methods for using stacking and other model weighting techiques to average Bayesian predictive distributions. For details on stacking and model weighting see:</p>
+<p>and computes model weights as described in</p>
 <ul>
 <li>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, <a href="doi:10.1214/17-BA1091" class="uri">doi:10.1214/17-BA1091</a>. <a href="https://projecteuclid.org/euclid.ba/1516093227">Online</a>, <a href="https://arxiv.org/abs/1704.02030">arXiv preprint arXiv:1704.02030</a>.</li>
 </ul>
+<p>From existing posterior simulation draws, we compute approximate LOO-CV using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models. We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful diagnostics and effective sample size and Monte Carlo standard error estimates.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install the latest release from <strong>CRAN</strong></p>
+<div id="resources" class="section level3">
+<h3 class="hasAnchor">
+<a href="#resources" class="anchor"></a>Resources</h3>
+<ul>
+<li>
+<a href="https://mc-stan.org/loo">mc-stan.org/loo</a> (online documentation, vignettes)</li>
+<li>
+<a href="https://discourse.mc-stan.org">Ask a question</a> (Stan Forums on Discourse)</li>
+<li>
+<a href="https://github.com/stan-dev/loo/issues">Open an issue</a> (GitHub issues for bug reports, feature requests)</li>
+</ul>
+</div>
+<div id="installation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h3>
+<ul>
+<li>Install the latest release from CRAN:</li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"loo"</span>)</pre></div>
-<p>Install the latest development version from <strong>GitHub</strong></p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">devtools</span>)) {
-  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"devtools"</span>)
-}
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"stan-dev/loo"</span>, <span class="kw">build_vignettes</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></div>
-<p>We do <em>not</em> recommend setting <code>build_vignettes=TRUE</code> when installing from GitHub because the vignettes take a long time to build and are always available online at <a href="https://mc-stan.org/loo/articles/">mc-stan.org/loo/articles/</a>.</p>
+<ul>
+<li>Install the latest development version from GitHub:</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages("remotes")</span>
+<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"stan-dev/loo"</span>)</pre></div>
+<p>We do <em>not</em> recommend setting <code>build_vignettes=TRUE</code> when installing from GitHub because some of the vignettes take a long time to build and are always available online at <a href="https://mc-stan.org/loo/articles/">mc-stan.org/loo/articles/</a>.</p>
 </div>
-<div id="python-and-matlaboctave-code" class="section level2">
-<h2 class="hasAnchor">
-<a href="#python-and-matlaboctave-code" class="anchor"></a>Python and Matlab/Octave Code</h2>
+<div id="python-and-matlaboctave-code" class="section level3">
+<h3 class="hasAnchor">
+<a href="#python-and-matlaboctave-code" class="anchor"></a>Python and Matlab/Octave Code</h3>
 <p>Corresponding Python and Matlab/Octave code can be found at the <a href="https://github.com/avehtari/PSIS">avehtari/PSIS</a> repository.</p>
 </div>
-
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -236,10 +233,11 @@ Efficient approximate leave-one-out cross-validation
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/stan-dev/loo"><img src="https://travis-ci.org/stan-dev/loo.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://codecov.io/github/stan-dev/loo?branch=master"><img src="https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg" alt="codecov"></a></li>
 <li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://www.r-pkg.org/badges/version/loo?color=blue" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://cranlogs.r-pkg.org/badges/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
+<li><a href="https://codecov.io/github/stan-dev/loo?branch=master"><img src="https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg" alt="codecov"></a></li>
+<li><a href="https://travis-ci.org/stan-dev/loo"><img src="https://travis-ci.org/stan-dev/loo.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/jgabry/loo"><img src="https://ci.appveyor.com/api/projects/status/github/stan-dev/loo?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
 </ul>
 </div>
 </div>
