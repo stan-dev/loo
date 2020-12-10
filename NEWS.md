@@ -1,6 +1,6 @@
 # loo 2.4.1
 
-Fixes issue reported by CRAN where one of the vignettes errored on an M1 Mac
+* Fixed issue reported by CRAN where one of the vignettes errored on an M1 Mac
 due to RStan's dependency on V8. 
 
 # loo 2.4.0
