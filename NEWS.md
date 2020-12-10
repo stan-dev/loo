@@ -1,3 +1,6 @@
+# Items for next release go here
+
+
 # loo 2.4.1
 
 * Fixed issue reported by CRAN where one of the vignettes errored on an M1 Mac
