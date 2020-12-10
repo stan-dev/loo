@@ -13,6 +13,9 @@ params:
 %\VignetteIndexEntry{Writing Stan programs for use with the loo package}
 -->
 
+```{r settings, child="children/SETTINGS-knitr.txt"}
+```
+
 ```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
 ```
 

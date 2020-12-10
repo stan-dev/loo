@@ -13,6 +13,9 @@ params:
 %\VignetteIndexEntry{Using Leave-one-out cross-validation for large data}
 -->
 
+```{r settings, child="children/SETTINGS-knitr.txt"}
+```
+
 ```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
 ```
 
