@@ -1,5 +1,6 @@
 # Items for next release go here
 
+* Switch unit tests from Travis to GitHub Actions. (#164)
 
 # loo 2.4.1
 
