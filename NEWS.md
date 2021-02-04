@@ -2,6 +2,10 @@
 
 * Switch unit tests from Travis to GitHub Actions. (#164)
 
+### Bug fixes 
+
+* Fixed a bug causing the normalizing constant of the PSIS (log) weights not to get updated when performing moment matching with `save_psis = TRUE` (GitHub issue #166).
+
 # loo 2.4.1
 
 * Fixed issue reported by CRAN where one of the vignettes errored on an M1 Mac
