@@ -151,6 +151,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     }
   }
   if (!is.null(loo$psis_object)) {
+    attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(loo$psis_object$log_weights)
     loo$psis_object$diagnostics <- loo$diagnostics
   }
 
