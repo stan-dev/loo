@@ -16,9 +16,12 @@ loo_compare(x, ...)
 \method{print}{compare.loo_ss}(x, ..., digits = 1, simplify = TRUE)
 }
 \arguments{
-\item{x}{An object of class \code{"loo"} or a list of such objects.}
+\item{x}{An object of class \code{"loo"} or a list of such objects. If a list is
+used then the list names will be used as the model names in the output. See
+\strong{Examples}.}
 
-\item{...}{Additional objects of class \code{"loo"}.}
+\item{...}{Additional objects of class \code{"loo"}, if not passed in as a single
+list.}
 
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
@@ -78,8 +81,9 @@ print(comp, digits = 2)
 # (will be the same for all models in this artificial example)
 print(comp, simplify = FALSE, digits = 3)
 
-# can use a list of objects
-loo_compare(x = list(loo1, loo2, loo3))
+# can use a list of objects with custom names
+# will use apple, banana, and cherry, as the names in the output
+loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 
 \dontrun{
 # works for waic (and kfold) too

@@ -6,8 +6,11 @@
 #'   `print(..., simplify=FALSE)` to print a more detailed summary.
 #'
 #' @export
-#' @param x An object of class `"loo"` or a list of such objects.
-#' @param ... Additional objects of class `"loo"`.
+#' @param x An object of class `"loo"` or a list of such objects. If a list is
+#'   used then the list names will be used as the model names in the output. See
+#'   **Examples**.
+#' @param ... Additional objects of class `"loo"`, if not passed in as a single
+#'   list.
 #'
 #' @return A matrix with class `"compare.loo"` that has its own
 #'   print method. See the **Details** section.
@@ -55,8 +58,9 @@
 #' # (will be the same for all models in this artificial example)
 #' print(comp, simplify = FALSE, digits = 3)
 #'
-#' # can use a list of objects
-#' loo_compare(x = list(loo1, loo2, loo3))
+#' # can use a list of objects with custom names
+#' # will use apple, banana, and cherry, as the names in the output
+#' loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 #'
 #' \dontrun{
 #' # works for waic (and kfold) too
