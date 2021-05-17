@@ -51,6 +51,7 @@
 #'
 #' @examples
 #' \donttest{
+#' if (requireNamespace("rstanarm", quietly = TRUE)) {
 #' # Use rstanarm package to quickly fit a model and get both a log-likelihood
 #' # matrix and draws from the posterior predictive distribution
 #' library("rstanarm")
@@ -80,6 +81,7 @@
 #' # To get Pareto k diagnostic with E_loo we also need to provide the negative
 #' # log-likelihood values using the log_ratios argument.
 #' E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
+#' }
 #' }
 #'
 E_loo <- function(x, psis_object, ...) {
