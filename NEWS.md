@@ -4,7 +4,8 @@
 
 ### Bug fixes 
 
-* Fixed a bug causing the normalizing constant of the PSIS (log) weights not to get updated when performing moment matching with `save_psis = TRUE` (GitHub issue #166).
+* Fixed a bug causing the normalizing constant of the PSIS (log) weights not 
+to get updated when performing moment matching with `save_psis = TRUE` (#166, @fweber144).
 
 # loo 2.4.1
 
