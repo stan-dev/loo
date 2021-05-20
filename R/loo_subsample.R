@@ -472,12 +472,7 @@ estimator_choices <- function() {
 #' @noRd
 #' 
 #' @return lpd value for a single data point i
-lpd_i <- function(i, data, draws, llfun) {
-  ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
-  ll_i <- as.vector(ll_i)
-  lpd_i <- logMeanExp(ll_i)
-  lpd_i
-}
+
 
 #' Utility function to compute lpd using user-defined likelihood function 
 #' using platform-dependent parallel backends when cores > 1
@@ -488,16 +483,22 @@ lpd_i <- function(i, data, draws, llfun) {
 #' @noRd
 #' @return a vector of computed log probability densities
 compute_lpds <- function(N, data, draws, llfun, cores) {
-  print(cores)
+  lpd_i <- function(i) {
+    ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
+    ll_i <- as.vector(ll_i)
+    lpd_i <- logMeanExp(ll_i)
+    lpd_i
+  }
+  
   if (cores == 1) {
-    lpds <- lapply(X = seq_len(N), FUN = lpd_i, data, draws, llfun)
+    lpds <- lapply(X = seq_len(N), FUN = lpd_i)
   } else {
     if (.Platform$OS.type != "windows") {
-      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, data, draws, llfun)
+      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i)
     } else {
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
-      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, data, draws, llfun)
+      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i)
     }
   }
   
@@ -524,6 +525,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE)
   }
 
+  cores <- loo_cores(cores)
   N <- dim(data)[1]
 
   if (loo_approximation == "none") return(rep(1L,N))
@@ -604,7 +606,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     } else {
       stop(loo_approximation, " is not implemented!", call. = FALSE)
     }
-
     return(lpds - p_eff_approx)
   }
 
