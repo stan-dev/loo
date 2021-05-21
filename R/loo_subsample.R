@@ -472,6 +472,12 @@ estimator_choices <- function() {
 #' @noRd
 #' 
 #' @return lpd value for a single data point i
+lpd_i <- function(i, llfun, data, draws) {
+  ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
+  ll_i <- as.vector(ll_i)
+  lpd_i <- logMeanExp(ll_i)
+  lpd_i
+}
 
 
 #' Utility function to compute lpd using user-defined likelihood function 
@@ -483,22 +489,15 @@ estimator_choices <- function() {
 #' @noRd
 #' @return a vector of computed log probability densities
 compute_lpds <- function(N, data, draws, llfun, cores) {
-  lpd_i <- function(i) {
-    ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
-    ll_i <- as.vector(ll_i)
-    lpd_i <- logMeanExp(ll_i)
-    lpd_i
-  }
-  
   if (cores == 1) {
-    lpds <- lapply(X = seq_len(N), FUN = lpd_i)
+    lpds <- lapply(X = seq_len(N), FUN = lpd_i, llfun, data, draws)
   } else {
     if (.Platform$OS.type != "windows") {
-      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i)
+      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, llfun, data, draws)
     } else {
       cl <- makePSOCKcluster(cores)
       on.exit(stopCluster(cl))
-      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i)
+      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, llfun, data, draws)
     }
   }
   
