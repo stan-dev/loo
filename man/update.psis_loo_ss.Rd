@@ -27,13 +27,13 @@
 posterior draws, and other arguments to pass to the log-likelihood
 function. Note that for some \code{loo_approximation}s, the draws will be replaced
 by the posteriors summary statistics to compute loo approximations. See
-\code{loo_approximation} for details.}
+argument \code{loo_approximation} for details.}
 
 \item{draws}{For \code{loo_subsample.function()}, these are the data,
 posterior draws, and other arguments to pass to the log-likelihood
 function. Note that for some \code{loo_approximation}s, the draws will be replaced
 by the posteriors summary statistics to compute loo approximations. See
-\code{loo_approximation} for details.}
+argument \code{loo_approximation} for details.}
 
 \item{observations}{The subsample observations to use. The argument can take
 four (4) types of arguments:

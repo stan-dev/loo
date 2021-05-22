@@ -36,7 +36,7 @@ loo_subsample <- function(x, ...) {
 #'   posterior draws, and other arguments to pass to the log-likelihood
 #'   function. Note that for some `loo_approximation`s, the draws will be replaced
 #'   by the posteriors summary statistics to compute loo approximations. See
-#'   `loo_approximation` for details.
+#'   argument `loo_approximation` for details.
 #' @param observations The subsample observations to use. The argument can take
 #'   four (4) types of arguments:
 #'   * `NULL` to use all observations. The algorithm then just uses
