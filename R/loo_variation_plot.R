@@ -1,7 +1,7 @@
 #' Compare models across domains
 #' 
-#' The LOO variation plot shows how the predictive accuracy of two different
-#' models changes as the predictor is varied. This can is useful for identifying
+#' The LOO difference plot shows how the difference in the ELPD of two different
+#' models changes when a predictor is varied. This can is useful for identifying
 #' opportunities for model stacking or expansion.
 #' 
 #' @param y A vector of observations. See Details.
@@ -61,7 +61,7 @@
 #'              xlab("Index") + scale_colour_manual(values=cbPalette)
 #' 
 #' 
-plot_loo_dif <- 
+plot_loo_variation <- 
   function(y,
            psis_object_1,
            psis_object_2,
