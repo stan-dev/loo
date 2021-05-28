@@ -12,6 +12,8 @@
 #' @param group A grouping variable (a vector or factor) the same length 
 #' as `y`. Each value in group is interpreted as the group level pertaining 
 #' to the corresponding value of `y`. If `FALSE`, ignored.
+#' @param outlier_thresh Flag values when the difference in the ELPD exceeds
+#' this threshold. Defaults to `NULL`, in which case no values are flagged.
 #' @param size,alpha,jitter Passed to `[ggplot2::geom_point()]` to control 
 #' aesthetics. `size` and `alpha` are passed to to the `size` and `alpha` 
 #' arguments of `[ggplot2::geom_jitter()]` to control the appearance of 
@@ -21,7 +23,7 @@
 #' @param quantiles Boolean that determines whether to plot the quantiles of
 #' `y` rather than `y` itself. Useful when `y` has a very irregular 
 #' distribution.
-#' @param sortByGroup Sort observations by `group`, then plot against an 
+#' @param sort_by_group Sort observations by `group`, then plot against an 
 #' arbitrary index. Plotting by index can be useful when categories have 
 #' very different sample sizes. 
 #' 
@@ -56,23 +58,23 @@
 #' # Plot using an index variable to reduce crowding
 #' 
 #' plot_loo_dif(1:2980, loo3, loo2, group = GM@data$super_region_name, 
-#'              alpha = .5, sortByGroup = TRUE, 
+#'              alpha = .5, sort_by_group = TRUE, 
 #'              ) + 
 #'              xlab("Index") + scale_colour_manual(values=cbPalette)
 #' 
 #' 
-plot_loo_variation <- 
+plot_loo_dif <- 
   function(y,
            psis_object_1,
            psis_object_2,
            ...,
-           group = FALSE,
-           outlier_thresh = FALSE,
+           group = NULL,
+           outlier_thresh = NULL,
            size = 1,
            alpha = 1,
            jitter = 0,
            quantiles = FALSE,
-           sortByGroup = FALSE
+           sort_by_group = FALSE
   ){
     
     # Adding a 0 at the end lets users provide a single number as input.
@@ -89,59 +91,57 @@ plot_loo_variation <-
     }
 
     
-    if (sortByGroup){
-      if (identical(group, FALSE) || !identical(y, 1:length(y))){
-        stop("ERROR: sortByGroup should only be used for grouping categorical 
+    if (sort_by_group){
+      if (identical(group, NULL) || !identical(y, 1:length(y))){
+        stop("ERROR: sort_by_group should only be used for grouping categorical 
              variables, then plotting them with an arbitrary index. You can
              create such an index using `1:length(data)`.
              ")
       }
       
-      values <- group_by(tibble(group, elpdDif), factor(group)) %>%
-                    arrange(.by_group = TRUE)
-      
-      elpdDif <- pull(values, elpdDif)
-      group <- pull(values, group)
+      ordering <- order(group)
+      elpdDif <- elpdDif[ordering]
+      group <- group[ordering]
       
     }
     
     
-    plot <- ggplot(mapping=aes(y, elpdDif)) +
-            geom_hline(yintercept=0) + 
-            xlab(ifelse(sortByGroup, "y", "Index")) +
-            ylab(expression(ELPD[i][1] - ELPD[i][2])) + 
-            labs(color = "Groups")
+    plot <- ggplot2::ggplot(mapping=aes(y, elpdDif)) +
+            ggplot2::geom_hline(yintercept=0) + 
+            ggplot2::xlab(ifelse(sort_by_group, "y", "Index")) +
+            ggplot2::ylab(expression(ELPD[i][1] - ELPD[i][2])) + 
+            ggplot2::labs(color = "Groups")
     
 
     
     if (identical(group, FALSE)){ 
       # Don't color by group if no groups are passed
       plot <- plot +  
-              geom_jitter(width = jitter[1], height = jitter[2], 
-                          alpha = alpha, size = size
-                          ) 
+              ggplot2::geom_jitter(width = jitter[1], height = jitter[2], 
+                                   alpha = alpha, size = size
+                                  ) 
     }
     else{
       # If group is passed, use color
       plot <- plot +  
-          geom_jitter(aes(color = factor(group)),
-                      width = jitter[1], height = jitter[2], 
-                      alpha = alpha, size = size
-                      ) 
+          ggplot2::geom_jitter(aes(color = factor(group)),
+                               width = jitter[1], height = jitter[2], 
+                               alpha = alpha, size = size
+                              ) 
     }
     
-    if (!identical(outlier_thresh, FALSE)){
+    if (!identical(outlier_thresh, NULL)){
       # Flag outliers
       is_outlier <- elpdDif > outlier_thresh
       index <- 1:length(y)
       outlier_labs <- index[is_outlier]
       
-      plot <- plot + annotate("text",
-                              x = y[is_outlier],
-                              y = elpdDif[outlier_labs],
-                              label = outlier_labs,
-                              size = 4
-                              )
+      plot <- plot + ggplot2::annotate("text",
+                                       x = y[is_outlier],
+                                       y = elpdDif[outlier_labs],
+                                       label = outlier_labs,
+                                       size = 4
+                                      )
               
       
     }
