@@ -59,11 +59,8 @@
 #'              ) + 
 #'              xlab("Index") + scale_colour_manual(values=cbPalette)
 #'
-#' cbPalette <- c("#636363", "#E69F00", "#56B4E9", "#009E73",
-#'                "#F0E442", "#0072B2","#CC79A7")
-#'
-#' options(mc.cores = parallel::detectCores())
-#' options(loo.cores = parallel::detectCores())
+#' 
+#' # Example using kid IQ Dataset with a continuous predictor
 #'
 #' data(kidiq)
 #'
