@@ -20,9 +20,6 @@
 #' points. `jitter` can be either a number or a vector of numbers.
 #' Passing a single number will jitter variables along the x axis only, while 
 #' passing a vector will jitter along both axes.
-#' @param quantiles Boolean that determines whether to plot the quantiles of
-#' `y` rather than `y` itself. Useful when `y` has a very irregular 
-#' distribution.
 #' @param sort_by_group Sort observations by `group`, then plot against an 
 #' arbitrary index. Plotting by index can be useful when categories have 
 #' very different sample sizes. 
@@ -73,7 +70,6 @@ plot_loo_dif <-
            size = 1,
            alpha = 1,
            jitter = 0,
-           quantiles = FALSE,
            sort_by_group = FALSE
   ){
     
@@ -83,12 +79,6 @@ plot_loo_dif <-
     
     elpdDif <- psis_object_1$pointwise[, "elpd_loo"] - 
                psis_object_2$pointwise[, "elpd_loo"]
-    
-
-    if (quantiles){
-      # If quantiles is set to true, replace all y values with their quantile
-      y <- ecdf(y)(y)
-    }
 
     
     if (sort_by_group){
