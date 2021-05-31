@@ -58,8 +58,45 @@
 #'              alpha = .5, sort_by_group = TRUE, 
 #'              ) + 
 #'              xlab("Index") + scale_colour_manual(values=cbPalette)
+#'
+#' cbPalette <- c("#636363", "#E69F00", "#56B4E9", "#009E73",
+#'                "#F0E442", "#0072B2","#CC79A7")
+#'
+#' options(mc.cores = parallel::detectCores())
+#' options(loo.cores = parallel::detectCores())
+#'
+#' data(kidiq)
+#'
+#' t_prior <- student_t(df = 10, location = 0, scale = .5)
+#' coef_prior <- student_t(df = 10, location = .5, scale = .25)
+#' kidiq$kid_std <- (kidiq$kid_score - 100) / 15
+#' kidiq$mom_std <- (kidiq$mom_iq - 100) / 15
+#' kidiq$age_std <- (kidiq$mom_age - mean(kidiq$mom_age)) / sd(kidiq$mom_age)
+#' kidiq$hs_cent <- kidiq$mom_hs - mean(kidiq$mom_hs)
+#'
+#' coFit <- stan_glm(kid_std ~ hs_cent, data = kidiq,
+#'                   family = gaussian(), prior = coef_prior,
+#'                   prior_intercept = t_prior,
+#'                   seed = 1776, chains = 2
+#' )
+#' iqFit <- stan_glm(kid_std ~ mom_std + hs_cent, data = kidiq,
+#'                   family = gaussian(),
+#'                   prior = coef_prior, prior_intercept = t_prior,
+#'                   seed = 1776, chains = 2
+#' )
+#'
+#'
+#' coLoo <- loo(iqFit, save_psis = TRUE)
+#' iqLoo <- loo(coFit, save_psis = TRUE)
+#'
+#'
+#' plot_loo_dif(kidiq$mom_iq, coLoo, iqLoo, group = kidiq$mom_hs,
+#'              alpha = .5, jitter = c(.1, .1)
+#' ) + ggplot2::geom_smooth() +
+#'   ggplot2::xlab("IQ of Mother") +
+#'   ggplot2::scale_colour_manual(values=cbPalette)
 #' 
-#' 
+
 plot_loo_dif <- 
   function(y,
            psis_object_1,
