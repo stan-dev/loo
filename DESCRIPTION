@@ -47,8 +47,7 @@ Suggests:
     rstanarm (>= 2.19.0),
     rstantools,
     spdep,
-    testthat (>= 2.1.0),
-    patrick
+    testthat (>= 2.1.0)
 VignetteBuilder: knitr
 Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
