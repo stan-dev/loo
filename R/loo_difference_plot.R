@@ -89,7 +89,8 @@
 #'
 #' plot_loo_dif(kidiq$mom_iq, coLoo, iqLoo, group = kidiq$mom_hs,
 #'              alpha = .5, jitter = c(.1, .1)
-#' ) + ggplot2::geom_smooth() +
+#'              ) +
+#'   ggplot2::geom_smooth() +
 #'   ggplot2::xlab("IQ of Mother") +
 #'   ggplot2::scale_colour_manual(values=cbPalette)
 #' 
