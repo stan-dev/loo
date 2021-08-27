@@ -205,8 +205,9 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   khat <- Inf
 
   if (enough_tail_samples(tail_len_i)) {
-    ord <- sort.int(lw_i, index.return = TRUE)
-    tail_ids <- seq(S - tail_len_i + 1, S)
+    tail_start <- S - tail_len_i + 1
+    ord <- sort.int(lw_i, index.return = TRUE, partial=tail_start:S)
+    tail_ids <- seq(tail_start, S)
     lw_tail <- ord$x[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps/100) {
       warning(
