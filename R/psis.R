@@ -206,7 +206,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
 
   if (enough_tail_samples(tail_len_i)) {
     tail_start <- S - tail_len_i + 1
-    ord <- sort.int(lw_i, index.return = TRUE, partial=tail_start:S)
+    ord <- sort.int(lw_i, index.return = TRUE, partial=(tail_start - 1):S)
     tail_ids <- seq(tail_start, S)
     lw_tail <- ord$x[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps/100) {
@@ -216,7 +216,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
         call. = FALSE
       )
     } else {
-      cutoff <- ord$x[min(tail_ids) - 1] # largest value smaller than tail values
+      cutoff <- ord$x[tail_start - 1] # largest value smaller than tail values
       smoothed <- psis_smooth_tail(lw_tail, cutoff)
       khat <- smoothed$k
       lw_i[ord$ix[tail_ids]] <- smoothed$tail
