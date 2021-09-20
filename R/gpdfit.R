@@ -40,9 +40,7 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
   xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
   theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
   l_theta <- N * lx(theta, x) # profile log-lik
-  w_theta <- 1 / vapply(jj, FUN.VALUE = numeric(1), FUN = function(j) {
-    sum(exp(l_theta - l_theta[j]))
-  })
+  w_theta <- exp(l_theta - matrixStats::logSumExp(l_theta)) # normalize
   theta_hat <- sum(theta * w_theta)
   k <- mean.default(log1p(-theta_hat * x))
   sigma <- -k / theta_hat
