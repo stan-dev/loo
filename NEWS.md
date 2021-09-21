@@ -1,5 +1,11 @@
 # Items for next release go here
 
+* Speed improvement from simplifying the normalization when fitting the 
+generalized Pareto distribution. (#187, @sethaxen)
+
+* Fixed bug where attribute storing normalizing constant of PSIS weights wasn't
+updated when using moment matching. (#167, @fweber144)
+
 * Switch unit tests from Travis to GitHub Actions. (#164)
 
 ### Bug fixes 
