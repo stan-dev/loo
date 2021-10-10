@@ -97,10 +97,10 @@ psis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
            cores = getOption("mc.cores", 1)) {
-  importance_sampling.array(log_ratios = log_ratios, ...,
-                            r_eff = r_eff,
-                            cores = cores,
-                            method = "psis")
+    importance_sampling.array(log_ratios = log_ratios, ...,
+                              r_eff = r_eff,
+                              cores = cores,
+                              method = "psis")
   }
 
 
@@ -245,14 +245,14 @@ psis_smooth_tail <- function(x, cutoff) {
 
   # save time not sorting since x already sorted
   fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
-  k <- fit$k
-  sigma <- fit$sigma
+  k <- fit$k_hat
+  sigma <- fit$sigma_hat
   if (is.finite(k)) {
-      p <- (seq_len(len) - 0.5) / len
-      qq <- qgpd(p, k, sigma) + exp_cutoff
-      tail <- log(qq)
+    p <- (seq_len(len) - 0.5) / len
+    qq <- qgpd(p, k, sigma) + exp_cutoff
+    tail <- log(qq)
   } else {
-      tail <- x
+    tail <- x
   }
   list(tail = tail, k = k)
 }
@@ -385,4 +385,3 @@ throw_psis_r_eff_warning <- function() {
     call. = FALSE
   )
 }
-

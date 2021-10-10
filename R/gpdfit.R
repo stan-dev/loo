@@ -17,7 +17,7 @@
 #'   algorithm is to sort the elements of `x`. If `x` is already
 #'   sorted in ascending order then `sort_x` can be set to `FALSE` to
 #'   skip the initial sorting step.
-#' @return A named list with components `k` and `sigma`.
+#' @return A named list with components `k_hat`, `sigma_hat`, `k` and `w_theta`.
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
@@ -39,31 +39,26 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
   jj <- seq_len(M)
   xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
   theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
-  l_theta <- N * lx(theta, x) # profile log-lik
+  k <- matrixStats::rowMeans2(log1p(-theta %o% x))
+  l_theta <- N * (log(-theta / k) - k - 1) # profile log-lik
   w_theta <- exp(l_theta - matrixStats::logSumExp(l_theta)) # normalize
   theta_hat <- sum(theta * w_theta)
-  k <- mean.default(log1p(-theta_hat * x))
-  sigma <- -k / theta_hat
+  k_hat <- mean.default(log1p(-theta_hat * x))
+  sigma_hat <- -k_hat / theta_hat
 
   if (wip) {
-    k <- adjust_k_wip(k, n = N)
+    k_hat <- adjust_k_wip(k_hat, n = N)
   }
 
-  if (is.nan(k)) {
-    k <- Inf
+  if (is.nan(k_hat)) {
+    k_hat <- Inf
   }
 
-  nlist(k, sigma)
+  nlist(k_hat, sigma_hat, k, w_theta)
 }
 
 
 # internal ----------------------------------------------------------------
-
-lx <- function(a,x) {
-  a <- -a
-  k <- vapply(a, FUN = function(a_i) mean(log1p(a_i * x)), FUN.VALUE = numeric(1))
-  log(a / k) - k - 1
-}
 
 #' Adjust k based on weakly informative prior, Gaussian centered on 0.5. This
 #' will stabilize estimates for very small Monte Carlo sample sizes and low neff

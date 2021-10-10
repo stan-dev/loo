@@ -73,8 +73,8 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
       fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
-      k <- fit$k
-      sigma <- fit$sigma
+      k <- fit$k_hat
+      sigma <- fit$sigma_hat
       prb <- (seq_len(tail_len) - 0.5) / tail_len
       qq <- qgpd(prb, k, sigma) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
