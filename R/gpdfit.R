@@ -17,7 +17,7 @@
 #'   algorithm is to sort the elements of `x`. If `x` is already
 #'   sorted in ascending order then `sort_x` can be set to `FALSE` to
 #'   skip the initial sorting step.
-#' @return A named list with components `k_hat`, `sigma_hat`, `k` and `w_theta`.
+#' @return A named list with components `k_hat`, `sigma_hat`, `k`, and `d_theta`.
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
@@ -50,11 +50,17 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
     k_hat <- adjust_k_wip(k_hat, n = N)
   }
 
-  if (is.nan(k_hat)) {
+  if (is.na(k_hat)) {
     k_hat <- Inf
+    sigma_hat <- NaN
   }
 
-  nlist(k_hat, sigma_hat, k, w_theta)
+  # estimate the normalization term with the trapezoidal rule
+  c <- 2 / sum((w_theta[-M] + w_theta[-1]) * (k[-M] - k[-1]))
+  # convert normalized quadrature weights to normalized densities
+  d_theta <- c * w_theta
+
+  nlist(k_hat, sigma_hat, k, d_theta)
 }
 
 
