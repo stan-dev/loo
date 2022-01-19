@@ -140,8 +140,9 @@ Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
 In \emph{International Conference on Machine Learning}
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}

@@ -3,6 +3,7 @@
 #' Leave-One-Out Cross-Validation for Large Data.
 #' In _International Conference on Machine Learning_
 #'
-#' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+#' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 #' Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+#' In _International Conference on Artificial Intelligence and Statistics (AISTATS)_
 #'

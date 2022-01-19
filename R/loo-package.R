@@ -31,7 +31,7 @@
 #'   predictive error such as AIC and DIC but are less used in practice because
 #'   they involve additional computational steps. This package implements the
 #'   fast and stable computations for approximate LOO-CV laid out in Vehtari,
-#'   Gelman, and Gabry (2017a). From existing posterior simulation draws, we
+#'   Gelman, and Gabry (2017). From existing posterior simulation draws, we
 #'   compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
 #'   Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
 #'   and diagnosing importance weights. As a byproduct of our calculations,
