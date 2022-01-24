@@ -75,7 +75,7 @@
 #' obtain the samples from the proposal distribution via MCMC the **loo**
 #' package also computes estimates for the Monte Carlo error and the effective
 #' sample size for importance sampling, which are more accurate for PSIS than
-#' for IS and TIS (see Vehtari et al (2017b) for details). However, the PSIS
+#' for IS and TIS (see Vehtari et al (2019) for details). However, the PSIS
 #' effective sample size estimate will be
 #'  **over-optimistic when the estimate of \eqn{k} is greater than 0.7**.
 #' }
