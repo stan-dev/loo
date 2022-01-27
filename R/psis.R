@@ -249,7 +249,7 @@ psis_smooth_tail <- function(x, cutoff) {
   sigma <- fit$sigma_hat
   if (is.finite(k)) {
     p <- (seq_len(len) - 0.5) / len
-    qq <- qgpd(p, k, sigma) + exp_cutoff
+    qq <- qgpd(p, sigma = sigma, k = k) + exp_cutoff
     tail <- log(qq)
   } else {
     tail <- x

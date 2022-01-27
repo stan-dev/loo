@@ -76,7 +76,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       k <- fit$k_hat
       sigma <- fit$sigma_hat
       prb <- (seq_len(tail_len) - 0.5) / tail_len
-      qq <- qgpd(prb, k, sigma) + exp_cutoff
+      qq <- qgpd(prb, sigma = sigma, k = k) + exp_cutoff
       smoothed_tail <- rep.int(0, tail_len)
       smoothed_tail[tail_ord] <- log(qq)
       x_new <- x
