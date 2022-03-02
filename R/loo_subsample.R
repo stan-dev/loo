@@ -111,7 +111,7 @@ loo_subsample.function <-
            estimator = "diff_srs",
            llgrad = NULL,
            llhess = NULL) {
-
+    cores <- loo_cores(cores)
     # Asserting inputs
     .llfun <- validate_llfun(x)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -466,8 +466,45 @@ estimator_choices <- function() {
   c("hh_pps", "diff_srs", "srs")
 }
 
-
 ## Approximate elpd -----
+
+#' Utility function to apply user-specified log-likelihood to a single data point
+#' @details 
+#' See [elpd_loo_approximation] and [compute_lpds] for usage examples
+#' @noRd
+#' 
+#' @return lpd value for a single data point i
+lpd_i <- function(i, llfun, data, draws) {
+  ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
+  ll_i <- as.vector(ll_i)
+  lpd_i <- logMeanExp(ll_i)
+  lpd_i
+}
+
+
+#' Utility function to compute lpd using user-defined likelihood function 
+#' using platform-dependent parallel backends when cores > 1
+#' 
+#' @details 
+#' See [elpd_loo_approximation] for usage examples
+#' 
+#' @noRd
+#' @return a vector of computed log probability densities
+compute_lpds <- function(N, data, draws, llfun, cores) {
+  if (cores == 1) {
+    lpds <- lapply(X = seq_len(N), FUN = lpd_i, llfun, data, draws)
+  } else {
+    if (.Platform$OS.type != "windows") {
+      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, llfun, data, draws)
+    } else {
+      cl <- makePSOCKcluster(cores)
+      on.exit(stopCluster(cl))
+      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, llfun, data, draws)
+    }
+  }
+  
+  unlist(lpds)
+}
 
 #' Compute approximation to loo_i:s
 #'
@@ -482,7 +519,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
   checkmate::assert_int(loo_approximation_draws, lower = 2, null.ok = TRUE)
-  cores <- loo_cores(cores)
   if (!is.null(.llgrad)) {
     checkmate::assert_function(.llgrad, args = c("data_i", "draws"), ordered = TRUE)
   }
@@ -490,6 +526,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE)
   }
 
+  cores <- loo_cores(cores)
   N <- dim(data)[1]
 
   if (loo_approximation == "none") return(rep(1L,N))
@@ -509,12 +546,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   # Compute the lpd or log p(y_i|y_{-i})
   if (loo_approximation == "lpd") {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws)
-      ll_i <- as.vector(ll_i)
-      lpd_i <- logMeanExp(ll_i)
-      lpd_i
-    }))
+    lpds <- compute_lpds(N, data, draws, .llfun, cores)
     return(lpds) # Use only the lpd
   }
 
@@ -526,12 +558,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     draws <- .thin_draws(draws, loo_approximation_draws)
     point_est <- .compute_point_estimate(draws)
-    lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
-      ll_i <- as.vector(ll_i)
-      lpd_i <- logMeanExp(ll_i)
-      lpd_i
-    }))
+    lpds <- compute_lpds(N, data, point_est, .llfun, cores)
     if (loo_approximation == "plpd") return(lpds) # Use only the lpd
   }
 
@@ -542,13 +569,8 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     point_est <- .compute_point_estimate(draws)
     # Compute the lpds
-    lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
-      ll_i <- as.vector(ll_i)
-      lpd_i <- logMeanExp(ll_i)
-      lpd_i
-    }))
-
+    lpds <- compute_lpds(N, data, point_est, .llfun, cores)
+    
     if (loo_approximation == "waic_grad" |
         loo_approximation == "waic_hess") {
       cov_est <- stats::cov(draws)
@@ -585,7 +607,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     } else {
       stop(loo_approximation, " is not implemented!", call. = FALSE)
     }
-
     return(lpds - p_eff_approx)
   }
 

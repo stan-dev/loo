@@ -333,10 +333,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
 
 context("loo_subsampling_approximations")
 
-test_that("elpd_loo_approximation works as expected", {
-
-
-  set.seed(123)
+geterate_test_elpd_dataset <- function() {
   N <- 10; K <- 10; S <- 1000; a0 <- 3; b0 <- 2
   p <- 0.7
   y <- rbinom(N, size = K, prob = p)
@@ -344,21 +341,31 @@ test_that("elpd_loo_approximation works as expected", {
   fake_posterior <- draws <- as.matrix(rbeta(S, a, b))
   fake_data <- data.frame(y,K)
   rm(N, K, S, a0, b0, p, y, a, b)
+  
+  list(fake_posterior = fake_posterior, fake_data = fake_data)
+}
+
+test_elpd_loo_approximation <- function(cores) {
+  set.seed(123)
+  test_data <- geterate_test_elpd_dataset()
+  fake_posterior <- test_data$fake_posterior
+  fake_data <- test_data$fake_data
+  
   llfun_test <- function(data_i, draws) {
     dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
   }
-
+  
   # Compute plpd approximation
-  expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "plpd", cores = 1))
+  expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "plpd", cores = cores))
   # Compute it manually
   point <- mean(fake_posterior)
   llik <- dbinom(fake_data$y, size = fake_data$K, prob = point, log = TRUE)
   abs_lliks <- abs(llik)
   man_elpd_loo_approximation <- abs_lliks/sum(abs_lliks)
   expect_equal(abs(pi_vals)/sum(abs(pi_vals)), man_elpd_loo_approximation, tol = 0.00001)
-
+  
   # Compute lpd approximation
-  expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "lpd", cores = 1))
+  expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "lpd", cores = cores))
   # Compute it manually
   llik <- numeric(10)
   for(i in seq_along(fake_data$y)){
@@ -367,23 +374,30 @@ test_that("elpd_loo_approximation works as expected", {
   abs_lliks <- abs(llik)
   man_approx_loo_variable <- abs_lliks/sum(abs_lliks)
   expect_equal(abs(pi_vals)/sum(abs(pi_vals)), man_approx_loo_variable, tol = 0.00001)
-
+  
   # Compute waic approximation
-  expect_silent(pi_vals_waic <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", cores = 1))
+  expect_silent(pi_vals_waic <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", cores = cores))
   expect_true(all(pi_vals > pi_vals_waic))
   expect_true(sum(pi_vals) - sum(pi_vals_waic) < 1)
-
+  
   # Compute tis approximation
   expect_silent(pi_vals_tis <- loo:::elpd_loo_approximation(.llfun = llfun_test,
                                                             data = fake_data,
                                                             draws = fake_posterior,
                                                             loo_approximation = "tis",
                                                             loo_approximation_draws = 100,
-                                                            cores = 1))
+                                                            cores = cores))
   expect_true(all(pi_vals > pi_vals_tis))
   expect_true(sum(pi_vals) - sum(pi_vals_tis) < 1)
+}
+
+test_that("elpd_loo_approximation works as expected", {
+  test_elpd_loo_approximation(1)
 })
 
+test_that("elpd_loo_approximation with multiple cores", {
+  test_elpd_loo_approximation(2)
+})
 
 test_that("Test loo_approximation_draws", {
 
