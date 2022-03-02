@@ -19,4 +19,4 @@ vignettes/loo2-non-factorizable_cache/*
 ^\.codecov\.yml$
 .github/*
 ^\.github$
-^vignettes/articles-online-only$
+^vignettes/online-only$
