@@ -708,7 +708,8 @@ can be expressed in terms of a multivariate normal likelihood.
 
 Anselin L. (1988). *Spatial econometrics: methods and models*. Dordrecht: Kluwer Academic.
 
-Bürkner P. C., Gabry J., & Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. [ArXiv preprint](https://arxiv.org/abs/1810.10559).
+Bürkner P. C., Gabry J., & Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. *Computational Statistics*, \doi:10.1007/s00180-020-01045-4. 
+[ArXiv preprint](https://arxiv.org/abs/1810.10559).
 
 Sundararajan S. & Keerthi S. S. (2001). Predictive approaches for choosing hyperparameters in Gaussian processes. *Neural Computation*, 13(5), 1103--1118.
 
