@@ -1,4 +1,6 @@
-# Items for next release go here
+# loo 2.5.0
+
+### Improvements
 
 * Speed improvement from simplifying the normalization when fitting the 
 generalized Pareto distribution. (#187, @sethaxen)
@@ -7,6 +9,8 @@ generalized Pareto distribution. (#187, @sethaxen)
 updated when using moment matching. (#167, @fweber144)
 
 * Switch unit tests from Travis to GitHub Actions. (#164)
+
+* Added parallel likelihood computation to speedup `loo_subsample()` when using posterior approximations. (#171, @kdubovikov)
 
 ### Bug fixes 
 

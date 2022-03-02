@@ -1,8 +1,8 @@
 Package: loo
 Type: Package
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 2.4.1.9000
-Date: 2020-12-07
+Version: 2.5.0
+Date: 2022-03-02
 Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
              person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
              person("Mans", "Magnusson", role = c("aut")),
@@ -51,5 +51,5 @@ Suggests:
 VignetteBuilder: knitr
 Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
