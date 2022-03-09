@@ -326,6 +326,8 @@ Pareto smoothed importance sampling.
 \itemize{
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
 for demonstrations.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
 \item \code{\link[=psis]{psis()}} for the underlying Pareto Smoothed Importance Sampling (PSIS)
 procedure used in the LOO-CV approximation.
 \item \link{pareto-k-diagnostic} for convenience functions for looking at diagnostics.

@@ -5,7 +5,12 @@
 #' @template loo-and-psis-references
 #' @template bayesvis-reference
 #'
-#' @description Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
+#' @description
+#'   The pages provides definitions to key terms. Also see the
+#'   [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'   the __loo__ website for answers to frequently asked questions.
+#'
+#'   Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 #'   **References**, below.
 #'
 #' @section ELPD and `elpd_loo`:

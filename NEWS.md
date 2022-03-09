@@ -2,20 +2,22 @@
 
 ### Improvements
 
+* New [Frequently Asked Questions page](https://mc-stan.org/loo/articles/online-only/faq.html) on the package website. (#143)
+
 * Speed improvement from simplifying the normalization when fitting the 
 generalized Pareto distribution. (#187, @sethaxen)
 
-* Fixed bug where attribute storing normalizing constant of PSIS weights wasn't
-updated when using moment matching. (#167, @fweber144)
+* Added parallel likelihood computation to speedup `loo_subsample()` when using posterior approximations. (#171, @kdubovikov)
 
 * Switch unit tests from Travis to GitHub Actions. (#164)
-
-* Added parallel likelihood computation to speedup `loo_subsample()` when using posterior approximations. (#171, @kdubovikov)
 
 ### Bug fixes 
 
 * Fixed a bug causing the normalizing constant of the PSIS (log) weights not 
 to get updated when performing moment matching with `save_psis = TRUE` (#166, @fweber144).
+
+* Fixed bug where the attribute storing normalizing constant of PSIS weights
+wasn't updated when using moment matching. (#167, @fweber144)
 
 # loo 2.4.1
 

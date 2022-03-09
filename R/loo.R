@@ -87,8 +87,10 @@
 #' }
 #'
 #' @seealso
-#'  * The **loo** package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'  * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html)
 #'    for demonstrations.
+#'  * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'    the __loo__ website for answers to frequently asked questions.
 #'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
 #'    procedure used in the LOO-CV approximation.
 #'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.

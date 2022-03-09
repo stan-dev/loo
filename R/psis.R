@@ -68,6 +68,10 @@
 #' @seealso
 #' * [loo()] for approximate LOO-CV using PSIS.
 #' * [pareto-k-diagnostic] for PSIS diagnostics.
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'   for demonstrations.
+#' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'   the __loo__ website for answers to frequently asked questions.
 #'
 #' @template loo-and-psis-references
 #'

@@ -155,5 +155,9 @@ Pareto smoothed importance sampling.
 \itemize{
 \item \code{\link[=loo]{loo()}} for approximate LOO-CV using PSIS.
 \item \link{pareto-k-diagnostic} for PSIS diagnostics.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
+for demonstrations.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
 }
 }

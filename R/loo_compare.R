@@ -42,6 +42,9 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
+#' @seealso
+#' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'   the __loo__ website for answers to frequently asked questions.
 #' @template loo-and-psis-references
 #'
 #' @examples
