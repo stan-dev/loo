@@ -44,9 +44,9 @@ setting \code{mc.cores} interactively or in a script is fine).
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
 internally but by default discards the (potentially large) \code{"psis"} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
-will add a \code{psis_object} component to the list returned by \code{loo}. Currently
-this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
-weighted expectations after running \code{loo}.}
+will add a \code{psis_object} component to the list returned by \code{loo}.
+Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
+compute weighted expectations after running \code{loo}.}
 
 \item{...}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass

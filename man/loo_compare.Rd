@@ -42,28 +42,28 @@ By default the print method shows only the most important information. Use
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
-expected predictive accuracy by the difference in \code{elpd_loo} or
-\code{elpd_waic} (or multiplied by \eqn{-2}, if desired, to be on the
-deviance scale).
+expected predictive accuracy by the difference in
+\code{\link[=loo-glossary]{elpd_loo}} or \code{elpd_waic} (or multiplied by \eqn{-2}, if
+desired, to be on the deviance scale).
 
-When using \code{loo_compare()}, the returned matrix will have one row per
-model and several columns of estimates. The values in the \code{elpd_diff}
-and \code{se_diff} columns of the returned matrix are computed by making
-pairwise comparisons between each model and the model with the largest ELPD
-(the model in the first row). For this reason the \code{elpd_diff} column
-will always have the value \code{0} in the first row (i.e., the difference
-between the preferred model and itself) and negative values in subsequent
-rows for the remaining models.
+When using \code{loo_compare()}, the returned matrix will have one row per model
+and several columns of estimates. The values in the
+\code{\link[=loo-glossary]{elpd_diff}} and \code{\link[=loo-glossary]{se_diff}} columns of the
+returned matrix are computed by making pairwise comparisons between each
+model and the model with the largest ELPD (the model in the first row). For
+this reason the \code{elpd_diff} column will always have the value \code{0} in the
+first row (i.e., the difference between the preferred model and itself) and
+negative values in subsequent rows for the remaining models.
 
-To compute the standard error of the difference in ELPD --- which should
-not be expected to equal the difference of the standard errors --- we use a
-paired estimate to take advantage of the fact that the same set of \eqn{N}
-data points was used to fit both models. These calculations should be most
-useful when \eqn{N} is large, because then non-normality of the
-distribution is not such an issue when estimating the uncertainty in these
-sums. These standard errors, for all their flaws, should give a better
-sense of uncertainty than what is obtained using the current standard
-approach of comparing differences of deviances to a Chi-squared
+To compute the standard error of the difference in \link[=loo-glossary]{ELPD} ---
+which should not be expected to equal the difference of the standard errors
+--- we use a paired estimate to take advantage of the fact that the same
+set of \eqn{N} data points was used to fit both models. These calculations
+should be most useful when \eqn{N} is large, because then non-normality of
+the distribution is not such an issue when estimating the uncertainty in
+these sums. These standard errors, for all their flaws, should give a
+better sense of uncertainty than what is obtained using the current
+standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
 }
