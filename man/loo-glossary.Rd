@@ -4,6 +4,10 @@
 \alias{loo-glossary}
 \title{LOO package glossary}
 \description{
+The pages provides definitions to key terms. Also see the
+\href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
+
 Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 \strong{References}, below.
 }
