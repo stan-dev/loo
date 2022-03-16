@@ -174,5 +174,9 @@ Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
 \seealso{
-\code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.
+\itemize{
+\item \code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
+}
 }

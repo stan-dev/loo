@@ -80,7 +80,10 @@
 #'  **over-optimistic when the estimate of \eqn{k} is greater than 0.7**.
 #' }
 #'
-#' @seealso [psis()] for the implementation of the PSIS algorithm.
+#' @seealso
+#'  * [psis()] for the implementation of the PSIS algorithm.
+#'  * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'    the __loo__ website for answers to frequently asked questions.
 #'
 #' @template loo-and-psis-references
 #'

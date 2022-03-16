@@ -1,14 +1,35 @@
+# loo 2.5.0
+
+### Improvements
+
+* New [Frequently Asked Questions page](https://mc-stan.org/loo/articles/online-only/faq.html) on the package website. (#143)
+
+* Speed improvement from simplifying the normalization when fitting the
+generalized Pareto distribution. (#187, @sethaxen)
+
+* Added parallel likelihood computation to speedup `loo_subsample()` when using posterior approximations. (#171, @kdubovikov)
+
+* Switch unit tests from Travis to GitHub Actions. (#164)
+
+### Bug fixes
+
+* Fixed a bug causing the normalizing constant of the PSIS (log) weights not
+to get updated when performing moment matching with `save_psis = TRUE` (#166, @fweber144).
+
+* Fixed bug where the attribute storing normalizing constant of PSIS weights
+wasn't updated when using moment matching. (#167, @fweber144)
+
 # loo 2.4.1
 
 * Fixed issue reported by CRAN where one of the vignettes errored on an M1 Mac
-due to RStan's dependency on V8. 
+due to RStan's dependency on V8.
 
 # loo 2.4.0
 
-### Bug fixes 
+### Bug fixes
 
 * Fixed a bug in `relative_eff.function()` that caused an error on Windows when
-using multiple cores. (#152) 
+using multiple cores. (#152)
 
 * Fixed a potential numerical issue in `loo_moment_match()` with `split=TRUE`. (#153)
 
@@ -16,7 +37,7 @@ using multiple cores. (#152)
 
 * Fixed `relative_eff()` when used with a `posterior::draws_array`. (#161, @rok-cesnovar)
 
-### New features 
+### New features
 
 * New generic function `elpd()` (and methods for matrices and arrays) for
 computing expected log predictive density of new data or log predictive density
@@ -39,7 +60,7 @@ update a `loo` object when Pareto k estimates are large. (#130)
 
 * The log weights provided by the importance sampling functions `psis()`,
 `tis()`, and `sis()` no longer have the largest log ratio subtracted from them
-when returned to the user. This should be less confusing for anyone using 
+when returned to the user. This should be less confusing for anyone using
 the `weights()` method to make an importance sampler. (#112, #146)
 
 * MCSE calculation is now deterministic (#116, #147)
@@ -80,7 +101,7 @@ the existing `compare()` function. (#93)
 
 * Improved stability of `psis()` when `log_ratios` are very small. (#74)
 
-* Allow `r_eff=NA` to suppress warning when specifying `r_eff` is not applicable 
+* Allow `r_eff=NA` to suppress warning when specifying `r_eff` is not applicable
 (i.e., draws not from MCMC). (#72)
 
 * Update effective sample size calculations to match RStan's version. (#85)
@@ -94,13 +115,13 @@ deprecate rather than remove old functionality, but it is possible that old code
 that accesses elements inside loo objects by position rather than name may
 error.
 
-* New package documentation website http://mc-stan.org/loo/ with vignettes, 
+* New package documentation website http://mc-stan.org/loo/ with vignettes,
 function reference, news.
 
 * Updated existing vignette and added two new vignettes demonstrating how to use
 the package.
 
-* New function `psis()` replaces `psislw()` (now deprecated). This version 
+* New function `psis()` replaces `psislw()` (now deprecated). This version
 implements the improvements to the PSIS algorithm described in the latest
 version of https://arxiv.org/abs/1507.02646. Additional diagnostic
 information is now also provided, including PSIS effective sample sizes.
@@ -110,7 +131,7 @@ Arguments `log` and `normalize` control whether the weights are returned on the
 log scale and whether they are normalized.
 
 * Updated the interface for the `loo()` methods to integrate nicely with the new
-PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions 
+PSIS algorithm. Methods for log-likelihood arrays, matrices, and functions
 are provided. Several arguments have changed, particularly for the
 `loo.function` method. The documentation at `help("loo")` has been updated to
 describe the new behavior.
@@ -149,7 +170,7 @@ variances, quantiles).
 
 * `pareto_k_table()` and `pareto_k_ids()` convenience functions for quickly
 identifying problematic observations
-* pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`, 
+* pareto k values now grouped into `(-Inf, 0.5]`, `(0.5, 0.7]`, `(0.7, 1]`,
 `(1, Inf)` (didn't used to include 0.7)
 * warning messages are now issued by `psislw()` instead of `print.loo`
 * `print.loo()` shows a table of pareto k estimates (if any k > 0.7)
@@ -189,27 +210,27 @@ statistic when `psislw` function is called in an interactive session.
 # loo 0.1.3
 
 This update provides several important improvements, most notably an alternative
-method for specifying the pointwise log-likelihood that reduces memory usage 
+method for specifying the pointwise log-likelihood that reduces memory usage
 and allows for __loo__ to be used with larger datasets. This update also makes
 it easier to to incorporate __loo__'s functionality into other packages.
 
 * Add Ben Goodrich as contributor
-* S3 generics and `matrix` and `function` methods for both `loo()` and `waic()`. 
-The matrix method provide the same functionality as in previous versions of 
-__loo__ (taking a log-likelihood matrix as the input). The function method 
-allows the user to provide a function for computing the log-likelihood from 
+* S3 generics and `matrix` and `function` methods for both `loo()` and `waic()`.
+The matrix method provide the same functionality as in previous versions of
+__loo__ (taking a log-likelihood matrix as the input). The function method
+allows the user to provide a function for computing the log-likelihood from
 the data and posterior draws (which are also provided by the user). The function
-method is less memory intensive and should make it possible to use __loo__ for 
+method is less memory intensive and should make it possible to use __loo__ for
 models fit to larger amounts of data than before.
-* Separate `plot` and `print` methods. `plot` also provides `label_points` 
-argument, which, if `TRUE`, will label any Pareto `k` points greater than 
-1/2 by the index number of the corresponding observation. The plot method 
-also now warns about `Inf`/`NA`/`NaN` values of `k` that are not shown in 
-the plot. 
+* Separate `plot` and `print` methods. `plot` also provides `label_points`
+argument, which, if `TRUE`, will label any Pareto `k` points greater than
+1/2 by the index number of the corresponding observation. The plot method
+also now warns about `Inf`/`NA`/`NaN` values of `k` that are not shown in
+the plot.
 * `compare` now returns model weights and accepts more than two inputs.
-* Allow setting number of cores using `options(loo.cores = NUMBER)`. 
+* Allow setting number of cores using `options(loo.cores = NUMBER)`.
 
-# loo 0.1.2 
+# loo 0.1.2
 
 * Updates names in package to reflect name changes in the accompanying paper.
 
@@ -218,7 +239,7 @@ the plot.
 * Better handling of special cases
 * Deprecates `loo_and_waic` function in favor of separate functions `loo` and
 `waic`
-* Deprecates `loo_and_waic_diff`. Use `compare` instead. 
+* Deprecates `loo_and_waic_diff`. Use `compare` instead.
 
 # loo 0.1.0
 

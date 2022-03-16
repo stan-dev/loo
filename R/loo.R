@@ -17,16 +17,16 @@
 #'   with MCMC. If MCMC draws are used and `r_eff` is not provided then
 #'   the reported PSIS effective sample sizes and Monte Carlo error estimates
 #'   will be over-optimistic. If the posterior draws are independent then
-#'   `r_eff=1` and can be omitted. See the [relative_eff()]
-#'   helper functions for computing `r_eff`.
-#'
+#'   `r_eff=1` and can be omitted. The warning message thrown when `r_eff` is
+#'   not specified can be disabled by setting `r_eff` to `NA`. See the
+#'   [relative_eff()] helper functions for computing `r_eff`.
 #' @param save_psis Should the `"psis"` object created internally by `loo()` be
 #'   saved in the returned object? The `loo()` function calls [psis()]
 #'   internally but by default discards the (potentially large) `"psis"` object
 #'   after using it to compute the LOO-CV summaries. Setting `save_psis=TRUE`
-#'   will add a `psis_object` component to the list returned by `loo`. Currently
-#'   this is only needed if you plan to use the [E_loo()] function to compute
-#'   weighted expectations after running `loo`.
+#'   will add a `psis_object` component to the list returned by `loo`.
+#'   Currently this is only needed if you plan to use the [E_loo()] function to
+#'   compute weighted expectations after running `loo`.
 #' @template cores
 #' @template is_method
 #'
@@ -47,32 +47,31 @@
 #'   `c("psis_loo", "loo")` and components:
 #' \describe{
 #'  \item{`estimates`}{
-#'   A matrix with two columns (`Estimate`, `SE`) and three rows
-#'   (`elpd_loo`, `p_loo`, `looic`). This
-#'   contains point estimates and standard errors of the expected log pointwise
-#'   predictive density (`elpd_loo`), the effective number of parameters
-#'   (`p_loo`) and the LOO information criterion `looic` (which is
-#'   just `-2 * elpd_loo`, i.e., converted to deviance scale).
+#'   A matrix with two columns (`Estimate`, `SE`) and three rows (`elpd_loo`,
+#'   `p_loo`, `looic`). This contains point estimates and standard errors of the
+#'   expected log pointwise predictive density ([`elpd_loo`][loo-glossary]), the
+#'   effective number of parameters ([`p_loo`][loo-glossary]) and the LOO
+#'   information criterion `looic` (which is just `-2 * elpd_loo`, i.e.,
+#'   converted to deviance scale).
 #'  }
 #'
 #'  \item{`pointwise`}{
 #'   A matrix with five columns (and number of rows equal to the number of
 #'   observations) containing the pointwise contributions of the measures
 #'   (`elpd_loo`, `mcse_elpd_loo`, `p_loo`, `looic`, `influence_pareto_k`).
-#'   in addition to the three measures in \code{estimates}, we also report
-#'   pointwise values of the Monte Carlo standard error of \code{elpd_loo}
-#'   (\code{mcse_elpd_loo}), and statistics describing the influence of
-#'   each observation on the posterior distribution (\code{influence_pareto_k}).
+#'   in addition to the three measures in `estimates`, we also report
+#'   pointwise values of the Monte Carlo standard error of [`elpd_loo`][loo-glossary]
+#'   ([`mcse_elpd_loo`][loo-glossary]), and statistics describing the influence of
+#'   each observation on the posterior distribution (`influence_pareto_k`).
 #'   These are the estimates of the shape parameter \eqn{k} of the
 #'   generalized Pareto fit to the importance ratios for each leave-one-out
-#'   distribution. See the [pareto-k-diagnostic] page for details.
+#'   distribution (see the [pareto-k-diagnostic] page for details).
 #'  }
-#'
 #'
 #'  \item{`diagnostics`}{
 #'  A named list containing two vectors:
 #'    * `pareto_k`: Importance sampling reliability diagnostics. By default,
-#'      these are equal to the \code{influence_pareto_k} in \code{pointwise}.
+#'      these are equal to the `influence_pareto_k` in `pointwise`.
 #'      Some algorithms can improve importance sampling reliability and
 #'      modify these diagnostics. See the [pareto-k-diagnostic] page for details.
 #'    * `n_eff`: PSIS effective sample size estimates.
@@ -87,8 +86,10 @@
 #' }
 #'
 #' @seealso
-#'  * The **loo** package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'  * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html)
 #'    for demonstrations.
+#'  * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'    the __loo__ website for answers to frequently asked questions.
 #'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
 #'    procedure used in the LOO-CV approximation.
 #'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.
