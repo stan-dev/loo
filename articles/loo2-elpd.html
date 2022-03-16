@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><script src="loo2-elpd_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><script src="loo2-elpd_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Holdout validation and K-fold cross-validation of Stan programs with the loo package</h1>
                         <h4 class="author">Bruno Nicenboim</h4>
             
-            <h4 class="date">2020-12-03</h4>
+            <h4 class="date">2022-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-elpd.Rmd</code></div>
@@ -157,7 +157,8 @@
 <h2 class="hasAnchor">
 <a href="#coding-the-stan-model" class="anchor"></a>Coding the Stan model</h2>
 <p>Here is the Stan code for fitting a Poisson regression model:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="no">stancode</span> <span class="kw">&lt;-</span> <span class="st">"
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">stancode</span> <span class="op">&lt;-</span> <span class="st">"
 data {
   int&lt;lower=1&gt; K;
   int&lt;lower=1&gt; N;
@@ -182,17 +183,21 @@ generated quantities {
   for (n in 1:N)
     log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));
 }
-"</span></pre></body></html></div>
+"</span></code></pre></div>
 <p>Following the usual approach recommended in <a href="http://mc-stan.org/loo/articles/loo2-with-rstan.html"><em>Writing Stan programs for use with the loo package</em></a>, we compute the log-likelihood for each observation in the <code>generated quantities</code> block of the Stan program.</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h2>
 <p>In addition to <strong>loo</strong>, we load the <strong>rstan</strong> package for fitting the model. We will also need the <strong>rstanarm</strong> package for the data.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"rstan"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"loo"</span>)
-<span class="no">seed</span> <span class="kw">&lt;-</span> <span class="fl">9547</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">seed</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/rstan/">"rstan"</a></span><span class="op">)</span></code></pre></div>
+<pre><code>Warning: package 'rstan' was built under R version 4.1.2</code></pre>
+<pre><code>Warning: package 'StanHeaders' was built under R version 4.1.2</code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/loo/">"loo"</a></span><span class="op">)</span>
+<span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">9547</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="holdout-validation" class="section level1">
@@ -203,57 +208,61 @@ generated quantities {
 <h2 class="hasAnchor">
 <a href="#splitting-the-data-between-train-and-test" class="anchor"></a>Splitting the data between train and test</h2>
 <p>The data is divided between train (80% of the data) and test (20%):</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># Prepare data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">roaches</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"rstanarm"</span>)
-<span class="no">roaches</span>$<span class="no">roach1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="no">roaches</span>$<span class="no">roach1</span>)
-<span class="no">roaches</span>$<span class="no">offset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">roaches</span>[,<span class="st">"exposure2"</span>])
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Prepare data</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">roaches</span>, package <span class="op">=</span> <span class="st">"rstanarm"</span><span class="op">)</span>
+<span class="va">roaches</span><span class="op">$</span><span class="va">roach1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">$</span><span class="va">roach1</span><span class="op">)</span>
+<span class="va">roaches</span><span class="op">$</span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span>,<span class="st">"exposure2"</span><span class="op">]</span><span class="op">)</span>
 <span class="co"># 20% of the data goes to the test set:</span>
-<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">&lt;-</span> <span class="fl">0</span>
-<span class="no">roaches</span>$<span class="no">test</span>[<span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">.2</span> * <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>)))] <span class="kw">&lt;-</span> <span class="fl">1</span>
+<span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fl">0</span>
+<span class="va">roaches</span><span class="op">$</span><span class="va">test</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span>
 <span class="co"># data to "train" the model</span>
-<span class="no">data_train</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">y</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">0</span>],
-                   <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">0</span>,
-                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span>)]),
-                   <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">0</span>,]),
-                   <span class="kw">K</span> <span class="kw">=</span> <span class="fl">3</span>,
-                   <span class="kw">offset</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">offset</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">0</span>],
-                   <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>,
-                   <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>
-                   )
+<span class="va">data_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span>,
+                   x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">0</span>,
+                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,
+                   N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">0</span>,<span class="op">]</span><span class="op">)</span>,
+                   K <span class="op">=</span> <span class="fl">3</span>,
+                   offset <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">offset</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span>,
+                   beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,
+                   alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span>
+                   <span class="op">)</span>
 <span class="co"># data to "test" the model</span>
-<span class="no">data_test</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">y</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">1</span>],
-                   <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">1</span>,
-                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span>)]),
-                   <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">1</span>,]),
-                   <span class="kw">K</span> <span class="kw">=</span> <span class="fl">3</span>,
-                   <span class="kw">offset</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">offset</span>[<span class="no">roaches</span>$<span class="no">test</span> <span class="kw">==</span> <span class="fl">1</span>],
-                   <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>,
-                   <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>
-                   )</pre></body></html></div>
+<span class="va">data_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span>,
+                   x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">1</span>,
+                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,
+                   N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">1</span>,<span class="op">]</span><span class="op">)</span>,
+                   K <span class="op">=</span> <span class="fl">3</span>,
+                   offset <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">offset</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">test</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span>,
+                   beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,
+                   alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span>
+                   <span class="op">)</span></code></pre></div>
 </div>
 <div id="fitting-the-model-with-rstan" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fitting-the-model-with-rstan" class="anchor"></a>Fitting the model with RStan</h2>
 <p>Next we fit the model to the “test” data in Stan using the <strong>rstan</strong> package:</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># Compile</span>
-<span class="no">stanmodel</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html">stan_model</a></span>(<span class="kw">model_code</span> <span class="kw">=</span> <span class="no">stancode</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Compile</span>
+<span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span>
 <span class="co"># Fit model</span>
-<span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span>(<span class="no">stanmodel</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">data_train</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>, <span class="kw">refresh</span> <span class="kw">=</span> <span class="fl">0</span>)</pre></body></html></div>
+<span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">data_train</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <p>We recompute the generated quantities using the posterior draws conditional on the training data, but we now pass in the held-out data to get the log predictive densities for the test data. Because we are using independent data, the log predictive density coincides with the log likelihood of the test data.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">gen_test</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html">gqs</a></span>(<span class="no">stanmodel</span>, <span class="kw">draws</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">fit</span>), <span class="kw">data</span><span class="kw">=</span> <span class="no">data_test</span>)
-<span class="no">log_pd</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span>(<span class="no">gen_test</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span>
+<span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="computing-holdout-elpd" class="section level2">
 <h2 class="hasAnchor">
 <a href="#computing-holdout-elpd" class="anchor"></a>Computing holdout elpd:</h2>
 <p>Now we evaluate the predictive performance of the model on the test data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r">(<span class="no">elpd_holdout</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span>(<span class="no">log_pd</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>
 Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
 
      Estimate    SE
-elpd  -1731.2 287.2
-ic     3462.4 574.5</code></pre>
+elpd  -1736.7 288.9
+ic     3473.5 577.9</code></pre>
 <p>When one wants to compare different models, the function <code><a href="../reference/loo_compare.html">loo_compare()</a></code> can be used to assess the difference in performance.</p>
 </div>
 </div>
@@ -265,51 +274,54 @@ ic     3462.4 574.5</code></pre>
 <h2 class="hasAnchor">
 <a href="#splitting-the-data-in-folds" class="anchor"></a>Splitting the data in folds</h2>
 <p>We use the data that is already pre-processed and we divide it in 10 random folds using <code>kfold_split_random</code></p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Prepare data</span>
-<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span>(<span class="kw">K</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Prepare data</span>
+<span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">10</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="fitting-and-extracting-the-log-pointwise-predictive-densities-for-each-fold" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fitting-and-extracting-the-log-pointwise-predictive-densities-for-each-fold" class="anchor"></a>Fitting and extracting the log pointwise predictive densities for each fold</h2>
 <p>We now loop over the 10 folds. In each fold we do the following. First, we fit the model to all the observations except the ones belonging to the left-out fold. Second, we compute the log pointwise predictive densities for the left-out fold. Last, we store the predictive density for the observations of the left-out fold in a matrix. The output of this loop is a matrix of the log pointwise predictive densities of all the observations.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span>
-<span class="no">log_pd_kfold</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">4000</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>))
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span>
+<span class="va">log_pd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">4000</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># Loop over the folds</span>
-<span class="kw">for</span>(<span class="no">k</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fl">10</span>){
-  <span class="no">data_train</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">y</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">!=</span> <span class="no">k</span>],
-                   <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">!=</span> <span class="no">k</span>,
-                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span>)]),
-                   <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">!=</span> <span class="no">k</span>,]),
-                   <span class="kw">K</span> <span class="kw">=</span> <span class="fl">3</span>,
-                   <span class="kw">offset</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">offset</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">!=</span> <span class="no">k</span>],
-                   <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>,
-                   <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>
-                   )
-  <span class="no">data_test</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">y</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">==</span> <span class="no">k</span>],
-                   <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">==</span> <span class="no">k</span>,
-                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span>)]),
-                   <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">roaches</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">==</span> <span class="no">k</span>,]),
-                   <span class="kw">K</span> <span class="kw">=</span> <span class="fl">3</span>,
-                   <span class="kw">offset</span> <span class="kw">=</span> <span class="no">roaches</span>$<span class="no">offset</span>[<span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">==</span> <span class="no">k</span>],
-                   <span class="kw">beta_prior_scale</span> <span class="kw">=</span> <span class="fl">2.5</span>,
-                   <span class="kw">alpha_prior_scale</span> <span class="kw">=</span> <span class="fl">5.0</span>
-                   )
-  <span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span>(<span class="no">stanmodel</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">data_train</span>, <span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>, <span class="kw">refresh</span> <span class="kw">=</span> <span class="fl">0</span>)
-  <span class="no">gen_test</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html">gqs</a></span>(<span class="no">stanmodel</span>, <span class="kw">draws</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">fit</span>), <span class="kw">data</span><span class="kw">=</span> <span class="no">data_test</span>)
-  <span class="no">log_pd_kfold</span>[, <span class="no">roaches</span>$<span class="no">fold</span> <span class="kw">==</span> <span class="no">k</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span>(<span class="no">gen_test</span>)
-}</pre></body></html></div>
+<span class="kw">for</span><span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">data_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">!=</span> <span class="va">k</span><span class="op">]</span>,
+                   x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">!=</span> <span class="va">k</span>,
+                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,
+                   N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">!=</span> <span class="va">k</span>,<span class="op">]</span><span class="op">)</span>,
+                   K <span class="op">=</span> <span class="fl">3</span>,
+                   offset <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">offset</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">!=</span> <span class="va">k</span><span class="op">]</span>,
+                   beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,
+                   alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span>
+                   <span class="op">)</span>
+  <span class="va">data_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span>,
+                   x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span>,
+                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,
+                   N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span>,<span class="op">]</span><span class="op">)</span>,
+                   K <span class="op">=</span> <span class="fl">3</span>,
+                   offset <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">offset</span><span class="op">[</span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span>,
+                   beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,
+                   alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span>
+                   <span class="op">)</span>
+  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">data_train</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+  <span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span>
+  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
 </div>
 <div id="computing-k-fold-elpd" class="section level2">
 <h2 class="hasAnchor">
 <a href="#computing-k-fold-elpd" class="anchor"></a>Computing K-fold elpd:</h2>
 <p>Now we evaluate the predictive performance of the model on the 10 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r">(<span class="no">elpd_kfold</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span>(<span class="no">log_pd_kfold</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
 
      Estimate     SE
-elpd  -5556.9  728.3
-ic    11113.8 1456.6</code></pre>
+elpd  -5552.6  727.7
+ic    11105.3 1455.4</code></pre>
 <p>If one wants to compare several models (with <code>loo_compare</code>), one should use the same folds for all the different models.</p>
 </div>
 </div>
@@ -337,7 +349,7 @@ ic    11113.8 1456.6</code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

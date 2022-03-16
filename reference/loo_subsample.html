@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -179,26 +179,26 @@
     <p>Efficient approximate leave-one-out cross-validation (LOO) using subsampling</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo_subsample</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo_subsample</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for `function`</span>
-<span class='fu'>loo_subsample</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>observations</span> <span class='kw'>=</span> <span class='fl'>400</span>,
-  <span class='kw'>log_p</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
-  <span class='kw'>loo_approximation</span> <span class='kw'>=</span> <span class='st'>"plpd"</span>,
-  <span class='kw'>loo_approximation_draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='st'>"diff_srs"</span>,
-  <span class='kw'>llgrad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>llhess</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+<span class='fu'>loo_subsample</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  observations <span class='op'>=</span> <span class='fl'>400</span>,
+  log_p <span class='op'>=</span> <span class='cn'>NULL</span>,
+  log_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  loo_approximation <span class='op'>=</span> <span class='st'>"plpd"</span>,
+  loo_approximation_draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  estimator <span class='op'>=</span> <span class='st'>"diff_srs"</span>,
+  llgrad <span class='op'>=</span> <span class='cn'>NULL</span>,
+  llhess <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -244,8 +244,9 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-<code>r_eff=1</code> and can be omitted. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
-helper functions for computing <code>r_eff</code>.</p></td>
+<code>r_eff=1</code> and can be omitted. The warning message thrown when <code>r_eff</code> is
+not specified can be disabled by setting <code>r_eff</code> to <code>NA</code>. See the
+<code><a href='relative_eff.html'>relative_eff()</a></code> helper functions for computing <code>r_eff</code>.</p></td>
     </tr>
     <tr>
       <th>save_psis</th>
@@ -346,7 +347,8 @@ compute the log density for the approximation.</p>
 <li><p><code>function</code>: A function <code>f()</code> that takes arguments <code>data_i</code> and <code>draws</code> and returns a
 vector containing the log-likelihood for a single observation <code>i</code> evaluated
 at each posterior draw. The function should be written such that, for each
-observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span>(<span class='kw'>data_i</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='no'>i</span>,, <span class='kw'>drop</span><span class='kw'>=</span><span class='fl'>FALSE</span>], <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>draws</span>)</pre>
+observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span><span class='op'>(</span>data_i <span class='op'>=</span> <span class='va'>data</span><span class='op'>[</span><span class='va'>i</span>,, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>, draws <span class='op'>=</span> <span class='va'>draws</span><span class='op'>)</span>
+</pre>
 
 <p>results in a vector of length <code>S</code> (size of posterior sample). The
 log-likelihood function can also have additional arguments but <code>data_i</code> and
@@ -394,7 +396,7 @@ Leave-One-Out Cross-Validation for Model Comparison in Large Data.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

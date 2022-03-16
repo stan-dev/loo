@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -179,15 +179,15 @@
     <p>Diagnostics for Laplace and ADVI approximations and Laplace-loo and ADVI-loo</p>
     </div>
 
-    <pre class="usage"><span class='fu'>psis_approximate_posterior</span>(
-  <span class='kw'>log_p</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_liks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>cores</span>,
-  <span class='no'>save_psis</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>log_q</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>psis_approximate_posterior</span><span class='op'>(</span>
+  log_p <span class='op'>=</span> <span class='cn'>NULL</span>,
+  log_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  log_liks <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>cores</span>,
+  <span class='va'>save_psis</span>,
+  <span class='va'>...</span>,
+  log_q <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -230,9 +230,9 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 saved in the returned object? The <code><a href='loo.html'>loo()</a></code> function calls <code><a href='psis.html'>psis()</a></code>
 internally but by default discards the (potentially large) <code>"psis"</code> object
 after using it to compute the LOO-CV summaries. Setting <code>save_psis=TRUE</code>
-will add a <code>psis_object</code> component to the list returned by <code>loo</code>. Currently
-this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to compute
-weighted expectations after running <code>loo</code>.</p></td>
+will add a <code>psis_object</code> component to the list returned by <code>loo</code>.
+Currently this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to
+compute weighted expectations after running <code>loo</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -280,7 +280,7 @@ Pareto smoothed importance sampling.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><script src="loo2-non-factorized_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><script src="loo2-non-factorized_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Leave-one-out cross-validation for non-factorized models</h1>
                         <h4 class="author">Aki Vehtari, Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 class="date">2020-12-04</h4>
+            <h4 class="date">2022-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-non-factorized.Rmd"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-non-factorized.Rmd</code></div>
@@ -258,31 +258,31 @@ y = \rho Wy + \eta + \epsilon
 <p>If we have <span class="math inline">\(\epsilon \sim {\mathrm N}(0, \,\sigma^2 I)\)</span>, it follows that <span class="math display">\[
 (I - \rho W)y \sim {\mathrm N}(\eta, \sigma^2 I),
 \]</span> which corresponds to the following log PDF coded in <strong>Stan</strong>:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r">/**
- * Normal log-pdf for spatially lagged responses
- *
- * @param y Vector of response values.
- * @param mu Mean parameter vector.
- * @param sigma Positive scalar residual standard deviation.
- * @param rho Positive scalar autoregressive parameter.
- * @param W Spatial weight matrix.
- *
- * @return A scalar to be added to the log posterior.
- */
-real normal_lagsar_lpdf(vector y, vector mu, real sigma,
-                        real rho, matrix W) {
-  int N = rows(y);
-  real inv_sigma2 = 1 / square(sigma);
-  matrix[N, N] W_tilde = -rho * W;
-  vector[N] half_pred;
-
-  for (n in 1:N) W_tilde[n,n] += 1;
-
-  half_pred = W_tilde * (y - mdivide_left(W_tilde, mu));
-
-  return 0.5 * log_determinant(crossprod(W_tilde) * inv_sigma2) -
-         0.5 * dot_self(half_pred) * inv_sigma2;
-}</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                        real rho, matrix W) {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  vector[N] half_pred;</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n,n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>         <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>For the purpose of computing LOO-CV, it makes sense to rewrite the SAR model in slightly different form. Conditional on <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\eta\)</span>, and <span class="math inline">\(\sigma\)</span>, if we write</p>
 <p><span class="math display">\[\begin{align}
 y-(I-\rho W)^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(I-\rho W)^{-1}(I-\rho W)^{-T}),
@@ -297,19 +297,20 @@ y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\wid
 <a href="#case-study-neighborhood-crime-in-columbus-ohio" class="anchor"></a>Case Study: Neighborhood Crime in Columbus, Ohio</h2>
 <p>In order to demonstrate how to carry out the computations implied by these equations, we will first fit a lagged SAR model to data on crime in 49 different neighborhoods of Columbus, Ohio during the year 1980. The data was originally described in Aneslin (1988) and ships with the <strong>spdep</strong> R package.</p>
 <p>In addition to the <strong>loo</strong> package, for this analysis we will use the <strong>brms</strong> interface to Stan to generate a Stan program and fit the model, and also the <strong>bayesplot</strong> and <strong>ggplot2</strong> packages for plotting.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"loo"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"brms"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"bayesplot"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"ggplot2"</span>)
-<span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-colors.html">color_scheme_set</a></span>(<span class="st">"brightblue"</span>)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html">theme_set</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/brms/man/theme_default.html">theme_default</a></span>())
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/loo/">"loo"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/paul-buerkner/brms">"brms"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/bayesplot/">"bayesplot"</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org">"ggplot2"</a></span><span class="op">)</span>
+<span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-colors.html">color_scheme_set</a></span><span class="op">(</span><span class="st">"brightblue"</span><span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/brms/man/theme_default.html">theme_default</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 
-<span class="no">SEED</span> <span class="kw">&lt;-</span> <span class="fl">10001</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">SEED</span>) <span class="co"># only sets seed for R (seed for Stan set later)</span>
+<span class="va">SEED</span> <span class="op">&lt;-</span> <span class="fl">10001</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">SEED</span><span class="op">)</span> <span class="co"># only sets seed for R (seed for Stan set later)</span>
 
 <span class="co"># loads COL.OLD data frame and COL.nb neighbor list</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">oldcol</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"spdep"</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">oldcol</span>, package <span class="op">=</span> <span class="st">"spdep"</span><span class="op">)</span></code></pre></div>
 <p>The three variables in the data set relevant to this example are:</p>
 <ul>
 <li>
@@ -319,7 +320,8 @@ y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\wid
 <li>
 <code>INC</code>: household income in units of $1000 USD</li>
 </ul>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">COL.OLD</span>[, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"CRIME"</span>, <span class="st">"HOVAL"</span>, <span class="st">"INC"</span>)])</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">COL.OLD</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CRIME"</span>, <span class="st">"HOVAL"</span>, <span class="st">"INC"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <pre><code>'data.frame':   49 obs. of  3 variables:
  $ CRIME: num  18.802 32.388 38.426 0.178 15.726 ...
  $ HOVAL: num  44.6 33.2 37.1 75 80.5 ...
@@ -329,166 +331,178 @@ y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\wid
 <h3 class="hasAnchor">
 <a href="#fit-lagged-sar-model" class="anchor"></a>Fit lagged SAR model</h3>
 <p>A model predicting <code>CRIME</code> from <code>INC</code> and <code>HOVAL</code>, while accounting for the spatial dependency via an SAR structure, can be specified in <strong>brms</strong> as follows.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">fit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span>(
-  <span class="no">CRIME</span> ~ <span class="no">INC</span> + <span class="no">HOVAL</span> + <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html">sar</a></span>(<span class="no">COL.nb</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"lag"</span>),
-  <span class="kw">data</span> <span class="kw">=</span> <span class="no">COL.OLD</span>,
-  <span class="kw">data2</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">COL.nb</span> <span class="kw">=</span> <span class="no">COL.nb</span>),
-  <span class="kw">chains</span> <span class="kw">=</span> <span class="fl">4</span>,
-  <span class="kw">seed</span> <span class="kw">=</span> <span class="no">SEED</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span><span class="op">(</span>
+  <span class="va">CRIME</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,
+  data <span class="op">=</span> <span class="va">COL.OLD</span>,
+  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,
+  chains <span class="op">=</span> <span class="fl">4</span>,
+  seed <span class="op">=</span> <span class="va">SEED</span>
+<span class="op">)</span></code></pre></div>
 <p>The code above fits the model in <strong>Stan</strong> using a log PDF equivalent to the <code>normal_lagsar_lpdf</code> function we defined above. In the summary output below we see that both higher income and higher housing value predict lower crime rates in the neighborhood. Moreover, there seems to be substantial spatial correlation between adjacent neighborhoods, as indicated by the posterior distribution of the <code>lagsar</code> parameter.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">lagsar</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">fit</span>, <span class="kw">pars</span> <span class="kw">=</span> <span class="st">"lagsar"</span>)
-<span class="no">estimates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span>(<span class="no">lagsar</span>, <span class="kw">probs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>))
-<span class="fu"><a href="https://mc-stan.org/bayesplot/reference/MCMC-distributions.html">mcmc_hist</a></span>(<span class="no">lagsar</span>) +
-  <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-helpers.html">vline_at</a></span>(<span class="no">estimates</span>, <span class="kw">linetype</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"lagsar: posterior median and 50% central interval"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">lagsar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">fit</span>, pars <span class="op">=</span> <span class="st">"lagsar"</span><span class="op">)</span>
+<span class="va">estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">lagsar</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://mc-stan.org/bayesplot/reference/MCMC-distributions.html">mcmc_hist</a></span><span class="op">(</span><span class="va">lagsar</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-helpers.html">vline_at</a></span><span class="op">(</span><span class="va">estimates</span>, linetype <span class="op">=</span> <span class="fl">2</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"lagsar: posterior median and 50% central interval"</span><span class="op">)</span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div id="approximate-loo-cv" class="section level3">
 <h3 class="hasAnchor">
 <a href="#approximate-loo-cv" class="anchor"></a>Approximate LOO-CV</h3>
 <p>After fitting the model, the next step is to compute the pointwise log-likelihood values needed for approximate LOO-CV. To do this we will use the recipe laid out in the previous sections.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">posterior</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">fit</span>)
-<span class="no">y</span> <span class="kw">&lt;-</span> <span class="no">fit</span>$<span class="no">data</span>$<span class="no">CRIME</span>
-<span class="no">N</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">y</span>)
-<span class="no">S</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">posterior</span>)
-<span class="no">loglik</span> <span class="kw">&lt;-</span> <span class="no">yloo</span> <span class="kw">&lt;-</span> <span class="no">sdloo</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw">nrow</span> <span class="kw">=</span> <span class="no">S</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="no">N</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">posterior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">CRIME</span>
+<span class="va">N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
+<span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">posterior</span><span class="op">)</span>
+<span class="va">loglik</span> <span class="op">&lt;-</span> <span class="va">yloo</span> <span class="op">&lt;-</span> <span class="va">sdloo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">S</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span>
 
-<span class="kw">for</span> (<span class="no">s</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="no">S</span>) {
-  <span class="no">p</span> <span class="kw">&lt;-</span> <span class="no">posterior</span>[<span class="no">s</span>, ]
-  <span class="no">eta</span> <span class="kw">&lt;-</span> <span class="no">p</span>$<span class="no">b_Intercept</span> + <span class="no">p</span>$<span class="no">b_INC</span> * <span class="no">fit</span>$<span class="no">data</span>$<span class="no">INC</span> + <span class="no">p</span>$<span class="no">b_HOVAL</span> * <span class="no">fit</span>$<span class="no">data</span>$<span class="no">HOVAL</span>
-  <span class="no">W_tilde</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="no">N</span>) - <span class="no">p</span>$<span class="no">lagsar</span> * <span class="kw pkg">spdep</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/spdep/man/nb2mat.html">nb2mat</a></span>(<span class="no">COL.nb</span>)
-  <span class="no">Cinv</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">W_tilde</span>) <span class="kw">%*%</span> <span class="no">W_tilde</span> / <span class="no">p</span>$<span class="no">sigma</span>^<span class="fl">2</span>
-  <span class="no">g</span> <span class="kw">&lt;-</span> <span class="no">Cinv</span> <span class="kw">%*%</span> (<span class="no">y</span> - <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span>(<span class="no">W_tilde</span>, <span class="no">eta</span>))
-  <span class="no">cbar</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="no">Cinv</span>)
-  <span class="no">yloo</span>[<span class="no">s</span>, ] <span class="kw">&lt;-</span> <span class="no">y</span> - <span class="no">g</span> / <span class="no">cbar</span>
-  <span class="no">sdloo</span>[<span class="no">s</span>, ] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="fl">1</span> / <span class="no">cbar</span>)
-  <span class="no">loglik</span>[<span class="no">s</span>, ] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">y</span>, <span class="no">yloo</span>[<span class="no">s</span>, ], <span class="no">sdloo</span>[<span class="no">s</span>, ], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-}
+<span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">S</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">posterior</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span>
+  <span class="va">eta</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">b_Intercept</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_INC</span> <span class="op">*</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">INC</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_HOVAL</span> <span class="op">*</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">HOVAL</span>
+  <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/spdep/man/nb2mat.html">nb2mat</a></span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span>
+  <span class="va">Cinv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">W_tilde</span><span class="op">)</span> <span class="op">%*%</span> <span class="va">W_tilde</span> <span class="op">/</span> <span class="va">p</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>
+  <span class="va">g</span> <span class="op">&lt;-</span> <span class="va">Cinv</span> <span class="op">%*%</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span><span class="op">(</span><span class="va">W_tilde</span>, <span class="va">eta</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">Cinv</span><span class="op">)</span>
+  <span class="va">yloo</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">-</span> <span class="va">g</span> <span class="op">/</span> <span class="va">cbar</span>
+  <span class="va">sdloo</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="va">cbar</span><span class="op">)</span>
+  <span class="va">loglik</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yloo</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span>, <span class="va">sdloo</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># use loo for psis smoothing</span>
-<span class="no">log_ratios</span> <span class="kw">&lt;-</span> -<span class="no">loglik</span>
-<span class="no">psis_result</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/psis.html">psis</a></span>(<span class="no">log_ratios</span>)</pre></body></html></div>
+<span class="va">log_ratios</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">loglik</span>
+<span class="va">psis_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/psis.html">psis</a></span><span class="op">(</span><span class="va">log_ratios</span><span class="op">)</span></code></pre></div>
 <p>The quality of the PSIS-LOO approximation can be investigated graphically by plotting the Pareto-k estimate for each observation. Ideally, they should not exceed <span class="math inline">\(0.5\)</span>, but in practice the algorithm turns out to be robust up to values of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017, 2019). In the plot below, we see that the fourth observation is problematic and so may reduce the accuracy of the LOO-CV approximation.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">psis_result</span>, <span class="kw">label_points</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">psis_result</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/plot-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also check that the conditional leave-one-out predictive distribution equations work correctly, for instance, using the last posterior draw:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">yloo_sub</span> <span class="kw">&lt;-</span> <span class="no">yloo</span>[<span class="no">S</span>, ]
-<span class="no">sdloo_sub</span> <span class="kw">&lt;-</span> <span class="no">sdloo</span>[<span class="no">S</span>, ]
-<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-  <span class="kw">y</span> <span class="kw">=</span> <span class="no">y</span>,
-  <span class="kw">yloo</span> <span class="kw">=</span> <span class="no">yloo_sub</span>,
-  <span class="kw">ymin</span> <span class="kw">=</span> <span class="no">yloo_sub</span> - <span class="no">sdloo_sub</span> * <span class="fl">2</span>,
-  <span class="kw">ymax</span> <span class="kw">=</span> <span class="no">yloo_sub</span> + <span class="no">sdloo_sub</span> * <span class="fl">2</span>
-)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">data</span><span class="kw">=</span><span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">y</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">yloo</span>, <span class="kw">ymin</span> <span class="kw">=</span> <span class="no">ymin</span>, <span class="kw">ymax</span> <span class="kw">=</span> <span class="no">ymax</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(
-    <span class="kw">width</span> <span class="kw">=</span> <span class="fl">1</span>,
-    <span class="kw">color</span> <span class="kw">=</span> <span class="st">"skyblue3"</span>,
-    <span class="kw">position</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter</a></span>(<span class="kw">width</span> <span class="kw">=</span> <span class="fl">0.25</span>)
-  ) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="st">"gray30"</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1.2</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">yloo_sub</span> <span class="op">&lt;-</span> <span class="va">yloo</span><span class="op">[</span><span class="va">S</span>, <span class="op">]</span>
+<span class="va">sdloo_sub</span> <span class="op">&lt;-</span> <span class="va">sdloo</span><span class="op">[</span><span class="va">S</span>, <span class="op">]</span>
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
+  y <span class="op">=</span> <span class="va">y</span>,
+  yloo <span class="op">=</span> <span class="va">yloo_sub</span>,
+  ymin <span class="op">=</span> <span class="va">yloo_sub</span> <span class="op">-</span> <span class="va">sdloo_sub</span> <span class="op">*</span> <span class="fl">2</span>,
+  ymax <span class="op">=</span> <span class="va">yloo_sub</span> <span class="op">+</span> <span class="va">sdloo_sub</span> <span class="op">*</span> <span class="fl">2</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">y</span>, y <span class="op">=</span> <span class="va">yloo</span>, ymin <span class="op">=</span> <span class="va">ymin</span>, ymax <span class="op">=</span> <span class="va">ymax</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span>
+    width <span class="op">=</span> <span class="fl">1</span>,
+    color <span class="op">=</span> <span class="st">"skyblue3"</span>,
+    position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span>, size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/checklast-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>Finally, we use PSIS-LOO to approximate the expected log predictive density (ELPD) for new data, which we will validate using exact LOO-CV in the upcoming section.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r">(<span class="no">psis_loo</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">loglik</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="op">(</span><span class="va">psis_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>
 Computed from 4000 by 49 log-likelihood matrix
 
          Estimate   SE
-elpd_loo   -187.2 11.1
-p_loo         8.3  5.4
-looic       374.3 22.1
+elpd_loo   -187.3 11.2
+p_loo         8.4  5.6
+looic       374.6 22.4
 ------
 Monte Carlo SE of elpd_loo is NA.
 
 Pareto k diagnostic values:
                          Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     47    95.9%   2240      
- (0.5, 0.7]   (ok)        1     2.0%   819       
+(-Inf, 0.5]   (good)     47    95.9%   832       
+ (0.5, 0.7]   (ok)        1     2.0%   3832      
    (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;      
-   (1, Inf)   (very bad)  1     2.0%   15        
+   (1, Inf)   (very bad)  1     2.0%   12        
 See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div id="exact-loo-cv" class="section level3">
 <h3 class="hasAnchor">
 <a href="#exact-loo-cv" class="anchor"></a>Exact LOO-CV</h3>
 <p>Exact LOO-CV for the above example is somewhat more involved, as we need to re-fit the model <span class="math inline">\(N\)</span> times and each time model the held-out data point as a parameter. First, we create an empty dummy model that we will update below as we loop over the observations.</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># see help("mi", "brms") for details on the mi() usage</span>
-<span class="no">fit_dummy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span>(
-  <span class="no">CRIME</span> <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/mi.html">mi</a></span>() ~ <span class="no">INC</span> + <span class="no">HOVAL</span> + <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html">sar</a></span>(<span class="no">COL.nb</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"lag"</span>),
-  <span class="kw">data</span> <span class="kw">=</span> <span class="no">COL.OLD</span>,
-  <span class="kw">data2</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">COL.nb</span> <span class="kw">=</span> <span class="no">COL.nb</span>),
-  <span class="kw">chains</span> <span class="kw">=</span> <span class="fl">0</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># see help("mi", "brms") for details on the mi() usage</span>
+<span class="va">fit_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html">brm</a></span><span class="op">(</span>
+  <span class="va">CRIME</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/mi.html">mi</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,
+  data <span class="op">=</span> <span class="va">COL.OLD</span>,
+  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,
+  chains <span class="op">=</span> <span class="fl">0</span>
+<span class="op">)</span></code></pre></div>
 <p>Next, we fit the model <span class="math inline">\(N\)</span> times, each time leaving out a single observation and then computing the log predictive density for that observation. For obvious reasons, this takes much longer than the approximation we computed above, but it is necessary in order to validate the approximate LOO-CV method. Thanks to the PSIS-LOO approximation, in general doing these slow exact computations can be avoided.</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">S</span> <span class="kw">&lt;-</span> <span class="fl">500</span>
-<span class="no">res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span>(<span class="st">"list"</span>, <span class="no">N</span>)
-<span class="no">loglik</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw">nrow</span> <span class="kw">=</span> <span class="no">S</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="no">N</span>)
-<span class="kw">for</span> (<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">N</span>)) {
-  <span class="no">dat_mi</span> <span class="kw">&lt;-</span> <span class="no">COL.OLD</span>
-  <span class="no">dat_mi</span>$<span class="no">CRIME</span>[<span class="no">i</span>] <span class="kw">&lt;-</span> <span class="fl">NA</span>
-  <span class="no">fit_i</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span>(<span class="no">fit_dummy</span>, <span class="kw">newdata</span> <span class="kw">=</span> <span class="no">dat_mi</span>,
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">S</span> <span class="op">&lt;-</span> <span class="fl">500</span>
+<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">N</span><span class="op">)</span>
+<span class="va">loglik</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">S</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">dat_mi</span> <span class="op">&lt;-</span> <span class="va">COL.OLD</span>
+  <span class="va">dat_mi</span><span class="op">$</span><span class="va">CRIME</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
+  <span class="va">fit_i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fit_dummy</span>, newdata <span class="op">=</span> <span class="va">dat_mi</span>,
                   <span class="co"># just for vignette</span>
-                  <span class="kw">chains</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">iter</span> <span class="kw">=</span> <span class="no">S</span> * <span class="fl">2</span>)
-  <span class="no">posterior</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">fit_i</span>)
-  <span class="no">yloo</span> <span class="kw">&lt;-</span> <span class="no">sdloo</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">NA</span>, <span class="no">S</span>)
-  <span class="kw">for</span> (<span class="no">s</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">S</span>)) {
-    <span class="no">p</span> <span class="kw">&lt;-</span> <span class="no">posterior</span>[<span class="no">s</span>, ]
-    <span class="no">y_miss_i</span> <span class="kw">&lt;-</span> <span class="no">y</span>
-    <span class="no">y_miss_i</span>[<span class="no">i</span>] <span class="kw">&lt;-</span> <span class="no">p</span>$<span class="no">Ymi</span>
-    <span class="no">eta</span> <span class="kw">&lt;-</span> <span class="no">p</span>$<span class="no">b_Intercept</span> + <span class="no">p</span>$<span class="no">b_INC</span> * <span class="no">fit_i</span>$<span class="no">data</span>$<span class="no">INC</span> + <span class="no">p</span>$<span class="no">b_HOVAL</span> * <span class="no">fit_i</span>$<span class="no">data</span>$<span class="no">HOVAL</span>
-    <span class="no">W_tilde</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="no">N</span>) - <span class="no">p</span>$<span class="no">lagsar</span> * <span class="kw pkg">spdep</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/spdep/man/nb2mat.html">nb2mat</a></span>(<span class="no">COL.nb</span>)
-    <span class="no">Cinv</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">W_tilde</span>) <span class="kw">%*%</span> <span class="no">W_tilde</span> / <span class="no">p</span>$<span class="no">sigma</span>^<span class="fl">2</span>
-    <span class="no">g</span> <span class="kw">&lt;-</span> <span class="no">Cinv</span> <span class="kw">%*%</span> (<span class="no">y_miss_i</span> - <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span>(<span class="no">W_tilde</span>, <span class="no">eta</span>))
-    <span class="no">cbar</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span>(<span class="no">Cinv</span>);
-    <span class="no">yloo</span>[<span class="no">s</span>] <span class="kw">&lt;-</span> <span class="no">y_miss_i</span>[<span class="no">i</span>] - <span class="no">g</span>[<span class="no">i</span>] / <span class="no">cbar</span>[<span class="no">i</span>]
-    <span class="no">sdloo</span>[<span class="no">s</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="fl">1</span> / <span class="no">cbar</span>[<span class="no">i</span>])
-    <span class="no">loglik</span>[<span class="no">s</span>, <span class="no">i</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span>(<span class="no">y</span>[<span class="no">i</span>], <span class="no">yloo</span>[<span class="no">s</span>], <span class="no">sdloo</span>[<span class="no">s</span>], <span class="kw">log</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-  }
-  <span class="no">ypred</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">S</span>, <span class="no">yloo</span>, <span class="no">sdloo</span>)
-  <span class="no">res</span><span class="kw">[[</span><span class="no">i</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">posterior</span>$<span class="no">Ymi</span>, <span class="no">ypred</span>))
-  <span class="no">res</span><span class="kw">[[</span><span class="no">i</span>]]$<span class="no">type</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"pp"</span>, <span class="st">"loo"</span>), <span class="kw">each</span> <span class="kw">=</span> <span class="no">S</span>)
-  <span class="no">res</span><span class="kw">[[</span><span class="no">i</span>]]$<span class="no">obs</span> <span class="kw">&lt;-</span> <span class="no">i</span>
-}
-<span class="no">res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span>(<span class="no">rbind</span>, <span class="no">res</span>)</pre></body></html></div>
+                  chains <span class="op">=</span> <span class="fl">1</span>, iter <span class="op">=</span> <span class="va">S</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>
+  <span class="va">posterior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">fit_i</span><span class="op">)</span>
+  <span class="va">yloo</span> <span class="op">&lt;-</span> <span class="va">sdloo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">S</span><span class="op">)</span>
+  <span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">posterior</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span>
+    <span class="va">y_miss_i</span> <span class="op">&lt;-</span> <span class="va">y</span>
+    <span class="va">y_miss_i</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">Ymi</span>
+    <span class="va">eta</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">b_Intercept</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_INC</span> <span class="op">*</span> <span class="va">fit_i</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">INC</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_HOVAL</span> <span class="op">*</span> <span class="va">fit_i</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">HOVAL</span>
+    <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/spdep/man/nb2mat.html">nb2mat</a></span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span>
+    <span class="va">Cinv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">W_tilde</span><span class="op">)</span> <span class="op">%*%</span> <span class="va">W_tilde</span> <span class="op">/</span> <span class="va">p</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span>
+    <span class="va">g</span> <span class="op">&lt;-</span> <span class="va">Cinv</span> <span class="op">%*%</span> <span class="op">(</span><span class="va">y_miss_i</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html">solve</a></span><span class="op">(</span><span class="va">W_tilde</span>, <span class="va">eta</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">Cinv</span><span class="op">)</span>;
+    <span class="va">yloo</span><span class="op">[</span><span class="va">s</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">y_miss_i</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="va">g</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">/</span> <span class="va">cbar</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
+    <span class="va">sdloo</span><span class="op">[</span><span class="va">s</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="va">cbar</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
+    <span class="va">loglik</span><span class="op">[</span><span class="va">s</span>, <span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">dnorm</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">yloo</span><span class="op">[</span><span class="va">s</span><span class="op">]</span>, <span class="va">sdloo</span><span class="op">[</span><span class="va">s</span><span class="op">]</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="op">}</span>
+  <span class="va">ypred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">S</span>, <span class="va">yloo</span>, <span class="va">sdloo</span><span class="op">)</span>
+  <span class="va">res</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">posterior</span><span class="op">$</span><span class="va">Ymi</span>, <span class="va">ypred</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">res</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">type</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"pp"</span>, <span class="st">"loo"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">S</span><span class="op">)</span>
+  <span class="va">res</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">obs</span> <span class="op">&lt;-</span> <span class="va">i</span>
+<span class="op">}</span>
+<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">res</span><span class="op">)</span></code></pre></div>
 <p>A first step in the validation of the pointwise predictive density is to compare the distribution of the implied response values for the left-out observation to the distribution of the <span class="math inline">\(y_i^{\mathrm{mis}}\)</span> posterior-predictive values estimated as part of the model. If the pointwise predictive density is correct, the two distributions should match very closely (up to sampling error). In the plot below, we overlay these two distributions for the first four observations and see that they match very closely (as is the case for all <span class="math inline">\(49\)</span> observations of in this example).</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">res_sub</span> <span class="kw">&lt;-</span> <span class="no">res</span>[<span class="no">res</span>$<span class="no">obs</span> <span class="kw">%in%</span> <span class="fl">1</span>:<span class="fl">4</span>, ]
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">y</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">type</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.6</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="st">"obs"</span>, <span class="kw">scales</span> <span class="kw">=</span> <span class="st">"fixed"</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">4</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res_sub</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">obs</span> <span class="op">%in%</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">y</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="st">"obs"</span>, scales <span class="op">=</span> <span class="st">"fixed"</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>In the final step, we compute the ELPD based on the exact LOO-CV and compare it to the approximate PSIS-LOO result computed earlier.</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">log_mean_exp</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">log_mean_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># more stable than log(mean(exp(x)))</span>
-  <span class="no">max_x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="no">x</span>)
-  <span class="no">max_x</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span> - <span class="no">max_x</span>))) - <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>))
-}
-<span class="no">exact_elpds</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span>(<span class="no">loglik</span>, <span class="fl">2</span>, <span class="no">log_mean_exp</span>)
-<span class="no">exact_elpd</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">exact_elpds</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">exact_elpd</span>, <span class="fl">1</span>)</pre></body></html></div>
-<pre><code>[1] -189.2</code></pre>
+  <span class="va">max_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="va">max_x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">max_x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
+<span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span>
+<span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<pre><code>[1] -187</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not as close as we would expect if there were no problematic observations. We can investigate this issue more closely by plotting the approximate against the exact pointwise ELPD values.</p>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-  <span class="kw">approx_elpd</span> <span class="kw">=</span> <span class="no">psis_loo</span>$<span class="no">pointwise</span>[, <span class="st">"elpd_loo"</span>],
-  <span class="kw">exact_elpd</span> <span class="kw">=</span> <span class="no">exact_elpds</span>
-)
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">approx_elpd</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">exact_elpd</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="st">"gray30"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw">size</span> <span class="kw">=</span> <span class="fl">2</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df</span>[<span class="fl">4</span>, ], <span class="kw">size</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">"red3"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Approximate elpds"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Exact elpds"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span>(<span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">16</span>, -<span class="fl">3</span>), <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">16</span>, -<span class="fl">3</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
+  approx_elpd <span class="op">=</span> <span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>, <span class="st">"elpd_loo"</span><span class="op">]</span>,
+  exact_elpd <span class="op">=</span> <span class="va">exact_elpds</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">approx_elpd</span>, y <span class="op">=</span> <span class="va">exact_elpd</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span><span class="op">[</span><span class="fl">4</span>, <span class="op">]</span>, size <span class="op">=</span> <span class="fl">2</span>, color <span class="op">=</span> <span class="st">"red3"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Approximate elpds"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Exact elpds"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/compare-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as problematic by the PSIS-LOO approximation— is colored in red and is the clear outlier. Otherwise, the correspondence between the exact and approximate values is strong. In fact, summing over the pointwise ELPD values and leaving out the fourth observation yields practically equivalent results for approximate and exact LOO-CV:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">without_pt_4</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
-  <span class="kw">approx</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">psis_loo</span>$<span class="no">pointwise</span>[-<span class="fl">4</span>, <span class="st">"elpd_loo"</span>]),
-  <span class="kw">exact</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">exact_elpds</span>[-<span class="fl">4</span>])
-)
-<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">without_pt_4</span>, <span class="fl">2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">without_pt_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
+  approx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span>, <span class="st">"elpd_loo"</span><span class="op">]</span><span class="op">)</span>,
+  exact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>  
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">without_pt_4</span>, <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code> approx   exact 
--173.07 -172.96 </code></pre>
+-173.03 -173.26 </code></pre>
 <p>From this we can conclude that the difference we found when including <em>all</em> observations does not indicate a bug in our implementation of the approximate LOO-CV but rather a violation of its assumptions.</p>
 </div>
 </div>
@@ -497,79 +511,79 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <h1 class="hasAnchor">
 <a href="#working-with-stan-directly" class="anchor"></a>Working with Stan directly</h1>
 <p>So far, we have specified the models in brms and only used Stan implicitely behind the scenes. This allowed us to focus on the primary purpose of validating approximate LOO-CV for non-factorized models. However, we would also like to show how everything can be set up in Stan directly. The Stan code brms generates is human readable and so we can use it to learn some of the essential aspects of Stan and the particular model we are implementing. The Stan program below is a slightly modified version of the code extracted via <code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html">stancode(fit_dummy)</a></code>:</p>
-<div class="sourceCode" id="cb20"><html><body><pre class="r">// generated with brms 2.2.0
-functions {
-/**
- * Normal log-pdf for spatially lagged responses
- *
- * @param y Vector of response values.
- * @param mu Mean parameter vector.
- * @param sigma Positive scalar residual standard deviation.
- * @param rho Positive scalar autoregressive parameter.
- * @param W Spatial weight matrix.
- *
- * @return A scalar to be added to the log posterior.
- */
-  real normal_lagsar_lpdf(vector y, vector mu, real sigma,
-                          real rho, matrix W) {
-    int N = rows(y);
-    real inv_sigma2 = 1 / square(sigma);
-    matrix[N, N] W_tilde = -rho * W;
-    vector[N] half_pred;
-    for (n in 1:N) W_tilde[n, n] += 1;
-    half_pred = W_tilde * (y - mdivide_left(W_tilde, mu));
-    return 0.5 * log_determinant(crossprod(W_tilde) * inv_sigma2) -
-           0.5 * dot_self(half_pred) * inv_sigma2;
-  }
-}
-data {
-  int&lt;lower=1&gt; N;  // total number of observations
-  vector[N] Y;  // response variable
-  int&lt;lower=0&gt; Nmi;  // number of missings
-  int&lt;lower=1&gt; Jmi[Nmi];  // positions of missings
-  int&lt;lower=1&gt; K;  // number of population-level effects
-  matrix[N, K] X;  // population-level design matrix
-  matrix[N, N] W;  // spatial weight matrix
-  int prior_only;  // should the likelihood be ignored?
-}
-transformed data {
-  int Kc = K - 1;
-  matrix[N, K - 1] Xc;  // centered version of X
-  vector[K - 1] means_X;  // column means of X before centering
-  for (i in 2:K) {
-    means_X[i - 1] = mean(X[, i]);
-    Xc[, i - 1] = X[, i] - means_X[i - 1];
-  }
-}
-parameters {
-  vector[Nmi] Ymi;  // estimated missings
-  vector[Kc] b;  // population-level effects
-  real temp_Intercept;  // temporary intercept
-  real&lt;lower=0&gt; sigma;  // residual SD
-  real&lt;lower=0,upper=1&gt; lagsar;  // SAR parameter
-}
-transformed parameters {
-}
-model {
-  vector[N] Yl = Y;
-  vector[N] mu = Xc * b + temp_Intercept;
-  Yl[Jmi] = Ymi;
-  // priors including all constants
-  target += student_t_lpdf(temp_Intercept | 3, 34, 17);
-  target += student_t_lpdf(sigma | 3, 0, 17)
-    - 1 * student_t_lccdf(0 | 3, 0, 17);
-  // likelihood including all constants
-  if (!prior_only) {
-    target += normal_lagsar_lpdf(Yl | mu, sigma, lagsar, W);
-  }
-}
-generated quantities {
-  // actual population-level intercept
-  real b_Intercept = temp_Intercept - dot_product(means_X, b);
-}</pre></body></html></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>functions {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                          real rho, matrix W) {</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    vector[N] half_pred;</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>data {</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>transformed data {</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>parameters {</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a>transformed parameters {</span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>model {</span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a>generated quantities {</span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Here we want to focus on two aspects of the Stan code. First, because there is no built-in function in Stan that calculates the log-likelihood for the lag-SAR model, we define a new <code>normal_lagsar_lpdf</code> function in the <code>functions</code> block of the Stan program. This is the same function we showed earlier in the vignette and it can be used to compute the log-likelihood in an efficient and numerically stable way. The <code>_lpdf</code> suffix used in the function name informs Stan that this is a log probability density function.</p>
 <p>Second, this Stan program nicely illustrates how to set up missing value imputation. Instead of just computing the log-likelihood for the observed responses <code>Y</code>, we define a new variable <code>Yl</code> which is equal to <code>Y</code> if the reponse is observed and equal to <code>Ymi</code> if the response is missing. The latter is in turn defined as a parameter and thus estimated along with all other paramters of the model. More details about missing value imputation in Stan can be found in the <em>Missing Data &amp; Partially Known Parameters</em> section of the <a href="https://mc-stan.org/users/documentation/index.html">Stan manual</a>.</p>
-<p>The Stan code extracted from brms is not only helpful when learning Stan, but can also drastically speed up the specification of models that are not support by brms. If brms can fit a model similar but not identical to the desired model, we can let brms generate the Stan program for the similar model and then mold it into the program that implements the model we actually want to fit. Rather than calling <code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html">stancode()</a></code>, which requires an existing fitted model object, we recommend using <code><a href="https://rdrr.io/pkg/brms/man/make_stancode.html">make_stancode()</a></code> and specifying the <code>save_model</code> argument to write the Stan program to a file. The corresponding data can be prepared with <code><a href="https://rdrr.io/pkg/brms/man/make_standata.html">make_standata()</a></code> and then manually amended if needed. Once the code and data have been edited, they can be passed to RStan’s <code>stan()</code> function via the <code>file</code> and <code>data</code> arguments.</p>
+<p>The Stan code extracted from brms is not only helpful when learning Stan, but can also drastically speed up the specification of models that are not support by brms. If brms can fit a model similar but not identical to the desired model, we can let brms generate the Stan program for the similar model and then mold it into the program that implements the model we actually want to fit. Rather than calling <code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html">stancode()</a></code>, which requires an existing fitted model object, we recommend using <code><a href="https://rdrr.io/pkg/brms/man/make_stancode.html">make_stancode()</a></code> and specifying the <code>save_model</code> argument to write the Stan program to a file. The corresponding data can be prepared with <code><a href="https://rdrr.io/pkg/brms/man/make_standata.html">make_standata()</a></code> and then manually amended if needed. Once the code and data have been edited, they can be passed to RStan’s <code><a href="https://mc-stan.org/rstan/reference/stan.html">stan()</a></code> function via the <code>file</code> and <code>data</code> arguments.</p>
 </div>
 <div id="conclusion" class="section level1">
 <h1 class="hasAnchor">
@@ -581,7 +595,7 @@ generated quantities {
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
 <p>Anselin L. (1988). <em>Spatial econometrics: methods and models</em>. Dordrecht: Kluwer Academic.</p>
-<p>Bürkner P. C., Gabry J., &amp; Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. <a href="https://arxiv.org/abs/1810.10559">ArXiv preprint</a>.</p>
+<p>Bürkner P. C., Gabry J., &amp; Vehtari A. (2020). Efficient leave-one-out cross-validation for Bayesian non-factorized normal and Student-t models. <em>Computational Statistics</em>, :10.1007/s00180-020-01045-4. <a href="https://arxiv.org/abs/1810.10559">ArXiv preprint</a>.</p>
 <p>Sundararajan S. &amp; Keerthi S. S. (2001). Predictive approaches for choosing hyperparameters in Gaussian processes. <em>Neural Computation</em>, 13(5), 1103–1118.</p>
 <p>Vehtari A., Mononen T., Tolvanen V., Sivula T., &amp; Winther O. (2016). Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models. <em>Journal of Machine Learning Research</em>, 17(103), 1–38. <a href="https://jmlr.org/papers/v17/14-540.html">Online</a>.</p>
 <p>Vehtari A., Gelman A., &amp; Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>, 27(5), 1413–1432. :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>. <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</p>
@@ -604,7 +618,7 @@ generated quantities {
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

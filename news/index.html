@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -173,6 +173,29 @@
       <small>Source: <a href='https://github.com/stan-dev/loo/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="loo-250" class="section level1">
+<h1 class="page-header" data-toc-text="2.5.0">
+<a href="#loo-250" class="anchor"></a>loo 2.5.0<small> 2022-03-16 </small>
+</h1>
+<div id="improvements" class="section level3">
+<h3 class="hasAnchor">
+<a href="#improvements" class="anchor"></a>Improvements</h3>
+<ul>
+<li><p>New <a href="https://mc-stan.org/loo/articles/online-only/faq.html">Frequently Asked Questions page</a> on the package website. (<a href='https://github.com/stan-dev/loo/issues/143'>#143</a>)</p></li>
+<li><p>Speed improvement from simplifying the normalization when fitting the generalized Pareto distribution. (<a href='https://github.com/stan-dev/loo/issues/187'>#187</a>, <a href='https://github.com/sethaxen'>@sethaxen</a>)</p></li>
+<li><p>Added parallel likelihood computation to speedup <code><a href="../reference/loo_subsample.html">loo_subsample()</a></code> when using posterior approximations. (<a href='https://github.com/stan-dev/loo/issues/171'>#171</a>, <a href='https://github.com/kdubovikov'>@kdubovikov</a>)</p></li>
+<li><p>Switch unit tests from Travis to GitHub Actions. (<a href='https://github.com/stan-dev/loo/issues/164'>#164</a>)</p></li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h3>
+<ul>
+<li><p>Fixed a bug causing the normalizing constant of the PSIS (log) weights not to get updated when performing moment matching with <code>save_psis = TRUE</code> (<a href='https://github.com/stan-dev/loo/issues/166'>#166</a>, <a href='https://github.com/fweber144'>@fweber144</a>).</p></li>
+<li><p>Fixed bug where the attribute storing normalizing constant of PSIS weights wasn’t updated when using moment matching. (<a href='https://github.com/stan-dev/loo/issues/167'>#167</a>, <a href='https://github.com/fweber144'>@fweber144</a>)</p></li>
+</ul>
+</div>
+</div>
     <div id="loo-241" class="section level1">
 <h1 class="page-header" data-toc-text="2.4.1">
 <a href="#loo-241" class="anchor"></a>loo 2.4.1<small> 2020-12-09 </small>
@@ -185,9 +208,9 @@
 <h1 class="page-header" data-toc-text="2.4.0">
 <a href="#loo-240" class="anchor"></a>loo 2.4.0<small> 2020-12-05 </small>
 </h1>
-<div id="bug-fixes" class="section level3">
+<div id="bug-fixes-1" class="section level3">
 <h3 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug fixes</h3>
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h3>
 <ul>
 <li><p>Fixed a bug in <code><a href="../reference/relative_eff.html">relative_eff.function()</a></code> that caused an error on Windows when using multiple cores. (<a href='https://github.com/stan-dev/loo/issues/152'>#152</a>)</p></li>
 <li><p>Fixed a potential numerical issue in <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> with <code>split=TRUE</code>. (<a href='https://github.com/stan-dev/loo/issues/153'>#153</a>)</p></li>
@@ -387,7 +410,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

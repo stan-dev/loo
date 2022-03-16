@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -125,13 +125,13 @@
 
       
 
-      </header><script src="loo2-with-rstan_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><script src="loo2-with-rstan_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Writing Stan programs for use with the loo package</h1>
                         <h4 class="author">Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 class="date">2020-12-04</h4>
+            <h4 class="date">2022-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-with-rstan.Rmd"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-with-rstan.Rmd</code></div>
@@ -189,18 +189,19 @@ generated quantities {
 <h2 class="hasAnchor">
 <a href="#fitting-the-model-with-rstan" class="anchor"></a>Fitting the model with RStan</h2>
 <p>Next we fit the model in Stan using the <strong>rstan</strong> package:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"rstan"</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/rstan/">"rstan"</a></span><span class="op">)</span>
 
 <span class="co"># Prepare data </span>
-<span class="no">url</span> <span class="kw">&lt;-</span> <span class="st">"http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"</span>
-<span class="no">wells</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="no">url</span>)
-<span class="no">wells</span>$<span class="no">dist100</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span>(<span class="no">wells</span>, <span class="no">dist</span> / <span class="fl">100</span>)
-<span class="no">X</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span>(~ <span class="no">dist100</span> + <span class="no">arsenic</span>, <span class="no">wells</span>)
-<span class="no">standata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">wells</span>$<span class="no">switch</span>, <span class="kw">X</span> <span class="kw">=</span> <span class="no">X</span>, <span class="kw">N</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">X</span>), <span class="kw">P</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="no">X</span>))
+<span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"</span>
+<span class="va">wells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span>
+<span class="va">wells</span><span class="op">$</span><span class="va">dist100</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html">with</a></span><span class="op">(</span><span class="va">wells</span>, <span class="va">dist</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span>
+<span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">dist100</span> <span class="op">+</span> <span class="va">arsenic</span>, <span class="va">wells</span><span class="op">)</span>
+<span class="va">standata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">wells</span><span class="op">$</span><span class="va">switch</span>, X <span class="op">=</span> <span class="va">X</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Fit model</span>
-<span class="no">fit_1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span>(<span class="st">"logistic.stan"</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">fit_1</span>, <span class="kw">pars</span> <span class="kw">=</span> <span class="st">"beta"</span>)</pre></body></html></div>
+<span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span><span class="op">(</span><span class="st">"logistic.stan"</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">fit_1</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></code></pre></div>
 <pre><code>         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
 beta[1]  0.00       0 0.08 -0.16 -0.05  0.00  0.05  0.15  1964    1
 beta[2] -0.89       0 0.10 -1.09 -0.96 -0.89 -0.82 -0.68  2048    1
@@ -210,22 +211,23 @@ beta[3]  0.46       0 0.04  0.38  0.43  0.46  0.49  0.54  2198    1</code></pre>
 <h2 class="hasAnchor">
 <a href="#computing-approximate-leave-one-out-cross-validation-using-psis-loo" class="anchor"></a>Computing approximate leave-one-out cross-validation using PSIS-LOO</h2>
 <p>We can then use the <strong>loo</strong> package to compute the efficient PSIS-LOO approximation to exact LOO-CV:</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"loo"</span>)
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/loo/">"loo"</a></span><span class="op">)</span>
 
 <span class="co"># Extract pointwise log-likelihood</span>
 <span class="co"># using merge_chains=FALSE returns an array, which is easier to </span>
 <span class="co"># use with relative_eff()</span>
-<span class="no">log_lik_1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span>(<span class="no">fit_1</span>, <span class="kw">merge_chains</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="va">log_lik_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">fit_1</span>, merge_chains <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co"># as of loo v2.0.0 we can optionally provide relative effective sample sizes</span>
 <span class="co"># when calling loo, which allows for better estimates of the PSIS effective</span>
 <span class="co"># sample sizes and Monte Carlo error</span>
-<span class="no">r_eff</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">log_lik_1</span>), <span class="kw">cores</span> <span class="kw">=</span> <span class="fl">2</span>)
+<span class="va">r_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">log_lik_1</span><span class="op">)</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> 
 
 <span class="co"># preferably use more than 2 cores (as many cores as possible)</span>
 <span class="co"># will use value of 'mc.cores' option if cores is not specified</span>
-<span class="no">loo_1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">log_lik_1</span>, <span class="kw">r_eff</span> <span class="kw">=</span> <span class="no">r_eff</span>, <span class="kw">cores</span> <span class="kw">=</span> <span class="fl">2</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo_1</span>)</pre></body></html></div>
+<span class="va">loo_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">log_lik_1</span>, r_eff <span class="op">=</span> <span class="va">r_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">loo_1</span><span class="op">)</span></code></pre></div>
 <pre><code>Computed from 4000 by 3020 log-likelihood matrix
 
          Estimate   SE
@@ -244,13 +246,14 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <h2 class="hasAnchor">
 <a href="#comparing-models" class="anchor"></a>Comparing models</h2>
 <p>To compare this model to an alternative model for the same data we can use the <code>loo_compare</code> function in the <strong>loo</strong> package. First we’ll fit a second model to the well-switching data, using <code><a href="https://rdrr.io/r/base/Log.html">log(arsenic)</a></code> instead of <code>arsenic</code> as a predictor:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">standata</span>$<span class="no">X</span>[, <span class="st">"arsenic"</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">standata</span>$<span class="no">X</span>[, <span class="st">"arsenic"</span>])
-<span class="no">fit_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span>(<span class="kw">fit</span> <span class="kw">=</span> <span class="no">fit_1</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">standata</span>)
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">standata</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>, <span class="st">"arsenic"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">standata</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>, <span class="st">"arsenic"</span><span class="op">]</span><span class="op">)</span>
+<span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html">stan</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">fit_1</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span> 
 
-<span class="no">log_lik_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span>(<span class="no">fit_2</span>, <span class="kw">merge_chains</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">r_eff_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">log_lik_2</span>))
-<span class="no">loo_2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span>(<span class="no">log_lik_2</span>, <span class="kw">r_eff</span> <span class="kw">=</span> <span class="no">r_eff_2</span>, <span class="kw">cores</span> <span class="kw">=</span> <span class="fl">2</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">loo_2</span>)</pre></body></html></div>
+<span class="va">log_lik_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">fit_2</span>, merge_chains <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">r_eff_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">log_lik_2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">loo_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">log_lik_2</span>, r_eff <span class="op">=</span> <span class="va">r_eff_2</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">loo_2</span><span class="op">)</span></code></pre></div>
 <pre><code>Computed from 4000 by 3020 log-likelihood matrix
 
          Estimate   SE
@@ -263,10 +266,12 @@ Monte Carlo SE of elpd_loo is 0.0.
 All Pareto k estimates are good (k &lt; 0.5).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>We can now compare the models on LOO using the <code>loo_compare</code> function:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Compare</span>
-<span class="no">comp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span>(<span class="no">loo_1</span>, <span class="no">loo_2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Compare</span>
+<span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loo_1</span>, <span class="va">loo_2</span><span class="op">)</span></code></pre></div>
 <p>This new object, <code>comp</code>, contains the estimated difference of expected leave-one-out prediction errors between the two models, along with the standard error:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">comp</span>) <span class="co"># can set simplify=FALSE for more detailed print output</span></pre></body></html></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span> <span class="co"># can set simplify=FALSE for more detailed print output</span></code></pre></div>
 <pre><code>       elpd_diff se_diff
 model2   0.0       0.0  
 model1 -16.3       4.4  </code></pre>
@@ -299,7 +304,7 @@ model1 -16.3       4.4  </code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

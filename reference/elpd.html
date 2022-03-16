@@ -82,7 +82,7 @@ predictive density of the observed data (an overestimate of the elpd)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -183,13 +183,13 @@ pointwise predictive density for a new dataset or the log pointwise
 predictive density of the observed data (an overestimate of the elpd).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>elpd</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for array</span>
-<span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>elpd</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>elpd</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>elpd</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -229,8 +229,9 @@ methods.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Calculate the lpd of the observed data</span>
-<span class='no'>LLarr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='fu'>elpd</span>(<span class='no'>LLarr</span>)</div><div class='output co'>#&gt; 
+<span class='va'>LLarr</span> <span class='op'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='fu'>elpd</span><span class='op'>(</span><span class='va'>LLarr</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
 #&gt; Computed from 1000 by 32 log-likelihood matrix using the generic elpd function
 #&gt; 
 #&gt;      Estimate  SE
@@ -252,7 +253,7 @@ methods.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

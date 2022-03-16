@@ -82,7 +82,7 @@ print(..., simplify=FALSE) to print a more detailed summary." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -183,16 +183,16 @@ print(..., simplify=FALSE) to print a more detailed summary." />
 <code><a href='https://rdrr.io/r/base/print.html'>print(..., simplify=FALSE)</a></code> to print a more detailed summary.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo_compare</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo_compare</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>loo_compare</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>loo_compare</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for compare.loo</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, digits <span class='op'>=</span> <span class='fl'>1</span>, simplify <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
 <span class='co'># S3 method for compare.loo_ss</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, digits <span class='op'>=</span> <span class='fl'>1</span>, simplify <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -225,26 +225,26 @@ print method. See the <strong>Details</strong> section.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>When comparing two fitted models, we can estimate the difference in their
-expected predictive accuracy by the difference in <code>elpd_loo</code> or
-<code>elpd_waic</code> (or multiplied by \(-2\), if desired, to be on the
-deviance scale).</p>
-<p>When using <code>loo_compare()</code>, the returned matrix will have one row per
-model and several columns of estimates. The values in the <code>elpd_diff</code>
-and <code>se_diff</code> columns of the returned matrix are computed by making
-pairwise comparisons between each model and the model with the largest ELPD
-(the model in the first row). For this reason the <code>elpd_diff</code> column
-will always have the value <code>0</code> in the first row (i.e., the difference
-between the preferred model and itself) and negative values in subsequent
-rows for the remaining models.</p>
-<p>To compute the standard error of the difference in ELPD --- which should
-not be expected to equal the difference of the standard errors --- we use a
-paired estimate to take advantage of the fact that the same set of \(N\)
-data points was used to fit both models. These calculations should be most
-useful when \(N\) is large, because then non-normality of the
-distribution is not such an issue when estimating the uncertainty in these
-sums. These standard errors, for all their flaws, should give a better
-sense of uncertainty than what is obtained using the current standard
-approach of comparing differences of deviances to a Chi-squared
+expected predictive accuracy by the difference in
+<code><a href='loo-glossary.html'>elpd_loo</a></code> or <code>elpd_waic</code> (or multiplied by \(-2\), if
+desired, to be on the deviance scale).</p>
+<p>When using <code>loo_compare()</code>, the returned matrix will have one row per model
+and several columns of estimates. The values in the
+<code><a href='loo-glossary.html'>elpd_diff</a></code> and <code><a href='loo-glossary.html'>se_diff</a></code> columns of the
+returned matrix are computed by making pairwise comparisons between each
+model and the model with the largest ELPD (the model in the first row). For
+this reason the <code>elpd_diff</code> column will always have the value <code>0</code> in the
+first row (i.e., the difference between the preferred model and itself) and
+negative values in subsequent rows for the remaining models.</p>
+<p>To compute the standard error of the difference in <a href='loo-glossary.html'>ELPD</a> ---
+which should not be expected to equal the difference of the standard errors
+--- we use a paired estimate to take advantage of the fact that the same
+set of \(N\) data points was used to fit both models. These calculations
+should be most useful when \(N\) is large, because then non-normality of
+the distribution is not such an issue when estimating the uncertainty in
+these sums. These standard errors, for all their flaws, should give a
+better sense of uncertainty than what is obtained using the current
+standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -257,34 +257,47 @@ evaluation using leave-one-out cross-validation and WAIC.
 <p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
 <a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'>
+<ul>
+<li><p>The <a href='https://mc-stan.org/loo/articles/online-only/faq.html'>FAQ page</a> on
+the <strong>loo</strong> website for answers to frequently asked questions.</p></li>
+</ul>
+</div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># very artificial example, just for demonstration!</span>
-<span class='no'>LL</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='no'>loo1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>LL</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>)     <span class='co'># should be worst model when compared</span>
-<span class='no'>loo2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>LL</span> + <span class='fl'>1</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>) <span class='co'># should be second best model when compared</span>
-<span class='no'>loo3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>LL</span> + <span class='fl'>2</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>) <span class='co'># should be best model when compared</span>
+<span class='va'>LL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>loo1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>LL</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>     <span class='co'># should be worst model when compared</span>
+<span class='va'>loo2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>LL</span> <span class='op'>+</span> <span class='fl'>1</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span> <span class='co'># should be second best model when compared</span>
+<span class='va'>loo3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>LL</span> <span class='op'>+</span> <span class='fl'>2</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span> <span class='co'># should be best model when compared</span>
 
-<span class='no'>comp</span> <span class='kw'>&lt;-</span> <span class='fu'>loo_compare</span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>, <span class='no'>loo3</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>comp</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt;        elpd_diff se_diff
+<span class='va'>comp</span> <span class='op'>&lt;-</span> <span class='fu'>loo_compare</span><span class='op'>(</span><span class='va'>loo1</span>, <span class='va'>loo2</span>, <span class='va'>loo3</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>comp</span>, digits <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        elpd_diff se_diff
 #&gt; model3   0.00      0.00 
 #&gt; model2 -32.00      0.00 
 #&gt; model1 -64.00      0.00 </div><div class='input'>
 <span class='co'># show more details with simplify=FALSE</span>
 <span class='co'># (will be the same for all models in this artificial example)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>comp</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt;        elpd_diff se_diff elpd_loo se_elpd_loo p_loo   se_p_loo looic   se_looic
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>comp</span>, simplify <span class='op'>=</span> <span class='cn'>FALSE</span>, digits <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        elpd_diff se_diff elpd_loo se_elpd_loo p_loo   se_p_loo looic   se_looic
 #&gt; model3   0.000     0.000 -19.589    4.284       3.329   1.152   39.178   8.568 
 #&gt; model2 -32.000     0.000 -51.589    4.284       3.329   1.152  103.178   8.568 
 #&gt; model1 -64.000     0.000 -83.589    4.284       3.329   1.152  167.178   8.568 </div><div class='input'>
 <span class='co'># can use a list of objects</span>
-<span class='fu'>loo_compare</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>loo1</span>, <span class='no'>loo2</span>, <span class='no'>loo3</span>))</div><div class='output co'>#&gt;        elpd_diff se_diff
+<span class='fu'>loo_compare</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>loo1</span>, <span class='va'>loo2</span>, <span class='va'>loo3</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        elpd_diff se_diff
 #&gt; model3   0.0       0.0  
 #&gt; model2 -32.0       0.0  
 #&gt; model1 -64.0       0.0  </div><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># works for waic (and kfold) too</span>
-<span class='fu'>loo_compare</span>(<span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span>), <span class='fu'><a href='waic.html'>waic</a></span>(<span class='no'>LL</span> - <span class='fl'>10</span>))
-}</div></pre>
+<span class='fu'>loo_compare</span><span class='op'>(</span><span class='fu'><a href='waic.html'>waic</a></span><span class='op'>(</span><span class='va'>LL</span><span class='op'>)</span>, <span class='fu'><a href='waic.html'>waic</a></span><span class='op'>(</span><span class='va'>LL</span> <span class='op'>-</span> <span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -300,7 +313,7 @@ Pareto smoothed importance sampling.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

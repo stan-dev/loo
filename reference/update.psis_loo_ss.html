@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Update <code>psis_loo_ss</code> objects — update.psis_loo_ss • loo</title>
+<title>Update psis_loo_ss objects — update.psis_loo_ss • loo</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Update <code>psis_loo_ss</code> objects — update.psis_loo_ss" />
+<meta property="og:title" content="Update psis_loo_ss objects — update.psis_loo_ss" />
 <meta property="og:description" content="Update psis_loo_ss objects" />
 <meta property="og:image" content="https://mc-stan.org/loo/logo.png" />
 
@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -180,19 +180,19 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for psis_loo_ss</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span>(
-  <span class='no'>object</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>observations</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
-  <span class='kw'>loo_approximation</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>loo_approximation_draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>llgrad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>llhess</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>...</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  observations <span class='op'>=</span> <span class='cn'>NULL</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  loo_approximation <span class='op'>=</span> <span class='cn'>NULL</span>,
+  loo_approximation_draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  llgrad <span class='op'>=</span> <span class='cn'>NULL</span>,
+  llhess <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -240,8 +240,9 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-<code>r_eff=1</code> and can be omitted. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
-helper functions for computing <code>r_eff</code>.</p></td>
+<code>r_eff=1</code> and can be omitted. The warning message thrown when <code>r_eff</code> is
+not specified can be disabled by setting <code>r_eff</code> to <code>NA</code>. See the
+<code><a href='relative_eff.html'>relative_eff()</a></code> helper functions for computing <code>r_eff</code>.</p></td>
     </tr>
     <tr>
       <th>cores</th>
@@ -329,7 +330,7 @@ supplied, new observations will be sampled to reach the supplied sample size.</p
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

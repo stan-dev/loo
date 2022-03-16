@@ -82,7 +82,7 @@ of the draws, and computes a single elpd using multiple importance sampling." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -183,21 +183,21 @@ Takes in the moment matching total transformation, transforms only half
 of the draws, and computes a single elpd using multiple importance sampling.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo_moment_match_split</span>(
-  <span class='no'>x</span>,
-  <span class='no'>upars</span>,
-  <span class='no'>cov</span>,
-  <span class='no'>total_shift</span>,
-  <span class='no'>total_scaling</span>,
-  <span class='no'>total_mapping</span>,
-  <span class='no'>i</span>,
-  <span class='no'>log_prob_upars</span>,
-  <span class='no'>log_lik_i_upars</span>,
-  <span class='no'>r_eff_i</span>,
-  <span class='no'>cores</span>,
-  <span class='no'>is_method</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>loo_moment_match_split</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>upars</span>,
+  <span class='va'>cov</span>,
+  <span class='va'>total_shift</span>,
+  <span class='va'>total_scaling</span>,
+  <span class='va'>total_mapping</span>,
+  <span class='va'>i</span>,
+  <span class='va'>log_prob_upars</span>,
+  <span class='va'>log_lik_i_upars</span>,
+  <span class='va'>r_eff_i</span>,
+  <span class='va'>cores</span>,
+  <span class='va'>is_method</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -291,9 +291,9 @@ log-likelihood values. Also returns the updated MCMC effective sample size
 and the integrand-specific log-importance weights.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
-Implicitly Adaptive Importance Sampling.
-<a href='https://arxiv.org/abs/1906.08850'>preprint arXiv:1906.08850</a></p>
+    <p>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2021).
+Implicitly adaptive importance sampling. <em>Statistics and Computing</em>, 31, 16.
+doi:10.1007/s11222-020-09982-2. arXiv preprint arXiv:1906.08850.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='loo.html'>loo()</a></code>, <code><a href='loo_moment_match.html'>loo_moment_match()</a></code></p></div>
@@ -313,7 +313,7 @@ Implicitly Adaptive Importance Sampling.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

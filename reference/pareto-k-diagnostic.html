@@ -86,7 +86,7 @@ and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -191,35 +191,35 @@ diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
 and Vehtari, Simpson, Gelman, Yao, and Gabry (2019) for full details.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pareto_k_table</span>(<span class='no'>x</span>)
+    <pre class="usage"><span class='fu'>pareto_k_table</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>pareto_k_ids</span>(<span class='no'>x</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
+<span class='fu'>pareto_k_ids</span><span class='op'>(</span><span class='va'>x</span>, threshold <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
 
-<span class='fu'>pareto_k_values</span>(<span class='no'>x</span>)
+<span class='fu'>pareto_k_values</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>pareto_k_influence_values</span>(<span class='no'>x</span>)
+<span class='fu'>pareto_k_influence_values</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>psis_n_eff_values</span>(<span class='no'>x</span>)
+<span class='fu'>psis_n_eff_values</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>mcse_loo</span>(<span class='no'>x</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.7</span>)
+<span class='fu'>mcse_loo</span><span class='op'>(</span><span class='va'>x</span>, threshold <span class='op'>=</span> <span class='fl'>0.7</span><span class='op'>)</span>
 
 <span class='co'># S3 method for psis_loo</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
-  <span class='no'>x</span>,
-  <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
-  <span class='no'>...</span>,
-  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
-)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  diagnostic <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"k"</span>, <span class='st'>"n_eff"</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  label_points <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  main <span class='op'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for psis</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(
-  <span class='no'>x</span>,
-  <span class='kw'>diagnostic</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"k"</span>, <span class='st'>"n_eff"</span>),
-  <span class='no'>...</span>,
-  <span class='kw'>label_points</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>main</span> <span class='kw'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  diagnostic <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"k"</span>, <span class='st'>"n_eff"</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  label_points <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  main <span class='op'>=</span> <span class='st'>"PSIS diagnostic plot"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -244,7 +244,7 @@ default) or <code>"n_eff"</code> for PSIS effective sample size estimates.</p></
     </tr>
     <tr>
       <th>label_points, ...</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method, if <code>label_points</code> is
+      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> method, if <code>label_points</code> is
 <code>TRUE</code> the observation numbers corresponding to any values of \(k\)
 greater than 0.5 will be displayed in the plot. Any arguments specified in
 <code>...</code> will be passed to <code><a href='https://rdrr.io/r/graphics/text.html'>graphics::text()</a></code> and can be used
@@ -252,7 +252,7 @@ to control the appearance of the labels.</p></td>
     </tr>
     <tr>
       <th>main</th>
-      <td><p>For the <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method, a title for the plot.</p></td>
+      <td><p>For the <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> method, a title for the plot.</p></td>
     </tr>
     </table>
 
@@ -273,9 +273,9 @@ effective sample sizes.</p>
 <p><code>mcse_loo()</code> returns the Monte Carlo standard error (MCSE)
 estimate for PSIS-LOO. MCSE will be NA if any Pareto \(k\) values are
 above <code>threshold</code>.</p>
-<p>The <code><a href='https://rdrr.io/r/base/plot.html'>plot()</a></code> method is called for its side effect and does not
+<p>The <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot()</a></code> method is called for its side effect and does not
 return anything. If <code>x</code> is the result of a call to <code><a href='loo.html'>loo()</a></code>
-or <code><a href='psis.html'>psis()</a></code> then <code><a href='https://rdrr.io/r/base/plot.html'>plot(x, diagnostic)</a></code> produces a plot of
+or <code><a href='psis.html'>psis()</a></code> then <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot(x, diagnostic)</a></code> produces a plot of
 the estimates of the Pareto shape parameters (<code>diagnostic = "k"</code>) or
 estimates of the PSIS effective sample sizes (<code>diagnostic = "n_eff"</code>).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -301,7 +301,7 @@ the raw importance ratios exists. The convergence rate is close to
 zero and bias can be large with practical sample sizes.</p></li>
 </ul>
 
-<h3>What if the estimated tail shape parameter \(k\) exceeds
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>What if the estimated tail shape parameter \(k\) exceeds
 \(0.5\)</h3>
 <p>Importance sampling is likely to work less well if the
 marginal posterior \(p(\theta^s | y)\) and LOO posterior
@@ -326,13 +326,13 @@ generally make approximate LOO-CV more stable.</p></li>
 
 
 
-<h3>Observation influence statistics</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Observation influence statistics</h3>
 <p>The estimated shape parameter
 \(k\) for each observation can be used as a measure of the observation's
 influence on posterior distribution of the model. These can be obtained with
 <code>pareto_k_influence_values()</code>.</p>
 
-<h3>Effective sample size and error estimates</h3>
+<h3 class='hasAnchor' id='arguments'><a class='anchor' href='#arguments'></a>Effective sample size and error estimates</h3>
 <p>In the case that we
 obtain the samples from the proposal distribution via MCMC the <strong>loo</strong>
 package also computes estimates for the Monte Carlo error and the effective
@@ -353,7 +353,13 @@ Pareto smoothed importance sampling.
 <a href='https://arxiv.org/abs/1507.02646'>preprint arXiv:1507.02646</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='psis.html'>psis()</a></code> for the implementation of the PSIS algorithm.</p></div>
+    <div class='dont-index'>
+<ul>
+<li><p><code><a href='psis.html'>psis()</a></code> for the implementation of the PSIS algorithm.</p></li>
+<li><p>The <a href='https://mc-stan.org/loo/articles/online-only/faq.html'>FAQ page</a> on
+the <strong>loo</strong> website for answers to frequently asked questions.</p></li>
+</ul>
+</div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -370,7 +376,7 @@ Pareto smoothed importance sampling.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

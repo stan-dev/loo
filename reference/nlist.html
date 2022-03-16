@@ -82,7 +82,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -183,7 +183,7 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 <code>nlist(a,b)</code> and <code><a href='https://rdrr.io/r/base/list.html'>list(a = a, b = 2)</a></code> becomes <code>nlist(a, b = 2)</code>, etc.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlist</span>(<span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>nlist</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -201,9 +201,10 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># All variables already defined</span>
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>)
-<span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/mat.or.vec.html'>mat.or.vec</a></span>(<span class='fl'>10</span>, <span class='fl'>3</span>)
-<span class='fu'>nlist</span>(<span class='no'>a</span>,<span class='no'>b</span>)</div><div class='output co'>#&gt; $a
+<span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>
+<span class='va'>b</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/mat.or.vec.html'>mat.or.vec</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'>nlist</span><span class='op'>(</span><span class='va'>a</span>,<span class='va'>b</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $a
 #&gt;   [1]  1.24485982  0.45987615  0.16770583 -0.27500302  0.49232262  1.33975457
 #&gt;   [7] -0.47674422 -1.49679554 -1.20142397 -0.40746103 -0.94774810  0.85166640
 #&gt;  [13] -0.58843101 -1.36247310 -0.44963794 -0.64332503 -0.51074555  0.25720201
@@ -236,7 +237,8 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 #&gt; [10,]    0    0    0
 #&gt; </div><div class='input'>
 <span class='co'># Define some variables in the call and take the rest from the environment</span>
-<span class='fu'>nlist</span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='kw'>veggies</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lettuce"</span>, <span class='st'>"spinach"</span>), <span class='kw'>fruits</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"banana"</span>, <span class='st'>"papaya"</span>))</div><div class='output co'>#&gt; $a
+<span class='fu'>nlist</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, veggies <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lettuce"</span>, <span class='st'>"spinach"</span><span class='op'>)</span>, fruits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"banana"</span>, <span class='st'>"papaya"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $a
 #&gt;   [1]  1.24485982  0.45987615  0.16770583 -0.27500302  0.49232262  1.33975457
 #&gt;   [7] -0.47674422 -1.49679554 -1.20142397 -0.40746103 -0.94774810  0.85166640
 #&gt;  [13] -0.58843101 -1.36247310 -0.44963794 -0.64332503 -0.51074555  0.25720201
@@ -290,7 +292,7 @@ names of the objects in the list. The code <code><a href='https://rdrr.io/r/base
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

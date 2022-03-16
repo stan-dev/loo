@@ -81,7 +81,7 @@ K-fold cross-validation. See the Details section for explanations." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -181,11 +181,11 @@ K-fold cross-validation. See the Details section for explanations." />
 K-fold cross-validation. See the <strong>Details</strong> section for explanations.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>kfold_split_random</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>N</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>kfold_split_random</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>10</span>, N <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>kfold_split_stratified</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>kfold_split_stratified</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>10</span>, x <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>kfold_split_grouped</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>kfold_split_grouped</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>10</span>, x <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -222,33 +222,41 @@ fold (relevant when when there are more groups than folds) is
 randomized.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_random</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>N</span> <span class='kw'>=</span> <span class='fl'>20</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;  [1] 5 1 1 3 4 3 2 4 2 4 3 5 4 1 2 1 5 2 3 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt; ids
+    <pre class="examples"><div class='input'><span class='va'>ids</span> <span class='op'>&lt;-</span> <span class='fu'>kfold_split_random</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>5</span>, N <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>ids</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 5 1 1 3 4 3 2 4 2 4 3 5 4 1 2 1 5 2 3 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>ids</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ids
 #&gt; 1 2 3 4 5 
 #&gt; 4 4 4 4 4 </div><div class='input'>
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>), <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.05</span>, <span class='fl'>0.95</span>))
-<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; x
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='fl'>200</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span>, prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.95</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; x
 #&gt;   0   1 
-#&gt;   7 193 </div><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_stratified</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ids</span>)</div><div class='output co'>#&gt;   [1] 2 2 3 1 2 3 1 2 5 1 1 3 3 1 5 2 5 4 1 3 2 1 2 1 5 2 2 1 4 1 1 2 4 5 3 4 4
+#&gt;   7 193 </div><div class='input'><span class='va'>ids</span> <span class='op'>&lt;-</span> <span class='fu'>kfold_split_stratified</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>5</span>, x <span class='op'>=</span> <span class='va'>x</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>ids</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   [1] 2 2 3 1 2 3 1 2 5 1 1 3 3 1 5 2 5 4 1 3 2 1 2 1 5 2 2 1 4 1 1 2 4 5 3 4 4
 #&gt;  [38] 3 3 3 5 1 5 4 3 4 4 4 4 5 3 5 3 1 5 5 5 4 1 3 4 2 1 5 5 2 5 4 2 3 5 2 3 5
 #&gt;  [75] 5 1 5 4 1 2 5 5 1 3 1 4 3 3 1 2 3 3 4 5 4 3 3 5 4 3 2 3 2 5 3 4 2 5 5 4 4
 #&gt; [112] 4 1 1 1 4 5 5 2 2 3 2 5 1 5 1 2 1 2 4 4 2 1 2 4 4 1 1 2 2 4 5 4 4 2 2 1 4
 #&gt; [149] 1 3 3 2 2 4 4 2 1 5 4 3 3 4 3 1 4 5 1 3 2 2 1 5 4 1 5 3 3 4 5 3 5 2 2 2 2
-#&gt; [186] 4 3 3 5 3 1 5 4 3 1 2 3 1 1 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>ids</span>, <span class='no'>x</span>)</div><div class='output co'>#&gt;    x
+#&gt; [186] 4 3 3 5 3 1 5 4 3 1 2 3 1 1 5</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>ids</span>, <span class='va'>x</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    x
 #&gt; ids  0  1
 #&gt;   1  2 38
 #&gt;   2  2 38
 #&gt;   3  1 39
 #&gt;   4  1 39
 #&gt;   5  1 39</div><div class='input'>
-<span class='no'>grp</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='no'>state.name</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>grp</span>)</div><div class='output co'>#&gt; [1] 750</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>))</div><div class='output co'>#&gt; grp
+<span class='va'>grp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>50</span>, k <span class='op'>=</span> <span class='fl'>15</span>, labels <span class='op'>=</span> <span class='va'>state.name</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>grp</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 750</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>grp</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; grp
 #&gt;    Alabama     Alaska    Arizona   Arkansas California   Colorado 
 #&gt;         15         15         15         15         15         15 </div><div class='input'>
-<span class='no'>ids_10</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_grouped</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>grp</span>)
-(<span class='no'>tab_10</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>, <span class='no'>ids_10</span>))</div><div class='output co'>#&gt;                 ids_10
+<span class='va'>ids_10</span> <span class='op'>&lt;-</span> <span class='fu'>kfold_split_grouped</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>10</span>, x <span class='op'>=</span> <span class='va'>grp</span><span class='op'>)</span>
+<span class='op'>(</span><span class='va'>tab_10</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>grp</span>, <span class='va'>ids_10</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;                 ids_10
 #&gt; grp               1  2  3  4  5  6  7  8  9 10
 #&gt;   Alabama         0  0  0  0  0 15  0  0  0  0
 #&gt;   Alaska          0 15  0  0  0  0  0  0  0  0
@@ -299,10 +307,12 @@ randomized.</p>
 #&gt;   Washington      0  0  0  0  0  0 15  0  0  0
 #&gt;   West Virginia   0  0  0 15  0  0  0  0  0  0
 #&gt;   Wisconsin       0  0  0  0  0  0  0 15  0  0
-#&gt;   Wyoming         0  0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_10</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 10 
+#&gt;   Wyoming         0  0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span><span class='op'>(</span><span class='va'>tab_10</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 10 
 #&gt; 75 75 75 75 75 75 75 75 75 75 </div><div class='input'>
-<span class='no'>ids_9</span> <span class='kw'>&lt;-</span> <span class='fu'>kfold_split_grouped</span>(<span class='kw'>K</span> <span class='kw'>=</span> <span class='fl'>9</span>, <span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>grp</span>)
-(<span class='no'>tab_9</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span>(<span class='no'>grp</span>, <span class='no'>ids_9</span>))</div><div class='output co'>#&gt;                 ids_9
+<span class='va'>ids_9</span> <span class='op'>&lt;-</span> <span class='fu'>kfold_split_grouped</span><span class='op'>(</span>K <span class='op'>=</span> <span class='fl'>9</span>, x <span class='op'>=</span> <span class='va'>grp</span><span class='op'>)</span>
+<span class='op'>(</span><span class='va'>tab_9</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>grp</span>, <span class='va'>ids_9</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;                 ids_9
 #&gt; grp               1  2  3  4  5  6  7  8  9
 #&gt;   Alabama         0  0  0  0 15  0  0  0  0
 #&gt;   Alaska          0  0  0  0  0  0  0  0 15
@@ -353,7 +363,8 @@ randomized.</p>
 #&gt;   Washington      0  0  0  0  0 15  0  0  0
 #&gt;   West Virginia   0  0  0 15  0  0  0  0  0
 #&gt;   Wisconsin      15  0  0  0  0  0  0  0  0
-#&gt;   Wyoming         0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span>(<span class='no'>tab_9</span>)</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 
+#&gt;   Wyoming         0  0  0  0 15  0  0  0  0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colSums</a></span><span class='op'>(</span><span class='va'>tab_9</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  1  2  3  4  5  6  7  8  9 
 #&gt; 90 90 90 90 90 75 75 75 75 </div><div class='input'>
 </div></pre>
   </div>
@@ -371,7 +382,7 @@ randomized.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

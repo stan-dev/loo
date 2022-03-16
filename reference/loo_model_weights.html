@@ -83,7 +83,7 @@ Gelman, Yao, and Gabry (2019) for background." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -185,25 +185,25 @@ al. (2018), Vehtari, Gelman, and Gabry (2017), and Vehtari, Simpson,
 Gelman, Yao, and Gabry (2019) for background.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo_model_weights</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo_model_weights</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>loo_model_weights</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stacking"</span>, <span class='st'>"pseudobma"</span>),
-  <span class='kw'>optim_method</span> <span class='kw'>=</span> <span class='st'>"BFGS"</span>,
-  <span class='kw'>optim_control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>BB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>BB_n</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>r_eff_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
-)
+<span class='fu'>loo_model_weights</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"stacking"</span>, <span class='st'>"pseudobma"</span><span class='op'>)</span>,
+  optim_method <span class='op'>=</span> <span class='st'>"BFGS"</span>,
+  optim_control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  BB <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  BB_n <span class='op'>=</span> <span class='fl'>1000</span>,
+  alpha <span class='op'>=</span> <span class='fl'>1</span>,
+  r_eff_list <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>stacking_weights</span>(<span class='no'>lpd_point</span>, <span class='kw'>optim_method</span> <span class='kw'>=</span> <span class='st'>"BFGS"</span>, <span class='kw'>optim_control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
+<span class='fu'>stacking_weights</span><span class='op'>(</span><span class='va'>lpd_point</span>, optim_method <span class='op'>=</span> <span class='st'>"BFGS"</span>, optim_control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>pseudobma_weights</span>(<span class='no'>lpd_point</span>, <span class='kw'>BB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>BB_n</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+<span class='fu'>pseudobma_weights</span><span class='op'>(</span><span class='va'>lpd_point</span>, BB <span class='op'>=</span> <span class='cn'>TRUE</span>, BB_n <span class='op'>=</span> <span class='fl'>1000</span>, alpha <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -346,16 +346,16 @@ stacking to average Bayesian predictive distributions.
 </div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'>### Demonstrating usage after fitting models with RStan</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>rstan</span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://mc-stan.org/rstan/'>rstan</a></span><span class='op'>)</span>
 
 <span class='co'># generate fake data from N(0,1).</span>
-<span class='no'>N</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>N</span>, <span class='fl'>0</span>, <span class='fl'>1</span>)
+<span class='va'>N</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>N</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># Suppose we have three models: N(-1, sigma), N(0.5, sigma) and N(0.6,sigma).</span>
-<span class='no'>stan_code</span> <span class='kw'>&lt;-</span> <span class='st'>"
+<span class='va'>stan_code</span> <span class='op'>&lt;-</span> <span class='st'>"
   data {
     int N;
     vector[N] y;
@@ -373,56 +373,58 @@ stacking to average Bayesian predictive distributions.
     for (n in 1:N) log_lik[n] = normal_lpdf(y[n]| mu_fixed, sigma);
   }"</span>
 
-<span class='no'>mod</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stan_model.html'>stan_model</a></span>(<span class='kw'>model_code</span> <span class='kw'>=</span> <span class='no'>stan_code</span>)
-<span class='no'>fit1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span>(<span class='no'>mod</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>N</span><span class='kw'>=</span><span class='no'>N</span>, <span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>mu_fixed</span><span class='kw'>=</span>-<span class='fl'>1</span>))
-<span class='no'>fit2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span>(<span class='no'>mod</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>N</span><span class='kw'>=</span><span class='no'>N</span>, <span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>mu_fixed</span><span class='kw'>=</span><span class='fl'>0.5</span>))
-<span class='no'>fit3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span>(<span class='no'>mod</span>, <span class='kw'>data</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>N</span><span class='kw'>=</span><span class='no'>N</span>, <span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>mu_fixed</span><span class='kw'>=</span><span class='fl'>0.6</span>))
-<span class='no'>model_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>fit1</span>, <span class='no'>fit2</span>, <span class='no'>fit3</span>)
-<span class='no'>log_lik_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='no'>model_list</span>, <span class='no'>extract_log_lik</span>)
+<span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stan_model.html'>stan_model</a></span><span class='op'>(</span>model_code <span class='op'>=</span> <span class='va'>stan_code</span><span class='op'>)</span>
+<span class='va'>fit1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span><span class='op'>(</span><span class='va'>mod</span>, data<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>N<span class='op'>=</span><span class='va'>N</span>, y<span class='op'>=</span><span class='va'>y</span>, mu_fixed<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>fit2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span><span class='op'>(</span><span class='va'>mod</span>, data<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>N<span class='op'>=</span><span class='va'>N</span>, y<span class='op'>=</span><span class='va'>y</span>, mu_fixed<span class='op'>=</span><span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>fit3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html'>sampling</a></span><span class='op'>(</span><span class='va'>mod</span>, data<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>N<span class='op'>=</span><span class='va'>N</span>, y<span class='op'>=</span><span class='va'>y</span>, mu_fixed<span class='op'>=</span><span class='fl'>0.6</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>model_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>fit1</span>, <span class='va'>fit2</span>, <span class='va'>fit3</span><span class='op'>)</span>
+<span class='va'>log_lik_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>model_list</span>, <span class='va'>extract_log_lik</span><span class='op'>)</span>
 
 <span class='co'># optional but recommended</span>
-<span class='no'>r_eff_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='no'>model_list</span>, <span class='kw'>function</span>(<span class='no'>x</span>) {
-  <span class='no'>ll_array</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='no'>x</span>, <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-  <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>ll_array</span>))
-})
+<span class='va'>r_eff_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>model_list</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='va'>ll_array</span> <span class='op'>&lt;-</span> <span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span><span class='op'>(</span><span class='va'>x</span>, merge_chains <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+  <span class='fu'><a href='relative_eff.html'>relative_eff</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>ll_array</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
 
 <span class='co'># stacking method:</span>
-<span class='no'>wts1</span> <span class='kw'>&lt;-</span> <span class='fu'>loo_model_weights</span>(
-  <span class='no'>log_lik_list</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"stacking"</span>,
-  <span class='kw'>r_eff_list</span> <span class='kw'>=</span> <span class='no'>r_eff_list</span>,
-  <span class='kw'>optim_control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>reltol</span><span class='kw'>=</span><span class='fl'>1e-10</span>)
-)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>wts1</span>)
+<span class='va'>wts1</span> <span class='op'>&lt;-</span> <span class='fu'>loo_model_weights</span><span class='op'>(</span>
+  <span class='va'>log_lik_list</span>,
+  method <span class='op'>=</span> <span class='st'>"stacking"</span>,
+  r_eff_list <span class='op'>=</span> <span class='va'>r_eff_list</span>,
+  optim_control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>reltol<span class='op'>=</span><span class='fl'>1e-10</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>wts1</span><span class='op'>)</span>
 
 <span class='co'># can also pass a list of psis_loo objects to avoid recomputing loo</span>
-<span class='no'>loo_list</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span>(<span class='fl'>1</span>:<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>log_lik_list</span>), <span class='kw'>function</span>(<span class='no'>j</span>) {
-  <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik_list</span><span class='kw'>[[</span><span class='no'>j</span>]], <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff_list</span><span class='kw'>[[</span><span class='no'>j</span>]])
-})
+<span class='va'>loo_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>log_lik_list</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>j</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>log_lik_list</span><span class='op'>[[</span><span class='va'>j</span><span class='op'>]</span><span class='op'>]</span>, r_eff <span class='op'>=</span> <span class='va'>r_eff_list</span><span class='op'>[[</span><span class='va'>j</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
 
-<span class='no'>wts2</span> <span class='kw'>&lt;-</span> <span class='fu'>loo_model_weights</span>(
-  <span class='no'>loo_list</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"stacking"</span>,
-  <span class='kw'>optim_control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>reltol</span><span class='kw'>=</span><span class='fl'>1e-10</span>)
-)
-<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='no'>wts1</span>, <span class='no'>wts2</span>)
+<span class='va'>wts2</span> <span class='op'>&lt;-</span> <span class='fu'>loo_model_weights</span><span class='op'>(</span>
+  <span class='va'>loo_list</span>,
+  method <span class='op'>=</span> <span class='st'>"stacking"</span>,
+  optim_control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>reltol<span class='op'>=</span><span class='fl'>1e-10</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span><span class='op'>(</span><span class='va'>wts1</span>, <span class='va'>wts2</span><span class='op'>)</span>
 
 
 <span class='co'># pseudo-BMA+ method:</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1414</span>)
-<span class='fu'>loo_model_weights</span>(<span class='no'>loo_list</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"pseudobma"</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1414</span><span class='op'>)</span>
+<span class='fu'>loo_model_weights</span><span class='op'>(</span><span class='va'>loo_list</span>, method <span class='op'>=</span> <span class='st'>"pseudobma"</span><span class='op'>)</span>
 
 <span class='co'># pseudo-BMA method (set BB = FALSE):</span>
-<span class='fu'>loo_model_weights</span>(<span class='no'>loo_list</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"pseudobma"</span>, <span class='kw'>BB</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>loo_model_weights</span><span class='op'>(</span><span class='va'>loo_list</span>, method <span class='op'>=</span> <span class='st'>"pseudobma"</span>, BB <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># calling stacking_weights or pseudobma_weights directly</span>
-<span class='no'>lpd1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik_list</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff_list</span><span class='kw'>[[</span><span class='fl'>1</span>]])$<span class='no'>pointwise</span>[,<span class='fl'>1</span>]
-<span class='no'>lpd2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik_list</span><span class='kw'>[[</span><span class='fl'>2</span>]], <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff_list</span><span class='kw'>[[</span><span class='fl'>2</span>]])$<span class='no'>pointwise</span>[,<span class='fl'>1</span>]
-<span class='no'>lpd3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span>(<span class='no'>log_lik_list</span><span class='kw'>[[</span><span class='fl'>3</span>]], <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff_list</span><span class='kw'>[[</span><span class='fl'>3</span>]])$<span class='no'>pointwise</span>[,<span class='fl'>1</span>]
-<span class='fu'>stacking_weights</span>(<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='no'>lpd1</span>, <span class='no'>lpd2</span>, <span class='no'>lpd3</span>))
-<span class='fu'>pseudobma_weights</span>(<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='no'>lpd1</span>, <span class='no'>lpd2</span>, <span class='no'>lpd3</span>))
-<span class='fu'>pseudobma_weights</span>(<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='no'>lpd1</span>, <span class='no'>lpd2</span>, <span class='no'>lpd3</span>), <span class='kw'>BB</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-}</div></pre>
+<span class='va'>lpd1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>log_lik_list</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>, r_eff <span class='op'>=</span> <span class='va'>r_eff_list</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span>,<span class='fl'>1</span><span class='op'>]</span>
+<span class='va'>lpd2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>log_lik_list</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span>, r_eff <span class='op'>=</span> <span class='va'>r_eff_list</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span>,<span class='fl'>1</span><span class='op'>]</span>
+<span class='va'>lpd3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loo.html'>loo</a></span><span class='op'>(</span><span class='va'>log_lik_list</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span>, r_eff <span class='op'>=</span> <span class='va'>r_eff_list</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span>,<span class='fl'>1</span><span class='op'>]</span>
+<span class='fu'>stacking_weights</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>lpd1</span>, <span class='va'>lpd2</span>, <span class='va'>lpd3</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>pseudobma_weights</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>lpd1</span>, <span class='va'>lpd2</span>, <span class='va'>lpd3</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>pseudobma_weights</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>lpd1</span>, <span class='va'>lpd2</span>, <span class='va'>lpd3</span><span class='op'>)</span>, BB <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -438,7 +440,7 @@ stacking to average Bayesian predictive distributions.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -84,7 +84,7 @@ For PSIS diagnostics see the pareto-k-diagnostic page." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -187,22 +187,22 @@ and Gabry (2019).
 For PSIS diagnostics see the <a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> page.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>psis</span><span class='op'>(</span><span class='va'>log_ratios</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for array</span>
-<span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>))
+<span class='fu'>psis</span><span class='op'>(</span><span class='va'>log_ratios</span>, <span class='va'>...</span>, r_eff <span class='op'>=</span> <span class='cn'>NULL</span>, cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>))
+<span class='fu'>psis</span><span class='op'>(</span><span class='va'>log_ratios</span>, <span class='va'>...</span>, r_eff <span class='op'>=</span> <span class='cn'>NULL</span>, cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='no'>...</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>psis</span><span class='op'>(</span><span class='va'>log_ratios</span>, <span class='va'>...</span>, r_eff <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>is.psis</span>(<span class='no'>x</span>)
+<span class='fu'>is.psis</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>is.sis</span>(<span class='no'>x</span>)
+<span class='fu'>is.sis</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>is.tis</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>is.tis</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -257,7 +257,7 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 
     <p>The <code>psis()</code> methods return an object of class <code>"psis"</code>,
 which is a named list with the following components:</p>
-<dl'>
+<dl>
 <dt><code>log_weights</code></dt><dd><p>Vector or matrix of smoothed (and truncated) but <em>unnormalized</em> log
 weights. To get normalized weights use the
 <code><a href='weights.importance_sampling.html'>weights()</a></code> method provided for objects of
@@ -272,7 +272,7 @@ page for details.</p></li>
 
 </dl>
 
-<p>Objects of class <code>"psis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl'>
+<p>Objects of class <code>"psis"</code> also have the following <a href='https://rdrr.io/r/base/attributes.html'>attributes</a>:</p><dl>
 <dt><code>norm_const_log</code></dt><dd><p>Vector of precomputed values of <code>colLogSumExps(log_weights)</code> that are
 used internally by the <code>weights</code> method to normalize the log weights.</p></dd>
 <dt><code>tail_len</code></dt><dd><p>Vector of tail lengths used for fitting the generalized Pareto distribution.</p></dd>
@@ -311,14 +311,19 @@ Pareto smoothed importance sampling.
 <ul>
 <li><p><code><a href='loo.html'>loo()</a></code> for approximate LOO-CV using PSIS.</p></li>
 <li><p><a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> for PSIS diagnostics.</p></li>
+<li><p>The <strong>loo</strong> package <a href='https://mc-stan.org/loo/articles/index.html'>vignettes</a>
+for demonstrations.</p></li>
+<li><p>The <a href='https://mc-stan.org/loo/articles/online-only/faq.html'>FAQ page</a> on
+the <strong>loo</strong> website for answers to frequently asked questions.</p></li>
 </ul>
 </div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>log_ratios</span> <span class='kw'>&lt;-</span> -<span class='fl'>1</span> * <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(-<span class='no'>log_ratios</span>))
-<span class='no'>psis_result</span> <span class='kw'>&lt;-</span> <span class='fu'>psis</span>(<span class='no'>log_ratios</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>(<span class='no'>psis_result</span>)</div><div class='output co'>#&gt; List of 2
+    <pre class="examples"><div class='input'><span class='va'>log_ratios</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>1</span> <span class='op'>*</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>r_eff</span> <span class='op'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>log_ratios</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>psis_result</span> <span class='op'>&lt;-</span> <span class='fu'>psis</span><span class='op'>(</span><span class='va'>log_ratios</span>, r_eff <span class='op'>=</span> <span class='va'>r_eff</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>psis_result</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; List of 2
 #&gt;  $ log_weights: num [1:1000, 1:32] 2.37 2.12 2.24 2.41 2.25 ...
 #&gt;  $ diagnostics:List of 2
 #&gt;   ..$ pareto_k: num [1:32] 0.0447 -0.0593 0.0696 -0.052 -0.1159 ...
@@ -328,13 +333,18 @@ Pareto smoothed importance sampling.
 #&gt;  - attr(*, "r_eff")= num [1:32] 0.933 0.939 0.968 0.913 0.911 ...
 #&gt;  - attr(*, "dims")= int [1:2] 1000 32
 #&gt;  - attr(*, "method")= chr "psis"
-#&gt;  - attr(*, "class")= chr [1:3] "psis" "importance_sampling" "list"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>psis_result</span>)</div><div class='img'><img src='psis-1.png' alt='' width='700' height='433' /></div><div class='input'>
+#&gt;  - attr(*, "class")= chr [1:3] "psis" "importance_sampling" "list"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>psis_result</span><span class='op'>)</span>
+</div><div class='img'><img src='psis-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># extract smoothed weights</span>
-<span class='no'>lw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>) <span class='co'># default args are log=TRUE, normalize=TRUE</span>
-<span class='no'>ulw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>, <span class='kw'>normalize</span><span class='kw'>=</span><span class='fl'>FALSE</span>) <span class='co'># unnormalized log-weights</span>
+<span class='va'>lw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span><span class='op'>(</span><span class='va'>psis_result</span><span class='op'>)</span> <span class='co'># default args are log=TRUE, normalize=TRUE</span>
+<span class='va'>ulw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span><span class='op'>(</span><span class='va'>psis_result</span>, normalize<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='co'># unnormalized log-weights</span>
 
-<span class='no'>w</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>) <span class='co'># normalized weights (not log-weights)</span>
-<span class='no'>uw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span>(<span class='no'>psis_result</span>, <span class='kw'>log</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) <span class='co'># unnormalized weights</span></div></pre>
+<span class='va'>w</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span><span class='op'>(</span><span class='va'>psis_result</span>, log<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='co'># normalized weights (not log-weights)</span>
+<span class='va'>uw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/weights.html'>weights</a></span><span class='op'>(</span><span class='va'>psis_result</span>, log<span class='op'>=</span><span class='cn'>FALSE</span>, normalize <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span> <span class='co'># unnormalized weights</span>
+
+
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -350,7 +360,7 @@ Pareto smoothed importance sampling.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

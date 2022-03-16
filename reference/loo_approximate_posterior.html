@@ -83,7 +83,7 @@ approximations" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -184,39 +184,39 @@ approximations</h1>
 approximations</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo_approximate_posterior</span>(<span class='no'>x</span>, <span class='no'>log_p</span>, <span class='no'>log_g</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo_approximate_posterior</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>log_p</span>, <span class='va'>log_g</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for array</span>
-<span class='fu'>loo_approximate_posterior</span>(
-  <span class='no'>x</span>,
-  <span class='no'>log_p</span>,
-  <span class='no'>log_g</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
-)
+<span class='fu'>loo_approximate_posterior</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>log_p</span>,
+  <span class='va'>log_g</span>,
+  <span class='va'>...</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>loo_approximate_posterior</span>(
-  <span class='no'>x</span>,
-  <span class='no'>log_p</span>,
-  <span class='no'>log_g</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
-)
+<span class='fu'>loo_approximate_posterior</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>log_p</span>,
+  <span class='va'>log_g</span>,
+  <span class='va'>...</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for `function`</span>
-<span class='fu'>loo_approximate_posterior</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_p</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>log_g</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)
-)</pre>
+<span class='fu'>loo_approximate_posterior</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  log_p <span class='op'>=</span> <span class='cn'>NULL</span>,
+  log_g <span class='op'>=</span> <span class='cn'>NULL</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -271,7 +271,7 @@ details on how to specify these arguments.</p></td>
 
     <p>The <code>loo_approximate_posterior()</code> methods return a named list with
 class <code><a href='https://rdrr.io/r/base/c.html'>c("psis_loo_ap", "psis_loo", "loo")</a></code>. It has the same structure
-as the objects returned by <code><a href='loo.html'>loo()</a></code> but with the additional slot:</p><dl'>
+as the objects returned by <code><a href='loo.html'>loo()</a></code> but with the additional slot:</p><dl>
 <dt><code>posterior_approximation</code></dt><dd><p>A list with two vectors, <code>log_p</code> and <code>log_g</code> of the same length
 containing the posterior density and the approximation density
 for the individual draws.</p></dd>
@@ -298,7 +298,8 @@ of data points.</p></li>
 <li><p><code>function</code>: A function <code>f()</code> that takes arguments <code>data_i</code> and <code>draws</code> and returns a
 vector containing the log-likelihood for a single observation <code>i</code> evaluated
 at each posterior draw. The function should be written such that, for each
-observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span>(<span class='kw'>data_i</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='no'>i</span>,, <span class='kw'>drop</span><span class='kw'>=</span><span class='fl'>FALSE</span>], <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>draws</span>)</pre>
+observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span><span class='op'>(</span>data_i <span class='op'>=</span> <span class='va'>data</span><span class='op'>[</span><span class='va'>i</span>,, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>, draws <span class='op'>=</span> <span class='va'>draws</span><span class='op'>)</span>
+</pre>
 
 <p>results in a vector of length <code>S</code> (size of posterior sample). The
 log-likelihood function can also have additional arguments but <code>data_i</code> and
@@ -346,7 +347,7 @@ Leave-One-Out Cross-Validation for Model Comparison in Large Data.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

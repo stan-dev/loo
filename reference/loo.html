@@ -86,7 +86,7 @@ functions for use with the loo.function() method." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
       </span>
     </div>
 
@@ -191,53 +191,53 @@ an implementation of the methods described in Vehtari, Gelman, and Gabry
 functions for use with the <code>loo.function()</code> method.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loo</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>loo</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for array</span>
-<span class='fu'>loo</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
-  <span class='kw'>is_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span>)
-)
+<span class='fu'>loo</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  is_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for matrix</span>
-<span class='fu'>loo</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
-  <span class='kw'>is_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span>)
-)
+<span class='fu'>loo</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  is_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for `function`</span>
-<span class='fu'>loo</span>(
-  <span class='no'>x</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>),
-  <span class='kw'>is_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span>)
-)
+<span class='fu'>loo</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>...</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  save_psis <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cores <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span>,
+  is_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"psis"</span>, <span class='st'>"tis"</span>, <span class='st'>"sis"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>loo_i</span>(
-  <span class='no'>i</span>,
-  <span class='no'>llfun</span>,
-  <span class='no'>...</span>,
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>draws</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>is_method</span> <span class='kw'>=</span> <span class='st'>"psis"</span>
-)
+<span class='fu'>loo_i</span><span class='op'>(</span>
+  <span class='va'>i</span>,
+  <span class='va'>llfun</span>,
+  <span class='va'>...</span>,
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  draws <span class='op'>=</span> <span class='cn'>NULL</span>,
+  r_eff <span class='op'>=</span> <span class='cn'>NULL</span>,
+  is_method <span class='op'>=</span> <span class='st'>"psis"</span>
+<span class='op'>)</span>
 
-<span class='fu'>is.loo</span>(<span class='no'>x</span>)
+<span class='fu'>is.loo</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>is.psis_loo</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>is.psis_loo</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -257,8 +257,9 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-<code>r_eff=1</code> and can be omitted. See the <code><a href='relative_eff.html'>relative_eff()</a></code>
-helper functions for computing <code>r_eff</code>.</p></td>
+<code>r_eff=1</code> and can be omitted. The warning message thrown when <code>r_eff</code> is
+not specified can be disabled by setting <code>r_eff</code> to <code>NA</code>. See the
+<code><a href='relative_eff.html'>relative_eff()</a></code> helper functions for computing <code>r_eff</code>.</p></td>
     </tr>
     <tr>
       <th>save_psis</th>
@@ -266,9 +267,9 @@ helper functions for computing <code>r_eff</code>.</p></td>
 saved in the returned object? The <code>loo()</code> function calls <code><a href='psis.html'>psis()</a></code>
 internally but by default discards the (potentially large) <code>"psis"</code> object
 after using it to compute the LOO-CV summaries. Setting <code>save_psis=TRUE</code>
-will add a <code>psis_object</code> component to the list returned by <code>loo</code>. Currently
-this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to compute
-weighted expectations after running <code>loo</code>.</p></td>
+will add a <code>psis_object</code> component to the list returned by <code>loo</code>.
+Currently this is only needed if you plan to use the <code><a href='E_loo.html'>E_loo()</a></code> function to
+compute weighted expectations after running <code>loo</code>.</p></td>
     </tr>
     <tr>
       <th>cores</th>
@@ -317,24 +318,24 @@ below for details on how to specify these arguments.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The <code>loo()</code> methods return a named list with class
-<code><a href='https://rdrr.io/r/base/c.html'>c("psis_loo", "loo")</a></code> and components:</p><dl'>
-<dt><code>estimates</code></dt><dd><p>A matrix with two columns (<code>Estimate</code>, <code>SE</code>) and three rows
-(<code>elpd_loo</code>, <code>p_loo</code>, <code>looic</code>). This
-contains point estimates and standard errors of the expected log pointwise
-predictive density (<code>elpd_loo</code>), the effective number of parameters
-(<code>p_loo</code>) and the LOO information criterion <code>looic</code> (which is
-just <code>-2 * elpd_loo</code>, i.e., converted to deviance scale).</p></dd>
+<code><a href='https://rdrr.io/r/base/c.html'>c("psis_loo", "loo")</a></code> and components:</p><dl>
+<dt><code>estimates</code></dt><dd><p>A matrix with two columns (<code>Estimate</code>, <code>SE</code>) and three rows (<code>elpd_loo</code>,
+<code>p_loo</code>, <code>looic</code>). This contains point estimates and standard errors of the
+expected log pointwise predictive density (<code><a href='loo-glossary.html'>elpd_loo</a></code>), the
+effective number of parameters (<code><a href='loo-glossary.html'>p_loo</a></code>) and the LOO
+information criterion <code>looic</code> (which is just <code>-2 * elpd_loo</code>, i.e.,
+converted to deviance scale).</p></dd>
 
 <dt><code>pointwise</code></dt><dd><p>A matrix with five columns (and number of rows equal to the number of
 observations) containing the pointwise contributions of the measures
 (<code>elpd_loo</code>, <code>mcse_elpd_loo</code>, <code>p_loo</code>, <code>looic</code>, <code>influence_pareto_k</code>).
 in addition to the three measures in <code>estimates</code>, we also report
-pointwise values of the Monte Carlo standard error of <code>elpd_loo</code>
-(<code>mcse_elpd_loo</code>), and statistics describing the influence of
+pointwise values of the Monte Carlo standard error of <code><a href='loo-glossary.html'>elpd_loo</a></code>
+(<code><a href='loo-glossary.html'>mcse_elpd_loo</a></code>), and statistics describing the influence of
 each observation on the posterior distribution (<code>influence_pareto_k</code>).
 These are the estimates of the shape parameter \(k\) of the
 generalized Pareto fit to the importance ratios for each leave-one-out
-distribution. See the <a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> page for details.</p></dd>
+distribution (see the <a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> page for details).</p></dd>
 
 <dt><code>diagnostics</code></dt><dd><p>A named list containing two vectors:
 <ul>
@@ -377,7 +378,8 @@ of data points.</p></li>
 <li><p><code>function</code>: A function <code>f()</code> that takes arguments <code>data_i</code> and <code>draws</code> and returns a
 vector containing the log-likelihood for a single observation <code>i</code> evaluated
 at each posterior draw. The function should be written such that, for each
-observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span>(<span class='kw'>data_i</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='no'>i</span>,, <span class='kw'>drop</span><span class='kw'>=</span><span class='fl'>FALSE</span>], <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>draws</span>)</pre>
+observation <code>i</code> in <code>1:N</code>, evaluating</p><pre><span class='fu'>f</span><span class='op'>(</span>data_i <span class='op'>=</span> <span class='va'>data</span><span class='op'>[</span><span class='va'>i</span>,, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>, draws <span class='op'>=</span> <span class='va'>draws</span><span class='op'>)</span>
+</pre>
 
 <p>results in a vector of length <code>S</code> (size of posterior sample). The
 log-likelihood function can also have additional arguments but <code>data_i</code> and
@@ -404,7 +406,7 @@ are recycled for each observation.</p></li>
     <p>Package developers can define
 <code>loo()</code> methods for fitted models objects. See the example <code>loo.stanfit()</code>
 method in the <strong>Examples</strong> section below for an example of defining a
-method that calls <code>loo.array()</code>. The <code>loo.stanreg()</code> method in the
+method that calls <code>loo.array()</code>. The <code><a href='https://mc-stan.org/rstanarm/reference/loo.stanreg.html'>loo.stanreg()</a></code> method in the
 <strong>rstanarm</strong> package is an example of defining a method that calls
 <code>loo.function()</code>.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -423,6 +425,8 @@ Pareto smoothed importance sampling.
 <ul>
 <li><p>The <strong>loo</strong> package <a href='https://mc-stan.org/loo/articles/index.html'>vignettes</a>
 for demonstrations.</p></li>
+<li><p>The <a href='https://mc-stan.org/loo/articles/online-only/faq.html'>FAQ page</a> on
+the <strong>loo</strong> website for answers to frequently asked questions.</p></li>
 <li><p><code><a href='psis.html'>psis()</a></code> for the underlying Pareto Smoothed Importance Sampling (PSIS)
 procedure used in the LOO-CV approximation.</p></li>
 <li><p><a href='pareto-k-diagnostic.html'>pareto-k-diagnostic</a> for convenience functions for looking at diagnostics.</p></li>
@@ -433,9 +437,10 @@ procedure used in the LOO-CV approximation.</p></li>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>### Array and matrix methods (using example objects included with loo package)</span>
 <span class='co'># Array method</span>
-<span class='no'>LLarr</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span>()
-<span class='no'>rel_n_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>LLarr</span>))
-<span class='fu'>loo</span>(<span class='no'>LLarr</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>rel_n_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; 
+<span class='va'>LLarr</span> <span class='op'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_array</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>rel_n_eff</span> <span class='op'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>LLarr</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>loo</span><span class='op'>(</span><span class='va'>LLarr</span>, r_eff <span class='op'>=</span> <span class='va'>rel_n_eff</span>, cores <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
 #&gt; Computed from 1000 by 32 log-likelihood matrix
 #&gt; 
 #&gt;          Estimate  SE
@@ -448,9 +453,10 @@ procedure used in the LOO-CV approximation.</p></li>
 #&gt; All Pareto k estimates are good (k &lt; 0.5).
 #&gt; See help('pareto-k-diagnostic') for details.</div><div class='input'>
 <span class='co'># Matrix method</span>
-<span class='no'>LLmat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_matrix</a></span>()
-<span class='no'>rel_n_eff</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>LLmat</span>), <span class='kw'>chain_id</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>500</span>))
-<span class='fu'>loo</span>(<span class='no'>LLmat</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>rel_n_eff</span>, <span class='kw'>cores</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; 
+<span class='va'>LLmat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='example_loglik_array.html'>example_loglik_matrix</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>rel_n_eff</span> <span class='op'>&lt;-</span> <span class='fu'><a href='relative_eff.html'>relative_eff</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>LLmat</span><span class='op'>)</span>, chain_id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, each <span class='op'>=</span> <span class='fl'>500</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>loo</span><span class='op'>(</span><span class='va'>LLmat</span>, r_eff <span class='op'>=</span> <span class='va'>rel_n_eff</span>, cores <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
 #&gt; Computed from 1000 by 32 log-likelihood matrix
 #&gt; 
 #&gt;          Estimate  SE
@@ -464,44 +470,50 @@ procedure used in the LOO-CV approximation.</p></li>
 #&gt; See help('pareto-k-diagnostic') for details.</div><div class='input'>
 
 <span class='co'>### Using log-likelihood function instead of array or matrix</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>124</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>124</span><span class='op'>)</span>
 
 <span class='co'># Simulate data and draw from posterior</span>
-<span class='no'>N</span> <span class='kw'>&lt;-</span> <span class='fl'>50</span>; <span class='no'>K</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>; <span class='no'>S</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>; <span class='no'>a0</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>; <span class='no'>b0</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span>
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='no'>a0</span>, <span class='no'>b0</span>)
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='no'>N</span>, <span class='kw'>size</span> <span class='kw'>=</span> <span class='no'>K</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='no'>p</span>)
-<span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='no'>a0</span> + <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>y</span>); <span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='no'>b0</span> + <span class='no'>N</span> * <span class='no'>K</span> - <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>y</span>)
-<span class='no'>fake_posterior</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='no'>S</span>, <span class='no'>a</span>, <span class='no'>b</span>))
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>fake_posterior</span>) <span class='co'># S x 1</span></div><div class='output co'>#&gt; [1] 100   1</div><div class='input'><span class='no'>fake_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='no'>y</span>,<span class='no'>K</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>fake_data</span>) <span class='co'># N x 2</span></div><div class='output co'>#&gt; [1] 50  2</div><div class='input'>
-<span class='no'>llfun</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>data_i</span>, <span class='no'>draws</span>) {
+<span class='va'>N</span> <span class='op'>&lt;-</span> <span class='fl'>50</span>; <span class='va'>K</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>; <span class='va'>S</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>; <span class='va'>a0</span> <span class='op'>&lt;-</span> <span class='fl'>3</span>; <span class='va'>b0</span> <span class='op'>&lt;-</span> <span class='fl'>2</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>a0</span>, <span class='va'>b0</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span><span class='op'>(</span><span class='va'>N</span>, size <span class='op'>=</span> <span class='va'>K</span>, prob <span class='op'>=</span> <span class='va'>p</span><span class='op'>)</span>
+<span class='va'>a</span> <span class='op'>&lt;-</span> <span class='va'>a0</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span>; <span class='va'>b</span> <span class='op'>&lt;-</span> <span class='va'>b0</span> <span class='op'>+</span> <span class='va'>N</span> <span class='op'>*</span> <span class='va'>K</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span>
+<span class='va'>fake_posterior</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span><span class='op'>(</span><span class='va'>S</span>, <span class='va'>a</span>, <span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span><span class='va'>fake_posterior</span><span class='op'>)</span> <span class='co'># S x 1</span>
+</div><div class='output co'>#&gt; [1] 100   1</div><div class='input'><span class='va'>fake_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>y</span>,<span class='va'>K</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span><span class='va'>fake_data</span><span class='op'>)</span> <span class='co'># N x 2</span>
+</div><div class='output co'>#&gt; [1] 50  2</div><div class='input'>
+<span class='va'>llfun</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>data_i</span>, <span class='va'>draws</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='co'># each time called internally within loo the arguments will be equal to:</span>
   <span class='co'># data_i: ith row of fake_data (fake_data[i,, drop=FALSE])</span>
   <span class='co'># draws: entire fake_posterior matrix</span>
-  <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>dbinom</a></span>(<span class='no'>data_i</span>$<span class='no'>y</span>, <span class='kw'>size</span> <span class='kw'>=</span> <span class='no'>data_i</span>$<span class='no'>K</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='no'>draws</span>, <span class='kw'>log</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-}
+  <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>dbinom</a></span><span class='op'>(</span><span class='va'>data_i</span><span class='op'>$</span><span class='va'>y</span>, size <span class='op'>=</span> <span class='va'>data_i</span><span class='op'>$</span><span class='va'>K</span>, prob <span class='op'>=</span> <span class='va'>draws</span>, log <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 <span class='co'># Use the loo_i function to check that llfun works on a single observation</span>
 <span class='co'># before running on all obs. For example, using the 3rd obs in the data:</span>
-<span class='no'>loo_3</span> <span class='kw'>&lt;-</span> <span class='fu'>loo_i</span>(<span class='kw'>i</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>llfun</span> <span class='kw'>=</span> <span class='no'>llfun</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>fake_data</span>, <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>fake_posterior</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>loo_3</span>$<span class='no'>pointwise</span>[, <span class='st'>"elpd_loo"</span>])</div><div class='output co'>#&gt;  elpd_loo 
+<span class='va'>loo_3</span> <span class='op'>&lt;-</span> <span class='fu'>loo_i</span><span class='op'>(</span>i <span class='op'>=</span> <span class='fl'>3</span>, llfun <span class='op'>=</span> <span class='va'>llfun</span>, data <span class='op'>=</span> <span class='va'>fake_data</span>, draws <span class='op'>=</span> <span class='va'>fake_posterior</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>loo_3</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span>, <span class='st'>"elpd_loo"</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  elpd_loo 
 #&gt; -1.267103 </div><div class='input'>
 <span class='co'># Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)</span>
-<span class='no'>loo_with_fn</span> <span class='kw'>&lt;-</span> <span class='fu'>loo</span>(<span class='no'>llfun</span>, <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>fake_posterior</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>fake_data</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+<span class='va'>loo_with_fn</span> <span class='op'>&lt;-</span> <span class='fu'>loo</span><span class='op'>(</span><span class='va'>llfun</span>, draws <span class='op'>=</span> <span class='va'>fake_posterior</span>, data <span class='op'>=</span> <span class='va'>fake_data</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
 
 <span class='co'># If we look at the elpd_loo contribution from the 3rd obs it should be the</span>
 <span class='co'># same as what we got above with the loo_i function and i=3:</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>loo_with_fn</span>$<span class='no'>pointwise</span>[<span class='fl'>3</span>, <span class='st'>"elpd_loo"</span>])</div><div class='output co'>#&gt;  elpd_loo 
-#&gt; -1.267103 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>loo_3</span>$<span class='no'>pointwise</span>[, <span class='st'>"elpd_loo"</span>])</div><div class='output co'>#&gt;  elpd_loo 
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>loo_with_fn</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span><span class='fl'>3</span>, <span class='st'>"elpd_loo"</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  elpd_loo 
+#&gt; -1.267103 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>loo_3</span><span class='op'>$</span><span class='va'>pointwise</span><span class='op'>[</span>, <span class='st'>"elpd_loo"</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  elpd_loo 
 #&gt; -1.267103 </div><div class='input'>
 <span class='co'># Check that the loo.matrix method gives same answer as loo.function method</span>
-<span class='no'>log_lik_matrix</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span>(<span class='fl'>1</span>:<span class='no'>N</span>, <span class='kw'>function</span>(<span class='no'>i</span>) {
-  <span class='fu'>llfun</span>(<span class='kw'>data_i</span> <span class='kw'>=</span> <span class='no'>fake_data</span>[<span class='no'>i</span>,, <span class='kw'>drop</span><span class='kw'>=</span><span class='fl'>FALSE</span>], <span class='kw'>draws</span> <span class='kw'>=</span> <span class='no'>fake_posterior</span>)
-})
-<span class='no'>loo_with_mat</span> <span class='kw'>&lt;-</span> <span class='fu'>loo</span>(<span class='no'>log_lik_matrix</span>, <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='no'>loo_with_mat</span>$<span class='no'>estimates</span>, <span class='no'>loo_with_fn</span>$<span class='no'>estimates</span>) <span class='co'># should be TRUE!</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='va'>log_lik_matrix</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>N</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>llfun</span><span class='op'>(</span>data_i <span class='op'>=</span> <span class='va'>fake_data</span><span class='op'>[</span><span class='va'>i</span>,, drop<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>]</span>, draws <span class='op'>=</span> <span class='va'>fake_posterior</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>loo_with_mat</span> <span class='op'>&lt;-</span> <span class='fu'>loo</span><span class='op'>(</span><span class='va'>log_lik_matrix</span>, r_eff <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span><span class='op'>(</span><span class='va'>loo_with_mat</span><span class='op'>$</span><span class='va'>estimates</span>, <span class='va'>loo_with_fn</span><span class='op'>$</span><span class='va'>estimates</span><span class='op'>)</span> <span class='co'># should be TRUE!</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'>### For package developers: defining loo methods</span>
 
 <span class='co'># An example of a possible loo method for 'stanfit' objects (rstan package).</span>
@@ -510,23 +522,26 @@ procedure used in the LOO-CV approximation.</p></li>
 <span class='co'># loo.stanfit(stanfit) the NAMESPACE needs to be handled appropriately</span>
 <span class='co'># (roxygen2 and devtools packages are good for that).</span>
 <span class='co'>#</span>
-<span class='no'>loo.stanfit</span> <span class='kw'>&lt;-</span>
- <span class='kw'>function</span>(<span class='no'>x</span>,
-         <span class='no'>pars</span> <span class='kw'>=</span> <span class='st'>"log_lik"</span>,
-         <span class='no'>...</span>,
-         <span class='no'>save_psis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-         <span class='no'>cores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"mc.cores"</span>, <span class='fl'>1</span>)) {
-  <span class='fu'><a href='https://rdrr.io/r/base/stopifnot.html'>stopifnot</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>pars</span>) <span class='kw'>==</span> <span class='fl'>1L</span>)
-  <span class='no'>LLarray</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>loo</span><span class='kw ns'>::</span><span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span>(<span class='kw'>stanfit</span> <span class='kw'>=</span> <span class='no'>x</span>,
-                                  <span class='kw'>parameter_name</span> <span class='kw'>=</span> <span class='no'>pars</span>,
-                                  <span class='kw'>merge_chains</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-  <span class='no'>r_eff</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>loo</span><span class='kw ns'>::</span><span class='fu'><a href='relative_eff.html'>relative_eff</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>LLarray</span>), <span class='kw'>cores</span> <span class='kw'>=</span> <span class='no'>cores</span>)
-  <span class='kw pkg'>loo</span><span class='kw ns'>::</span><span class='fu'>loo.array</span>(<span class='no'>LLarray</span>,
-                 <span class='kw'>r_eff</span> <span class='kw'>=</span> <span class='no'>r_eff</span>,
-                 <span class='kw'>cores</span> <span class='kw'>=</span> <span class='no'>cores</span>,
-                 <span class='kw'>save_psis</span> <span class='kw'>=</span> <span class='no'>save_psis</span>)
-}
-}</div></pre>
+<span class='va'>loo.stanfit</span> <span class='op'>&lt;-</span>
+ <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span>,
+         <span class='va'>pars</span> <span class='op'>=</span> <span class='st'>"log_lik"</span>,
+         <span class='va'>...</span>,
+         <span class='va'>save_psis</span> <span class='op'>=</span> <span class='cn'>FALSE</span>,
+         <span class='va'>cores</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"mc.cores"</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/stopifnot.html'>stopifnot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>pars</span><span class='op'>)</span> <span class='op'>==</span> <span class='fl'>1L</span><span class='op'>)</span>
+  <span class='va'>LLarray</span> <span class='op'>&lt;-</span> <span class='fu'>loo</span><span class='fu'>::</span><span class='fu'><a href='extract_log_lik.html'>extract_log_lik</a></span><span class='op'>(</span>stanfit <span class='op'>=</span> <span class='va'>x</span>,
+                                  parameter_name <span class='op'>=</span> <span class='va'>pars</span>,
+                                  merge_chains <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+  <span class='va'>r_eff</span> <span class='op'>&lt;-</span> <span class='fu'>loo</span><span class='fu'>::</span><span class='fu'><a href='relative_eff.html'>relative_eff</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>LLarray</span><span class='op'>)</span>, cores <span class='op'>=</span> <span class='va'>cores</span><span class='op'>)</span>
+  <span class='fu'>loo</span><span class='fu'>::</span><span class='fu'>loo.array</span><span class='op'>(</span><span class='va'>LLarray</span>,
+                 r_eff <span class='op'>=</span> <span class='va'>r_eff</span>,
+                 cores <span class='op'>=</span> <span class='va'>cores</span>,
+                 save_psis <span class='op'>=</span> <span class='va'>save_psis</span><span class='op'>)</span>
+<span class='op'>}</span>
+<span class='op'>}</span>
+
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -542,7 +557,7 @@ procedure used in the LOO-CV approximation.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
