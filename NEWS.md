@@ -16,9 +16,6 @@ generalized Pareto distribution. (#187, @sethaxen)
 * Fixed a bug causing the normalizing constant of the PSIS (log) weights not 
 to get updated when performing moment matching with `save_psis = TRUE` (#166, @fweber144).
 
-* Fixed bug where the attribute storing normalizing constant of PSIS weights
-wasn't updated when using moment matching. (#167, @fweber144)
-
 # loo 2.4.1
 
 * Fixed issue reported by CRAN where one of the vignettes errored on an M1 Mac
