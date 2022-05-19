@@ -4,8 +4,9 @@
 #' predictive errors given a set of predictions and observations. Curreantly
 #' supported error metrics are mean absolute error, mean squared error and root
 #' mean squared error for continuous predictions and accuracy and balanced
-#' accuracy for binary classification. Predictions are passed on to the `E_loo()`
-#' function, so this function assumes that the PSIS approximation is working well.
+#' accuracy for binary classification. Predictions are passed on to the
+#' `E_loo()` function, so this function assumes that the PSIS approximation is
+#' working well.
 #'
 #' @param x A numeric matrix of predictions.
 #' @param y A numeric vector of observations. Length should be equal to the
@@ -49,6 +50,31 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' if (requireNamespace("rstanarm", quietly = TRUE)) {
+#' # Use rstanarm package to quickly fit a model and get both a log-likelihood
+#' # matrix and draws from the posterior predictive distribution
+#' library("rstanarm")
+#'
+#' # data from help("lm")
+#' d <- data.frame(
+#'   weight = c(ctl, trt),
+#'   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
+#' )
+#' fit <- stan_glm(weight ~ group, data = d, refresh = 0)
+#' ll <- log_lik(fit)
+#' r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
+#'
+#' mu_pred <- posterior_epred(fit)
+#' # Leave-one-out mean absolute error of predictions
+#' mae <- loo_predictive_error(x = mu_pred, y = d$weight, ll = ll,
+#'                             pred_error = 'mae', r_eff = r_eff)
+#' # Leave-one-out 90%-quantile of mean absolute error
+#' mae_90q <- loo_predictive_error(x = mu_pred, y = d$weight, ll = ll,
+#'                                 pred_error = 'mae', r_eff = r_eff,
+#'                                 type = 'quantile', probs = 0.9)
+#' }
+#' }
 loo_predictive_error <- function(x, ...) {
   UseMethod("loo_predictive_error")
 }
@@ -84,7 +110,8 @@ loo_predictive_error.default <-
 #'
 #' @noRd
 #' @param pred_error The predictive error used.
-#' @return The function used to compute predictive error specified by `pred_error`.
+#' @return The function used to compute predictive error specified by
+#' `pred_error`.
 .loo_predictive_error_fun <- function(pred_error) {
   switch(
     pred_error,
