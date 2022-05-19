@@ -31,6 +31,27 @@ bacc_mean <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'balanced_a
 bacc_quant <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'balanced_acc', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
+test_that('loo_predictive_error stops with incorrect inputs', {
+  expect_error(loo_predictive_error(as.character(x), y, LL, r_eff = r_eff),
+               'is.numeric(x) is not TRUE',
+               fixed = TRUE)
+
+  expect_error(loo_predictive_error(x, as.character(y), LL, r_eff = r_eff),
+               'is.numeric(y) is not TRUE',
+               fixed = TRUE)
+
+  x_invalid <- matrix(rnorm(9), nrow = 3)
+  expect_error(loo_predictive_error(x_invalid, y, LL, r_eff = r_eff),
+               'identical(ncol(x), length(y)) is not TRUE',
+               fixed = TRUE)
+
+  x_invalid <- matrix(rnorm(64), nrow = 2)
+  expect_error(loo_predictive_error(x_invalid, y, LL, r_eff = r_eff),
+               'identical(dim(x), dim(ll)) is not TRUE',
+               fixed = TRUE)
+})
+
+
 test_that('loo_predictive_error return types are correct', {
   # MAE
   expect_type(mae_mean, 'list')
@@ -60,16 +81,16 @@ test_that('loo_predictive_error return types are correct', {
 })
 
 test_that('loo_predictive_error is equal to reference', {
-  expect_equal_to_reference(mae_mean, 'tests/testthat/reference-results/loo_predictive_error_mae_mean.rds')
-  expect_equal_to_reference(mae_quant, 'tests/testthat/reference-results/loo_predictive_error_mae_quant.rds')
-  expect_equal_to_reference(rmse_mean, 'tests/testthat/reference-results/loo_predictive_error_rmse_mean.rds')
-  expect_equal_to_reference(rmse_quant, 'tests/testthat/reference-results/loo_predictive_error_rmse_quant.rds')
-  expect_equal_to_reference(mse_mean, 'tests/testthat/reference-results/loo_predictive_error_mse_mean.rds')
-  expect_equal_to_reference(mse_quant, 'tests/testthat/reference-results/loo_predictive_error_mse_quant.rds')
-  expect_equal_to_reference(acc_mean, 'tests/testthat/reference-results/loo_predictive_error_acc_mean.rds')
-  expect_equal_to_reference(acc_quant, 'tests/testthat/reference-results/loo_predictive_error_acc_quant.rds')
-  expect_equal_to_reference(bacc_mean, 'tests/testthat/reference-results/loo_predictive_error_bacc_mean.rds')
-  expect_equal_to_reference(bacc_quant, 'tests/testthat/reference-results/loo_predictive_error_bacc_quant.rds')
+  expect_equal_to_reference(mae_mean, 'reference-results/loo_predictive_error_mae_mean.rds')
+  expect_equal_to_reference(mae_quant, 'reference-results/loo_predictive_error_mae_quant.rds')
+  expect_equal_to_reference(rmse_mean, 'reference-results/loo_predictive_error_rmse_mean.rds')
+  expect_equal_to_reference(rmse_quant, 'reference-results/loo_predictive_error_rmse_quant.rds')
+  expect_equal_to_reference(mse_mean, 'reference-results/loo_predictive_error_mse_mean.rds')
+  expect_equal_to_reference(mse_quant, 'reference-results/loo_predictive_error_mse_quant.rds')
+  expect_equal_to_reference(acc_mean, 'reference-results/loo_predictive_error_acc_mean.rds')
+  expect_equal_to_reference(acc_quant, 'reference-results/loo_predictive_error_acc_quant.rds')
+  expect_equal_to_reference(bacc_mean, 'reference-results/loo_predictive_error_bacc_mean.rds')
+  expect_equal_to_reference(bacc_quant, 'reference-results/loo_predictive_error_bacc_quant.rds')
 })
 
 test_that('MAE computation is correct', {
