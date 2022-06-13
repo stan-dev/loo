@@ -2,7 +2,17 @@
 #'
 #' The `crps()` and `scrps()` and their `loo` counterparts can be used to
 #' compute the continuously ranked probability score (CRPS) and scaled CRPS
-#' (see Bolin and Wallin, 2022).
+#' (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and strictly proper
+#' when the first moment is finite, which can be expressed in terms of samples
+#' form the predictive distribution. See e.g. Gneiting and Raftery (2007) for
+#' comprehensive discussion on CRPS.
+#'
+#' To compute (S)CRPS user needs to provide two sets of draws from the
+#' predictive distribution. I.e. one needs to call, for instance,
+#' `posterior_predict()` two times and pass the returned values on to crps
+#' functions. This is due to the fact that formulas used to compute crps involve
+#' an expectation of the absolute difference of `X1` and `X2`, both having the
+#' same distribution. See Gneiting and Raftery (2007) details.
 #'
 #' @export
 #' @param x1 A.default or an array of posterior predictive draws.
@@ -11,14 +21,29 @@
 #' @param y A vector of observations
 #' @param ... Passed on to `E_loo()` in `loo_*`-functions.
 #'
+#' @return A vector of pointwise CRPS values.
+#'
+#' @examples
+#' \dontrun{
+#' # An example using rstanarm
+#' library(rstanarm)
+#' data("kidiq")
+#' fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
+#' ypred1 <- posterior_predict(fit)
+#' ypred2 <- posterior_predict(fit)
+#' y <- get_y(fit)
+#' mean(crps(ypred1, ypred2, y))
+#' mean(loo_crps(ypred1, ypred2, y, ll = log_lik(fit)))
+#' }
+#'
 #' @references
+#' #' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
+#' proper scoring rules. arXiv.
+#' <https://doi.org/10.48550/arXiv.1912.05642>
+#'
 #' Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 #' Prediction, and Estimation. Journal of the American Statistical Association,
 #' 102(477), 359–378.
-#'
-#' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
-#' proper scoring rules. arXiv.
-#' <https://doi.org/10.48550/arXiv.1912.05642>
 crps <- function(x1, ...) {
   UseMethod("crps")
 }
