@@ -17,7 +17,7 @@
 #' @export
 #' @param x1 A.default or an array of posterior predictive draws.
 #' @param x2 Draws from the same distribution as draws in `x1`.
-#'     Sholud be of identical dimension.
+#'     Should be of the identical dimension.
 #' @param y A vector of observations
 #' @param ... Passed on to `E_loo()` in `loo_*`-functions.
 #'
@@ -80,7 +80,7 @@ crps.default <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
   EXX <- colMeans(abs(x1 - x2))
   EXy <- colMeans(abs(sweep(x1, 2, y)))
-  return(.crps_fun(EXX, EXy))
+  return(crps_output(.crps_fun(EXX, EXy)))
 }
 
 
@@ -91,7 +91,7 @@ loo_crps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   psis_obj <- psis(-ll, r_eff = r_eff)
   EXX <- E_loo(abs(x1 - x2), psis_obj, log_ratios = -ll, ...)$value
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
-  return(.crps_fun(EXX, EXy))
+  return(crps_output(.crps_fun(EXX, EXy)))
 }
 
 
@@ -101,7 +101,7 @@ scrps.default <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   EXX <- colMeans(abs(x1 - x2))
-  return(.crps_fun(EXX, EXy, scale = TRUE))
+  return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
 }
 
 #' @rdname crps
@@ -112,7 +112,7 @@ loo_scrps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
 
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
   EXX <- E_loo(abs(x1 - x2), psis_obj, log_ratios = -ll, ...)$value
-  return(.crps_fun(EXX, EXy, scale = TRUE))
+  return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
 }
 
 
@@ -122,9 +122,19 @@ loo_scrps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
 #' @noRd
 .crps_fun <- function(EXX, EXy, scale = FALSE) {
   if(scale) return(-EXy/EXX - 0.5 * log(EXX))
-  return(0.5 * EXX - EXy)
+  return( 0.5 * EXX - EXy)
 }
 
+#' Compute output list for the crps-utilities
+#' @noRd
+crps_output <- function(crps_pw) {
+  n <- length(crps_pw)
+  out <- list()
+  out$estimates <- c(mean(crps_pw), sd(crps_pw) / sqrt(n))
+  names(out$estimates) <- c('Estimate', 'SE')
+  out$pointwise <- crps_pw
+  return(out)
+}
 
 #' Validate input of CRPS functions
 #'
