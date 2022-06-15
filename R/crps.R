@@ -7,12 +7,12 @@
 #' form the predictive distribution. See e.g. Gneiting and Raftery (2007) for
 #' comprehensive discussion on CRPS.
 #'
-#' To compute (S)CRPS user needs to provide two sets of draws from the
+#' To compute (s)crps user needs to provide two sets of draws from the
 #' predictive distribution. I.e. one needs to call, for instance,
-#' `posterior_predict()` two times and pass the returned values on to crps
+#' `posterior_predict()` two times and pass the returned values on to `crps()`
 #' functions. This is due to the fact that formulas used to compute crps involve
 #' an expectation of the absolute difference of `X1` and `X2`, both having the
-#' same distribution. See Gneiting and Raftery (2007) details.
+#' same distribution. See Gneiting and Raftery (2007) for details.
 #'
 #' @export
 #' @param x1 A.default or an array of posterior predictive draws.
