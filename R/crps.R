@@ -21,7 +21,9 @@
 #' @param y A vector of observations
 #' @param ... Passed on to `E_loo()` in `loo_*`-functions.
 #'
-#' @return A vector of pointwise CRPS values.
+#' @return A list containing two elements: `estimates` and `pointwise`.
+#'   The former reports estimator and standard error and latter the pointwise
+#'   values.
 #'
 #' @examples
 #' \dontrun{
@@ -125,7 +127,7 @@ loo_scrps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   return( 0.5 * EXX - EXy)
 }
 
-#' Compute output list for the crps-utilities
+#' Compute output data for crps functions
 #' @noRd
 crps_output <- function(crps_pw) {
   n <- length(crps_pw)
