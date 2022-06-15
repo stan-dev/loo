@@ -34,8 +34,8 @@
 #' ypred1 <- posterior_predict(fit)
 #' ypred2 <- posterior_predict(fit)
 #' y <- get_y(fit)
-#' mean(crps(ypred1, ypred2, y))
-#' mean(loo_crps(ypred1, ypred2, y, ll = log_lik(fit)))
+#' crps(ypred1, ypred2, y)
+#' loo_crps(ypred1, ypred2, y, ll = log_lik(fit))
 #' }
 #'
 #' @references
