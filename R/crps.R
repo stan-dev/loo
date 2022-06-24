@@ -90,8 +90,13 @@ crps.default <- function(x1, x2, y) {
 #' @export
 loo_crps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   validate_crps_input(x1, x2, y, ll)
+  S <- length(x1)
+  shuffle <- sample (1:S)
+  x2 <- x2[shuffle]
+  ll2 <- ll[shuffle]
   psis_obj <- psis(-ll, r_eff = r_eff)
-  EXX <- E_loo(abs(x1 - x2), psis_obj, log_ratios = -ll, ...)$value
+  psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
+  EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
   return(crps_output(.crps_fun(EXX, EXy)))
 }
@@ -101,6 +106,9 @@ loo_crps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
 #' @export
 scrps.default <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
+  S <- length(x1)
+  shuffle <- sample (1:S)
+  x2 <- x2[shuffle]
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   EXX <- colMeans(abs(x1 - x2))
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
@@ -111,9 +119,12 @@ scrps.default <- function(x1, x2, y) {
 loo_scrps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   validate_crps_input(x1, x2, y, ll)
   psis_obj <- psis(-ll, r_eff = r_eff)
-
+  S <- length(x1)
+  shuffle <- sample (1:S)
+  x2 <- x2[shuffle]
+  psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
+  EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
-  EXX <- E_loo(abs(x1 - x2), psis_obj, log_ratios = -ll, ...)$value
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
 }
 
