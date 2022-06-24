@@ -80,6 +80,9 @@ loo_scrps <- function(x1, ...) {
 #' @export
 crps.default <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
+  S <- length(x1)
+  shuffle <- sample (1:S)
+  x2 <- x2[shuffle]
   EXX <- colMeans(abs(x1 - x2))
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   return(crps_output(.crps_fun(EXX, EXy)))
