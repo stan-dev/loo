@@ -6,6 +6,13 @@ x1 <- matrix(rnorm(n * S), nrow = S)
 x2 <- matrix(rnorm(n * S), nrow = S)
 ll <- matrix(rnorm(n * S) * 0.1 - 1, nrow = S)
 
+with_seed <- function(seed, code) {
+  code <- substitute(code)
+  orig.seed <- .Random.seed
+  on.exit(.Random.seed <<- orig.seed)
+  set.seed(seed)
+  eval.parent(code)
+}
 
 test_that("crps computation is correct", {
   expect_equal(.crps_fun(2.0, 1.0), 0.0)
@@ -18,14 +25,14 @@ test_that("crps computation is correct", {
 })
 
 test_that("crps matches references", {
-  expect_equal_to_reference(crps(x1, x2, y), 'reference-results/crps.rds')
-  expect_equal_to_reference(scrps(x1, x2, y), 'reference-results/scrps.rds')
+  expect_equal_to_reference(with_seed(1, crps(x1, x2, y)), 'reference-results/crps.rds')
+  expect_equal_to_reference(with_seed(1, scrps(x1, x2, y)), 'reference-results/scrps.rds')
   # Suppress warnings for the missing r_eff
   suppressWarnings(expect_equal_to_reference(
-    loo_crps(x1, x2, y, ll),
+    with_seed(1, loo_crps(x1, x2, y, ll)),
     'reference-results/loo_crps.rds'))
   suppressWarnings(expect_equal_to_reference(
-    loo_scrps(x1, x2, y, ll),
+    with_seed(1, loo_scrps(x1, x2, y, ll)),
     'reference-results/loo_scrps.rds'))
 })
 

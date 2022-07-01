@@ -15,10 +15,11 @@
 #' same distribution. See Gneiting and Raftery (2007) for details.
 #'
 #' @export
-#' @param x1 A.default or an array of posterior predictive draws.
-#' @param x2 Draws from the same distribution as draws in `x1`.
+#' @param x1 A S by N matrix, or a vector of length S when only single
+#'     observation is provided.
+#' @param x2 Independent draws from the same distribution as draws in `x1`.
 #'     Should be of the identical dimension.
-#' @param y A vector of observations
+#' @param y A vector of observations or a single value.
 #' @param ... Passed on to `E_loo()` in `loo_*`-functions.
 #'
 #' @return A list containing two elements: `estimates` and `pointwise`.
@@ -78,25 +79,35 @@ loo_scrps <- function(x1, ...) {
 
 #' @rdname crps
 #' @export
-crps.default <- function(x1, x2, y) {
+crps.matrix <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
-  S <- length(x1)
+  S <- nrow(x1)
   shuffle <- sample (1:S)
-  x2 <- x2[shuffle]
+  x2 <- x2[shuffle,]
   EXX <- colMeans(abs(x1 - x2))
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   return(crps_output(.crps_fun(EXX, EXy)))
 }
 
 
+#' Method for a single data point
 #' @rdname crps
 #' @export
-loo_crps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
+crps.numeric <- function(x1, x2, y) {
+  stopifnot(length(x1) == length(x2),
+            length(y) == 1)
+  crps.matrix(as.matrix(x1), as.matrix(x2), y)
+}
+
+
+#' @rdname crps
+#' @export
+loo_crps.matrix <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   validate_crps_input(x1, x2, y, ll)
-  S <- length(x1)
+  S <- nrow(x1)
   shuffle <- sample (1:S)
-  x2 <- x2[shuffle]
-  ll2 <- ll[shuffle]
+  x2 <- x2[shuffle,]
+  ll2 <- ll[shuffle,]
   psis_obj <- psis(-ll, r_eff = r_eff)
   psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
   EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
@@ -107,11 +118,11 @@ loo_crps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
 
 #' @rdname crps
 #' @export
-scrps.default <- function(x1, x2, y) {
+scrps.matrix <- function(x1, x2, y) {
   validate_crps_input(x1, x2, y)
-  S <- length(x1)
+  S <- nrow(x1)
   shuffle <- sample (1:S)
-  x2 <- x2[shuffle]
+  x2 <- x2[shuffle,]
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   EXX <- colMeans(abs(x1 - x2))
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
@@ -119,18 +130,27 @@ scrps.default <- function(x1, x2, y) {
 
 #' @rdname crps
 #' @export
-loo_scrps.default <- function(x1, x2, y, ll, r_eff = NULL, ...) {
+scrps.numeric <- function(x1, x2, y) {
+  stopifnot(length(x1) == length(x2),
+            length(y) == 1)
+  scrps.matrix(as.matrix(x1), as.matrix(x2), y)
+}
+
+
+#' @rdname crps
+#' @export
+loo_scrps.matrix <- function(x1, x2, y, ll, r_eff = NULL, ...) {
   validate_crps_input(x1, x2, y, ll)
   psis_obj <- psis(-ll, r_eff = r_eff)
-  S <- length(x1)
+  S <- nrow(x1)
   shuffle <- sample (1:S)
-  x2 <- x2[shuffle]
+  x2 <- x2[shuffle,]
+  ll2 <- ll[shuffle,]
   psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
   EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
 }
-
 
 # ------------ Internals ----------------
 
