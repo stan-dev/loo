@@ -2,10 +2,11 @@
 #'
 #' The `crps()` and `scrps()` and their `loo` counterparts can be used to
 #' compute the continuously ranked probability score (CRPS) and scaled CRPS
-#' (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and strictly proper
-#' when the first moment is finite, which can be expressed in terms of samples
-#' form the predictive distribution. See e.g. Gneiting and Raftery (2007) for
-#' comprehensive discussion on CRPS.
+#' (SCRPS) (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and
+#' strictly proper when the first moment of the predictive distribution is
+#' finite. Both can be expressed in terms of samples form the predictive
+#' distribution. See e.g. Gneiting and Raftery (2007) for a comprehensive
+#' discussion on CRPS.
 #'
 #' To compute (S)CRPS, user needs to provide two sets of draws from the
 #' predictive distribution. I.e. one needs to call, for instance,
@@ -20,6 +21,13 @@
 #' @param x2 Independent draws from the same distribution as draws in `x1`.
 #'     Should be of the identical dimension.
 #' @param y A vector of observations or a single value.
+#' @param permutations An integer, with default value of 1,  specifying how many
+#'     times the expected value of  |X - X'| is computed. The row order of `x2`
+#'     is shuffled to as elements `x1` and `x2` are typically drawn given the
+#'     same value of parameters. This happens e.g. when one calls
+#'     `posterior_predict()` twice for a fitted `rstanarm` model. Generating
+#'     more permutations is expected to decrease the variance of the computed
+#'     expected value.
 #' @param ... Passed on to `E_loo()` in `loo_*`-functions.
 #'
 #' @return A list containing two elements: `estimates` and `pointwise`.
@@ -79,12 +87,10 @@ loo_scrps <- function(x1, ...) {
 
 #' @rdname crps
 #' @export
-crps.matrix <- function(x1, x2, y) {
+crps.matrix <- function(x1, x2, y, permutations = 1) {
   validate_crps_input(x1, x2, y)
-  S <- nrow(x1)
-  shuffle <- sample (1:S)
-  x2 <- x2[shuffle,]
-  EXX <- colMeans(abs(x1 - x2))
+  repeats <- replicate(permutations, EXX_compute(x1, x2), simplify = F)
+  EXX <- Reduce(`+`, repeats) / permutations
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   return(crps_output(.crps_fun(EXX, EXy)))
 }
@@ -93,24 +99,29 @@ crps.matrix <- function(x1, x2, y) {
 #' Method for a single data point
 #' @rdname crps
 #' @export
-crps.numeric <- function(x1, x2, y) {
+crps.numeric <- function(x1, x2, y, permutations = 1) {
   stopifnot(length(x1) == length(x2),
             length(y) == 1)
-  crps.matrix(as.matrix(x1), as.matrix(x2), y)
+  crps.matrix(as.matrix(x1), as.matrix(x2), y, permutations)
 }
 
 
 #' @rdname crps
 #' @export
-loo_crps.matrix <- function(x1, x2, y, ll, r_eff = NULL, ...) {
+loo_crps.matrix <-
+  function(x1,
+           x2,
+           y,
+           ll,
+           permutations = 1,
+           r_eff = NULL,
+           ...) {
   validate_crps_input(x1, x2, y, ll)
-  S <- nrow(x1)
-  shuffle <- sample (1:S)
-  x2 <- x2[shuffle,]
-  ll2 <- ll[shuffle,]
+  repeats <- replicate(permutations,
+                       EXX_loo_compute(x1, x2, ll, r_eff = r_eff, ...),
+                       simplify = F)
+  EXX <- Reduce(`+`, repeats) / permutations
   psis_obj <- psis(-ll, r_eff = r_eff)
-  psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
-  EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
   EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
   return(crps_output(.crps_fun(EXX, EXy)))
 }
@@ -118,41 +129,64 @@ loo_crps.matrix <- function(x1, x2, y, ll, r_eff = NULL, ...) {
 
 #' @rdname crps
 #' @export
-scrps.matrix <- function(x1, x2, y) {
+scrps.matrix <- function(x1, x2, y, permutations = 1) {
   validate_crps_input(x1, x2, y)
-  S <- nrow(x1)
-  shuffle <- sample (1:S)
-  x2 <- x2[shuffle,]
+  repeats <- replicate(1, EXX_compute(x1, x2), simplify = F)
+  EXX <- Reduce(`+`, repeats) / permutations
   EXy <- colMeans(abs(sweep(x1, 2, y)))
-  EXX <- colMeans(abs(x1 - x2))
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
 }
 
 #' @rdname crps
 #' @export
-scrps.numeric <- function(x1, x2, y) {
+scrps.numeric <- function(x1, x2, y, permutations = 1) {
   stopifnot(length(x1) == length(x2),
             length(y) == 1)
-  scrps.matrix(as.matrix(x1), as.matrix(x2), y)
+  scrps.matrix(as.matrix(x1), as.matrix(x2), y, permutations)
 }
 
 
 #' @rdname crps
 #' @export
-loo_scrps.matrix <- function(x1, x2, y, ll, r_eff = NULL, ...) {
+loo_scrps.matrix <-
+  function(
+    x1,
+    x2,
+    y,
+    ll,
+    permutations = 1,
+    r_eff = NULL,
+    ...) {
   validate_crps_input(x1, x2, y, ll)
+  repeats <- replicate(permutations,
+                       EXX_loo_compute(x1, x2, ll, r_eff = r_eff, ...),
+                       simplify = F)
+  EXX <- Reduce(`+`, repeats) / permutations
   psis_obj <- psis(-ll, r_eff = r_eff)
+  EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
+  return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
+}
+
+# ------------ Internals ----------------
+
+
+EXX_compute <- function(x1, x2) {
+  S <- nrow(x1)
+  EXX <- colMeans(abs(x1 - x2[sample(1:S),]))
+  return(EXX)
+}
+
+
+EXX_loo_compute <- function(x1, x2, ll, r_eff = NULL, ...) {
   S <- nrow(x1)
   shuffle <- sample (1:S)
   x2 <- x2[shuffle,]
   ll2 <- ll[shuffle,]
   psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
   EXX <- E_loo(abs(x1 - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
-  EXy <- E_loo(abs(sweep(x1, 2, y)), psis_obj, log_ratios = -ll, ...)$value
-  return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
+  return(EXX)
 }
 
-# ------------ Internals ----------------
 
 #' Function to compute crps and scrps
 #' @noRd
