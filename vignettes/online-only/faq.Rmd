@@ -239,12 +239,14 @@ The short answer is "Yes". Hierarchical model is useful, for example, if there a
 - LOO is valid if the focus is in the conditional observation model. LOO can often already reveal misspecification of the conditional observation model, and as LOO is often easy to compute, it is fine to start with LOO to investigate possible model issues.
 - LOO is also valid if the prediction task is new individuals in the existing groups.
 - If the prediction task is to predict for new groups or we are interested in generalizability for new groups, then leave-one-group-out (LOGO) is a better choice. Computation of LOGO is often more challenging as hierarchical models often have group specific parameters, and removing the all data from one group will change the posterior of those parameters a lot.
+- Leave-one-group-out (LOGO) cross-validation usually doesn't work with PSIS approach, unless the group specific parameters are integrated out. This is sometimes possible analytically (@Vehtari+etal:2016:LOO_for_GLVM) or by quadrature (@Merkle+Furr+Rabe_Hesketh:2019, [a Stan code example](https://avehtari.github.io/modelselection/roaches.html#5_Poisson_model_with_%E2%80%9Crandom_effects%E2%80%9D_and_integrated_LOO))
 
 See also
 
  - [A blog post](https://statmodeling.stat.columbia.edu/2018/08/03/loo-cross-validation-approaches-valid/)
  - [Model selection videos](https://avehtari.github.io/modelselection/)
  - A case study [Cross-validation for hierarchical models](https://avehtari.github.io/modelselection/rats_kcv.html)
+ - A case study [Roaches cross-validation demo](https://avehtari.github.io/modelselection/roaches.html) with "randome effects" models
  - [Merkel, Furr, and Rabe-Hesketh (2019). Bayesian Comparison of Latent Variable Models: Conditional Versus Marginal Likelihoods. *Psychometrika* 84:802-829.](https://link.springer.com/article/10.1007/s11336-019-09679-0)
 
 # Can cross-validation be used for time series? {#timeseries}
@@ -259,6 +261,20 @@ See also
  - [A blog post](https://statmodeling.stat.columbia.edu/2018/08/03/loo-cross-validation-approaches-valid/)
  - [Model selection videos](https://avehtari.github.io/modelselection/)
  - Vignette [Approximate leave-future-out cross-validation for Bayesian time series models](http://mc-stan.org/loo/articles/loo2-lfo.html)
+
+# Can cross-validation be used for spatial data? {#spatial}
+
+The short answer is "Yes". This is closely related to [the question about time series](#timeseries).  If there is a model $p(y_i \mid f_i,\phi)$ and joint spatial prior for $(f_1,...,f_T)$ then $p(y_i \mid f_i,\phi)$ can be considered independent given $f_i$ and $\phi$ and likelihood is factorizable. This is true often and the observations in the nearby regions are correlated, but conditionally we know $f_i$, the nearby observations are not providing additional information. This should not be confused with that when we don’t know $f_i$ and integrate over the posterior of $(f_1,...,f_T)$, as then $y_i$ are not conditionally independent given $\phi$. Also they are not anymore exchangeable as we have the spatial ordering telling additional information.
+
+- LOO is valid if the focus is in the conditional observation model $p(y_i \mid f_i)$. LOO can often already reveal problems in the model, and as LOO is often easy to compute, it is fine to start with LOO to investigate possible model issues.
+- Various spatially structured cross-validation approaches can be used when the there is interest in assessing extrapolation to new regions or otherwise focus the assessment to the spatial model part.
+
+See also
+
+ - [A blog post](https://statmodeling.stat.columbia.edu/2018/08/03/loo-cross-validation-approaches-valid/)
+ - [Model selection videos](https://avehtari.github.io/modelselection/)
+ - Vignette [Approximate leave-future-out cross-validation for Bayesian time series models](http://mc-stan.org/loo/articles/loo2-lfo.html)
+
 
 # Can other utility or loss functions be used than log predictive density? {#otherutility}
 
