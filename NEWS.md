@@ -1,3 +1,7 @@
+# loo 2.5.1
+
+* Fix R CMD check error on M1 Mac
+
 # loo 2.5.0
 
 ### Improvements
