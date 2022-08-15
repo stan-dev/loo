@@ -21,7 +21,7 @@ sorted in ascending order then \code{sort_x} can be set to \code{FALSE} to
 skip the initial sorting step.}
 }
 \value{
-A named list with components \code{k} and \code{sigma}.
+A named list with components \code{k_hat}, \code{sigma_hat}, \code{k}, \code{k_w}, and \code{k_d}
 }
 \description{
 Given a sample \eqn{x}, Estimate the parameters \eqn{k} and \eqn{\sigma} of

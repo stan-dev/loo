@@ -17,7 +17,7 @@
 #'   algorithm is to sort the elements of `x`. If `x` is already
 #'   sorted in ascending order then `sort_x` can be set to `FALSE` to
 #'   skip the initial sorting step.
-#' @return A named list with components `k` and `sigma`.
+#' @return A named list with components `k_hat`, `sigma_hat`, `k`, `k_w`, and `k_d`
 #'
 #' @details Here the parameter \eqn{k} is the negative of \eqn{k} in Zhang &
 #'   Stephens (2009).
@@ -29,7 +29,7 @@
 #' for the generalized Pareto distribution. *Technometrics* **51**, 316-325.
 #'
 gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
-  # See section 4 of Zhang and Stephens (2009)
+  # see section 4 of Zhang and Stephens (2009)
   if (sort_x) {
     x <- sort.int(x)
   }
@@ -39,61 +39,32 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
   jj <- seq_len(M)
   xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
   theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
-  l_theta <- N * lx(theta, x) # profile log-lik
+  k <- matrixStats::rowMeans2(log1p(-theta %o% x))
+  l_theta <- N * (log(-theta / k) - k - 1) # profile log-lik
   w_theta <- exp(l_theta - matrixStats::logSumExp(l_theta)) # normalize
   theta_hat <- sum(theta * w_theta)
-  k <- mean.default(log1p(-theta_hat * x))
-  sigma <- -k / theta_hat
+  k_hat <- mean.default(log1p(-theta_hat * x))
+  sigma_hat <- -k_hat / theta_hat
 
+  # quadrature weights for k are same as for theta
+  k_w <- w_theta
+  # quadrature weights are just the normalized likelihoods
+  # we get the unnormalized posterior by multiplying these by the prior
+  k_d <- k_w * dgpd(-theta, mu = -1 / x[N], sigma = 1 / prior / xstar, k = 0.5)
+  # normalize using the trapezoidal rule
+  Z <- sum((k_d[-M] + k_d[-1]) * (k[-M] - k[-1])) / 2
+  k_d <- k_d / Z
+
+  # adjust k_hat based on weakly informative prior, Gaussian centered on 0.5.
+  # this stabilizes estimates for very small Monte Carlo sample sizes and low neff
   if (wip) {
-    k <- adjust_k_wip(k, n = N)
+    k_hat <- (k_hat * N + 0.5 * 10) / (N + 10)
   }
 
-  if (is.nan(k)) {
-    k <- Inf
+  if (is.na(k_hat)) {
+    k_hat <- Inf
+    sigma_hat <- NaN
   }
 
-  nlist(k, sigma)
-}
-
-
-# internal ----------------------------------------------------------------
-
-lx <- function(a,x) {
-  a <- -a
-  k <- vapply(a, FUN = function(a_i) mean(log1p(a_i * x)), FUN.VALUE = numeric(1))
-  log(a / k) - k - 1
-}
-
-#' Adjust k based on weakly informative prior, Gaussian centered on 0.5. This
-#' will stabilize estimates for very small Monte Carlo sample sizes and low neff
-#' cases.
-#'
-#' @noRd
-#' @param k Scalar khat estimate.
-#' @param n Integer number of tail samples used to fit GPD.
-#' @return Scalar adjusted khat estimate.
-#'
-adjust_k_wip <- function(k, n) {
-  a <- 10
-  n_plus_a <- n + a
-  k * n / n_plus_a + a * 0.5 / n_plus_a
-}
-
-
-#' Inverse CDF of generalized pareto distribution
-#' (assuming location parameter is 0)
-#'
-#' @noRd
-#' @param p Vector of probabilities.
-#' @param k Scalar shape parameter.
-#' @param sigma Scalar scale parameter.
-#' @return Vector of quantiles.
-#'
-qgpd <- function(p, k, sigma) {
-  if (is.nan(sigma) || sigma <= 0) {
-    return(rep(NaN, length(p)))
-  }
-
-  sigma * expm1(-k * log1p(-p)) / k
+  nlist(k_hat, sigma_hat, k, k_w, k_d)
 }
