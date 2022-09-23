@@ -57,13 +57,15 @@
 #' library("rstanarm")
 #'
 #' # data from help("lm")
+#' ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+#' trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
 #' d <- data.frame(
 #'   weight = c(ctl, trt),
 #'   group = gl(2, 10, 20, labels = c("Ctl","Trt"))
 #' )
 #' fit <- stan_glm(weight ~ group, data = d, refresh = 0)
 #' ll <- log_lik(fit)
-#' r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
+#' r_eff <- relative_eff(exp(-ll), chain_id = rep(1:4, each = 1000))
 #'
 #' mu_pred <- posterior_epred(fit)
 #' # Leave-one-out mean absolute error of predictions
