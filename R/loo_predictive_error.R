@@ -100,7 +100,7 @@ loo_predictive_error.default <-
 
     predictive_error_fun <- .loo_predictive_error_fun(pred_error)
 
-    return(predictive_error_fun(y, pred_loo))
+    predictive_error_fun(y, pred_loo)
   }
 
 
@@ -132,7 +132,7 @@ loo_predictive_error.default <-
   stopifnot(length(y) == length(yhat))
   n <- length(y)
   e <- abs(y - yhat)
-  return(list(estimate = mean(e), se = sd(e) / sqrt(n)))
+  list(estimate = mean(e), se = sd(e) / sqrt(n))
 }
 
 #' Mean squared error
@@ -144,7 +144,7 @@ loo_predictive_error.default <-
   stopifnot(length(y) == length(yhat))
   n <- length(y)
   e <- (y - yhat)^2
-  return(list(estimate = mean(e), se = sd(e) / sqrt(n)))
+  list(estimate = mean(e), se = sd(e) / sqrt(n))
 }
 
 #' Root mean squared error
@@ -173,7 +173,7 @@ loo_predictive_error.default <-
   yhat <- as.integer(yhat > 0.5)
   acc <- as.integer(yhat == y)
   est <- mean(acc)
-  return(list(estimate = est, se = sqrt(est * (1-est) / n) ))
+  list(estimate = est, se = sqrt(est * (1-est) / n) )
 }
 
 #' Balanced classification accuracy
@@ -195,6 +195,6 @@ loo_predictive_error.default <-
   bls_acc <- (tp + tn) / 2
   # This approximation has quite large bias for small samples
   bls_acc_var <- (tp * (1 - tp) + tn * (1 - tn)) / 4
-  return(list(estimate = bls_acc, se = sqrt(bls_acc_var / n)))
+  list(estimate = bls_acc, se = sqrt(bls_acc_var / n))
 }
 
