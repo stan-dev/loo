@@ -1,19 +1,19 @@
-#' Estimate leave-one-out predictive errors.
+#' Estimate leave-one-out predictive performance..
 #'
-#' The `loo_predictive_error()` function computes estimates of leave-one-out
-#' predictive errors given a set of predictions and observations. Curreantly
-#' supported error metrics are mean absolute error, mean squared error and root
-#' mean squared error for continuous predictions and accuracy and balanced
-#' accuracy for binary classification. Predictions are passed on to the
-#' `E_loo()` function, so this function assumes that the PSIS approximation is
-#' working well.
+#' The `loo_predictive_metric()` function computes estimates of leave-one-out
+#' predictive metrics given a set of predictions and observations. Currently
+#' supported metrics are mean absolute error, mean squared error and root mean
+#' squared error for continuous predictions and accuracy and balanced accuracy
+#' for binary classification. Predictions are passed on to the `E_loo()`
+#' function, so this function assumes that the PSIS approximation is working
+#' well.
 #'
 #' @param x A numeric matrix of predictions.
 #' @param y A numeric vector of observations. Length should be equal to the
 #'     number of rows in `x`.
-#' @param ll A matrix of pointwise log-likelihoods. Should be of same dimension
-#'     as `x`.
-#' @param pred_error The type of predictive error to be used. Currently
+#' @param log_lik A matrix of pointwise log-likelihoods. Should be of same
+#'     dimension as `x`.
+#' @param metric The type of predictive metric to be used. Currently
 #'     supported options are `"mae"`, `"rmse"` and `"mse"` for regression and
 #'     for binary classification `"acc"` and `"balanced_acc"`.
 #'     \describe{
@@ -69,54 +69,57 @@
 #'
 #' mu_pred <- posterior_epred(fit)
 #' # Leave-one-out mean absolute error of predictions
-#' mae <- loo_predictive_error(x = mu_pred, y = d$weight, ll = ll,
+#' mae <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
 #'                             pred_error = 'mae', r_eff = r_eff)
 #' # Leave-one-out 90%-quantile of mean absolute error
-#' mae_90q <- loo_predictive_error(x = mu_pred, y = d$weight, ll = ll,
+#' mae_90q <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
 #'                                 pred_error = 'mae', r_eff = r_eff,
 #'                                 type = 'quantile', probs = 0.9)
 #' }
 #' }
-loo_predictive_error <- function(x, ...) {
-  UseMethod("loo_predictive_error")
+loo_predictive_metric <- function(x, ...) {
+  UseMethod("loo_predictive_metric")
 }
 
-#' @rdname loo_predictive_error
+#' @rdname loo_predictive_metric
 #' @export
-loo_predictive_error.default <-
+loo_predictive_metric.default <-
   function(x,
            y,
-           ll,
-           pred_error = c("mae", "rmse", "mse", "acc", "balanced_acc"),
+           log_lik,
+           metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = NULL,
            ...) {
     stopifnot(
       is.numeric(x),
       is.numeric(y),
       identical(ncol(x), length(y)),
-      identical(dim(x), dim(ll))
+      identical(dim(x), dim(log_lik))
     )
-    pred_error <- match.arg(pred_error)
-    psis_object <- psis(-ll, r_eff = r_eff)
-    pred_loo <- E_loo(x, psis_object = psis_object, log_ratios = -ll, ...)$value
+    metric <- match.arg(metric)
+    psis_object <- psis(-log_lik, r_eff = r_eff)
+    pred_loo <- E_loo(x,
+                      psis_object = psis_object,
+                      log_ratios = -log_lik,
+                      ...)$value
 
-    predictive_error_fun <- .loo_predictive_error_fun(pred_error)
+    predictive_metric_fun <- .loo_predictive_metric_fun(metric)
 
-    predictive_error_fun(y, pred_loo)
+    predictive_metric_fun(y, pred_loo)
   }
 
 
 # ----------------------------- Internals -----------------------------
 
-#' Select predictive error function based on user's `pred_error` argument
+#' Select predictive metric function based on user's `metric` argument
 #'
 #' @noRd
-#' @param pred_error The predictive error used.
-#' @return The function used to compute predictive error specified by
-#' `pred_error`.
-.loo_predictive_error_fun <- function(pred_error) {
+#' @param metric The metric used.
+#' @return The function used to compute predictive error or accuracy specified
+#' by the argument `metric`.
+.loo_predictive_metric_fun <- function(metric) {
   switch(
-    pred_error,
+    metric,
     'mae' = .mae,
     'rmse' = .rmse,
     'mse' = .mse,

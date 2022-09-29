@@ -1,5 +1,3 @@
-
-
 LL <- example_loglik_matrix()
 chain_id <- rep(1:2, each = dim(LL)[1] / 2)
 r_eff <- relative_eff(exp(LL), chain_id)
@@ -11,48 +9,48 @@ x_prob <- 1 / (1 + exp(-x))
 y <- rnorm(ncol(LL))
 y_binary <- rbinom(ncol(LL), 1, 0.5)
 
-mae_mean <- loo_predictive_error(x, y, LL, pred_error = 'mae', r_eff = r_eff)
-mae_quant <- loo_predictive_error(x, y, LL, pred_error = 'mae', r_eff = r_eff,
+mae_mean <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff)
+mae_quant <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
-rmse_mean <- loo_predictive_error(x, y, LL, pred_error = 'rmse', r_eff = r_eff)
-rmse_quant <- loo_predictive_error(x, y, LL, pred_error = 'rmse', r_eff = r_eff,
+rmse_mean <- loo_predictive_metric(x, y, LL, metric = 'rmse', r_eff = r_eff)
+rmse_quant <- loo_predictive_metric(x, y, LL, metric = 'rmse', r_eff = r_eff,
                                    type = 'quantile', probs = 0.9)
 
-mse_mean <- loo_predictive_error(x, y, LL, pred_error = 'mse', r_eff = r_eff)
-mse_quant <- loo_predictive_error(x, y, LL, pred_error = 'mse', r_eff = r_eff,
+mse_mean <- loo_predictive_metric(x, y, LL, metric = 'mse', r_eff = r_eff)
+mse_quant <- loo_predictive_metric(x, y, LL, metric = 'mse', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
-acc_mean <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'acc', r_eff = r_eff)
-acc_quant <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'acc', r_eff = r_eff,
+acc_mean <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'acc', r_eff = r_eff)
+acc_quant <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'acc', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
-bacc_mean <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'balanced_acc', r_eff = r_eff)
-bacc_quant <- loo_predictive_error(x_prob, y_binary, LL, pred_error = 'balanced_acc', r_eff = r_eff,
+bacc_mean <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'balanced_acc', r_eff = r_eff)
+bacc_quant <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'balanced_acc', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
-test_that('loo_predictive_error stops with incorrect inputs', {
-  expect_error(loo_predictive_error(as.character(x), y, LL, r_eff = r_eff),
+test_that('loo_predictive_metric stops with incorrect inputs', {
+  expect_error(loo_predictive_metric(as.character(x), y, LL, r_eff = r_eff),
                'is.numeric(x) is not TRUE',
                fixed = TRUE)
 
-  expect_error(loo_predictive_error(x, as.character(y), LL, r_eff = r_eff),
+  expect_error(loo_predictive_metric(x, as.character(y), LL, r_eff = r_eff),
                'is.numeric(y) is not TRUE',
                fixed = TRUE)
 
   x_invalid <- matrix(rnorm(9), nrow = 3)
-  expect_error(loo_predictive_error(x_invalid, y, LL, r_eff = r_eff),
+  expect_error(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff),
                'identical(ncol(x), length(y)) is not TRUE',
                fixed = TRUE)
 
   x_invalid <- matrix(rnorm(64), nrow = 2)
-  expect_error(loo_predictive_error(x_invalid, y, LL, r_eff = r_eff),
-               'identical(dim(x), dim(ll)) is not TRUE',
+  expect_error(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff),
+               'identical(dim(x), dim(log_lik)) is not TRUE',
                fixed = TRUE)
 })
 
 
-test_that('loo_predictive_error return types are correct', {
+test_that('loo_predictive_metric return types are correct', {
   # MAE
   expect_type(mae_mean, 'list')
   expect_type(mae_quant, 'list')
@@ -80,17 +78,17 @@ test_that('loo_predictive_error return types are correct', {
   expect_named(bacc_quant, c('estimate', 'se'))
 })
 
-test_that('loo_predictive_error is equal to reference', {
-  expect_equal_to_reference(mae_mean, 'reference-results/loo_predictive_error_mae_mean.rds')
-  expect_equal_to_reference(mae_quant, 'reference-results/loo_predictive_error_mae_quant.rds')
-  expect_equal_to_reference(rmse_mean, 'reference-results/loo_predictive_error_rmse_mean.rds')
-  expect_equal_to_reference(rmse_quant, 'reference-results/loo_predictive_error_rmse_quant.rds')
-  expect_equal_to_reference(mse_mean, 'reference-results/loo_predictive_error_mse_mean.rds')
-  expect_equal_to_reference(mse_quant, 'reference-results/loo_predictive_error_mse_quant.rds')
-  expect_equal_to_reference(acc_mean, 'reference-results/loo_predictive_error_acc_mean.rds')
-  expect_equal_to_reference(acc_quant, 'reference-results/loo_predictive_error_acc_quant.rds')
-  expect_equal_to_reference(bacc_mean, 'reference-results/loo_predictive_error_bacc_mean.rds')
-  expect_equal_to_reference(bacc_quant, 'reference-results/loo_predictive_error_bacc_quant.rds')
+test_that('loo_predictive_metric is equal to reference', {
+  expect_equal_to_reference(mae_mean, 'reference-results/loo_predictive_metric_mae_mean.rds')
+  expect_equal_to_reference(mae_quant, 'reference-results/loo_predictive_metric_mae_quant.rds')
+  expect_equal_to_reference(rmse_mean, 'reference-results/loo_predictive_metric_rmse_mean.rds')
+  expect_equal_to_reference(rmse_quant, 'reference-results/loo_predictive_metric_rmse_quant.rds')
+  expect_equal_to_reference(mse_mean, 'reference-results/loo_predictive_metric_mse_mean.rds')
+  expect_equal_to_reference(mse_quant, 'reference-results/loo_predictive_metric_mse_quant.rds')
+  expect_equal_to_reference(acc_mean, 'reference-results/loo_predictive_metric_acc_mean.rds')
+  expect_equal_to_reference(acc_quant, 'reference-results/loo_predictive_metric_acc_quant.rds')
+  expect_equal_to_reference(bacc_mean, 'reference-results/loo_predictive_metric_bacc_mean.rds')
+  expect_equal_to_reference(bacc_quant, 'reference-results/loo_predictive_metric_bacc_quant.rds')
 })
 
 test_that('MAE computation is correct', {
