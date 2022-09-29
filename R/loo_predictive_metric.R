@@ -41,7 +41,7 @@
 #' @return A list with the following components:
 #' \describe{
 #'   \item{`estimate`}{
-#'   Estimate of the given predictive error measure.
+#'   Estimate of the given metric.
 #'   }
 #'  \item{`se`}{
 #'   Standard error of the estimate.

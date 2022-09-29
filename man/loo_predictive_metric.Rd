@@ -56,7 +56,7 @@ one element per observation. See \code{\link[=psis]{psis()}} for more details.}
 A list with the following components:
 \describe{
 \item{\code{estimate}}{
-Estimate of the given predictive error measure.
+Estimate of the given metric.
 }
 \item{\code{se}}{
 Standard error of the estimate.
