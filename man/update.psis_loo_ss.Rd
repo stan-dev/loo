@@ -23,6 +23,8 @@
 
 \item{...}{Currently not used.}
 
+\item{data, draws}{See \code{\link[=loo_subsample.function]{loo_subsample.function()}}.}
+
 \item{observations}{The subsample observations to use. The argument can take
 four (4) types of arguments:
 \itemize{
