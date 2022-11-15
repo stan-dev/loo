@@ -43,11 +43,11 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
-            any::BH
-            any::RcppEigen
-            any::vdiffr
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          args: c("--ignore-vignettes", "--no-manual", "--as-cran")
+          build_args: c("--no-build-vignettes")
+
