@@ -189,7 +189,8 @@ release_questions <- function() {
   c(
     "Have you updated references?",
     "Have you updated inst/CITATION?",
-    "Have you updated the vignettes?"
+    "Have you updated the vignettes?",
+    "Have you tested building the vignettes on GitHub Actions?"
   )
 }
 # nocov end
