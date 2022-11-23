@@ -112,17 +112,17 @@ For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+\item \code{psis(array)}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+\item \code{psis(matrix)}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{default}: A vector of length \eqn{S} (posterior sample size).
-}}
+\item \code{psis(default)}: A vector of length \eqn{S} (posterior sample size).
 
+}}
 \examples{
 log_ratios <- -1 * example_loglik_array()
 r_eff <- relative_eff(exp(-log_ratios))

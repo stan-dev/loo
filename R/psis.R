@@ -302,9 +302,9 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #' @return Nothing, just possibly throws warnings.
 #'
 throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
-  if (any(k > too_high)) {
+  if (isTRUE(any(k > too_high))) {
     .warn("Some Pareto k diagnostic values are too high. ", .k_help())
-  } else if (any(k > high)) {
+  } else if (isTRUE(any(k > high))) {
     .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
   }
 }
