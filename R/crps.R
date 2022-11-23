@@ -48,7 +48,7 @@
 #' }
 #'
 #' @references
-#' #' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
+#' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
 #' proper scoring rules. arXiv.
 #' <https://doi.org/10.48550/arXiv.1912.05642>
 #'
@@ -131,7 +131,7 @@ loo_crps.matrix <-
 #' @export
 scrps.matrix <- function(x1, x2, y, permutations = 1) {
   validate_crps_input(x1, x2, y)
-  repeats <- replicate(1, EXX_compute(x1, x2), simplify = F)
+  repeats <- replicate(permutations, EXX_compute(x1, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
   EXy <- colMeans(abs(sweep(x1, 2, y)))
   return(crps_output(.crps_fun(EXX, EXy, scale = TRUE)))
