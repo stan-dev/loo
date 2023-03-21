@@ -37,12 +37,7 @@ parallel_importance_sampling_list(
 
 \item{.llfun}{See \code{llfun} in \code{\link[=loo.function]{loo.function()}}.}
 
-\item{data}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
-
-\item{draws}{For the \code{loo.function()} method and the \code{loo_i()}
+\item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
 below for details on how to specify these arguments.}
@@ -79,11 +74,6 @@ recommend using as many (or close to as many) cores as possible.
 the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
 setting \code{mc.cores} interactively or in a script is fine).
 }}
-
-\item{...}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
 
 \item{method}{See \code{is_method} for \code{\link[=loo]{loo()}}}
 }
