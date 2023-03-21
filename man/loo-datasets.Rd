@@ -4,6 +4,8 @@
 \alias{loo-datasets}
 \alias{Kline}
 \alias{milk}
+\alias{voice}
+\alias{voice_loo}
 \title{Datasets for loo examples and vignettes}
 \description{
 Small datasets for use in \strong{loo} examples and vignettes. The \code{Kline}
@@ -22,6 +24,8 @@ McElreath (2016a,2016b). \href{https://www.rdocumentation.org/packages/rethinkin
 Small dataset from Hinde and Milligan (2011) on primate milk
 composition.This data is discussed in detail in McElreath (2016a,2016b).
 \href{https://www.rdocumentation.org/packages/rethinking/versions/1.59/topics/milk}{(Link to variable descriptions)}
+\item \code{voice}:
+Voice rehabilitation data from Tsanas et al. (2014).
 }
 }
 \examples{
@@ -39,4 +43,9 @@ R package version 1.59.
 
 McElreath, R. (2016b). \emph{Statistical rethinking: A Bayesian course with
 examples in R and Stan}. Chapman & Hall/CRC.
+
+A. Tsanas, M.A. Little, C. Fox, L.O. Ramig: Objective automatic assessment of
+rehabilitative speech treatment in Parkinson's disease, IEEE
+Transactions on Neural Systems and Rehabilitation Engineering, Vol. 22, pp.
+181-190, January 2014
 }
