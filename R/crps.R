@@ -48,8 +48,7 @@
 #'
 #' @references
 #' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
-#' proper scoring rules. arXiv.
-#' <https://doi.org/10.48550/arXiv.1912.05642>
+#' proper scoring rules. arXiv. \doi{10.48550/arXiv.1912.05642}
 #'
 #' Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 #' Prediction, and Estimation. Journal of the American Statistical Association,
