@@ -80,7 +80,7 @@ loo_scrps <- function(x, ...) {
 
 #' @rdname crps
 #' @export
-crps.matrix <- function(x, x2, y, permutations = 1) {
+crps.matrix <- function(x, x2, y, permutations = 1, ...) {
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -92,7 +92,7 @@ crps.matrix <- function(x, x2, y, permutations = 1) {
 #' Method for a single data point
 #' @rdname crps
 #' @export
-crps.numeric <- function(x, x2, y, permutations = 1) {
+crps.numeric <- function(x, x2, y, permutations = 1, ...) {
   stopifnot(length(x) == length(x2),
             length(y) == 1)
   crps.matrix(as.matrix(x), as.matrix(x2), y, permutations)
@@ -125,7 +125,7 @@ loo_crps.matrix <-
 
 #' @rdname crps
 #' @export
-scrps.matrix <- function(x, x2, y, permutations = 1) {
+scrps.matrix <- function(x, x2, y, permutations = 1, ...) {
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -135,7 +135,7 @@ scrps.matrix <- function(x, x2, y, permutations = 1) {
 
 #' @rdname crps
 #' @export
-scrps.numeric <- function(x, x2, y, permutations = 1) {
+scrps.numeric <- function(x, x2, y, permutations = 1, ...) {
   stopifnot(length(x) == length(x2),
             length(y) == 1)
   scrps.matrix(as.matrix(x), as.matrix(x2), y, permutations)

@@ -21,15 +21,15 @@ loo_crps(x, ...)
 
 loo_scrps(x, ...)
 
-\method{crps}{matrix}(x, x2, y, permutations = 1)
+\method{crps}{matrix}(x, x2, y, permutations = 1, ...)
 
-\method{crps}{numeric}(x, x2, y, permutations = 1)
+\method{crps}{numeric}(x, x2, y, permutations = 1, ...)
 
 \method{loo_crps}{matrix}(x, x2, y, ll, permutations = 1, r_eff = NULL, ...)
 
-\method{scrps}{matrix}(x, x2, y, permutations = 1)
+\method{scrps}{matrix}(x, x2, y, permutations = 1, ...)
 
-\method{scrps}{numeric}(x, x2, y, permutations = 1)
+\method{scrps}{numeric}(x, x2, y, permutations = 1, ...)
 
 \method{loo_scrps}{matrix}(x, x2, y, ll, permutations = 1, r_eff = NULL, ...)
 }
