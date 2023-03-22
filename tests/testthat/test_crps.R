@@ -38,7 +38,7 @@ test_that("crps matches references", {
 
 test_that("input validation throws correct errors", {
   expect_error(validate_crps_input(as.character(x1), x2, y),
-               "is.numeric(x1) is not TRUE",
+               "is.numeric(x) is not TRUE",
                fixed = TRUE)
   expect_error(validate_crps_input(x1, as.character(x2), y),
                "is.numeric(x2) is not TRUE",
@@ -47,12 +47,12 @@ test_that("input validation throws correct errors", {
                "is.numeric(y) is not TRUE",
                fixed = TRUE)
   expect_error(validate_crps_input(x1, t(x2), y),
-               "identical(dim(x1), dim(x2)) is not TRUE",
+               "identical(dim(x), dim(x2)) is not TRUE",
                fixed = TRUE)
   expect_error(validate_crps_input(x1, x2, c(1, 2)),
-               "ncol(x1) == length(y) is not TRUE",
+               "ncol(x) == length(y) is not TRUE",
                fixed = TRUE)
   expect_error(validate_crps_input(x1, x2, y, t(ll)),
-               "ifelse(is.null(ll), TRUE, identical(dim(ll), dim(x1))) is not TRUE",
+               "ifelse(is.null(ll), TRUE, identical(dim(ll), dim(x))) is not TRUE",
                fixed = TRUE)
   })

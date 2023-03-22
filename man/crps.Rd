@@ -13,49 +13,50 @@
 \alias{loo_scrps.matrix}
 \title{Continuously ranked probability score}
 \usage{
-crps(x1, ...)
+crps(x, ...)
 
-scrps(x1, ...)
+scrps(x, ...)
 
-loo_crps(x1, ...)
+loo_crps(x, ...)
 
-loo_scrps(x1, ...)
+loo_scrps(x, ...)
 
-\method{crps}{matrix}(x1, x2, y, permutations = 1)
+\method{crps}{matrix}(x, x2, y, permutations = 1)
 
-\method{crps}{numeric}(x1, x2, y, permutations = 1)
+\method{crps}{numeric}(x, x2, y, permutations = 1)
 
-\method{loo_crps}{matrix}(x1, x2, y, ll, permutations = 1, r_eff = NULL, ...)
+\method{loo_crps}{matrix}(x, x2, y, ll, permutations = 1, r_eff = NULL, ...)
 
-\method{scrps}{matrix}(x1, x2, y, permutations = 1)
+\method{scrps}{matrix}(x, x2, y, permutations = 1)
 
-\method{scrps}{numeric}(x1, x2, y, permutations = 1)
+\method{scrps}{numeric}(x, x2, y, permutations = 1)
 
-\method{loo_scrps}{matrix}(x1, x2, y, ll, permutations = 1, r_eff = NULL, ...)
+\method{loo_scrps}{matrix}(x, x2, y, ll, permutations = 1, r_eff = NULL, ...)
 }
 \arguments{
-\item{x1}{A S by N matrix, or a vector of length S when only single
-observation is provided.}
+\item{x}{A \code{S} by \code{N} matrix (draws by observations), or a vector of length
+\code{S} when only single observation is provided in \code{y}.}
 
-\item{...}{Passed on to \code{E_loo()} in \verb{loo_*}-functions.}
+\item{...}{Passed on to \code{\link[=E_loo]{E_loo()}} in the \verb{loo_*()} version of these
+functions.}
 
-\item{x2}{Independent draws from the same distribution as draws in \code{x1}.
+\item{x2}{Independent draws from the same distribution as draws in \code{x}.
 Should be of the identical dimension.}
 
 \item{y}{A vector of observations or a single value.}
 
 \item{permutations}{An integer, with default value of 1,  specifying how many
-times the expected value of  |X - X'| is computed. The row order of \code{x2}
-is shuffled to as elements \code{x1} and \code{x2} are typically drawn given the
-same value of parameters. This happens e.g. when one calls
-\code{posterior_predict()} twice for a fitted \code{rstanarm} model. Generating
-more permutations is expected to decrease the variance of the computed
-expected value.}
+times the expected value of  |X - X'| (\verb{|x - x2|}) is computed. The row
+order of \code{x2} is shuffled as elements \code{x} and \code{x2} are typically drawn
+given the same values of parameters. This happens, e.g., when one calls
+\code{posterior_predict()} twice for a fitted \pkg{rstanarm} or \pkg{brms}
+model. Generating more permutations is expected to decrease the variance of
+the computed expected value.}
 
-\item{ll}{A log-likelihood.default or array (for \code{loo_}-functions)}
+\item{ll}{A log-likelihood matrix the same size as \code{x}.}
 
-\item{r_eff}{A vector of relative effective sample size estimates containing
-one element per observation (for \code{loo_}-functions).}
+\item{r_eff}{An optional vector of relative effective sample size estimates
+containing one element per observation.}
 }
 \value{
 A list containing two elements: \code{estimates} and \code{pointwise}.
@@ -63,21 +64,20 @@ The former reports estimator and standard error and latter the pointwise
 values.
 }
 \description{
-The \code{crps()} and \code{scrps()} and their \code{loo} counterparts can be used to
-compute the continuously ranked probability score (CRPS) and scaled CRPS
-(SCRPS) (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and
+The \code{crps()} and \code{scrps()} functions and their \verb{loo_*()} counterparts can be
+used to compute the continuously ranked probability score (CRPS) and scaled
+CRPS (SCRPS) (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and
 strictly proper when the first moment of the predictive distribution is
 finite. Both can be expressed in terms of samples form the predictive
 distribution. See e.g. Gneiting and Raftery (2007) for a comprehensive
 discussion on CRPS.
 }
 \details{
-To compute (S)CRPS, user needs to provide two sets of draws from the
-predictive distribution. I.e. one needs to call, for instance,
-\code{posterior_predict()} two times and pass the returned values on to the CRPS
-functions. This is due to the fact that formulas used to compute CRPS involve
-an expectation of the absolute difference of \code{X1} and \code{X2}, both having the
-same distribution. See Gneiting and Raftery (2007) for details.
+To compute (S)CRPS, the user needs to provide two sets of draws, \code{x} and
+\code{x2}, from the predictive distribution. This is due to the fact that formulas
+used to compute CRPS involve an expectation of the absolute difference of \code{x}
+and \code{x2}, both having the same distribution. See the \code{permutations} argument,
+as well as Gneiting and Raftery (2007) for details.
 }
 \examples{
 \dontrun{
@@ -87,9 +87,8 @@ data("kidiq")
 fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 ypred1 <- posterior_predict(fit)
 ypred2 <- posterior_predict(fit)
-y <- get_y(fit)
-crps(ypred1, ypred2, y)
-loo_crps(ypred1, ypred2, y, ll = log_lik(fit))
+crps(ypred1, ypred2, y = fit$y)
+loo_crps(ypred1, ypred2, y = fit$y, ll = log_lik(fit))
 }
 
 }
