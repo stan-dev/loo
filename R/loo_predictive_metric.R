@@ -4,7 +4,7 @@
 #' predictive metrics given a set of predictions and observations. Currently
 #' supported metrics are mean absolute error, mean squared error and root mean
 #' squared error for continuous predictions and accuracy and balanced accuracy
-#' for binary classification. Predictions are passed on to the `E_loo()`
+#' for binary classification. Predictions are passed on to the [E_loo()]
 #' function, so this function assumes that the PSIS approximation is working
 #' well.
 #'
@@ -36,6 +36,8 @@
 #'     }
 #' @param r_eff A Vector of relative effective sample size estimates containing
 #'     one element per observation. See [psis()] for more details.
+#' @param cores The number of cores to use for parallelization of `[psis()]`.
+#'   See [psis()] for details.
 #' @param ... Additional arguments passed on to [E_loo()]
 #'
 #' @return A list with the following components:
@@ -83,13 +85,14 @@ loo_predictive_metric <- function(x, ...) {
 
 #' @rdname loo_predictive_metric
 #' @export
-loo_predictive_metric.default <-
+loo_predictive_metric.matrix <-
   function(x,
            y,
            log_lik,
+           ...,
            metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = NULL,
-           ...) {
+           cores = getOption("mc.cores", 1)) {
     stopifnot(
       is.numeric(x),
       is.numeric(y),
@@ -97,7 +100,7 @@ loo_predictive_metric.default <-
       identical(dim(x), dim(log_lik))
     )
     metric <- match.arg(metric)
-    psis_object <- psis(-log_lik, r_eff = r_eff)
+    psis_object <- psis(-log_lik, r_eff = r_eff, cores = cores)
     pred_loo <- E_loo(x,
                       psis_object = psis_object,
                       log_ratios = -log_lik,

@@ -53,6 +53,6 @@ test_that("input validation throws correct errors", {
                "ncol(x) == length(y) is not TRUE",
                fixed = TRUE)
   expect_error(validate_crps_input(x1, x2, y, t(ll)),
-               "ifelse(is.null(ll), TRUE, identical(dim(ll), dim(x))) is not TRUE",
+               "ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x))) is not TRUE",
                fixed = TRUE)
   })

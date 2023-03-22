@@ -29,7 +29,7 @@ loo_scrps(x, ...)
   x,
   x2,
   y,
-  ll,
+  log_lik,
   ...,
   permutations = 1,
   r_eff = NULL,
@@ -44,7 +44,7 @@ loo_scrps(x, ...)
   x,
   x2,
   y,
-  ll,
+  log_lik,
   ...,
   permutations = 1,
   r_eff = NULL,
@@ -71,7 +71,7 @@ given the same values of parameters. This happens, e.g., when one calls
 model. Generating more permutations is expected to decrease the variance of
 the computed expected value.}
 
-\item{ll}{A log-likelihood matrix the same size as \code{x}.}
+\item{log_lik}{A log-likelihood matrix the same size as \code{x}.}
 
 \item{r_eff}{An optional vector of relative effective sample size estimates
 containing one element per observation. See \code{\link[=psis]{psis()}} for details.}
@@ -109,7 +109,7 @@ fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 ypred1 <- posterior_predict(fit)
 ypred2 <- posterior_predict(fit)
 crps(ypred1, ypred2, y = fit$y)
-loo_crps(ypred1, ypred2, y = fit$y, ll = log_lik(fit))
+loo_crps(ypred1, ypred2, y = fit$y, log_lik = log_lik(fit))
 }
 
 }

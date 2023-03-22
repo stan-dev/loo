@@ -1,3 +1,14 @@
+# loo 2.6.0
+
+* New `loo_predictive_metric()` function for computing estimates of leave-one-out
+predictive metrics: mean absolute error, mean squared error and root mean
+squared error for continuous predictions. and accuracy and balanced accuracy for
+binary classification. (#202, @LeeviLindgren)
+
+* New functions `crps()`, `scrps()`, `loo_crps()`, and `loo_scrps()` for
+computing the (scaled) continuously ranked probability score. (#203,
+@LeeviLindgren)
+
 # loo 2.5.1
 
 * Fix R CMD check error on M1 Mac
