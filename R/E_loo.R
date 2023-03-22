@@ -276,5 +276,5 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
     cutoff <- log_a[min(tail_ids) - 1]
 
     smoothed <- psis_smooth_tail(tail_sample, cutoff)
-    return(smoothed$k)
+    smoothed$k
   }
