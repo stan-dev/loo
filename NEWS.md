@@ -2,7 +2,7 @@
 
 * New `loo_predictive_metric()` function for computing estimates of leave-one-out
 predictive metrics: mean absolute error, mean squared error and root mean
-squared error for continuous predictions. and accuracy and balanced accuracy for
+squared error for continuous predictions, and accuracy and balanced accuracy for
 binary classification. (#202, @LeeviLindgren)
 
 * New functions `crps()`, `scrps()`, `loo_crps()`, and `loo_scrps()` for
