@@ -363,7 +363,7 @@ prepare_psis_r_eff <- function(r_eff, len) {
   } else if (anyNA(r_eff)) {
     stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
   }
-  return(r_eff)
+  r_eff
 }
 
 #' Check if `psis()` was called from one of the loo methods
