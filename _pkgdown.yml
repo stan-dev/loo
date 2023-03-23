@@ -73,6 +73,7 @@ articles:
       - loo2-lfo
       - loo2-large-data
       - loo2-moment-matching
+      - loo2-mixis
   - title: "Frequently asked questions"
     desc: >
       Answers to frequently asked questions about cross-validation and the **loo** package.
