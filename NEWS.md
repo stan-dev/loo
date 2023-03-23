@@ -6,8 +6,10 @@ squared error for continuous predictions, and accuracy and balanced accuracy for
 binary classification. (#202, @LeeviLindgren)
 
 * New functions `crps()`, `scrps()`, `loo_crps()`, and `loo_scrps()` for
-computing the (scaled) continuously ranked probability score. (#203,
-@LeeviLindgren)
+computing the (scaled) continuously ranked probability score. (#203, @LeeviLindgren)
+
+* New vignette "Mixture IS leave-one-out cross-validation for high-dimensional Bayesian models." This is a demonstration of the mixture estimators proposed in [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). 
+
 
 # loo 2.5.1
 
