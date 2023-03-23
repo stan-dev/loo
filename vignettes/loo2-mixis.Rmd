@@ -172,7 +172,7 @@ elpd_psis <- loo_post$pointwise[,1]
 print(paste("RMSE(PSIS) =",round( sqrt(mean((elpd_loo-elpd_psis)^2)) ,2)))
 print(paste("RMSE(MixIS) =",round( sqrt(mean((elpd_loo-elpd_mixis)^2)) ,2)))
 ```
-Here mixture estimators provide a $\approx 2-3$x reduction in RMSE. Note that this value would increase with the number of samples drawn from the posterior and mixture, since in this example the RMSE of MixIS will exhibit a CLT-type decay while the one of PSIS will converge at a slower rate (this can be verified by running the above code with a larger sample size; see also Figure 3 of Silva and Zanella (2022) for analogous results). 
+Here mixture estimator provides a reduction in RMSE. Note that this value would increase with the number of samples drawn from the posterior and mixture, since in this example the RMSE of MixIS will exhibit a CLT-type decay while the one of PSIS will converge at a slower rate (this can be verified by running the above code with a larger sample size; see also Figure 3 of Silva and Zanella (2022) for analogous results). 
 
 We then compare the overall ELPD estimates with the brute force one.
 ```{r}
