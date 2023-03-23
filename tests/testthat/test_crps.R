@@ -55,4 +55,9 @@ test_that("input validation throws correct errors", {
   expect_error(validate_crps_input(x1, x2, y, t(ll)),
                "ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x))) is not TRUE",
                fixed = TRUE)
-  })
+})
+
+test_that("methods for single data point don't error", {
+  expect_silent(crps(x1[,1], x2[,1], y[1]))
+  expect_silent(scrps(x1[,1], x2[,1], y[1]))
+})
