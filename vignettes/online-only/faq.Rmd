@@ -117,7 +117,7 @@ These are examples of utility and loss functions for using the model to predict 
 
 The value of the loss functions necessarily depends on the data we observe next. We can however try to estimate an _expectation_ of the loss (a summary of average predictive performance over several predictions or expected predictive performance for one prediction) under the assumption that both the covariates and responses we currently have are representative of those we will observe in the future.
 
-- ELPD: The theoretical expected log pointwise predictive density for a new observations (or other exchangeable entity) (Eq 1 in @Vehtari+etal:PSIS-LOO:2017). One scenario when we could also actually observe this is if we would get infinite number of future observations from the same data generating mechanism. However, this expected value is valid also when thinking just about one future observation (other exchangeable entity). This can be computed given different data partitions. For simplicity the ELPD acronym is used also for expected log pointwise predictive probabilities for discrete models.
+- ELPD: The theoretical expected log pointwise predictive density for new observations (or other exchangeable entity) (Eq 1 in @Vehtari+etal:PSIS-LOO:2017). One scenario when we could also actually observe this is if we would get infinite number of future observations from the same data generating mechanism. However, this expected value is valid also when thinking just about one future observation (other exchangeable entity). This can be computed given different data partitions. For simplicity the ELPD acronym is used also for expected log pointwise predictive probabilities for discrete models.
 
 Similarly we can have expected RMSE, ACC, $R^2$, etc.  
 
