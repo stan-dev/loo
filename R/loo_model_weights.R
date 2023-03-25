@@ -6,16 +6,16 @@
 #' Gelman, Yao, and Gabry (2019) for background.
 #'
 #' @export
-#' @param x A list of pointwise log-likelihood matrices or `"psis_loo"` objects
-#'   (objects returned by [loo()]), one for each model. Each
-#'   matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
-#'   the size of the posterior sample (with all chains merged) and \eqn{N} is
-#'   the number of data points. If `x` is a list of log-likelihood matrices
-#'   then [loo()] is called internally on each matrix. Currently the
-#'   `loo_model_weights()` function is not implemented to be used with
-#'   results from K-fold CV, but you can still obtain weights using K-fold CV
-#'   results by calling the `stacking_weights()` function directly.
-#'
+#' @param x A list of `"psis_loo"` objects (objects returned by [loo()]) or
+#'   pointwise log-likelihood matrices or , one for each model. If the list
+#'   elements are named the names will be used to label the models in the
+#'   results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
+#'   where \eqn{S} is the size of the posterior sample (with all chains merged)
+#'   and \eqn{N} is the number of data points. If `x` is a list of
+#'   log-likelihood matrices then [loo()] is called internally on each matrix.
+#'   Currently the `loo_model_weights()` function is not implemented to be used
+#'   with results from K-fold CV, but you can still obtain weights using K-fold
+#'   CV results by calling the `stacking_weights()` function directly.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
@@ -140,6 +140,9 @@
 #' )
 #' all.equal(wts1, wts2)
 #'
+#' # can provide names to be used in the results
+#' loo_model_weights(setNames(loo_list, c("A", "B", "C")))
+#'
 #'
 #' # pseudo-BMA+ method:
 #' set.seed(1414)
@@ -189,9 +192,9 @@ loo_model_weights.default <-
       for (k in 1:K) {
         r_eff_k <- r_eff_list[[k]] # possibly NULL
         log_likelihood <- x[[k]]
-        L <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
-        lpd_point[, k] <- L$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
-        elpd_loo[k] <- L$estimates["elpd_loo", "Estimate"]
+        loo_object <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
+        lpd_point[, k] <- loo_object$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
+        elpd_loo[k] <- loo_object$estimates["elpd_loo", "Estimate"]
       }
     } else if (is.psis_loo(x[[1]])) {
       validate_psis_loo_list(x)
@@ -219,10 +222,14 @@ loo_model_weights.default <-
       )
     }
 
-    if (!is.null(names(x)) && all(nzchar(names(x)))) {
-      wts <- setNames(wts, names(x))
+    if (is.matrix(x[[1]])) {
+      if (!is.null(names(x)) && all(nzchar(names(x)))) {
+        wts <- setNames(wts, names(x))
+      }
+    } else { # list of loo objects
+      wts <- setNames(wts, find_model_names(x))
     }
-    return(wts)
+    wts
   }
 
 

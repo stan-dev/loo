@@ -231,8 +231,7 @@ find_model_names <- function(x) {
       out_names[j] <- names4[j]
     }
   }
-
-  return(out_names)
+  out_names
 }
 
 
