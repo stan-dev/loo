@@ -94,4 +94,22 @@ test_that("stacking_weights and pseudobma_weights throw correct errors", {
   expect_error(pseudobma_weights(xx), "two models are required")
 })
 
+test_that("loo_model_weights uses correct names for list of loo objects", {
+  loo1 <- loo_list[[1]]
+  loo2 <- loo_list[[2]]
+  loo3 <- loo_list[[3]]
+
+  expect_named(
+    loo_model_weights(list(loo1, loo2, loo3)),
+    c("model1", "model2", "model3")
+  )
+  expect_named(
+    loo_model_weights(list("a" = loo1, loo2, "c" = loo3)),
+    c("a", "model2", "c")
+  )
+  expect_named(
+    loo_model_weights(list(`a` = loo1, `b` = loo2, `c` = loo3)),
+    c("a", "b", "c")
+  )
+})
 
