@@ -2,18 +2,19 @@
 % Please edit documentation in R/loo_predictive_metric.R
 \name{loo_predictive_metric}
 \alias{loo_predictive_metric}
-\alias{loo_predictive_metric.default}
+\alias{loo_predictive_metric.matrix}
 \title{Estimate leave-one-out predictive performance..}
 \usage{
 loo_predictive_metric(x, ...)
 
-\method{loo_predictive_metric}{default}(
+\method{loo_predictive_metric}{matrix}(
   x,
   y,
   log_lik,
+  ...,
   metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
   r_eff = NULL,
-  ...
+  cores = getOption("mc.cores", 1)
 )
 }
 \arguments{
@@ -51,6 +52,9 @@ negative rates.
 
 \item{r_eff}{A Vector of relative effective sample size estimates containing
 one element per observation. See \code{\link[=psis]{psis()}} for more details.}
+
+\item{cores}{The number of cores to use for parallelization of \verb{[psis()]}.
+See \code{\link[=psis]{psis()}} for details.}
 }
 \value{
 A list with the following components:
@@ -68,7 +72,7 @@ The \code{loo_predictive_metric()} function computes estimates of leave-one-out
 predictive metrics given a set of predictions and observations. Currently
 supported metrics are mean absolute error, mean squared error and root mean
 squared error for continuous predictions and accuracy and balanced accuracy
-for binary classification. Predictions are passed on to the \code{E_loo()}
+for binary classification. Predictions are passed on to the \code{\link[=E_loo]{E_loo()}}
 function, so this function assumes that the PSIS approximation is working
 well.
 }

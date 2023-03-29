@@ -341,7 +341,7 @@ geterate_test_elpd_dataset <- function() {
   fake_posterior <- draws <- as.matrix(rbeta(S, a, b))
   fake_data <- data.frame(y,K)
   rm(N, K, S, a0, b0, p, y, a, b)
-  
+
   list(fake_posterior = fake_posterior, fake_data = fake_data)
 }
 
@@ -350,11 +350,11 @@ test_elpd_loo_approximation <- function(cores) {
   test_data <- geterate_test_elpd_dataset()
   fake_posterior <- test_data$fake_posterior
   fake_data <- test_data$fake_data
-  
+
   llfun_test <- function(data_i, draws) {
     dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
   }
-  
+
   # Compute plpd approximation
   expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "plpd", cores = cores))
   # Compute it manually
@@ -363,7 +363,7 @@ test_elpd_loo_approximation <- function(cores) {
   abs_lliks <- abs(llik)
   man_elpd_loo_approximation <- abs_lliks/sum(abs_lliks)
   expect_equal(abs(pi_vals)/sum(abs(pi_vals)), man_elpd_loo_approximation, tol = 0.00001)
-  
+
   # Compute lpd approximation
   expect_silent(pi_vals <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "lpd", cores = cores))
   # Compute it manually
@@ -374,12 +374,12 @@ test_elpd_loo_approximation <- function(cores) {
   abs_lliks <- abs(llik)
   man_approx_loo_variable <- abs_lliks/sum(abs_lliks)
   expect_equal(abs(pi_vals)/sum(abs(pi_vals)), man_approx_loo_variable, tol = 0.00001)
-  
+
   # Compute waic approximation
   expect_silent(pi_vals_waic <- loo:::elpd_loo_approximation(.llfun = llfun_test, data = fake_data, draws = fake_posterior, loo_approximation = "waic", cores = cores))
   expect_true(all(pi_vals > pi_vals_waic))
   expect_true(sum(pi_vals) - sum(pi_vals_waic) < 1)
-  
+
   # Compute tis approximation
   expect_silent(pi_vals_tis <- loo:::elpd_loo_approximation(.llfun = llfun_test,
                                                             data = fake_data,
@@ -452,9 +452,9 @@ test_that("waic using delta method and gradient", {
     # fake_posterior <- mvtnorm::rmvnorm(n = S, mean = mu_n, sigma = solve(Lambda_n))
     colnames(fake_posterior) <- c("a", "b")
     fake_data <- data.frame(y, X)
-    save(fake_posterior, fake_data, file = test_path("normal_reg_waic_test_example.rda"))
+    save(fake_posterior, fake_data, file = test_path("data-for-tests/normal_reg_waic_test_example.rda"))
   } else {
-    load(file = test_path("normal_reg_waic_test_example.rda"))
+    load(file = test_path("data-for-tests/normal_reg_waic_test_example.rda"))
   }
 
   .llfun <- function(data_i, draws) {
@@ -506,9 +506,9 @@ test_that("waic using delta 2nd order method", {
     fake_posterior[,"sigma2"] <- sqrt(fake_posterior[,"sigma2"])
     colnames(fake_posterior) <- c("a", "b", "sigma")
     fake_data <- data.frame(y, X)
-    save(fake_posterior, fake_data, file = test_path("normal_reg_waic_test_example2.rda"), compression_level = 9)
+    save(fake_posterior, fake_data, file = test_path("data-for-tests/normal_reg_waic_test_example2.rda"), compression_level = 9)
   } else {
-    load(file = test_path("normal_reg_waic_test_example2.rda"))
+    load(file = test_path("data-for-tests/normal_reg_waic_test_example2.rda"))
   }
 
   .llfun <- function(data_i, draws) {
@@ -731,7 +731,7 @@ context("loo_subsampling cases")
 test_that("Test loo_subsampling and loo_approx with radon data", {
   skip_on_cran() # avoid going over time limit for tests
 
-  load(test_path("test_radon_laplace_loo.rda"))
+  load(test_path("data-for-tests/test_radon_laplace_loo.rda"))
   # Rename to spot variable leaking errors
   llfun_test <- llfun
   log_p_test <- log_p
@@ -904,10 +904,10 @@ test_that("Test the vignette", {
          stan_df, stan_df2,
          parameter_draws, parameter_draws_laplace, parameter_draws_2,
          log_p, log_g,
-         file = test_path("loo_subsample_vignette.rda"), compression_level = 9)
+         file = test_path("data-for-tests/loo_subsample_vignette.rda"), compression_level = 9)
 
   } else {
-    load(test_path("loo_subsample_vignette.rda"))
+    load(test_path("data-for-tests/loo_subsample_vignette.rda"))
   }
 
   set.seed(4711)

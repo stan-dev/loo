@@ -31,7 +31,7 @@ bacc_quant <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'balanced_acc
 
 test_that('loo_predictive_metric stops with incorrect inputs', {
   expect_error(loo_predictive_metric(as.character(x), y, LL, r_eff = r_eff),
-               'is.numeric(x) is not TRUE',
+               'no applicable method',
                fixed = TRUE)
 
   expect_error(loo_predictive_metric(x, as.character(y), LL, r_eff = r_eff),

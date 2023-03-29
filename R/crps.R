@@ -43,13 +43,12 @@
 #' ypred1 <- posterior_predict(fit)
 #' ypred2 <- posterior_predict(fit)
 #' crps(ypred1, ypred2, y = fit$y)
-#' loo_crps(ypred1, ypred2, y = fit$y, ll = log_lik(fit))
+#' loo_crps(ypred1, ypred2, y = fit$y, log_lik = log_lik(fit))
 #' }
 #'
 #' @references
 #' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
-#' proper scoring rules. arXiv.
-#' <https://doi.org/10.48550/arXiv.1912.05642>
+#' proper scoring rules. arXiv. \doi{10.48550/arXiv.1912.05642}
 #'
 #' Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 #' Prediction, and Estimation. Journal of the American Statistical Association,
@@ -101,7 +100,7 @@ crps.numeric <- function(x, x2, y, ..., permutations = 1) {
 
 #' @rdname crps
 #' @export
-#' @param ll A log-likelihood matrix the same size as `x`.
+#' @param log_lik A log-likelihood matrix the same size as `x`.
 #' @param r_eff An optional vector of relative effective sample size estimates
 #'   containing one element per observation. See [psis()] for details.
 #' @param cores The number of cores to use for parallelization of `[psis()]`.
@@ -110,18 +109,18 @@ loo_crps.matrix <-
   function(x,
            x2,
            y,
-           ll,
+           log_lik,
            ...,
            permutations = 1,
            r_eff = NULL,
            cores = getOption("mc.cores", 1)) {
-  validate_crps_input(x, x2, y, ll)
+  validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, ll, r_eff = r_eff, ...),
+                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
                        simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-ll, r_eff = r_eff, cores = cores)
-  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -ll, ...)$value
+  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
   crps_output(.crps_fun(EXX, EXy))
 }
 
@@ -152,18 +151,18 @@ loo_scrps.matrix <-
     x,
     x2,
     y,
-    ll,
+    log_lik,
     ...,
     permutations = 1,
     r_eff = NULL,
     cores = getOption("mc.cores", 1)) {
-  validate_crps_input(x, x2, y, ll)
+  validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, ll, r_eff = r_eff, ...),
+                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
                        simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-ll, r_eff = r_eff, cores = cores)
-  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -ll, ...)$value
+  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
   crps_output(.crps_fun(EXX, EXy, scale = TRUE))
 }
 
@@ -176,13 +175,13 @@ EXX_compute <- function(x, x2) {
 }
 
 
-EXX_loo_compute <- function(x, x2, ll, r_eff = NULL, ...) {
+EXX_loo_compute <- function(x, x2, log_lik, r_eff = NULL, ...) {
   S <- nrow(x)
   shuffle <- sample (1:S)
   x2 <- x2[shuffle,]
-  ll2 <- ll[shuffle,]
-  psis_obj_joint <- psis(-ll - ll2 , r_eff = r_eff)
-  E_loo(abs(x - x2), psis_obj_joint, log_ratios = -ll - ll2, ...)$value
+  log_lik2 <- log_lik[shuffle,]
+  psis_obj_joint <- psis(-log_lik - log_lik2 , r_eff = r_eff)
+  E_loo(abs(x - x2), psis_obj_joint, log_ratios = -log_lik - log_lik2, ...)$value
 }
 
 
@@ -208,12 +207,12 @@ crps_output <- function(crps_pw) {
 #'
 #' Check that predictive draws and observed data are of compatible shape
 #' @noRd
-validate_crps_input <- function(x, x2, y, ll = NULL) {
+validate_crps_input <- function(x, x2, y, log_lik = NULL) {
   stopifnot(is.numeric(x),
             is.numeric(x2),
             is.numeric(y),
             identical(dim(x), dim(x2)),
             ncol(x) == length(y),
-            ifelse(is.null(ll), TRUE, identical(dim(ll), dim(x)))
+            ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x)))
             )
 }

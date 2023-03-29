@@ -145,7 +145,7 @@ test_that("loo, waic, and elpd error with vector input", {
 
 
 # testing function methods ------------------------------------------------
-source(test_path("function_method_stuff.R"))
+source(test_path("data-for-tests/function_method_stuff.R"))
 
 waic_with_fn <- waic(llfun, data = data, draws = draws)
 waic_with_mat <- waic(llmat_from_fn)
