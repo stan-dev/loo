@@ -43,7 +43,6 @@ Suggests:
     ggplot2,
     graphics,
     knitr,
-    posterior,
     rmarkdown,
     rstan,
     rstanarm (>= 2.19.0),
