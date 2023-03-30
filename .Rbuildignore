@@ -19,3 +19,4 @@ vignettes/loo2-non-factorizable_cache/*
 ^\.github$
 ^vignettes/online-only$
 
+^CRAN-SUBMISSION$
