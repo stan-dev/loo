@@ -1,0 +1,198 @@
+---
+title: "Mixture IS leave-one-out cross-validation for high-dimensional Bayesian models"
+author: "Luca Silva and Giacomo Zanella"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Mixture IS leave-one-out cross-validation for high-dimensional Bayesian models}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+This vignette shows how to perform Bayesian leave-one-out cross-validation (LOO-CV) using the mixture estimators proposed in the paper [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). These estimators have shown to be useful in presence of outliers but also, and especially, in high-dimensional settings where the model features many parameters. In these contexts it can happen that a large portion of observations lead to high values of Pareto-$k$ diagnostics and potential instability of PSIS-LOO estimators. 
+
+For this illustration we consider a high-dimensional Bayesian Logistic regression model applied to the _Voice_ dataset.
+
+## Setup: load packages and set seed
+
+```{r, warnings=FALSE, message=FALSE}
+library("rstan")
+library("loo")
+library("matrixStats")
+options(mc.cores = parallel::detectCores(), parallel=FALSE)
+set.seed(24877)
+```
+
+## Model
+
+This is the Stan code for a logistic regression model with regularized horseshoe prior. The code includes an if statement to include a code line needed later for the MixIS approach.
+
+```{r stancode_horseshoe}
+stancode_horseshoe <- "
+data {
+  int <lower=0> n;                
+  int <lower=0> p;                
+  int <lower=0, upper=1> y[n];    
+  matrix [n,p] X;                
+  real <lower=0> scale_global;
+  int <lower=0,upper=1> mixis;                
+}
+transformed data {
+  real<lower=1> nu_global=1; // degrees of freedom for the half-t priors for tau
+  real<lower=1> nu_local=1;  // degrees of freedom for the half-t priors for lambdas
+                             // (nu_local = 1 corresponds to the horseshoe)
+  real<lower=0> slab_scale=2;// for the regularized horseshoe
+  real<lower=0> slab_df=100; // for the regularized horseshoe
+}
+parameters {
+  vector[p] z;                // for non-centered parameterization
+  real <lower=0> tau;         // global shrinkage parameter
+  vector <lower=0>[p] lambda; // local shrinkage parameter
+  real<lower=0> caux;
+}
+transformed parameters {
+  vector[p] beta;
+  { 
+    vector[p] lambda_tilde;   // 'truncated' local shrinkage parameter
+    real c = slab_scale * sqrt(caux); // slab scale
+    lambda_tilde = sqrt( c^2 * square(lambda) ./ (c^2 + tau^2*square(lambda)));
+    beta = z .* lambda_tilde*tau;
+  }
+}
+model {
+  vector[n] means=X*beta;
+  vector[n] log_lik;
+  target += std_normal_lpdf(z);
+  target += student_t_lpdf(lambda | nu_local, 0, 1);
+  target += student_t_lpdf(tau | nu_global, 0, scale_global);
+  target += inv_gamma_lpdf(caux | 0.5*slab_df, 0.5*slab_df);
+  for (index in 1:n) {
+    log_lik[index]= bernoulli_logit_lpmf(y[index] | means[index]);
+  }
+  target += sum(log_lik);
+  if (mixis) {
+    target += log_sum_exp(-log_lik);
+  }
+}
+generated quantities {
+  vector[n] means=X*beta;
+  vector[n] log_lik;
+  for (index in 1:n) {
+    log_lik[index] = bernoulli_logit_lpmf(y[index] | means[index]);
+  }
+}
+"
+```
+
+## Dataset
+
+The _LSVT Voice Rehabilitation Data Set_ (see [link](https://archive.ics.uci.edu/ml/datasets/LSVT+Voice+Rehabilitation) for details) has $p=312$ covariates and $n=126$ observations with binary response. We construct data list for Stan.
+```{r, results='hide', warning=FALSE, message=FALSE, error=FALSE}
+data(voice)
+y <- voice$y
+X <- voice[2:length(voice)]
+n <- dim(X)[1]
+p <- dim(X)[2]
+p0 <- 10
+scale_global <- 2*p0/(p-p0)/sqrt(n-1)
+standata <- list(n = n, p = p, X = as.matrix(X), y = c(y), scale_global = scale_global, mixis = 0)
+```
+
+Note that in our prior specification we divide the prior variance by the number of covariates $p$. This is often done in high-dimensional contexts to have a prior variance for the linear predictors $X\beta$ that remains bounded as $p$ increases.
+
+## PSIS estimators and Pareto-$k$ diagnostics
+
+LOO-CV computations are challenging in this context due to high-dimensionality of the parameter space. To show that, we compute PSIS-LOO estimators, which require sampling from the posterior distribution, and inspect the associated Pareto-$k$ diagnostics.
+
+```{r, results='hide', warning=FALSE}
+chains <- 4
+n_iter <- 2000
+warm_iter <- 1000
+stanmodel <- stan_model(model_code = stancode_horseshoe)
+fit_post <- sampling(stanmodel, data = standata, chains = chains, iter = n_iter, warmup = warm_iter, refresh = 0)
+loo_post <-loo(fit_post)
+```
+
+```{r}
+print(loo_post)
+```
+
+As we can see the diagnostics signal either "bad" or "very bad" Pareto-$k$ values for roughly $15-30\%$ of the observations which is a significant portion of the dataset. 
+
+## Mixture estimators
+
+We now compute the mixture estimators proposed in Silva and Zanella (2022). These require to sample from the following mixture of leave-one-out posteriors
+\begin{equation}
+q_{mix}(\theta) =  \frac{\sum_{i=1}^n p(y_{-i}|\theta)p(\theta)}{\sum_{i=1}^np(y_{-i})}\propto p(\theta|y)\cdot \left(\sum_{i=1}^np(y_i|\theta)^{-1}\right).
+\end{equation}
+The code to generate a Stan model for the above mixture distribution is the same to the one for the posterior, just enabling one line of code with a _LogSumExp_ contribution to account for the last term in the equation above.
+```
+  if (mixis) {
+    target += log_sum_exp(-log_lik);
+  }
+```
+
+We sample from the mixture and collect the log-likelihoods term.
+```{r, results='hide', warnings=FALSE}
+standata$mixis <- 1
+fit_mix <- sampling(stanmodel, data = standata, chains = chains, iter = n_iter, warmup = warm_iter, refresh = 0, pars = "log_lik")
+log_lik_mix <- extract(fit_mix)$log_lik
+```
+
+We now compute the mixture estimators, following the numerically stable implementation in Appendix A.2 of [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). The code below makes use of the package "matrixStats".
+
+```{r}
+l_common_mix <- rowLogSumExps(-log_lik_mix)
+log_weights <- -log_lik_mix - l_common_mix
+elpd_mixis <- logSumExp(-l_common_mix) - rowLogSumExps(t(log_weights))
+```
+
+## Comparison with benchmark values obtained with long simulations
+
+To evaluate the performance of mixture estimators (MixIS) we also generate _benchmark values_, i.e.\ accurate approximations of the LOO predictives $\{p(y_i|y_{-i})\}_{i=1,\dots,n}$, obtained by brute-force sampling from the leave-one-out posteriors directly, getting $90k$ samples from each and discarding the first $10k$ as warmup. This is computationally heavy, hence we have saved the results and we just load them in the current vignette. 
+```{r}
+data(voice_loo)
+elpd_loo <- voice_loo$elpd_loo
+```
+
+We can then compute the root mean squared error (RMSE) of the PSIS and mixture estimators relative to such benchmark values.
+```{r}
+elpd_psis <- loo_post$pointwise[,1]
+print(paste("RMSE(PSIS) =",round( sqrt(mean((elpd_loo-elpd_psis)^2)) ,2)))
+print(paste("RMSE(MixIS) =",round( sqrt(mean((elpd_loo-elpd_mixis)^2)) ,2)))
+```
+Here mixture estimator provides a reduction in RMSE. Note that this value would increase with the number of samples drawn from the posterior and mixture, since in this example the RMSE of MixIS will exhibit a CLT-type decay while the one of PSIS will converge at a slower rate (this can be verified by running the above code with a larger sample size; see also Figure 3 of Silva and Zanella (2022) for analogous results). 
+
+We then compare the overall ELPD estimates with the brute force one.
+```{r}
+elpd_psis <- loo_post$pointwise[,1]
+print(paste("ELPD (PSIS)=",round(sum(elpd_psis),2)))
+print(paste("ELPD (MixIS)=",round(sum(elpd_mixis),2)))
+print(paste("ELPD (brute force)=",round(sum(elpd_loo),2)))
+```
+
+In this example, MixIS provides a more accurate ELPD estimate closer to the brute force estimate, while PSIS severely overestimates the ELPD. Note that low accuracy of the PSIS ELPD estimate is expected in this example given the large number of large Pareto-$k$ values. In this example, the accuracy of MixIS estimate will also improve with bigger MCMC sample size.
+
+More generally, mixture estimators can be useful in situations where standard PSIS estimators struggle and return many large Pareto-$k$ values. In these contexts MixIS often provides more accurate LOO-CV and ELPD estimates with a single sampling routine (i.e. with a cost comparable to sampling from the original posterior).
+
+## References 
+
+Silva L. and Zanella G. (2022). Robust leave-one-out cross-validation for high-dimensional Bayesian models. Preprint at [arXiv:2209.09190](https://arxiv.org/abs/2209.09190)
+
+Vehtari A., Gelman A., and Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. Preprint at [arXiv:1507.04544](https://arxiv.org/abs/1507.04544)
+
+Vehtari A., Simpson D., Gelman A., Yao Y., and Gabry J. (2022). Pareto smoothed importance sampling. Preprint at [arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
+
+
+

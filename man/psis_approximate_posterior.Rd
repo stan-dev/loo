@@ -48,11 +48,6 @@ will add a \code{psis_object} component to the list returned by \code{loo}.
 Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
 compute weighted expectations after running \code{loo}.}
 
-\item{...}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
-
 \item{log_q}{Deprecated argument name (the same as log_g).}
 }
 \value{

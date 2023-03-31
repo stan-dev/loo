@@ -23,13 +23,7 @@
 
 \item{...}{Currently not used.}
 
-\item{data}{For \code{loo_subsample.function()}, these are the data,
-posterior draws, and other arguments to pass to the log-likelihood
-function.}
-
-\item{draws}{For \code{loo_subsample.function()}, these are the data,
-posterior draws, and other arguments to pass to the log-likelihood
-function.}
+\item{data, draws}{See \code{\link[=loo_subsample.function]{loo_subsample.function()}}.}
 
 \item{observations}{The subsample observations to use. The argument can take
 four (4) types of arguments:

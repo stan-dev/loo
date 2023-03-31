@@ -243,6 +243,7 @@ loo_subsample.function <-
 #'
 #' @export
 #' @inheritParams loo_subsample.function
+#' @param data,draws See [loo_subsample.function()].
 #' @param object A `psis_loo_ss` object to update.
 #' @param ... Currently not used.
 #' @return A `psis_loo_ss` object.
@@ -467,6 +468,44 @@ estimator_choices <- function() {
 
 ## Approximate elpd -----
 
+#' Utility function to apply user-specified log-likelihood to a single data point
+#' @details
+#' See [elpd_loo_approximation] and [compute_lpds] for usage examples
+#' @noRd
+#'
+#' @return lpd value for a single data point i
+lpd_i <- function(i, llfun, data, draws) {
+  ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws)
+  ll_i <- as.vector(ll_i)
+  lpd_i <- logMeanExp(ll_i)
+  lpd_i
+}
+
+
+#' Utility function to compute lpd using user-defined likelihood function
+#' using platform-dependent parallel backends when cores > 1
+#'
+#' @details
+#' See [elpd_loo_approximation] for usage examples
+#'
+#' @noRd
+#' @return a vector of computed log probability densities
+compute_lpds <- function(N, data, draws, llfun, cores) {
+  if (cores == 1) {
+    lpds <- lapply(X = seq_len(N), FUN = lpd_i, llfun, data, draws)
+  } else {
+    if (.Platform$OS.type != "windows") {
+      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, llfun, data, draws)
+    } else {
+      cl <- makePSOCKcluster(cores)
+      on.exit(stopCluster(cl))
+      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, llfun, data, draws)
+    }
+  }
+
+  unlist(lpds)
+}
+
 #' Compute approximation to loo_i:s
 #'
 #' @details
@@ -540,12 +579,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     point_est <- .compute_point_estimate(draws)
     # Compute the lpds
-    lpds <- unlist(lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = point_est)
-      ll_i <- as.vector(ll_i)
-      lpd_i <- logMeanExp(ll_i)
-      lpd_i
-    }))
+    lpds <- compute_lpds(N, data, point_est, .llfun, cores)
 
     if (loo_approximation == "waic_grad" |
         loo_approximation == "waic_hess") {
@@ -1283,6 +1317,3 @@ assert_subsampling_pointwise <- function(x) {
   checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k", "idx", "m_i", "elpd_loo_approx"))
   x
 }
-
-
-

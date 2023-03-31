@@ -27,15 +27,16 @@ stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
 \arguments{
-\item{x}{A list of pointwise log-likelihood matrices or \code{"psis_loo"} objects
-(objects returned by \code{\link[=loo]{loo()}}), one for each model. Each
-matrix/object should have dimensions \eqn{S} by \eqn{N}, where \eqn{S} is
-the size of the posterior sample (with all chains merged) and \eqn{N} is
-the number of data points. If \code{x} is a list of log-likelihood matrices
-then \code{\link[=loo]{loo()}} is called internally on each matrix. Currently the
-\code{loo_model_weights()} function is not implemented to be used with
-results from K-fold CV, but you can still obtain weights using K-fold CV
-results by calling the \code{stacking_weights()} function directly.}
+\item{x}{A list of \code{"psis_loo"} objects (objects returned by \code{\link[=loo]{loo()}}) or
+pointwise log-likelihood matrices or , one for each model. If the list
+elements are named the names will be used to label the models in the
+results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
+where \eqn{S} is the size of the posterior sample (with all chains merged)
+and \eqn{N} is the number of data points. If \code{x} is a list of
+log-likelihood matrices then \code{\link[=loo]{loo()}} is called internally on each matrix.
+Currently the \code{loo_model_weights()} function is not implemented to be used
+with results from K-fold CV, but you can still obtain weights using K-fold
+CV results by calling the \code{stacking_weights()} function directly.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
@@ -185,6 +186,9 @@ wts2 <- loo_model_weights(
   optim_control = list(reltol=1e-10)
 )
 all.equal(wts1, wts2)
+
+# can provide names to be used in the results
+loo_model_weights(setNames(loo_list, c("A", "B", "C")))
 
 
 # pseudo-BMA+ method:
