@@ -199,17 +199,14 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
 #' @return MCMC effective sample size based on RStan's calculation.
 #'
 ess_rfun <- function(sims) {
-  # Compute the effective sample size for samples of several chains
-  # for one parameter; see the C++ code of function
-  # effective_sample_size in chains.cpp
-  #
-  # Args:
-  #   sims: a 2-d array _without_ warmup samples (# iter * # chains)
-  #
   if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-  acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
+  if (requireNamespace("posterior", quietly = TRUE)) {
+    acov <- lapply(1:chains, FUN = function(i) posterior::autocovariance(sims[,i]))
+  } else {
+    acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
+  }
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
@@ -276,6 +273,7 @@ fft_next_good_size <- function(N) {
   }
 }
 
+# autocovariance function to use if posterior::autocovariance is not available
 autocovariance <- function(y) {
   # Compute autocovariance estimates for every lag for the specified
   # input sequence using a fast Fourier transform approach.
