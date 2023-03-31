@@ -95,13 +95,15 @@ reference:
       - loo_subsample
       - loo_approximate_posterior
       - loo_moment_match
+      - loo_moment_match_split
       - E_loo
       - psis
+      - ap_psis
       - tis
       - sis
       - weights.importance_sampling
       - pareto-k-diagnostic
-  - title: "Model comparison and weighting/averaging"
+  - title: "Model comparison weighting/averaging"
     desc: >
       Functions for comparing models and computing model weights via stacking of
       predictive distributions or pseudo-BMA weighting.
@@ -119,6 +121,8 @@ reference:
       - elpd
   - title: "Other functions"
     contents:
+      - loo_predictive_metric
+      - crps
       - elpd
       - waic
       - extract_log_lik
@@ -126,6 +130,9 @@ reference:
       - gpdfit
       - starts_with("example_loglik")
       - print.loo
+      - nobs.psis_loo_ss
+      - obs_idx
+      - update.psis_loo_ss
   - title: "Deprecated functions"
     contents:
       - compare

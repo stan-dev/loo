@@ -29,13 +29,15 @@
     of predictive errors between models. The package also provides methods
     for using stacking and other model weighting techniques to average
     Bayesian predictive distributions.">
-<meta property="og:image" content="https://mc-stan.org/loo/logo.png">
+<meta property="og:image" content="https://mc-stan.org/loo/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -48,7 +50,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
       </span>
     </div>
 
@@ -70,57 +72,57 @@
   <a href="news/index.html">News</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="https://mc-stan.org/rstan">rstan</a>
+      <a href="https://mc-stan.org/rstan" class="external-link">rstan</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/cmdstanr">cmdstanr</a>
+      <a href="https://mc-stan.org/cmdstanr" class="external-link">cmdstanr</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/rstanarm">rstanarm</a>
+      <a href="https://mc-stan.org/rstanarm" class="external-link">rstanarm</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/bayesplot">bayesplot</a>
+      <a href="https://mc-stan.org/bayesplot" class="external-link">bayesplot</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/shinystan">shinystan</a>
+      <a href="https://mc-stan.org/shinystan" class="external-link">shinystan</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/projpred">projpred</a>
+      <a href="https://mc-stan.org/projpred" class="external-link">projpred</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/rstantools">rstantools</a>
+      <a href="https://mc-stan.org/rstantools" class="external-link">rstantools</a>
     </li>
     <li>
-      <a href="https://mc-stan.org/posterior">posterior</a>
+      <a href="https://mc-stan.org/posterior" class="external-link">posterior</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="https://mc-stan.org">Stan</a>
+  <a href="https://mc-stan.org" class="external-link">Stan</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://twitter.com/mcmc_stan">
+  <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/stan-dev/loo">
+  <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://discourse.mc-stan.org/">
+  <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
      
   </a>
@@ -137,89 +139,88 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="loo-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#loo-" class="anchor"></a>loo <img src="reference/figures/stanlogo.png" align="right" width="120">
+<div class="section level1">
+<div class="page-header"><h1 id="loo-">loo <img src="reference/figures/stanlogo.png" align="right" width="120"><a class="anchor" aria-label="anchor" href="#loo-"></a>
 </h1></div>
 <!-- badges: start -->
 
-<div id="efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models" class="section level3">
-<h3 class="hasAnchor">
-<a href="#efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models" class="anchor"></a>Efficient approximate leave-one-out cross-validation for fitted Bayesian models</h3>
+<div class="section level3">
+<h3 id="efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models">Efficient approximate leave-one-out cross-validation for fitted Bayesian models<a class="anchor" aria-label="anchor" href="#efficient-approximate-leave-one-out-cross-validation-for-fitted-bayesian-models"></a>
+</h3>
 <p><strong>loo</strong> is an R package that allows users to compute efficient approximate leave-one-out cross-validation for fitted Bayesian models, as well as model weights that can be used to average predictive distributions. The <strong>loo</strong> package package implements the fast and stable computations for approximate LOO-CV and WAIC from</p>
 <ul>
-<li>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">Online</a>, <a href="https://arxiv.org/abs/1507.04544">arXiv preprint arXiv:1507.04544</a>.</li>
+<li>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">Online</a>, <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv preprint arXiv:1507.04544</a>.</li>
 </ul>
 <p>and computes model weights as described in</p>
 <ul>
-<li>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, <a href="doi:10.1214/17-BA1091" class="uri">doi:10.1214/17-BA1091</a>. <a href="https://projecteuclid.org/euclid.ba/1516093227">Online</a>, <a href="https://arxiv.org/abs/1704.02030">arXiv preprint arXiv:1704.02030</a>.</li>
+<li>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using stacking to average Bayesian predictive distributions. In Bayesian Analysis, <a href="doi:10.1214/17-BA1091" class="uri">doi:10.1214/17-BA1091</a>. <a href="https://projecteuclid.org/euclid.ba/1516093227" class="external-link">Online</a>, <a href="https://arxiv.org/abs/1704.02030" class="external-link">arXiv preprint arXiv:1704.02030</a>.</li>
 </ul>
 <p>From existing posterior simulation draws, we compute approximate LOO-CV using Pareto smoothed importance sampling (PSIS), a new procedure for regularizing importance weights. As a byproduct of our calculations, we also obtain approximate standard errors for estimated predictive errors and for comparing predictive errors between two models. We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful diagnostics and effective sample size and Monte Carlo standard error estimates.</p>
 </div>
-<div id="resources" class="section level3">
-<h3 class="hasAnchor">
-<a href="#resources" class="anchor"></a>Resources</h3>
+<div class="section level3">
+<h3 id="resources">Resources<a class="anchor" aria-label="anchor" href="#resources"></a>
+</h3>
 <ul>
 <li>
 <a href="https://mc-stan.org/loo">mc-stan.org/loo</a> (online documentation, vignettes)</li>
 <li>
-<a href="https://discourse.mc-stan.org">Ask a question</a> (Stan Forums on Discourse)</li>
+<a href="https://discourse.mc-stan.org" class="external-link">Ask a question</a> (Stan Forums on Discourse)</li>
 <li>
-<a href="https://github.com/stan-dev/loo/issues">Open an issue</a> (GitHub issues for bug reports, feature requests)</li>
+<a href="https://github.com/stan-dev/loo/issues" class="external-link">Open an issue</a> (GitHub issues for bug reports, feature requests)</li>
 </ul>
 </div>
-<div id="installation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h3>
+<div class="section level3">
+<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h3>
 <ul>
 <li>Install the latest release from CRAN:</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"loo"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"loo"</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>Install the latest development version from GitHub:</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"stan-dev/loo"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"stan-dev/loo"</span><span class="op">)</span></span></code></pre></div>
 <p>We do <em>not</em> recommend setting <code>build_vignettes=TRUE</code> when installing from GitHub because some of the vignettes take a long time to build and are always available online at <a href="https://mc-stan.org/loo/articles/">mc-stan.org/loo/articles/</a>.</p>
 </div>
-<div id="python-and-matlaboctave-code" class="section level3">
-<h3 class="hasAnchor">
-<a href="#python-and-matlaboctave-code" class="anchor"></a>Python and Matlab/Octave Code</h3>
-<p>Corresponding Python and Matlab/Octave code can be found at the <a href="https://github.com/avehtari/PSIS">avehtari/PSIS</a> repository.</p>
+<div class="section level3">
+<h3 id="python-and-matlaboctave-code">Python and Matlab/Octave Code<a class="anchor" aria-label="anchor" href="#python-and-matlaboctave-code"></a>
+</h3>
+<p>Corresponding Python and Matlab/Octave code can be found at the <a href="https://github.com/avehtari/PSIS" class="external-link">avehtari/PSIS</a> repository.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=loo">https://​cloud.r-project.org/​package=loo</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/stan-dev/loo/">https://​github.com/​stan-dev/​loo/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/stan-dev/loo/issues">https://​github.com/​stan-dev/​loo/​issues</a>
-</li>
-<li>Ask a question at <br><a href="https://discourse.mc-stan.org/">https://​discourse.mc-stan.org/​</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=loo" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/stan-dev/loo/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/stan-dev/loo/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://discourse.mc-stan.org/" class="external-link">Ask a question</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;=3)</li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing loo</a></li>
+<li><a href="authors.html#citation">Citing loo</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Aki Vehtari <br><small class="roles"> Author </small>  </li>
 <li>Jonah Gabry <br><small class="roles"> Maintainer, author </small>  </li>
@@ -228,29 +229,32 @@
 <li>Paul-Christian Bürkner <br><small class="roles"> Author </small>  </li>
 <li>Topi Paananen <br><small class="roles"> Author </small>  </li>
 <li>Andrew Gelman <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://www.r-pkg.org/badges/version/loo?color=blue" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://cran.r-project.org/web/packages/loo"><img src="https://cranlogs.r-pkg.org/badges/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
-<li><a href="https://codecov.io/github/stan-dev/loo?branch=master"><img src="https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg" alt="codecov"></a></li>
-<li><a href="https://github.com/stan-dev/loo/actions"><img src="https://github.com/stan-dev/loo/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://cran.r-project.org/web/packages/loo" class="external-link"><img src="https://www.r-pkg.org/badges/version/loo?color=blue" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cran.r-project.org/web/packages/loo" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/loo?color=blue" alt="RStudio_CRAN_mirror_downloads_badge"></a></li>
+<li><a href="https://codecov.io/github/stan-dev/loo?branch=master" class="external-link"><img src="https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg" alt="codecov"></a></li>
+<li><a href="https://github.com/stan-dev/loo/actions" class="external-link"><img src="https://github.com/stan-dev/loo/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
+  <p></p>
+<p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -258,6 +262,8 @@
 
   
 
+
+  
 
   </body>
 </html>
