@@ -18,12 +18,14 @@ log_rats <- -LLmat
 # matrix method
 E_test_mean <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)
 E_test_var <- E_loo(x, psis_mat, type = "var", log_ratios = log_rats)
+E_test_sd <- E_loo(x, psis_mat, type = "sd", log_ratios = log_rats)
 E_test_quant <- E_loo(x, psis_mat, type = "quantile", probs = 0.5, log_ratios = log_rats)
 E_test_quant2 <- E_loo(x, psis_mat, type = "quantile", probs = c(0.1, 0.9), log_ratios = log_rats)
 
 # vector method
 E_test_mean_vec <- E_loo(x[, 1], psis_vec, type = "mean", log_ratios = log_rats[,1])
 E_test_var_vec <- E_loo(x[, 1], psis_vec, type = "var", log_ratios = log_rats[,1])
+E_test_sd_vec <- E_loo(x[, 1], psis_vec, type = "sd", log_ratios = log_rats[,1])
 E_test_quant_vec <- E_loo(x[, 1], psis_vec, type = "quant", probs = 0.5, log_ratios = log_rats[,1])
 E_test_quant_vec2 <- E_loo(x[, 1], psis_vec, type = "quant", probs = c(0.1, 0.5, 0.9), log_ratios = log_rats[,1])
 
@@ -42,6 +44,12 @@ test_that("E_loo return types correct for matrix method", {
   expect_length(E_test_var, 2)
   expect_length(E_test_var$value, ncol(x))
   expect_length(E_test_var$pareto_k, ncol(x))
+
+  expect_type(E_test_sd, "list")
+  expect_named(E_test_sd, c("value", "pareto_k"))
+  expect_length(E_test_sd, 2)
+  expect_length(E_test_sd$value, ncol(x))
+  expect_length(E_test_sd$pareto_k, ncol(x))
 
   expect_type(E_test_quant, "list")
   expect_named(E_test_quant, c("value", "pareto_k"))
@@ -69,6 +77,12 @@ test_that("E_loo return types correct for default/vector method", {
   expect_length(E_test_var_vec$value, 1)
   expect_length(E_test_var_vec$pareto_k, 1)
 
+  expect_type(E_test_sd_vec, "list")
+  expect_named(E_test_sd_vec, c("value", "pareto_k"))
+  expect_length(E_test_sd_vec, 2)
+  expect_length(E_test_sd_vec$value, 1)
+  expect_length(E_test_sd_vec$pareto_k, 1)
+
   expect_type(E_test_quant_vec, "list")
   expect_named(E_test_quant_vec, c("value", "pareto_k"))
   expect_length(E_test_quant_vec, 2)
@@ -85,6 +99,7 @@ test_that("E_loo return types correct for default/vector method", {
 test_that("E_loo.default equal to reference", {
   expect_equal_to_reference(E_test_mean_vec, "reference-results/E_loo_default_mean.rds")
   expect_equal_to_reference(E_test_var_vec, "reference-results/E_loo_default_var.rds")
+  expect_equal_to_reference(E_test_sd_vec, "reference-results/E_loo_default_sd.rds")
   expect_equal_to_reference(E_test_quant_vec, "reference-results/E_loo_default_quantile_50.rds")
   expect_equal_to_reference(E_test_quant_vec2, "reference-results/E_loo_default_quantile_10_50_90.rds")
 })
@@ -92,6 +107,7 @@ test_that("E_loo.default equal to reference", {
 test_that("E_loo.matrix equal to reference", {
   expect_equal_to_reference(E_test_mean, "reference-results/E_loo_matrix_mean.rds")
   expect_equal_to_reference(E_test_var, "reference-results/E_loo_matrix_var.rds")
+  expect_equal_to_reference(E_test_sd, "reference-results/E_loo_matrix_sd.rds")
   expect_equal_to_reference(E_test_quant, "reference-results/E_loo_matrix_quantile_50.rds")
   expect_equal_to_reference(E_test_quant2, "reference-results/E_loo_matrix_quantile_10_90.rds")
 })
