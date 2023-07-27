@@ -21,7 +21,7 @@ E_loo(x, psis_object, ...)
   x,
   psis_object,
   ...,
-  type = c("mean", "variance", "quantile"),
+  type = c("mean", "variance", "sd", "quantile"),
   probs = NULL,
   log_ratios = NULL
 )
