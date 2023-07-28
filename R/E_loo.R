@@ -194,8 +194,10 @@ E_loo.matrix <-
   sum(w * x)
 }
 .wvar <- function(x, w, ...) {
-  # denominator is equal to (1 - 1/ess) where ess = 1/sum(w^2)
-  # see: https://github.com/stan-dev/loo/pull/226#discussion_r1277590986
+  # The denominator (1- sum(w^2)) is equal to (ESS-1)/ESS, where effective
+  # sample size ESS is estimated with the generic target quantity invariant
+  # estimate 1/sum(w^2), see e.g. "Monte Carlo theory, methods and examples"
+  # by Owen (2013).
   (sum(.wmean(x^2, w)) - sum(.wmean(x, w)^2)) / (1 - sum(w^2))
 }
 .wsd <- function(x, w, ...) {
