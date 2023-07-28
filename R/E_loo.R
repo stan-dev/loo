@@ -194,7 +194,9 @@ E_loo.matrix <-
   sum(w * x)
 }
 .wvar <- function(x, w, ...) {
-  (sum(.wmean(x^2, w)) - sum(.wmean(x, w)^2)) / (1 - 1/length(w))
+  # denominator is equal to (1 - 1/ess) where ess = 1/sum(w^2)
+  # see: https://github.com/stan-dev/loo/pull/226#discussion_r1277590986
+  (sum(.wmean(x^2, w)) - sum(.wmean(x, w)^2)) / (1 - sum(w^2))
 }
 .wsd <- function(x, w, ...) {
   sqrt(.wvar(x, w))
