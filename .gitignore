@@ -21,3 +21,4 @@ tests/testthat/Rplots.pdf
 
 cran-comments.md
 CRAN-RELEASE
+release-prep.R
