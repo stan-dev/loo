@@ -20,3 +20,4 @@ vignettes/loo2-non-factorizable_cache/*
 ^vignettes/online-only$
 
 ^CRAN-SUBMISSION$
+^release-prep\.R$
