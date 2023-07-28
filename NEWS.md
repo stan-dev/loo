@@ -1,4 +1,47 @@
-# Items for next release go here
+# loo 2.6.0.9000
+
+### New features
+
+* `E_loo` now allows `type="sd"`. 
+
+
+### Bug fixes
+
+* Fix bug in `E_loo` when `type=variance`. 
+ 
+# loo 2.6.0
+
+### New features 
+
+* New `loo_predictive_metric()` function for computing estimates of leave-one-out
+predictive metrics: mean absolute error, mean squared error and root mean
+squared error for continuous predictions, and accuracy and balanced accuracy for
+binary classification. (#202, @LeeviLindgren)
+
+* New functions `crps()`, `scrps()`, `loo_crps()`, and `loo_scrps()` for
+computing the (scaled) continuously ranked probability score. (#203, @LeeviLindgren)
+
+* New vignette "Mixture IS leave-one-out cross-validation for high-dimensional Bayesian models." This is a demonstration of the mixture estimators proposed by [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). (#210)
+
+### Bug fixes
+
+* Minor fix to model names displayed by `loo_model_weights()` to make them consistent with `loo_compare()`. (#217)
+
+
+# loo 2.5.1
+
+* Fix R CMD check error on M1 Mac
+
+# loo 2.5.0
+
+### Improvements
+
+* New [Frequently Asked Questions page](https://mc-stan.org/loo/articles/online-only/faq.html) on the package website. (#143)
+
+* Speed improvement from simplifying the normalization when fitting the 
+generalized Pareto distribution. (#187, @sethaxen)
+
+* Added parallel likelihood computation to speedup `loo_subsample()` when using posterior approximations. (#171, @kdubovikov)
 
 * Switch unit tests from Travis to GitHub Actions. (#164)
 

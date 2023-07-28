@@ -17,3 +17,7 @@ vignettes/loo2-non-factorizable_cache/*
 ^\.codecov\.yml$
 .github/*
 ^\.github$
+^vignettes/online-only$
+
+^CRAN-SUBMISSION$
+^release-prep\.R$

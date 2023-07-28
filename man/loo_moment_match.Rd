@@ -97,19 +97,19 @@ in addition to those specified for each function.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: A default method that takes as arguments a
+\item \code{loo_moment_match(default)}: A default method that takes as arguments a
 user-specified model object \code{x}, a \code{loo} object and user-specified
 functions \code{post_draws}, \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars},
 and \code{log_lik_i_upars}.
-}}
 
+}}
 \examples{
 # See the vignette for loo_moment_match()
 }
 \references{
-Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
-Implicitly Adaptive Importance Sampling.
-\href{https://arxiv.org/abs/1906.08850}{preprint arXiv:1906.08850}
+Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2021).
+Implicitly adaptive importance sampling. \emph{Statistics and Computing}, 31, 16.
+doi:10.1007/s11222-020-09982-2. arXiv preprint arXiv:1906.08850.
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=loo_moment_match_split]{loo_moment_match_split()}}

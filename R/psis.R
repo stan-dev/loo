@@ -68,6 +68,10 @@
 #' @seealso
 #' * [loo()] for approximate LOO-CV using PSIS.
 #' * [pareto-k-diagnostic] for PSIS diagnostics.
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'   for demonstrations.
+#' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'   the __loo__ website for answers to frequently asked questions.
 #'
 #' @template loo-and-psis-references
 #'
@@ -299,9 +303,9 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #' @return Nothing, just possibly throws warnings.
 #'
 throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
-  if (any(k > too_high)) {
+  if (isTRUE(any(k > too_high))) {
     .warn("Some Pareto k diagnostic values are too high. ", .k_help())
-  } else if (any(k > high)) {
+  } else if (isTRUE(any(k > high))) {
     .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
   }
 }
@@ -360,7 +364,7 @@ prepare_psis_r_eff <- function(r_eff, len) {
   } else if (anyNA(r_eff)) {
     stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
   }
-  return(r_eff)
+  r_eff
 }
 
 #' Check if `psis()` was called from one of the loo methods

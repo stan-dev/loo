@@ -6,7 +6,7 @@
 \title{Efficient LOO-CV and WAIC for Bayesian models}
 \description{
 \if{html}{
-  \figure{stanlogo.png}{options: width="50px" alt="mc-stan.org"}
+  \figure{stanlogo.png}{options: width="50" alt="mc-stan.org"}
 }
 \emph{Stan Development Team}
 
@@ -29,7 +29,7 @@ values. LOO-CV and WAIC have various advantages over simpler estimates of
 predictive error such as AIC and DIC but are less used in practice because
 they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
-Gelman, and Gabry (2017a). From existing posterior simulation draws, we
+Gelman, and Gabry (2017). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
 Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
 and diagnosing importance weights. As a byproduct of our calculations,
@@ -41,7 +41,7 @@ diagnostics and effective sample size and Monte Carlo standard error
 estimates.
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
@@ -60,8 +60,9 @@ Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
 In \emph{International Conference on Machine Learning}
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.

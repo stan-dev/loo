@@ -60,8 +60,9 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
-helper functions for computing \code{r_eff}.}
+\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
+not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
+\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo_subsample()} be saved in the returned object? See \code{\link[=loo]{loo()}} for details.}
@@ -147,11 +148,13 @@ compute the log density for the approximation.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+\item \code{loo_subsample(`function`)}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
 vector containing the log-likelihood for a single observation \code{i} evaluated
 at each posterior draw. The function should be written such that, for each
-observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
-}
+observation \code{i} in \code{1:N}, evaluating
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}\if{html}{\out{</div>}}
 
 results in a vector of length \code{S} (size of posterior sample). The
 log-likelihood function can also have additional arguments but \code{data_i} and
@@ -174,15 +177,16 @@ the log-likelihood function.
 arguments. These arguments are used like the \code{draws} argument in that they
 are recycled for each observation.
 }
-}}
 
+}}
 \references{
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
 In \emph{International Conference on Machine Learning}
 
-Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}

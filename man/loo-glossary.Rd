@@ -4,6 +4,10 @@
 \alias{loo-glossary}
 \title{LOO package glossary}
 \description{
+The pages provides definitions to key terms. Also see the
+\href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
+
 Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 \strong{References}, below.
 }
@@ -129,7 +133,7 @@ and some more difficult to predict for all models).
 }
 
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},

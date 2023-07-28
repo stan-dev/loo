@@ -23,17 +23,7 @@
 
 \item{...}{Currently not used.}
 
-\item{data}{For \code{loo_subsample.function()}, these are the data,
-posterior draws, and other arguments to pass to the log-likelihood
-function. Note that for some \code{loo_approximation}s, the draws will be replaced
-by the posteriors summary statistics to compute loo approximations. See
-argument \code{loo_approximation} for details.}
-
-\item{draws}{For \code{loo_subsample.function()}, these are the data,
-posterior draws, and other arguments to pass to the log-likelihood
-function. Note that for some \code{loo_approximation}s, the draws will be replaced
-by the posteriors summary statistics to compute loo approximations. See
-argument \code{loo_approximation} for details.}
+\item{data, draws}{See \code{\link[=loo_subsample.function]{loo_subsample.function()}}.}
 
 \item{observations}{The subsample observations to use. The argument can take
 four (4) types of arguments:
@@ -55,8 +45,9 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
-helper functions for computing \code{r_eff}.}
+\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
+not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
+\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by

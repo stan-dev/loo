@@ -157,13 +157,13 @@ influence on posterior distribution of the model. These can be obtained with
 obtain the samples from the proposal distribution via MCMC the \strong{loo}
 package also computes estimates for the Monte Carlo error and the effective
 sample size for importance sampling, which are more accurate for PSIS than
-for IS and TIS (see Vehtari et al (2017b) for details). However, the PSIS
+for IS and TIS (see Vehtari et al (2019) for details). However, the PSIS
 effective sample size estimate will be
 \strong{over-optimistic when the estimate of \eqn{k} is greater than 0.7}.
 }
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
@@ -174,5 +174,9 @@ Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
 \seealso{
-\code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.
+\itemize{
+\item \code{\link[=psis]{psis()}} for the implementation of the PSIS algorithm.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
+}
 }

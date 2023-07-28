@@ -1,4 +1,4 @@
-# This file create data to test the loo using approximative posteriors
+# This file create data to test loo using approximate posteriors
 # Three datasets are used:
 # 1. Linear regression with normal (independent) posterior - Laplace, ADVI-mf, ADVI-fr should all pass
 # 2. Linear regression with normal (correlated) posterior - Laplace, ADVI-fr pass, ADVI-mf fail
@@ -188,4 +188,4 @@ test_data_psis_approximate_posterior <-
                                           log_q = advi_fullrank_normal$log_q[2:1001],
                                           log_liks = as.matrix(advi_fullrank_normal[2:1001, log_lik_idx_normal])))
 
-save(test_data_psis_approximate_posterior, file = "tests/testthat/test_data_psis_approximate_posterior.rda")
+save(test_data_psis_approximate_posterior, file = "tests/testthat/data-for-tests/test_data_psis_approximate_posterior.rda")

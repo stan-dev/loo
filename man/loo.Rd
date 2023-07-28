@@ -67,16 +67,17 @@ self-normalizing importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
 will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
-helper functions for computing \code{r_eff}.}
+\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
+not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
+\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
 internally but by default discards the (potentially large) \code{"psis"} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
-will add a \code{psis_object} component to the list returned by \code{loo}. Currently
-this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
-weighted expectations after running \code{loo}.}
+will add a \code{psis_object} component to the list returned by \code{loo}.
+Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
+compute weighted expectations after running \code{loo}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -117,12 +118,12 @@ The \code{loo()} methods return a named list with class
 \code{c("psis_loo", "loo")} and components:
 \describe{
 \item{\code{estimates}}{
-A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
-(\code{elpd_loo}, \code{p_loo}, \code{looic}). This
-contains point estimates and standard errors of the expected log pointwise
-predictive density (\code{elpd_loo}), the effective number of parameters
-(\code{p_loo}) and the LOO information criterion \code{looic} (which is
-just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
+A matrix with two columns (\code{Estimate}, \code{SE}) and three rows (\code{elpd_loo},
+\code{p_loo}, \code{looic}). This contains point estimates and standard errors of the
+expected log pointwise predictive density (\code{\link[=loo-glossary]{elpd_loo}}), the
+effective number of parameters (\code{\link[=loo-glossary]{p_loo}}) and the LOO
+information criterion \code{looic} (which is just \code{-2 * elpd_loo}, i.e.,
+converted to deviance scale).
 }
 
 \item{\code{pointwise}}{
@@ -130,12 +131,12 @@ A matrix with five columns (and number of rows equal to the number of
 observations) containing the pointwise contributions of the measures
 (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}, \code{influence_pareto_k}).
 in addition to the three measures in \code{estimates}, we also report
-pointwise values of the Monte Carlo standard error of \code{elpd_loo}
-(\code{mcse_elpd_loo}), and statistics describing the influence of
+pointwise values of the Monte Carlo standard error of \code{\link[=loo-glossary]{elpd_loo}}
+(\code{\link[=loo-glossary]{mcse_elpd_loo}}), and statistics describing the influence of
 each observation on the posterior distribution (\code{influence_pareto_k}).
 These are the estimates of the shape parameter \eqn{k} of the
 generalized Pareto fit to the importance ratios for each leave-one-out
-distribution. See the \link{pareto-k-diagnostic} page for details.
+distribution (see the \link{pareto-k-diagnostic} page for details).
 }
 
 \item{\code{diagnostics}}{
@@ -182,19 +183,21 @@ method is more memory efficient and may be preferable.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+\item \code{loo(array)}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+\item \code{loo(matrix)}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+\item \code{loo(`function`)}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
 vector containing the log-likelihood for a single observation \code{i} evaluated
 at each posterior draw. The function should be written such that, for each
-observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
-}
+observation \code{i} in \code{1:N}, evaluating
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}\if{html}{\out{</div>}}
 
 results in a vector of length \code{S} (size of posterior sample). The
 log-likelihood function can also have additional arguments but \code{data_i} and
@@ -217,8 +220,8 @@ the log-likelihood function.
 arguments. These arguments are used like the \code{draws} argument in that they
 are recycled for each observation.
 }
-}}
 
+}}
 \section{Defining \code{loo()} methods in a package}{
  Package developers can define
 \code{loo()} methods for fitted models objects. See the example \code{loo.stanfit()}
@@ -312,7 +315,7 @@ loo.stanfit <-
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
@@ -326,6 +329,8 @@ Pareto smoothed importance sampling.
 \itemize{
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
 for demonstrations.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
 \item \code{\link[=psis]{psis()}} for the underlying Pareto Smoothed Importance Sampling (PSIS)
 procedure used in the LOO-CV approximation.
 \item \link{pareto-k-diagnostic} for convenience functions for looking at diagnostics.

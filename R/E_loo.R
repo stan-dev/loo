@@ -18,7 +18,7 @@
 #'   specified we are able to compute [Pareto k][pareto-k-diagnostic]
 #'   diagnostics specific to `E_loo()`.
 #' @param type The type of expectation to compute. The options are
-#'   `"mean"`, `"variance"`, and `"quantile"`.
+#'   `"mean"`, `"variance"`, `"sd"`, and `"quantile"`.
 #' @param probs For computing quantiles, a vector of probabilities.
 #' @param ... Arguments passed to individual methods.
 #'
@@ -75,6 +75,7 @@
 #'
 #' E_loo(yrep, psis_object, type = "mean")
 #' E_loo(yrep, psis_object, type = "var")
+#' E_loo(yrep, psis_object, type = "sd")
 #' E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 #' E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 #'
@@ -94,7 +95,7 @@ E_loo.default <-
   function(x,
            psis_object,
            ...,
-           type = c("mean", "variance", "quantile"),
+           type = c("mean", "variance", "sd", "quantile"),
            probs = NULL,
            log_ratios = NULL) {
     stopifnot(
@@ -105,14 +106,9 @@ E_loo.default <-
     )
     type <- match.arg(type)
     E_fun <- .E_fun(type)
-    r_eff <- NULL
-    if (type == "variance") {
-      r_eff <- relative_eff(psis_object)
-    }
-
     w <- as.vector(weights(psis_object, log = FALSE))
     x <- as.vector(x)
-    out <- E_fun(x, w, probs, r_eff)
+    out <- E_fun(x, w, probs)
 
     if (is.null(log_ratios)) {
       warning("'log_ratios' not specified. Can't compute k-hat diagnostic.",
@@ -130,7 +126,7 @@ E_loo.matrix <-
   function(x,
            psis_object,
            ...,
-           type = c("mean", "variance", "quantile"),
+           type = c("mean", "variance", "sd", "quantile"),
            probs = NULL,
            log_ratios = NULL) {
     stopifnot(
@@ -142,10 +138,7 @@ E_loo.matrix <-
     type <- match.arg(type)
     E_fun <- .E_fun(type)
     fun_val <- numeric(1)
-    r_eff <- NULL
-    if (type == "variance") {
-      r_eff <- relative_eff(psis_object)
-    } else if (type == "quantile") {
+    if (type == "quantile") {
       stopifnot(
         is.numeric(probs),
         length(probs) >= 1,
@@ -156,7 +149,7 @@ E_loo.matrix <-
     w <- weights(psis_object, log = FALSE)
 
     out <- vapply(seq_len(ncol(x)), function(i) {
-      E_fun(x[, i], w[, i], probs = probs, r_eff = r_eff[i])
+      E_fun(x[, i], w[, i], probs = probs)
     }, FUN.VALUE = fun_val)
 
     if (is.null(log_ratios)) {
@@ -178,11 +171,12 @@ E_loo.matrix <-
 #' @return The function for computing the weighted expectation specified by
 #'   `type`.
 #'
-.E_fun <- function(type = c("mean", "variance", "quantile")) {
+.E_fun <- function(type = c("mean", "variance", "sd", "quantile")) {
   switch(
     type,
     "mean" = .wmean,
     "variance" = .wvar,
+    "sd" = .wsd,
     "quantile" = .wquant
   )
 }
@@ -199,12 +193,15 @@ E_loo.matrix <-
 .wmean <- function(x, w, ...) {
   sum(w * x)
 }
-.wvar <- function(x, w, r_eff = NULL, ...) {
-  if (is.null(r_eff)) {
-    r_eff <- 1
-  }
-  r <- (x - .wmean(x, w))^2
-  sum(w^2 * r) / r_eff
+.wvar <- function(x, w, ...) {
+  # The denominator (1- sum(w^2)) is equal to (ESS-1)/ESS, where effective
+  # sample size ESS is estimated with the generic target quantity invariant
+  # estimate 1/sum(w^2), see e.g. "Monte Carlo theory, methods and examples"
+  # by Owen (2013).
+  (sum(.wmean(x^2, w)) - sum(.wmean(x, w)^2)) / (1 - sum(w^2))
+}
+.wsd <- function(x, w, ...) {
+  sqrt(.wvar(x, w))
 }
 .wquant <- function(x, w, probs, ...) {
   if (all(w == w[1])) {
@@ -276,5 +273,5 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
     cutoff <- log_a[min(tail_ids) - 1]
 
     smoothed <- psis_smooth_tail(tail_sample, cutoff)
-    return(smoothed$k)
+    smoothed$k
   }
