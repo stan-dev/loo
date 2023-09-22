@@ -42,10 +42,19 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
+#'   If more than \eqn{11} models are compared, then the worst model by elpd is
+#'   taken as the baseline model, and the risk of difference in predictive
+#'   performance being due to random noise is estimated as described by
+#'   McLatchie and Vehtari (2023). This will flag a warning if it is deemed that
+#'   there is a risk of over-fitting due to the selection process, and users
+#'   are recommended to either avoid model selection based on LOO-CV, and
+#'   instead to favour of model averaging/stacking or projection predictive
+#'   inference.
+#'
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
-#' @template loo-and-psis-references
+#' @template loo-and-compare-references
 #'
 #' @examples
 #' # very artificial example, just for demonstration!
@@ -107,6 +116,9 @@ loo_compare.default <- function(x, ...) {
   se_diff <- apply(diffs, 2, se_elpd_diff)
   comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
   rownames(comp) <- rnms
+
+  # run order statistics-based checks on models
+  loo_order_stat_check(loos, ord)
 
   class(comp) <- c("compare.loo", class(comp))
   return(comp)
@@ -269,4 +281,56 @@ loo_compare_order <- function(loos){
   rnms <- rownames(tmp)
   ord <- order(tmp[grep("^elpd", rnms), ], decreasing = TRUE)
   ord
+}
+
+#' Perform checks on `"loo"` objects __after__ comparison
+#' @noRd
+#' @keywords internal
+#' @param loos List of `"loo"` objects.
+#' @param ord List of `"loo"` object orderings.
+#' @return Nothing, just possibly throws errors/warnings.
+loo_order_stat_check <- function(loos, ord) {
+
+  ## breaks
+
+  if (length(loos) <= 11L) {
+    # procedure cannot be diagnosed for fewer than ten candidate models
+    # (total models = worst model + ten candidates)
+    # break from function
+    return(NULL)
+  }
+
+  ## warnings
+
+  # compute the elpd differences
+  worst_idx <- tail(ord, n=1)
+  diffs <- mapply(FUN = elpd_diffs, loos[ord[worst_idx]], loos[ord])
+  elpd_diff <- apply(diffs, 2, sum)
+
+  # estimate the standard deviation of the upper-half-normal
+  diff_median <- median(elpd_diff)
+  elpd_diff_trunc <- elpd_diff[elpd_diff >= diff_median]
+  n_models <- sum(!is.na(elpd_diff_trunc))
+  candidate_sd <- sqrt(1 / n_models * sum(elpd_diff_trunc^2, na.rm = TRUE))
+
+  # estimate expected best diff under null hypothesis
+  K <- length(loos) - 1
+  order_stat <- order_stat_heuristic(K, candidate_sd)
+
+  if (max(elpd_diff) <= order_stat) {
+    # flag warning if we suspect no model is theoretically better than the baseline
+    warning("Difference in performance potentially due to random noise.",
+            call. = FALSE)
+  }
+}
+
+#' Computes maximum order statistic from K Gaussians
+#' @noRd
+#' @keywords internal
+#' @param K Number of Gaussians.
+#' @param c Scaling of the order statistic.
+#' @return Numeric expected maximum from K samples from a Gaussian with mean
+#' zero and scale `"c"`
+order_stat_heuristic <- function(K, c) {
+  qnorm(p = 1 - 1 / (K * 2), mean = 0, sd = c)
 }
