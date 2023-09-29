@@ -69,7 +69,7 @@ asymptotically, and which only applies to nested models in any case.
 
 If more than \eqn{11} models are compared, then the worst model by elpd is
 taken as the baseline model, and the risk of the difference in predictive
-performance being due to random noise is estimated as described by
+performance being due to chance is estimated as described by
 McLatchie and Vehtari (2023). This will flag a warning if it is deemed that
 there is a risk of over-fitting due to the selection process, and users
 are recommended to avoid model selection based on LOO-CV, and

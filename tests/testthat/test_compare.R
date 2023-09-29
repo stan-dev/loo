@@ -43,7 +43,7 @@ test_that("loo_compare throws appropriate warnings", {
   set.seed(123)
   w_list <- lapply(1:25, function(x) SW(waic(LLarr + rnorm(1, 0, 0.1))))
   expect_warning(loo_compare(w_list),
-                 "Difference in performance potentially due to random noise")
+                 "Difference in performance potentially due to chance")
 
   w_list_short <- lapply(1:4, function(x) SW(waic(LLarr + rnorm(1, 0, 0.1))))
   expect_no_warning(loo_compare(w_list_short))
