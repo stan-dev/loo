@@ -42,9 +42,10 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#'   If more than \eqn{11} models are compared, then the worst model by elpd is
-#'   taken as the baseline model, and the risk of the difference in predictive
-#'   performance being due to chance is estimated as described by
+#'   If more than \eqn{11} models are compared, then the median model by elpd is
+#'   taken as the baseline model, and we recompute (internally) the model
+#'   differences to this baseline. We then estimate whether the difference in
+#'   predictive performances is potentially due to chance as described by
 #'   McLatchie and Vehtari (2023). This will flag a warning if it is deemed that
 #'   there is a risk of over-fitting due to the selection process, and users
 #'   are recommended to avoid model selection based on LOO-CV, and
@@ -302,13 +303,13 @@ loo_order_stat_check <- function(loos, ord) {
 
   ## warnings
 
-  # compute the elpd differences
-  worst_idx <- tail(ord, n=1)
-  diffs <- mapply(FUN = elpd_diffs, loos[ord[worst_idx]], loos[ord])
+  # compute the elpd differences from the median model
+  baseline_idx <- middle_idx(ord)
+  diffs <- mapply(FUN = elpd_diffs, loos[ord[baseline_idx]], loos[ord])
   elpd_diff <- apply(diffs, 2, sum)
 
   # estimate the standard deviation of the upper-half-normal
-  diff_median <- median(elpd_diff)
+  diff_median <- stats::median(elpd_diff)
   elpd_diff_trunc <- elpd_diff[elpd_diff >= diff_median]
   n_models <- sum(!is.na(elpd_diff_trunc))
   candidate_sd <- sqrt(1 / n_models * sum(elpd_diff_trunc^2, na.rm = TRUE))
@@ -320,9 +321,17 @@ loo_order_stat_check <- function(loos, ord) {
   if (max(elpd_diff) <= order_stat) {
     # flag warning if we suspect no model is theoretically better than the baseline
     warning("Difference in performance potentially due to chance.",
+            "See McLatchie and Vehtari (2023) for details.",
             call. = FALSE)
   }
 }
+
+#' Returns the middle index of a vector
+#' @noRd
+#' @keywords internal
+#' @param vec A vector.
+#' @return Integer index value.
+middle_idx <- function(vec) floor(length(vec) / 2)
 
 #' Computes maximum order statistic from K Gaussians
 #' @noRd
