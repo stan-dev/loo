@@ -39,11 +39,14 @@ set.seed(24877)
 This is the Stan code for a logistic regression model with regularized horseshoe prior. The code includes an if statement to include a code line needed later for the MixIS approach.
 
 ```{r stancode_horseshoe}
+# Note: some syntax used in this program requires RStan >= 2.26 (or CmdStanR)
+# To use an older version of RStan change the line declaring `y` to:
+#    int<lower=0,upper=1> y[N];
 stancode_horseshoe <- "
 data {
   int <lower=0> n;                
   int <lower=0> p;                
-  int <lower=0, upper=1> y[n];    
+  array[N] int <lower=0, upper=1> y;    
   matrix [n,p] X;                
   real <lower=0> scale_global;
   int <lower=0,upper=1> mixis;                
