@@ -569,7 +569,7 @@ is strong. In fact, summing over the pointwise ELPD values and leaving out the
 fourth observation yields practically equivalent results for approximate and
 exact LOO-CV:
 
-````{r pt4}
+```{r pt4}
 without_pt_4 <- c(
   approx = sum(psis_loo$pointwise[-4, "elpd_loo"]),
   exact = sum(exact_elpds[-4])  
