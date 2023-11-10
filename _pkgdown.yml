@@ -101,6 +101,7 @@ reference:
       - ap_psis
       - tis
       - sis
+      - importance_sampling
       - weights.importance_sampling
       - pareto-k-diagnostic
   - title: "Model comparison weighting/averaging"
