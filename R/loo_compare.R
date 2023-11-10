@@ -42,16 +42,14 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#'   If more than \eqn{11} models are compared, then the median model by elpd is
-#'   taken as the baseline model, and we recompute (internally) the model
-#'   differences to this baseline. We then estimate whether the difference in
-#'   predictive performances is potentially due to chance as described by
-#'   McLatchie and Vehtari (2023). This will flag a warning if it is deemed that
-#'   there is a risk of over-fitting due to the selection process, and users
-#'   are recommended to avoid model selection based on LOO-CV, and
-#'   instead to favour of model averaging/stacking or projection predictive
-#'   inference.
-#'
+#'   If more than \eqn{11} models are compared, we internally recompute the model
+#'   differences using the median model by ELPD as the baseline model. We then
+#'   estimate whether the differences in predictive performance are potentially
+#'   due to chance as described by McLatchie and Vehtari (2023). This will flag
+#'   a warning if it is deemed that there is a risk of over-fitting due to the
+#'   selection process. In that case users are recommended to avoid model
+#'   selection based on LOO-CV, and instead to favor model averaging/stacking or
+#'   projection predictive inference.
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
