@@ -22,4 +22,4 @@ tests/testthat/Rplots.pdf
 
 cran-comments.md
 CRAN-RELEASE
-.DS_Store
+release-prep.R

@@ -1,3 +1,14 @@
+# loo 2.6.0.9000
+
+### New features
+
+* `E_loo` now allows `type="sd"`. 
+
+
+### Bug fixes
+
+* Fix bug in `E_loo` when `type=variance`. 
+ 
 # loo 2.6.0
 
 ### New features 

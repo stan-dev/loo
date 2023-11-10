@@ -12,7 +12,7 @@ E_loo(x, psis_object, ...)
   x,
   psis_object,
   ...,
-  type = c("mean", "variance", "quantile"),
+  type = c("mean", "variance", "sd", "quantile"),
   probs = NULL,
   log_ratios = NULL
 )
@@ -21,7 +21,7 @@ E_loo(x, psis_object, ...)
   x,
   psis_object,
   ...,
-  type = c("mean", "variance", "quantile"),
+  type = c("mean", "variance", "sd", "quantile"),
   probs = NULL,
   log_ratios = NULL
 )
@@ -34,7 +34,7 @@ E_loo(x, psis_object, ...)
 \item{...}{Arguments passed to individual methods.}
 
 \item{type}{The type of expectation to compute. The options are
-\code{"mean"}, \code{"variance"}, and \code{"quantile"}.}
+\code{"mean"}, \code{"variance"}, \code{"sd"}, and \code{"quantile"}.}
 
 \item{probs}{For computing quantiles, a vector of probabilities.}
 
@@ -106,6 +106,7 @@ psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
 
 E_loo(yrep, psis_object, type = "mean")
 E_loo(yrep, psis_object, type = "var")
+E_loo(yrep, psis_object, type = "sd")
 E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 

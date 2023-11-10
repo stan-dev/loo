@@ -67,12 +67,14 @@ Here is the Stan code for fitting the logistic regression model, which
 we save in a file called `logistic.stan`:
 
 ```
-// save in `logistic.stan`
+// Note: some syntax used in this program requires RStan >= 2.26 (or CmdStanR)
+// To use an older version of RStan change the line declaring `y` to:
+//    int<lower=0,upper=1> y[N];
 data {
   int<lower=0> N;             // number of data points
   int<lower=0> P;             // number of predictors (including intercept)
   matrix[N,P] X;              // predictors (including 1s for intercept)
-  int<lower=0,upper=1> y[N];  // binary outcome
+  array[N] int<lower=0,upper=1> y;  // binary outcome
 }
 parameters {
   vector[P] beta;

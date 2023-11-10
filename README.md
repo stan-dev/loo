@@ -69,3 +69,8 @@ online at [mc-stan.org/loo/articles/](https://mc-stan.org/loo/articles/).
 
 Corresponding Python and Matlab/Octave code can be found at the
 [avehtari/PSIS](https://github.com/avehtari/PSIS) repository.
+
+
+### License
+
+The code is distributed under the GPL 3 license. The documentation is distributed under the CC BY 4.0 license.
