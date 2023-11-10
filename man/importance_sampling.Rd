@@ -2,9 +2,30 @@
 % Please edit documentation in R/importance_sampling.R
 \name{importance_sampling}
 \alias{importance_sampling}
+\alias{importance_sampling.array}
+\alias{importance_sampling.matrix}
+\alias{importance_sampling.default}
 \title{A parent class for different importance sampling methods.}
 \usage{
 importance_sampling(log_ratios, method, ...)
+
+\method{importance_sampling}{array}(
+  log_ratios,
+  method,
+  ...,
+  r_eff = NULL,
+  cores = getOption("mc.cores", 1)
+)
+
+\method{importance_sampling}{matrix}(
+  log_ratios,
+  method,
+  ...,
+  r_eff = NULL,
+  cores = getOption("mc.cores", 1)
+)
+
+\method{importance_sampling}{default}(log_ratios, method, ..., r_eff = NULL)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
@@ -22,8 +43,33 @@ are implemented:
 }}
 
 \item{...}{Arguments passed on to the various methods.}
+
+\item{r_eff}{Vector of relative effective sample size estimates containing
+one element per observation. The values provided should be the relative
+effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
+This is related to the relative efficiency of estimating the normalizing
+term in self-normalizing importance sampling. If \code{r_eff} is not
+provided then the reported PSIS effective sample sizes and Monte Carlo
+error estimates will be over-optimistic. See the \code{\link[=relative_eff]{relative_eff()}}
+helper function for computing \code{r_eff}. If using \code{psis} with
+draws of the \code{log_ratios} not obtained from MCMC then the warning
+message thrown when not specifying \code{r_eff} can be disabled by
+setting \code{r_eff} to \code{NA}.}
+
+\item{cores}{The number of cores to use for parallelization. This defaults to
+the option \code{mc.cores} which can be set for an entire R session by
+\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
+deprecated but will be given precedence over \code{mc.cores} until
+\code{loo.cores} is removed in a future release. \strong{As of version
+2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
+recommend using as many (or close to as many) cores as possible.
+\itemize{
+\item Note for Windows 10 users: it is \strong{strongly}
+\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
+the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
+setting \code{mc.cores} interactively or in a script is fine).
+}}
 }
 \description{
 A parent class for different importance sampling methods.
 }
-\keyword{internal}

@@ -1,5 +1,5 @@
 #' A parent class for different importance sampling methods.
-#' @keywords internal
+#'
 #' @inheritParams psis
 #' @param method The importance sampling method to use. The following methods
 #'   are implemented:
@@ -8,27 +8,13 @@
 #'   `sqrt(S)`, where `S` is the number of posterior draws.
 #' * [`"sis"`][sis]: Standard Importance Sampling (SIS).
 #'
-importance_sampling <- function(log_ratios, method, ...) UseMethod("importance_sampling")
-
-#' @noRd
-#' @keywords internal
-#' @description
-#' Currently implemented importance sampling methods
-assert_importance_sampling_method_is_implemented <- function(x){
-  if (!x %in% implemented_is_methods()) {
-    stop("Importance sampling method '",
-         x,
-         "' is not implemented. Implemented methods: '",
-         paste0(implemented_is_methods, collapse = "', '"),
-         "'")
-  }
+importance_sampling <- function(log_ratios, method, ...) {
+  UseMethod("importance_sampling")
 }
-implemented_is_methods <- function() c("psis", "tis", "sis")
 
-#' Importance sampling of array
+
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.array <-
   function(log_ratios, method,
@@ -44,10 +30,8 @@ importance_sampling.array <-
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' Importance sampling of matrices
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.matrix <-
   function(log_ratios, method,
@@ -61,10 +45,8 @@ importance_sampling.matrix <-
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' Importance sampling (default)
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.default <-
   function(log_ratios, method, ..., r_eff = NULL) {
@@ -121,6 +103,23 @@ weights.importance_sampling <-
   }
 
 # internal ----------------------------------------------------------------
+
+#' Validate selected importance sampling method
+#' @noRd
+#' @keywords internal
+#' @description
+#' Currently implemented importance sampling methods
+assert_importance_sampling_method_is_implemented <- function(x){
+  if (!x %in% implemented_is_methods()) {
+    stop("Importance sampling method '",
+         x,
+         "' is not implemented. Implemented methods: '",
+         paste0(implemented_is_methods, collapse = "', '"),
+         "'")
+  }
+}
+implemented_is_methods <- function() c("psis", "tis", "sis")
+
 
 #' Structure the object returned by the importance_sampling methods
 #'
