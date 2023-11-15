@@ -66,6 +66,16 @@ better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
+
+If more than \eqn{11} models are compared, then the median model by elpd is
+taken as the baseline model, and we recompute (internally) the model
+differences to this baseline. We then estimate whether the difference in
+predictive performances is potentially due to chance as described by
+McLatchie and Vehtari (2023). This will flag a warning if it is deemed that
+there is a risk of over-fitting due to the selection process, and users
+are recommended to avoid model selection based on LOO-CV, and
+instead to favour of model averaging/stacking or projection predictive
+inference.
 }
 \examples{
 # very artificial example, just for demonstration!
@@ -101,6 +111,10 @@ evaluation using leave-one-out cross-validation and WAIC.
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+
+McLatchie, Y., and Vehtari, A. (2023).
+Efficient estimation and correction of selection-induced bias with order statistics.
+\href{https://arxiv.org/abs/2309.03742}{preprint arXiv:2309.03742}
 }
 \seealso{
 \itemize{

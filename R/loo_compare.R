@@ -42,10 +42,18 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
+#'   If more than \eqn{11} models are compared, we internally recompute the model
+#'   differences using the median model by ELPD as the baseline model. We then
+#'   estimate whether the differences in predictive performance are potentially
+#'   due to chance as described by McLatchie and Vehtari (2023). This will flag
+#'   a warning if it is deemed that there is a risk of over-fitting due to the
+#'   selection process. In that case users are recommended to avoid model
+#'   selection based on LOO-CV, and instead to favor model averaging/stacking or
+#'   projection predictive inference.
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
-#' @template loo-and-psis-references
+#' @template loo-and-compare-references
 #'
 #' @examples
 #' # very artificial example, just for demonstration!
@@ -107,6 +115,9 @@ loo_compare.default <- function(x, ...) {
   se_diff <- apply(diffs, 2, se_elpd_diff)
   comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
   rownames(comp) <- rnms
+
+  # run order statistics-based checks on models
+  loo_order_stat_check(loos, ord)
 
   class(comp) <- c("compare.loo", class(comp))
   return(comp)
@@ -269,4 +280,64 @@ loo_compare_order <- function(loos){
   rnms <- rownames(tmp)
   ord <- order(tmp[grep("^elpd", rnms), ], decreasing = TRUE)
   ord
+}
+
+#' Perform checks on `"loo"` objects __after__ comparison
+#' @noRd
+#' @keywords internal
+#' @param loos List of `"loo"` objects.
+#' @param ord List of `"loo"` object orderings.
+#' @return Nothing, just possibly throws errors/warnings.
+loo_order_stat_check <- function(loos, ord) {
+
+  ## breaks
+
+  if (length(loos) <= 11L) {
+    # procedure cannot be diagnosed for fewer than ten candidate models
+    # (total models = worst model + ten candidates)
+    # break from function
+    return(NULL)
+  }
+
+  ## warnings
+
+  # compute the elpd differences from the median model
+  baseline_idx <- middle_idx(ord)
+  diffs <- mapply(FUN = elpd_diffs, loos[ord[baseline_idx]], loos[ord])
+  elpd_diff <- apply(diffs, 2, sum)
+
+  # estimate the standard deviation of the upper-half-normal
+  diff_median <- stats::median(elpd_diff)
+  elpd_diff_trunc <- elpd_diff[elpd_diff >= diff_median]
+  n_models <- sum(!is.na(elpd_diff_trunc))
+  candidate_sd <- sqrt(1 / n_models * sum(elpd_diff_trunc^2, na.rm = TRUE))
+
+  # estimate expected best diff under null hypothesis
+  K <- length(loos) - 1
+  order_stat <- order_stat_heuristic(K, candidate_sd)
+
+  if (max(elpd_diff) <= order_stat) {
+    # flag warning if we suspect no model is theoretically better than the baseline
+    warning("Difference in performance potentially due to chance.",
+            "See McLatchie and Vehtari (2023) for details.",
+            call. = FALSE)
+  }
+}
+
+#' Returns the middle index of a vector
+#' @noRd
+#' @keywords internal
+#' @param vec A vector.
+#' @return Integer index value.
+middle_idx <- function(vec) floor(length(vec) / 2)
+
+#' Computes maximum order statistic from K Gaussians
+#' @noRd
+#' @keywords internal
+#' @param K Number of Gaussians.
+#' @param c Scaling of the order statistic.
+#' @return Numeric expected maximum from K samples from a Gaussian with mean
+#' zero and scale `"c"`
+order_stat_heuristic <- function(K, c) {
+  qnorm(p = 1 - 1 / (K * 2), mean = 0, sd = c)
 }
