@@ -65,7 +65,7 @@ elpd_object <- function(pointwise, dims) {
     class = c("elpd_generic", "loo")
   )
 }
-
+#' @export
 print_dims.elpd_generic <- function(x, ...) {
   cat(
     "Computed from",

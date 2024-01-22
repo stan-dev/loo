@@ -884,11 +884,11 @@ psis_loo_ss_object <- function(x,
 as.psis_loo_ss <- function(x) {
   UseMethod("as.psis_loo_ss")
 }
-
+#' @export
 as.psis_loo_ss.psis_loo_ss <- function(x) {
   x
 }
-
+#' @export
 as.psis_loo_ss.psis_loo <- function(x) {
   class(x) <- c("psis_loo_ss", class(x))
   x$estimates <- cbind(x$estimates, matrix(0, nrow = nrow(x$estimates)))
@@ -913,10 +913,11 @@ as.psis_loo <- function(x) {
   UseMethod("as.psis_loo")
 }
 
+#' @export
 as.psis_loo.psis_loo <- function(x) {
   x
 }
-
+#' @export
 as.psis_loo.psis_loo_ss <- function(x) {
   if (x$loo_subsampling$data_dim[1] == nrow(x$pointwise)) {
     x$estimates <- x$estimates[, 1:2]
