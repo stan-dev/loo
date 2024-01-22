@@ -240,11 +240,11 @@ E_loo.matrix <-
 E_loo_khat <- function(x, psis_object, log_ratios, ...) {
   UseMethod("E_loo_khat")
 }
-
+#' @export
 E_loo_khat.default <- function(x, psis_object, log_ratios, ...) {
   .E_loo_khat_i(x, log_ratios, attr(psis_object, "tail_len"))
 }
-
+#' @export
 E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   tail_lengths <- attr(psis_object, "tail_len")
   sapply(seq_len(ncol(x)), function(i) {

@@ -170,6 +170,8 @@ relative_eff.importance_sampling <- function(x, ...) {
 psis_n_eff <- function(w, ...) {
   UseMethod("psis_n_eff")
 }
+
+#' @export
 psis_n_eff.default <- function(w, r_eff = NULL, ...) {
   ss <- sum(w^2)
   if (is.null(r_eff)) {
@@ -179,6 +181,8 @@ psis_n_eff.default <- function(w, r_eff = NULL, ...) {
   stopifnot(length(r_eff) == 1)
   1 / ss * r_eff
 }
+
+#' @export
 psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
   ss <- colSums(w^2)
   if (is.null(r_eff)) {

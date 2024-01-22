@@ -140,11 +140,13 @@ are recycled for each observation.
 \references{
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In \emph{International Conference on Machine Learning}
+In \emph{Thirty-sixth International Conference on Machine Learning},
+PMLR 97:4244-4253.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
-In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
+In \emph{Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}

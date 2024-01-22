@@ -58,11 +58,13 @@ stacking to average Bayesian predictive distributions.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In \emph{International Conference on Machine Learning}
+In \emph{Thirty-sixth International Conference on Machine Learning},
+PMLR 97:4244-4253.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
-In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
+In \emph{Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
@@ -104,4 +106,35 @@ widely application information criterion in singular learning theory.
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://mc-stan.org/loo/}
+  \item \url{https://discourse.mc-stan.org}
+  \item Report bugs at \url{https://github.com/stan-dev/loo/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jonah Gabry \email{jsg2201@columbia.edu}
+
+Authors:
+\itemize{
+  \item Aki Vehtari \email{Aki.Vehtari@aalto.fi}
+  \item Mans Magnusson
+  \item Yuling Yao
+  \item Paul-Christian Bürkner
+  \item Topi Paananen
+  \item Andrew Gelman
+}
+
+Other contributors:
+\itemize{
+  \item Ben Goodrich [contributor]
+  \item Juho Piironen [contributor]
+  \item Bruno Nicenboim [contributor]
+  \item Leevi Lindgren [contributor]
+}
+
 }

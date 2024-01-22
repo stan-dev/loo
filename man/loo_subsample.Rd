@@ -3,7 +3,9 @@
 \name{loo_subsample}
 \alias{loo_subsample}
 \alias{loo_subsample.function}
-\title{Efficient approximate leave-one-out cross-validation (LOO) using subsampling}
+\title{Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
+so that less costly and more approximate computation is made for all LOO-fold,
+and more costly and accurate computations are made only for m<N LOO-folds.}
 \usage{
 loo_subsample(x, ...)
 
@@ -115,9 +117,11 @@ to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 The default is \code{"diff_srs"}.
 \itemize{
 \item \code{"diff_srs"}: uses the difference estimator with simple random sampling
-(srs). \code{p_loo} is estimated using standard srs.
-\item \code{"hh"}: uses the Hansen-Hurwitz estimator with sampling proportional to
-size, where \code{abs} of loo_approximation is used as size.
+without replacement (srs). \code{p_loo} is estimated using standard srs.
+(Magnusson et al., 2020)
+\item \code{"hh"}: uses the Hansen-Hurwitz estimator with sampling with replacement
+proportional to size, where \code{abs} of loo_approximation is used as size.
+(Magnusson et al., 2019)
 \item \code{"srs"}: uses simple random sampling and ordinary estimation.
 }}
 
@@ -125,7 +129,7 @@ size, where \code{abs} of loo_approximation is used as size.
 is only used when \code{loo_approximation} is \code{"waic_grad"},
 \code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{The hessian of the log-likelihood. This is only used
+\item{llhess}{The Hessian of the log-likelihood. This is only used
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
@@ -138,7 +142,9 @@ for the individual draws.
 }
 }
 \description{
-Efficient approximate leave-one-out cross-validation (LOO) using subsampling
+Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
+so that less costly and more approximate computation is made for all LOO-fold,
+and more costly and accurate computations are made only for m<N LOO-folds.
 }
 \details{
 The \code{loo_subsample()} function is an S3 generic and a methods is
@@ -182,11 +188,13 @@ are recycled for each observation.
 \references{
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In \emph{International Conference on Machine Learning}
+In \emph{Thirty-sixth International Conference on Machine Learning},
+PMLR 97:4244-4253.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
-In \emph{International Conference on Artificial Intelligence and Statistics (AISTATS)}
+In \emph{Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}
