@@ -125,9 +125,8 @@ pareto_k_table <- function(x) {
 #' @export
 print.pareto_k_table <- function(x, digits = 1, ...) {
   count <- x[, "Count"]
-
   if (sum(count[2:3]) == 0) {
-    cat(paste0("\nAll Pareto k estimates are good (k < ", threshold, ").\n"))
+    cat(paste0("\nAll Pareto k estimates are good (k < ", x[1, "Threshold"], ").\n"))
   } else {
     tab <- cbind(
       " " = rep("", 3),
