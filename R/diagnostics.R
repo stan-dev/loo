@@ -27,7 +27,10 @@
 #'
 #' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not reliable,
-#'   but increasing (effective) sample size \eqn{S} above 2200 may help.
+#'   but increasing (effective) sample size \eqn{S} above 2200 may help
+#'   (this will increase the sample size specific threshold
+#'    \eqn{(1-1/log10(2200)>0.7} and then the bias specific threshold
+#'    0.7 dominates).
 #'
 #' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
