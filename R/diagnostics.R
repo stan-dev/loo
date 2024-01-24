@@ -22,18 +22,18 @@
 #' generalized Pareto distribution:
 #'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-#'   sample size PSIS estimate and the corresponding Monte Carlo
+#'   sample size, PSIS estimate and the corresponding Monte Carlo
 #'   standard error estimate are reliable.
 #'
-#' * If \eqn{1 - 1 / log10(S) <= k < 0.7} PSIS estimate and the
+#' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not reliable,
 #'   but increasing (effective) sample size \eqn{S} above 2200 may help.
 #'
-#' * If \eqn{0.7 <= k < 1} PSIS estimate and the corresponding Monte
+#' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
 #'   sample size may reduce the uncertainty in \eqn{k} estimate.
 #'
-#' * If \eqn{k \geq 1}{k >= 1} The target distribution is estimated to
+#' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
 #'   have non-finite mean. PSIS estimate and the corresponding Monte
 #'   Carlo standard error are not well defined. Increasing sample size
 #'   may reduce the uncertainty in \eqn{k} estimate.
@@ -45,7 +45,7 @@
 #'   nominal sample size (e.g. if MCMC-ESS > S/4).
 #' 
 #' \subsection{What if the estimated tail shape parameter \eqn{k}
-#' exceeds diagnostic threshold}{ Importance sampling is likely to
+#' exceeds the diagnostic threshold?}{ Importance sampling is likely to
 #' work less well if the marginal posterior \eqn{p(\theta^s | y)} and
 #' LOO posterior \eqn{p(\theta^s | y_{-i})} are very different, which
 #' is more likely to happen with a non-robust model and highly
@@ -234,7 +234,7 @@ mcse_loo <- function(x, threshold = NULL) {
 #' @export
 #' @param label_points,... For the `plot()` method, if `label_points` is
 #'   `TRUE` the observation numbers corresponding to any values of \eqn{k}
-#'   greater than the diagnostic threhold will be displayed in the plot.
+#'   greater than the diagnostic threshold will be displayed in the plot.
 #'   Any arguments specified in `...` will be passed to [graphics::text()]
 #'   and can be used to control the appearance of the labels.
 #' @param diagnostic For the `plot` method, which diagnostic should be

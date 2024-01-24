@@ -72,7 +72,7 @@
 #' importance sampling and guarantees finite variance estimate with a
 #' cost of some bias.
 #'
-#' The diagnostic threshold for Pareto k depends on sample size
+#' The diagnostic threshold for Pareto \eqn{k} depends on sample size
 #' \eqn{S}. For simplicity the nominal sample size \eqn{S} is used
 #' when computing the sample size specific threshold. This is likely
 #' to provide optimistic threshold, but for many purposes this is fine
@@ -83,15 +83,15 @@
 #'   sample size PSIS estimate and the corresponding Monte
 #'   Carlo standard error estimate are reliable.
 #'
-#' * If \eqn{1 - 1 / log10(S) <= k < 0.7} PSIS estimate and the
+#' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not reliable,
 #'   but increasing (effective) sample size \eqn{S} above 2200 may help.
 #'
-#' * If \eqn{0.7 <= k < 1} PSIS estimate and the corresponding Monte
+#' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
 #'   sample size may reduce the uncertainty in \eqn{k} estimate.
 #'
-#' * If \eqn{k \geq 1}{k >= 1} The target distribution is estimated to
+#' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
 #'   have non-finite mean. PSIS estimate and the corresponding Monte
 #'   Carlo standard error are not well defined. Increasing sample size
 #'   may reduce the uncertainty in \eqn{k} estimate.
