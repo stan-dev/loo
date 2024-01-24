@@ -293,19 +293,17 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 }
 
 
-#' Throw warnings about pareto k estimates
+#' Throw warnings about Pareto k estimates
 #'
 #' @noRd
-#' @param k A vector of pareto k estimates.
+#' @param k A vector of Pareto k estimates.
 #' @param high The value at which to warn about slighly high estimates.
 #' @param too_high The value at which to warn about very high estimates.
 #' @return Nothing, just possibly throws warnings.
 #'
-throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
-  if (isTRUE(any(k > too_high))) {
+throw_pareto_warnings <- function(k, k_threshold) {
+  if (isTRUE(any(k > k_threshold))) {
     .warn("Some Pareto k diagnostic values are too high. ", .k_help())
-  } else if (isTRUE(any(k > high))) {
-    .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
   }
 }
 

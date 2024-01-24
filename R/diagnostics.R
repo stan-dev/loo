@@ -13,31 +13,37 @@
 #' @param threshold For `pareto_k_ids()`, `threshold` is the minimum \eqn{k}
 #'   value to flag (default is `1 - 1 / log10(S)`). For `mcse_loo()`, if any
 #'   \eqn{k} estimates are greater than `threshold` the MCSE estimate is
-#'   returned as `NA` (default is `0.7`). See **Details** for the motivation
-#'   behind these defaults.
+#'   returned as `NA` (default is `1 - 1 / log10(S)`). See **Details** for
+#'   the motivation behind these defaults.
 #'
 #' @details
 #' The reliability and approximate convergence rate of the PSIS-based estimates
 #' can be assessed using the estimates for the shape parameter \eqn{k} of the
 #' generalized Pareto distribution:
-#' 
+#'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-#'   (effective) sample size PSIS estimate and the corresponding Monte
-#'   Carlo standard error estimate are reliable.
+#'   sample size PSIS estimate and the corresponding Monte Carlo
+#'   standard error estimate are reliable.
 #'
 #' * If \eqn{1 - 1 / log10(S) <= k < 0.7} PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not reliable,
 #'   but increasing (effective) sample size \eqn{S} above 2200 may help.
-#'   
+#'
 #' * If \eqn{0.7 <= k < 1} PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
 #'   sample size may reduce the uncertainty in \eqn{k} estimate.
-#'   
+#'
 #' * If \eqn{k \geq 1}{k >= 1} The target distribution is estimated to
 #'   have non-finite mean. PSIS estimate and the corresponding Monte
 #'   Carlo standard error are not well defined. Increasing sample size
 #'   may reduce the uncertainty in \eqn{k} estimate.
 #'
+#' * For simplicity the nominal sample size \eqn{S} is used when
+#'   computing the sample size specific threshold. This is likely to
+#'   provide optimistic threshold, but for many purposes this is fine
+#'   if the MCMC effective sample size is not much smaller than the
+#'   nominal sample size (e.g. if MCMC-ESS > S/4).
+#' 
 #' \subsection{What if the estimated tail shape parameter \eqn{k}
 #' exceeds diagnostic threshold}{ Importance sampling is likely to
 #' work less well if the marginal posterior \eqn{p(\theta^s | y)} and
@@ -109,25 +115,27 @@ pareto_k_table <- function(x) {
   }
 
   S <- dim(x)[1]
-  threshold <- min(ps_khat_threshold(S), 0.7)
-  kcut <- k_cut(k, threshold)
+  k_threshold <- min(ps_khat_threshold(S), 0.7)
+  kcut <- k_cut(k, k_threshold)
   min_n_eff <- min_n_eff_by_k(n_eff, kcut)
   count <- table(kcut)
   out <- cbind(
     Count = count,
     Proportion = prop.table(count),
-    "Min. n_eff" = min_n_eff,
-    Threshold = threshold
+    "Min. n_eff" = min_n_eff
   )
+  attr(out, "k_threshold") <- k_threshold
   structure(out, class = c("pareto_k_table", class(out)))
 }
 
 #' @export
 print.pareto_k_table <- function(x, digits = 1, ...) {
   count <- x[, "Count"]
+  k_threshold <- attr(x, "k_threshold")
 
   if (sum(count[2:3]) == 0) {
-    cat(paste0("\nAll Pareto k estimates are good (k < ", threshold, ").\n"))
+    cat(paste0("\nAll Pareto k estimates are good (k < ",
+               round(k_threshold,2), ").\n"))
   } else {
     tab <- cbind(
       " " = rep("", 3),
@@ -206,11 +214,15 @@ psis_n_eff_values <- function(x) {
 #'   estimate for PSIS-LOO. MCSE will be NA if any Pareto \eqn{k} values are
 #'   above `threshold`.
 #'
-mcse_loo <- function(x) {
+mcse_loo <- function(x, threshold = NULL) {
   stopifnot(is.psis_loo(x))
   S <- dim(x)[1]
-  threshold <- min(ps_khat_threshold(S), 0.7)
-  if (any(pareto_k_values(x) > threshold, na.rm = TRUE)) {
+  if (is.null(threshold)) {
+    k_threshold <- min(ps_khat_threshold(S), 0.7)
+  } else {
+    k_threshold <- threshold
+  }
+  if (any(pareto_k_values(x) > k_threshold, na.rm = TRUE)) {
     return(NA)
   }
   mc_var <- x$pointwise[, "mcse_elpd_loo"]^2
@@ -256,12 +268,12 @@ plot.psis_loo <- function(x,
     n_eff <- NULL
   }
   S <- dim(x)[1]
-  threshold <- min(ps_khat_threshold(S), 0.7)
+  k_threshold <- min(ps_khat_threshold(S), 0.7)
 
   plot_diagnostic(
     k = k,
     n_eff = n_eff,
-    threshold = threshold,
+    threshold = k_threshold,
     ...,
     label_points = label_points,
     main = main

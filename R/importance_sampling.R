@@ -184,6 +184,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   assert_importance_sampling_method_is_implemented(method)
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
+  k_threshold <- min(ps_khat_threshold(S), 0.7)
   tail_len <- n_pareto(r_eff, S)
 
   if (method == "psis") {
@@ -223,7 +224,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")
-  throw_pareto_warnings(pareto_k)
+  throw_pareto_warnings(pareto_k, k_threshold)
 
   importance_sampling_object(
     unnormalized_log_weights = log_weights,

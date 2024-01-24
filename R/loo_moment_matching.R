@@ -26,7 +26,8 @@
 #'   reached, there will be a warning, and increasing `max_iters` may improve
 #'   accuracy.
 #' @param k_threshold Threshold value for Pareto k values above which the moment
-#'   matching algorithm is used. The default value is 0.5.
+#'   matching algorithm is used. The default value is `1 - 1 / log10(S)`,
+#'   where `S` is the sample size.
 #' @param split Logical; Indicate whether to do the split transformation or not
 #'   at the end of moment matching for each LOO fold.
 #' @param cov Logical; Indicate whether to match the covariance matrix of the
@@ -65,7 +66,7 @@ loo_moment_match <- function(x, ...) {
 loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
                           log_lik_i_upars, max_iters = 30L,
-                          k_threshold = 0.7, split = TRUE,
+                          k_threshold = NULL, split = TRUE,
                           cov = TRUE, cores = getOption("mc.cores", 1),
                           ...) {
 
@@ -92,6 +93,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   S <- dim(loo)[1]
   N <- dim(loo)[2]
+  k_threshold <- min(ps_khat_threshold(S), 0.7)
   pars <- post_draws(x, ...)
   # transform the model parameters to unconstrained space
   upars <- unconstrain_pars(x, pars = pars, ...)
@@ -170,10 +172,10 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   loo$se_looic <- loo$estimates["looic","SE"]
 
   # Warn if some Pareto ks are still high
-  psislw_warnings(loo$diagnostics$pareto_k)
+  throw_pareto_warnings(loo$diagnostics$pareto_k, k_threshold)
   # if we don't split, accuracy may be compromised
   if (!split) {
-    throw_large_kf_warning(kfs)
+    throw_large_kf_warning(kfs, k_threshold)
   }
 
   loo
@@ -588,9 +590,10 @@ throw_moment_match_max_iters_warning <- function() {
   )
 }
 
-#' Warning message if not using split transformation and accuracy is compromised
+#' Warning message if not using split transformation and accuracy is
+#' compromised
 #' @noRd
-throw_large_kf_warning <- function(kf, k_threshold = 0.5) {
+throw_large_kf_warning <- function(kf, k_threshold) {
   if (any(kf > k_threshold)) {
     warning(
       "The accuracy of self-normalized importance sampling may be bad.\n",
@@ -598,21 +601,5 @@ throw_large_kf_warning <- function(kf, k_threshold = 0.5) {
       call. = FALSE
     )
   }
-
 }
 
-#' warnings about pareto k values ------------------------------------------
-#' @noRd
-psislw_warnings <- function(k) {
-  if (any(k > 0.7)) {
-    .warn(
-      "Some Pareto k diagnostic values are too high. ",
-      .k_help()
-    )
-  } else if (any(k > 0.5)) {
-    .warn(
-      "Some Pareto k diagnostic values are slightly high. ",
-      .k_help()
-    )
-  }
-}

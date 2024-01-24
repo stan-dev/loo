@@ -39,7 +39,7 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5))) {
+  if (length(pareto_k_ids(x, threshold = 0.7))) {
     cat("\n")
   }
   print(pareto_k_table(x), digits = digits)
@@ -65,7 +65,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   cat("------\n")
   cat("Posterior approximation correction used.\n")
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5))) {
+  if (length(pareto_k_ids(x, threshold = 0.7))) {
     cat("\n")
   }
   print(pareto_k_table(x), digits = digits)
