@@ -184,7 +184,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   assert_importance_sampling_method_is_implemented(method)
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
-  k_threshold <- min(ps_khat_threshold(S), 0.7)
+  k_threshold <- ps_khat_threshold(S)
   tail_len <- n_pareto(r_eff, S)
 
   if (method == "psis") {

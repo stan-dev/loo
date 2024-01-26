@@ -93,7 +93,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   S <- dim(loo)[1]
   N <- dim(loo)[2]
-  k_threshold <- min(ps_khat_threshold(S), 0.7)
+  k_threshold <- ps_khat_threshold(S)
   pars <- post_draws(x, ...)
   # transform the model parameters to unconstrained space
   upars <- unconstrain_pars(x, pars = pars, ...)

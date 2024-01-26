@@ -118,7 +118,7 @@ pareto_k_table <- function(x) {
   }
 
   S <- dim(x)[1]
-  k_threshold <- min(ps_khat_threshold(S), 0.7)
+  k_threshold <- ps_khat_threshold(S)
   kcut <- k_cut(k, k_threshold)
   min_n_eff <- min_n_eff_by_k(n_eff, kcut)
   count <- table(kcut)
@@ -221,7 +221,7 @@ mcse_loo <- function(x, threshold = NULL) {
   stopifnot(is.psis_loo(x))
   S <- dim(x)[1]
   if (is.null(threshold)) {
-    k_threshold <- min(ps_khat_threshold(S), 0.7)
+    k_threshold <- ps_khat_threshold(S)
   } else {
     k_threshold <- threshold
   }
@@ -271,7 +271,7 @@ plot.psis_loo <- function(x,
     n_eff <- NULL
   }
   S <- dim(x)[1]
-  k_threshold <- min(ps_khat_threshold(S), 0.7)
+  k_threshold <- ps_khat_threshold(S)
 
   plot_diagnostic(
     k = k,
@@ -413,11 +413,16 @@ min_n_eff_by_k <- function(n_eff, kcut) {
 #'
 #' Given sample size S computes khat threshold for reliable Pareto
 #' smoothed estimate (to have small probability of large error). See
-#' section 3.2.4, equation (13).
+#' section 3.2.4, equation (13). Sample sizes 100, 320, 1000, 2200,
+#' 10000 correspond to thresholds 0.5, 0.6, 0.67, 0.7, 0.75. Although
+#' with bigger sample size S we can achieve estimates with small
+#' probability of large error, it is difficult to get accurate MCSE
+#' estimates as the bias starts to dominate when k > 0.7 (see Section 3.2.3).
+#' Thus the sample size dependend k-ht threshold is capped at 0.7.
 #' @param S sample size
 #' @param ... unused
 #' @return threshold
 #' @noRd
 ps_khat_threshold <- function(S, ...) {
-  1 - 1 / log10(S)
+  min(1 - 1 / log10(S), 0.7)
 }
