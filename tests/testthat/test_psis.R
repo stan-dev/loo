@@ -123,8 +123,8 @@ test_that("psis_n_eff methods works properly", {
     psis_n_eff.default(w[, 1], r_eff = 2),
     psis_n_eff.matrix(w, r_eff = rep(2, ncol(w)))[1]
   )
-  expect_warning(psis_n_eff.default(w[, 1]), "not adjusted based on MCMC n_eff")
-  expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
+  expect_no_warning(psis_n_eff.default(w[, 1]))
+  expect_no_warning(psis_n_eff.matrix(w))
 })
 
 

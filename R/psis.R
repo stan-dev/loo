@@ -278,7 +278,7 @@ psis_smooth_tail <- function(x, cutoff) {
 #' @return An N-vector of tail lengths.
 #'
 n_pareto <- function(r_eff, S) {
-  if is.null(r_eff) {
+  if (is.null(r_eff)) {
     r_eff <- 1
   }
   ceiling(pmin(0.2 * S, 3 * sqrt(S / r_eff)))
