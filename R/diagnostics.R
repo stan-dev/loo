@@ -11,41 +11,52 @@
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
 #' @param threshold For `pareto_k_ids()`, `threshold` is the minimum \eqn{k}
-#'   value to flag (default is `1 - 1 / log10(S)`). For `mcse_loo()`, if any
-#'   \eqn{k} estimates are greater than `threshold` the MCSE estimate is
-#'   returned as `NA` (default is `1 - 1 / log10(S)`). See **Details** for
-#'   the motivation behind these defaults.
+#'
+#'   value to flag (default is a sample size `S` dependend threshold
+#'   `1 - 1 / log10(S)`). For `mcse_loo()`, if any \eqn{k} estimates are
+#'   greater than `threshold` the MCSE estimate is returned as `NA`
+#'   See **Details** for the motivation behind these defaults.
 #'
 #' @details
-#' The reliability and approximate convergence rate of the PSIS-based estimates
-#' can be assessed using the estimates for the shape parameter \eqn{k} of the
-#' generalized Pareto distribution:
+#' 
+#' The reliability and approximate convergence rate of the PSIS-based
+#' estimates can be assessed using the estimates for the shape
+#' parameter \eqn{k} of the generalized Pareto distribution. The
+#' diagnostic threshold for Pareto \eqn{k} depends on sample size
+#' \eqn{S} (sample size dependent threshold was introduced by Vehtari
+#' et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+#' recommended). For simplicity, `loo` package uses the nominal sample
+#' size \eqn{S} when computing the sample size specific
+#' threshold. This provides an optimistic threshold if the effective
+#' sample size is less than 2200, but if MCMC-ESS > S/2 the difference
+#' is usually negligible. Thinning of MCMC draws can be used to
+#' improve the ratio ESS/S.
 #'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
 #'   sample size, PSIS estimate and the corresponding Monte Carlo
 #'   standard error estimate are reliable.
 #'
 #' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
-#'   corresponding Monte Carlo standard error estimate are not reliable,
-#'   but increasing (effective) sample size \eqn{S} above 2200 may help
-#'   (this will increase the sample size specific threshold
-#'    \eqn{(1-1/log10(2200)>0.7} and then the bias specific threshold
-#'    0.7 dominates).
+#'   corresponding Monte Carlo standard error estimate are not
+#'   reliable, but increasing (effective) sample size \eqn{S} above
+#'   2200 may help (this will increase the sample size specific
+#'   threshold \eqn{(1-1/log10(2200)>0.7} and then the bias specific
+#'   threshold 0.7 dominates).
 #'
 #' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
 #'   sample size may reduce the uncertainty in \eqn{k} estimate.
 #'
+#' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
+#'   Carlo standard error have large bias and are not reliable. Increasing
+#'   sample size may reduce the variability in \eqn{k} estimate, which
+#'   may result in lower \eqn{k} estimate, too.
+#'
 #' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
 #'   have non-finite mean. PSIS estimate and the corresponding Monte
 #'   Carlo standard error are not well defined. Increasing sample size
-#'   may reduce the uncertainty in \eqn{k} estimate.
-#'
-#' * For simplicity the nominal sample size \eqn{S} is used when
-#'   computing the sample size specific threshold. This is likely to
-#'   provide optimistic threshold, but for many purposes this is fine
-#'   if the MCMC effective sample size is not much smaller than the
-#'   nominal sample size (e.g. if MCMC-ESS > S/4).
+#'   may reduce the variability in \eqn{k} estimate, which
+#'   may result in lower \eqn{k} estimate, too.
 #' 
 #' \subsection{What if the estimated tail shape parameter \eqn{k}
 #' exceeds the diagnostic threshold?}{ Importance sampling is likely to
@@ -55,7 +66,7 @@
 #' influential observations.  If the estimated tail shape parameter
 #' \eqn{k} exceeds the diagnostic threshold, the user should be
 #' warned. (Note: If \eqn{k} is greater than the diagnostic threshold
-#' then WAIC is also likely to fail, but WAIC lacks its own
+#' then WAIC is also likely to fail, but WAIC lacks as accurate
 #' diagnostic.)  When using PSIS in the context of approximate LOO-CV,
 #' we recommend one of the following actions when \eqn{k > 0.7}:
 #'

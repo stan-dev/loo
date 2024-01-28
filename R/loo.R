@@ -4,7 +4,7 @@
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 #' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is
 #' an implementation of the methods described in Vehtari, Gelman, and Gabry
-#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
+#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2022).
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**

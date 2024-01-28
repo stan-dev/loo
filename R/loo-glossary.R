@@ -3,6 +3,7 @@
 #' @name loo-glossary
 #'
 #' @template loo-and-psis-references
+#' @template loo-uncertainty-reference
 #' @template bayesvis-reference
 #'
 #' @description
@@ -38,7 +39,8 @@
 #' estimate is an accurate estimate for the scale, it ignores the skewness. When
 #' making model comparisons, the SE of the component-wise (pairwise) differences
 #' should be used instead (see the `se_diff` section below and Eq 24 in
-#' VGG2017).
+#' VGG2017). Sivula et al. (2022) discuss the conditions when the normal
+#' approximation used for SE and `se_diff` is good.
 #'
 #' @section Monte Carlo SE of elpd_loo:
 #'
@@ -62,10 +64,10 @@
 #'
 #' @section Pareto k estimates:
 #'
-#' The Pareto `k` estimate is a diagnostic for Pareto smoothed importance
+#' The Pareto \eqn{k} estimate is a diagnostic for Pareto smoothed importance
 #' sampling (PSIS), which is used to compute components of `elpd_loo`. In
-#' importance-sampling LOO (the full posterior distribution is used as the
-#' proposal distribution). The Pareto k diagnostic estimates how far an
+#' importance-sampling LOO the full posterior distribution is used as the
+#' proposal distribution. The Pareto k diagnostic estimates how far an
 #' individual leave-one-out distribution is from the full distribution. If
 #' leaving out an observation changes the posterior too much then importance
 #' sampling is not able to give reliable estimate. Pareto smoothing stabilizes
@@ -73,33 +75,42 @@
 #' cost of some bias.
 #'
 #' The diagnostic threshold for Pareto \eqn{k} depends on sample size
-#' \eqn{S}. For simplicity the nominal sample size \eqn{S} is used
-#' when computing the sample size specific threshold. This is likely
-#' to provide optimistic threshold, but for many purposes this is fine
-#' if the MCMC effective sample size is not much smaller than the
-#' nominal sample size (e.g. if MCMC-ESS > S/4).
+#' \eqn{S} (sample size dependent threshold was introduced by Vehtari
+#' et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+#' recommended). For simplicity, `loo` package uses the nominal sample
+#' size \eqn{S}  when computing the sample size specific
+#' threshold. This provides an optimistic threshold if the effective
+#' sample size is less than 2200, but even then if ESS/S>1/2 the difference
+#' is usually negligible. Thinning of MCMC draws can be used to improve
+#' the ratio ESS/S.
 #'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
 #'   sample size PSIS estimate and the corresponding Monte
 #'   Carlo standard error estimate are reliable.
 #'
 #' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
-#'   corresponding Monte Carlo standard error estimate are not reliable,
-#'   but increasing (effective) sample size \eqn{S} above 2200 may help.
+#'   corresponding Monte Carlo standard error estimate are not
+#'   reliable, but increasing (effective) sample size \eqn{S} above
+#'   2200 may help (this will increase the sample size specific
+#'   threshold \eqn{(1-1/log10(2200)>0.7} and then the bias specific
+#'   threshold 0.7 dominates).
 #'
 #' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
-#'   sample size may reduce the uncertainty in \eqn{k} estimate.
+#'   sample size may reduce the variability in \eqn{k} estimate, which
+#'   may result in lower \eqn{k} estimate, too.
 #'
 #' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
 #'   have non-finite mean. PSIS estimate and the corresponding Monte
 #'   Carlo standard error are not well defined. Increasing sample size
-#'   may reduce the uncertainty in \eqn{k} estimate.
+#'   may reduce the variability in \eqn{k} estimate, which
+#'   may result in lower \eqn{k} estimate, too.
 #' 
-#' Pareto k is also useful as a measure of influence of an observation.
-#' Highly influential observations have high k values. Very high k values
-#' often indicate model misspecification, outliers or mistakes in data
-#' processing. See Section 6 of Gabry et al. (2019) for an example.
+#' Pareto \eqn{k} is also useful as a measure of influence of an
+#' observation.  Highly influential observations have high \eqn{k}
+#' values. Very high \eqn{k} values often indicate model
+#' misspecification, outliers or mistakes in data processing. See
+#' Section 6 of Gabry et al. (2019) for an example.
 #'
 #' \subsection{Interpreting `p_loo` when Pareto `k` is large}{
 #' If `k > 0.7` then we can also look at the `p_loo` estimate for
