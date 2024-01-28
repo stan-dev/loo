@@ -300,8 +300,7 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #'
 #' @noRd
 #' @param k A vector of Pareto k estimates.
-#' @param high The value at which to warn about slighly high estimates.
-#' @param too_high The value at which to warn about very high estimates.
+#' @param k_threshold The value at which to warn about high Pareto k estimates.
 #' @return Nothing, just possibly throws warnings.
 #'
 throw_pareto_warnings <- function(k, k_threshold) {

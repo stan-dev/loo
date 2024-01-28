@@ -11,7 +11,6 @@
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
 #' @param threshold For `pareto_k_ids()`, `threshold` is the minimum \eqn{k}
-#'
 #'   value to flag (default is a sample size `S` dependend threshold
 #'   `1 - 1 / log10(S)`). For `mcse_loo()`, if any \eqn{k} estimates are
 #'   greater than `threshold` the MCSE estimate is returned as `NA`
@@ -173,7 +172,11 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
 #' @return `pareto_k_ids()` returns an integer vector indicating which
 #' observations have Pareto \eqn{k} estimates above `threshold`.
 #'
-pareto_k_ids <- function(x, threshold = 0.7) {
+pareto_k_ids <- function(x, threshold = NULL) {
+  if (is.null(threshold)) {
+    S <- dim(x)[1]
+    threshold <- ps_khat_threshold(S)
+  }
   k <- pareto_k_values(x)
   which(k > threshold)
 }
