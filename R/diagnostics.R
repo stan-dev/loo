@@ -33,19 +33,19 @@
 #' improve the ratio ESS/S.
 #'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-#'   sample size, PSIS estimate and the corresponding Monte Carlo
+#'   sample size, the PSIS estimate and the corresponding Monte Carlo
 #'   standard error estimate are reliable.
 #'
 #' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not
-#'   reliable, but increasing (effective) sample size \eqn{S} above
+#'   reliable, but increasing the (effective) sample size \eqn{S} above
 #'   2200 may help (this will increase the sample size specific
 #'   threshold \eqn{(1-1/log10(2200)>0.7} and then the bias specific
 #'   threshold 0.7 dominates).
 #'
-#' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
+#' * If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
-#'   sample size may reduce the uncertainty in \eqn{k} estimate.
+#'  the sample size may reduce the uncertainty in the \eqn{k} estimate.
 #'
 #' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
@@ -53,8 +53,8 @@
 #'   may result in lower \eqn{k} estimate, too.
 #'
 #' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
-#'   have non-finite mean. PSIS estimate and the corresponding Monte
-#'   Carlo standard error are not well defined. Increasing sample size
+#'   have non-finite mean. The PSIS estimate and the corresponding Monte
+#'   Carlo standard error are not well defined. Increasing the sample size
 #'   may reduce the variability in \eqn{k} estimate, which
 #'   may result in lower \eqn{k} estimate, too.
 #' 
@@ -253,7 +253,7 @@ mcse_loo <- function(x, threshold = NULL) {
 #'   and can be used to control the appearance of the labels.
 #' @param diagnostic For the `plot` method, which diagnostic should be
 #'   plotted? The options are `"k"` for Pareto \eqn{k} estimates (the
-#'   default) or `"ESS"` (`"n_eff"`) for PSIS effective sample size estimates.
+#'   default), or `"ESS"` or `"n_eff"` for PSIS effective sample size estimates.
 #' @param main For the `plot()` method, a title for the plot.
 #'
 #' @return The `plot()` method is called for its side effect and does not
@@ -276,7 +276,7 @@ plot.psis_loo <- function(x,
             "% of Pareto k estimates are Inf/NA/NaN and not plotted.")
   }
 
-  if (diagnostic == "ESS" | diagnostic == "n_eff") {
+  if (diagnostic == "ESS" || diagnostic == "n_eff") {
     n_eff <- psis_n_eff_values(x)
   } else {
     n_eff <- NULL
