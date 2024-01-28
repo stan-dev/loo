@@ -128,7 +128,7 @@ implemented_is_methods <- function() c("psis", "tis", "sis")
 #'   but unnormalized.
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
-#' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
+#' @param r_eff Vector of relative MCMC ESS (n_eff) for `exp(log lik)`
 #' @template is_method
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.

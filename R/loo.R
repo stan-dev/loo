@@ -13,10 +13,10 @@
 #' @param r_eff Vector of relative effective sample size estimates for the
 #'   likelihood (`exp(log_lik)`) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
-#'   self-normalizing importance sampling when using posterior draws obtained
+#'   self-normalized importance sampling when using posterior draws obtained
 #'   with MCMC. If MCMC draws are used and `r_eff` is not provided then
 #'   the reported PSIS effective sample sizes and Monte Carlo error estimates
-#'   will be over-optimistic. If the posterior draws are independent then
+#'   can be over-optimistic. If the posterior draws are independent then
 #'   `r_eff=1` and can be omitted. The warning message thrown when `r_eff` is
 #'   not specified can be disabled by setting `r_eff` to `NA`. See the
 #'   [relative_eff()] helper functions for computing `r_eff`.
@@ -522,8 +522,8 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
 throw_loo_r_eff_warning <- function() {
   warning(
     "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-    "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
-    "MCSE estimates will be over-optimistic.",
+    "For models fit with MCMC, the reported PSIS ESS and \n",
+    "MCSE estimates can be over-optimistic.",
     call. = FALSE
   )
 }

@@ -273,11 +273,14 @@ psis_smooth_tail <- function(x, cutoff) {
 #' 20% of the total number of weights.
 #'
 #' @noRd
-#' @param r_eff A N-vector of relative MCMC effective sample sizes of `exp(log-lik matrix)`.
+#' @param r_eff A N-vector of relative MCMC effective sample sizes of `exp(log-lik matrix)`. If NULL, relative efficiency of 1 is used.
 #' @param S The (integer) size of posterior sample.
 #' @return An N-vector of tail lengths.
 #'
 n_pareto <- function(r_eff, S) {
+  if is.null(r_eff) {
+    r_eff <- 1
+  }
   ceiling(pmin(0.2 * S, 3 * sqrt(S / r_eff)))
 }
 
@@ -383,7 +386,7 @@ called_from_loo <- function() {
 throw_psis_r_eff_warning <- function() {
   warning(
     "Relative effective sample sizes ('r_eff' argument) not specified. ",
-    "PSIS n_eff will not be adjusted based on MCMC n_eff.",
+    "PSIS ESS (n_eff) will not be adjusted based on MCMC ESS (n_eff).",
     call. = FALSE
   )
 }
