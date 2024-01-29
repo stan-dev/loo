@@ -63,10 +63,10 @@ each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
+can be over-optimistic. If the posterior draws are independent then
 \code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
 not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
 \code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
@@ -169,7 +169,7 @@ The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is
 an implementation of the methods described in Vehtari, Gelman, and Gabry
-(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
+(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2022).
 
 The \code{loo_i()} function enables testing log-likelihood
 functions for use with the \code{loo.function()} method.
@@ -321,7 +321,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
