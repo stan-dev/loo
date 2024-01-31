@@ -19,15 +19,16 @@
 #'   can be over-optimistic. If the posterior draws are (near) independent then
 #'   `r_eff=1` can be used. `r_eff` has to be a scalar (same value is used
 #'    for all observations) or a vector with length equal to the number of
-#'    observations. The default value is 1.
-#'   [relative_eff()] helper functions for computing `r_eff`.
-#' @param save_psis Should the `"psis"` object created internally by `loo()` be
+#'    observations. The default value is 1. See the [relative_eff()] helper
+#'    functions for help computing `r_eff`.
+#' @param save_psis Should the `psis` object created internally by `loo()` be
 #'   saved in the returned object? The `loo()` function calls [psis()]
-#'   internally but by default discards the (potentially large) `"psis"` object
+#'   internally but by default discards the (potentially large) `psis` object
 #'   after using it to compute the LOO-CV summaries. Setting `save_psis=TRUE`
 #'   will add a `psis_object` component to the list returned by `loo`.
-#'   Currently this is only needed if you plan to use the [E_loo()] function to
-#'   compute weighted expectations after running `loo`.
+#'   This is useful if you plan to use the [E_loo()] function to compute
+#'   weighted expectations after running `loo`. Several functions in the
+#'   \pkg{bayesplot} package also accept `psis` objects.
 #' @template cores
 #' @template is_method
 #'
@@ -133,7 +134,7 @@
 #'
 #' # Use the loo_i function to check that llfun works on a single observation
 #' # before running on all obs. For example, using the 3rd obs in the data:
-#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
+#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
 #' print(loo_3$pointwise[, "elpd_loo"])
 #'
 #' # Use loo.function method (default r_eff=1 is used as this posterior not obtained via MCMC)

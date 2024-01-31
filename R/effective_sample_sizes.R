@@ -183,8 +183,9 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
   if (is.null(r_eff)) {
     return(1 / ss)
   }
-  if (length(r_eff) != length(ss) && length(r_eff) != 1)
+  if (length(r_eff) != length(ss) && length(r_eff) != 1) {
     stop("r_eff must have length 1 or ncol(w).", call. = FALSE)
+  }
   1 / ss * r_eff
 }
 

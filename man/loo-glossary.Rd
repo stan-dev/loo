@@ -91,23 +91,23 @@ is usually negligible. Thinning of MCMC draws can be used to improve
 the ratio ESS/S.
 \itemize{
 \item If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-sample size, PSIS estimate and the corresponding Monte
+sample size, the PSIS estimate and the corresponding Monte
 Carlo standard error estimate are reliable.
-\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
+\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
 corresponding Monte Carlo standard error estimate are not
-reliable, but increasing (effective) sample size \eqn{S} above
+reliable, but increasing the (effective) sample size \eqn{S} above
 2200 may help (this will increase the sample size specific
 threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
 threshold 0.7 dominates).
-\item If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
+\item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
-sample size may reduce the variability in \eqn{k} estimate, which
-may result in a lower \eqn{k} estimate, too.
+the sample size may reduce the variability in the \eqn{k} estimate, which
+may also result in a lower \eqn{k} estimate.
 \item If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
-have non-finite mean. PSIS estimate and the corresponding Monte
-Carlo standard error are not well defined. Increasing sample size
-may reduce the variability in \eqn{k} estimate, which
-may result in a lower \eqn{k} estimate, too.
+have non-finite mean. The PSIS estimate and the corresponding Monte
+Carlo standard error are not well defined. Increasing the sample size
+may reduce the variability in \eqn{k} estimate, which may also result in
+a lower \eqn{k} estimate.
 }
 
 Pareto \eqn{k} is also useful as a measure of influence of an
@@ -119,14 +119,12 @@ Section 6 of Gabry et al. (2019) for an example.
 \subsection{Interpreting \code{p_loo} when Pareto \code{k} is large}{
 If \eqn{k < min(1 - 1 / log10(S), 0.7)} then we can also look at
 the \code{p_loo} estimate for some additional information about the problem:
-
 \itemize{
 \item If \verb{p_loo << p} (the total number of parameters in the model),
 then the model is likely to be misspecified. Posterior predictive checks
 (PPCs) are then likely to also detect the problem. Try using an overdispersed
 model, or add more structural information (nonlinearity, mixture model,
 etc.).
-
 \item If \code{p_loo < p} and the number of parameters \code{p} is relatively
 large compared to the number of observations (e.g., \code{p>N/5}), it is
 likely that the model is so flexible or the population prior so weak that it’s
@@ -134,7 +132,6 @@ difficult to predict the left out observation (even for the true model).
 This happens, for example, in the simulated 8 schools (in VGG2017), random
 effect models with a few observations per random effect, and Gaussian
 processes and spatial models with short correlation lengths.
-
 \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
 If the number of parameters \verb{p<<N}, then PPCs are also likely to detect the
 problem. See the case study at

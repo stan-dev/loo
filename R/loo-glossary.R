@@ -85,27 +85,27 @@
 #' the ratio ESS/S.
 #'
 #' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-#'   sample size, PSIS estimate and the corresponding Monte
+#'   sample size, the PSIS estimate and the corresponding Monte
 #'   Carlo standard error estimate are reliable.
 #'
-#' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
+#' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not
-#'   reliable, but increasing (effective) sample size \eqn{S} above
+#'   reliable, but increasing the (effective) sample size \eqn{S} above
 #'   2200 may help (this will increase the sample size specific
 #'   threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
 #'   threshold 0.7 dominates).
 #'
-#' * If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
+#' * If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
-#'   sample size may reduce the variability in \eqn{k} estimate, which
-#'   may result in a lower \eqn{k} estimate, too.
+#'   the sample size may reduce the variability in the \eqn{k} estimate, which
+#'   may also result in a lower \eqn{k} estimate.
 #'
 #' * If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
-#'   have non-finite mean. PSIS estimate and the corresponding Monte
-#'   Carlo standard error are not well defined. Increasing sample size
-#'   may reduce the variability in \eqn{k} estimate, which
-#'   may result in a lower \eqn{k} estimate, too.
-#' 
+#'   have non-finite mean. The PSIS estimate and the corresponding Monte
+#'   Carlo standard error are not well defined. Increasing the sample size
+#'   may reduce the variability in \eqn{k} estimate, which may also result in
+#'   a lower \eqn{k} estimate.
+#'
 #' Pareto \eqn{k} is also useful as a measure of influence of an
 #' observation.  Highly influential observations have high \eqn{k}
 #' values. Very high \eqn{k} values often indicate model
@@ -116,14 +116,13 @@
 #' If \eqn{k < min(1 - 1 / log10(S), 0.7)} then we can also look at
 #' the `p_loo` estimate for some additional information about the problem:
 #'
-#' \itemize{
-#' \item If `p_loo << p` (the total number of parameters in the model),
+#' * If `p_loo << p` (the total number of parameters in the model),
 #' then the model is likely to be misspecified. Posterior predictive checks
 #' (PPCs) are then likely to also detect the problem. Try using an overdispersed
 #' model, or add more structural information (nonlinearity, mixture model,
 #' etc.).
 #'
-#' \item If `p_loo < p` and the number of parameters `p` is relatively
+#' * If `p_loo < p` and the number of parameters `p` is relatively
 #' large compared to the number of observations (e.g., `p>N/5`), it is
 #' likely that the model is so flexible or the population prior so weak that it’s
 #' difficult to predict the left out observation (even for the true model).
@@ -131,7 +130,7 @@
 #' effect models with a few observations per random effect, and Gaussian
 #' processes and spatial models with short correlation lengths.
 #'
-#' \item If `p_loo > p`, then the model is likely to be badly misspecified.
+#' * If `p_loo > p`, then the model is likely to be badly misspecified.
 #' If the number of parameters `p<<N`, then PPCs are also likely to detect the
 #' problem. See the case study at
 #' <https://avehtari.github.io/modelselection/roaches.html> for an example.
@@ -140,7 +139,6 @@
 #' observations influencing each parameter as in hierarchical models some groups
 #' may have few observations and other groups many), it is possible that PPCs won't
 #' detect the problem.
-#' }
 #' }
 #'
 #' @section elpd_diff:
