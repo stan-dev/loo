@@ -47,8 +47,8 @@ the reported PSIS effective sample sizes and Monte Carlo error estimates
 can be over-optimistic. If the posterior draws are (near) independent then
 \code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
 for all observations) or a vector with length equal to the number of
-observations. The default value is 1.
-\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
