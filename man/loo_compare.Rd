@@ -81,9 +81,9 @@ projection predictive inference.
 \examples{
 # very artificial example, just for demonstration!
 LL <- example_loglik_array()
-loo1 <- loo(LL, r_eff = NA)     # should be worst model when compared
-loo2 <- loo(LL + 1, r_eff = NA) # should be second best model when compared
-loo3 <- loo(LL + 2, r_eff = NA) # should be best model when compared
+loo1 <- loo(LL)     # should be worst model when compared
+loo2 <- loo(LL + 1) # should be second best model when compared
+loo3 <- loo(LL + 2) # should be best model when compared
 
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)

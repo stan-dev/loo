@@ -10,7 +10,7 @@
   data = NULL,
   draws = NULL,
   observations = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1),
   loo_approximation = NULL,
   loo_approximation_draws = NULL,
@@ -44,9 +44,10 @@ the relative efficiency of estimating the normalizing term in
 self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-can be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1.
 \code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to

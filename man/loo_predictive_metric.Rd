@@ -13,7 +13,7 @@ loo_predictive_metric(x, ...)
   log_lik,
   ...,
   metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1)
 )
 }

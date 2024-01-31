@@ -32,7 +32,7 @@ loo_scrps(x, ...)
   log_lik,
   ...,
   permutations = 1,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1)
 )
 
@@ -47,7 +47,7 @@ loo_scrps(x, ...)
   log_lik,
   ...,
   permutations = 1,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1)
 )
 }

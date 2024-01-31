@@ -76,8 +76,8 @@ importance-sampling LOO the full posterior distribution is used as the
 proposal distribution. The Pareto k diagnostic estimates how far an
 individual leave-one-out distribution is from the full distribution. If
 leaving out an observation changes the posterior too much then importance
-sampling is not able to give reliable estimate. Pareto smoothing stabilizes
-importance sampling and guarantees finite variance estimate with a
+sampling is not able to give a reliable estimate. Pareto smoothing stabilizes
+importance sampling and guarantees a finite variance estimate at the
 cost of some bias.
 
 The diagnostic threshold for Pareto \eqn{k} depends on sample size
@@ -86,28 +86,28 @@ et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
 recommended). For simplicity, \code{loo} package uses the nominal sample
 size \eqn{S}  when computing the sample size specific
 threshold. This provides an optimistic threshold if the effective
-sample size is less than 2200, but even then if ESS/S>1/2 the difference
+sample size is less than 2200, but even then if ESS/S > 1/2 the difference
 is usually negligible. Thinning of MCMC draws can be used to improve
 the ratio ESS/S.
 \itemize{
 \item If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
-sample size PSIS estimate and the corresponding Monte
+sample size, PSIS estimate and the corresponding Monte
 Carlo standard error estimate are reliable.
 \item If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
 corresponding Monte Carlo standard error estimate are not
 reliable, but increasing (effective) sample size \eqn{S} above
 2200 may help (this will increase the sample size specific
-threshold \eqn{(1-1/log10(2200)>0.7} and then the bias specific
+threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
 threshold 0.7 dominates).
 \item If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
 sample size may reduce the variability in \eqn{k} estimate, which
-may result in lower \eqn{k} estimate, too.
+may result in a lower \eqn{k} estimate, too.
 \item If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
 have non-finite mean. PSIS estimate and the corresponding Monte
 Carlo standard error are not well defined. Increasing sample size
 may reduce the variability in \eqn{k} estimate, which
-may result in lower \eqn{k} estimate, too.
+may result in a lower \eqn{k} estimate, too.
 }
 
 Pareto \eqn{k} is also useful as a measure of influence of an
@@ -117,8 +117,8 @@ misspecification, outliers or mistakes in data processing. See
 Section 6 of Gabry et al. (2019) for an example.
 
 \subsection{Interpreting \code{p_loo} when Pareto \code{k} is large}{
-If \code{k > 0.7} then we can also look at the \code{p_loo} estimate for
-some additional information about the problem:
+If \eqn{k < min(1 - 1 / log10(S), 0.7)} then we can also look at
+the \code{p_loo} estimate for some additional information about the problem:
 
 \itemize{
 \item If \verb{p_loo << p} (the total number of parameters in the model),

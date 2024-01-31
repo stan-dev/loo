@@ -15,7 +15,7 @@ loo(x, ...)
 \method{loo}{array}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -24,7 +24,7 @@ loo(x, ...)
 \method{loo}{matrix}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -35,21 +35,13 @@ loo(x, ...)
   ...,
   data = NULL,
   draws = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
 )
 
-loo_i(
-  i,
-  llfun,
-  ...,
-  data = NULL,
-  draws = NULL,
-  r_eff = NULL,
-  is_method = "psis"
-)
+loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = 1, is_method = "psis")
 
 is.loo(x)
 
@@ -66,9 +58,10 @@ the relative efficiency of estimating the normalizing term in
 self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-can be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1.
 \code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
@@ -269,8 +262,8 @@ llfun <- function(data_i, draws) {
 loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
 print(loo_3$pointwise[, "elpd_loo"])
 
-# Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
-loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
+# Use loo.function method (default r_eff=1 is used as this posterior not obtained via MCMC)
+loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
 
 # If we look at the elpd_loo contribution from the 3rd obs it should be the
 # same as what we got above with the loo_i function and i=3:
@@ -281,7 +274,7 @@ print(loo_3$pointwise[, "elpd_loo"])
 log_lik_matrix <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
+loo_with_mat <- loo(log_lik_matrix)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
 
