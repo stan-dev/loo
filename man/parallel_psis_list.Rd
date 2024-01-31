@@ -45,10 +45,10 @@ below for details on how to specify these arguments.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
+can be over-optimistic. If the posterior draws are independent then
 \code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
 not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
 \code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
