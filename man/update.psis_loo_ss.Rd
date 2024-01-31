@@ -98,7 +98,7 @@ to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 is only used when \code{loo_approximation} is \code{"waic_grad"},
 \code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{The hessian of the log-likelihood. This is only used
+\item{llhess}{The Hessian of the log-likelihood. This is only used
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
