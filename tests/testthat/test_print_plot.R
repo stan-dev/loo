@@ -7,7 +7,8 @@ LLarr <- example_loglik_array()
 waic1 <- suppressWarnings(waic(LLarr))
 loo1 <- suppressWarnings(loo(LLarr))
 psis1 <- suppressWarnings(psis(-LLarr))
-
+r_eff_arr <- relative_eff(exp(LLarr))
+loo1_r_eff <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 
 
 # plotting ----------------------------------------------------------------
@@ -51,6 +52,8 @@ test_that("print.psis_loo and print.psis output ok",{
   expect_output(print(psis1), lwdim_msg)
   expect_output(print(psis1), "Pareto k estimates are good")
   expect_output(print(loo1), lldim_msg)
+  expect_output(print(loo1), "MCSE and ESS estimates assume independent draws")
+  expect_output(print(loo1_r_eff), "MCSE and ESS estimates assume MCMC draws")
   expect_output(print(loo1), "Pareto k estimates are good")
 
   loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, 0, .49)

@@ -19,7 +19,7 @@ importance_sampling <- function(log_ratios, method, ...) {
 importance_sampling.array <-
   function(log_ratios, method,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
@@ -36,7 +36,7 @@ importance_sampling.array <-
 importance_sampling.matrix <-
   function(log_ratios, method,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     assert_importance_sampling_method_is_implemented(method)
@@ -49,7 +49,7 @@ importance_sampling.matrix <-
 #' @inheritParams psis
 #' @export
 importance_sampling.default <-
-  function(log_ratios, method, ..., r_eff = NULL) {
+  function(log_ratios, method, ..., r_eff = 1) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     assert_importance_sampling_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)
@@ -153,7 +153,7 @@ importance_sampling_object <-
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
-        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
+        diagnostics = list(pareto_k = pareto_k, n_eff = NULL, r_eff = r_eff)
       ),
       # attributes
       norm_const_log = norm_const_log,

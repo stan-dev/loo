@@ -17,6 +17,7 @@
 print.loo <- function(x, digits = 1, ...) {
   cat("\n")
   print_dims(x)
+  print_reff_summary(x, digits)
   if (!("estimates" %in% names(x))) {
     x <- convert_old_object(x)
   }
@@ -120,7 +121,7 @@ print_dims.importance_sampling <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-weights matrix\n"
+    "log-weights matrix.\n"
   )
 }
 
@@ -130,7 +131,7 @@ print_dims.psis_loo <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix\n"
+    "log-likelihood matrix.\n"
   )
 }
 
@@ -140,7 +141,7 @@ print_dims.importance_sampling_loo <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix using", class(x)[1], "\n"
+    "log-likelihood matrix using", class(x)[1], ".\n"
   )
 }
 
@@ -150,7 +151,7 @@ print_dims.waic <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix\n"
+    "log-likelihood matrix.\n"
   )
 }
 
@@ -159,7 +160,7 @@ print_dims.waic <- function(x, ...) {
 print_dims.kfold <- function(x, ...) {
   K <- attr(x, "K", exact = TRUE)
   if (!is.null(K)) {
-    cat("Based on", paste0(K, "-fold"), "cross-validation\n")
+    cat("Based on", paste0(K, "-fold"), "cross-validation.\n")
   }
 }
 
@@ -175,6 +176,22 @@ print_dims.psis_loo_ss <- function(x, ...) {
   )
 }
 
+print_reff_summary <- function(x, digits) {
+  r_eff <- x$diagnostics$r_eff
+  if (all(r_eff==1)) {
+    cat(
+      "MCSE and ESS estimates assume independent draws (r_eff=1).\n"
+    )
+  } else {
+    cat(paste0(
+      "MCSE and ESS estimates assume MCMC draws (r_eff in [",
+      .fr(min(r_eff), digits),
+      ", ",
+      .fr(max(r_eff), digits),
+      "]).\n"
+    ))
+  }
+}
 
 print_mcse_summary <- function(x, digits) {
   mcse_val <- mcse_loo(x)
@@ -183,7 +200,6 @@ print_mcse_summary <- function(x, digits) {
     paste0(.fr(mcse_val, digits), ".\n")
   )
 }
-
 
 # print and warning helpers
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)

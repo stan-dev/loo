@@ -42,8 +42,8 @@ test_that("tis() and sis() returns object with correct structure for tis/sis", {
   expect_named(tis1, c("log_weights", "diagnostics"))
   expect_named(is1, c("log_weights", "diagnostics"))
 
-  expect_named(tis1$diagnostics, c("pareto_k", "n_eff"))
-  expect_named(is1$diagnostics, c("pareto_k", "n_eff"))
+  expect_named(tis1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
+  expect_named(is1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
 
   expect_equal(dim(tis1), dim(LLmat))
   expect_equal(dim(is1), dim(LLmat))
@@ -78,22 +78,36 @@ test_that("psis methods give same results", {
 
 
 
-test_that("psis throws correct errors and warnings", {
-  # r_eff=NULL warnings
-  expect_warning(tis(-LLarr), "Relative effective sample sizes")
-  expect_warning(tis(-LLmat), "Relative effective sample sizes")
-  expect_warning(tis(-LLmat[, 1]), "Relative effective sample sizes")
+test_that("tis throws correct errors and warnings", {
+  # r_eff default no warnings
+  expect_silent(tis(-LLarr))
+  expect_silent(tis(-LLmat))
+  expect_silent(tis(-LLmat[, 1]))
 
-  # r_eff=NA disables warnings
+  # r_eff=NULL no warnings
+  expect_silent(tis(-LLarr, r_eff = NULL))
+  expect_silent(tis(-LLmat, r_eff = NULL))
+  expect_silent(tis(-LLmat[,1], r_eff = NULL))
+
+  # r_eff=NA no warnings
   expect_silent(tis(-LLarr, r_eff = NA))
   expect_silent(tis(-LLmat, r_eff = NA))
   expect_silent(tis(-LLmat[,1], r_eff = NA))
 
-  # r_eff=NULL and r_eff=NA give same answer
+  # r_eff default and r_eff=NA give same answer
   expect_equal(
     suppressWarnings(tis(-LLarr)),
                      tis(-LLarr, r_eff = NA)
   )
+
+  # r_eff=NULL and r_eff=NA give same answer
+  expect_equal(
+    suppressWarnings(tis(-LLarr, r_eff = NULL)),
+                     tis(-LLarr, r_eff = NA)
+  )
+
+  # r_eff scalar is fine
+  expect_silent(tis(-LLarr, r_eff = r_eff_arr[1]))
 
   # r_eff wrong length is error
   expect_error(tis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")

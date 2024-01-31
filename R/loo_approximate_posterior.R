@@ -127,7 +127,7 @@ loo_approximate_posterior.function <-
                                     .llfun = .llfun,
                                     data = data,
                                     draws = draws,
-                                    r_eff = NULL, # r_eff is ignored
+                                    r_eff = 1, # r_eff is ignored
                                     save_psis = save_psis,
                                     log_p = log_p,
                                     log_g = log_g,
@@ -172,7 +172,7 @@ loo_approximate_posterior.function <-
            draws,
            log_p,
            log_g,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            is_method) {
 

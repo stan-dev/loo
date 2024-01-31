@@ -27,13 +27,8 @@ test_that("crps computation is correct", {
 test_that("crps matches references", {
   expect_equal_to_reference(with_seed(1, crps(x1, x2, y)), 'reference-results/crps.rds')
   expect_equal_to_reference(with_seed(1, scrps(x1, x2, y)), 'reference-results/scrps.rds')
-  # Suppress warnings for the missing r_eff
-  suppressWarnings(expect_equal_to_reference(
-    with_seed(1, loo_crps(x1, x2, y, ll)),
-    'reference-results/loo_crps.rds'))
-  suppressWarnings(expect_equal_to_reference(
-    with_seed(1, loo_scrps(x1, x2, y, ll)),
-    'reference-results/loo_scrps.rds'))
+  expect_equal_to_reference(with_seed(1, loo_crps(x1, x2, y, ll)), 'reference-results/loo_crps.rds')
+  expect_equal_to_reference(with_seed(1, loo_scrps(x1, x2, y, ll)), 'reference-results/loo_scrps.rds')
 })
 
 test_that("input validation throws correct errors", {
