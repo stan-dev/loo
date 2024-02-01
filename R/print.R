@@ -195,7 +195,7 @@ print_reff_summary <- function(x, digits) {
 print_mcse_summary <- function(x, digits) {
   mcse_val <- mcse_loo(x)
   cat(
-    "Monte Carlo SE of elpd_loo is",
+    "MCSE of elpd_loo is",
     paste0(.fr(mcse_val, digits), ".\n")
   )
   print_reff_summary(x, digits)
