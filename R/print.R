@@ -17,7 +17,6 @@
 print.loo <- function(x, digits = 1, ...) {
   cat("\n")
   print_dims(x)
-  print_reff_summary(x, digits)
   if (!("estimates" %in% names(x))) {
     x <- convert_old_object(x)
   }
@@ -199,6 +198,7 @@ print_mcse_summary <- function(x, digits) {
     "Monte Carlo SE of elpd_loo is",
     paste0(.fr(mcse_val, digits), ".\n")
   )
+  print_reff_summary(x, digits)
 }
 
 # print and warning helpers
