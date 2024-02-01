@@ -117,7 +117,7 @@ misspecification, outliers or mistakes in data processing. See
 Section 6 of Gabry et al. (2019) for an example.
 
 \subsection{Interpreting \code{p_loo} when Pareto \code{k} is large}{
-If \eqn{k < min(1 - 1 / log10(S), 0.7)} then we can also look at
+If \eqn{k > 0.7} then we can also look at
 the \code{p_loo} estimate for some additional information about the problem:
 \itemize{
 \item If \verb{p_loo << p} (the total number of parameters in the model),
