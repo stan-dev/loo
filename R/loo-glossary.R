@@ -113,7 +113,7 @@
 #' Section 6 of Gabry et al. (2019) for an example.
 #'
 #' \subsection{Interpreting `p_loo` when Pareto `k` is large}{
-#' If \eqn{k < min(1 - 1 / log10(S), 0.7)} then we can also look at
+#' If \eqn{k > 0.7} then we can also look at
 #' the `p_loo` estimate for some additional information about the problem:
 #'
 #' * If `p_loo << p` (the total number of parameters in the model),

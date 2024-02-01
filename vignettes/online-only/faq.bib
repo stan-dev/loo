@@ -1,3 +1,23 @@
+@article{Merkle+Furr+Rabe_Hesketh:2019,
+   title={Bayesian Comparison of Latent Variable Models: Conditional Versus Marginal Likelihoods},
+   volume={84},
+   number={3},
+   journal={Psychometrika},
+   author={Merkle, Edgar C. and Furr, Daniel and Rabe-Hesketh, Sophia},
+   year={2019},
+   pages={802–829}
+}
+
+@article{Vehtari+etal:2016:LOO_for_GLVM,
+  title={Bayesian leave-one-out cross-validation approximations for Gaussian latent variable models},
+  author={Vehtari, Aki and Mononen, Tommi and Tolvanen, Ville and Sivula, Tuomas and Winther, Ole},
+  journal={The Journal of Machine Learning Research},
+  volume={17},
+  number={1},
+  pages={3581--3618},
+  year={2016}
+}
+
 @article{Merkle+Furr+Rabe-Hesketh:2018,
   title={Bayesian comparison of latent variable models: {C}onditional vs marginal likelihoods},
   author={Merkle, Edgar C and Furr, Daniel and Rabe-Hesketh, Sophia},
@@ -214,6 +234,14 @@ year  = {1998}
   url={https://arxiv.org/abs/1507.02646v6}
 }
 
+@article{Vehtari+etal:PSIS:2022,
+  title={Pareto smoothed importance sampling},
+  author={Vehtari, Aki and Simpson, Daniel and Gelman, Andrew and Yao, Yuling and Gabry, Jonah},
+  journal={arXiv preprint arXiv:1507.02646},
+  year={2022},
+  url={https://arxiv.org/abs/1507.02646v6}
+}
+
 @article{Piironen+etal:projpred:2018,
   title={Projective Inference in High-dimensional Problems: Prediction and Feature Selection},
   author={Piironen, Juho and Paasiniemi, Markus and Vehtari, Aki},
@@ -243,8 +271,9 @@ year={2020}
 title={Using reference models in variable selection},
 author={Pavone, Federico and Piironen, Juho and B{\"u}rkner, Paul-Christian and Vehtari, Aki},
 journal={Computational Statistics},
-year={2022},
-  doi={10.1007/s00180-022-01231-6}
+volume = 38,
+pges = {349--371},
+year={2022}
 }
 
 @article{Vehtari+etal:PSIS-LOO:2017,
@@ -435,7 +464,6 @@ year  = {2019}
   year={2020}
 }
 
-
 @article{Gabry+etal:2019:visualization,
   author = {Gabry, Jonah and Simpson, Daniel and Vehtari, Aki and Betancourt, Michael and  Gelman, Andrew},
   title = {Visualization in {Bayesian} workflow},
@@ -444,4 +472,159 @@ year  = {2019}
   number = 2,
   pages = {389-402},
   year = 2019
+}
+
+@Article{Cooper+etal:2023,
+  author = 	 {Alex Cooper and Dan Simpson and Lauren Kennedy and Catherine Forbes and Aki Vehtari},
+  title = 	 {Cross-validatory model selection for Bayesian autoregressions with exogenous regressors},
+  journal = 	 {Bayesian Analysis},
+  year = 	 {2023},
+  note = {Accepted for publication. Preprint arXiv:2301.08276.}
+}
+
+@Article{Burman:1989,
+ author	     = {Prabir Burman},
+ title	     = {A Comparative Study of Ordinary Cross-Validation,
+                $v$-Fold Cross-Validation and the Repeated
+                Learning-Testing Methods},
+ journal     = {Biometrika},
+ year	     = {1989},
+ volume	     = {76},
+ number	     = {3},
+ pages	     = {503--514},
+ abstract    = {Concepts of $\nu$-fold cross-validation and
+                repeated learning-testing methods have been
+                introduced here. In many problems, these methods
+                are computationally much less expensive than
+                ordinary cross-validation and can be used in its
+                place. A comparative study of these three methods
+                has been carried out in detail.}
+}
+
+@article{Bengio+Grandvalet:2004,
+  title={No unbiased estimator of the variance of $k$-fold cross-validation},
+  author={Bengio, Yoshua and Grandvalet, Yves},
+  journal={Journal of Machine Learning Research},
+  volume={5},
+  pages={1089--1105},
+  year={2004}
+}
+
+@article{Sivula+Magnusson+Vehtari:2023,
+  title={Unbiased estimator for the variance of the leave-one-out cross-validation estimator for a Bayesian normal model with fixed variance},
+  author={Sivula, Tuomas and Magnusson, M{\aa}ns and Vehtari, Aki},
+  journal={Communications in Statistics-Theory and Methods},
+  volume={52},
+  number={16},
+  pages={5877--5899},
+  year={2023}
+}
+
+@article{Fushiki:2011,
+  title={Estimation of prediction error by using K-fold cross-validation},
+  author={Fushiki, Tadayoshi},
+  journal={Statistics and Computing},
+  volume={21},
+  pages={137--146},
+  year={2011}
+}
+
+@Article{McLatchie+Vehtari:2023,
+  author = 	 {Yann McLatchie and Aki Vehtari},
+  title = 	 {Efficient estimation and correction of selection-induced bias with order statistics},
+  journal = 	 {arXiv preprint arXiv:2309.03742},
+  year = 	 {2023}
+}
+
+@article{Ambroise+McLachlan:2002,
+	title = {Selection bias in gene extraction on the basis of microarray gene-expression data},
+	volume = {99},
+	number = {10},
+	journal = {Proceedings of the National Academy of Sciences},
+	author = {Ambroise, Christophe and McLachlan, Geoffrey J.},
+	year = {2002},
+	pages = {6562--6566}
+}
+
+@article{Reunanen:2003,
+	title = {Overfitting in making comparisons between variable selection methods},
+	volume = {3},
+	journal = {Journal of Machine Learning Research},
+	author = {Reunanen, Juho},
+	year = {2003},
+	pages = {1371--1382}
+}
+
+@article{Cawley+Talbot:2010,
+	title = {On Over-Fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation},
+	volume = {11},
+	journal = {Journal of Machine Learning Research},
+	author = {Cawley, Gavin C. and Talbot, Nicola L. C.},
+	year = {2010},
+	pages = {2079--2107}
+}
+
+@article{McLatchie+etal:2023:projpred_workflow,
+  title={Robust and efficient projection predictive inference},
+  author={McLatchie, Yann and R{\"o}gnvaldsson, S{\"o}lvi and Weber, Frank and Vehtari, Aki},
+  journal={arXiv preprint arXiv:2306.15581},
+  year={2023}
+}
+
+@article{Zhang+etal:2022:R2D2,
+	title = {Bayesian Regression Using a Prior on the Model Fit: The {R2-D2} Shrinkage Prior},
+	volume = 117,
+	number = 538,
+	journal = {Journal of the American Statistical Association},
+	author = {Zhang, Yan Dora and Naughton, Brian P. and Bondell, Howard D. and Reich, Brian J.},
+	year = 2022,
+	pages = {862--874}
+	}
+
+@article{McLatchie+etal:2023:projpred_workflow,
+  title = {Robust and Efficient Projection Predictive Inference},
+  author = {McLatchie, Yann and R{\"o}gnvaldsson, S{\"o}lvi and Weber, Frank and Vehtari, Aki},
+  year = {2023},
+  journal = {arXiv:2306.15581},
+}
+
+@article{Heinze+etal:bodyfat,
+  title={Variable selection--a review and recommendations for the practicing statistician},
+  author={Heinze, Georg and Wallisch, Christine and Dunkler, Daniela},
+  journal={Biometrical Journal},
+  volume={60},
+  number={3},
+  pages={431--449},
+  year={2018}
+}
+
+@article{Kennedy+etal:2023,
+  title={Scoring multilevel regression and postratification based population and subpopulation estimates},
+  author={Kennedy, Lauren and Vehtari, Aki and Gelman, Andrew},
+  journal={arXiv preprint arXiv:2312.06334},
+  year={2023}
+}
+
+@article{Cooper+etal:2023:parallelCV,
+  title={Bayesian cross-validation by parallel {Markov} chain {Monte} {Carlo}},
+  author={Cooper, Alex and Vehtari, Aki and Forbes, Catherine and Kennedy, Lauren and Simpson, Dan},
+  journal={arXiv preprint arXiv:2310.07002},
+  year={2023}
+}
+
+@article{Silva+Zanella:2023,
+  title={Robust leave-one-out cross-validation for high-dimensional {Bayesian} models},
+  author={Silva, Luca Alessandro and Zanella, Giacomo},
+  journal={Journal of the American Statistical Association},
+  pages={1--13},
+  year={2023}
+}
+
+@article{Vehtari+etal:2019:limitations,
+  title={Limitations of ``{Limitations} of {Bayesian} leave-one-out cross-validation for model selection''},
+  author={Vehtari, Aki and Simpson, Daniel P and Yao, Yuling and Gelman, Andrew},
+  journal={Computational Brain \& Behavior},
+  volume={2},
+  pages={22--27},
+  year={2019}
 }
