@@ -7,7 +7,8 @@ loo1 <- suppressWarnings(loo(example_loglik_matrix()))
 test_that("pointwise throws the right errors", {
   expect_error(
     pointwise(loo1, "xxx"),
-    "'xxx' not found"
+    "'xxx' not found",
+    fixed = TRUE
   )
   expect_error(
     pointwise(loo1, c("elpd_loo", "p_loo")),
