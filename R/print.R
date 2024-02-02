@@ -66,6 +66,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   cat("Posterior approximation correction used.\n")
+  attr(x, 'r_eff') <- 1
   print_mcse_summary(x, digits = digits)
   S <- dim(x)[1]
   k_threshold <- ps_khat_threshold(S)
@@ -85,6 +86,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
 #' @rdname print.loo
 print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print_dims(x)
+  print_reff_summary(x, digits)
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
@@ -177,18 +179,27 @@ print_dims.psis_loo_ss <- function(x, ...) {
 
 print_reff_summary <- function(x, digits) {
   r_eff <- x$diagnostics$r_eff
-  if (all(r_eff==1)) {
-    cat(
-      "MCSE and ESS estimates assume independent draws (r_eff=1).\n"
-    )
-  } else {
-    cat(paste0(
-      "MCSE and ESS estimates assume MCMC draws (r_eff in [",
-      .fr(min(r_eff), digits),
-      ", ",
-      .fr(max(r_eff), digits),
-      "]).\n"
-    ))
+  if (is.null(r_eff)) {
+    if (!is.null(x$psis_object)) {
+      r_eff <- attr(x$psis_object,'r_eff')
+    } else {
+      r_eff <- attr(x,'r_eff')
+    }
+  }
+  if (!is.null(r_eff)) {
+    if (all(r_eff==1)) {
+      cat(
+        "MCSE and ESS estimates assume independent draws (r_eff=1).\n"
+      )
+    } else {
+      cat(paste0(
+        "MCSE and ESS estimates assume MCMC draws (r_eff in [",
+        .fr(min(r_eff), digits),
+        ", ",
+        .fr(max(r_eff), digits),
+        "]).\n"
+      ))
+    }
   }
 }
 
