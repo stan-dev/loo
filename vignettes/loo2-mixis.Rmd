@@ -20,7 +20,7 @@ params:
 
 # Introduction
 
-This vignette shows how to perform Bayesian leave-one-out cross-validation (LOO-CV) using the mixture estimators proposed in the paper [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). These estimators have shown to be useful in presence of outliers but also, and especially, in high-dimensional settings where the model features many parameters. In these contexts it can happen that a large portion of observations lead to high values of Pareto-$k$ diagnostics and potential instability of PSIS-LOO estimators. 
+This vignette shows how to perform Bayesian leave-one-out cross-validation (LOO-CV) using the mixture estimators proposed in the paper [Silva and Zanella (2022)](https://arxiv.org/abs/2209.09190). These estimators have shown to be useful in presence of outliers but also, and especially, in high-dimensional settings where the model features many parameters. In these contexts it can happen that a large portion of observations lead to high values of Pareto-$k$ diagnostics and potential instability of PSIS-LOO estimators.
 
 For this illustration we consider a high-dimensional Bayesian Logistic regression model applied to the _Voice_ dataset.
 
@@ -44,12 +44,12 @@ This is the Stan code for a logistic regression model with regularized horseshoe
 #    int<lower=0,upper=1> y[N];
 stancode_horseshoe <- "
 data {
-  int <lower=0> n;                
-  int <lower=0> p;                
-  array[N] int <lower=0, upper=1> y;    
-  matrix [n,p] X;                
+  int <lower=0> N;
+  int <lower=0> P;
+  array[N] int <lower=0, upper=1> y;
+  matrix [N,P] X;
   real <lower=0> scale_global;
-  int <lower=0,upper=1> mixis;                
+  int <lower=0,upper=1> mixis;
 }
 transformed data {
   real<lower=1> nu_global=1; // degrees of freedom for the half-t priors for tau
@@ -59,29 +59,29 @@ transformed data {
   real<lower=0> slab_df=100; // for the regularized horseshoe
 }
 parameters {
-  vector[p] z;                // for non-centered parameterization
+  vector[P] z;                // for non-centered parameterization
   real <lower=0> tau;         // global shrinkage parameter
-  vector <lower=0>[p] lambda; // local shrinkage parameter
+  vector <lower=0>[P] lambda; // local shrinkage parameter
   real<lower=0> caux;
 }
 transformed parameters {
-  vector[p] beta;
+  vector[P] beta;
   { 
-    vector[p] lambda_tilde;   // 'truncated' local shrinkage parameter
+    vector[P] lambda_tilde;   // 'truncated' local shrinkage parameter
     real c = slab_scale * sqrt(caux); // slab scale
     lambda_tilde = sqrt( c^2 * square(lambda) ./ (c^2 + tau^2*square(lambda)));
     beta = z .* lambda_tilde*tau;
   }
 }
 model {
-  vector[n] means=X*beta;
-  vector[n] log_lik;
+  vector[N] means=X*beta;
+  vector[N] log_lik;
   target += std_normal_lpdf(z);
   target += student_t_lpdf(lambda | nu_local, 0, 1);
   target += student_t_lpdf(tau | nu_global, 0, scale_global);
   target += inv_gamma_lpdf(caux | 0.5*slab_df, 0.5*slab_df);
-  for (index in 1:n) {
-    log_lik[index]= bernoulli_logit_lpmf(y[index] | means[index]);
+  for (n in 1:N) {
+    log_lik[n]= bernoulli_logit_lpmf(y[n] | means[n]);
   }
   target += sum(log_lik);
   if (mixis) {
@@ -89,10 +89,10 @@ model {
   }
 }
 generated quantities {
-  vector[n] means=X*beta;
-  vector[n] log_lik;
-  for (index in 1:n) {
-    log_lik[index] = bernoulli_logit_lpmf(y[index] | means[index]);
+  vector[N] means=X*beta;
+  vector[N] log_lik;
+  for (n in 1:N) {
+    log_lik[n] = bernoulli_logit_lpmf(y[n] | means[n]);
   }
 }
 "
@@ -105,11 +105,11 @@ The _LSVT Voice Rehabilitation Data Set_ (see [link](https://archive.ics.uci.edu
 data(voice)
 y <- voice$y
 X <- voice[2:length(voice)]
-n <- dim(X)[1]
+p <- dim(X)[1]
 p <- dim(X)[2]
 p0 <- 10
 scale_global <- 2*p0/(p-p0)/sqrt(n-1)
-standata <- list(n = n, p = p, X = as.matrix(X), y = c(y), scale_global = scale_global, mixis = 0)
+standata <- list(N = n, P = p, X = as.matrix(X), y = c(y), scale_global = scale_global, mixis = 0)
 ```
 
 Note that in our prior specification we divide the prior variance by the number of covariates $p$. This is often done in high-dimensional contexts to have a prior variance for the linear predictors $X\beta$ that remains bounded as $p$ increases.
