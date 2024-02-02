@@ -147,6 +147,12 @@ test_that("loo_moment_match.default warnings work", {
                               k_thres = 0.5, split = FALSE,
                               cov = TRUE, cores = 1), "The accuracy of self-normalized importance sampling")
 
+  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
+                              unconstrain_pars_test, log_prob_upars_test,
+                              log_lik_i_upars_test, max_iters = 30L,
+                              split = FALSE,
+                              cov = TRUE, cores = 1), "The accuracy of self-normalized importance sampling")
+
   expect_no_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 30L,

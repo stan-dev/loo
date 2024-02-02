@@ -78,7 +78,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   checkmate::assertFunction(log_prob_upars)
   checkmate::assertFunction(log_lik_i_upars)
   checkmate::assertNumber(max_iters)
-  checkmate::assertNumber(k_threshold)
+  checkmate::assertNumber(k_threshold, null.ok=TRUE)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
   checkmate::assertNumber(cores)

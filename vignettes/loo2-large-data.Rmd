@@ -35,7 +35,7 @@ Proceedings of the 23rd International Conference on Artificial Intelligence and 
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](https://link.springer.com/article/10.1007/s11222-016-9696-4) | [arXiv preprint](https://arxiv.org/abs/1507.04544).
 
-* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
 which provide important background for understanding the methods implemented in
 the package.
@@ -195,8 +195,9 @@ p_loo         3.1  0.1            0.4
 looic      3936.9 31.2            0.6
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -246,8 +247,9 @@ p_loo         3.2  0.1            0.4
 looic      3936.7 31.2            0.5
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -290,8 +292,9 @@ p_loo         3.5  0.2            0.5
 looic      3937.9 30.7            1.1
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -343,15 +346,9 @@ looic      3936.8 31.2
 ------
 Posterior approximation correction used.
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
 
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     2989  99.0%   1827      
- (0.5, 0.7]   (ok)         31   1.0%   1996      
-   (0.7, 1]   (bad)         0   0.0%   <NA>      
-   (1, Inf)   (very bad)    0   0.0%   <NA>      
-
-All Pareto k estimates are ok (k < 0.7).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -386,15 +383,9 @@ looic      3936.4 31.1            0.8
 ------
 Posterior approximation correction used.
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
 
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     97    97.0%   1971      
- (0.5, 0.7]   (ok)        3     3.0%   1997      
-   (0.7, 1]   (bad)       0     0.0%   <NA>      
-   (1, Inf)   (very bad)  0     0.0%   <NA>      
-
-All Pareto k estimates are ok (k < 0.7).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -471,8 +462,9 @@ p_loo         2.6  0.1            0.3
 looic      3903.9 32.4            0.4
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [1.0, 1.1]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -616,6 +608,6 @@ Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
 [online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
 [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto
 smoothed importance sampling.
 [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
