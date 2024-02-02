@@ -5,9 +5,9 @@
 \alias{pointwise.loo}
 \title{Convenience function for extracting pointwise estimates}
 \usage{
-pointwise(x, estimate = NULL, ...)
+pointwise(x, estimate, ...)
 
-\method{pointwise}{loo}(x, estimate = NULL, ...)
+\method{pointwise}{loo}(x, estimate, ...)
 }
 \arguments{
 \item{x}{A \code{loo} object, for example one returned by \code{\link[=loo]{loo()}},
@@ -17,23 +17,19 @@ pointwise(x, estimate = NULL, ...)
 returned. The objects returned by the different functions (\code{\link[=loo]{loo()}},
 \code{\link[=loo_subsample]{loo_subsample()}}, etc.) have slightly different estimates available.
 Typically at a minimum the estimates \code{elpd_loo}, \code{looic}, \code{mcse_elpd_loo},
-\code{p_loo}, and \code{influence_pareto_k} will be available but there may be
+\code{p_loo}, and \code{influence_pareto_k} will be available, but there may be
 others.}
 
 \item{...}{Currently ignored.}
 }
 \value{
-If \code{estimate} is \code{NULL} then all pointwise estimates are returned in
-a matrix with one column per estimate and one row per observation.
-Otherwise a vector of length equal to the number of observations is
-returned containing the pointwise values for \code{estimate}.
+A vector of length equal to the number of observations.
 }
 \description{
 Convenience function for extracting pointwise estimates
 }
 \examples{
 x <- loo(example_loglik_array())
-head(pointwise(x))
 pointwise(x, "elpd_loo")
 
 }

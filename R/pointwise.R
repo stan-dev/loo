@@ -7,32 +7,26 @@
 #'   returned. The objects returned by the different functions ([loo()],
 #'   [loo_subsample()], etc.) have slightly different estimates available.
 #'   Typically at a minimum the estimates `elpd_loo`, `looic`, `mcse_elpd_loo`,
-#'   `p_loo`, and `influence_pareto_k` will be available but there may be
+#'   `p_loo`, and `influence_pareto_k` will be available, but there may be
 #'   others.
 #' @param ... Currently ignored.
-#' @return If `estimate` is `NULL` then all pointwise estimates are returned in
-#'   a matrix with one column per estimate and one row per observation.
-#'   Otherwise a vector of length equal to the number of observations is
-#'   returned containing the pointwise values for `estimate`.
+#' @return A vector of length equal to the number of observations.
 #'
 #' @examples
 #' x <- loo(example_loglik_array())
-#' head(pointwise(x))
 #' pointwise(x, "elpd_loo")
 #'
-pointwise <- function(x, estimate = NULL, ...) {
+pointwise <- function(x, estimate, ...) {
   UseMethod("pointwise")
 }
 
 #' @rdname pointwise
 #' @export
-pointwise.loo <- function(x, estimate = NULL, ...) {
+pointwise.loo <- function(x, estimate, ...) {
+  stopifnot(is.character(estimate), length(estimate) == 1)
   pw <- x$pointwise
   if (is.null(pw)) {
     stop("No pointwise estimates found.", call. = FALSE)
-  }
-  if (is.null(estimate)) {
-    return(pw)
   }
   estimates <- colnames(pw)
   if (!(estimate %in% estimates)) {
