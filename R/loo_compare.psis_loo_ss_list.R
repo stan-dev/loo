@@ -4,6 +4,7 @@
 #' @param ... Currently ignored.
 #' @return A `compare.loo_ss` object.
 #' @author Mans Magnusson
+#' @export
 loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
