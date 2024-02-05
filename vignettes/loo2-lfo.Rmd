@@ -222,7 +222,6 @@ interface to Stan to generate a Stan program and fit the model, and also the
 ```{r pkgs, cache=FALSE}
 library("brms")
 library("loo")
-devtools::load_all('~/proj/loo')
 library("bayesplot")
 library("ggplot2")
 color_scheme_set("brightblue")
