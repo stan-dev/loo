@@ -105,7 +105,7 @@ estimates can be assessed using the estimates for the shape
 parameter \eqn{k} of the generalized Pareto distribution. The
 diagnostic threshold for Pareto \eqn{k} depends on sample size
 \eqn{S} (sample size dependent threshold was introduced by Vehtari
-et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+et al. (2022), and before that fixed thresholds of 0.5 and 0.7 were
 recommended). For simplicity, \code{loo} package uses the nominal sample
 size \eqn{S} when computing the sample size specific
 threshold. This provides an optimistic threshold if the effective
@@ -116,7 +116,7 @@ improve the ratio ESS/S.
 \item If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
 sample size, the PSIS estimate and the corresponding Monte Carlo
 standard error estimate are reliable.
-\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, PSIS estimate and the
+\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
 corresponding Monte Carlo standard error estimate are not
 reliable, but increasing the (effective) sample size \eqn{S} above
 2200 may help (this will increase the sample size specific
@@ -125,15 +125,15 @@ threshold 0.7 dominates).
 \item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
 the sample size may reduce the uncertainty in the \eqn{k} estimate.
-\item If \eqn{0.7 <= k < 1}, PSIS estimate and the corresponding Monte
+\item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
-sample size may reduce the variability in \eqn{k} estimate, which
+the sample size may reduce the variability in \eqn{k} estimate, which
 may result in lower \eqn{k} estimate, too.
 \item If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
-have non-finite mean. The PSIS estimate and the corresponding Monte
+have a non-finite mean. The PSIS estimate and the corresponding Monte
 Carlo standard error are not well defined. Increasing the sample size
-may reduce the variability in \eqn{k} estimate, which
-may result in lower \eqn{k} estimate, too.
+may reduce the variability in the \eqn{k} estimate, which
+may also result in a lower \eqn{k} estimate.
 }
 
 \subsection{What if the estimated tail shape parameter \eqn{k}
@@ -146,7 +146,7 @@ influential observations.  If the estimated tail shape parameter
 warned. (Note: If \eqn{k} is greater than the diagnostic threshold
 then WAIC is also likely to fail, but WAIC lacks as accurate
 diagnostic.)  When using PSIS in the context of approximate LOO-CV,
-we recommend one of the following actions when \eqn{k > 0.7}:
+we recommend one of the following actions:
 \itemize{
 \item With some additional computations, it is possible to transform
 the MCMC draws from the posterior distribution to obtain more
@@ -179,8 +179,8 @@ package also computes estimates for the Monte Carlo error and the effective
 sample size for importance sampling, which are more accurate for PSIS than
 for IS and TIS (see Vehtari et al (2022) for details). However, the PSIS
 effective sample size estimate will be
-\strong{over-optimistic when the estimate of \eqn{k} is greater than
-\eqn{min(1-1/log10(S), 0.7)}}, where \eqn{S} is the sample size.
+\strong{over-optimistic when the estimate of \eqn{k} is greater than}
+\eqn{min(1-1/log10(S), 0.7)}, where \eqn{S} is the sample size.
 }
 }
 \references{
