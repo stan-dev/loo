@@ -105,7 +105,7 @@ The _LSVT Voice Rehabilitation Data Set_ (see [link](https://archive.ics.uci.edu
 data(voice)
 y <- voice$y
 X <- voice[2:length(voice)]
-p <- dim(X)[1]
+n <- dim(X)[1]
 p <- dim(X)[2]
 p0 <- 10
 scale_global <- 2*p0/(p-p0)/sqrt(n-1)
