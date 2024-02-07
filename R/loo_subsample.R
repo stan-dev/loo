@@ -138,7 +138,7 @@ loo_subsample.function <-
     cores <- loo_cores(cores)
 
     checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
-    checkmate::assert_int(loo_approximation_draws, lower = 1, upper = n_draws(draws), null.ok = TRUE)
+    checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
     checkmate::assert_choice(estimator, choices = estimator_choices())
 
     .llgrad <- .llhess <- NULL
@@ -234,7 +234,7 @@ loo_subsample.function <-
                                  .llgrad = .llgrad,
                                  .llhess = .llhess,
                                  data_dim = dim(data),
-                                 ndraws = n_draws(draws))
+                                 ndraws = .ndraws(draws))
     loo_ss
   }
 
@@ -537,20 +537,20 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
   if (loo_approximation == "none") return(rep(1L,N))
 
   if (loo_approximation %in% c("tis", "sis")) {
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation))
     return(is_values$pointwise[, "elpd_loo"])
   }
 
   if (loo_approximation == "waic") {
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     waic_full_obj <- waic.function(.llfun, data = data, draws = draws)
     return(waic_full_obj$pointwise[,"elpd_waic"])
   }
 
   # Compute the lpd or log p(y_i|y_{-i})
   if (loo_approximation == "lpd") {
-    draws <- thin_draws(draws, loo_approximation_draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
     lpds <- compute_lpds(N, data, draws, .llfun, cores)
     return(lpds) # Use only the lpd
   }
@@ -561,8 +561,8 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
       loo_approximation == "waic_grad_marginal" |
       loo_approximation == "waic_hess") {
 
-    draws <- thin_draws(draws, loo_approximation_draws)
-    point_est <- compute_point_estimate(draws)
+    draws <- .thin_draws(draws, loo_approximation_draws)
+    point_est <- .compute_point_estimate(draws)
     lpds <- compute_lpds(N, data, point_est, .llfun, cores)
     if (loo_approximation == "plpd") return(lpds) # Use only the lpd
   }
@@ -572,7 +572,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
       loo_approximation == "waic_hess") {
     checkmate::assert_true(!is.null(.llgrad))
 
-    point_est <- compute_point_estimate(draws)
+    point_est <- .compute_point_estimate(draws)
     # Compute the lpds
     lpds <- compute_lpds(N, data, point_est, .llfun, cores)
 
@@ -620,28 +620,32 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
 #' Compute a point estimate from a draws object
 #'
-#' @noRd
+#' @keywords internal
+#' @export
 #' @details This is a generic function to compute point estimates from draws
 #'   objects. The function is internal and should only be used by developers to
 #'   enable [loo_subsample()] for arbitrary draws objects.
 #'
 #' @param draws A draws object with draws from the posterior.
 #' @return A 1 by P matrix with point estimates from a draws object.
-compute_point_estimate <- function(draws) {
-  UseMethod("compute_point_estimate")
+.compute_point_estimate <- function(draws) {
+  UseMethod(".compute_point_estimate")
 }
+#' @rdname dot-compute_point_estimate
 #' @export
-compute_point_estimate.matrix <- function(draws) {
+.compute_point_estimate.matrix <- function(draws) {
   t(as.matrix(colMeans(draws)))
 }
+#' @rdname dot-compute_point_estimate
 #' @export
-compute_point_estimate.default <- function(draws) {
-  stop("compute_point_estimate() has not been implemented for objects of class '", class(draws), "'")
+.compute_point_estimate.default <- function(draws) {
+  stop(".compute_point_estimate() has not been implemented for objects of class '", class(draws), "'")
 }
 
 #' Thin a draws object
 #'
-#' @noRd
+#' @keywords internal
+#' @export
 #' @details This is a generic function to thin draws from arbitrary draws
 #'   objects. The function is internal and should only be used by developers to
 #'   enable [loo_subsample()] for arbitrary draws objects.
@@ -649,48 +653,53 @@ compute_point_estimate.default <- function(draws) {
 #' @param draws A draws object with posterior draws.
 #' @param loo_approximation_draws The number of posterior draws to return (ie after thinning).
 #' @return A thinned draws object.
-thin_draws <- function(draws, loo_approximation_draws) {
-  UseMethod("thin_draws")
+.thin_draws <- function(draws, loo_approximation_draws) {
+  UseMethod(".thin_draws")
 }
-
+#' @rdname dot-thin_draws
 #' @export
-thin_draws.matrix <- function(draws, loo_approximation_draws) {
+.thin_draws.matrix <- function(draws, loo_approximation_draws) {
   if (is.null(loo_approximation_draws)) return(draws)
-  checkmate::assert_int(loo_approximation_draws, lower = 1, upper = n_draws(draws), null.ok = TRUE)
-  S <- n_draws(draws)
+  checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
+  S <- .ndraws(draws)
   idx <- 1:loo_approximation_draws * S %/% loo_approximation_draws
   draws <- draws[idx, , drop = FALSE]
   draws
 }
+#' @rdname dot-thin_draws
 #' @export
-thin_draws.numeric <- function(draws, loo_approximation_draws) {
-  thin_draws.matrix(as.matrix(draws), loo_approximation_draws)
+.thin_draws.numeric <- function(draws, loo_approximation_draws) {
+  .thin_draws.matrix(as.matrix(draws), loo_approximation_draws)
 }
+#' @rdname dot-thin_draws
 #' @export
-thin_draws.default <- function(draws, loo_approximation_draws) {
-  stop("thin_draws() has not been implemented for objects of class '", class(draws), "'")
+.thin_draws.default <- function(draws, loo_approximation_draws) {
+  stop(".thin_draws() has not been implemented for objects of class '", class(draws), "'")
 }
 
 
 #' The number of posterior draws in a draws object.
 #'
-#' @noRd
+#' @keywords internal
+#' @export
 #' @details This is a generic function to return the total number of draws from
 #'   an arbitrary draws objects. The function is internal and should only be
 #'   used by developers to enable [loo_subsample()] for arbitrary draws objects.
 #'
 #' @param x A draws object with posterior draws.
 #' @return An integer with the number of draws.
-n_draws <- function(x) {
-  UseMethod("n_draws")
+.ndraws <- function(x) {
+  UseMethod(".ndraws")
 }
+#' @rdname dot-ndraws
 #' @export
-n_draws.matrix <- function(x) {
+.ndraws.matrix <- function(x) {
   nrow(x)
 }
+#' @rdname dot-ndraws
 #' @export
-n_draws.default <- function(x) {
-  stop("n_draws() has not been implemented for objects of class '", class(x), "'")
+.ndraws.default <- function(x) {
+  stop(".ndraws() has not been implemented for objects of class '", class(x), "'")
 }
 
 ## Subsampling -----
