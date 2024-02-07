@@ -4,7 +4,7 @@
 \alias{.thin_draws}
 \alias{.thin_draws.matrix}
 \alias{.thin_draws.numeric}
-\alias{thin_draws.default}
+\alias{.thin_draws.default}
 \title{Thin a draws object}
 \usage{
 .thin_draws(draws, loo_approximation_draws)
@@ -13,7 +13,7 @@
 
 \method{.thin_draws}{numeric}(draws, loo_approximation_draws)
 
-thin_draws.default(draws, loo_approximation_draws)
+\method{.thin_draws}{default}(draws, loo_approximation_draws)
 }
 \arguments{
 \item{draws}{A draws object with posterior draws.}
