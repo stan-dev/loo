@@ -548,7 +548,7 @@ df_oos <- df[c(past, oos), , drop = FALSE]
 fit_past <- update(fit, newdata = df_past, recompile = FALSE)
 loglik <- log_lik(fit_past, newdata = df_oos, oos = oos)
 loglikm <- rowSums(loglik[, oos])
-approx_elpds_1sap[L + 1] <- log_mean_exp(loglikm)
+approx_elpds_4sap[L + 1] <- log_mean_exp(loglikm)
 
 # iterate over i > L
 i_refit <- L
