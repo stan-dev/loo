@@ -7,7 +7,8 @@ LLarr <- example_loglik_array()
 waic1 <- suppressWarnings(waic(LLarr))
 loo1 <- suppressWarnings(loo(LLarr))
 psis1 <- suppressWarnings(psis(-LLarr))
-
+r_eff_arr <- relative_eff(exp(LLarr))
+loo1_r_eff <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 
 
 # plotting ----------------------------------------------------------------
@@ -51,6 +52,8 @@ test_that("print.psis_loo and print.psis output ok",{
   expect_output(print(psis1), lwdim_msg)
   expect_output(print(psis1), "Pareto k estimates are good")
   expect_output(print(loo1), lldim_msg)
+  expect_output(print(loo1), "MCSE and ESS estimates assume independent draws")
+  expect_output(print(loo1_r_eff), "MCSE and ESS estimates assume MCMC draws")
   expect_output(print(loo1), "Pareto k estimates are good")
 
   loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, 0, .49)
@@ -102,9 +105,9 @@ test_that("pareto_k_ids identifies correct observations", {
 })
 
 test_that("pareto_k_table gives correct output", {
-  psis1$diagnostics$pareto_k[1:10] <- runif(10, 0, 0.49)
-  psis1$diagnostics$pareto_k[11:17] <- runif(7, 0.51, 0.69)
-  psis1$diagnostics$pareto_k[18:20] <- runif(3, 0.71, 0.99)
+  threshold <- ps_khat_threshold(dim(psis1)[1])
+  psis1$diagnostics$pareto_k[1:10] <- runif(10, 0, threshold)
+  psis1$diagnostics$pareto_k[11:20] <- runif(10, threshold+0.01, 0.99)
   psis1$diagnostics$pareto_k[21:32] <- runif(12, 1, 10)
   k <- pareto_k_values(psis1)
   tab <- pareto_k_table(psis1)
@@ -114,24 +117,20 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(tab[, "Count"]), length(k))
   expect_equal(sum(tab[, "Proportion"]), 1)
 
-  expect_equal(sum(k <= 0.5), tab[1,1])
-  expect_equal(sum(k > 0.5 & k <= 0.7), tab[2,1])
-  expect_equal(sum(k > 0.7 & k <= 1), tab[3,1])
-  expect_equal(sum(k > 1), tab[4,1])
-
-  psis1$diagnostics$pareto_k[1:32] <- 0.4
-  expect_output(print(pareto_k_table(psis1)), "All Pareto k estimates are good (k < 0.5)",
-                fixed = TRUE)
-
-  psis1$diagnostics$pareto_k[1:32] <- 0.65
-  expect_output(print(pareto_k_table(psis1)), "All Pareto k estimates are ok (k < 0.7)",
-                fixed = TRUE)
+  expect_equal(sum(k <= threshold), tab[1,1])
+  expect_equal(sum(k > threshold & k <= 1), tab[2,1])
+  expect_equal(sum(k > 1), tab[3,1])
 
   # if n_eff is NULL
   psis1$diagnostics$n_eff <- NULL
   tab2 <- pareto_k_table(psis1)
   expect_output(print(tab2), "<NA>")
-  expect_equal(unname(tab2[, "Min. n_eff"]), rep(NA_real_, 4))
+  expect_equal(unname(tab2[, "Min. n_eff"]), rep(NA_real_, 3))
+
+  psis1$diagnostics$pareto_k[1:32] <- 0.4
+  expect_output(print(pareto_k_table(psis1)),
+                paste0("All Pareto k estimates are good (k < ", round(threshold,2), ")"),
+                fixed = TRUE)
 })
 
 
@@ -144,7 +143,7 @@ test_that("psis_n_eff_values extractor works", {
   expect_identical(psis_n_eff_values(psis1), psis_n_eff_values(loo1))
 
   psis1$diagnostics$n_eff <- NULL
-  expect_error(psis_n_eff_values(psis1), "No PSIS n_eff estimates found")
+  expect_error(psis_n_eff_values(psis1), "No PSIS ESS estimates found")
 })
 
 test_that("mcse_loo extractor gives correct value", {

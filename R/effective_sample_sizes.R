@@ -175,7 +175,6 @@ psis_n_eff <- function(w, ...) {
 psis_n_eff.default <- function(w, r_eff = NULL, ...) {
   ss <- sum(w^2)
   if (is.null(r_eff)) {
-    warning("PSIS n_eff not adjusted based on MCMC n_eff.", call. = FALSE)
     return(1 / ss)
   }
   stopifnot(length(r_eff) == 1)
@@ -186,11 +185,11 @@ psis_n_eff.default <- function(w, r_eff = NULL, ...) {
 psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
   ss <- colSums(w^2)
   if (is.null(r_eff)) {
-    warning("PSIS n_eff not adjusted based on MCMC n_eff.", call. = FALSE)
     return(1 / ss)
   }
-  if (length(r_eff) != length(ss))
-    stop("r_eff must have length ncol(w).", call. = FALSE)
+  if (length(r_eff) != length(ss) && length(r_eff) != 1) {
+    stop("r_eff must have length 1 or ncol(w).", call. = FALSE)
+  }
   1 / ss * r_eff
 }
 

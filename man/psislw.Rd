@@ -55,7 +55,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }

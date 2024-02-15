@@ -13,11 +13,13 @@
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of `1/exp(log_ratios)` (i.e., `1/ratios`).
 #'   This is related to the relative efficiency of estimating the normalizing
-#'   term in self-normalizing importance sampling. See the [relative_eff()]
-#'   helper function for computing `r_eff`. If using `psis` with
-#'   draws of the `log_ratios` not obtained from MCMC then the warning
-#'   message thrown when not specifying `r_eff` can be disabled by
-#'   setting `r_eff` to `NA`.
+#'   term in self-normalizing importance sampling. If `r_eff` is not
+#'   provided then the reported (T)IS effective sample sizes and Monte Carlo
+#'   error estimates can be over-optimistic. If the posterior draws are (near)
+#'   independent then `r_eff=1` can be used. `r_eff` has to be a scalar (same
+#'   value is used for all observations) or a vector with length equal to the
+#'   number of observations. The default value is 1. See the [relative_eff()]
+#'   helper function for computing `r_eff`.
 #'
 #' @return The `tis()` methods return an object of class `"tis"`,
 #'   which is a named list with the following components:
@@ -88,7 +90,7 @@ tis <- function(log_ratios, ...) UseMethod("tis")
 #'
 tis.array <-
   function(log_ratios, ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
@@ -103,7 +105,7 @@ tis.array <-
 tis.matrix <-
   function(log_ratios,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
     importance_sampling.matrix(log_ratios,
                                ...,
@@ -117,7 +119,7 @@ tis.matrix <-
 #' @template vector
 #'
 tis.default <-
-  function(log_ratios, ..., r_eff = NULL) {
+  function(log_ratios, ..., r_eff = 1) {
     importance_sampling.default(log_ratios = log_ratios, ...,
                                 r_eff = r_eff, method = "tis")
   }

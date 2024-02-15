@@ -39,7 +39,9 @@ print.psis_loo <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5))) {
+  S <- dim(x)[1]
+  k_threshold <- ps_khat_threshold(S)
+  if (length(pareto_k_ids(x, threshold = k_threshold))) {
     cat("\n")
   }
   print(pareto_k_table(x), digits = digits)
@@ -64,8 +66,11 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.loo(x, digits = digits, ...)
   cat("------\n")
   cat("Posterior approximation correction used.\n")
+  attr(x, 'r_eff') <- 1
   print_mcse_summary(x, digits = digits)
-  if (length(pareto_k_ids(x, threshold = 0.5))) {
+  S <- dim(x)[1]
+  k_threshold <- ps_khat_threshold(S)
+  if (length(pareto_k_ids(x, threshold = k_threshold))) {
     cat("\n")
   }
   print(pareto_k_table(x), digits = digits)
@@ -81,6 +86,7 @@ print.psis_loo_ap <- function(x, digits = 1, plot_k = FALSE, ...) {
 #' @rdname print.loo
 print.psis <- function(x, digits = 1, plot_k = FALSE, ...) {
   print_dims(x)
+  print_reff_summary(x, digits)
   print(pareto_k_table(x), digits = digits)
   cat(.k_help())
   if (plot_k) {
@@ -116,7 +122,7 @@ print_dims.importance_sampling <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-weights matrix\n"
+    "log-weights matrix.\n"
   )
 }
 
@@ -126,7 +132,7 @@ print_dims.psis_loo <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix\n"
+    "log-likelihood matrix.\n"
   )
 }
 
@@ -136,7 +142,7 @@ print_dims.importance_sampling_loo <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix using", class(x)[1], "\n"
+    "log-likelihood matrix using", class(x)[1], ".\n"
   )
 }
 
@@ -146,7 +152,7 @@ print_dims.waic <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix\n"
+    "log-likelihood matrix.\n"
   )
 }
 
@@ -155,7 +161,7 @@ print_dims.waic <- function(x, ...) {
 print_dims.kfold <- function(x, ...) {
   K <- attr(x, "K", exact = TRUE)
   if (!is.null(K)) {
-    cat("Based on", paste0(K, "-fold"), "cross-validation\n")
+    cat("Based on", paste0(K, "-fold"), "cross-validation.\n")
   }
 }
 
@@ -171,15 +177,40 @@ print_dims.psis_loo_ss <- function(x, ...) {
   )
 }
 
+print_reff_summary <- function(x, digits) {
+  r_eff <- x$diagnostics$r_eff
+  if (is.null(r_eff)) {
+    if (!is.null(x$psis_object)) {
+      r_eff <- attr(x$psis_object,'r_eff')
+    } else {
+      r_eff <- attr(x,'r_eff')
+    }
+  }
+  if (!is.null(r_eff)) {
+    if (all(r_eff==1)) {
+      cat(
+        "MCSE and ESS estimates assume independent draws (r_eff=1).\n"
+      )
+    } else {
+      cat(paste0(
+        "MCSE and ESS estimates assume MCMC draws (r_eff in [",
+        .fr(min(r_eff), digits),
+        ", ",
+        .fr(max(r_eff), digits),
+        "]).\n"
+      ))
+    }
+  }
+}
 
 print_mcse_summary <- function(x, digits) {
   mcse_val <- mcse_loo(x)
   cat(
-    "Monte Carlo SE of elpd_loo is",
+    "MCSE of elpd_loo is",
     paste0(.fr(mcse_val, digits), ".\n")
   )
+  print_reff_summary(x, digits)
 }
-
 
 # print and warning helpers
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)

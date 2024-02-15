@@ -13,7 +13,7 @@ importance_sampling(log_ratios, method, ...)
   log_ratios,
   method,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1)
 )
 
@@ -21,11 +21,11 @@ importance_sampling(log_ratios, method, ...)
   log_ratios,
   method,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1)
 )
 
-\method{importance_sampling}{default}(log_ratios, method, ..., r_eff = NULL)
+\method{importance_sampling}{default}(log_ratios, method, ..., r_eff = 1)
 }
 \arguments{
 \item{log_ratios}{An array, matrix, or vector of importance ratios on the log
@@ -50,11 +50,11 @@ effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 This is related to the relative efficiency of estimating the normalizing
 term in self-normalizing importance sampling. If \code{r_eff} is not
 provided then the reported PSIS effective sample sizes and Monte Carlo
-error estimates will be over-optimistic. See the \code{\link[=relative_eff]{relative_eff()}}
-helper function for computing \code{r_eff}. If using \code{psis} with
-draws of the \code{log_ratios} not obtained from MCMC then the warning
-message thrown when not specifying \code{r_eff} can be disabled by
-setting \code{r_eff} to \code{NA}.}
+error estimates can be over-optimistic. If the posterior draws are (near)
+independent then \code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same
+value is used for all observations) or a vector with length equal to the
+number of observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}}
+helper function for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by

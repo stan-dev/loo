@@ -144,14 +144,20 @@ test_that("loo_moment_match.default warnings work", {
   expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 30L,
-                              k_thres = 100, split = FALSE,
-                              cov = TRUE, cores = 1), "Some Pareto k")
+                              k_thres = 0.5, split = FALSE,
+                              cov = TRUE, cores = 1), "The accuracy of self-normalized importance sampling")
 
   expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 30L,
-                              k_thres = 0.5, split = FALSE,
+                              split = FALSE,
                               cov = TRUE, cores = 1), "The accuracy of self-normalized importance sampling")
+
+  expect_no_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
+                              unconstrain_pars_test, log_prob_upars_test,
+                              log_lik_i_upars_test, max_iters = 30L,
+                              k_thres = 100, split = TRUE,
+                              cov = TRUE, cores = 1))
 
   expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
@@ -180,13 +186,13 @@ test_that("loo_moment_match.default works", {
                                                 k_thres = 0.8, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-  # diagnostic pareto k decreases but influence pareto k stays the same
+  # diagnostic Pareto k decreases but influence pareto k stays the same
   expect_lt(loo_moment_match_object$diagnostics$pareto_k[1], loo_moment_match_object$pointwise[1,"influence_pareto_k"])
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$pointwise[,"influence_pareto_k"])
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$diagnostics$pareto_k)
 
   expect_equal_to_reference(loo_moment_match_object, "reference-results/moment_match_loo_1.rds")
-
+  
   loo_moment_match_object2 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
                                                 log_lik_i_upars_test, max_iters = 30L,

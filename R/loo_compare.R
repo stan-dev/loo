@@ -41,6 +41,8 @@
 #'   standard approach of comparing differences of deviances to a Chi-squared
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
+#'   Sivula et al. (2022) discuss the conditions when the normal
+#'   approximation used for SE and `se_diff` is good.
 #'
 #'   If more than \eqn{11} models are compared, we internally recompute the model
 #'   differences using the median model by ELPD as the baseline model. We then
@@ -50,6 +52,7 @@
 #'   selection process. In that case users are recommended to avoid model
 #'   selection based on LOO-CV, and instead to favor model averaging/stacking or
 #'   projection predictive inference.
+#' 
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
@@ -58,9 +61,9 @@
 #' @examples
 #' # very artificial example, just for demonstration!
 #' LL <- example_loglik_array()
-#' loo1 <- loo(LL, r_eff = NA)     # should be worst model when compared
-#' loo2 <- loo(LL + 1, r_eff = NA) # should be second best model when compared
-#' loo3 <- loo(LL + 2, r_eff = NA) # should be best model when compared
+#' loo1 <- loo(LL)     # should be worst model when compared
+#' loo2 <- loo(LL + 1) # should be second best model when compared
+#' loo3 <- loo(LL + 2) # should be best model when compared
 #'
 #' comp <- loo_compare(loo1, loo2, loo3)
 #' print(comp, digits = 2)

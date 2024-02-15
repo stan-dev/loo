@@ -40,13 +40,14 @@ the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argumen
 setting \code{mc.cores} interactively or in a script is fine).
 }}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+\item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally but by default discards the (potentially large) \code{"psis"} object
+internally but by default discards the (potentially large) \code{psis} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
 will add a \code{psis_object} component to the list returned by \code{loo}.
-Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
-compute weighted expectations after running \code{loo}.}
+This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}. Several functions in the
+\pkg{bayesplot} package also accept \code{psis} objects.}
 
 \item{log_q}{Deprecated argument name (the same as log_g).}
 }
@@ -64,7 +65,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }

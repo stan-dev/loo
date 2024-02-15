@@ -107,7 +107,7 @@ loo_subsample.function <-
            observations = 400,
            log_p = NULL,
            log_g = NULL,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            loo_approximation = "plpd",
@@ -128,11 +128,7 @@ loo_subsample.function <-
     checkmate::assert_null(dim(log_g))
 
     if (is.null(log_p) && is.null(log_g)) {
-      if (is.null(r_eff)) {
-        throw_loo_r_eff_warning()
-      } else {
         r_eff <- prepare_psis_r_eff(r_eff, len = dim(data)[1])
-      }
     }
     checkmate::assert_flag(save_psis)
     cores <- loo_cores(cores)
@@ -258,7 +254,7 @@ update.psis_loo_ss <- function(object, ...,
                                data = NULL,
                                draws = NULL,
                                observations = NULL,
-                               r_eff = NULL,
+                               r_eff = 1,
                                cores = getOption("mc.cores", 1),
                                loo_approximation = NULL,
                                loo_approximation_draws = NULL,
@@ -988,6 +984,7 @@ rbind_psis_loo_ss <- function(object, x) {
   object$diagnostics$pareto_k <-
     c(object$diagnostics$pareto_k, x$diagnostics$pareto_k)
   object$diagnostics$n_eff <- c(object$diagnostics$n_eff, x$diagnostics$n_eff)
+  object$diagnostics$r_eff <- c(object$diagnostics$r_eff, x$diagnostics$r_eff)
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
@@ -1011,6 +1008,7 @@ remove_idx.psis_loo_ss <- function(object, idxs) {
   object$pointwise <- object$pointwise[-row_map$row_no,,drop = FALSE]
   object$diagnostics$pareto_k <- object$diagnostics$pareto_k[-row_map$row_no]
   object$diagnostics$n_eff <- object$diagnostics$n_eff[-row_map$row_no]
+  object$diagnostics$r_eff <- object$diagnostics$r_eff[-row_map$row_no]
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
@@ -1032,6 +1030,7 @@ order.psis_loo_ss <- function(x, observations) {
   x$pointwise <- x$pointwise[row_map$row_no_x,,drop = FALSE]
   x$diagnostics$pareto_k <- x$diagnostics$pareto_k[row_map$row_no_x]
   x$diagnostics$n_eff <- x$diagnostics$n_eff[row_map$row_no_x]
+  x$diagnostics$r_eff <- x$diagnostics$r_eff[row_map$row_no_x]
   x
 }
 

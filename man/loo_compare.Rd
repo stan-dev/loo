@@ -66,6 +66,8 @@ better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
+Sivula et al. (2022) discuss the conditions when the normal
+approximation used for SE and \code{se_diff} is good.
 
 If more than \eqn{11} models are compared, we internally recompute the model
 differences using the median model by ELPD as the baseline model. We then
@@ -79,9 +81,9 @@ projection predictive inference.
 \examples{
 # very artificial example, just for demonstration!
 LL <- example_loglik_array()
-loo1 <- loo(LL, r_eff = NA)     # should be worst model when compared
-loo2 <- loo(LL + 1, r_eff = NA) # should be second best model when compared
-loo3 <- loo(LL + 2, r_eff = NA) # should be best model when compared
+loo1 <- loo(LL)     # should be worst model when compared
+loo2 <- loo(LL + 1) # should be second best model when compared
+loo3 <- loo(LL + 2) # should be best model when compared
 
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
@@ -107,12 +109,16 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 
-McLatchie, Y., and Vehtari, A. (2023).
-Efficient estimation and correction of selection-induced bias with order statistics.
+Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
+Uncertainty in Bayesian leave-one-out cross-validation based model
+comparison. \href{https://arxiv.org/abs/2008.10296v3}{preprint arXiv:2008.10296v3.}.
+
+McLatchie, Y., and Vehtari, A. (2023).  Efficient estimation and
+correction of selection-induced bias with order statistics.
 \href{https://arxiv.org/abs/2309.03742}{preprint arXiv:2309.03742}
 }
 \seealso{

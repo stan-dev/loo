@@ -48,7 +48,7 @@ test_that("loo_model_weights throws correct errors and warnings", {
                "List elements must all be 'psis_loo' objects or log-likelihood matrices",
                fixed = TRUE)
 
-  expect_warning(loo_model_weights(ll_list), "Relative effective sample sizes")
+  expect_no_warning(loo_model_weights(ll_list))
 })
 
 

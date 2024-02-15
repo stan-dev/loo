@@ -30,7 +30,7 @@ encourage readers to refer to the following papers for more details:
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](https://link.springer.com/article/10.1007/s11222-016-9696-4) | [arXiv preprint](https://arxiv.org/abs/1507.04544).
 
-* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
  
 
 # Setup
@@ -179,22 +179,20 @@ leave-one-out cross-validation marginal posterior predictive checks [Gabry et al
 (2018)](https://arxiv.org/abs/1709.01449). LOO-PIT values are cumulative
 probabilities for $y_i$ computed using the LOO marginal predictive distributions
 $p(y_i|y_{-i})$. For a good model, the distribution of LOO-PIT values should be
-uniform. In the following plot the distribution (smoothed density estimate) of
-the LOO-PIT values for our model (thick curve) is compared to many
-independently generated samples (each the same size as our dataset) from the
-standard uniform distribution (thin curves).
+uniform. In the following QQ-plot the LOO-PIT values for our model (y-axi) is
+compared to standard uniform distribution (x-axis).
 
 ```{r ppc_loo_pit_overlay}
 yrep <- posterior_predict(fit1)
 
-ppc_loo_pit_overlay(
+ppc_loo_pit_qq(
   y = roaches$y,
   yrep = yrep,
   lw = weights(loo1$psis_object)
 )
 ```
 
-The excessive number of values close to 0 indicates that the model is
+The excessive number of LOO-PIT values close to 0 indicates that the model is
 under-dispersed compared to the data, and we should consider a model that allows
 for greater dispersion.
 
@@ -219,7 +217,8 @@ print(loo2)
 plot(loo2, label_points = TRUE)
 ```
 
-Using the `label_points` argument will label any $k$ values larger than 0.7 with
+Using the `label_points` argument will label any $k$ values larger than the
+diagnostic threshold with
 the index of the corresponding data point. These high values are often the
 result of model misspecification and frequently correspond to data points that
 would be considered ``outliers'' in the data and surprising according to the
@@ -253,7 +252,7 @@ still some degree of model misspecification, but this is much better than the
 For further model checking we again examine the LOO-PIT values.
 ```{r ppc_loo_pit_overlay-negbin}
 yrep <- posterior_predict(fit2)
-ppc_loo_pit_overlay(roaches$y, yrep, lw = weights(loo2$psis_object))
+ppc_loo_pit_qq(roaches$y, yrep, lw = weights(loo2$psis_object))
 ```
 
 The plot for the negative binomial model looks better than the Poisson plot, but
@@ -272,7 +271,7 @@ loo_compare(loo1, loo2)
 
 The difference in ELPD is much larger than several times the estimated standard
 error of the difference again indicating that the negative-binomial model is
-expected to have better predictive performance than the Poisson model. However,
+xpected to have better predictive performance than the Poisson model. However,
 according to the LOO-PIT checks there is still some misspecification, and a
 reasonable guess is that a hurdle or zero-inflated model would be an improvement
 (we leave that for another case study).

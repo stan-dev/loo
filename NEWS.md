@@ -1,13 +1,43 @@
 # loo 2.6.0.9000
 
-### New features
+### Major changes
+
+* Use of new sample size specific diagnostic threshold for Pareto `k`. The pre-2022 version
+of the [PSIS paper](https://arxiv.org/abs/1507.02646) recommended diagnostic
+thresholds of 
+`k < 0.5 "good"`, `0.5 <= k < 0.7 "ok"`, 
+`0.7 <= k < 1 "bad"`, `k>=1 "very bad"`. 
+The 2022 revision of the PSIS paper now recommends 
+`k < min(1 - 1/log10(S), 0.7) "good"`, `min(1 - 1/log10(S), 0.7) <= k < 1 "bad"`, 
+`k > 1 "very bad"`, where `S` is the sample size. 
+There is now one fewer diagnostic threshold (`"ok"` has been removed), and the
+most important threshold now depends on the sample size `S`. With sample sizes
+`100`, `320`, `1000`, `2200`, `10000` the sample size specific part 
+`1 - 1/log10(S)` corresponds to thresholds of `0.5`, `0.6`, `0.67`, `0.7`, `0.75`.
+Even if the sample size grows, the bias in the PSIS estimate dominates if 
+`0.7 <= k < 1`, and thus the diagnostic threshold for good is capped at 
+`0.7` (if `k > 1`, the mean does not exist and bias is not a valid measure). 
+The new recommended thresholds are based on more careful bias-variance analysis
+of PSIS based on truncated Pareto sums theory. For those who use the Stan
+default 4000 posterior draws, the `0.7` threshold will be roughly the same, but
+there will be fewer warnings as there will be no diagnostic message for `0.5 <=
+k < 0.7`. Those who use smaller sample sizes may see diagnostic messages with a
+threshold less than `0.7`, and they can simply increase the sample size to about
+`2200` to get the threshold to `0.7`.
+
+* There are no more warnings if the `r_eff` argument is not provided, and the
+default is now `r_eff = 1`. The summary print output showing MCSE and ESS now
+shows diagnostic information on the range of `r_eff`. The change was made to
+reduce unnecessary warnings. The use of `r_eff` does not change the expected
+value of `elpd_loo`, `p_loo`, and Pareto `k`, and is needed only to estimate
+MCSE and ESS. Thus it is better to show the diagnostic information about `r_eff`
+only when MCSE and ESS values are shown.
+
+### Other changes
 
 * `E_loo` now allows `type="sd"`. 
-
-
-### Bug fixes
-
 * Fix bug in `E_loo` when `type=variance`. 
+
  
 # loo 2.6.0
 

@@ -4,7 +4,7 @@
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 #' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is
 #' an implementation of the methods described in Vehtari, Gelman, and Gabry
-#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
+#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2022).
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
@@ -13,20 +13,22 @@
 #' @param r_eff Vector of relative effective sample size estimates for the
 #'   likelihood (`exp(log_lik)`) of each observation. This is related to
 #'   the relative efficiency of estimating the normalizing term in
-#'   self-normalizing importance sampling when using posterior draws obtained
+#'   self-normalized importance sampling when using posterior draws obtained
 #'   with MCMC. If MCMC draws are used and `r_eff` is not provided then
 #'   the reported PSIS effective sample sizes and Monte Carlo error estimates
-#'   will be over-optimistic. If the posterior draws are independent then
-#'   `r_eff=1` and can be omitted. The warning message thrown when `r_eff` is
-#'   not specified can be disabled by setting `r_eff` to `NA`. See the
-#'   [relative_eff()] helper functions for computing `r_eff`.
-#' @param save_psis Should the `"psis"` object created internally by `loo()` be
+#'   can be over-optimistic. If the posterior draws are (near) independent then
+#'   `r_eff=1` can be used. `r_eff` has to be a scalar (same value is used
+#'    for all observations) or a vector with length equal to the number of
+#'    observations. The default value is 1. See the [relative_eff()] helper
+#'    functions for help computing `r_eff`.
+#' @param save_psis Should the `psis` object created internally by `loo()` be
 #'   saved in the returned object? The `loo()` function calls [psis()]
-#'   internally but by default discards the (potentially large) `"psis"` object
+#'   internally but by default discards the (potentially large) `psis` object
 #'   after using it to compute the LOO-CV summaries. Setting `save_psis=TRUE`
 #'   will add a `psis_object` component to the list returned by `loo`.
-#'   Currently this is only needed if you plan to use the [E_loo()] function to
-#'   compute weighted expectations after running `loo`.
+#'   This is useful if you plan to use the [E_loo()] function to compute
+#'   weighted expectations after running `loo`. Several functions in the
+#'   \pkg{bayesplot} package also accept `psis` objects.
 #' @template cores
 #' @template is_method
 #'
@@ -132,11 +134,11 @@
 #'
 #' # Use the loo_i function to check that llfun works on a single observation
 #' # before running on all obs. For example, using the 3rd obs in the data:
-#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
+#' loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
 #' print(loo_3$pointwise[, "elpd_loo"])
 #'
-#' # Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
-#' loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
+#' # Use loo.function method (default r_eff=1 is used as this posterior not obtained via MCMC)
+#' loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
 #'
 #' # If we look at the elpd_loo contribution from the 3rd obs it should be the
 #' # same as what we got above with the loo_i function and i=3:
@@ -147,7 +149,7 @@
 #' log_lik_matrix <- sapply(1:N, function(i) {
 #'   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 #' })
-#' loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
+#' loo_with_mat <- loo(log_lik_matrix)
 #' all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 #'
 #'
@@ -191,11 +193,10 @@ loo <- function(x, ...) {
 loo.array <-
   function(x,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
-    if (is.null(r_eff)) throw_loo_r_eff_warning()
     is_method <- match.arg(is_method)
     psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
@@ -216,14 +217,11 @@ loo.array <-
 loo.matrix <-
   function(x,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    if (is.null(r_eff)) {
-      throw_loo_r_eff_warning()
-    }
     psis_out <-
       importance_sampling.matrix(
         log_ratios = -x,
@@ -254,7 +252,7 @@ loo.function <-
            ...,
            data = NULL,
            draws = NULL,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
@@ -265,11 +263,7 @@ loo.function <-
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
-    if (is.null(r_eff)) {
-      throw_loo_r_eff_warning()
-    } else {
-      r_eff <- prepare_psis_r_eff(r_eff, len = N)
-    }
+    r_eff <- prepare_psis_r_eff(r_eff, len = N)
 
     psis_list <-
       parallel_importance_sampling_list(
@@ -294,7 +288,8 @@ loo.function <-
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
       diagnostics <- list(
         pareto_k = psis_apply(diagnostics_list, "pareto_k"),
-        n_eff = psis_apply(diagnostics_list, "n_eff")
+        n_eff = psis_apply(diagnostics_list, "n_eff"),
+        r_eff = psis_apply(diagnostics_list, "r_eff")
       )
     }
 
@@ -331,7 +326,7 @@ loo_i <-
            ...,
            data = NULL,
            draws = NULL,
-           r_eff = NULL,
+           r_eff = 1,
            is_method = "psis"
            ) {
     stopifnot(
@@ -364,7 +359,7 @@ loo_i <-
            ...,
            data,
            draws,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            is_method) {
 
@@ -522,8 +517,8 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
 throw_loo_r_eff_warning <- function() {
   warning(
     "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-    "For models fit with MCMC, the reported PSIS effective sample sizes and \n",
-    "MCSE estimates will be over-optimistic.",
+    "For models fit with MCMC, the reported PSIS ESS and \n",
+    "MCSE estimates can be over-optimistic.",
     call. = FALSE
   )
 }
@@ -552,7 +547,8 @@ list2importance_sampling <- function(objects) {
       log_weights = log_weights,
       diagnostics = list(
         pareto_k = psis_apply(diagnostics, item = "pareto_k"),
-        n_eff = psis_apply(diagnostics, item = "n_eff")
+        n_eff = psis_apply(diagnostics, item = "n_eff"),
+        r_eff = psis_apply(diagnostics, item = "r_eff")
       )
     ),
     norm_const_log = psis_apply(objects, "norm_const_log", fun = "attr"),
