@@ -491,7 +491,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
   lik <- exp(ll)
   w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
-  if (length(r_eff)==1 && !is.null(ncol(ll))) {
+  if (length(r_eff) == 1 && !is.null(ncol(ll))) {
     r_eff <- rep(r_eff, ncol(ll))
   }
   var_elpd <-
@@ -505,7 +505,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
         # Compute variance in log scale by match the variance of a
         # log-normal approximation
         # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
-        log(1 + var_epd_i/E_epd[i]^2)
+        log(1 + var_epd_i / E_epd[i]^2)
       }
     )
   sqrt(var_elpd)
