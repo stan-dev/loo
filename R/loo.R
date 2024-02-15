@@ -484,31 +484,31 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
 #' @param ll Log-likelihood matrix.
 #' @param E_elpd elpd_loo column of pointwise matrix.
 #' @param psis_object Object returned by [psis()].
-#' @param n_samples Number of draws to take from `Normal(E[epd_i], SD[epd_i])`.
+#' @param n_samples Deprecated
 #' @return Vector of standard error estimates.
 #'
-mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = 1000) {
+mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
   lik <- exp(ll)
   w2 <- exp(lw)^2
   E_epd <- exp(E_elpd)
-  # zn is approximate ordered statistics of unit normal distribution with offset
-  # recommended by Blom (1958)
-  S <- n_samples
-  c <- 3/8
-  r <- 1:n_samples
-  zn <- qnorm((r - c) / (S - 2 * c + 1))
+  if (length(r_eff)==1 && !is.null(ncol(ll))) {
+    r_eff <- rep(r_eff, ncol(ll))
+  }
   var_elpd <-
     vapply(
       seq_len(ncol(w2)),
       FUN.VALUE = numeric(1),
       FUN = function(i) {
-        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2)
-        sd_epd_i <- sqrt(var_epd_i)
-        z <- E_epd[i] + sd_epd_i * zn
-        var(log(z[z > 0]))
+        # Variance in linear scale
+        # Equation (6) in Vehtari et al. (2022)
+        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2) / r_eff[i]
+        # Compute variance in log scale by match the variance of a
+        # log-normal approximation
+        # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
+        log(1 + var_epd_i/E_epd[i]^2)
       }
     )
-  sqrt(var_elpd / r_eff)
+  sqrt(var_elpd)
 }
 
 
