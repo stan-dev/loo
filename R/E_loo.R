@@ -15,7 +15,7 @@
 #' @param log_ratios Optionally, a vector or matrix (the same dimensions as `x`)
 #'   of raw (not smoothed) log ratios. If working with log-likelihood values,
 #'   the log ratios are the **negative** of those values. If `log_ratios` is
-#'   specified we are able to compute [Pareto k][pareto-k-diagnostic]
+#'   specified we are able to compute more accurate [Pareto k][pareto-k-diagnostic]
 #'   diagnostics specific to `E_loo()`.
 #' @param type The type of expectation to compute. The options are
 #'   `"mean"`, `"variance"`, `"sd"`, and `"quantile"`.
@@ -40,11 +40,19 @@
 #'  \item{`pareto_k`}{
 #'   Function-specific diagnostic.
 #'
-#'   If `log_ratios` is not specified when calling `E_loo()`,
-#'   `pareto_k` will be `NULL`. Otherwise, for the matrix method it
-#'   will be a vector of length `ncol(x)` containing estimates of the shape
-#'   parameter \eqn{k} of the generalized Pareto distribution. For the
-#'   default/vector method, the estimate is a scalar.
+#'   For the matrix method it will be a vector of length `ncol(x)`
+#'   containing estimates of the shape parameter \eqn{k} of the
+#'   generalized Pareto distribution. For the default/vector method,
+#'   the estimate is a scalar. If `log_ratios` is not specified when
+#'   calling `E_loo()`, the smoothed log-weights are used to estimate
+#'   Pareto-k's, which may produce optimistic estimates.
+#'
+#'   For mean, var, and sd the returned Pareto-k is maximum of
+#'   Pareto-k's for left and right tail of \eqn{hr} and right tail of
+#'   \eqn{r}, where \eqn{h=x} in case of mean and \eqn{h=x^2} in case
+#'   of var and sd, and \eqn{r} is the importance ratio. For quantile
+#'   the returned Pareto-k is the Pareto-k for the right tail of
+#'   \eqn{r}.
 #'  }
 #' }
 #'
@@ -111,12 +119,18 @@ E_loo.default <-
     out <- E_fun(x, w, probs)
 
     if (is.null(log_ratios)) {
-      warning("'log_ratios' not specified. Can't compute k-hat diagnostic.",
-              call. = FALSE)
-      khat <- NULL
-    } else {
-      khat <- E_loo_khat.default(x, psis_object, log_ratios)
+      # Use of smoothed ratios gives slightly optimistic
+      # Pareto-k's, but these are still better than nothing
+      log_ratios <- weights(psis_object, log = TRUE)
     }
+    h <- switch(
+      type,
+      "mean" = x,
+      "variance" = x^2,
+      "sd" = x^2,
+      "quantile" = NULL
+    )
+    khat <- E_loo_khat.default(h, psis_object, log_ratios)
     list(value = out, pareto_k = khat)
   }
 
@@ -153,12 +167,18 @@ E_loo.matrix <-
     }, FUN.VALUE = fun_val)
 
     if (is.null(log_ratios)) {
-      warning("'log_ratios' not specified. Can't compute k-hat diagnostic.",
-              call. = FALSE)
-      khat <- NULL
-    } else {
-      khat <- E_loo_khat.matrix(x, psis_object, log_ratios)
+      # Use of smoothed ratios gives slightly optimistic
+      # Pareto-k's, but these are still better than nothing
+      log_ratios <- weights(psis_object, log = TRUE)
     }
+    h <- switch(
+      type,
+      "mean" = x,
+      "variance" = x^2,
+      "sd" = x^2,
+      "quantile" = NULL
+    )
+    khat <- E_loo_khat.matrix(h, psis_object, log_ratios)
     list(value = out, pareto_k = khat)
   }
 
@@ -247,9 +267,15 @@ E_loo_khat.default <- function(x, psis_object, log_ratios, ...) {
 #' @export
 E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   tail_lengths <- attr(psis_object, "tail_len")
-  sapply(seq_len(ncol(x)), function(i) {
-    .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
-  })
+  if (is.null(x)) {
+    sapply(seq_len(ncol(log_ratios)), function(i) {
+      .E_loo_khat_i(x, log_ratios[, i], tail_lengths[i])
+    })
+  } else {
+    sapply(seq_len(ncol(log_ratios)), function(i) {
+      .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
+    })
+  }
 }
 
 #' Compute function-specific khat estimates
@@ -264,14 +290,11 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 .E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
     h_theta <- x_i
     r_theta <- exp(log_ratios_i - max(log_ratios_i))
-    a <- sqrt(1 + h_theta^2) * r_theta
-    log_a <- sort(log(a))
-
-    S <- length(log_a)
-    tail_ids <- seq(S - tail_len_i + 1, S)
-    tail_sample <- log_a[tail_ids]
-    cutoff <- log_a[min(tail_ids) - 1]
-
-    smoothed <- psis_smooth_tail(tail_sample, cutoff)
-    smoothed$k
-  }
+    khat_r <- posterior::pareto_khat(r_theta, tail="right", ndraws_tail = tail_len_i)$khat
+    if (is.null(x_i)) {
+      khat_r
+    } else {
+      khat_hr <- posterior::pareto_khat(h_theta*r_theta, tail="both", ndraws_tail = tail_len_i)$khat
+    max(khat_hr, khat_r)
+    }
+}
