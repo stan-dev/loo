@@ -119,8 +119,8 @@ E_loo(yrep, psis_object, type = "sd")
 E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 
-# To get Pareto k diagnostic with E_loo we also need to provide the negative
-# log-likelihood values using the log_ratios argument.
+# We can get more accurate Pareto k diagnostic if we also provide
+# the log_ratios argument
 E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 }
 }
