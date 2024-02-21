@@ -130,6 +130,7 @@ pareto_k_table <- function(x) {
   S <- dim(x)[1]
   k_threshold <- ps_khat_threshold(S)
   kcut <- k_cut(k, k_threshold)
+  n_eff[k>k_threshold] <- NA
   min_n_eff <- min_n_eff_by_k(n_eff, kcut)
   count <- table(kcut)
   out <- cbind(
