@@ -41,7 +41,7 @@ E_loo(x, psis_object, ...)
 \item{log_ratios}{Optionally, a vector or matrix (the same dimensions as \code{x})
 of raw (not smoothed) log ratios. If working with log-likelihood values,
 the log ratios are the \strong{negative} of those values. If \code{log_ratios} is
-specified we are able to compute \link[=pareto-k-diagnostic]{Pareto k}
+specified we are able to compute more accurate \link[=pareto-k-diagnostic]{Pareto k}
 diagnostics specific to \code{E_loo()}.}
 }
 \value{
@@ -63,11 +63,19 @@ are specified in \code{probs} the \code{value} component is a vector with
 \item{\code{pareto_k}}{
 Function-specific diagnostic.
 
-If \code{log_ratios} is not specified when calling \code{E_loo()},
-\code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
-will be a vector of length \code{ncol(x)} containing estimates of the shape
-parameter \eqn{k} of the generalized Pareto distribution. For the
-default/vector method, the estimate is a scalar.
+For the matrix method it will be a vector of length \code{ncol(x)}
+containing estimates of the shape parameter \eqn{k} of the
+generalized Pareto distribution. For the default/vector method,
+the estimate is a scalar. If \code{log_ratios} is not specified when
+calling \code{E_loo()}, the smoothed log-weights are used to estimate
+Pareto-k's, which may produce optimistic estimates.
+
+For mean, var, and sd the returned Pareto-k is maximum of
+Pareto-k's for left and right tail of \eqn{hr} and right tail of
+\eqn{r}, where \eqn{h=x} in case of mean and \eqn{h=x^2} in case
+of var and sd, and \eqn{r} is the importance ratio. For quantile
+the returned Pareto-k is the Pareto-k for the right tail of
+\eqn{r}.
 }
 }
 }
