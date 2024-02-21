@@ -56,7 +56,7 @@ multiple values are specified in \code{probs} the \code{value} component of
 the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 
 For the default/vector method the \code{value} component is scalar, with
-one exception: when \code{type} is \code{"quantile"} and multiple values
+one exception: when \code{type="quantile"} and multiple values
 are specified in \code{probs} the \code{value} component is a vector with
 \code{length(probs)} elements.
 }
@@ -70,12 +70,12 @@ the estimate is a scalar. If \code{log_ratios} is not specified when
 calling \code{E_loo()}, the smoothed log-weights are used to estimate
 Pareto-k's, which may produce optimistic estimates.
 
-For mean, var, and sd the returned Pareto-k is maximum of
-Pareto-k's for left and right tail of \eqn{hr} and right tail of
-\eqn{r}, where \eqn{h=x} in case of mean and \eqn{h=x^2} in case
-of var and sd, and \eqn{r} is the importance ratio. For quantile
-the returned Pareto-k is the Pareto-k for the right tail of
-\eqn{r}.
+For \code{type="mean"}, \code{type="var"}, and \code{type="sd"}, the returned Pareto-k is
+the maximum of the Pareto-k's for the left and right tail of \eqn{hr} and
+the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+\eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and
+\code{type="sd"}. For \code{type="quantile"}, the returned Pareto-k is the Pareto-k
+for the right tail of \eqn{r}.
 }
 }
 }

@@ -33,7 +33,7 @@
 #'   the returned object is a `length(probs)` by `ncol(x)` matrix.
 #'
 #'   For the default/vector method the `value` component is scalar, with
-#'   one exception: when `type` is `"quantile"` and multiple values
+#'   one exception: when `type="quantile"` and multiple values
 #'   are specified in `probs` the `value` component is a vector with
 #'   `length(probs)` elements.
 #'   }
@@ -47,12 +47,12 @@
 #'   calling `E_loo()`, the smoothed log-weights are used to estimate
 #'   Pareto-k's, which may produce optimistic estimates.
 #'
-#'   For mean, var, and sd the returned Pareto-k is the maximum of the
-#'   Pareto-k's for the left and right tail of \eqn{hr} and the right tail of
-#'   \eqn{r}, where \eqn{r} is the importance ratio and \eqn{h=x} for
-#'   `type="mean"` and \eqn{h=x^2} for `type="var"` and `type="sd"`. For
-#'   `type="quantile"`, the returned Pareto-k is the Pareto-k for the right tail
-#'   of \eqn{r}.
+#'   For `type="mean"`, `type="var"`, and `type="sd"`, the returned Pareto-k is
+#'   the maximum of the Pareto-k's for the left and right tail of \eqn{hr} and
+#'   the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+#'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and
+#'   `type="sd"`. For `type="quantile"`, the returned Pareto-k is the Pareto-k
+#'   for the right tail of \eqn{r}.
 #'  }
 #' }
 #'
@@ -290,11 +290,11 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 .E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
   h_theta <- x_i
   r_theta <- exp(log_ratios_i - max(log_ratios_i))
-  khat_r <- posterior::pareto_khat(r_theta, tail="right", ndraws_tail = tail_len_i)$khat
+  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)$khat
   if (is.null(x_i)) {
     khat_r
   } else {
-    khat_hr <- posterior::pareto_khat(h_theta*r_theta, tail="both", ndraws_tail = tail_len_i)$khat
+    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)$khat
     max(khat_hr, khat_r)
   }
 }

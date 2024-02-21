@@ -36,6 +36,7 @@ Imports:
     checkmate,
     matrixStats (>= 0.52),
     parallel,
+    posterior (>= 1.5.0),
     stats
 Suggests:
     bayesplot (>= 1.7.0),
@@ -43,7 +44,6 @@ Suggests:
     ggplot2,
     graphics,
     knitr,
-    posterior,
     rmarkdown,
     rstan,
     rstanarm (>= 2.19.0),
