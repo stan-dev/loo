@@ -127,6 +127,7 @@ reference:
       - elpd
       - waic
       - extract_log_lik
+      - pointwise
       - relative_eff
       - gpdfit
       - starts_with("example_loglik")
