@@ -11,7 +11,7 @@
 \emph{Stan Development Team}
 
 This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
 Yao et al. (2018). To get started see the \strong{loo} package
 \href{https://mc-stan.org/loo/articles/index.html}{vignettes}, the
 \code{\link[=loo]{loo()}} function for efficient approximate leave-one-out
@@ -31,7 +31,7 @@ they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
 Gelman, and Gabry (2017a). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
+Simpson, Gelman, Yao, and Gabry, 2022), a new procedure for stabilizing
 and diagnosing importance weights. As a byproduct of our calculations,
 we also obtain approximate standard errors for estimated predictive
 errors and for comparing of predictive errors between two models.
@@ -47,7 +47,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 
@@ -58,10 +58,13 @@ stacking to average Bayesian predictive distributions.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In \emph{International Conference on Machine Learning}
+In \emph{Thirty-sixth International Conference on Machine Learning},
+PMLR 97:4244-4253.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In \emph{Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 
 Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
@@ -103,4 +106,35 @@ widely application information criterion in singular learning theory.
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 for the generalized Pareto distribution. \emph{Technometrics} \strong{51},
 316-325.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://mc-stan.org/loo/}
+  \item \url{https://discourse.mc-stan.org}
+  \item Report bugs at \url{https://github.com/stan-dev/loo/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jonah Gabry \email{jsg2201@columbia.edu}
+
+Authors:
+\itemize{
+  \item Aki Vehtari \email{Aki.Vehtari@aalto.fi}
+  \item Mans Magnusson
+  \item Yuling Yao
+  \item Paul-Christian Bürkner
+  \item Topi Paananen
+  \item Andrew Gelman
+}
+
+Other contributors:
+\itemize{
+  \item Ben Goodrich [contributor]
+  \item Juho Piironen [contributor]
+  \item Bruno Nicenboim [contributor]
+  \item Leevi Lindgren [contributor]
+}
+
 }

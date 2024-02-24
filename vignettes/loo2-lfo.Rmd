@@ -54,7 +54,7 @@ leave-one-out cross-validation (LOO-CV). For a data set with $N$ observations,
 we refit the model $N$ times, each time leaving out one of the $N$ observations
 and assessing how well the model predicts the left-out observation. LOO-CV is
 very expensive computationally in most realistic settings, but the Pareto
-smoothed importance sampling (PSIS, Vehtari et al, 2017, 2019) algorithm provided by
+smoothed importance sampling (PSIS, Vehtari et al, 2017, 2022) algorithm provided by
 the *loo* package allows for approximating exact LOO-CV with PSIS-LOO-CV.
 PSIS-LOO-CV requires only a single fit of the full model and comes with
 diagnostics for assessing the validity of the approximation.
@@ -179,7 +179,7 @@ variability of the importance ratios $r_i^{(s)}$ will become too large and
 importance sampling will fail. We will refer to this particular value of $i$ as
 $i^\star_1$. To identify the value of $i^\star_1$, we check for which value of
 $i$ does the estimated shape parameter $k$ of the generalized Pareto
-distribution first cross a certain threshold $\tau$ (Vehtari et al, 2019). Only
+distribution first cross a certain threshold $\tau$ (Vehtari et al, 2022). Only
 then do we refit the model using the observations up to $i^\star_1$ and restart
 the process from there by setting $\theta^{(s)} = \theta^{(s)}_{1:i^\star_1}$
 and $i^\star = i^\star_1$ until the next refit.
@@ -188,7 +188,7 @@ In some cases we may only need to refit once and in other cases we will find a
 value $i^\star_2$ that requires a second refitting, maybe an $i^\star_3$ that
 requires a third refitting, and so on. We refit as many times as is required
 (only when $k > \tau$) until we arrive at observation $i = N - M$. 
-For LOO, we recommend to use a threshold of $\tau = 0.7$ (Vehtari et al, 2017, 2019)
+For LOO, assuming posterior sample size is 4000 or larger, we recommend to use a threshold of $\tau = 0.7$ (Vehtari et al, 2017, 2022)
 and it turns out this is a reasonable threshold for LFO as well (Bürkner et al. 2020).
 
 ## Autoregressive models
@@ -220,8 +220,8 @@ interface to Stan to generate a Stan program and fit the model, and also the
 **bayesplot** and **ggplot2** packages for plotting.
 
 ```{r pkgs, cache=FALSE}
-library("loo")
 library("brms")
+library("loo")
 library("bayesplot")
 library("ggplot2")
 color_scheme_set("brightblue")
@@ -281,7 +281,7 @@ preds <- cbind(
 )
 
 ggplot(cbind(df, preds), aes(x = year, y = Estimate)) +
-  geom_smooth(aes(ymin = Q5, ymax = Q95), stat = "identity", size = 0.5) +
+  geom_smooth(aes(ymin = Q5, ymax = Q95), stat = "identity", linewidth = 0.5) +
   geom_point(aes(y = y)) + 
   labs(
     y = "Water Level (ft)", 
@@ -321,7 +321,7 @@ The initial step for the exact computation is to calculate the log-predictive
 densities by refitting the model many times:
 
 ```{r exact_loglik, results="hide"}
-loglik_exact <- matrix(nrow = nsamples(fit), ncol = N)
+loglik_exact <- matrix(nrow = ndraws(fit), ncol = N)
 for (i in L:(N - 1)) {
   past <- 1:i
   oos <- i + 1
@@ -514,7 +514,7 @@ predict.
 
 ```{r exact_loglikm, results="hide"}
 M <- 4
-loglikm <- matrix(nrow = nsamples(fit), ncol = N)
+loglikm <- matrix(nrow = ndraws(fit), ncol = N)
 for (i in L:(N - M)) {
   past <- 1:i
   oos <- (i + 1):(i + M)
@@ -548,7 +548,7 @@ df_oos <- df[c(past, oos), , drop = FALSE]
 fit_past <- update(fit, newdata = df_past, recompile = FALSE)
 loglik <- log_lik(fit_past, newdata = df_oos, oos = oos)
 loglikm <- rowSums(loglik[, oos])
-approx_elpds_1sap[L + 1] <- log_mean_exp(loglikm)
+approx_elpds_4sap[L + 1] <- log_mean_exp(loglikm)
 
 # iterate over i > L
 i_refit <- L
@@ -640,7 +640,7 @@ Bürkner P. C., Gabry J., & Vehtari A. (2020). Approximate leave-future-out cros
 
 Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
 
 <br />
 

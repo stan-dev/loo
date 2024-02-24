@@ -1,5 +1,5 @@
 #' A parent class for different importance sampling methods.
-#' @keywords internal
+#'
 #' @inheritParams psis
 #' @param method The importance sampling method to use. The following methods
 #'   are implemented:
@@ -8,32 +8,18 @@
 #'   `sqrt(S)`, where `S` is the number of posterior draws.
 #' * [`"sis"`][sis]: Standard Importance Sampling (SIS).
 #'
-importance_sampling <- function(log_ratios, method, ...) UseMethod("importance_sampling")
-
-#' @noRd
-#' @keywords internal
-#' @description
-#' Currently implemented importance sampling methods
-assert_importance_sampling_method_is_implemented <- function(x){
-  if (!x %in% implemented_is_methods()) {
-    stop("Importance sampling method '",
-         x,
-         "' is not implemented. Implemented methods: '",
-         paste0(implemented_is_methods, collapse = "', '"),
-         "'")
-  }
+importance_sampling <- function(log_ratios, method, ...) {
+  UseMethod("importance_sampling")
 }
-implemented_is_methods <- function() c("psis", "tis", "sis")
 
-#' Importance sampling of array
+
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.array <-
   function(log_ratios, method,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
@@ -44,15 +30,13 @@ importance_sampling.array <-
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' Importance sampling of matrices
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.matrix <-
   function(log_ratios, method,
            ...,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     assert_importance_sampling_method_is_implemented(method)
@@ -61,13 +45,11 @@ importance_sampling.matrix <-
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
 
-#' Importance sampling (default)
+#' @rdname importance_sampling
 #' @inheritParams psis
-#' @template is_method
-#' @keywords internal
 #' @export
 importance_sampling.default <-
-  function(log_ratios, method, ..., r_eff = NULL) {
+  function(log_ratios, method, ..., r_eff = 1) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     assert_importance_sampling_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)
@@ -122,6 +104,23 @@ weights.importance_sampling <-
 
 # internal ----------------------------------------------------------------
 
+#' Validate selected importance sampling method
+#' @noRd
+#' @keywords internal
+#' @description
+#' Currently implemented importance sampling methods
+assert_importance_sampling_method_is_implemented <- function(x){
+  if (!x %in% implemented_is_methods()) {
+    stop("Importance sampling method '",
+         x,
+         "' is not implemented. Implemented methods: '",
+         paste0(implemented_is_methods, collapse = "', '"),
+         "'")
+  }
+}
+implemented_is_methods <- function() c("psis", "tis", "sis")
+
+
 #' Structure the object returned by the importance_sampling methods
 #'
 #' @noRd
@@ -129,7 +128,7 @@ weights.importance_sampling <-
 #'   but unnormalized.
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
-#' @param r_eff Vector of relative MCMC n_eff for `exp(log lik)`
+#' @param r_eff Vector of relative MCMC ESS (n_eff) for `exp(log lik)`
 #' @template is_method
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
@@ -154,7 +153,7 @@ importance_sampling_object <-
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
-        diagnostics = list(pareto_k = pareto_k, n_eff = NULL)
+        diagnostics = list(pareto_k = pareto_k, n_eff = NULL, r_eff = r_eff)
       ),
       # attributes
       norm_const_log = norm_const_log,
@@ -185,6 +184,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   assert_importance_sampling_method_is_implemented(method)
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
+  k_threshold <- ps_khat_threshold(S)
   tail_len <- n_pareto(r_eff, S)
 
   if (method == "psis") {
@@ -224,7 +224,7 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")
-  throw_pareto_warnings(pareto_k)
+  throw_pareto_warnings(pareto_k, k_threshold)
 
   importance_sampling_object(
     unnormalized_log_weights = log_weights,

@@ -1,13 +1,60 @@
-# loo 2.6.0.9000
+# loo 2.7.0
 
-### New features
+### Major changes
 
-* `E_loo` now allows `type="sd"`. 
+* __New sample size specific diagnostic threshold for Pareto `k`__. The pre-2022 version
+of the [PSIS paper](https://arxiv.org/abs/1507.02646) recommended diagnostic
+thresholds of 
+`k < 0.5 "good"`, `0.5 <= k < 0.7 "ok"`, 
+`0.7 <= k < 1 "bad"`, `k>=1 "very bad"`. 
+The 2022 revision of the PSIS paper now recommends 
+`k < min(1 - 1/log10(S), 0.7) "good"`, `min(1 - 1/log10(S), 0.7) <= k < 1 "bad"`, 
+`k > 1 "very bad"`, where `S` is the sample size. 
+There is now one fewer diagnostic threshold (`"ok"` has been removed), and the
+most important threshold now depends on the sample size `S`. With sample sizes
+`100`, `320`, `1000`, `2200`, `10000` the sample size specific part 
+`1 - 1/log10(S)` corresponds to thresholds of `0.5`, `0.6`, `0.67`, `0.7`, `0.75`.
+Even if the sample size grows, the bias in the PSIS estimate dominates if 
+`0.7 <= k < 1`, and thus the diagnostic threshold for good is capped at 
+`0.7` (if `k > 1`, the mean does not exist and bias is not a valid measure). 
+The new recommended thresholds are based on more careful bias-variance analysis
+of PSIS based on truncated Pareto sums theory. For those who use the Stan
+default 4000 posterior draws, the `0.7` threshold will be roughly the same, but
+there will be fewer warnings as there will be no diagnostic message for `0.5 <=
+k < 0.7`. Those who use smaller sample sizes may see diagnostic messages with a
+threshold less than `0.7`, and they can simply increase the sample size to about
+`2200` to get the threshold to `0.7`. 
+
+* __No more warnings if the `r_eff` argument is not provided__, and the
+default is now `r_eff = 1`. The summary print output showing MCSE and ESS now
+shows diagnostic information on the range of `r_eff`. The change was made to
+reduce unnecessary warnings. The use of `r_eff` does not change the expected
+value of `elpd_loo`, `p_loo`, and Pareto `k`, and is needed only to estimate
+MCSE and ESS. Thus it is better to show the diagnostic information about `r_eff`
+only when MCSE and ESS values are shown.
+
+### Other changes
+
+* Make Pareto `k` Inf if it is NA by @topipa in #224
+* Fix bug in `E_loo()` when type is variance by @jgabry in #226
+* `E_loo()` now allows `type="sd"` by @jgabry in #226
+* update array syntax in vignettes by @jgabry in #229
+* Fix unbalanced knitr backticks by @jgabry in #232
+* include cc-by 4.0 license for documentation  by @jgabry in #216
+* Add order statistic warning by @yannmclatchie in #230
+* `pointwise()` convenience function for extracting pointwise estimates by @jgabry in #241
+* use new `k` threshold by @avehtari in #235
+* simplify `mcse_elpd` using log-normal approximation by @avehtari in #246
+* show NA for `n_eff/ESS` if `k > k_threshold` by @avehtari in #248
+* improved `E_loo()` Pareto-k diagnostics by @avehtari in #247
+* Doc improvement in `loo_subsample.R` by @avehtari in #238
+* Fix typo and deprecations in LFO vignette by @jgabry in #244
+* Register internal S3 methods by @jgabry in #239
+* Avoid R cmd check NOTEs about some internal functions by @jgabry in #240
+* fix R cmd check note due to importance_sampling roxygen template by @jgabry in #233
+* fix R cmd check notes by @jgabry in #242
 
 
-### Bug fixes
-
-* Fix bug in `E_loo` when `type=variance`. 
  
 # loo 2.6.0
 

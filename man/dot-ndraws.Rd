@@ -2,9 +2,15 @@
 % Please edit documentation in R/loo_subsample.R
 \name{.ndraws}
 \alias{.ndraws}
+\alias{.ndraws.matrix}
+\alias{.ndraws.default}
 \title{The number of posterior draws in a draws object.}
 \usage{
 .ndraws(x)
+
+\method{.ndraws}{matrix}(x)
+
+\method{.ndraws}{default}(x)
 }
 \arguments{
 \item{x}{A draws object with posterior draws.}

@@ -29,7 +29,7 @@ Some sections from this vignette are excerpted from our papers
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](https://link.springer.com/article/10.1007/s11222-016-9696-4) | [arXiv preprint](https://arxiv.org/abs/1507.04544).
 
-* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.02646).
 
 which provide important background for understanding the methods implemented in
 the package.
@@ -53,7 +53,7 @@ of any given observation is small, and so the computations should be stable.
 
 ## Coding the Stan model
 
-Here is the Stan code for fitting the logistic regression model, which 
+Here is the Stan code for fitting the logistic regression model, which
 we save in a file called `logistic.stan`:
 
 ```
@@ -81,10 +81,10 @@ generated quantities {
 }
 ```
 
-We have defined the log likelihood as a vector named `log_lik` in the generated 
-quantities block so that the individual terms will be saved by Stan. After 
+We have defined the log likelihood as a vector named `log_lik` in the generated
+quantities block so that the individual terms will be saved by Stan. After
 running Stan, `log_lik` can be extracted (using the `extract_log_lik` function
-provided in the **loo** package) as an $S \times N$ matrix, where $S$ is the 
+provided in the **loo** package) as an $S \times N$ matrix, where $S$ is the
 number of simulations (posterior draws) and $N$ is the number of data points.
 
 ## Fitting the model with RStan
@@ -94,7 +94,7 @@ Next we fit the model in Stan using the **rstan** package:
 ```{r, eval=FALSE}
 library("rstan")
 
-# Prepare data 
+# Prepare data
 url <- "http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"
 wells <- read.table(url)
 wells$dist100 <- with(wells, dist / 100)
@@ -122,14 +122,14 @@ approximation to exact LOO-CV:
 library("loo")
 
 # Extract pointwise log-likelihood
-# using merge_chains=FALSE returns an array, which is easier to 
+# using merge_chains=FALSE returns an array, which is easier to
 # use with relative_eff()
 log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
 
 # as of loo v2.0.0 we can optionally provide relative effective sample sizes
 # when calling loo, which allows for better estimates of the PSIS effective
 # sample sizes and Monte Carlo error
-r_eff <- relative_eff(exp(log_lik_1), cores = 2) 
+r_eff <- relative_eff(exp(log_lik_1), cores = 2)
 
 # preferably use more than 2 cores (as many cores as possible)
 # will use value of 'mc.cores' option if cores is not specified
@@ -146,8 +146,9 @@ p_loo         3.2  0.1
 looic      3937.0 31.2
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.3]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -164,13 +165,13 @@ all of the estimates for $k$ are fine.
 
 ## Comparing models
 
-To compare this model to an alternative model for the same data we can use the 
+To compare this model to an alternative model for the same data we can use the
 `loo_compare` function in the **loo** package. First we'll fit a second model to the
 well-switching data, using `log(arsenic)` instead of `arsenic` as a predictor:
 
 ```{r, eval=FALSE}
 standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
-fit_2 <- stan(fit = fit_1, data = standata) 
+fit_2 <- stan(fit = fit_1, data = standata)
 
 log_lik_2 <- extract_log_lik(fit_2, merge_chains = FALSE)
 r_eff_2 <- relative_eff(exp(log_lik_2))
@@ -187,8 +188,9 @@ p_loo         3.1  0.1
 looic      3904.6 32.4
 ------
 Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.2]).
 
-All Pareto k estimates are good (k < 0.5).
+All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
@@ -199,8 +201,8 @@ We can now compare the models on LOO using the `loo_compare` function:
 comp <- loo_compare(loo_1, loo_2)
 ```
 
-This new object, `comp`, contains the estimated difference of expected 
-leave-one-out prediction errors between the two models, along with the standard 
+This new object, `comp`, contains the estimated difference of expected
+leave-one-out prediction errors between the two models, along with the standard
 error:
 
 ```{r, eval=FALSE}
@@ -212,9 +214,9 @@ model2   0.0       0.0
 model1 -16.3       4.4  
 ```
 
-The first column shows the difference in ELPD relative to the model with 
-the largest ELPD. In this case, the difference in `elpd` and its scale relative 
-to the approximate standard error of the difference) indicates a 
+The first column shows the difference in ELPD relative to the model with
+the largest ELPD. In this case, the difference in `elpd` and its scale relative
+to the approximate standard error of the difference) indicates a
 preference for the second model (`model2`).
 
 
@@ -229,9 +231,9 @@ Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._  
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. _Statistics and
 Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
-[online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
+[online](https://link.springer.com/article/10.1007/s11222-016-9696-4),
 [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019). Pareto
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto
 smoothed importance sampling.
 [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).

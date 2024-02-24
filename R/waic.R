@@ -29,7 +29,7 @@
 #' @seealso
 #' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) and
 #'   Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao,
-#'   and Gabry (2019) for more details on why we prefer `loo()` to `waic()`.
+#'   and Gabry (2022) for more details on why we prefer `loo()` to `waic()`.
 #' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
 #'
 #' @references

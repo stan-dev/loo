@@ -83,7 +83,7 @@ adjust_k_wip <- function(k, n) {
 }
 
 
-#' Inverse CDF of generalized pareto distribution
+#' Inverse CDF of generalized Pareto distribution
 #' (assuming location parameter is 0)
 #'
 #' @noRd

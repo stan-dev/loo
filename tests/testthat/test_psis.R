@@ -23,7 +23,7 @@ test_that("psis returns object with correct structure", {
   expect_false(is.psis_loo(psis1))
 
   expect_named(psis1, c("log_weights", "diagnostics"))
-  expect_named(psis1$diagnostics, c("pareto_k", "n_eff"))
+  expect_named(psis1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
   expect_equal(dim(psis1), dim(LLmat))
   expect_length(psis1$diagnostics$pareto_k, dim(psis1)[2])
   expect_length(psis1$diagnostics$n_eff, dim(psis1)[2])
@@ -40,23 +40,37 @@ test_that("psis methods give same results", {
 })
 
 test_that("psis throws correct errors and warnings", {
-  # r_eff=NULL warnings
-  expect_warning(psis(-LLarr), "Relative effective sample sizes")
-  expect_warning(psis(-LLmat), "Relative effective sample sizes")
-  expect_warning(psis(-LLmat[, 1]), "Relative effective sample sizes")
+  # r_eff default no warnings
+  expect_no_warning(psis(-LLarr))
+  expect_no_warning(psis(-LLmat))
+  expect_no_warning(psis(-LLmat[, 1]))
+
+  # r_eff=NULL no warnings
+  expect_silent(psis(-LLarr, r_eff = NULL))
+  expect_silent(psis(-LLmat, r_eff = NULL))
+  expect_silent(psis(-LLmat[,1], r_eff = NULL))
 
   # r_eff=NA disables warnings
   expect_silent(psis(-LLarr, r_eff = NA))
   expect_silent(psis(-LLmat, r_eff = NA))
   expect_silent(psis(-LLmat[,1], r_eff = NA))
 
-  # r_eff=NULL and r_eff=NA give same answer
+  # r_eff default and r_eff=NA give same answer
   expect_equal(
     suppressWarnings(psis(-LLarr)),
     psis(-LLarr, r_eff = NA)
   )
 
-  # r_eff wrong length is error
+  # r_eff=NULL and r_eff=NA give same answer
+  expect_equal(
+    suppressWarnings(psis(-LLarr, r_eff=NULL)),
+    psis(-LLarr, r_eff = NA)
+  )
+
+  # r_eff scalar is fine
+  expect_silent(psis(-LLarr, r_eff = r_eff_arr[1]))
+
+  # r_eff non-scalar wrong length is error
   expect_error(psis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")
 
   # r_eff has some NA values causes error
@@ -123,8 +137,8 @@ test_that("psis_n_eff methods works properly", {
     psis_n_eff.default(w[, 1], r_eff = 2),
     psis_n_eff.matrix(w, r_eff = rep(2, ncol(w)))[1]
   )
-  expect_warning(psis_n_eff.default(w[, 1]), "not adjusted based on MCMC n_eff")
-  expect_warning(psis_n_eff.matrix(w), "not adjusted based on MCMC n_eff")
+  expect_no_warning(psis_n_eff.default(w[, 1]))
+  expect_no_warning(psis_n_eff.matrix(w))
 })
 
 

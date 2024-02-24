@@ -2,9 +2,15 @@
 % Please edit documentation in R/loo_subsample.R
 \name{.compute_point_estimate}
 \alias{.compute_point_estimate}
+\alias{.compute_point_estimate.matrix}
+\alias{.compute_point_estimate.default}
 \title{Compute a point estimate from a draws object}
 \usage{
 .compute_point_estimate(draws)
+
+\method{.compute_point_estimate}{matrix}(draws)
+
+\method{.compute_point_estimate}{default}(draws)
 }
 \arguments{
 \item{draws}{A draws object with draws from the posterior.}
@@ -16,7 +22,7 @@ A 1 by P matrix with point estimates from a draws object.
 Compute a point estimate from a draws object
 }
 \details{
-This is a generic function to thin draws from arbitrary draws
+This is a generic function to compute point estimates from draws
 objects. The function is internal and should only be used by developers to
 enable \code{\link[=loo_subsample]{loo_subsample()}} for arbitrary draws objects.
 }

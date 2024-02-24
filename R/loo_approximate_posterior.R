@@ -127,7 +127,7 @@ loo_approximate_posterior.function <-
                                     .llfun = .llfun,
                                     data = data,
                                     draws = draws,
-                                    r_eff = NULL, # r_eff is ignored
+                                    r_eff = 1, # r_eff is ignored
                                     save_psis = save_psis,
                                     log_p = log_p,
                                     log_g = log_g,
@@ -172,11 +172,10 @@ loo_approximate_posterior.function <-
            draws,
            log_p,
            log_g,
-           r_eff = NULL,
+           r_eff = 1,
            save_psis = FALSE,
            is_method) {
 
-    if (!is.null(r_eff)) warning("r_eff not implemented for aploo.")
     if (is_method != "psis") stop(is_method, " not implemented for aploo.")
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)

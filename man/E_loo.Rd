@@ -41,7 +41,7 @@ E_loo(x, psis_object, ...)
 \item{log_ratios}{Optionally, a vector or matrix (the same dimensions as \code{x})
 of raw (not smoothed) log ratios. If working with log-likelihood values,
 the log ratios are the \strong{negative} of those values. If \code{log_ratios} is
-specified we are able to compute \link[=pareto-k-diagnostic]{Pareto k}
+specified we are able to compute more accurate \link[=pareto-k-diagnostic]{Pareto k}
 diagnostics specific to \code{E_loo()}.}
 }
 \value{
@@ -56,18 +56,26 @@ multiple values are specified in \code{probs} the \code{value} component of
 the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 
 For the default/vector method the \code{value} component is scalar, with
-one exception: when \code{type} is \code{"quantile"} and multiple values
+one exception: when \code{type="quantile"} and multiple values
 are specified in \code{probs} the \code{value} component is a vector with
 \code{length(probs)} elements.
 }
 \item{\code{pareto_k}}{
 Function-specific diagnostic.
 
-If \code{log_ratios} is not specified when calling \code{E_loo()},
-\code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
-will be a vector of length \code{ncol(x)} containing estimates of the shape
-parameter \eqn{k} of the generalized Pareto distribution. For the
-default/vector method, the estimate is a scalar.
+For the matrix method it will be a vector of length \code{ncol(x)}
+containing estimates of the shape parameter \eqn{k} of the
+generalized Pareto distribution. For the default/vector method,
+the estimate is a scalar. If \code{log_ratios} is not specified when
+calling \code{E_loo()}, the smoothed log-weights are used to estimate
+Pareto-k's, which may produce optimistic estimates.
+
+For \code{type="mean"}, \code{type="var"}, and \code{type="sd"}, the returned Pareto-k is
+the maximum of the Pareto-k's for the left and right tail of \eqn{hr} and
+the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+\eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and
+\code{type="sd"}. For \code{type="quantile"}, the returned Pareto-k is the Pareto-k
+for the right tail of \eqn{r}.
 }
 }
 }
@@ -110,8 +118,8 @@ E_loo(yrep, psis_object, type = "sd")
 E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 
-# To get Pareto k diagnostic with E_loo we also need to provide the negative
-# log-likelihood values using the log_ratios argument.
+# We can get more accurate Pareto k diagnostic if we also provide
+# the log_ratios argument
 E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 }
 

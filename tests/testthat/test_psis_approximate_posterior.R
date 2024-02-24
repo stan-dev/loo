@@ -47,7 +47,7 @@ test_that("Laplace approximation, normal model", {
   log_p <- test_data_psis_approximate_posterior$laplace_normal$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_normal$log_q
   ll <- test_data_psis_approximate_posterior$laplace_normal$log_liks
-  expect_warning(
+  expect_no_warning(
     psis_lap <-
       psis_approximate_posterior(log_p = log_p, log_g = log_g, cores = 1, save_psis = FALSE)
   )

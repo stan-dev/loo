@@ -81,7 +81,7 @@ test_that("loo returns object with correct structure", {
       "se_looic"
     )
   )
-  expect_named(loo1$diagnostics, c("pareto_k", "n_eff"))
+  expect_named(loo1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
   expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))
   expect_equal(colnames(loo1$pointwise), c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k"))
@@ -163,9 +163,8 @@ test_that("loo.cores deprecation warning works with function method", {
 })
 
 test_that("loo_i results match loo results for ith data point", {
-  expect_warning(
+  expect_no_warning(
     loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws),
-    "Relative effective sample sizes"
   )
   expect_equal(loo_i_val$pointwise[, "elpd_loo"], loo_with_fn$pointwise[2, "elpd_loo"])
   expect_equal(loo_i_val$pointwise[, "p_loo"], loo_with_fn$pointwise[2, "p_loo"])
@@ -194,9 +193,9 @@ test_that("save_psis option to loo.function makes correct psis object", {
   expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })
 
-test_that("loo throws r_eff warnings", {
-  expect_warning(loo(-LLarr), "MCSE estimates will be over-optimistic")
-  expect_warning(loo(-LLmat), "MCSE estimates will be over-optimistic")
-  expect_warning(loo(llfun, data = data, draws = draws), "MCSE estimates will be over-optimistic")
+test_that("loo doesn't throw r_eff warnings", {
+  expect_no_warning(loo(-LLarr))
+  expect_no_warning(loo(-LLmat))
+  expect_no_warning(loo(llfun, data = data, draws = draws))
 })
 

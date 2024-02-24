@@ -170,23 +170,26 @@ relative_eff.importance_sampling <- function(x, ...) {
 psis_n_eff <- function(w, ...) {
   UseMethod("psis_n_eff")
 }
+
+#' @export
 psis_n_eff.default <- function(w, r_eff = NULL, ...) {
   ss <- sum(w^2)
   if (is.null(r_eff)) {
-    warning("PSIS n_eff not adjusted based on MCMC n_eff.", call. = FALSE)
     return(1 / ss)
   }
   stopifnot(length(r_eff) == 1)
   1 / ss * r_eff
 }
+
+#' @export
 psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
   ss <- colSums(w^2)
   if (is.null(r_eff)) {
-    warning("PSIS n_eff not adjusted based on MCMC n_eff.", call. = FALSE)
     return(1 / ss)
   }
-  if (length(r_eff) != length(ss))
-    stop("r_eff must have length ncol(w).", call. = FALSE)
+  if (length(r_eff) != length(ss) && length(r_eff) != 1) {
+    stop("r_eff must have length 1 or ncol(w).", call. = FALSE)
+  }
   1 / ss * r_eff
 }
 
@@ -202,11 +205,7 @@ ess_rfun <- function(sims) {
   if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-  if (requireNamespace("posterior", quietly = TRUE)) {
-    acov <- lapply(1:chains, FUN = function(i) posterior::autocovariance(sims[,i]))
-  } else {
-    acov <- lapply(1:chains, FUN = function(i) autocovariance(sims[,i]))
-  }
+  acov <- lapply(1:chains, FUN = function(i) posterior::autocovariance(sims[,i]))
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
   mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
@@ -271,20 +270,4 @@ fft_next_good_size <- function(N) {
       return(N)
     N = N + 1
   }
-}
-
-# autocovariance function to use if posterior::autocovariance is not available
-autocovariance <- function(y) {
-  # Compute autocovariance estimates for every lag for the specified
-  # input sequence using a fast Fourier transform approach.
-  N <- length(y)
-  M <- fft_next_good_size(N)
-  Mt2 <- 2 * M
-  yc <- y - mean(y)
-  yc <- c(yc, rep.int(0, Mt2-N))
-  transform <- stats::fft(yc)
-  ac <- stats::fft(Conj(transform) * transform, inverse = TRUE)
-  # use "biased" estimate as recommended by Geyer (1992)
-  ac <- Re(ac)[1:N] / (N^2 * 2)
-  ac
 }

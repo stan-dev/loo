@@ -15,7 +15,7 @@ loo(x, ...)
 \method{loo}{array}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -24,7 +24,7 @@ loo(x, ...)
 \method{loo}{matrix}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -35,21 +35,13 @@ loo(x, ...)
   ...,
   data = NULL,
   draws = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
 )
 
-loo_i(
-  i,
-  llfun,
-  ...,
-  data = NULL,
-  draws = NULL,
-  r_eff = NULL,
-  is_method = "psis"
-)
+loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = 1, is_method = "psis")
 
 is.loo(x)
 
@@ -63,21 +55,23 @@ each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
-\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+\item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally but by default discards the (potentially large) \code{"psis"} object
+internally but by default discards the (potentially large) \code{psis} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
 will add a \code{psis_object} component to the list returned by \code{loo}.
-Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
-compute weighted expectations after running \code{loo}.}
+This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}. Several functions in the
+\pkg{bayesplot} package also accept \code{psis} objects.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -169,7 +163,7 @@ The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is
 an implementation of the methods described in Vehtari, Gelman, and Gabry
-(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
+(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2022).
 
 The \code{loo_i()} function enables testing log-likelihood
 functions for use with the \code{loo.function()} method.
@@ -266,11 +260,11 @@ llfun <- function(data_i, draws) {
 
 # Use the loo_i function to check that llfun works on a single observation
 # before running on all obs. For example, using the 3rd obs in the data:
-loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
+loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
 print(loo_3$pointwise[, "elpd_loo"])
 
-# Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
-loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
+# Use loo.function method (default r_eff=1 is used as this posterior not obtained via MCMC)
+loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
 
 # If we look at the elpd_loo contribution from the 3rd obs it should be the
 # same as what we got above with the loo_i function and i=3:
@@ -281,7 +275,7 @@ print(loo_3$pointwise[, "elpd_loo"])
 log_lik_matrix <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
+loo_with_mat <- loo(log_lik_matrix)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
 
@@ -321,7 +315,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }

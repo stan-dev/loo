@@ -45,21 +45,23 @@ below for details on how to specify these arguments.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
-\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+\item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally but by default discards the (potentially large) \code{"psis"} object
+internally but by default discards the (potentially large) \code{psis} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
 will add a \code{psis_object} component to the list returned by \code{loo}.
-Currently this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to
-compute weighted expectations after running \code{loo}.}
+This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}. Several functions in the
+\pkg{bayesplot} package also accept \code{psis} objects.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by

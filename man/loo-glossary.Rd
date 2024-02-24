@@ -39,7 +39,8 @@ the actual SE can even be twice as large. Even for moderate N, when the SE
 estimate is an accurate estimate for the scale, it ignores the skewness. When
 making model comparisons, the SE of the component-wise (pairwise) differences
 should be used instead (see the \code{se_diff} section below and Eq 24 in
-VGG2017).
+VGG2017). Sivula et al. (2022) discuss the conditions when the normal
+approximation used for SE and \code{se_diff} is good.
 }
 
 \section{Monte Carlo SE of elpd_loo}{
@@ -69,32 +70,61 @@ about high Pareto k diagnostic values.
 \section{Pareto k estimates}{
 
 
-The Pareto \code{k} estimate is a diagnostic for Pareto smoothed importance
+The Pareto \eqn{k} estimate is a diagnostic for Pareto smoothed importance
 sampling (PSIS), which is used to compute components of \code{elpd_loo}. In
-importance-sampling LOO (the full posterior distribution is used as the
-proposal distribution). The Pareto k diagnostic estimates how far an
+importance-sampling LOO the full posterior distribution is used as the
+proposal distribution. The Pareto k diagnostic estimates how far an
 individual leave-one-out distribution is from the full distribution. If
 leaving out an observation changes the posterior too much then importance
-sampling is not able to give reliable estimate. If \code{k<0.5}, then the
-corresponding component of \code{elpd_loo} is estimated with high accuracy.
-If \verb{0.5<k<0.7} the accuracy is lower, but still ok. If \code{k>0.7},
-then importance sampling is not able to provide useful estimate for that
-component/observation. Pareto k is also useful as a measure of influence of
-an observation. Highly influential observations have high k values. Very high
-k values often indicate model misspecification, outliers or mistakes in data
-processing. See Section 6 of Gabry et al. (2019) for an example.
+sampling is not able to give a reliable estimate. Pareto smoothing stabilizes
+importance sampling and guarantees a finite variance estimate at the
+cost of some bias.
+
+The diagnostic threshold for Pareto \eqn{k} depends on sample size
+\eqn{S} (sample size dependent threshold was introduced by Vehtari
+et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+recommended). For simplicity, \code{loo} package uses the nominal sample
+size \eqn{S}  when computing the sample size specific
+threshold. This provides an optimistic threshold if the effective
+sample size is less than 2200, but even then if ESS/S > 1/2 the difference
+is usually negligible. Thinning of MCMC draws can be used to improve
+the ratio ESS/S.
+\itemize{
+\item If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
+sample size, the PSIS estimate and the corresponding Monte
+Carlo standard error estimate are reliable.
+\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
+corresponding Monte Carlo standard error estimate are not
+reliable, but increasing the (effective) sample size \eqn{S} above
+2200 may help (this will increase the sample size specific
+threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
+threshold 0.7 dominates).
+\item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
+Carlo standard error have large bias and are not reliable. Increasing
+the sample size may reduce the variability in the \eqn{k} estimate, which
+may also result in a lower \eqn{k} estimate.
+\item If \eqn{k \geq 1}{k >= 1}, the target distribution is estimated to
+have non-finite mean. The PSIS estimate and the corresponding Monte
+Carlo standard error are not well defined. Increasing the sample size
+may reduce the variability in \eqn{k} estimate, which may also result in
+a lower \eqn{k} estimate.
+}
+
+Pareto \eqn{k} is also useful as a measure of influence of an
+observation.  Highly influential observations have high \eqn{k}
+values. Very high \eqn{k} values often indicate model
+misspecification, outliers or mistakes in data processing. See
+Section 6 of Gabry et al. (2019) for an example.
 
 \subsection{Interpreting \code{p_loo} when Pareto \code{k} is large}{
-If \code{k > 0.7} then we can also look at the \code{p_loo} estimate for
-some additional information about the problem:
-
+If \eqn{k > 0.7} then we can also look at
+the \code{p_loo} estimate for some additional information about the problem:
 \itemize{
 \item If \verb{p_loo << p} (the total number of parameters in the model),
 then the model is likely to be misspecified. Posterior predictive checks
 (PPCs) are then likely to also detect the problem. Try using an overdispersed
 model, or add more structural information (nonlinearity, mixture model,
 etc.).
-
 \item If \code{p_loo < p} and the number of parameters \code{p} is relatively
 large compared to the number of observations (e.g., \code{p>N/5}), it is
 likely that the model is so flexible or the population prior so weak that it’s
@@ -102,7 +132,6 @@ difficult to predict the left out observation (even for the true model).
 This happens, for example, in the simulated 8 schools (in VGG2017), random
 effect models with a few observations per random effect, and Gaussian
 processes and spatial models with short correlation lengths.
-
 \item If \code{p_loo > p}, then the model is likely to be badly misspecified.
 If the number of parameters \verb{p<<N}, then PPCs are also likely to detect the
 problem. See the case study at
@@ -139,9 +168,13 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+
+Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari,
+A. (2022).  Uncertainty in Bayesian leave-one-out
+cross-validation based model comparison. \href{https://arxiv.org/abs/2008.10296v3}{preprint arXiv:2008.10296v3.}.
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
 Gelman, A. (2019), Visualization in Bayesian workflow.

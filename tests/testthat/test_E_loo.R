@@ -114,9 +114,9 @@ test_that("E_loo.matrix equal to reference", {
 
 test_that("E_loo throws correct errors and warnings", {
   # warnings
-  expect_warning(E_loo.matrix(x, psis_mat), "'log_ratios' not specified")
-  expect_warning(E_test <- E_loo.default(x[, 1], psis_vec), "'log_ratios' not specified")
-  expect_null(E_test$pareto_k)
+  expect_no_warning(E_loo.matrix(x, psis_mat))
+  expect_no_warning(E_test <- E_loo.default(x[, 1], psis_vec))
+  expect_length(E_test$pareto_k, 1)
 
   # errors
   expect_error(E_loo(x, 1), "is.psis")

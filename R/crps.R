@@ -112,7 +112,7 @@ loo_crps.matrix <-
            log_lik,
            ...,
            permutations = 1,
-           r_eff = NULL,
+           r_eff = 1,
            cores = getOption("mc.cores", 1)) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
@@ -154,7 +154,7 @@ loo_scrps.matrix <-
     log_lik,
     ...,
     permutations = 1,
-    r_eff = NULL,
+    r_eff = 1,
     cores = getOption("mc.cores", 1)) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
@@ -175,7 +175,7 @@ EXX_compute <- function(x, x2) {
 }
 
 
-EXX_loo_compute <- function(x, x2, log_lik, r_eff = NULL, ...) {
+EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, ...) {
   S <- nrow(x)
   shuffle <- sample (1:S)
   x2 <- x2[shuffle,]

@@ -125,7 +125,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
@@ -133,7 +133,7 @@ Pareto smoothed importance sampling.
 \itemize{
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes} and
 Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao,
-and Gabry (2019) for more details on why we prefer \code{loo()} to \code{waic()}.
+and Gabry (2022) for more details on why we prefer \code{loo()} to \code{waic()}.
 \item \code{\link[=loo_compare]{loo_compare()}} for comparing models on approximate LOO-CV or WAIC.
 }
 }

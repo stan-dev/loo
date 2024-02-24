@@ -3,7 +3,9 @@
 \name{loo_subsample}
 \alias{loo_subsample}
 \alias{loo_subsample.function}
-\title{Efficient approximate leave-one-out cross-validation (LOO) using subsampling}
+\title{Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
+so that less costly and more approximate computation is made for all LOO-fold,
+and more costly and accurate computations are made only for m<N LOO-folds.}
 \usage{
 loo_subsample(x, ...)
 
@@ -15,7 +17,7 @@ loo_subsample(x, ...)
   observations = 400,
   log_p = NULL,
   log_g = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   loo_approximation = "plpd",
@@ -54,13 +56,14 @@ using MCMC). If not \code{NULL} then they should be specified as described in
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
-\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo_subsample()} be saved in the returned object? See \code{\link[=loo]{loo()}} for details.}
@@ -113,9 +116,11 @@ to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 The default is \code{"diff_srs"}.
 \itemize{
 \item \code{"diff_srs"}: uses the difference estimator with simple random sampling
-(srs). \code{p_loo} is estimated using standard srs.
-\item \code{"hh"}: uses the Hansen-Hurwitz estimator with sampling proportional to
-size, where \code{abs} of loo_approximation is used as size.
+without replacement (srs). \code{p_loo} is estimated using standard srs.
+(Magnusson et al., 2020)
+\item \code{"hh"}: uses the Hansen-Hurwitz estimator with sampling with replacement
+proportional to size, where \code{abs} of loo_approximation is used as size.
+(Magnusson et al., 2019)
 \item \code{"srs"}: uses simple random sampling and ordinary estimation.
 }}
 
@@ -123,7 +128,7 @@ size, where \code{abs} of loo_approximation is used as size.
 is only used when \code{loo_approximation} is \code{"waic_grad"},
 \code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{The hessian of the log-likelihood. This is only used
+\item{llhess}{The Hessian of the log-likelihood. This is only used
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{
@@ -136,7 +141,9 @@ for the individual draws.
 }
 }
 \description{
-Efficient approximate leave-one-out cross-validation (LOO) using subsampling
+Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
+so that less costly and more approximate computation is made for all LOO-fold,
+and more costly and accurate computations are made only for m<N LOO-folds.
 }
 \details{
 The \code{loo_subsample()} function is an S3 generic and a methods is
@@ -180,10 +187,13 @@ are recycled for each observation.
 \references{
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In \emph{International Conference on Machine Learning}
+In \emph{Thirty-sixth International Conference on Machine Learning},
+PMLR 97:4244-4253.
 
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In \emph{Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}
