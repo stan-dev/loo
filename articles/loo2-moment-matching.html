@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -135,7 +135,7 @@ cross-validation with moment matching</h1>
                         <h4 data-toc-skip class="author">Topi Paananen,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2023-03-31</h4>
+            <h4 data-toc-skip class="date">2024-02-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-moment-matching.Rmd</code></div>
@@ -180,7 +180,7 @@ model evaluation using leave-one-out cross-validation and WAIC.
 | <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv
 preprint</a>.</p></li>
 <li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J.
-(2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
+(2022). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
 arXiv:1507.02646</a>.</p></li>
 </ul>
 </div>
@@ -197,12 +197,14 @@ regression model as in the case study.</p>
 <p>Here is the Stan code for fitting the Poisson regression model, which
 we will use for modeling the number of roaches.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stancode</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
+<code class="sourceCode R"><span><span class="co"># Note: some syntax used in this Stan program requires RStan &gt;= 2.26 (or CmdStanR)</span></span>
+<span><span class="co"># To use an older version of RStan change the line declaring `y` to: int y[N];</span></span>
+<span><span class="va">stancode</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
 <span><span class="st">data {</span></span>
 <span><span class="st">  int&lt;lower=1&gt; K;</span></span>
 <span><span class="st">  int&lt;lower=1&gt; N;</span></span>
 <span><span class="st">  matrix[N,K] x;</span></span>
-<span><span class="st">  int y[N];</span></span>
+<span><span class="st">  array[N] int y;</span></span>
 <span><span class="st">  vector[N] offset;</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">  real beta_prior_scale;</span></span>
@@ -271,21 +273,21 @@ package:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo1</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate     SE
 elpd_loo  -5459.4  694.1
 p_loo       258.8   55.4
 looic     10918.9 1388.2
 ------
-Monte Carlo SE of elpd_loo is NA.
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
 
 Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     241   92.0%   241       
- (0.5, 0.7]   (ok)         7    2.7%   53        
-   (0.7, 1]   (bad)        7    2.7%   24        
-   (1, Inf)   (very bad)   7    2.7%   2         
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     248   94.7%   53      
+   (0.7, 1]   (bad)        7    2.7%   24      
+   (1, Inf)   (very bad)   7    2.7%   2       
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>The <code><a href="../reference/loo.html">loo()</a></code> function output warnings that there are some
 observations which are highly influential, and thus the accuracy of
@@ -319,31 +321,25 @@ using <strong>rstan</strong>. It only requires setting the argument
 <code>moment_match</code> to <code>TRUE</code> in the <code><a href="../reference/loo.html">loo()</a></code>
 function. Optionally, you can also set the argument
 <code>k_threshold</code> which determines the Pareto <span class="math inline">\(k\)</span> threshold, above which moment matching
-is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than 0.7.</p>
+is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than the sample size
+(<span class="math inline">\(S\)</span>) specific threshold <span class="math inline">\(\min(1 - 1 / \log_{10}(S), 0.7)\)</span> (which is
+<span class="math inline">\(0.7\)</span> for <span class="math inline">\(S&gt;2200\)</span>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># available in rstan &gt;= 2.21</span></span>
-<span><span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit</span>, moment_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loo2</span></span></code></pre></div>
+<span><span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit</span>, moment_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">loo2</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate     SE
 elpd_loo  -5478.8  700.0
 p_loo       269.8   61.5
 looic     10957.7 1400.1
 ------
-Monte Carlo SE of elpd_loo is 0.4.
+MCSE of elpd_loo is 0.4.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
 
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     252   96.2%   236       
- (0.5, 0.7]   (ok)        10    3.8%   50        
-   (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
-   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
-
-All Pareto k estimates are ok (k &lt; 0.7).
+All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>After the moment matching, all observations have the diagnostic
 Pareto <span class="math inline">\(k\)</span> less than 0.7, meaning
@@ -423,7 +419,7 @@ passed via <code>upars</code>.</li>
 and show an example of using <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> directly.
 For stanfit objects from <strong>rstan</strong> objects, the functions
 look like this:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create a named list of draws for use with rstan methods</span></span>
 <span><span class="va">.rstan_relist</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">skeleton</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/relist.html" class="external-link">relist</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">skeleton</span><span class="op">)</span></span>
@@ -486,7 +482,7 @@ look like this:</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Using these function, we can call <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code> to
 update the existing <code>loo</code> object.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo3</span> <span class="op">&lt;-</span> <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="../reference/loo_moment_match.html">loo_moment_match.default</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">fit</span>,</span>
 <span>  loo <span class="op">=</span> <span class="va">loo1</span>,</span>
@@ -495,28 +491,20 @@ update the existing <code>loo</code> object.</p>
 <span>  unconstrain_pars <span class="op">=</span> <span class="va">unconstrain_pars_stanfit</span>,</span>
 <span>  log_prob_upars <span class="op">=</span> <span class="va">log_prob_upars_stanfit</span>,</span>
 <span>  log_lik_i_upars <span class="op">=</span> <span class="va">log_lik_i_upars_stanfit</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code>Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loo3</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="va">loo3</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate     SE
 elpd_loo  -5478.8  700.0
 p_loo       269.8   61.5
 looic     10957.7 1400.1
 ------
-Monte Carlo SE of elpd_loo is 0.4.
+MCSE of elpd_loo is 0.4.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
 
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     252   96.2%   236       
- (0.5, 0.7]   (ok)        10    3.8%   50        
-   (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
-   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
-
-All Pareto k estimates are ok (k &lt; 0.7).
+All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>As expected, the result is identical to the previous result of
 <code>loo2 &lt;- loo(fit, moment_match = TRUE)</code>.</p>
@@ -537,7 +525,7 @@ model evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413–1432.
 :10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">published</a>
 | <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv preprint</a>.</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
 arXiv:1507.02646</a>.</p>
 </div>

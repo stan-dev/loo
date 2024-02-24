@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -135,7 +135,7 @@ non-factorized models</h1>
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2023-03-31</h4>
+            <h4 data-toc-skip class="date">2024-02-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-non-factorized.Rmd</code></div>
@@ -299,7 +299,7 @@ referred to as PSIS-LOO (Vehtari et al, 2017).</p>
 </h3>
 <p>In order to validate the approximate LOO procedure, and also in order
 to allow exact computations to be made for a small number of
-leave-one-out folds for which the Pareto <span class="math inline">\(k\)</span> diagnostic (Vehtari et al, 2019)
+leave-one-out folds for which the Pareto <span class="math inline">\(k\)</span> diagnostic (Vehtari et al, 2022)
 indicates an unstable approximation, we need to consider how we might to
 do <em>exact</em> leave-one-out CV for a non-factorized model. In the
 case of a Gaussian process that has the marginalization property, we
@@ -373,31 +373,31 @@ linear models.</p>
 (I - \rho W)y \sim {\mathrm N}(\eta, \sigma^2 I),
 \]</span> which corresponds to the following log PDF coded in
 <strong>Stan</strong>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                        real rho, matrix W) {</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  vector[N] half_pred;</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n,n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>         <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>                        real rho, matrix W) {</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>  matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  vector[N] half_pred;</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>  <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n,n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>  half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>         <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>}</span></code></pre></div>
 <p>For the purpose of computing LOO-CV, it makes sense to rewrite the
 SAR model in slightly different form. Conditional on <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\eta\)</span>, and <span class="math inline">\(\sigma\)</span>, if we write</p>
 <p><span class="math display">\[\begin{align}
@@ -467,8 +467,8 @@ account for the spatial dependency among the observations.</p>
 <code>HOVAL</code>, while accounting for the spatial dependency via an
 SAR structure, can be specified in <strong>brms</strong> as follows.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
-<span>  <span class="va">CRIME</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paul-buerkner.github.io/brms/reference/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
+<span>  <span class="va">CRIME</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://paul-buerkner.github.io/brms/reference/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">COL.OLD</span>,</span>
 <span>  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,</span>
 <span>  chains <span class="op">=</span> <span class="fl">4</span>,</span>
@@ -518,9 +518,8 @@ use the recipe laid out in the previous sections.</p>
 <span><span class="va">log_ratios</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">loglik</span></span>
 <span><span class="va">psis_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/psis.html">psis</a></span><span class="op">(</span><span class="va">log_ratios</span><span class="op">)</span></span></code></pre></div>
 <p>The quality of the PSIS-LOO approximation can be investigated
-graphically by plotting the Pareto-k estimate for each observation.
-Ideally, they should not exceed <span class="math inline">\(0.5\)</span>, but in practice the algorithm turns
-out to be robust up to values of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017, 2019). In the
+graphically by plotting the Pareto-k estimate for each observation. The
+approximation is robust up to values of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017, 2022). In the
 plot below, we see that the fourth observation is problematic and so may
 reduce the accuracy of the LOO-CV approximation.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -553,21 +552,21 @@ in the upcoming section.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">psis_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 49 log-likelihood matrix
+Computed from 4000 by 49 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo   -186.7 10.4
-p_loo         7.8  4.9
-looic       373.5 20.8
+elpd_loo   -187.3 11.3
+p_loo         8.6  5.7
+looic       374.5 22.6
 ------
-Monte Carlo SE of elpd_loo is NA.
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume independent draws (r_eff=1).
 
 Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     47    95.9%   2252      
- (0.5, 0.7]   (ok)        0     0.0%   &lt;NA&gt;      
-   (0.7, 1]   (bad)       2     4.1%   57        
-   (1, Inf)   (very bad)  0     0.0%   &lt;NA&gt;      
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     48    98.0%   726     
+   (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;    
+   (1, Inf)   (very bad)  1     2.0%   10      
 See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div class="section level4">
@@ -580,22 +579,34 @@ create an empty dummy model that we will update below as we loop over
 the observations.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># see help("mi", "brms") for details on the mi() usage</span></span>
-<span><span class="va">fit_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
-<span>  <span class="va">CRIME</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/mi.html" class="external-link">mi</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,</span>
+<span><span class="va">fit_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paul-buerkner.github.io/brms/reference/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
+<span>  <span class="va">CRIME</span> <span class="op">|</span> <span class="fu"><a href="https://paul-buerkner.github.io/brms/reference/mi.html" class="external-link">mi</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://paul-buerkner.github.io/brms/reference/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">COL.OLD</span>,</span>
 <span>  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,</span>
 <span>  chains <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
-clang -mmacosx-version-min=10.13 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -DBOOST_NO_AUTO_PTR  -include '/Library/Frameworks/R.framework/Versions/4.2/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fPIC  -Wall -g -O2  -c foo.c -o foo.o
+using C compiler: ‘Apple clang version 13.0.0 (clang-1300.0.29.30)’
+using SDK: ‘’
+clang -arch x86_64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/opt/R/x86_64/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c foo.c -o foo.o
 In file included from &lt;built-in&gt;:1:
-In file included from /Library/Frameworks/R.framework/Versions/4.2/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22:
-In file included from /Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppEigen/include/Eigen/Dense:1:
-In file included from /Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppEigen/include/Eigen/Core:19:
-/Library/Frameworks/R.framework/Versions/4.2/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: 'cmath' file not found
-#include &lt;cmath&gt;
-         ^~~~~~~
-1 error generated.
+In file included from /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22:
+In file included from /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/Core:88:
+/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:1: error: unknown type name 'namespace'
+namespace Eigen {
+^
+/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:16: error: expected ';' after top level declarator
+namespace Eigen {
+               ^
+               ;
+In file included from &lt;built-in&gt;:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22:
+In file included from /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/Dense:1:
+/Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+#include &lt;complex&gt;
+         ^~~~~~~~~
+3 errors generated.
 make: *** [foo.o] Error 1</code></pre>
 <p>Next, we fit the model <span class="math inline">\(N\)</span> times,
 each time leaving out a single observation and then computing the log
@@ -660,7 +671,7 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] -188.9</code></pre>
+<pre><code>[1] -186.4</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate
@@ -691,7 +702,7 @@ equivalent results for approximate and exact LOO-CV:</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">without_pt_4</span>, <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code> approx   exact 
--173.34 -173.07 </code></pre>
+-172.95 -173.13 </code></pre>
 <p>From this we can conclude that the difference we found when including
 <em>all</em> observations does not indicate a bug in our implementation
 of the approximate LOO-CV but rather a violation of its assumptions.</p>
@@ -709,76 +720,76 @@ directly. The Stan code brms generates is human readable and so we can
 use it to learn some of the essential aspects of Stan and the particular
 model we are implementing. The Stan program below is a slightly modified
 version of the code extracted via <code>stancode(fit_dummy)</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>functions {</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>                          real rho, matrix W) {</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    vector[N] half_pred;</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>data {</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>transformed data {</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>parameters {</span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>transformed parameters {</span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>model {</span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
-<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
-<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
-<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
-<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
-<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
-<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
-<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>generated quantities {</span>
-<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
-<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
-<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>functions {</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a>                          real rho, matrix W) {</span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a>    vector[N] half_pred;</span>
+<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb21-21"><a href="#cb21-21" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a>  }</span>
+<span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a>}</span>
+<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a>data {</span>
+<span id="cb21-27"><a href="#cb21-27" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
+<span id="cb21-28"><a href="#cb21-28" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
+<span id="cb21-29"><a href="#cb21-29" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
+<span id="cb21-30"><a href="#cb21-30" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
+<span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
+<span id="cb21-32"><a href="#cb21-32" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
+<span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
+<span id="cb21-34"><a href="#cb21-34" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
+<span id="cb21-35"><a href="#cb21-35" tabindex="-1"></a>}</span>
+<span id="cb21-36"><a href="#cb21-36" tabindex="-1"></a>transformed data {</span>
+<span id="cb21-37"><a href="#cb21-37" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
+<span id="cb21-38"><a href="#cb21-38" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
+<span id="cb21-39"><a href="#cb21-39" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
+<span id="cb21-40"><a href="#cb21-40" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
+<span id="cb21-41"><a href="#cb21-41" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
+<span id="cb21-42"><a href="#cb21-42" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
+<span id="cb21-43"><a href="#cb21-43" tabindex="-1"></a>  }</span>
+<span id="cb21-44"><a href="#cb21-44" tabindex="-1"></a>}</span>
+<span id="cb21-45"><a href="#cb21-45" tabindex="-1"></a>parameters {</span>
+<span id="cb21-46"><a href="#cb21-46" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
+<span id="cb21-47"><a href="#cb21-47" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
+<span id="cb21-48"><a href="#cb21-48" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
+<span id="cb21-49"><a href="#cb21-49" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
+<span id="cb21-50"><a href="#cb21-50" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
+<span id="cb21-51"><a href="#cb21-51" tabindex="-1"></a>}</span>
+<span id="cb21-52"><a href="#cb21-52" tabindex="-1"></a>transformed parameters {</span>
+<span id="cb21-53"><a href="#cb21-53" tabindex="-1"></a>}</span>
+<span id="cb21-54"><a href="#cb21-54" tabindex="-1"></a>model {</span>
+<span id="cb21-55"><a href="#cb21-55" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
+<span id="cb21-56"><a href="#cb21-56" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
+<span id="cb21-57"><a href="#cb21-57" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
+<span id="cb21-58"><a href="#cb21-58" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
+<span id="cb21-59"><a href="#cb21-59" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
+<span id="cb21-60"><a href="#cb21-60" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
+<span id="cb21-61"><a href="#cb21-61" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
+<span id="cb21-62"><a href="#cb21-62" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
+<span id="cb21-63"><a href="#cb21-63" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
+<span id="cb21-64"><a href="#cb21-64" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
+<span id="cb21-65"><a href="#cb21-65" tabindex="-1"></a>  }</span>
+<span id="cb21-66"><a href="#cb21-66" tabindex="-1"></a>}</span>
+<span id="cb21-67"><a href="#cb21-67" tabindex="-1"></a>generated quantities {</span>
+<span id="cb21-68"><a href="#cb21-68" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
+<span id="cb21-69"><a href="#cb21-69" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
+<span id="cb21-70"><a href="#cb21-70" tabindex="-1"></a>}</span></code></pre></div>
 <p>Here we want to focus on two aspects of the Stan code. First, because
 there is no built-in function in Stan that calculates the log-likelihood
 for the lag-SAR model, we define a new <code>normal_lagsar_lpdf</code>
@@ -803,10 +814,10 @@ are not support by brms. If brms can fit a model similar but not
 identical to the desired model, we can let brms generate the Stan
 program for the similar model and then mold it into the program that
 implements the model we actually want to fit. Rather than calling
-<code><a href="https://rdrr.io/pkg/brms/man/stancode.brmsfit.html" class="external-link">stancode()</a></code>, which requires an existing fitted model object,
-we recommend using <code><a href="https://rdrr.io/pkg/brms/man/make_stancode.html" class="external-link">make_stancode()</a></code> and specifying the
+<code><a href="https://paul-buerkner.github.io/brms/reference/stancode.brmsfit.html" class="external-link">stancode()</a></code>, which requires an existing fitted model object,
+we recommend using <code><a href="https://paul-buerkner.github.io/brms/reference/make_stancode.html" class="external-link">make_stancode()</a></code> and specifying the
 <code>save_model</code> argument to write the Stan program to a file.
-The corresponding data can be prepared with <code><a href="https://rdrr.io/pkg/brms/man/make_standata.html" class="external-link">make_standata()</a></code>
+The corresponding data can be prepared with <code><a href="https://paul-buerkner.github.io/brms/reference/make_standata.html" class="external-link">make_standata()</a></code>
 and then manually amended if needed. Once the code and data have been
 edited, they can be passed to RStan’s <code><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan()</a></code> function via
 the <code>file</code> and <code>data</code> arguments.</p>
@@ -844,7 +855,7 @@ model evaluation using leave-one-out cross-validation and WAIC.
 :10.1007/s11222-016-9696-4. <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">Online</a>.
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv preprint
 arXiv:1507.04544</a>.</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
 arXiv:1507.02646</a>.</p>
 </div>
