@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -108,7 +108,28 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importance_sampling</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">method</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importance_sampling</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">method</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for array</span></span>
+<span><span class="fu">importance_sampling</span><span class="op">(</span></span>
+<span>  <span class="va">log_ratios</span>,</span>
+<span>  <span class="va">method</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  r_eff <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for matrix</span></span>
+<span><span class="fu">importance_sampling</span><span class="op">(</span></span>
+<span>  <span class="va">log_ratios</span>,</span>
+<span>  <span class="va">method</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  r_eff <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">importance_sampling</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">method</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -131,6 +152,34 @@ are implemented:</p><ul><li><p><code><a href="psis.html">"psis"</a></code>: Pare
 
 <dt>...</dt>
 <dd><p>Arguments passed on to the various methods.</p></dd>
+
+
+<dt>r_eff</dt>
+<dd><p>Vector of relative effective sample size estimates containing
+one element per observation. The values provided should be the relative
+effective sample sizes of <code>1/exp(log_ratios)</code> (i.e., <code>1/ratios</code>).
+This is related to the relative efficiency of estimating the normalizing
+term in self-normalizing importance sampling. If <code>r_eff</code> is not
+provided then the reported PSIS effective sample sizes and Monte Carlo
+error estimates can be over-optimistic. If the posterior draws are (near)
+independent then <code>r_eff=1</code> can be used. <code>r_eff</code> has to be a scalar (same
+value is used for all observations) or a vector with length equal to the
+number of observations. The default value is 1. See the <code><a href="relative_eff.html">relative_eff()</a></code>
+helper function for computing <code>r_eff</code>.</p></dd>
+
+
+<dt>cores</dt>
+<dd><p>The number of cores to use for parallelization. This defaults to
+the option <code>mc.cores</code> which can be set for an entire R session by
+<code>options(mc.cores = NUMBER)</code>. The old option <code>loo.cores</code> is now
+deprecated but will be given precedence over <code>mc.cores</code> until
+<code>loo.cores</code> is removed in a future release. <strong>As of version
+2.0.0 the default is now 1 core if <code>mc.cores</code> is not set</strong>, but we
+recommend using as many (or close to as many) cores as possible.</p><ul><li><p>Note for Windows 10 users: it is <strong>strongly</strong>
+<a href="https://github.com/stan-dev/loo/issues/94" class="external-link">recommended</a> to avoid using
+the <code>.Rprofile</code> file to set <code>mc.cores</code> (using the <code>cores</code> argument or
+setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
+</ul></dd>
 
 </dl></div>
 

@@ -18,7 +18,7 @@ truncated at S^(1/2) as recommended by Ionides (2008)."><meta property="og:image
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -113,13 +113,13 @@ truncated at S^(1/2) as recommended by Ionides (2008).</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for array</span></span>
-<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for matrix</span></span>
-<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
-<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">tis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -140,11 +140,13 @@ description of how to specify the inputs for each method.</p></dd>
 one element per observation. The values provided should be the relative
 effective sample sizes of <code>1/exp(log_ratios)</code> (i.e., <code>1/ratios</code>).
 This is related to the relative efficiency of estimating the normalizing
-term in self-normalizing importance sampling. See the <code><a href="relative_eff.html">relative_eff()</a></code>
-helper function for computing <code>r_eff</code>. If using <code>psis</code> with
-draws of the <code>log_ratios</code> not obtained from MCMC then the warning
-message thrown when not specifying <code>r_eff</code> can be disabled by
-setting <code>r_eff</code> to <code>NA</code>.</p></dd>
+term in self-normalizing importance sampling. If <code>r_eff</code> is not
+provided then the reported (T)IS effective sample sizes and Monte Carlo
+error estimates can be over-optimistic. If the posterior draws are (near)
+independent then <code>r_eff=1</code> can be used. <code>r_eff</code> has to be a scalar (same
+value is used for all observations) or a vector with length equal to the
+number of observations. The default value is 1. See the <code><a href="relative_eff.html">relative_eff()</a></code>
+helper function for computing <code>r_eff</code>.</p></dd>
 
 
 <dt>cores</dt>
@@ -233,9 +235,10 @@ of data points.</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">tis_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ log_weights: num [1:1000, 1:32] 2.37 2.12 2.24 2.41 2.25 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ diagnostics:List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ diagnostics:List of 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ pareto_k: num [1:32] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ n_eff   : num [1:32] 901 923 930 896 896 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ r_eff   : num [1:32] 0.933 0.939 0.968 0.913 0.911 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "norm_const_log")= num [1:32] 9.28 9.04 9.24 9.09 9 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "tail_len")= num [1:32] 99 98 97 100 100 102 99 100 103 98 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "r_eff")= num [1:32] 0.933 0.939 0.968 0.913 0.911 ...</span>

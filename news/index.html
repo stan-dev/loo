@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -102,6 +102,37 @@
       <small>Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.7.0" id="loo-270">loo 2.7.0<a class="anchor" aria-label="anchor" href="#loo-270"></a></h2>
+<div class="section level4">
+<h4 id="major-changes-2-7-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-2-7-0"></a></h4>
+<ul><li><p><strong>New sample size specific diagnostic threshold for Pareto <code>k</code></strong>. The pre-2022 version of the <a href="https://arxiv.org/abs/1507.02646" class="external-link">PSIS paper</a> recommended diagnostic thresholds of <code>k &lt; 0.5 "good"</code>, <code>0.5 &lt;= k &lt; 0.7 "ok"</code>, <code>0.7 &lt;= k &lt; 1 "bad"</code>, <code>k&gt;=1 "very bad"</code>. The 2022 revision of the PSIS paper now recommends <code>k &lt; min(1 - 1/log10(S), 0.7) "good"</code>, <code>min(1 - 1/log10(S), 0.7) &lt;= k &lt; 1 "bad"</code>, <code>k &gt; 1 "very bad"</code>, where <code>S</code> is the sample size. There is now one fewer diagnostic threshold (<code>"ok"</code> has been removed), and the most important threshold now depends on the sample size <code>S</code>. With sample sizes <code>100</code>, <code>320</code>, <code>1000</code>, <code>2200</code>, <code>10000</code> the sample size specific part <code>1 - 1/log10(S)</code> corresponds to thresholds of <code>0.5</code>, <code>0.6</code>, <code>0.67</code>, <code>0.7</code>, <code>0.75</code>. Even if the sample size grows, the bias in the PSIS estimate dominates if <code>0.7 &lt;= k &lt; 1</code>, and thus the diagnostic threshold for good is capped at <code>0.7</code> (if <code>k &gt; 1</code>, the mean does not exist and bias is not a valid measure). The new recommended thresholds are based on more careful bias-variance analysis of PSIS based on truncated Pareto sums theory. For those who use the Stan default 4000 posterior draws, the <code>0.7</code> threshold will be roughly the same, but there will be fewer warnings as there will be no diagnostic message for <code>0.5 &lt;= k &lt; 0.7</code>. Those who use smaller sample sizes may see diagnostic messages with a threshold less than <code>0.7</code>, and they can simply increase the sample size to about <code>2200</code> to get the threshold to <code>0.7</code>.</p></li>
+<li><p><strong>No more warnings if the <code>r_eff</code> argument is not provided</strong>, and the default is now <code>r_eff = 1</code>. The summary print output showing MCSE and ESS now shows diagnostic information on the range of <code>r_eff</code>. The change was made to reduce unnecessary warnings. The use of <code>r_eff</code> does not change the expected value of <code>elpd_loo</code>, <code>p_loo</code>, and Pareto <code>k</code>, and is needed only to estimate MCSE and ESS. Thus it is better to show the diagnostic information about <code>r_eff</code> only when MCSE and ESS values are shown.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="other-changes-2-7-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-2-7-0"></a></h4>
+<ul><li>Make Pareto <code>k</code> Inf if it is NA by <a href="https://github.com/topipa" class="external-link">@topipa</a> in <a href="https://github.com/stan-dev/loo/issues/224" class="external-link">#224</a></li>
+<li>Fix bug in <code><a href="../reference/E_loo.html">E_loo()</a></code> when type is variance by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/226" class="external-link">#226</a></li>
+<li>
+<code><a href="../reference/E_loo.html">E_loo()</a></code> now allows <code>type="sd"</code> by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/226" class="external-link">#226</a></li>
+<li>update array syntax in vignettes by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/229" class="external-link">#229</a></li>
+<li>Fix unbalanced knitr backticks by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/232" class="external-link">#232</a></li>
+<li>include cc-by 4.0 license for documentation by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/216" class="external-link">#216</a></li>
+<li>Add order statistic warning by <a href="https://github.com/yannmclatchie" class="external-link">@yannmclatchie</a> in <a href="https://github.com/stan-dev/loo/issues/230" class="external-link">#230</a></li>
+<li>
+<code><a href="../reference/pointwise.html">pointwise()</a></code> convenience function for extracting pointwise estimates by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/241" class="external-link">#241</a></li>
+<li>use new <code>k</code> threshold by <a href="https://github.com/avehtari" class="external-link">@avehtari</a> in <a href="https://github.com/stan-dev/loo/issues/235" class="external-link">#235</a></li>
+<li>simplify <code>mcse_elpd</code> using log-normal approximation by <a href="https://github.com/avehtari" class="external-link">@avehtari</a> in <a href="https://github.com/stan-dev/loo/issues/246" class="external-link">#246</a></li>
+<li>show NA for <code>n_eff/ESS</code> if <code>k &gt; k_threshold</code> by <a href="https://github.com/avehtari" class="external-link">@avehtari</a> in <a href="https://github.com/stan-dev/loo/issues/248" class="external-link">#248</a></li>
+<li>improved <code><a href="../reference/E_loo.html">E_loo()</a></code> Pareto-k diagnostics by <a href="https://github.com/avehtari" class="external-link">@avehtari</a> in <a href="https://github.com/stan-dev/loo/issues/247" class="external-link">#247</a></li>
+<li>Doc improvement in <code>loo_subsample.R</code> by <a href="https://github.com/avehtari" class="external-link">@avehtari</a> in <a href="https://github.com/stan-dev/loo/issues/238" class="external-link">#238</a></li>
+<li>Fix typo and deprecations in LFO vignette by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/244" class="external-link">#244</a></li>
+<li>Register internal S3 methods by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/239" class="external-link">#239</a></li>
+<li>Avoid R cmd check NOTEs about some internal functions by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/240" class="external-link">#240</a></li>
+<li>fix R cmd check note due to importance_sampling roxygen template by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/233" class="external-link">#233</a></li>
+<li>fix R cmd check notes by <a href="https://github.com/jgabry" class="external-link">@jgabry</a> in <a href="https://github.com/stan-dev/loo/issues/242" class="external-link">#242</a></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.6.0" id="loo-260">loo 2.6.0<small>2023-03-31</small><a class="anchor" aria-label="anchor" href="#loo-260"></a></h2>
 <div class="section level4">

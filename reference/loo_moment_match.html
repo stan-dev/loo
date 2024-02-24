@@ -18,7 +18,7 @@ are large."><meta property="og:image" content="https://mc-stan.org/loo/logo.svg"
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@ are large.</p>
 <span>  <span class="va">log_prob_upars</span>,</span>
 <span>  <span class="va">log_lik_i_upars</span>,</span>
 <span>  max_iters <span class="op">=</span> <span class="fl">30L</span>,</span>
-<span>  k_threshold <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  k_threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  split <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cov <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -183,7 +183,8 @@ accuracy.</p></dd>
 
 <dt>k_threshold</dt>
 <dd><p>Threshold value for Pareto k values above which the moment
-matching algorithm is used. The default value is 0.5.</p></dd>
+matching algorithm is used. The default value is <code>1 - 1 / log10(S)</code>,
+where <code>S</code> is the sample size.</p></dd>
 
 
 <dt>split</dt>

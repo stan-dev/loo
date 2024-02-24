@@ -19,7 +19,7 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -176,7 +176,17 @@ these sums. These standard errors, for all their flaws, should give a
 better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
-asymptotically, and which only applies to nested models in any case.</p>
+asymptotically, and which only applies to nested models in any case.
+Sivula et al. (2022) discuss the conditions when the normal
+approximation used for SE and <code>se_diff</code> is good.</p>
+<p>If more than \(11\) models are compared, we internally recompute the model
+differences using the median model by ELPD as the baseline model. We then
+estimate whether the differences in predictive performance are potentially
+due to chance as described by McLatchie and Vehtari (2023). This will flag
+a warning if it is deemed that there is a risk of over-fitting due to the
+selection process. In that case users are recommended to avoid model
+selection based on LOO-CV, and instead to favor model averaging/stacking or
+projection predictive inference.</p>
     </div>
     <div id="references">
     <h2>References</h2>
@@ -185,9 +195,15 @@ evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 <a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
+<p>Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
+Uncertainty in Bayesian leave-one-out cross-validation based model
+comparison. <a href="https://arxiv.org/abs/2008.10296v3" class="external-link">preprint arXiv:2008.10296v3.</a>.</p>
+<p>McLatchie, Y., and Vehtari, A. (2023).  Efficient estimation and
+correction of selection-induced bias with order statistics.
+<a href="https://arxiv.org/abs/2309.03742" class="external-link">preprint arXiv:2309.03742</a></p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -201,9 +217,9 @@ the <strong>loo</strong> website for answers to frequently asked questions.</p><
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># very artificial example, just for demonstration!</span></span></span>
 <span class="r-in"><span><span class="va">LL</span> <span class="op">&lt;-</span> <span class="fu"><a href="example_loglik_array.html">example_loglik_array</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">loo1</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span>, r_eff <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>     <span class="co"># should be worst model when compared</span></span></span>
-<span class="r-in"><span><span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span> <span class="op">+</span> <span class="fl">1</span>, r_eff <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># should be second best model when compared</span></span></span>
-<span class="r-in"><span><span class="va">loo3</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span> <span class="op">+</span> <span class="fl">2</span>, r_eff <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># should be best model when compared</span></span></span>
+<span class="r-in"><span><span class="va">loo1</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span><span class="op">)</span>     <span class="co"># should be worst model when compared</span></span></span>
+<span class="r-in"><span><span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># should be second best model when compared</span></span></span>
+<span class="r-in"><span><span class="va">loo3</span> <span class="op">&lt;-</span> <span class="fu"><a href="loo.html">loo</a></span><span class="op">(</span><span class="va">LL</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># should be best model when compared</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu">loo_compare</span><span class="op">(</span><span class="va">loo1</span>, <span class="va">loo2</span>, <span class="va">loo3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comp</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>

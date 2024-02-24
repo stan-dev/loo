@@ -24,7 +24,7 @@ development and will be added in a future release."><meta property="og:image" co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -129,7 +129,7 @@ development and will be added in a future release.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">psis_object</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"variance"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"variance"</span>, <span class="st">"sd"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
 <span>  probs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_ratios <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -139,7 +139,7 @@ development and will be added in a future release.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">psis_object</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"variance"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"variance"</span>, <span class="st">"sd"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
 <span>  probs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_ratios <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -161,7 +161,7 @@ development and will be added in a future release.</p>
 
 <dt>type</dt>
 <dd><p>The type of expectation to compute. The options are
-<code>"mean"</code>, <code>"variance"</code>, and <code>"quantile"</code>.</p></dd>
+<code>"mean"</code>, <code>"variance"</code>, <code>"sd"</code>, and <code>"quantile"</code>.</p></dd>
 
 
 <dt>probs</dt>
@@ -172,7 +172,7 @@ development and will be added in a future release.</p>
 <dd><p>Optionally, a vector or matrix (the same dimensions as <code>x</code>)
 of raw (not smoothed) log ratios. If working with log-likelihood values,
 the log ratios are the <strong>negative</strong> of those values. If <code>log_ratios</code> is
-specified we are able to compute <a href="pareto-k-diagnostic.html">Pareto k</a>
+specified we are able to compute more accurate <a href="pareto-k-diagnostic.html">Pareto k</a>
 diagnostics specific to <code>E_loo()</code>.</p></dd>
 
 </dl></div>
@@ -187,17 +187,24 @@ elements, with one exception: when <code>type="quantile"</code> and
 multiple values are specified in <code>probs</code> the <code>value</code> component of
 the returned object is a <code>length(probs)</code> by <code>ncol(x)</code> matrix.</p>
 <p>For the default/vector method the <code>value</code> component is scalar, with
-one exception: when <code>type</code> is <code>"quantile"</code> and multiple values
+one exception: when <code>type="quantile"</code> and multiple values
 are specified in <code>probs</code> the <code>value</code> component is a vector with
 <code>length(probs)</code> elements.</p></dd>
 
 <dt><code>pareto_k</code></dt>
 <dd><p>Function-specific diagnostic.</p>
-<p>If <code>log_ratios</code> is not specified when calling <code>E_loo()</code>,
-<code>pareto_k</code> will be <code>NULL</code>. Otherwise, for the matrix method it
-will be a vector of length <code>ncol(x)</code> containing estimates of the shape
-parameter \(k\) of the generalized Pareto distribution. For the
-default/vector method, the estimate is a scalar.</p></dd>
+<p>For the matrix method it will be a vector of length <code>ncol(x)</code>
+containing estimates of the shape parameter \(k\) of the
+generalized Pareto distribution. For the default/vector method,
+the estimate is a scalar. If <code>log_ratios</code> is not specified when
+calling <code>E_loo()</code>, the smoothed log-weights are used to estimate
+Pareto-k's, which may produce optimistic estimates.</p>
+<p>For <code>type="mean"</code>, <code>type="var"</code>, and <code>type="sd"</code>, the returned Pareto-k is
+the maximum of the Pareto-k's for the left and right tail of \(hr\) and
+the right tail of \(r\), where \(r\) is the importance ratio and
+\(h=x\) for <code>type="mean"</code> and \(h=x^2\) for <code>type="var"</code> and
+<code>type="sd"</code>. For <code>type="quantile"</code>, the returned Pareto-k is the Pareto-k
+for the right tail of \(r\).</p></dd>
 
 
 </dl></div>
@@ -208,12 +215,6 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class="r-in"><span><span class="co"># Use rstanarm package to quickly fit a model and get both a log-likelihood</span></span></span>
 <span class="r-in"><span><span class="co"># matrix and draws from the posterior predictive distribution</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/rstanarm/" class="external-link">"rstanarm"</a></span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Rcpp</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> This is rstanarm version 2.21.3</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - For execution on a local, multicore CPU with excess RAM we recommend calling</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(mc.cores = parallel::detectCores())</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># data from help("lm")</span></span></span>
 <span class="r-in"><span><span class="va">ctl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.17</span>,<span class="fl">5.58</span>,<span class="fl">5.18</span>,<span class="fl">6.11</span>,<span class="fl">4.50</span>,<span class="fl">4.61</span>,<span class="fl">5.17</span>,<span class="fl">4.53</span>,<span class="fl">5.33</span>,<span class="fl">5.14</span><span class="op">)</span></span></span>
@@ -235,66 +236,85 @@ default/vector method, the estimate is a scalar.</p></dd>
 <span class="r-in"><span><span class="va">psis_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="psis.html">psis</a></span><span class="op">(</span><span class="va">log_ratios</span>, r_eff <span class="op">=</span> <span class="va">r_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'log_ratios' not specified. Can't compute k-hat diagnostic.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.159049 4.966521 5.007666 4.936129 5.110558 5.108392 5.030244 5.080837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 5.000796 5.029638 4.635559 4.701159 4.695538 4.768058 4.542233 4.762575</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.509362 4.621553 4.713217 4.669388</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.134289 4.990779 5.063717 4.891445 5.079014 5.086955 4.994977 5.090987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.988923 5.028137 4.660947 4.726802 4.694544 4.770618 4.536826 4.731126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.520809 4.651735 4.688359 4.646684</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.18122791 0.21659000 0.13761689 0.34883930 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13090888 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.30000611 0.35896221 0.34946561 0.42997715 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'log_ratios' not specified. Can't compute k-hat diagnostic.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.0002037422 0.0002121794 0.0003120603 0.0002381440 0.0001996315</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 0.0002234251 0.0003140785 0.0001937419 0.0002647202 0.0003179773</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 0.0002882070 0.0002318150 0.0002846632 0.0002192418 0.0003495323</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16] 0.0002294693 0.0005414286 0.0002557699 0.0002598545 0.0003085766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.5539901 0.6215686 0.6318423 0.5705244 0.6158968 0.6300637 0.6307183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.6096513 0.6536491 0.6660210 0.6306628 0.6297063 0.6144081 0.5575993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] 0.5235398 0.5939326 0.4765025 0.6248334 0.6486129 0.6233823</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.20633393 0.21659000 0.13761689 0.30777257 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13115833 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.31299009 0.33112990 0.40107004 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"sd"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.7443051 0.7883962 0.7948851 0.7553306 0.7847909 0.7937655 0.7941777</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.7808017 0.8084857 0.8161011 0.7941428 0.7935403 0.7838419 0.7467257</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] 0.7235605 0.7706702 0.6902916 0.7904641 0.8053651 0.7895457</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.20633393 0.21659000 0.13761689 0.30777257 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13115833 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.31299009 0.33112990 0.40107004 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, probs <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="co"># median</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'log_ratios' not specified. Can't compute k-hat diagnostic.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.151455 4.969630 5.006205 4.911495 5.085145 5.096823 5.021451 5.083281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.989998 5.028857 4.635323 4.705774 4.695495 4.778008 4.540621 4.760443</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.517806 4.628075 4.705734 4.659420</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.143318 4.990419 5.045964 4.893522 5.078653 5.088694 4.995732 5.106827</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.985569 5.044546 4.638359 4.719482 4.693008 4.770725 4.530231 4.727474</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.532588 4.644159 4.692495 4.642926</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.15656938 0.21659000 0.13761689 0.30380728 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13090888 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.26787598 0.33112990 0.27326698 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'log_ratios' not specified. Can't compute k-hat diagnostic.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 4.195856 3.929749 3.985757 4.023786 4.141688 4.118301 4.012345 4.104410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 6.130801 5.963534 6.014129 5.864966 6.115942 6.114645 6.018165 6.041274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 4.202947 4.024490 4.069320 3.975519 4.072362 4.100821 3.999408 4.086386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 6.058854 5.971274 6.083626 5.812561 6.065001 6.079247 5.974741 6.080411</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.994901 4.014882 3.641831 3.713065 3.696238 3.854874 3.629619 3.789748</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.996236 6.054583 5.625478 5.673327 5.711968 5.690776 5.431133 5.748500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.974495 3.985170 3.685336 3.742536 3.720220 3.838895 3.661197 3.758993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 6.000139 6.057105 5.667853 5.731417 5.646776 5.683174 5.429682 5.687527</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         [,17]    [,18]    [,19]    [,20]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.627065 3.646186 3.724462 3.647525</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.434909 5.618534 5.703162 5.671337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.652822 3.657359 3.702788 3.663643</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.394626 5.655873 5.676459 5.635945</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.15656938 0.21659000 0.13761689 0.30380728 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13090888 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.26787598 0.33112990 0.27326698 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># To get Pareto k diagnostic with E_loo we also need to provide the negative</span></span></span>
-<span class="r-in"><span><span class="co"># log-likelihood values using the log_ratios argument.</span></span></span>
+<span class="r-in"><span><span class="co"># We can get more accurate Pareto k diagnostic if we also provide</span></span></span>
+<span class="r-in"><span><span class="co"># the log_ratios argument</span></span></span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"mean"</span>, log_ratios <span class="op">=</span> <span class="va">log_ratios</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.159049 4.966521 5.007666 4.936129 5.110558 5.108392 5.030244 5.080837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 5.000796 5.029638 4.635559 4.701159 4.695538 4.768058 4.542233 4.762575</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.509362 4.621553 4.713217 4.669388</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.134289 4.990779 5.063717 4.891445 5.079014 5.086955 4.994977 5.090987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.988923 5.028137 4.660947 4.726802 4.694544 4.770618 4.536826 4.731126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.520809 4.651735 4.688359 4.646684</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.34040926  0.14872826  0.05050987  0.30727724  0.22794724  0.15023183</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.09826373  0.19426301  0.15156339  0.15956006  0.02110562  0.04121434</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13] -0.00999068  0.10847330  0.30014603  0.13221484  0.38781537  0.09850812</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.09001664  0.01124195</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.15699800 0.21844059 0.11530492 0.33568909 0.16902681 0.16234511</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.10826052 0.14299833 0.19011429 0.09605399 0.17210857 0.19834356</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.06436174 0.30159936 0.36916719 0.34152301 0.43622364 0.15634152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.09568308 0.10803477</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

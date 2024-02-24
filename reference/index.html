@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -128,7 +128,9 @@
       </tr><tr><td>
           <p><code><a href="loo_subsample.html">loo_subsample</a></code> <code><a href="loo_subsample.html">loo_subsample.function</a></code> </p>
         </td>
-        <td><p>Efficient approximate leave-one-out cross-validation (LOO) using subsampling</p></td>
+        <td><p>Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
+so that less costly and more approximate computation is made for all LOO-fold,
+and more costly and accurate computations are made only for m&lt;N LOO-folds.</p></td>
       </tr><tr><td>
           <p><code><a href="loo_approximate_posterior.html">loo_approximate_posterior</a></code> <code><a href="loo_approximate_posterior.html">loo_approximate_posterior.array</a></code> <code><a href="loo_approximate_posterior.html">loo_approximate_posterior.matrix</a></code> <code><a href="loo_approximate_posterior.html">loo_approximate_posterior.function</a></code> </p>
         </td>
@@ -163,6 +165,10 @@ using approximate posteriors</p></td>
           <p><code><a href="sis.html">sis()</a></code> </p>
         </td>
         <td><p>Standard importance sampling (SIS)</p></td>
+      </tr><tr><td>
+          <p><code><a href="importance_sampling.html">importance_sampling()</a></code> </p>
+        </td>
+        <td><p>A parent class for different importance sampling methods.</p></td>
       </tr><tr><td>
           <p><code><a href="weights.importance_sampling.html">weights(<i>&lt;importance_sampling&gt;</i>)</a></code> </p>
         </td>
@@ -223,6 +229,10 @@ using approximate posteriors</p></td>
           <p><code><a href="extract_log_lik.html">extract_log_lik()</a></code> </p>
         </td>
         <td><p>Extract pointwise log-likelihood from a Stan model</p></td>
+      </tr><tr><td>
+          <p><code><a href="pointwise.html">pointwise()</a></code> </p>
+        </td>
+        <td><p>Convenience function for extracting pointwise estimates</p></td>
       </tr><tr><td>
           <p><code><a href="relative_eff.html">relative_eff</a></code> <code><a href="relative_eff.html">relative_eff.default</a></code> <code><a href="relative_eff.html">relative_eff.matrix</a></code> <code><a href="relative_eff.html">relative_eff.array</a></code> <code><a href="relative_eff.html">relative_eff.function</a></code> <code><a href="relative_eff.html">relative_eff.importance_sampling</a></code> </p>
         </td>

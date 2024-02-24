@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -159,23 +159,25 @@ below for details on how to specify these arguments.</p></dd>
 <dd><p>Vector of relative effective sample size estimates for the
 likelihood (<code>exp(log_lik)</code>) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and <code>r_eff</code> is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-<code>r_eff=1</code> and can be omitted. The warning message thrown when <code>r_eff</code> is
-not specified can be disabled by setting <code>r_eff</code> to <code>NA</code>. See the
-<code><a href="relative_eff.html">relative_eff()</a></code> helper functions for computing <code>r_eff</code>.</p></dd>
+can be over-optimistic. If the posterior draws are (near) independent then
+<code>r_eff=1</code> can be used. <code>r_eff</code> has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the <code><a href="relative_eff.html">relative_eff()</a></code> helper
+functions for help computing <code>r_eff</code>.</p></dd>
 
 
 <dt>save_psis</dt>
-<dd><p>Should the <code>"psis"</code> object created internally by <code><a href="loo.html">loo()</a></code> be
+<dd><p>Should the <code>psis</code> object created internally by <code><a href="loo.html">loo()</a></code> be
 saved in the returned object? The <code><a href="loo.html">loo()</a></code> function calls <code><a href="psis.html">psis()</a></code>
-internally but by default discards the (potentially large) <code>"psis"</code> object
+internally but by default discards the (potentially large) <code>psis</code> object
 after using it to compute the LOO-CV summaries. Setting <code>save_psis=TRUE</code>
 will add a <code>psis_object</code> component to the list returned by <code>loo</code>.
-Currently this is only needed if you plan to use the <code><a href="E_loo.html">E_loo()</a></code> function to
-compute weighted expectations after running <code>loo</code>.</p></dd>
+This is useful if you plan to use the <code><a href="E_loo.html">E_loo()</a></code> function to compute
+weighted expectations after running <code>loo</code>. Several functions in the
+<span class="pkg">bayesplot</span> package also accept <code>psis</code> objects.</p></dd>
 
 
 <dt>cores</dt>

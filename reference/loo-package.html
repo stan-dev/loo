@@ -3,7 +3,7 @@
 
 Stan Development Team
 This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
 Yao et al. (2018). To get started see the loo package
 vignettes, the
 loo() function for efficient approximate leave-one-out
@@ -28,7 +28,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -117,7 +117,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
     <div class="ref-description">
     <p><em>Stan Development Team</em></p>
 <p>This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
 Yao et al. (2018). To get started see the <strong>loo</strong> package
 <a href="https://mc-stan.org/loo/articles/index.html">vignettes</a>, the
 <code><a href="loo.html">loo()</a></code> function for efficient approximate leave-one-out
@@ -140,7 +140,7 @@ they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
 Gelman, and Gabry (2017a). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
+Simpson, Gelman, Yao, and Gabry, 2022), a new procedure for stabilizing
 and diagnosing importance weights. As a byproduct of our calculations,
 we also obtain approximate standard errors for estimated predictive
 errors and for comparing of predictive errors between two models.</p>
@@ -155,7 +155,7 @@ evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
 Pareto smoothed importance sampling.
 <a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
 <p>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
@@ -164,9 +164,12 @@ stacking to average Bayesian predictive distributions.
 (<a href="https://projecteuclid.org/euclid.ba/1516093227" class="external-link">online</a>).</p>
 <p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Large Data.
-In <em>International Conference on Machine Learning</em></p>
+In <em>Thirty-sixth International Conference on Machine Learning</em>,
+PMLR 97:4244-4253.</p>
 <p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
-Leave-One-Out Cross-Validation for Model Comparison in Large Data.</p>
+Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+In <em>Proceedings of the 23rd International Conference on Artificial
+Intelligence and Statistics (AISTATS)</em>, PMLR 108:341-351.</p>
 <p>Epifani, I., MacEachern, S. N., and Peruggia, M. (2008). Case-deletion
 importance sampling estimators: Central limit theorems and related results.
 <em>Electronic Journal of Statistics</em> <strong>2</strong>, 774-806.</p>
@@ -198,6 +201,27 @@ widely application information criterion in singular learning theory.
 for the generalized Pareto distribution. <em>Technometrics</em> <strong>51</strong>,
 316-325.</p>
     </div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p>Useful links:</p><ul><li><p><a href="https://mc-stan.org/loo/">https://mc-stan.org/loo/</a></p></li>
+<li><p><a href="https://discourse.mc-stan.org" class="external-link">https://discourse.mc-stan.org</a></p></li>
+<li><p>Report bugs at <a href="https://github.com/stan-dev/loo/issues" class="external-link">https://github.com/stan-dev/loo/issues</a></p></li>
+</ul></div>
+    </div>
+    <div id="author">
+    <h2>Author</h2>
+    <p><strong>Maintainer</strong>: Jonah Gabry <a href="mailto:jsg2201@columbia.edu">jsg2201@columbia.edu</a></p>
+<p>Authors:</p><ul><li><p>Aki Vehtari <a href="mailto:Aki.Vehtari@aalto.fi">Aki.Vehtari@aalto.fi</a></p></li>
+<li><p>Mans Magnusson</p></li>
+<li><p>Yuling Yao</p></li>
+<li><p>Paul-Christian Bürkner</p></li>
+<li><p>Topi Paananen</p></li>
+<li><p>Andrew Gelman</p></li>
+</ul><p>Other contributors:</p><ul><li><p>Ben Goodrich [contributor]</p></li>
+<li><p>Juho Piironen [contributor]</p></li>
+<li><p>Bruno Nicenboim [contributor]</p></li>
+<li><p>Leevi Lindgren [contributor]</p></li>
+</ul></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

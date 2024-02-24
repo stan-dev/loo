@@ -23,7 +23,7 @@ well."><meta property="og:image" content="https://mc-stan.org/loo/logo.svg"><!--
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
       </span>
     </div>
 
@@ -129,7 +129,7 @@ well.</p>
 <span>  <span class="va">log_lik</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mae"</span>, <span class="st">"rmse"</span>, <span class="st">"mse"</span>, <span class="st">"acc"</span>, <span class="st">"balanced_acc"</span><span class="op">)</span>,</span>
-<span>  r_eff <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  r_eff <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -228,8 +228,6 @@ See <code><a href="psis.html">psis()</a></code> for details.</p></dd>
 <span class="r-in"><span>                                pred_error <span class="op">=</span> <span class="st">'mae'</span>, r_eff <span class="op">=</span> <span class="va">r_eff</span>,</span></span>
 <span class="r-in"><span>                                type <span class="op">=</span> <span class="st">'quantile'</span>, probs <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
