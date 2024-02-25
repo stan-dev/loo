@@ -1,3 +1,7 @@
+# loo 2.7.0.9000
+
+Items for next release go here
+
 # loo 2.7.0
 
 ### Major changes
