@@ -48,11 +48,11 @@
 #'   Pareto-k's, which may produce optimistic estimates.
 #'
 #'   For `type="mean"`, `type="var"`, and `type="sd"`, the returned Pareto-k is
-#'   the maximum of the Pareto-k's for the left and right tail of \eqn{hr} and
-#'   the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
-#'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and
-#'   `type="sd"`. For `type="quantile"`, the returned Pareto-k is the Pareto-k
-#'   for the right tail of \eqn{r}.
+#'   usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
+#'   and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+#'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and `type="sd"`.
+#'   If \eqn{h} is binary, constant, or not finite, or if type="quantile"`, the
+#'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}. 
 #'  }
 #' }
 #'
@@ -291,10 +291,16 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   h_theta <- x_i
   r_theta <- exp(log_ratios_i - max(log_ratios_i))
   khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)$khat
-  if (is.null(x_i)) {
+  if (is.null(x_i) || is_constant(x_i) || length(unique(x_i))==2 ||
+        anyNA(x_i) || any(is.infinite(x_i))) {
     khat_r
   } else {
     khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)$khat
-    max(khat_hr, khat_r)
+    if (is.na(khat_hr) && is.na(khat_r)) {
+      k <- NA
+    } else {
+      k <- max(khat_hr, khat_r, na.rm=TRUE)
+    }
+    k
   }
 }
