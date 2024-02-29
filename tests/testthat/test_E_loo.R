@@ -115,7 +115,7 @@ test_that("E_loo.matrix equal to reference", {
 test_that("E_loo throws correct errors and warnings", {
   # warnings
   expect_no_warning(E_loo.matrix(x, psis_mat))
-  # now warnings if x is constant, binary, NA, NaN, Inf
+  # no warnings if x is constant, binary, NA, NaN, Inf
   expect_no_warning(E_loo.matrix(x*0, psis_mat))
   expect_no_warning(E_loo.matrix(0+(x>0), psis_mat))
   expect_no_warning(E_loo.matrix(x+NA, psis_mat))   
