@@ -71,11 +71,11 @@ calling \code{E_loo()}, the smoothed log-weights are used to estimate
 Pareto-k's, which may produce optimistic estimates.
 
 For \code{type="mean"}, \code{type="var"}, and \code{type="sd"}, the returned Pareto-k is
-the maximum of the Pareto-k's for the left and right tail of \eqn{hr} and
-the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
-\eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and
-\code{type="sd"}. For \code{type="quantile"}, the returned Pareto-k is the Pareto-k
-for the right tail of \eqn{r}.
+usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
+and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+\eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and \code{type="sd"}.
+If \eqn{h} is binary, constant, or not finite, or if \code{type="quantile"}, the
+returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 }
 }
 }

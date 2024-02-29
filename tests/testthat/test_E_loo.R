@@ -115,6 +115,12 @@ test_that("E_loo.matrix equal to reference", {
 test_that("E_loo throws correct errors and warnings", {
   # warnings
   expect_no_warning(E_loo.matrix(x, psis_mat))
+  # no warnings if x is constant, binary, NA, NaN, Inf
+  expect_no_warning(E_loo.matrix(x*0, psis_mat))
+  expect_no_warning(E_loo.matrix(0+(x>0), psis_mat))
+  expect_no_warning(E_loo.matrix(x+NA, psis_mat))   
+  expect_no_warning(E_loo.matrix(x*NaN, psis_mat))
+  expect_no_warning(E_loo.matrix(x*Inf, psis_mat))
   expect_no_warning(E_test <- E_loo.default(x[, 1], psis_vec))
   expect_length(E_test$pareto_k, 1)
 
@@ -191,4 +197,3 @@ test_that("weighted variance works", {
   w <- c(rep(0.1, 10), rep(0, 90))
   expect_equal(.wvar(x, w), var(x[w > 0]))
 })
-

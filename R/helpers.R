@@ -193,3 +193,7 @@ release_questions <- function() {
   )
 }
 # nocov end
+
+is_constant <- function(x, tol = .Machine$double.eps) {
+  abs(max(x) - min(x)) < tol
+}
