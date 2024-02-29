@@ -51,8 +51,8 @@
 #'   usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
 #'   and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
 #'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and `type="sd"`.
-#'   If \eqn{h} is binary, constant, or not finite, or if type="quantile"`, the
-#'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}. 
+#'   If \eqn{h} is binary, constant, or not finite, or if `type="quantile"`, the
+#'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 #'  }
 #' }
 #'
