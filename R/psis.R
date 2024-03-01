@@ -3,7 +3,7 @@
 #' Implementation of Pareto smoothed importance sampling (PSIS), a method for
 #' stabilizing importance ratios. The version of PSIS implemented here
 #' corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
-#' and Gabry (2022).
+#' and Gabry (2024).
 #' For PSIS diagnostics see the [pareto-k-diagnostic] page.
 #'
 #' @export

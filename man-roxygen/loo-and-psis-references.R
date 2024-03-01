@@ -6,6 +6,7 @@
 #'  [preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544)).
 #'
 #' Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
-#' Pareto smoothed importance sampling.
+#' Pareto smoothed importance sampling.  *Journal of Machine Learning Research*,
+#' accepted for publication.
 #' [preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
 #' 
