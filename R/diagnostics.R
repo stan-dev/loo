@@ -6,7 +6,7 @@
 #' `threshold` value, or plot observation indexes vs. diagnostic estimates.
 #' The **Details** section below provides a brief overview of the
 #' diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
-#' and Vehtari, Simpson, Gelman, Yao, and Gabry (2022) for full details.
+#' and Vehtari, Simpson, Gelman, Yao, and Gabry (2024) for full details.
 #'
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
@@ -23,7 +23,7 @@
 #' parameter \eqn{k} of the generalized Pareto distribution. The
 #' diagnostic threshold for Pareto \eqn{k} depends on sample size
 #' \eqn{S} (sample size dependent threshold was introduced by Vehtari
-#' et al. (2022), and before that fixed thresholds of 0.5 and 0.7 were
+#' et al. (2024), and before that fixed thresholds of 0.5 and 0.7 were
 #' recommended). For simplicity, `loo` package uses the nominal sample
 #' size \eqn{S} when computing the sample size specific
 #' threshold. This provides an optimistic threshold if the effective
@@ -99,7 +99,7 @@
 #' obtain the samples from the proposal distribution via MCMC the **loo**
 #' package also computes estimates for the Monte Carlo error and the effective
 #' sample size for importance sampling, which are more accurate for PSIS than
-#' for IS and TIS (see Vehtari et al (2022) for details). However, the PSIS
+#' for IS and TIS (see Vehtari et al (2024) for details). However, the PSIS
 #' effective sample size estimate will be
 #' **over-optimistic when the estimate of \eqn{k} is greater than**
 #' \eqn{min(1-1/log10(S), 0.7)}, where \eqn{S} is the sample size.

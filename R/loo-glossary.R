@@ -76,7 +76,7 @@
 #'
 #' The diagnostic threshold for Pareto \eqn{k} depends on sample size
 #' \eqn{S} (sample size dependent threshold was introduced by Vehtari
-#' et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+#' et al., 2024, and before that fixed thresholds of 0.5 and 0.7 were
 #' recommended). For simplicity, `loo` package uses the nominal sample
 #' size \eqn{S}  when computing the sample size specific
 #' threshold. This provides an optimistic threshold if the effective

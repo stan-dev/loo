@@ -4,7 +4,7 @@
 #' CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 #' models using Pareto smoothed importance sampling ([PSIS][psis()]). This is
 #' an implementation of the methods described in Vehtari, Gelman, and Gabry
-#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2022).
+#' (2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2024).
 #'
 #' @export loo loo.array loo.matrix loo.function
 #' @param x A log-likelihood array, matrix, or function. The **Methods (by class)**
@@ -500,7 +500,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
       FUN.VALUE = numeric(1),
       FUN = function(i) {
         # Variance in linear scale
-        # Equation (6) in Vehtari et al. (2022)
+        # Equation (6) in Vehtari et al. (2024)
         var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2) / r_eff[i]
         # Compute variance in log scale by match the variance of a
         # log-normal approximation
