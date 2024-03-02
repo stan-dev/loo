@@ -11,7 +11,7 @@
 \emph{Stan Development Team}
 
 This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2024), and
 Yao et al. (2018). To get started see the \strong{loo} package
 \href{https://mc-stan.org/loo/articles/index.html}{vignettes}, the
 \code{\link[=loo]{loo()}} function for efficient approximate leave-one-out
@@ -31,7 +31,7 @@ they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
 Gelman, and Gabry (2017). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Simpson, Gelman, Yao, and Gabry, 2022), a new procedure for stabilizing
+Simpson, Gelman, Yao, and Gabry, 2024), a new procedure for stabilizing
 and diagnosing importance weights. As a byproduct of our calculations,
 we also obtain approximate standard errors for estimated predictive
 errors and for comparing of predictive errors between two models.
@@ -47,8 +47,9 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
-Pareto smoothed importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling.  \emph{Journal of Machine Learning Research},
+accepted for publication.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using

@@ -97,7 +97,7 @@ the estimated Pareto shape parameter \eqn{k} is larger than some
 \code{threshold} value, or plot observation indexes vs. diagnostic estimates.
 The \strong{Details} section below provides a brief overview of the
 diagnostics, but we recommend consulting Vehtari, Gelman, and Gabry (2017)
-and Vehtari, Simpson, Gelman, Yao, and Gabry (2022) for full details.
+and Vehtari, Simpson, Gelman, Yao, and Gabry (2024) for full details.
 }
 \details{
 The reliability and approximate convergence rate of the PSIS-based
@@ -105,7 +105,7 @@ estimates can be assessed using the estimates for the shape
 parameter \eqn{k} of the generalized Pareto distribution. The
 diagnostic threshold for Pareto \eqn{k} depends on sample size
 \eqn{S} (sample size dependent threshold was introduced by Vehtari
-et al. (2022), and before that fixed thresholds of 0.5 and 0.7 were
+et al. (2024), and before that fixed thresholds of 0.5 and 0.7 were
 recommended). For simplicity, \code{loo} package uses the nominal sample
 size \eqn{S} when computing the sample size specific
 threshold. This provides an optimistic threshold if the effective
@@ -122,9 +122,6 @@ reliable, but increasing the (effective) sample size \eqn{S} above
 2200 may help (this will increase the sample size specific
 threshold \eqn{(1-1/log10(2200)>0.7} and then the bias specific
 threshold 0.7 dominates).
-\item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
-Carlo standard error have large bias and are not reliable. Increasing
-the sample size may reduce the uncertainty in the \eqn{k} estimate.
 \item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
 the sample size may reduce the variability in \eqn{k} estimate, which
@@ -177,7 +174,7 @@ influence on posterior distribution of the model. These can be obtained with
 obtain the samples from the proposal distribution via MCMC the \strong{loo}
 package also computes estimates for the Monte Carlo error and the effective
 sample size for importance sampling, which are more accurate for PSIS than
-for IS and TIS (see Vehtari et al (2022) for details). However, the PSIS
+for IS and TIS (see Vehtari et al (2024) for details). However, the PSIS
 effective sample size estimate will be
 \strong{over-optimistic when the estimate of \eqn{k} is greater than}
 \eqn{min(1-1/log10(S), 0.7)}, where \eqn{S} is the sample size.
@@ -190,8 +187,9 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
-Pareto smoothed importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling.  \emph{Journal of Machine Learning Research},
+accepted for publication.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 }
 \seealso{

@@ -82,7 +82,7 @@ cost of some bias.
 
 The diagnostic threshold for Pareto \eqn{k} depends on sample size
 \eqn{S} (sample size dependent threshold was introduced by Vehtari
-et al., 2022, and before that fixed thresholds of 0.5 and 0.7 were
+et al., 2024, and before that fixed thresholds of 0.5 and 0.7 were
 recommended). For simplicity, \code{loo} package uses the nominal sample
 size \eqn{S}  when computing the sample size specific
 threshold. This provides an optimistic threshold if the effective
@@ -168,8 +168,9 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
-Pareto smoothed importance sampling.
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling.  \emph{Journal of Machine Learning Research},
+accepted for publication.
 \href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
 
 Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari,
