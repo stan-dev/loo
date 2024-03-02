@@ -54,7 +54,7 @@ leave-one-out cross-validation (LOO-CV). For a data set with $N$ observations,
 we refit the model $N$ times, each time leaving out one of the $N$ observations
 and assessing how well the model predicts the left-out observation. LOO-CV is
 very expensive computationally in most realistic settings, but the Pareto
-smoothed importance sampling (PSIS, Vehtari et al, 2017, 2022) algorithm provided by
+smoothed importance sampling (PSIS, Vehtari et al, 2017, 2024) algorithm provided by
 the *loo* package allows for approximating exact LOO-CV with PSIS-LOO-CV.
 PSIS-LOO-CV requires only a single fit of the full model and comes with
 diagnostics for assessing the validity of the approximation.
@@ -179,7 +179,7 @@ variability of the importance ratios $r_i^{(s)}$ will become too large and
 importance sampling will fail. We will refer to this particular value of $i$ as
 $i^\star_1$. To identify the value of $i^\star_1$, we check for which value of
 $i$ does the estimated shape parameter $k$ of the generalized Pareto
-distribution first cross a certain threshold $\tau$ (Vehtari et al, 2022). Only
+distribution first cross a certain threshold $\tau$ (Vehtari et al, 2024). Only
 then do we refit the model using the observations up to $i^\star_1$ and restart
 the process from there by setting $\theta^{(s)} = \theta^{(s)}_{1:i^\star_1}$
 and $i^\star = i^\star_1$ until the next refit.
@@ -188,7 +188,7 @@ In some cases we may only need to refit once and in other cases we will find a
 value $i^\star_2$ that requires a second refitting, maybe an $i^\star_3$ that
 requires a third refitting, and so on. We refit as many times as is required
 (only when $k > \tau$) until we arrive at observation $i = N - M$. 
-For LOO, assuming posterior sample size is 4000 or larger, we recommend to use a threshold of $\tau = 0.7$ (Vehtari et al, 2017, 2022)
+For LOO, assuming posterior sample size is 4000 or larger, we recommend to use a threshold of $\tau = 0.7$ (Vehtari et al, 2017, 2024)
 and it turns out this is a reasonable threshold for LFO as well (Bürkner et al. 2020).
 
 ## Autoregressive models
@@ -640,7 +640,10 @@ Bürkner P. C., Gabry J., & Vehtari A. (2020). Approximate leave-future-out cros
 
 Vehtari A., Gelman A., & Gabry J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. *Statistics and Computing*, 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4). [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling.  *Journal of Machine Learning Research*,
+accepted for publication.
+[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
 
 <br />
 
