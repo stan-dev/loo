@@ -44,10 +44,6 @@
 #'
 #' * If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 #'   Carlo standard error have large bias and are not reliable. Increasing
-#'   the sample size may reduce the uncertainty in the \eqn{k} estimate.
-#'
-#' * If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
-#'   Carlo standard error have large bias and are not reliable. Increasing
 #'   the sample size may reduce the variability in \eqn{k} estimate, which
 #'   may result in lower \eqn{k} estimate, too.
 #'
