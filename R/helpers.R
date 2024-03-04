@@ -57,8 +57,8 @@ validate_ll <- function(x) {
     stop("List not allowed as input.")
   } else if (anyNA(x)) {
     stop("NAs not allowed in input.")
-  } else if (!all(is.finite(x))) {
-    stop("All input values must be finite.")
+  } else if (any(x==Inf)) {
+    stop("All input values must be finite or -Inf.")
   }
   invisible(x)
 }

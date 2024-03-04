@@ -88,8 +88,11 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLmat), "NAs not allowed in input")
 
   LLmat[1,1] <- 1
+  LLmat[10, 2] <- -Inf
+  expect_error(psis(-LLmat), "All input values must be finite or -Inf")
+  # log ratio of -Inf is allowed
   LLmat[10, 2] <- Inf
-  expect_error(psis(-LLmat), "All input values must be finite")
+  expect_no_error(psis(-LLmat))
 
   # no lists allowed
   expect_error(expect_warning(psis(as.list(-LLvec))), "List not allowed as input")

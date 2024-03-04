@@ -177,6 +177,11 @@ test_that("loo_moment_match.default warnings work", {
 
 test_that("loo_moment_match.default works", {
 
+  # allow -Inf
+  lwi_x <- lwi_1
+  lwi_x[which.min(lwi_1)] <- -Inf
+  expect_no_error(suppressWarnings(importance_sampling.default(lwi_1, method = "psis", r_eff = 1, cores = 1)))
+
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
 
@@ -286,7 +291,6 @@ test_that("loo_moment_match.default works with multiple cores", {
   expect_equal(loo_moment_match_manual3$pointwise, loo_moment_match_manual4$pointwise, tolerance=5e-4)
 
 })
-
 
 
 test_that("loo_moment_match_split works", {
