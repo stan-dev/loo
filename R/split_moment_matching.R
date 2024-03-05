@@ -100,7 +100,7 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
 
   # lwi_half may have NaNs if computation involves -Inf + Inf
   # replace NaN log ratios with -Inf
-  lr<-lwi_half
+  lr <- lwi_half
   lr[is.na(lr)] <- -Inf
   is_obj_half <- suppressWarnings(importance_sampling.default(lr,
                                                               method = is_method,
@@ -110,7 +110,7 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
 
   # lwi_half may have NaNs if computation involves -Inf + Inf
   # replace NaN log ratios with -Inf
-  lr<-lwi_half + log_liki_half
+  lr <- lwi_half + log_liki_half
   lr[is.na(lr)] <- -Inf
   is_obj_f_half <- suppressWarnings(importance_sampling.default(lr,
                                                                 method = is_method,
