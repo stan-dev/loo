@@ -258,6 +258,7 @@ loo_moment_match_i <- function(i,
   dim(log_liki) <- c(S_per_chain, N_chains, 1)
   r_eff_i <- loo::relative_eff(exp(log_liki), cores = 1)
   dim(log_liki) <- NULL
+  lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
 
   is_obj <- suppressWarnings(importance_sampling.default(-log_liki,
                                                          method = is_method,
@@ -388,7 +389,6 @@ loo_moment_match_i <- function(i,
 
   # pointwise estimates
   elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
-  lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
   mcse_elpd_loo <- mcse_elpd(
     ll = as.matrix(log_liki), lw = as.matrix(lwi),
     E_elpd = exp(elpd_loo_i), r_eff = r_eff_i
