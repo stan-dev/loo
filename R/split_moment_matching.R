@@ -98,14 +98,21 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
         log1p(exp(log_prob_half_trans[!stable_S] -
                    log_prob_half_trans_inv[!stable_S])))
 
-  is_obj_half <- suppressWarnings(importance_sampling.default(lwi_half,
+  # lwi_half may have NaNs if computation involves -Inf + Inf
+  # replace NaN log ratios with -Inf
+  lr <- lwi_half
+  lr[is.na(lr)] <- -Inf
+  is_obj_half <- suppressWarnings(importance_sampling.default(lr,
                                                               method = is_method,
                                                               r_eff = r_eff_i,
                                                               cores = cores))
   lwi_half <- as.vector(weights(is_obj_half))
 
-  is_obj_f_half <- suppressWarnings(importance_sampling.default(lwi_half +
-                                                                  log_liki_half,
+  # lwi_half may have NaNs if computation involves -Inf + Inf
+  # replace NaN log ratios with -Inf
+  lr <- lwi_half + log_liki_half
+  lr[is.na(lr)] <- -Inf
+  is_obj_f_half <- suppressWarnings(importance_sampling.default(lr,
                                                                 method = is_method,
                                                                 r_eff = r_eff_i,
                                                                 cores = cores))

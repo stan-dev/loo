@@ -121,8 +121,10 @@ test_that("tis throws correct errors and warnings", {
   expect_error(tis(-LLmat), "NAs not allowed in input")
 
   LLmat[1,1] <- 1
+  LLmat[10, 2] <- -Inf
+  expect_error(tis(-LLmat), "All input values must be finite or -Inf")
   LLmat[10, 2] <- Inf
-  expect_error(tis(-LLmat), "All input values must be finite")
+  expect_no_error(tis(-LLmat))
 
   # no lists allowed
   expect_error(expect_warning(tis(as.list(-LLvec)), "List not allowed as input"))

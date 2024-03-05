@@ -386,7 +386,6 @@ loo_moment_match_i <- function(i,
     dim(log_liki) <- NULL
   }
 
-
   # pointwise estimates
   elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
   mcse_elpd_loo <- mcse_elpd(
@@ -439,17 +438,18 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
   log_liki_new <- log_lik_i_upars(x, upars = upars, i = i, ...)
   # compute new log importance weights
 
-  is_obj_new <- suppressWarnings(importance_sampling.default(-log_liki_new +
-                                                               log_prob_new -
-                                                               orig_log_prob,
+  # If log_liki_new and log_prob_new both have same element as Inf,
+  # replace the log ratio with -Inf
+  lr <- -log_liki_new + log_prob_new - orig_log_prob
+  lr[is.na(lr)] <- -Inf
+  is_obj_new <- suppressWarnings(importance_sampling.default(lr,
                                                              method = is_method,
                                                              r_eff = r_eff_i,
                                                              cores = 1))
   lwi_new <- as.vector(weights(is_obj_new))
   ki_new <- is_obj_new$diagnostics$pareto_k
 
-  is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new -
-                                                                 orig_log_prob,
+  is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new - orig_log_prob,
                                                                method = is_method,
                                                                r_eff = r_eff_i,
                                                                cores = 1))
