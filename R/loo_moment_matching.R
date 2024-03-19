@@ -286,7 +286,7 @@ loo_moment_match_i <- function(i,
     # 1. match means
     trans <- shift(x, uparsi, lwi)
     # gather updated quantities
-    quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+    quantities_i <- tryCatch(update_quantities_i(x, trans$upars,  i = i,
                                         orig_log_prob = orig_log_prob,
                                         log_prob_upars = log_prob_upars,
                                         log_lik_i_upars = log_lik_i_upars,
@@ -294,6 +294,12 @@ loo_moment_match_i <- function(i,
                                         cores = 1,
                                         is_method = is_method,
                                         ...)
+                        )
+    if (is_try_error(quantities_i)) {
+      # Stan log prob caused an exception probably due to under- or
+      # overflow of parameters to invalid values
+      break
+    }
     if (quantities_i$ki < ki) {
       uparsi <- trans$upars
       total_shift <- total_shift + trans$shift
@@ -310,7 +316,7 @@ loo_moment_match_i <- function(i,
     # 2. match means and marginal variances
     trans <- shift_and_scale(x, uparsi, lwi)
     # gather updated quantities
-    quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+    quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
                                         orig_log_prob = orig_log_prob,
                                         log_prob_upars = log_prob_upars,
                                         log_lik_i_upars = log_lik_i_upars,
@@ -318,6 +324,12 @@ loo_moment_match_i <- function(i,
                                         cores = 1,
                                         is_method = is_method,
                                         ...)
+                        )
+    if (is_try_error(quantities_i)) {
+      # Stan log prob caused an exception probably due to under- or
+      # overflow of parameters to invalid values
+      break
+    }
     if (quantities_i$ki < ki) {
       uparsi <- trans$upars
       total_shift <- total_shift + trans$shift
@@ -336,7 +348,7 @@ loo_moment_match_i <- function(i,
     if (cov) {
       trans <- shift_and_cov(x, uparsi, lwi)
       # gather updated quantities
-      quantities_i <- update_quantities_i(x, trans$upars,  i = i,
+      quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
                                           orig_log_prob = orig_log_prob,
                                           log_prob_upars = log_prob_upars,
                                           log_lik_i_upars = log_lik_i_upars,
@@ -344,7 +356,13 @@ loo_moment_match_i <- function(i,
                                           cores = 1,
                                           is_method = is_method,
                                           ...)
+                          )
 
+      if (is_try_error(quantities_i)) {
+        # Stan log prob caused an exception probably due to under- or
+        # overflow of parameters to invalid values
+        break
+      }
       if (quantities_i$ki < ki) {
         uparsi <- trans$upars
         total_shift <- total_shift + trans$shift
