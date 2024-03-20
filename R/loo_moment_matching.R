@@ -286,7 +286,7 @@ loo_moment_match_i <- function(i,
     # 1. match means
     trans <- shift(x, uparsi, lwi)
     # gather updated quantities
-    quantities_i <- tryCatch(update_quantities_i(x, trans$upars,  i = i,
+    quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
                                         orig_log_prob = orig_log_prob,
                                         log_prob_upars = log_prob_upars,
                                         log_lik_i_upars = log_lik_i_upars,
@@ -295,7 +295,7 @@ loo_moment_match_i <- function(i,
                                         is_method = is_method,
                                         ...)
                         )
-    if (is_try_error(quantities_i)) {
+    if (inherits(quantities_i, "try-error")) {
       # Stan log prob caused an exception probably due to under- or
       # overflow of parameters to invalid values
       break
@@ -325,7 +325,7 @@ loo_moment_match_i <- function(i,
                                         is_method = is_method,
                                         ...)
                         )
-    if (is_try_error(quantities_i)) {
+    if (inherits(quantities_i, "try-error")) {
       # Stan log prob caused an exception probably due to under- or
       # overflow of parameters to invalid values
       break
@@ -358,7 +358,7 @@ loo_moment_match_i <- function(i,
                                           ...)
                           )
 
-      if (is_try_error(quantities_i)) {
+      if (inherits(quantities_i, "try-error")) {
         # Stan log prob caused an exception probably due to under- or
         # overflow of parameters to invalid values
         break
