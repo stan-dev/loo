@@ -290,12 +290,18 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 .E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
   h_theta <- x_i
   r_theta <- exp(log_ratios_i - max(log_ratios_i))
-  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)$khat
+  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)
+  if (!is.na(khat_r)) { # https://github.com/stan-dev/loo/issues/263
+    khat_r <- khat_r$khat
+  }
   if (is.null(x_i) || is_constant(x_i) || length(unique(x_i))==2 ||
         anyNA(x_i) || any(is.infinite(x_i))) {
     khat_r
   } else {
-    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)$khat
+    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)
+    if (!is.na(khat_hr)) { # https://github.com/stan-dev/loo/issues/263
+      khat_hr <- khat_hr$khat
+    }
     if (is.na(khat_hr) && is.na(khat_r)) {
       k <- NA
     } else {
