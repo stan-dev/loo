@@ -195,7 +195,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @param i observation number.
 #' @param x A fitted model object.
 #' @param log_lik_i A function that takes `x` and `i` and returns a matrix (one
-#'   column per chain) or a vector (all chains stacked) of log-likeliood draws
+#'   column per chain) or a vector (all chains stacked) of log-likelihood draws
 #'   of the `i`th observation based on the model `x`. If the draws are obtained
 #'   using MCMC, the matrix with MCMC chains separated is preferred.
 #' @param unconstrain_pars A function that takes arguments `x`, and `pars` and
@@ -440,7 +440,7 @@ loo_moment_match_i <- function(i,
 #'   `upars` and returns a matrix of log-posterior density values of the
 #'   unconstrained posterior draws passed via `upars`.
 #' @param log_lik_i_upars A function that takes arguments `x`, `upars`,
-#'   and `i` and returns a vector of log-likeliood draws of the `i`th
+#'   and `i` and returns a vector of log-likelihood draws of the `i`th
 #'   observation based on the unconstrained posterior draws passed via
 #'   `upars`.
 #' @param r_eff_i MCMC effective sample size divided by the total sample size

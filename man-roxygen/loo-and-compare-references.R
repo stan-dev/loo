@@ -7,8 +7,8 @@
 #'
 #' Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
 #' Pareto smoothed importance sampling. *Journal of Machine Learning Research*,
-#' accepted for publication.
-#' [preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
+#' 25(72):1-58.
+#' [PDF](https://jmlr.org/papers/v25/19-556.html)
 #'
 #' Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
 #' Uncertainty in Bayesian leave-one-out cross-validation based model

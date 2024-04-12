@@ -31,8 +31,7 @@ Some sections from this vignette are excerpted from our papers
 
 * Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
 Pareto smoothed importance sampling.  *Journal of Machine Learning Research*,
-accepted for publication.
-[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
+25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
 
 which provide important background for understanding the methods implemented in
 the package.
@@ -239,5 +238,4 @@ Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
 Pareto smoothed importance sampling.  *Journal of Machine Learning Research*,
-accepted for publication.
-[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646)
+25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
