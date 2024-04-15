@@ -111,8 +111,8 @@ evaluation using leave-one-out cross-validation and WAIC.
 
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
 Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research},
-accepted for publication.
-\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+25(72):1-58.
+\href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 
 Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
 Uncertainty in Bayesian leave-one-out cross-validation based model

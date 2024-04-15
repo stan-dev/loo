@@ -316,7 +316,7 @@ update.psis_loo_ss <- function(object, ...,
       stopifnot(is.data.frame(data) || is.matrix(data) & !is.null(draws))
     }
 
-    # Compute subsample indecies
+    # Compute subsample indices
     if (length(observations) > 1) {
       idxs <- compute_idxs(observations)
     } else {
@@ -448,7 +448,7 @@ nobs.psis_loo_ss <- function(object, ...) {
 #' @details
 #' The choice `psis` is returned if a `psis_loo` object
 #' is converted to a `psis_loo_ss` object with `as.psis_loo_ss()`.
-#' But `psis` cannot be chosen in the api of `loo_subsample()`.
+#' But `psis` cannot be chosen in the API of `loo_subsample()`.
 #'
 #' @noRd
 #' @param api The choices available in the loo API or all possible choices.
@@ -756,7 +756,7 @@ compute_idxs <- function(observations) {
 }
 
 
-#' Compare the indecies to prepare handling
+#' Compare the indices to prepare handling
 #'
 #' @details
 #' The function compares the object and sampled indices into `new`
@@ -1193,14 +1193,15 @@ srs_diff_est <- function(y_approx, y, y_idx) {
   # eq (9) first row second `+` should be `-`
   # Supplementary material eq (6) has this correct
   # Here the variance is for sum, while in the paper the variance is for mean
-  # which explains the proporional difference of 1/n
+  # which explains the proportional difference of 1/N
   est_list$hat_v_y <- (t_pi2_tilde + t_hat_epsilon) - # a (has been checked)
     (1/N) * (t_e^2 - est_list$v_y_hat + 2 * t_pi_tilde * est_list$y_hat - t_pi_tilde^2) # b
   est_list
 }
 
 
-#' Estimate elpd using the standard SRS estimator and SRS WOR
+#' Estimate elpd using the standard simple-re-sample without
+#' resampling (SRS-WOR) estimator
 #' @noRd
 #' @param x A `psis_loo_ss` object.
 #' @return A `psis_loo_ss` object.
@@ -1220,7 +1221,7 @@ loo_subsample_estimation_srs <- function(x) {
   update_psis_loo_ss_estimates(x)
 }
 
-#' Simple SRS-WOR estimation
+#' Simple-re-sample without resampling (SRS-WOR) estimation
 #' @noRd
 #' @param y The values observed.
 #' @param y_approx A vector of length N.
@@ -1324,6 +1325,3 @@ assert_subsampling_pointwise <- function(x) {
   checkmate::assert_names(colnames(x), identical.to = c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k", "idx", "m_i", "elpd_loo_approx"))
   x
 }
-
-
-
