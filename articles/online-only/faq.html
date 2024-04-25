@@ -134,7 +134,7 @@
                         <h4 data-toc-skip class="author"><a href="https://users.aalto.fi/~ave/" class="external-link">Aki Vehtari</a></h4>
             
             <h4 data-toc-skip class="date">First version 2020-03-11.
-Last modified 2024-02-24.</h4>
+Last modified 2024-04-25.</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/online-only/faq.Rmd" class="external-link"><code>vignettes/online-only/faq.Rmd</code></a></small>
       <div class="hidden name"><code>faq.Rmd</code></div>
@@ -429,7 +429,7 @@ Vehtari (<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">2020</a>)</span>).</li
 <li>p_loo: This is not utility/loss as the others, but an estimate of
 effective complexity of the model, which can be used for diagnostics.
 See Vignette <a href="https://mc-stan.org/loo/reference/loo-glossary.html">LOO
-Glossary</a> for interpreting p_loo when Pareto k is large.</li>
+Glossary</a> for interpreting p_loo when Pareto-<span class="math inline">\(\hat{k}\)</span> is large.</li>
 </ul>
 <p>Similarly we can use the similar notation for other data divisions,
 and utility and loss functions. For example, when using LOO data
@@ -465,8 +465,9 @@ the inference needs to be repeated <span class="math inline">\(N\)</span> times.
 parallelization can make the wall clock time to be close to the time
 needed for one model fit [Cooper+etal:2023:parallelCV].</li>
 <li>PSIS-LOO: Pareto smoothed importance sampling leave-one-out
-cross-validation. Pareto smoothed importance sampling (PSIS, <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>, <span class="citation">Vehtari, D. Simpson, <em>et al.</em> (<a href="#ref-Vehtari+etal:PSIS:2019">2019</a>)</span>) is used to estimate
-leave-one-out predictive densities or probabilities.</li>
+cross-validation. Pareto smoothed importance sampling (PSIS, <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>,
+Vehtari+etal:PSIS:2024) is used to estimate leave-one-out predictive
+densities or probabilities.</li>
 <li>PSIS: Richard McElreath shortens PSIS-LOO as PSIS in Statistical
 Rethinking, 2nd ed.</li>
 <li>MM-LOO: Moment matching importance sampling leave-one-out
@@ -951,8 +952,8 @@ difference (elpd_diff)?</a>.</p>
 / response distributions / likelihoods?<a class="anchor" aria-label="anchor" href="#differentmodels"></a>
 </h2>
 <p>Short answer is “Yes”. First to make the terms more clear, <span class="math inline">\(p(y \mid \theta)\)</span> as a function of <span class="math inline">\(y\)</span> is an observation model and <span class="math inline">\(p(y \mid \theta)\)</span> as a function of <span class="math inline">\(\theta\)</span> is a likelihood. It is better to
-ask
-<code>Can cross-validation be used to compare different observation models?</code></p>
+ask “Can cross-validation be used to compare different observation
+models?”</p>
 <ul>
 <li>You can compare models given different discrete observation models
 and it’s also allowed to have different transformations of <span class="math inline">\(y\)</span> as long as the mapping is bijective
@@ -960,7 +961,9 @@ and it’s also allowed to have different transformations of <span class="math i
 <li>You can’t compare densities and probabilities directly. Thus you
 can’t compare model given continuous and discrete observation models,
 unless you compute probabilities in intervals from the continuous model
-(also known as discretising the continuous model).</li>
+(also known as discretising the continuous model). <a href="https://users.aalto.fi/~ave/casestudies/Nabiximols/nabiximols.html" class="external-link">Nabiximols
+case study</a> includes an illustration how this discretisation can be
+easy for count data.</li>
 <li>You can compare models given different continuous observation models
 if you have exactly the same <span class="math inline">\(y\)</span> (loo
 functions in <code>rstanarm</code> and <code>brms</code> check that the
@@ -1162,9 +1165,9 @@ models</a>
 <li>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian
 model evaluation using leave-one-out cross-validation and WAIC.
 <em>Statistics and Computing</em>. 27(5), 1413–1432. <a href="doi:10.1007/s11222-016-9696-4" class="uri">doi:10.1007/s11222-016-9696-4</a>. <a href="http://link.springer.com/article/10.1007%2Fs11222-016-9696-4" class="external-link">Online</a>.</li>
-<li>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
-Pareto smoothed importance sampling. <a href="http://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
-arXiv:1507.02646</a>.</li>
+<li>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. <em>Journal of Machine Learning
+Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html" class="external-link">Online</a>.</li>
 <li>Video <a href="https://www.youtube.com/watch?v=U_EbJMMVdAU&amp;t=278s" class="external-link">Pareto-$
 as practical pre-asymptotic diagnostic of Monte Carlo estimates</a>
 (34min)</li>
@@ -1213,8 +1216,8 @@ Glossary</a>.</p>
 </h2>
 <p>See for some limitations, for example, <a href="https://doi.org/10.1007/s42113-018-0020-6" class="external-link">Limitations of
 “Limitations of Bayesian Leave-one-out Cross-Validation for Model
-Selection”</a> <span class="citation">(<a href="#ref-Vehtari+etal:2019:limitations">Vehtari, D. P. Simpson, <em>et
-al.</em>, 2019</a>)</span> and <a href="https://doi.org/10.1007/s42113-018-0019-z" class="external-link">Between the Devil and
+Selection”</a> <span class="citation">(<a href="#ref-Vehtari+etal:2019:limitations">Vehtari <em>et al.</em>,
+2019</a>)</span> and <a href="https://doi.org/10.1007/s42113-018-0019-z" class="external-link">Between the Devil and
 the Deep Blue Sea: Tensions Between Scientific Judgement and Statistical
 Model Selection</a> <span class="citation">(<a href="#ref-Navarro:2019:between">Navarro, 2019</a>)</span>.</p>
 </div>
@@ -1616,11 +1619,6 @@ Vehtari, A., Simpson, D. P., Yao, Y. and Gelman, A. (2019)
 <span>Bayesian</span> leave-one-out cross-validation for model
 selection”</span>’</span>, <em>Computational Brain &amp; Behavior</em>,
 2, pp. 22–27.
-</div>
-<div id="ref-Vehtari+etal:PSIS:2019" class="csl-entry">
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y. and Gabry, J. (2019)
-<span>‘Pareto smoothed importance sampling’</span>, <em>arXiv preprint
-arXiv:1507.02646</em>. Available at: <a href="https://arxiv.org/abs/1507.02646v6" class="external-link">https://arxiv.org/abs/1507.02646v6</a>.
 </div>
 <div id="ref-Vehtari+etal:PSIS:2022" class="csl-entry">
 Vehtari, A., Simpson, D., Gelman, A., Yao, Y. and Gabry, J. (2022)
