@@ -129,7 +129,7 @@ In the papers and `loo` package, following notations have been used
 - elpd_loo: The Bayesian LOO estimate of the expected log pointwise predictive density (Eq 4 in @Vehtari+etal:PSIS-LOO:2017). 
 - elpd_lfo: The Bayesian LFO estimate of the expected log pointwise predictive density (see, e.g, @Burkner+Gabry+Vehtari:LFO-CV:2020). 
 - LOOIC: -2*elpd_loo. See later for discussion of multiplier -2.
-- p_loo: This is not utility/loss as the others, but an estimate of effective complexity of the model, which can be used for diagnostics. See Vignette [LOO Glossary](https://mc-stan.org/loo/reference/loo-glossary.html) for interpreting p_loo when Pareto k is large.
+- p_loo: This is not utility/loss as the others, but an estimate of effective complexity of the model, which can be used for diagnostics. See Vignette [LOO Glossary](https://mc-stan.org/loo/reference/loo-glossary.html) for interpreting p_loo when Pareto-$\hat{k}$ is large.
 
 Similarly we can use the similar notation for other data divisions,
 and utility and loss functions. For example, when using LOO data
@@ -147,7 +147,7 @@ The choice of partitions to leave out or metric of model performance is independ
 
 - $K$-fold-CV: Each cross-validation fold uses the same inference as is used for the full data. For example, if MCMC is used then MCMC inference needs to be run $K$ times.
 - LOO with $K$-fold-CV: If $K=N$, where $N$ is the number of observations, then $K$-fold-CV is LOO. Sometimes this is called exact, naive or brute-force LOO. This can be time consuming as the inference needs to be repeated $N$ times. Sometimes, efficient parallelization can make the wall clock time to be close to the time needed for one model fit [Cooper+etal:2023:parallelCV].
-- PSIS-LOO: Pareto smoothed importance sampling leave-one-out cross-validation. Pareto smoothed importance sampling (PSIS, @Vehtari+etal:PSIS-LOO:2017, @Vehtari+etal:PSIS:2019) is used to estimate leave-one-out predictive densities or probabilities.
+- PSIS-LOO: Pareto smoothed importance sampling leave-one-out cross-validation. Pareto smoothed importance sampling (PSIS, @Vehtari+etal:PSIS-LOO:2017, Vehtari+etal:PSIS:2024) is used to estimate leave-one-out predictive densities or probabilities.
 - PSIS: Richard McElreath shortens PSIS-LOO as PSIS in Statistical Rethinking, 2nd ed.
 - MM-LOO: Moment matching importance sampling leave-one-out cross-validation [@Paananen+etal:2021:implicit]. Which works better than PSIS-LOO in challenging cases, but is still faster than $K$-fold-CV with K=N.
 - RE-LOO: Run exact LOO (see LOO with $K$-fold-CV) for those observations for which PSIS diagnostic indicates PSIS-LOO is not accurate (that is, re-fit the model for those leave-one-out cases).
@@ -200,7 +200,7 @@ Thus if there are a very large number of models to be compared, either methods t
 See more in tutorial videos on using cross-validation for model selection
 
  - Bayesian data analysis lectures
- [8.2](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=456afda7-0e6d-4903-b0df-b0ab00da8f1e), [9.1](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=a4961b5a-7e42-4603-8aaf-b0b200ca6295), [9.2](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=a4796c79-eab2-436e-b55f-b0b200dac7ce).
+[8.2](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=456afda7-0e6d-4903-b0df-b0ab00da8f1e), [9.1](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=a4961b5a-7e42-4603-8aaf-b0b200ca6295), [9.2](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=a4796c79-eab2-436e-b55f-b0b200dac7ce).
 , and [11.1](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=7ef70bc8-122b-4e86-80fa-b0c000cb5511).
 
 
@@ -305,10 +305,10 @@ See also [How to interpret in Standard error (SE) of elpd difference (elpd_diff)
 
 # Can cross-validation be used to compare different observation models / response distributions / likelihoods? {#differentmodels}
 
-Short answer is "Yes". First to make the terms more clear, $p(y \mid \theta)$ as a function of $y$ is an observation model and $p(y \mid \theta)$ as a function of $\theta$ is a likelihood. It is better to ask ``Can cross-validation be used to compare different observation models?``
+Short answer is "Yes". First to make the terms more clear, $p(y \mid \theta)$ as a function of $y$ is an observation model and $p(y \mid \theta)$ as a function of $\theta$ is a likelihood. It is better to ask "Can cross-validation be used to compare different observation models?"
 
 - You can compare models given different discrete observation models and it’s also allowed to have different transformations of $y$ as long as the mapping is bijective (the probabilities will the stay the same). 
-- You can't compare densities and probabilities directly. Thus you can’t compare model given continuous and discrete observation models, unless you compute probabilities in intervals from the continuous model (also known as discretising the continuous model).
+- You can't compare densities and probabilities directly. Thus you can’t compare model given continuous and discrete observation models, unless you compute probabilities in intervals from the continuous model (also known as discretising the continuous model). [Nabiximols case study](https://users.aalto.fi/~ave/casestudies/Nabiximols/nabiximols.html) includes an illustration how this discretisation can be easy for count data.
 - You can compare models given different continuous observation models if you have exactly the same $y$ (loo functions in `rstanarm` and `brms` check that the hash of $y$ is the same). If $y$ is transformed, then the Jacobian of that transformation needs to be included. There is an example of this in [mesquite case study](https://avehtari.github.io/ROS-Examples/Mesquite/mesquite.html).
 - Transformations of variables are briefly discussed in BDA3 p. 21 [@BDA3] and
 in [Stan Reference Manual Chapter 10](https://mc-stan.org/docs/reference-manual/variable-transforms-chapter.html).
@@ -394,8 +394,8 @@ The number of high Pareto $\hat{k}$'s can be reduced by
 For more information see 
 
 - Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4. [Online](http://link.springer.com/article/10.1007\%2Fs11222-016-9696-4).
-- Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). 
-  Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.02646](http://arxiv.org/abs/1507.02646).
+- Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024). 
+  Pareto smoothed importance sampling. _Journal of Machine Learning Research_, 25(72):1-58. [Online](https://jmlr.org/papers/v25/19-556.html).
 - Video [Pareto-$\hat{k}  as practical pre-asymptotic diagnostic of Monte Carlo estimates](https://www.youtube.com/watch?v=U_EbJMMVdAU&t=278s) (34min)
 - [Practical pre-asymptotic diagnostic of Monte Carlo estimates in Bayesian inference and machine learning](https://www.youtube.com/watch?v=uIojz7lOz9w&list=PLBqnAso5Dy7PCUJbWHO7z3bdeizDdgOhY&index=2) (50min)
 
