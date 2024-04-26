@@ -84,15 +84,15 @@
 #' is usually negligible. Thinning of MCMC draws can be used to improve
 #' the ratio ESS/S.
 #'
-#' * If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
+#' * If \eqn{k < \min(1 - 1 / \log_{10}(S), 0.7)}, where \eqn{S} is the
 #'   sample size, the PSIS estimate and the corresponding Monte
 #'   Carlo standard error estimate are reliable.
 #'
-#' * If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
+#' * If \eqn{1 - 1 / \log_{10}(S) <= k < 0.7}, the PSIS estimate and the
 #'   corresponding Monte Carlo standard error estimate are not
 #'   reliable, but increasing the (effective) sample size \eqn{S} above
 #'   2200 may help (this will increase the sample size specific
-#'   threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
+#'   threshold \eqn{(1 - 1 / \log_{10}(2200) > 0.7} and then the bias specific
 #'   threshold 0.7 dominates).
 #'
 #' * If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
