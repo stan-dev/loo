@@ -90,14 +90,14 @@ sample size is less than 2200, but even then if ESS/S > 1/2 the difference
 is usually negligible. Thinning of MCMC draws can be used to improve
 the ratio ESS/S.
 \itemize{
-\item If \eqn{k < min(1 - 1 / log10(S), 0.7)}, where \eqn{S} is the
+\item If \eqn{k < \min(1 - 1 / \log_{10}(S), 0.7)}, where \eqn{S} is the
 sample size, the PSIS estimate and the corresponding Monte
 Carlo standard error estimate are reliable.
-\item If \eqn{1 - 1 / log10(S) <= k < 0.7}, the PSIS estimate and the
+\item If \eqn{1 - 1 / \log_{10}(S) <= k < 0.7}, the PSIS estimate and the
 corresponding Monte Carlo standard error estimate are not
 reliable, but increasing the (effective) sample size \eqn{S} above
 2200 may help (this will increase the sample size specific
-threshold \eqn{(1 - 1 / log10(2200) > 0.7} and then the bias specific
+threshold \eqn{(1 - 1 / \log_{10}(2200) > 0.7} and then the bias specific
 threshold 0.7 dominates).
 \item If \eqn{0.7 <= k < 1}, the PSIS estimate and the corresponding Monte
 Carlo standard error have large bias and are not reliable. Increasing
