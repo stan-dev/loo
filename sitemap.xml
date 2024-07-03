@@ -4,6 +4,9 @@
     <loc>https://mc-stan.org/loo/404.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/CONTRIBUTING.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/LICENSE-text.html</loc>
   </url>
   <url>
@@ -190,6 +193,9 @@
     <loc>https://mc-stan.org/loo/reference/pareto-k-diagnostic.html</loc>
   </url>
   <url>
+    <loc>https://mc-stan.org/loo/reference/pointwise.html</loc>
+  </url>
+  <url>
     <loc>https://mc-stan.org/loo/reference/print.loo.html</loc>
   </url>
   <url>
@@ -239,6 +245,9 @@
   </url>
   <url>
     <loc>https://mc-stan.org/loo/revdep/library.noindex/loo/old/loo/doc/loo2-lfo.html</loc>
+  </url>
+  <url>
+    <loc>https://mc-stan.org/loo/revdep/library.noindex/loo/old/loo/doc/loo2-mixis.html</loc>
   </url>
   <url>
     <loc>https://mc-stan.org/loo/revdep/library.noindex/loo/old/loo/doc/loo2-moment-matching.html</loc>

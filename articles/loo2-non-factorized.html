@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -135,7 +135,7 @@ non-factorized models</h1>
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2024-02-24</h4>
+            <h4 data-toc-skip class="date">2024-07-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-non-factorized.Rmd</code></div>
@@ -215,9 +215,10 @@ p(y_i \,|\, y_{i-1}, \theta) =
 \]</span></p>
 <p>but the expression on the right-hand side may not always have an
 analytical solution. Computing <span class="math inline">\(\log p(y_i
-\,|\, y_{-i}, \theta)\)</span> for non-factorized models is therefore
-often impossible, or at least inefficient and numerically unstable.
-However, there is a large class of multivariate normal and Student-<span class="math inline">\(t\)</span> models for which there are efficient
+\,|\, y_{-i},
+\theta)\)</span> for non-factorized models is therefore often
+impossible, or at least inefficient and numerically unstable. However,
+there is a large class of multivariate normal and Student-<span class="math inline">\(t\)</span> models for which there are efficient
 analytical solutions available.</p>
 <p>More details can be found in our paper about LOO-CV for
 non-factorized models (Bürkner, Gabry, &amp; Vehtari, 2020), which is
@@ -814,10 +815,10 @@ are not support by brms. If brms can fit a model similar but not
 identical to the desired model, we can let brms generate the Stan
 program for the similar model and then mold it into the program that
 implements the model we actually want to fit. Rather than calling
-<code><a href="https://paul-buerkner.github.io/brms/reference/stancode.brmsfit.html" class="external-link">stancode()</a></code>, which requires an existing fitted model object,
-we recommend using <code><a href="https://paul-buerkner.github.io/brms/reference/make_stancode.html" class="external-link">make_stancode()</a></code> and specifying the
+<code><a href="https://paul-buerkner.github.io/brms/reference/stancode.html" class="external-link">stancode()</a></code>, which requires an existing fitted model object,
+we recommend using <code><a href="https://paul-buerkner.github.io/brms/reference/stancode.html" class="external-link">make_stancode()</a></code> and specifying the
 <code>save_model</code> argument to write the Stan program to a file.
-The corresponding data can be prepared with <code><a href="https://paul-buerkner.github.io/brms/reference/make_standata.html" class="external-link">make_standata()</a></code>
+The corresponding data can be prepared with <code><a href="https://paul-buerkner.github.io/brms/reference/standata.html" class="external-link">make_standata()</a></code>
 and then manually amended if needed. Once the code and data have been
 edited, they can be passed to RStan’s <code><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan()</a></code> function via
 the <code>file</code> and <code>data</code> arguments.</p>
@@ -873,12 +874,12 @@ arXiv:1507.02646</a>.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
+<p>Developed by Aki Vehtari, Jonah Gabry, Måns Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

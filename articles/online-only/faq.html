@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../../bootstrap-toc.css">
 <script src="../../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -134,7 +134,7 @@
                         <h4 data-toc-skip class="author"><a href="https://users.aalto.fi/~ave/" class="external-link">Aki Vehtari</a></h4>
             
             <h4 data-toc-skip class="date">First version 2020-03-11.
-Last modified 2024-04-25.</h4>
+Last modified 2024-07-03.</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/online-only/faq.Rmd" class="external-link"><code>vignettes/online-only/faq.Rmd</code></a></small>
       <div class="hidden name"><code>faq.Rmd</code></div>
@@ -863,7 +863,7 @@ density?<a class="anchor" aria-label="anchor" href="#otherutility"></a>
 <p>Short answer is “Yes”. <span class="citation">Vehtari, Gelman and
 Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span> state
 ``Instead of the log predictive density <span class="math inline">\(\log
-p(\tilde{y}_i \mid y)\)</span>, other utility (or loss) functions <span class="math inline">\(u(p(\tilde{y}_i \mid y), \tilde{y})\)</span> could
+p(\tilde{y}_i  \mid y)\)</span>, other utility (or loss) functions <span class="math inline">\(u(p(\tilde{y}_i \mid y), \tilde{y})\)</span> could
 be used, such as classification error.’’ See also <span class="citation">Vehtari and Ojanen (<a href="#ref-Vehtari+Ojanen:2012">2012</a>)</span>.</p>
 <p>Vignette for <code>loo</code> package about other utility and loss
 functions is work in progress, but there are examples elsewhere:</p>
@@ -1067,9 +1067,9 @@ introduced by <span class="citation">Vehtari <em>et al.</em> (<a href="#ref-Veht
 fixed thresholds of 0.5 and 0.7 were recommended. For simplicity,
 <code>loo</code> package uses the nominal sample size <span class="math inline">\(S\)</span> when computing the sample size specific
 threshold. This provides an optimistic threshold if the effective sample
-size (ESS) is less than 2200, but even then if <span class="math inline">\(\mathrm{ESS}/S &gt; 1/2\)</span> the difference is
-usually negligible. Thinning of MCMC draws can be used to improve the
-ratio $/S.</p>
+size (ESS) is less than 2200, but even then if <span class="math inline">\(\mathrm{ESS}/S
+&gt; 1/2\)</span> the difference is usually negligible. Thinning of MCMC
+draws can be used to improve the ratio $/S.</p>
 <ul>
 <li>If <span class="math inline">\(\hat{k} &lt; \min(1 - 1 /
 \log_{10}(S), 0.7)\)</span>, where <span class="math inline">\(S\)</span> is the sample size, PSIS estimate and
@@ -1661,12 +1661,12 @@ questions and discussing answers.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
+<p>Developed by Aki Vehtari, Jonah Gabry, Måns Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

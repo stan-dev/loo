@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -134,7 +134,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2023-03-31</h4>
+            <h4 data-toc-skip class="date">2024-07-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-example.Rmd</code></div>
@@ -165,8 +165,8 @@ model evaluation using leave-one-out cross-validation and WAIC.
 | <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv
 preprint</a>.</p></li>
 <li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J.
-(2019). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.04544" class="external-link">arXiv preprint
-arXiv:1507.04544</a>.</p></li>
+(2022). Pareto smoothed importance sampling. <a href="https://arxiv.org/abs/1507.02646" class="external-link">arXiv preprint
+arXiv:1507.02646</a>.</p></li>
 </ul>
 </div>
 <div class="section level2">
@@ -283,21 +283,21 @@ the <code>loo</code> object.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo1</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate     SE
 elpd_loo  -6247.8  728.0
 p_loo       292.4   73.3
 looic     12495.5 1455.9
 ------
-Monte Carlo SE of elpd_loo is NA.
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.2]).
 
 Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     239   91.2%   200       
- (0.5, 0.7]   (ok)         6    2.3%   56        
-   (0.7, 1]   (bad)        8    3.1%   25        
-   (1, Inf)   (very bad)   9    3.4%   1         
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     245   93.5%   56      
+   (0.7, 1]   (bad)        8    3.1%   &lt;NA&gt;    
+   (1, Inf)   (very bad)   9    3.4%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>The table shows us a summary of Pareto <span class="math inline">\(k\)</span> diagnostic, which is used to assess the
 reliability of the estimates. In addition to the proportion of
@@ -344,24 +344,23 @@ some high <span class="math inline">\(k\)</span> values.</p>
 marginal posterior predictive checks <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al (2018)</a>. LOO-PIT
 values are cumulative probabilities for <span class="math inline">\(y_i\)</span> computed using the LOO marginal
 predictive distributions <span class="math inline">\(p(y_i|y_{-i})\)</span>. For a good model, the
-distribution of LOO-PIT values should be uniform. In the following plot
-the distribution (smoothed density estimate) of the LOO-PIT values for
-our model (thick curve) is compared to many independently generated
-samples (each the same size as our dataset) from the standard uniform
-distribution (thin curves).</p>
+distribution of LOO-PIT values should be uniform. In the following
+QQ-plot the LOO-PIT values for our model (y-axi) is compared to standard
+uniform distribution (x-axis).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yrep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html" class="external-link">ppc_loo_pit_overlay</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html" class="external-link">ppc_loo_pit_qq</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span>,</span>
 <span>  yrep <span class="op">=</span> <span class="va">yrep</span>,</span>
 <span>  lw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">loo1</span><span class="op">$</span><span class="va">psis_object</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code>NOTE: The kernel density estimate assumes continuous observations and is not optimal for discrete observations.</code></pre>
+<pre><code>Warning:  [1m [22mRemoved 24 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
 <p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-1.png" width="60%" style="display: block; margin: auto;"></p>
-<p>The excessive number of values close to 0 indicates that the model is
-under-dispersed compared to the data, and we should consider a model
-that allows for greater dispersion.</p>
+<p>The excessive number of LOO-PIT values close to 0 indicates that the
+model is under-dispersed compared to the data, and we should consider a
+model that allows for greater dispersion.</p>
 </div>
 </div>
 <div class="section level3">
@@ -380,33 +379,33 @@ allows the conditional mean and variance of <span class="math inline">\(y\)</spa
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate   SE
 elpd_loo   -895.6 37.8
 p_loo         6.7  2.7
 looic      1791.3 75.5
 ------
-Monte Carlo SE of elpd_loo is NA.
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.7, 1.4]).
 
 Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     260   99.2%   2615      
- (0.5, 0.7]   (ok)         1    0.4%   377       
-   (0.7, 1]   (bad)        1    0.4%   28        
-   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     261   99.6%   377     
+   (0.7, 1]   (bad)        1    0.4%   &lt;NA&gt;    
+   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loo2</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loo2-example_files/figure-html/plot-loo2-1.png" width="60%" style="display: block; margin: auto;"></p>
-<p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than 0.7 with the index
-of the corresponding data point. These high values are often the result
-of model misspecification and frequently correspond to data points that
-would be considered ``outliers’’ in the data and surprising according to
-the model <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al
-(2019)</a>. Unfortunately, while large <span class="math inline">\(k\)</span> values are a useful indicator of model
-misspecification, small <span class="math inline">\(k\)</span> values
-are not a guarantee that a model is well-specified.</p>
+<p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than the diagnostic
+threshold with the index of the corresponding data point. These high
+values are often the result of model misspecification and frequently
+correspond to data points that would be considered ``outliers’’ in the
+data and surprising according to the model <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al (2019)</a>.
+Unfortunately, while large <span class="math inline">\(k\)</span> values
+are a useful indicator of model misspecification, small <span class="math inline">\(k\)</span> values are not a guarantee that a model
+is well-specified.</p>
 <p>If there are a small number of problematic <span class="math inline">\(k\)</span> values then we can use a feature in
 <strong>rstanarm</strong> that lets us refit the model once for each of
 these problematic observations. Each time the model is refit, one of the
@@ -426,23 +425,17 @@ Fitting model 1 out of 1 (leaving out observation 93)</code></pre>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix
+Computed from 4000 by 262 log-likelihood matrix.
 
          Estimate   SE
 elpd_loo   -895.5 37.7
 p_loo         6.6  2.6
 looic      1791.1 75.4
 ------
-Monte Carlo SE of elpd_loo is 0.2.
+MCSE of elpd_loo is 0.2.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.7, 1.4]).
 
-Pareto k diagnostic values:
-                         Count Pct.    Min. n_eff
-(-Inf, 0.5]   (good)     260   99.6%   2615      
- (0.5, 0.7]   (ok)         1    0.4%   377       
-   (0.7, 1]   (bad)        0    0.0%   &lt;NA&gt;      
-   (1, Inf)   (very bad)   0    0.0%   &lt;NA&gt;      
-
-All Pareto k estimates are ok (k &lt; 0.7).
+All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>In the print output we can see that the Monte Carlo SE is small
 compared to the other uncertainties.</p>
@@ -454,8 +447,7 @@ estimate for the Poisson model.</p>
 <p>For further model checking we again examine the LOO-PIT values.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yrep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html" class="external-link">ppc_loo_pit_overlay</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">$</span><span class="va">y</span>, <span class="va">yrep</span>, lw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">$</span><span class="va">psis_object</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code>NOTE: The kernel density estimate assumes continuous observations and is not optimal for discrete observations.</code></pre>
+<span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html" class="external-link">ppc_loo_pit_qq</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">$</span><span class="va">y</span>, <span class="va">yrep</span>, lw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">$</span><span class="va">psis_object</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-negbin-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The plot for the negative binomial model looks better than the
 Poisson plot, but we still see that this model is not capturing all of
@@ -466,18 +458,18 @@ the essential features in the data.</p>
 </h3>
 <p>We can use the <code>loo_compare</code> function to compare our two
 models on expected log predictive density (ELPD) for new data:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loo1</span>, <span class="va">loo2</span><span class="op">)</span></span></code></pre></div>
 <pre><code>     elpd_diff se_diff
 fit2     0.0       0.0
 fit1 -5352.2     709.2</code></pre>
 <p>The difference in ELPD is much larger than several times the
 estimated standard error of the difference again indicating that the
-negative-binomial model is expected to have better predictive
-performance than the Poisson model. However, according to the LOO-PIT
-checks there is still some misspecification, and a reasonable guess is
-that a hurdle or zero-inflated model would be an improvement (we leave
-that for another case study).</p>
+negative-binomial model is xpected to have better predictive performance
+than the Poisson model. However, according to the LOO-PIT checks there
+is still some misspecification, and a reasonable guess is that a hurdle
+or zero-inflated model would be an improvement (we leave that for
+another case study).</p>
 <p><br></p>
 </div>
 </div>
@@ -517,12 +509,12 @@ arXiv:1507.02646</a>.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Aki Vehtari, Jonah Gabry, Mans Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
+<p>Developed by Aki Vehtari, Jonah Gabry, Måns Magnusson, Yuling Yao, Paul-Christian Bürkner, Topi Paananen, Andrew Gelman.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>
