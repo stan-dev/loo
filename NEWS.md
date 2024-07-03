@@ -1,29 +1,43 @@
+# loo 2.8.0
+
+* make E_loo Pareto-k diagnostic more robust by @avehtari in #251
+* update psis paper reference by @avehtari in #252
+* update PSIS references in vignettes by @jgabry in #254
+* fix loo_moment_match p_loo computation by @avehtari in #257
+* fix loo_moment_matching NaN issue by @avehtari in #259
+* catch Stan log_prob exceptions inside moment matching by @avehtari in #262
+* Fix E_loo_khat error when posterior::pareto_khat returns NA by @jgabry in #264
+* update psis ref + some minor typo fixes by @avehtari in #266
+* update PSIS ref + link to Nabiximols study for Jacobian correction by @avehtari in #267
+* Fix issue with pareto_khat output no longer being a list by @n-kall in #269
+* fix equations in loo-glossary by @avehtari in #268
+
 # loo 2.7.0
 
 ### Major changes
 
 * __New sample size specific diagnostic threshold for Pareto `k`__. The pre-2022 version
 of the [PSIS paper](https://arxiv.org/abs/1507.02646) recommended diagnostic
-thresholds of 
-`k < 0.5 "good"`, `0.5 <= k < 0.7 "ok"`, 
-`0.7 <= k < 1 "bad"`, `k>=1 "very bad"`. 
-The 2022 revision of the PSIS paper now recommends 
-`k < min(1 - 1/log10(S), 0.7) "good"`, `min(1 - 1/log10(S), 0.7) <= k < 1 "bad"`, 
-`k > 1 "very bad"`, where `S` is the sample size. 
+thresholds of
+`k < 0.5 "good"`, `0.5 <= k < 0.7 "ok"`,
+`0.7 <= k < 1 "bad"`, `k>=1 "very bad"`.
+The 2022 revision of the PSIS paper now recommends
+`k < min(1 - 1/log10(S), 0.7) "good"`, `min(1 - 1/log10(S), 0.7) <= k < 1 "bad"`,
+`k > 1 "very bad"`, where `S` is the sample size.
 There is now one fewer diagnostic threshold (`"ok"` has been removed), and the
 most important threshold now depends on the sample size `S`. With sample sizes
-`100`, `320`, `1000`, `2200`, `10000` the sample size specific part 
+`100`, `320`, `1000`, `2200`, `10000` the sample size specific part
 `1 - 1/log10(S)` corresponds to thresholds of `0.5`, `0.6`, `0.67`, `0.7`, `0.75`.
-Even if the sample size grows, the bias in the PSIS estimate dominates if 
-`0.7 <= k < 1`, and thus the diagnostic threshold for good is capped at 
-`0.7` (if `k > 1`, the mean does not exist and bias is not a valid measure). 
+Even if the sample size grows, the bias in the PSIS estimate dominates if
+`0.7 <= k < 1`, and thus the diagnostic threshold for good is capped at
+`0.7` (if `k > 1`, the mean does not exist and bias is not a valid measure).
 The new recommended thresholds are based on more careful bias-variance analysis
 of PSIS based on truncated Pareto sums theory. For those who use the Stan
 default 4000 posterior draws, the `0.7` threshold will be roughly the same, but
 there will be fewer warnings as there will be no diagnostic message for `0.5 <=
 k < 0.7`. Those who use smaller sample sizes may see diagnostic messages with a
 threshold less than `0.7`, and they can simply increase the sample size to about
-`2200` to get the threshold to `0.7`. 
+`2200` to get the threshold to `0.7`.
 
 * __No more warnings if the `r_eff` argument is not provided__, and the
 default is now `r_eff = 1`. The summary print output showing MCSE and ESS now
@@ -55,10 +69,10 @@ only when MCSE and ESS values are shown.
 * fix R cmd check notes by @jgabry in #242
 
 
- 
+
 # loo 2.6.0
 
-### New features 
+### New features
 
 * New `loo_predictive_metric()` function for computing estimates of leave-one-out
 predictive metrics: mean absolute error, mean squared error and root mean
