@@ -1,3 +1,7 @@
+# loo 2.8.0.9000
+
+Items for next release go here
+
 # loo 2.8.0
 
 * make E_loo Pareto-k diagnostic more robust by @avehtari in #251
