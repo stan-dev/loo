@@ -123,7 +123,7 @@ Useful links:
 Authors:
 \itemize{
   \item Aki Vehtari \email{Aki.Vehtari@aalto.fi}
-  \item Mans Magnusson
+  \item Måns Magnusson
   \item Yuling Yao
   \item Paul-Christian Bürkner
   \item Topi Paananen

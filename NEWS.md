@@ -1,6 +1,16 @@
-# loo 2.7.0.9000
+# loo 2.8.0
 
-Items for next release go here
+* make E_loo Pareto-k diagnostic more robust by @avehtari in #251
+* update psis paper reference by @avehtari in #252
+* update PSIS references in vignettes by @jgabry in #254
+* fix loo_moment_match p_loo computation by @avehtari in #257
+* fix loo_moment_matching NaN issue by @avehtari in #259
+* catch Stan log_prob exceptions inside moment matching by @avehtari in #262
+* Fix E_loo_khat error when posterior::pareto_khat returns NA by @jgabry in #264
+* update psis ref + some minor typo fixes by @avehtari in #266
+* update PSIS ref + link to Nabiximols study for Jacobian correction by @avehtari in #267
+* Fix issue with pareto_khat output no longer being a list by @n-kall in #269
+* fix equations in loo-glossary by @avehtari in #268
 
 # loo 2.7.0
 
