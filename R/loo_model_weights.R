@@ -260,7 +260,7 @@ stacking_weights <-
     negative_log_score_loo <- function(w) {
       # objective function: log score
       stopifnot(length(w) == K - 1)
-      w_full <- (c(w, 1 - sum(w)))
+      w_full <- c(w, 1 - sum(w))
       # avoid over- and underflows using log weights and rowLogSumExps
       sum <- sum(matrixStats::rowLogSumExps(sweep(lpd_point[1:N,], 2, log(w_full), '+')))
       return(-as.numeric(sum))
@@ -275,7 +275,7 @@ stacking_weights <-
       # and by subtracting the row maximum of lpd_point
       mlpd <- matrixStats::rowMaxs(lpd_point)
       for (k in 1:(K - 1)) {
-        grad[k] <- sum((exp(lpd_point[, k]-mlpd) - exp(lpd_point[, K]-mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+'))-mlpd))
+        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
       }
       return(-grad)
     }
