@@ -15,7 +15,8 @@
 #'   log-likelihood matrices then [loo()] is called internally on each matrix.
 #'   Currently the `loo_model_weights()` function is not implemented to be used
 #'   with results from K-fold CV, but you can still obtain weights using K-fold
-#'   CV results by calling the `stacking_weights()` function directly.
+#'   CV results by calling the `stacking_weights()` or `pseudobma_weights()`
+#'   function directly.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
