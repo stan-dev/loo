@@ -22,6 +22,14 @@ test_that("kfold_split_stratified works", {
   y <- mtcars$cyl
   fold_strat <- kfold_split_stratified(10, y)
   expect_equal(range(table(fold_strat)), c(3, 4))
+
+  # test when a group has 1 observation
+  # https://github.com/stan-dev/loo/issues/277
+  y <- rep(c(1, 2, 3), times = c(20, 40, 1))
+  expect_silent(fold_strat <- kfold_split_stratified(5, y)) # used to be a warning before fixing issue #277
+  tab <- table(fold_strat, y)
+  expect_equal(tab[1, ], c("1" = 4, "2" = 8, "3" = 1))
+  for (i in 2:nrow(tab)) expect_equal(tab[i, ], c("1" = 4, "2" = 8, "3" = 0))
 })
 
 test_that("kfold_split_grouped works", {
