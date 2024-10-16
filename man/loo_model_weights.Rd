@@ -36,7 +36,8 @@ and \eqn{N} is the number of data points. If \code{x} is a list of
 log-likelihood matrices then \code{\link[=loo]{loo()}} is called internally on each matrix.
 Currently the \code{loo_model_weights()} function is not implemented to be used
 with results from K-fold CV, but you can still obtain weights using K-fold
-CV results by calling the \code{stacking_weights()} function directly.}
+CV results by calling the \code{stacking_weights()} or \code{pseudobma_weights()}
+function directly.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}

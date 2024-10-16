@@ -56,7 +56,7 @@ reached, there will be a warning, and increasing \code{max_iters} may improve
 accuracy.}
 
 \item{k_threshold}{Threshold value for Pareto k values above which the moment
-matching algorithm is used. The default value is \code{1 - 1 / log10(S)},
+matching algorithm is used. The default value is \code{min(1 - 1/log10(S), 0.7)},
 where \code{S} is the sample size.}
 
 \item{split}{Logical; Indicate whether to do the split transformation or not
