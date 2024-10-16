@@ -26,7 +26,7 @@
 #'   reached, there will be a warning, and increasing `max_iters` may improve
 #'   accuracy.
 #' @param k_threshold Threshold value for Pareto k values above which the moment
-#'   matching algorithm is used. The default value is `1 - 1 / log10(S)`,
+#'   matching algorithm is used. The default value is `min(1 - 1/log10(S), 0.7)`,
 #'   where `S` is the sample size.
 #' @param split Logical; Indicate whether to do the split transformation or not
 #'   at the end of moment matching for each LOO fold.
