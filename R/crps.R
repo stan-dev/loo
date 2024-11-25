@@ -2,11 +2,11 @@
 #'
 #' The `crps()` and `scrps()` functions and their `loo_*()` counterparts can be
 #' used to compute the continuously ranked probability score (CRPS) and scaled
-#' CRPS (SCRPS) (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and
+#' CRPS (SCRPS) (as defined by Bolin and Wallin, 2023). CRPS is a proper scoring rule, and
 #' strictly proper when the first moment of the predictive distribution is
 #' finite. Both can be expressed in terms of samples form the predictive
-#' distribution. See e.g. Gneiting and Raftery (2007) for a comprehensive
-#' discussion on CRPS.
+#' distribution. See, for example, a paper by Gneiting and Raftery (2007)
+#' for a comprehensive discussion on CRPS.
 #'
 #' To compute (S)CRPS, the user needs to provide two sets of draws, `x` and
 #' `x2`, from the predictive distribution. This is due to the fact that formulas
@@ -32,7 +32,7 @@
 #'
 #' @return A list containing two elements: `estimates` and `pointwise`.
 #'   The former reports estimator and standard error and latter the pointwise
-#'   values.
+#'   values. Following Bolin & Wallin (2023), a larger value is better.
 #'
 #' @examples
 #' \dontrun{
@@ -47,8 +47,8 @@
 #' }
 #'
 #' @references
-#' Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
-#' proper scoring rules. arXiv. \doi{10.48550/arXiv.1912.05642}
+#' Bolin, D., & Wallin, J. (2023). Local scale invariance and robustness of
+#' proper scoring rules. Statistical Science, 38(1):140-159.
 #'
 #' Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 #' Prediction, and Estimation. Journal of the American Statistical Association,
