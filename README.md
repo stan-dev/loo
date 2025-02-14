@@ -4,7 +4,7 @@
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
 [![RStudio_CRAN_mirror_downloads_badge](https://cranlogs.r-pkg.org/badges/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
 [![codecov](https://codecov.io/gh/stan-dev/loo/branch/master/graph/badge.svg)](https://codecov.io/github/stan-dev/loo?branch=master)
-[![R-CMD-check](https://github.com/stan-dev/loo/workflows/R-CMD-check/badge.svg)](https://github.com/stan-dev/loo/actions)
+[![R-CMD-check](https://github.com/stan-dev/loo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/stan-dev/loo/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ### Efficient approximate leave-one-out cross-validation for fitted Bayesian models
