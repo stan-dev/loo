@@ -32,8 +32,11 @@ bibentry(bibtype = "Article",
     		            person("Aki", "Vehtari"),
                     person("Daniel", "Simpson"),
                     person("Andrew", "Gelman")),
-         year = "2017",
          journal = "Bayesian Analysis",
+         year = "2018",
+         volume = 13,
+         issue = 3,
+         pages = "917--1007",
          doi = "10.1214/17-BA1091",
          header = "To cite the stacking paper:"
 )
