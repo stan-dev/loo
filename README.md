@@ -70,6 +70,10 @@ Corresponding Python and Matlab/Octave code can be found at the
 [avehtari/PSIS](https://github.com/avehtari/PSIS) repository.
 
 
+### Contributing to loo
+
+Contributions are welcome! **loo** is under active development and pull requests are always appreciated. Bugs, ideas (with or without implementations) should be noted by [opening an issue](https://github.com/stan-dev/loo/issues). Please read [CONTRIBUTING.md](https://github.com/stan-dev/loo/blob/master/.github/CONTRIBUTING.md) for further details.
+
 ### License
 
 The code is distributed under the GPL 3 license. The documentation is distributed under the CC BY 4.0 license.
