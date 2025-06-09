@@ -365,7 +365,8 @@ plot_diagnostic <-
                        col = clrs, pch = 3, cex = .6)
       return(invisible())
     } else {
-      graphics::points(x = if (use_n_eff) n_eff[k < threshold] else k[k < threshold],
+      graphics::points(x = which(k < threshold), 
+                       y = if (use_n_eff) n_eff[k < threshold] else k[k < threshold],
                        col = clrs[k < threshold], pch = 3, cex = .6)
       sel <- !in_range(k, breaks[1:2])
       dots <- list(...)
