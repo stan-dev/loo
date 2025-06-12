@@ -126,7 +126,7 @@ pareto_k_table <- function(x) {
   S <- dim(x)[1]
   k_threshold <- ps_khat_threshold(S)
   kcut <- k_cut(k, k_threshold)
-  n_eff[k>k_threshold] <- NA
+  n_eff[k > k_threshold] <- NA
   min_n_eff <- min_n_eff_by_k(n_eff, kcut)
   count <- table(kcut)
   out <- cbind(
@@ -144,8 +144,11 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
   k_threshold <- attr(x, "k_threshold")
 
   if (sum(count[2:3]) == 0) {
-    cat(paste0("\nAll Pareto k estimates are good (k < ",
-               round(k_threshold,2), ").\n"))
+    cat(paste0(
+      "\nAll Pareto k estimates are good (k < ",
+      round(k_threshold, 2),
+      ").\n"
+    ))
   } else {
     tab <- cbind(
       " " = rep("", 3),
@@ -201,9 +204,8 @@ pareto_k_values <- function(x) {
 #'   model posterior distribution.
 pareto_k_influence_values <- function(x) {
   if ("influence_pareto_k" %in% colnames(x$pointwise)) {
-    k <- x$pointwise[,"influence_pareto_k"]
-  }
-  else {
+    k <- x$pointwise[, "influence_pareto_k"]
+  } else {
     stop("No Pareto k influence estimates found.", call. = FALSE)
   }
   return(k)
@@ -262,18 +264,22 @@ mcse_loo <- function(x, threshold = NULL) {
 #'   the estimates of the Pareto shape parameters (`diagnostic = "k"`) or
 #'   estimates of the PSIS effective sample sizes (`diagnostic = "ESS"`).
 #'
-plot.psis_loo <- function(x,
-                          diagnostic = c("k", "ESS", "n_eff"),
-                          ...,
-                          label_points = FALSE,
-                          main = "PSIS diagnostic plot") {
+plot.psis_loo <- function(
+  x,
+  diagnostic = c("k", "ESS", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+) {
   diagnostic <- match.arg(diagnostic)
   k <- pareto_k_values(x)
-  k[is.na(k)] <- 0  # FIXME when reloo is changed to make NA k values -Inf
+  k[is.na(k)] <- 0 # FIXME when reloo is changed to make NA k values -Inf
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
-    warning(signif(100 * mean(k_inf), 2),
-            "% of Pareto k estimates are Inf/NA/NaN and not plotted.")
+    warning(
+      signif(100 * mean(k_inf), 2),
+      "% of Pareto k estimates are Inf/NA/NaN and not plotted."
+    )
   }
 
   if (diagnostic == "ESS" || diagnostic == "n_eff") {
@@ -301,24 +307,34 @@ plot.loo <- plot.psis_loo
 
 #' @export
 #' @rdname pareto-k-diagnostic
-plot.psis <- function(x, diagnostic = c("k", "ESS", "n_eff"), ...,
-                      label_points = FALSE,
-                      main = "PSIS diagnostic plot") {
-  plot.psis_loo(x, diagnostic = diagnostic, ...,
-                label_points = label_points, main = main)
+plot.psis <- function(
+  x,
+  diagnostic = c("k", "ESS", "n_eff"),
+  ...,
+  label_points = FALSE,
+  main = "PSIS diagnostic plot"
+) {
+  plot.psis_loo(
+    x,
+    diagnostic = diagnostic,
+    ...,
+    label_points = label_points,
+    main = main
+  )
 }
-
 
 
 # internal ----------------------------------------------------------------
 
 plot_diagnostic <-
-  function(k,
-           n_eff = NULL,
-           threshold = 0.7,
-           ...,
-           label_points = FALSE,
-           main = "PSIS diagnostic plot") {
+  function(
+    k,
+    n_eff = NULL,
+    threshold = 0.7,
+    ...,
+    label_points = FALSE,
+    main = "PSIS diagnostic plot"
+  ) {
     use_n_eff <- !is.null(n_eff)
     graphics::plot(
       x = if (use_n_eff) n_eff else k,
@@ -343,13 +359,14 @@ plot_diagnostic <-
       ltys <- c(3, 2, 1)
       for (j in seq_along(breaks)) {
         val <- breaks[j]
-        if (in_range(val, krange))
+        if (in_range(val, krange)) {
           graphics::abline(
             h = val,
             col = ifelse(val == 0, "darkgray", hex_clrs[j - 1]),
             lty = ltys[j],
             lwd = 1
           )
+        }
       }
     }
 
@@ -361,13 +378,21 @@ plot_diagnostic <-
       ifelse(in_range(k, breaks[2:3]), hex_clrs[2], hex_clrs[3])
     )
     if (all(k < threshold) || !label_points) {
-      graphics::points(x = if (use_n_eff) n_eff else k,
-                       col = clrs, pch = 3, cex = .6)
+      graphics::points(
+        x = if (use_n_eff) n_eff else k,
+        col = clrs,
+        pch = 3,
+        cex = .6
+      )
       return(invisible())
     } else {
-      graphics::points(x = which(k < threshold), 
-                       y = if (use_n_eff) n_eff[k < threshold] else k[k < threshold],
-                       col = clrs[k < threshold], pch = 3, cex = .6)
+      graphics::points(
+        x = which(k < threshold),
+        y = if (use_n_eff) n_eff[k < threshold] else k[k < threshold],
+        col = clrs[k < threshold],
+        pch = 3,
+        cex = .6
+      )
       sel <- !in_range(k, breaks[1:2])
       dots <- list(...)
       txt_args <- c(
@@ -378,9 +403,15 @@ plot_diagnostic <-
         ),
         if (length(dots)) dots
       )
-      if (!("adj" %in% names(txt_args))) txt_args$adj <- 2 / 3
-      if (!("cex" %in% names(txt_args))) txt_args$cex <- 0.75
-      if (!("col" %in% names(txt_args))) txt_args$col <- clrs[sel]
+      if (!("adj" %in% names(txt_args))) {
+        txt_args$adj <- 2 / 3
+      }
+      if (!("cex" %in% names(txt_args))) {
+        txt_args$cex <- 0.75
+      }
+      if (!("col" %in% names(txt_args))) {
+        txt_args$col <- clrs[sel]
+      }
 
       do.call(graphics::text, txt_args)
     }
@@ -397,9 +428,11 @@ k_cut <- function(k, threshold) {
   cut(
     k,
     breaks = c(-Inf, threshold, 1, Inf),
-    labels = c(paste0("(-Inf, ", round(threshold,2), "]"),
-               paste0("(", round(threshold,2), ", 1]"),
-               "(1, Inf)")
+    labels = c(
+      paste0("(-Inf, ", round(threshold, 2), "]"),
+      paste0("(", round(threshold, 2), ", 1]"),
+      "(1, Inf)"
+    )
   )
 }
 

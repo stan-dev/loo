@@ -17,32 +17,48 @@ importance_sampling <- function(log_ratios, method, ...) {
 #' @inheritParams psis
 #' @export
 importance_sampling.array <-
-  function(log_ratios, method,
-           ...,
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
+  function(
+    log_ratios,
+    method,
+    ...,
+    r_eff = 1,
+    cores = getOption("mc.cores", 1)
+  ) {
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
+    do_importance_sampling(
+      log_ratios,
+      r_eff = r_eff,
+      cores = cores,
+      method = method
+    )
   }
 
 #' @rdname importance_sampling
 #' @inheritParams psis
 #' @export
 importance_sampling.matrix <-
-  function(log_ratios, method,
-           ...,
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
+  function(
+    log_ratios,
+    method,
+    ...,
+    r_eff = 1,
+    cores = getOption("mc.cores", 1)
+  ) {
     cores <- loo_cores(cores)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
+    do_importance_sampling(
+      log_ratios,
+      r_eff = r_eff,
+      cores = cores,
+      method = method
+    )
   }
 
 #' @rdname importance_sampling
@@ -54,7 +70,12 @@ importance_sampling.default <-
     assert_importance_sampling_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)
     r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    importance_sampling.matrix(log_ratios, r_eff = r_eff, cores = 1, method = method)
+    importance_sampling.matrix(
+      log_ratios,
+      r_eff = r_eff,
+      cores = 1,
+      method = method
+    )
   }
 
 
@@ -84,16 +105,15 @@ dim.importance_sampling <- function(x) {
 #' # See the examples at help("psis")
 #'
 weights.importance_sampling <-
-  function(object,
-           ...,
-           log = TRUE,
-           normalize = TRUE) {
+  function(object, ..., log = TRUE, normalize = TRUE) {
     out <- object[["log_weights"]] # smoothed but unnormalized log weights
     if (normalize) {
-      out <- sweep(out,
-                   MARGIN = 2,
-                   STATS = attr(object, "norm_const_log"), # colLogSumExp(log_weights)
-                   check.margin = FALSE)
+      out <- sweep(
+        out,
+        MARGIN = 2,
+        STATS = attr(object, "norm_const_log"), # colLogSumExp(log_weights)
+        check.margin = FALSE
+      )
     }
     if (!log) {
       out <- exp(out)
@@ -109,13 +129,15 @@ weights.importance_sampling <-
 #' @keywords internal
 #' @description
 #' Currently implemented importance sampling methods
-assert_importance_sampling_method_is_implemented <- function(x){
+assert_importance_sampling_method_is_implemented <- function(x) {
   if (!x %in% implemented_is_methods()) {
-    stop("Importance sampling method '",
-         x,
-         "' is not implemented. Implemented methods: '",
-         paste0(implemented_is_methods, collapse = "', '"),
-         "'")
+    stop(
+      "Importance sampling method '",
+      x,
+      "' is not implemented. Implemented methods: '",
+      paste0(implemented_is_methods, collapse = "', '"),
+      "'"
+    )
   }
 }
 implemented_is_methods <- function() c("psis", "tis", "sis")
@@ -134,11 +156,7 @@ implemented_is_methods <- function() c("psis", "tis", "sis")
 #'   the top of this file.
 #'
 importance_sampling_object <-
-  function(unnormalized_log_weights,
-           pareto_k,
-           tail_len,
-           r_eff,
-           method) {
+  function(unnormalized_log_weights, pareto_k, tail_len, r_eff, method) {
     stopifnot(is.matrix(unnormalized_log_weights))
     methods <- unique(method)
     stopifnot(all(methods %in% implemented_is_methods()))
@@ -199,15 +217,17 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   }
 
   if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i]))
+    lw_list <- lapply(seq_len(N), function(i) {
+      is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
+    })
   } else {
     if (!os_is_windows()) {
       lw_list <- parallel::mclapply(
         X = seq_len(N),
         mc.cores = cores,
-        FUN = function(i)
+        FUN = function(i) {
           is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
+        }
       )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -216,8 +236,9 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(N),
-          fun = function(i)
+          fun = function(i) {
             is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
+          }
         )
     }
   }

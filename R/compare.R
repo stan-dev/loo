@@ -63,8 +63,10 @@ compare <- function(..., x = list()) {
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {
-      stop("If 'x' is specified then '...' should not be specified.",
-           call. = FALSE)
+      stop(
+        "If 'x' is specified then '...' should not be specified.",
+        call. = FALSE
+      )
     }
     nms <- as.character(match.call(expand.dots = TRUE))[-1L]
   } else {
@@ -97,7 +99,7 @@ compare <- function(..., x = list()) {
 
     x <- sapply(dots, function(x) {
       est <- x$estimates
-      setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))) )
+      setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
     })
     colnames(x) <- nms
     rnms <- rownames(x)
@@ -105,8 +107,10 @@ compare <- function(..., x = list()) {
     ord <- order(x[grep("^elpd", rnms), ], decreasing = TRUE)
     comp <- t(comp)[ord, ]
     patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
-    col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
-                      use.names = FALSE)
+    col_ord <- unlist(
+      sapply(patts, function(p) grep(p, colnames(comp))),
+      use.names = FALSE
+    )
     comp <- comp[, col_ord]
 
     # compute elpd_diff and se_elpd_diff relative to best model
@@ -122,13 +126,25 @@ compare <- function(..., x = list()) {
 }
 
 
-
 # internal ----------------------------------------------------------------
-compare_two_models <- function(loo_a, loo_b, return = c("elpd_diff", "se"), check_dims = TRUE) {
+compare_two_models <- function(
+  loo_a,
+  loo_b,
+  return = c("elpd_diff", "se"),
+  check_dims = TRUE
+) {
   if (check_dims) {
     if (dim(loo_a$pointwise)[1] != dim(loo_b$pointwise)[1]) {
-      stop(paste("Models don't have the same number of data points.",
-                 "\nFound N_1 =", dim(loo_a$pointwise)[1], "and N_2 =", dim(loo_b$pointwise)[1]), call. = FALSE)
+      stop(
+        paste(
+          "Models don't have the same number of data points.",
+          "\nFound N_1 =",
+          dim(loo_a$pointwise)[1],
+          "and N_2 =",
+          dim(loo_b$pointwise)[1]
+        ),
+        call. = FALSE
+      )
     }
   }
 

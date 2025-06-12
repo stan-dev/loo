@@ -45,15 +45,16 @@
 #' <https://mc-stan.org/>
 #'
 extract_log_lik <-
-  function(stanfit,
-           parameter_name = "log_lik",
-           merge_chains = TRUE) {
-    if (!inherits(stanfit, "stanfit"))
+  function(stanfit, parameter_name = "log_lik", merge_chains = TRUE) {
+    if (!inherits(stanfit, "stanfit")) {
       stop("Not a stanfit object.", call. = FALSE)
-    if (stanfit@mode != 0)
+    }
+    if (stanfit@mode != 0) {
       stop("Stan model does not contain posterior draws.", call. = FALSE)
-    if (!requireNamespace("rstan", quietly = TRUE))
+    }
+    if (!requireNamespace("rstan", quietly = TRUE)) {
       stop("Please load the 'rstan' package.", call. = FALSE)
+    }
 
     if (merge_chains) {
       log_lik <- as.matrix(stanfit, pars = parameter_name)

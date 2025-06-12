@@ -38,10 +38,21 @@
 #' @template moment-matching-references
 #'
 #'
-loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
-                     total_mapping, i, log_prob_upars,
-                     log_lik_i_upars, r_eff_i, cores,
-                     is_method, ...) {
+loo_moment_match_split <- function(
+  x,
+  upars,
+  cov,
+  total_shift,
+  total_scaling,
+  total_mapping,
+  i,
+  log_prob_upars,
+  log_lik_i_upars,
+  r_eff_i,
+  cores,
+  is_method,
+  ...
+) {
   S <- dim(upars)[1]
   S_half <- as.integer(0.5 * S)
   mean_original <- colMeans(upars)
@@ -78,44 +89,56 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
 
   # compute log likelihoods and log probabilities
   log_prob_half_trans <- log_prob_upars(x, upars = upars_trans_half, ...)
-  log_prob_half_trans_inv <- log_prob_upars(x, upars = upars_trans_half_inv, ...)
+  log_prob_half_trans_inv <- log_prob_upars(
+    x,
+    upars = upars_trans_half_inv,
+    ...
+  )
   log_liki_half <- log_lik_i_upars(x, upars = upars_trans_half, i = i, ...)
 
   # compute weights
   log_prob_half_trans_inv <- (log_prob_half_trans_inv -
-                              log(prod(total_scaling)) -
-                              log(det(total_mapping)))
+    log(prod(total_scaling)) -
+    log(det(total_mapping)))
   stable_S <- log_prob_half_trans > log_prob_half_trans_inv
 
   lwi_half <- -log_liki_half + log_prob_half_trans
   lwi_half[stable_S] <- lwi_half[stable_S] -
     (log_prob_half_trans[stable_S] +
-      log1p(exp(log_prob_half_trans_inv[stable_S] -
-                  log_prob_half_trans[stable_S])))
+      log1p(exp(
+        log_prob_half_trans_inv[stable_S] -
+          log_prob_half_trans[stable_S]
+      )))
 
   lwi_half[!stable_S] <- lwi_half[!stable_S] -
     (log_prob_half_trans_inv[!stable_S] +
-        log1p(exp(log_prob_half_trans[!stable_S] -
-                   log_prob_half_trans_inv[!stable_S])))
+      log1p(exp(
+        log_prob_half_trans[!stable_S] -
+          log_prob_half_trans_inv[!stable_S]
+      )))
 
   # lwi_half may have NaNs if computation involves -Inf + Inf
   # replace NaN log ratios with -Inf
   lr <- lwi_half
   lr[is.na(lr)] <- -Inf
-  is_obj_half <- suppressWarnings(importance_sampling.default(lr,
-                                                              method = is_method,
-                                                              r_eff = r_eff_i,
-                                                              cores = cores))
+  is_obj_half <- suppressWarnings(importance_sampling.default(
+    lr,
+    method = is_method,
+    r_eff = r_eff_i,
+    cores = cores
+  ))
   lwi_half <- as.vector(weights(is_obj_half))
 
   # lwi_half may have NaNs if computation involves -Inf + Inf
   # replace NaN log ratios with -Inf
   lr <- lwi_half + log_liki_half
   lr[is.na(lr)] <- -Inf
-  is_obj_f_half <- suppressWarnings(importance_sampling.default(lr,
-                                                                method = is_method,
-                                                                r_eff = r_eff_i,
-                                                                cores = cores))
+  is_obj_f_half <- suppressWarnings(importance_sampling.default(
+    lr,
+    method = is_method,
+    r_eff = r_eff_i,
+    cores = cores
+  ))
   lwfi_half <- as.vector(weights(is_obj_f_half))
 
   # relative_eff recomputation
@@ -130,7 +153,7 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
   dim(log_liki_half_2) <- c(length(take), 1, 1)
   r_eff_i1 <- loo::relative_eff(exp(log_liki_half_1), cores = cores)
   r_eff_i2 <- loo::relative_eff(exp(log_liki_half_2), cores = cores)
-  r_eff_i <- min(r_eff_i1,r_eff_i2)
+  r_eff_i <- min(r_eff_i1, r_eff_i2)
 
   list(
     lwi = lwi_half,

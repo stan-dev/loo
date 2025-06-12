@@ -59,9 +59,13 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
 
 # internal ----------------------------------------------------------------
 
-lx <- function(a,x) {
+lx <- function(a, x) {
   a <- -a
-  k <- vapply(a, FUN = function(a_i) mean(log1p(a_i * x)), FUN.VALUE = numeric(1))
+  k <- vapply(
+    a,
+    FUN = function(a_i) mean(log1p(a_i * x)),
+    FUN.VALUE = numeric(1)
+  )
   log(a / k) - k - 1
 }
 

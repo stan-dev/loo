@@ -35,4 +35,3 @@ example_loglik_matrix <- function() {
   ll <- example_loglik_array()
   return(llarray_to_matrix(ll))
 }
-

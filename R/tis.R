@@ -89,13 +89,14 @@ tis <- function(log_ratios, ...) UseMethod("tis")
 #' @template array
 #'
 tis.array <-
-  function(log_ratios, ...,
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
-  importance_sampling.array(log_ratios = log_ratios, ...,
-                            r_eff = r_eff,
-                            cores = cores,
-                            method = "tis")
+  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+    importance_sampling.array(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "tis"
+    )
   }
 
 #' @export
@@ -103,15 +104,14 @@ tis.array <-
 #' @template matrix
 #'
 tis.matrix <-
-  function(log_ratios,
-           ...,
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
-    importance_sampling.matrix(log_ratios,
-                               ...,
-                               r_eff = r_eff,
-                               cores = cores,
-                               method = "tis")
+  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+    importance_sampling.matrix(
+      log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "tis"
+    )
   }
 
 #' @export
@@ -120,8 +120,12 @@ tis.matrix <-
 #'
 tis.default <-
   function(log_ratios, ..., r_eff = 1) {
-    importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff, method = "tis")
+    importance_sampling.default(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      method = "tis"
+    )
   }
 
 
@@ -157,4 +161,3 @@ do_tis_i <- function(log_ratios_i, ...) {
   lw_i <- pmin(log_ratios_i, log_cutpoint)
   list(log_weights = lw_i, pareto_k = 0)
 }
-

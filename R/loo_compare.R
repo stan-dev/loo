@@ -52,7 +52,7 @@
 #'   selection process. In that case users are recommended to avoid model
 #'   selection based on LOO-CV, and instead to favor model averaging/stacking or
 #'   projection predictive inference.
-#' 
+#'
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
@@ -141,12 +141,11 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
       xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
     }
   } else if (NCOL(xcopy) >= 2 && simplify) {
-     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
+    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)
   invisible(x)
 }
-
 
 
 # internal ----------------------------------------------------------------
@@ -180,40 +179,47 @@ se_elpd_diff <- function(diffs) {
 loo_compare_checks <- function(loos) {
   ## errors
   if (length(loos) <= 1L) {
-    stop("'loo_compare' requires at least two models.", call.=FALSE)
+    stop("'loo_compare' requires at least two models.", call. = FALSE)
   }
   if (!all(sapply(loos, is.loo))) {
-    stop("All inputs should have class 'loo'.", call.=FALSE)
+    stop("All inputs should have class 'loo'.", call. = FALSE)
   }
 
   Ns <- sapply(loos, function(x) nrow(x$pointwise))
   if (!all(Ns == Ns[1L])) {
-    stop("Not all models have the same number of data points.", call.=FALSE)
+    stop("Not all models have the same number of data points.", call. = FALSE)
   }
 
   ## warnings
 
   yhash <- lapply(loos, attr, which = "yhash")
-  yhash_ok <- sapply(yhash, function(x) { # ok only if all yhash are same (all NULL is ok)
+  yhash_ok <- sapply(yhash, function(x) {
+    # ok only if all yhash are same (all NULL is ok)
     isTRUE(all.equal(x, yhash[[1]]))
   })
   if (!all(yhash_ok)) {
-    warning("Not all models have the same y variable. ('yhash' attributes do not match)",
-            call. = FALSE)
+    warning(
+      "Not all models have the same y variable. ('yhash' attributes do not match)",
+      call. = FALSE
+    )
   }
 
   if (all(sapply(loos, is.kfold))) {
     Ks <- unlist(lapply(loos, attr, which = "K"))
     if (!all(Ks == Ks[1])) {
-      warning("Not all kfold objects have the same K value. ",
-              "For a more accurate comparison use the same number of folds. ",
-              call. = FALSE)
+      warning(
+        "Not all kfold objects have the same K value. ",
+        "For a more accurate comparison use the same number of folds. ",
+        call. = FALSE
+      )
     }
   } else if (any(sapply(loos, is.kfold)) && any(sapply(loos, is.psis_loo))) {
-    warning("Comparing LOO-CV to K-fold-CV. ",
-            "For a more accurate comparison use the same number of folds ",
-            "or loo for all models compared.",
-            call. = FALSE)
+    warning(
+      "Comparing LOO-CV to K-fold-CV. ",
+      "For a more accurate comparison use the same number of folds ",
+      "or loo for all models compared.",
+      call. = FALSE
+    )
   }
 }
 
@@ -253,7 +259,7 @@ find_model_names <- function(x) {
 #' @keywords internal
 #' @noRd
 #' @param loos List of `"loo"` objects.
-loo_compare_matrix <- function(loos){
+loo_compare_matrix <- function(loos) {
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
     setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
@@ -264,8 +270,10 @@ loo_compare_matrix <- function(loos){
   ord <- loo_compare_order(loos)
   comp <- t(comp)[ord, ]
   patts <- c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
-  col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
-                    use.names = FALSE)
+  col_ord <- unlist(
+    sapply(patts, function(p) grep(p, colnames(comp))),
+    use.names = FALSE
+  )
   comp <- comp[, col_ord]
   comp
 }
@@ -274,7 +282,7 @@ loo_compare_matrix <- function(loos){
 #' @noRd
 #' @keywords internal
 #' @param loos List of `"loo"` objects.
-loo_compare_order <- function(loos){
+loo_compare_order <- function(loos) {
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
     setNames(c(est), nm = c(rownames(est), paste0("se_", rownames(est))))
@@ -292,7 +300,6 @@ loo_compare_order <- function(loos){
 #' @param ord List of `"loo"` object orderings.
 #' @return Nothing, just possibly throws errors/warnings.
 loo_order_stat_check <- function(loos, ord) {
-
   ## breaks
 
   if (length(loos) <= 11L) {
@@ -321,9 +328,11 @@ loo_order_stat_check <- function(loos, ord) {
 
   if (max(elpd_diff) <= order_stat) {
     # flag warning if we suspect no model is theoretically better than the baseline
-    warning("Difference in performance potentially due to chance.",
-            "See McLatchie and Vehtari (2023) for details.",
-            call. = FALSE)
+    warning(
+      "Difference in performance potentially due to chance.",
+      "See McLatchie and Vehtari (2023) for details.",
+      call. = FALSE
+    )
   }
 }
 

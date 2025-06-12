@@ -92,14 +92,14 @@ llmatrix_to_array <- function(x, chain_id) {
   chain_counts <- as.numeric(table(chain_id))
 
   if (length(chain_id) != lldim[1]) {
-    stop("Number of rows in matrix not equal to length(chain_id).",
-         call. = FALSE)
+    stop(
+      "Number of rows in matrix not equal to length(chain_id).",
+      call. = FALSE
+    )
   } else if (any(chain_counts != chain_counts[1])) {
-    stop("Not all chains have same number of iterations.",
-         call. = FALSE)
+    stop("Not all chains have same number of iterations.", call. = FALSE)
   } else if (max(chain_id) != n_chain) {
-    stop("max(chain_id) not equal to the number of chains.",
-         call. = FALSE)
+    stop("max(chain_id) not equal to the number of chains.", call. = FALSE)
   }
 
   n_iter <- lldim[1] / n_chain
@@ -158,8 +158,9 @@ nlist <- function(...) {
   out <- list(...)
   no_names <- is.null(names(out))
   has_name <- if (no_names) FALSE else nzchar(names(out))
-  if (all(has_name))
+  if (all(has_name)) {
     return(out)
+  }
   nms <- as.character(m)[-1L]
   if (no_names) {
     names(out) <- nms
@@ -176,8 +177,10 @@ loo_cores <- function(cores) {
   loo_cores_op <- getOption("loo.cores", NA)
   if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
     cores <- loo_cores_op
-    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
-            call. = FALSE)
+    warning(
+      "'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
+      call. = FALSE
+    )
   }
   return(cores)
 }

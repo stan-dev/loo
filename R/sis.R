@@ -84,13 +84,14 @@ sis <- function(log_ratios, ...) UseMethod("sis")
 #' @template array
 #'
 sis.array <-
-  function(log_ratios, ...,
-           r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
-  importance_sampling.array(log_ratios = log_ratios, ...,
-                            r_eff = r_eff,
-                            cores = cores,
-                            method = "sis")
+  function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
+    importance_sampling.array(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "sis"
+    )
   }
 
 #' @export
@@ -98,15 +99,14 @@ sis.array <-
 #' @template matrix
 #'
 sis.matrix <-
-  function(log_ratios,
-           ...,
-           r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
-    importance_sampling.matrix(log_ratios,
-                               ...,
-                               r_eff = r_eff,
-                               cores = cores,
-                               method = "sis")
+  function(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1)) {
+    importance_sampling.matrix(
+      log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "sis"
+    )
   }
 
 #' @export
@@ -115,9 +115,12 @@ sis.matrix <-
 #'
 sis.default <-
   function(log_ratios, ..., r_eff = NULL) {
-    importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff,
-                                method = "sis")
+    importance_sampling.default(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      method = "sis"
+    )
   }
 
 #' @rdname psis
@@ -128,7 +131,6 @@ is.sis <- function(x) {
 
 
 # internal ----------------------------------------------------------------
-
 
 #' Standard IS on a single vector
 #'

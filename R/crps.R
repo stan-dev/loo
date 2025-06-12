@@ -92,8 +92,7 @@ crps.matrix <- function(x, x2, y, ..., permutations = 1) {
 #' @rdname crps
 #' @export
 crps.numeric <- function(x, x2, y, ..., permutations = 1) {
-  stopifnot(length(x) == length(x2),
-            length(y) == 1)
+  stopifnot(length(x) == length(x2), length(y) == 1)
   crps.matrix(as.matrix(x), as.matrix(x2), y, permutations)
 }
 
@@ -106,23 +105,32 @@ crps.numeric <- function(x, x2, y, ..., permutations = 1) {
 #' @param cores The number of cores to use for parallelization of `[psis()]`.
 #'   See [psis()] for details.
 loo_crps.matrix <-
-  function(x,
-           x2,
-           y,
-           log_lik,
-           ...,
-           permutations = 1,
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
-  validate_crps_input(x, x2, y, log_lik)
-  repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
-                       simplify = F)
-  EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
-  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
-  crps_output(.crps_fun(EXX, EXy))
-}
+  function(
+    x,
+    x2,
+    y,
+    log_lik,
+    ...,
+    permutations = 1,
+    r_eff = 1,
+    cores = getOption("mc.cores", 1)
+  ) {
+    validate_crps_input(x, x2, y, log_lik)
+    repeats <- replicate(
+      permutations,
+      EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
+      simplify = F
+    )
+    EXX <- Reduce(`+`, repeats) / permutations
+    psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+    EXy <- E_loo(
+      abs(sweep(x, 2, y)),
+      psis_obj,
+      log_ratios = -log_lik,
+      ...
+    )$value
+    crps_output(.crps_fun(EXX, EXy))
+  }
 
 
 #' @rdname crps
@@ -138,8 +146,7 @@ scrps.matrix <- function(x, x2, y, ..., permutations = 1) {
 #' @rdname crps
 #' @export
 scrps.numeric <- function(x, x2, y, ..., permutations = 1) {
-  stopifnot(length(x) == length(x2),
-            length(y) == 1)
+  stopifnot(length(x) == length(x2), length(y) == 1)
   scrps.matrix(as.matrix(x), as.matrix(x2), y, permutations)
 }
 
@@ -155,40 +162,54 @@ loo_scrps.matrix <-
     ...,
     permutations = 1,
     r_eff = 1,
-    cores = getOption("mc.cores", 1)) {
-  validate_crps_input(x, x2, y, log_lik)
-  repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
-                       simplify = F)
-  EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
-  EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
-  crps_output(.crps_fun(EXX, EXy, scale = TRUE))
-}
+    cores = getOption("mc.cores", 1)
+  ) {
+    validate_crps_input(x, x2, y, log_lik)
+    repeats <- replicate(
+      permutations,
+      EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
+      simplify = F
+    )
+    EXX <- Reduce(`+`, repeats) / permutations
+    psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+    EXy <- E_loo(
+      abs(sweep(x, 2, y)),
+      psis_obj,
+      log_ratios = -log_lik,
+      ...
+    )$value
+    crps_output(.crps_fun(EXX, EXy, scale = TRUE))
+  }
 
 # ------------ Internals ----------------
 
-
 EXX_compute <- function(x, x2) {
   S <- nrow(x)
-  colMeans(abs(x - x2[sample(1:S),]))
+  colMeans(abs(x - x2[sample(1:S), ]))
 }
 
 
 EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, ...) {
   S <- nrow(x)
-  shuffle <- sample (1:S)
-  x2 <- x2[shuffle,]
-  log_lik2 <- log_lik[shuffle,]
-  psis_obj_joint <- psis(-log_lik - log_lik2 , r_eff = r_eff)
-  E_loo(abs(x - x2), psis_obj_joint, log_ratios = -log_lik - log_lik2, ...)$value
+  shuffle <- sample(1:S)
+  x2 <- x2[shuffle, ]
+  log_lik2 <- log_lik[shuffle, ]
+  psis_obj_joint <- psis(-log_lik - log_lik2, r_eff = r_eff)
+  E_loo(
+    abs(x - x2),
+    psis_obj_joint,
+    log_ratios = -log_lik - log_lik2,
+    ...
+  )$value
 }
 
 
 #' Function to compute crps and scrps
 #' @noRd
 .crps_fun <- function(EXX, EXy, scale = FALSE) {
-  if (scale) return(-EXy/EXX - 0.5 * log(EXX))
+  if (scale) {
+    return(-EXy / EXX - 0.5 * log(EXX))
+  }
   0.5 * EXX - EXy
 }
 
@@ -208,11 +229,12 @@ crps_output <- function(crps_pw) {
 #' Check that predictive draws and observed data are of compatible shape
 #' @noRd
 validate_crps_input <- function(x, x2, y, log_lik = NULL) {
-  stopifnot(is.numeric(x),
-            is.numeric(x2),
-            is.numeric(y),
-            identical(dim(x), dim(x2)),
-            ncol(x) == length(y),
-            ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x)))
-            )
+  stopifnot(
+    is.numeric(x),
+    is.numeric(x2),
+    is.numeric(y),
+    identical(dim(x), dim(x2)),
+    ncol(x) == length(y),
+    ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x)))
+  )
 }

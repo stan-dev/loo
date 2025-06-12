@@ -45,19 +45,20 @@ elpd.matrix <- function(x, ...) {
 }
 
 
-
 # internal ----------------------------------------------------------------
-pointwise_elpd_calcs <- function(ll){
+pointwise_elpd_calcs <- function(ll) {
   elpd <- colLogSumExps(ll) - log(nrow(ll))
   ic <- -2 * elpd
   cbind(elpd, ic)
 }
 
 elpd_object <- function(pointwise, dims) {
-  if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
+  if (!is.matrix(pointwise)) {
+    stop("Internal error ('pointwise' must be a matrix)")
+  }
 
   cols_to_summarize <- colnames(pointwise)
-  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
+  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop = FALSE])
   out <- nlist(estimates, pointwise)
   structure(
     out,
