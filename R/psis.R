@@ -207,6 +207,14 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   # shift log ratios for safer exponentation
   lw_i <- log_ratios_i - max(log_ratios_i)
 
+  if (length(unique(tail(log_ratios_i, -tail_len_i))) == 1) {
+    warning(
+      "Can't fit generalized Pareto distribution ",
+      "because all tail values are the same.",
+      call. = FALSE
+    )
+  }
+
   smoothed <- posterior::pareto_smooth_tail(
     x = lw_i,
     ndraws_tail = tail_len_i,
