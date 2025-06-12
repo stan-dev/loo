@@ -206,61 +206,24 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   # shift log ratios for safer exponentation
   lw_i <- log_ratios_i - max(log_ratios_i)
-  khat <- Inf
 
-  if (enough_tail_samples(tail_len_i)) {
-    ord <- sort.int(lw_i, index.return = TRUE)
-    tail_ids <- seq(S - tail_len_i + 1, S)
-    lw_tail <- ord$x[tail_ids]
-    if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps/100) {
-      warning(
-        "Can't fit generalized Pareto distribution ",
-        "because all tail values are the same.",
-        call. = FALSE
-      )
-    } else {
-      cutoff <- ord$x[min(tail_ids) - 1] # largest value smaller than tail values
-      smoothed <- psis_smooth_tail(lw_tail, cutoff)
-      khat <- smoothed$k
-      lw_i[ord$ix[tail_ids]] <- smoothed$tail
-    }
-  }
+  smoothed <- posterior::pareto_smooth_tail(
+    x = lw_i,
+    ndraws_tail = tail_len_i,
+    tail = "right",
+    are_log_weights = TRUE
+  )
+
+  lw_i <- smoothed$x
+  khat <- smoothed$k
 
   # truncate at max of raw wts (i.e., 0 since max has been subtracted)
   lw_i[lw_i > 0] <- 0
   # shift log weights back so that the smallest log weights remain unchanged
   lw_i <- lw_i + max(log_ratios_i)
 
-  list(log_weights = lw_i, pareto_k = khat)
+  list(log_weights = lw_i, pareto_k = if (is.na(khat)) Inf else khat)
 }
-
-#' PSIS tail smoothing for a single vector
-#'
-#' @noRd
-#' @param x Vector of tail elements already sorted in ascending order.
-#' @return A named list containing:
-#' * `tail`: vector same size as `x` containing the logs of the
-#'   order statistics of the generalized pareto distribution.
-#' * `k`: scalar shape parameter estimate.
-#'
-psis_smooth_tail <- function(x, cutoff) {
-  len <- length(x)
-  exp_cutoff <- exp(cutoff)
-
-  # save time not sorting since x already sorted
-  fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
-  k <- fit$k
-  sigma <- fit$sigma
-  if (is.finite(k)) {
-      p <- (seq_len(len) - 0.5) / len
-      qq <- qgpd(p, k, sigma) + exp_cutoff
-      tail <- log(qq)
-  } else {
-      tail <- x
-  }
-  list(tail = tail, k = k)
-}
-
 
 #' Calculate tail lengths to use for fitting the GPD
 #'
