@@ -49,7 +49,12 @@ relative_eff.default <- function(x, chain_id, ...) {
 #' @templateVar fn relative_eff
 #' @template matrix
 #'
-relative_eff.matrix <- function(x, chain_id, ..., cores = getOption("mc.cores", 1)) {
+relative_eff.matrix <- function(
+  x,
+  chain_id,
+  ...,
+  cores = getOption("mc.cores", 1)
+) {
   x <- llmatrix_to_array(x, chain_id)
   relative_eff.array(x, cores = cores)
 }
@@ -70,7 +75,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::mclapply(
           mc.cores = cores,
           X = seq_len(dim(x)[3]),
-          FUN = function(i) ess_rfun(x[, , i, drop = TRUE])
+          FUN = function(i) ess_rfun(x[,, i, drop = TRUE])
         )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -79,7 +84,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(dim(x)[3]),
-          fun = function(i) ess_rfun(x[, , i, drop = TRUE])
+          fun = function(i) ess_rfun(x[,, i, drop = TRUE])
         )
     }
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
@@ -94,13 +99,14 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
 #' @param data,draws,... Same as for the [loo()] function method.
 #'
 relative_eff.function <-
-  function(x,
-           chain_id,
-           ...,
-           cores = getOption("mc.cores", 1),
-           data = NULL,
-           draws = NULL) {
-
+  function(
+    x,
+    chain_id,
+    ...,
+    cores = getOption("mc.cores", 1),
+    data = NULL,
+    draws = NULL
+  ) {
     f_i <- validate_llfun(x) # not really an llfun, should return exp(ll) or exp(-ll)
     N <- dim(data)[1]
 
@@ -110,7 +116,11 @@ relative_eff.function <-
           X = seq_len(N),
           FUN = function(i) {
             val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
+            relative_eff.default(
+              as.vector(val_i),
+              chain_id = chain_id,
+              cores = 1
+            )
           }
         )
     } else {
@@ -120,13 +130,21 @@ relative_eff.function <-
             X = seq_len(N),
             FUN = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
+              relative_eff.default(
+                as.vector(val_i),
+                chain_id = chain_id,
+                cores = 1
+              )
             },
             mc.cores = cores
           )
       } else {
         cl <- parallel::makePSOCKcluster(cores)
-        parallel::clusterExport(cl=cl, varlist=c("draws", "chain_id", "data"), envir=environment())
+        parallel::clusterExport(
+          cl = cl,
+          varlist = c("draws", "chain_id", "data"),
+          envir = environment()
+        )
         on.exit(parallel::stopCluster(cl))
         n_eff_list <-
           parallel::parLapply(
@@ -134,7 +152,11 @@ relative_eff.function <-
             X = seq_len(N),
             fun = function(i) {
               val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
+              relative_eff.default(
+                as.vector(val_i),
+                chain_id = chain_id,
+                cores = 1
+              )
             }
           )
       }
@@ -154,7 +176,6 @@ relative_eff.importance_sampling <- function(x, ...) {
 
 
 # internal ----------------------------------------------------------------
-
 
 #' Effective sample size for PSIS
 #'
@@ -202,16 +223,21 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
 #' @return MCMC effective sample size based on RStan's calculation.
 #'
 ess_rfun <- function(sims) {
-  if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
+  if (is.vector(sims)) {
+    dim(sims) <- c(length(sims), 1)
+  }
   chains <- ncol(sims)
   n_samples <- nrow(sims)
-  acov <- lapply(1:chains, FUN = function(i) posterior::autocovariance(sims[,i]))
+  acov <- lapply(1:chains, FUN = function(i) {
+    posterior::autocovariance(sims[, i])
+  })
   acov <- do.call(cbind, acov)
   chain_mean <- colMeans(sims)
-  mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
+  mean_var <- mean(acov[1, ]) * n_samples / (n_samples - 1)
   var_plus <- mean_var * (n_samples - 1) / n_samples
-  if (chains > 1)
+  if (chains > 1) {
     var_plus <- var_plus + var(chain_mean)
+  }
   # Geyer's initial positive sequence
   rho_hat_t <- rep.int(0, n_samples)
   t <- 0
@@ -219,8 +245,11 @@ ess_rfun <- function(sims) {
   rho_hat_t[t + 1] <- rho_hat_even
   rho_hat_odd <- 1 - (mean_var - mean(acov[t + 2, ])) / var_plus
   rho_hat_t[t + 2] <- rho_hat_odd
-  while (t < nrow(acov) - 5 && !is.nan(rho_hat_even + rho_hat_odd) &&
-         (rho_hat_even + rho_hat_odd > 0)) {
+  while (
+    t < nrow(acov) - 5 &&
+      !is.nan(rho_hat_even + rho_hat_odd) &&
+      (rho_hat_even + rho_hat_odd > 0)
+  ) {
     t <- t + 2
     rho_hat_even = 1 - (mean_var - mean(acov[t + 1, ])) / var_plus
     rho_hat_odd = 1 - (mean_var - mean(acov[t + 2, ])) / var_plus
@@ -231,26 +260,26 @@ ess_rfun <- function(sims) {
   }
   max_t <- t
   # this is used in the improved estimate
-  if (rho_hat_even>0)
-      rho_hat_t[max_t + 1] <- rho_hat_even
+  if (rho_hat_even > 0) {
+    rho_hat_t[max_t + 1] <- rho_hat_even
+  }
 
   # Geyer's initial monotone sequence
   t <- 0
   while (t <= max_t - 4) {
     t <- t + 2
-    if (rho_hat_t[t + 1] + rho_hat_t[t + 2] >
-        rho_hat_t[t - 1] + rho_hat_t[t]) {
-      rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2;
-      rho_hat_t[t + 2] = rho_hat_t[t + 1];
+    if (rho_hat_t[t + 1] + rho_hat_t[t + 2] > rho_hat_t[t - 1] + rho_hat_t[t]) {
+      rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2
+      rho_hat_t[t + 2] = rho_hat_t[t + 1]
     }
   }
   ess <- chains * n_samples
   # Geyer's truncated estimate
   # tau_hat <- -1 + 2 * sum(rho_hat_t[1:max_t])
   # Improved estimate reduces variance in antithetic case
-  tau_hat <- -1 + 2 * sum(rho_hat_t[1:max_t]) + rho_hat_t[max_t+1]
+  tau_hat <- -1 + 2 * sum(rho_hat_t[1:max_t]) + rho_hat_t[max_t + 1]
   # Safety check for negative values and with max ess equal to ess*log10(ess)
-  tau_hat <- max(tau_hat, 1/log10(ess))
+  tau_hat <- max(tau_hat, 1 / log10(ess))
   ess <- ess / tau_hat
   ess
 }
@@ -259,15 +288,23 @@ ess_rfun <- function(sims) {
 fft_next_good_size <- function(N) {
   # Find the optimal next size for the FFT so that
   # a minimum number of zeros are padded.
-  if (N <= 2)
+  if (N <= 2) {
     return(2)
+  }
   while (TRUE) {
     m = N
-    while ((m %% 2) == 0) m = m / 2
-    while ((m %% 3) == 0) m = m / 3
-    while ((m %% 5) == 0) m = m / 5
-    if (m <= 1)
+    while ((m %% 2) == 0) {
+      m = m / 2
+    }
+    while ((m %% 3) == 0) {
+      m = m / 3
+    }
+    while ((m %% 5) == 0) {
+      m = m / 5
+    }
+    if (m <= 1) {
       return(N)
+    }
     N = N + 1
   }
 }

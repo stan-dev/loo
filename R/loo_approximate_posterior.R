@@ -41,16 +41,28 @@ loo_approximate_posterior <- function(x, log_p, log_g, ...) {
 #' @templateVar fn loo_approximate_posterior
 #' @template array
 loo_approximate_posterior.array <-
-  function(x,
-           log_p,
-           log_g,
-           ...,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+  function(
+    x,
+    log_p,
+    log_g,
+    ...,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1)
+  ) {
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
-    checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
-    checkmate::assert_matrix(log_g, mode = "numeric", nrows = nrow(log_p), ncols = ncol(log_p))
+    checkmate::assert_matrix(
+      log_p,
+      mode = "numeric",
+      nrows = dim(x)[1],
+      ncols = dim(x)[2]
+    )
+    checkmate::assert_matrix(
+      log_g,
+      mode = "numeric",
+      nrows = nrow(log_p),
+      ncols = ncol(log_p)
+    )
 
     ll <- llarray_to_matrix(x)
     log_p <- as.vector(log_p)
@@ -69,12 +81,14 @@ loo_approximate_posterior.array <-
 #' @templateVar fn loo_approximate_posterior
 #' @template matrix
 loo_approximate_posterior.matrix <-
-  function(x,
-           log_p,
-           log_g,
-           ...,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+  function(
+    x,
+    log_p,
+    log_g,
+    ...,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1)
+  ) {
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_numeric(log_p, len = nrow(x))
@@ -106,15 +120,16 @@ loo_approximate_posterior.matrix <-
 #'   details on how to specify these arguments.
 #'
 loo_approximate_posterior.function <-
-  function(x,
-           ...,
-           data = NULL,
-           draws = NULL,
-           log_p = NULL,
-           log_g = NULL,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
-
+  function(
+    x,
+    ...,
+    data = NULL,
+    draws = NULL,
+    log_p = NULL,
+    log_g = NULL,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1)
+  ) {
     checkmate::assert_numeric(log_p, len = length(log_g))
     checkmate::assert_numeric(log_g, len = length(log_p))
     cores <- loo_cores(cores)
@@ -122,17 +137,19 @@ loo_approximate_posterior.function <-
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
-    psis_list <- parallel_psis_list(N = N,
-                                    .loo_i = .loo_ap_i,
-                                    .llfun = .llfun,
-                                    data = data,
-                                    draws = draws,
-                                    r_eff = 1, # r_eff is ignored
-                                    save_psis = save_psis,
-                                    log_p = log_p,
-                                    log_g = log_g,
-                                    cores = cores,
-                                    ...)
+    psis_list <- parallel_psis_list(
+      N = N,
+      .loo_i = .loo_ap_i,
+      .llfun = .llfun,
+      data = data,
+      draws = draws,
+      r_eff = 1, # r_eff is ignored
+      save_psis = save_psis,
+      log_p = log_p,
+      log_g = log_g,
+      cores = cores,
+      ...
+    )
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -165,24 +182,32 @@ loo_approximate_posterior.function <-
 # for the loo_approximate_posterior.function method. The arguments and return
 # value are the same as the ones documented for the user-facing loo_i function.
 .loo_ap_i <-
-  function(i,
-           llfun,
-           ...,
-           data,
-           draws,
-           log_p,
-           log_g,
-           r_eff = 1,
-           save_psis = FALSE,
-           is_method) {
-
-    if (is_method != "psis") stop(is_method, " not implemented for aploo.")
+  function(
+    i,
+    llfun,
+    ...,
+    data,
+    draws,
+    log_p,
+    log_g,
+    r_eff = 1,
+    save_psis = FALSE,
+    is_method
+  ) {
+    if (is_method != "psis") {
+      stop(is_method, " not implemented for aploo.")
+    }
     d_i <- data[i, , drop = FALSE]
     ll_i <- llfun(data_i = d_i, draws = draws, ...)
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, cores = 1)
+    psis_out <- ap_psis(
+      log_ratios = -ll_i,
+      log_p = log_p,
+      log_g = log_g,
+      cores = 1
+    )
 
     structure(
       list(
@@ -198,9 +223,28 @@ loo_approximate_posterior.function <-
 
 assert_psis_loo_ap <- function(x) {
   checkmate::assert_class(x, "psis_loo_ap")
-  checkmate::assert_names(names(x), must.include = c("estimates", "pointwise", "diagnostics", "psis_object", "approximate_posterior"))
-  checkmate::assert_names(names(x$approximate_posterior), must.include = c("log_p", "log_g"))
-  checkmate::assert_numeric(x$approximate_posterior$log_p, len = length(x$approximate_posterior$log_g), any.missing = FALSE)
-  checkmate::assert_numeric(x$approximate_posterior$log_g, len = length(x$approximate_posterior$log_p), any.missing = FALSE)
+  checkmate::assert_names(
+    names(x),
+    must.include = c(
+      "estimates",
+      "pointwise",
+      "diagnostics",
+      "psis_object",
+      "approximate_posterior"
+    )
+  )
+  checkmate::assert_names(
+    names(x$approximate_posterior),
+    must.include = c("log_p", "log_g")
+  )
+  checkmate::assert_numeric(
+    x$approximate_posterior$log_p,
+    len = length(x$approximate_posterior$log_g),
+    any.missing = FALSE
+  )
+  checkmate::assert_numeric(
+    x$approximate_posterior$log_g,
+    len = length(x$approximate_posterior$log_p),
+    any.missing = FALSE
+  )
 }
-

@@ -100,12 +100,14 @@ E_loo <- function(x, psis_object, ...) {
 #' @rdname E_loo
 #' @export
 E_loo.default <-
-  function(x,
-           psis_object,
-           ...,
-           type = c("mean", "variance", "sd", "quantile"),
-           probs = NULL,
-           log_ratios = NULL) {
+  function(
+    x,
+    psis_object,
+    ...,
+    type = c("mean", "variance", "sd", "quantile"),
+    probs = NULL,
+    log_ratios = NULL
+  ) {
     stopifnot(
       is.numeric(x),
       is.psis(psis_object),
@@ -137,12 +139,14 @@ E_loo.default <-
 #' @rdname E_loo
 #' @export
 E_loo.matrix <-
-  function(x,
-           psis_object,
-           ...,
-           type = c("mean", "variance", "sd", "quantile"),
-           probs = NULL,
-           log_ratios = NULL) {
+  function(
+    x,
+    psis_object,
+    ...,
+    type = c("mean", "variance", "sd", "quantile"),
+    probs = NULL,
+    log_ratios = NULL
+  ) {
     stopifnot(
       is.numeric(x),
       is.psis(psis_object),
@@ -162,9 +166,13 @@ E_loo.matrix <-
     }
     w <- weights(psis_object, log = FALSE)
 
-    out <- vapply(seq_len(ncol(x)), function(i) {
-      E_fun(x[, i], w[, i], probs = probs)
-    }, FUN.VALUE = fun_val)
+    out <- vapply(
+      seq_len(ncol(x)),
+      function(i) {
+        E_fun(x[, i], w[, i], probs = probs)
+      },
+      FUN.VALUE = fun_val
+    )
 
     if (is.null(log_ratios)) {
       # Use of smoothed ratios gives slightly optimistic
@@ -181,7 +189,6 @@ E_loo.matrix <-
     khat <- E_loo_khat.matrix(h, psis_object, log_ratios)
     list(value = out, pareto_k = khat)
   }
-
 
 
 #' Select the function to use based on user's 'type' argument
@@ -290,22 +297,37 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 .E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
   h_theta <- x_i
   r_theta <- exp(log_ratios_i - max(log_ratios_i))
-  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)
-  if (is.list(khat_r)) { # retain compatiblity with older posterior that returned a list
+  khat_r <- posterior::pareto_khat(
+    r_theta,
+    tail = "right",
+    ndraws_tail = tail_len_i
+  )
+  if (is.list(khat_r)) {
+    # retain compatiblity with older posterior that returned a list
     khat_r <- khat_r$khat
   }
-  if (is.null(x_i) || is_constant(x_i) || length(unique(x_i))==2 ||
-        anyNA(x_i) || any(is.infinite(x_i))) {
+  if (
+    is.null(x_i) ||
+      is_constant(x_i) ||
+      length(unique(x_i)) == 2 ||
+      anyNA(x_i) ||
+      any(is.infinite(x_i))
+  ) {
     khat_r
   } else {
-    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)
-    if (is.list(khat_hr)) { # retain compatiblity with older posterior that returned a list
+    khat_hr <- posterior::pareto_khat(
+      h_theta * r_theta,
+      tail = "both",
+      ndraws_tail = tail_len_i
+    )
+    if (is.list(khat_hr)) {
+      # retain compatiblity with older posterior that returned a list
       khat_hr <- khat_hr$khat
     }
     if (is.na(khat_hr) && is.na(khat_r)) {
       k <- NA
     } else {
-      k <- max(khat_hr, khat_r, na.rm=TRUE)
+      k <- max(khat_hr, khat_r, na.rm = TRUE)
     }
     k
   }

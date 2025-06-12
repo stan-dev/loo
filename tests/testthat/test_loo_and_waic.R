@@ -84,7 +84,10 @@ test_that("loo returns object with correct structure", {
   expect_named(loo1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
   expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))
-  expect_equal(colnames(loo1$pointwise), c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k"))
+  expect_equal(
+    colnames(loo1$pointwise),
+    c("elpd_loo", "mcse_elpd_loo", "p_loo", "looic", "influence_pareto_k")
+  )
   expect_equal(dim(loo1), dim(LLmat))
 })
 
@@ -107,7 +110,10 @@ test_that("elpd returns object with correct structure", {
 
 
 test_that("two pareto k values are equal", {
-  expect_identical(loo1$pointwise[,"influence_pareto_k"], loo1$diagnostics$pareto_k)
+  expect_identical(
+    loo1$pointwise[, "influence_pareto_k"],
+    loo1$diagnostics$pareto_k
+  )
 })
 
 test_that("loo.array and loo.matrix give same result", {
@@ -143,32 +149,55 @@ test_that("loo, waic, and elpd error with vector input", {
 })
 
 
-
 # testing function methods ------------------------------------------------
 source(test_path("data-for-tests/function_method_stuff.R"))
 
 waic_with_fn <- waic(llfun, data = data, draws = draws)
 waic_with_mat <- waic(llmat_from_fn)
 
-loo_with_fn <- loo(llfun, data = data, draws = draws,
-                   r_eff = rep(1, nrow(data)))
-loo_with_mat <- loo(llmat_from_fn, r_eff = rep(1, ncol(llmat_from_fn)),
-                    save_psis = TRUE)
+loo_with_fn <- loo(
+  llfun,
+  data = data,
+  draws = draws,
+  r_eff = rep(1, nrow(data))
+)
+loo_with_mat <- loo(
+  llmat_from_fn,
+  r_eff = rep(1, ncol(llmat_from_fn)),
+  save_psis = TRUE
+)
 
 test_that("loo.cores deprecation warning works with function method", {
   options(loo.cores = 1)
-  expect_warning(loo(llfun, cores = 2, data = data, draws = draws, r_eff = rep(1, nrow(data))),
-                 "loo.cores")
-  options(loo.cores=NULL)
+  expect_warning(
+    loo(
+      llfun,
+      cores = 2,
+      data = data,
+      draws = draws,
+      r_eff = rep(1, nrow(data))
+    ),
+    "loo.cores"
+  )
+  options(loo.cores = NULL)
 })
 
 test_that("loo_i results match loo results for ith data point", {
   expect_no_warning(
     loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws),
   )
-  expect_equal(loo_i_val$pointwise[, "elpd_loo"], loo_with_fn$pointwise[2, "elpd_loo"])
-  expect_equal(loo_i_val$pointwise[, "p_loo"], loo_with_fn$pointwise[2, "p_loo"])
-  expect_equal(loo_i_val$diagnostics$pareto_k, loo_with_fn$diagnostics$pareto_k[2])
+  expect_equal(
+    loo_i_val$pointwise[, "elpd_loo"],
+    loo_with_fn$pointwise[2, "elpd_loo"]
+  )
+  expect_equal(
+    loo_i_val$pointwise[, "p_loo"],
+    loo_with_fn$pointwise[2, "p_loo"]
+  )
+  expect_equal(
+    loo_i_val$diagnostics$pareto_k,
+    loo_with_fn$diagnostics$pareto_k[2]
+  )
   expect_equal(loo_i_val$diagnostics$n_eff, loo_with_fn$diagnostics$n_eff[2])
 })
 
@@ -180,16 +209,31 @@ test_that("function and matrix methods return same result", {
 })
 
 test_that("loo.function runs with multiple cores", {
-  loo_with_fn1 <- loo(llfun, data = data, draws = draws,
-                     r_eff = rep(1, nrow(data)), cores = 1)
-  loo_with_fn2 <- loo(llfun, data = data, draws = draws,
-                      r_eff = rep(1, nrow(data)), cores = 2)
+  loo_with_fn1 <- loo(
+    llfun,
+    data = data,
+    draws = draws,
+    r_eff = rep(1, nrow(data)),
+    cores = 1
+  )
+  loo_with_fn2 <- loo(
+    llfun,
+    data = data,
+    draws = draws,
+    r_eff = rep(1, nrow(data)),
+    cores = 2
+  )
   expect_identical(loo_with_fn2$estimates, loo_with_fn1$estimates)
 })
 
 test_that("save_psis option to loo.function makes correct psis object", {
-  loo_with_fn2 <- loo.function(llfun, data = data, draws = draws,
-                      r_eff = rep(1, nrow(data)), save_psis = TRUE)
+  loo_with_fn2 <- loo.function(
+    llfun,
+    data = data,
+    draws = draws,
+    r_eff = rep(1, nrow(data)),
+    save_psis = TRUE
+  )
   expect_identical(loo_with_fn2$psis_object, loo_with_mat$psis_object)
 })
 
@@ -198,4 +242,3 @@ test_that("loo doesn't throw r_eff warnings", {
   expect_no_warning(loo(-LLmat))
   expect_no_warning(loo(llfun, data = data, draws = draws))
 })
-

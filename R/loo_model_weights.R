@@ -169,17 +169,18 @@ loo_model_weights <- function(x, ...) {
 #' @export
 #' @export loo_model_weights.default
 loo_model_weights.default <-
-  function(x,
-           ...,
-           method = c("stacking", "pseudobma"),
-           optim_method = "BFGS",
-           optim_control = list(),
-           BB = TRUE,
-           BB_n = 1000,
-           alpha = 1,
-           r_eff_list = NULL,
-           cores = getOption("mc.cores", 1)) {
-
+  function(
+    x,
+    ...,
+    method = c("stacking", "pseudobma"),
+    optim_method = "BFGS",
+    optim_control = list(),
+    BB = TRUE,
+    BB_n = 1000,
+    alpha = 1,
+    r_eff_list = NULL,
+    cores = getOption("mc.cores", 1)
+  ) {
     cores <- loo_cores(cores)
     method <- match.arg(method)
     K <- length(x) # number of models
@@ -194,25 +195,27 @@ loo_model_weights.default <-
         r_eff_k <- r_eff_list[[k]] # possibly NULL
         log_likelihood <- x[[k]]
         loo_object <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
-        lpd_point[, k] <- loo_object$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
+        lpd_point[, k] <- loo_object$pointwise[, "elpd_loo"] #calculate log(p_k (y_i | y_-i))
         elpd_loo[k] <- loo_object$estimates["elpd_loo", "Estimate"]
       }
     } else if (is.psis_loo(x[[1]])) {
       validate_psis_loo_list(x)
-      lpd_point <- do.call(cbind, lapply(x, function(obj) obj$pointwise[, "elpd_loo"]))
+      lpd_point <- do.call(
+        cbind,
+        lapply(x, function(obj) obj$pointwise[, "elpd_loo"])
+      )
       elpd_loo <- sapply(x, function(obj) obj$estimates["elpd_loo", "Estimate"])
     } else {
       stop("'x' must be a list of matrices or a list of 'psis_loo' objects.")
     }
 
     ## 1) stacking on log score
-    if (method =="stacking") {
+    if (method == "stacking") {
       wts <- stacking_weights(
         lpd_point = lpd_point,
         optim_method = optim_method,
         optim_control = optim_control
       )
-
     } else {
       # method =="pseudobma"
       wts <- pseudobma_weights(
@@ -227,7 +230,8 @@ loo_model_weights.default <-
       if (!is.null(names(x)) && all(nzchar(names(x)))) {
         wts <- setNames(wts, names(x))
       }
-    } else { # list of loo objects
+    } else {
+      # list of loo objects
       wts <- setNames(wts, find_model_names(x))
     }
     wts
@@ -247,10 +251,7 @@ loo_model_weights.default <-
 #' @importFrom stats constrOptim
 #'
 stacking_weights <-
-  function(lpd_point,
-           optim_method = "BFGS",
-           optim_control = list()) {
-
+  function(lpd_point, optim_method = "BFGS", optim_control = list()) {
     stopifnot(is.matrix(lpd_point))
     N <- nrow(lpd_point)
     K <- ncol(lpd_point)
@@ -263,7 +264,12 @@ stacking_weights <-
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       # avoid over- and underflows using log weights and rowLogSumExps
-      sum <- sum(matrixStats::rowLogSumExps(sweep(lpd_point[1:N,], 2, log(w_full), '+')))
+      sum <- sum(matrixStats::rowLogSumExps(sweep(
+        lpd_point[1:N, ],
+        2,
+        log(w_full),
+        '+'
+      )))
       return(-as.numeric(sum))
     }
 
@@ -276,12 +282,23 @@ stacking_weights <-
       # and by subtracting the row maximum of lpd_point
       mlpd <- matrixStats::rowMaxs(lpd_point)
       for (k in 1:(K - 1)) {
-        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
+        grad[k] <- sum(
+          (exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) /
+            exp(
+              matrixStats::rowLogSumExps(sweep(
+                lpd_point,
+                2,
+                log(w_full),
+                '+'
+              )) -
+                mlpd
+            )
+        )
       }
       return(-grad)
     }
 
-    ui <- rbind(rep(-1, K - 1), diag(K - 1))  # K-1 simplex constraint matrix
+    ui <- rbind(rep(-1, K - 1), diag(K - 1)) # K-1 simplex constraint matrix
     ci <- c(-1, rep(0, K - 1))
     w <- constrOptim(
       theta = rep(1 / K, K - 1),
@@ -307,10 +324,7 @@ stacking_weights <-
 #' @export
 #'
 pseudobma_weights <-
-  function(lpd_point,
-           BB = TRUE,
-           BB_n = 1000,
-           alpha = 1) {
+  function(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1) {
     stopifnot(is.matrix(lpd_point))
     N <- nrow(lpd_point)
     K <- ncol(lpd_point)
@@ -388,17 +402,23 @@ print_weight_vector <- function(x, digits) {
 #' @return Either throws an error or returns `TRUE` invisibly.
 #'
 validate_r_eff_list <- function(r_eff_list, K, N) {
-  if (is.null(r_eff_list)) return(invisible(TRUE))
+  if (is.null(r_eff_list)) {
+    return(invisible(TRUE))
+  }
 
   if (length(r_eff_list) != K) {
-    stop("If r_eff_list is specified then it must contain ",
-         "one component for each model being compared.",
-         call. = FALSE)
+    stop(
+      "If r_eff_list is specified then it must contain ",
+      "one component for each model being compared.",
+      call. = FALSE
+    )
   }
   if (any(sapply(r_eff_list, length) != N)) {
-    stop("Each component of r_eff list must have the same length ",
-         "as the number of columns in the log-likelihood matrix.",
-         call. = FALSE)
+    stop(
+      "Each component of r_eff list must have the same length ",
+      "as the number of columns in the log-likelihood matrix.",
+      call. = FALSE
+    )
   }
   invisible(TRUE)
 }
@@ -419,9 +439,14 @@ validate_log_lik_list <- function(log_lik_list) {
   if (length(log_lik_list) < 2) {
     stop("At least two models are required.", call. = FALSE)
   }
-  if (length(unique(sapply(log_lik_list, ncol))) != 1 |
-     length(unique(sapply(log_lik_list, nrow))) != 1) {
-    stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
+  if (
+    length(unique(sapply(log_lik_list, ncol))) != 1 |
+      length(unique(sapply(log_lik_list, nrow))) != 1
+  ) {
+    stop(
+      "Each log-likelihood matrix must have the same dimensions.",
+      call. = FALSE
+    )
   }
   invisible(TRUE)
 }
@@ -432,13 +457,20 @@ validate_psis_loo_list <- function(psis_loo_list) {
     stop("At least two models are required.", call. = FALSE)
   }
   if (!all(sapply(psis_loo_list, is.psis_loo))) {
-    stop("List elements must all be 'psis_loo' objects or log-likelihood matrices.")
+    stop(
+      "List elements must all be 'psis_loo' objects or log-likelihood matrices."
+    )
   }
 
   dims <- sapply(psis_loo_list, dim)
-  if (length(unique(dims[1, ])) != 1 |
-      length(unique(dims[2, ])) != 1) {
-    stop("Each object in the list must have the same dimensions.", call. = FALSE)
+  if (
+    length(unique(dims[1, ])) != 1 |
+      length(unique(dims[2, ])) != 1
+  ) {
+    stop(
+      "Each object in the list must have the same dimensions.",
+      call. = FALSE
+    )
   }
   invisible(TRUE)
 }

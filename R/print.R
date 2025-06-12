@@ -142,7 +142,9 @@ print_dims.importance_sampling_loo <- function(x, ...) {
   cat(
     "Computed from",
     paste(dim(x), collapse = " by "),
-    "log-likelihood matrix using", class(x)[1], ".\n"
+    "log-likelihood matrix using",
+    class(x)[1],
+    ".\n"
   )
 }
 
@@ -170,7 +172,7 @@ print_dims.kfold <- function(x, ...) {
 print_dims.psis_loo_ss <- function(x, ...) {
   cat(
     "Computed from",
-    paste(c(dim(x)[1], nobs(x)) , collapse = " by "),
+    paste(c(dim(x)[1], nobs(x)), collapse = " by "),
     "subsampled log-likelihood\nvalues from",
     length(x$loo_subsampling$elpd_loo_approx),
     "total observations.\n"
@@ -181,13 +183,13 @@ print_reff_summary <- function(x, digits) {
   r_eff <- x$diagnostics$r_eff
   if (is.null(r_eff)) {
     if (!is.null(x$psis_object)) {
-      r_eff <- attr(x$psis_object,'r_eff')
+      r_eff <- attr(x$psis_object, 'r_eff')
     } else {
-      r_eff <- attr(x,'r_eff')
+      r_eff <- attr(x, 'r_eff')
     }
   }
   if (!is.null(r_eff)) {
-    if (all(r_eff==1)) {
+    if (all(r_eff == 1)) {
       cat(
         "MCSE and ESS estimates assume independent draws (r_eff=1).\n"
       )

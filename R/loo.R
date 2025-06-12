@@ -191,14 +191,21 @@ loo <- function(x, ...) {
 #' @template array
 #'
 loo.array <-
-  function(x,
-           ...,
-           r_eff = 1,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
-           is_method = c("psis", "tis", "sis")) {
+  function(
+    x,
+    ...,
+    r_eff = 1,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1),
+    is_method = c("psis", "tis", "sis")
+  ) {
     is_method <- match.arg(is_method)
-    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
+    psis_out <- importance_sampling.array(
+      log_ratios = -x,
+      r_eff = r_eff,
+      cores = cores,
+      method = is_method
+    )
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     importance_sampling_loo_object(
@@ -215,12 +222,14 @@ loo.array <-
 #' @template matrix
 #'
 loo.matrix <-
-  function(x,
-           ...,
-           r_eff = 1,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
-           is_method = c("psis", "tis", "sis")) {
+  function(
+    x,
+    ...,
+    r_eff = 1,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1),
+    is_method = c("psis", "tis", "sis")
+  ) {
     is_method <- match.arg(is_method)
     psis_out <-
       importance_sampling.matrix(
@@ -248,14 +257,16 @@ loo.matrix <-
 #'   below for details on how to specify these arguments.
 #'
 loo.function <-
-  function(x,
-           ...,
-           data = NULL,
-           draws = NULL,
-           r_eff = 1,
-           save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
-           is_method = c("psis", "tis", "sis")) {
+  function(
+    x,
+    ...,
+    data = NULL,
+    draws = NULL,
+    r_eff = 1,
+    save_psis = FALSE,
+    cores = getOption("mc.cores", 1),
+    is_method = c("psis", "tis", "sis")
+  ) {
     is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -321,14 +332,15 @@ loo.function <-
 #'   observation.
 #'
 loo_i <-
-  function(i,
-           llfun,
-           ...,
-           data = NULL,
-           draws = NULL,
-           r_eff = 1,
-           is_method = "psis"
-           ) {
+  function(
+    i,
+    llfun,
+    ...,
+    data = NULL,
+    draws = NULL,
+    r_eff = 1,
+    is_method = "psis"
+  ) {
     stopifnot(
       i == as.integer(i),
       is.function(llfun) || is.character(llfun),
@@ -354,15 +366,16 @@ loo_i <-
 # for the loo.function method. The arguments and return value are the same as
 # the ones documented above for the user-facing loo_i function.
 .loo_i <-
-  function(i,
-           llfun,
-           ...,
-           data,
-           draws,
-           r_eff = 1,
-           save_psis = FALSE,
-           is_method) {
-
+  function(
+    i,
+    llfun,
+    ...,
+    data,
+    draws,
+    r_eff = 1,
+    save_psis = FALSE,
+    is_method
+  ) {
     if (!is.null(r_eff)) {
       r_eff <- r_eff[i]
     }
@@ -432,7 +445,12 @@ pointwise_loo_calcs <- function(ll, psis_object) {
   elpd_loo <- matrixStats::colLogSumExps(ll + lw)
   lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_loo <- lpd - elpd_loo
-  mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
+  mcse_elpd_loo <- mcse_elpd(
+    ll,
+    lw,
+    E_elpd = elpd_loo,
+    r_eff = relative_eff(psis_object)
+  )
   looic <- -2 * elpd_loo
   influence_pareto_k <- psis_object$diagnostics$pareto_k
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, influence_pareto_k)
@@ -450,14 +468,24 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'
-importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
-                                           is_method, is_object = NULL) {
-  if (!is.matrix(pointwise)) stop("Internal error ('pointwise' must be a matrix)")
-  if (!is.list(diagnostics)) stop("Internal error ('diagnostics' must be a list)")
+importance_sampling_loo_object <- function(
+  pointwise,
+  diagnostics,
+  dims,
+  is_method,
+  is_object = NULL
+) {
+  if (!is.matrix(pointwise)) {
+    stop("Internal error ('pointwise' must be a matrix)")
+  }
+  if (!is.list(diagnostics)) {
+    stop("Internal error ('diagnostics' must be a list)")
+  }
   assert_importance_sampling_method_is_implemented(is_method)
 
-  cols_to_summarize <- !(colnames(pointwise) %in% c("mcse_elpd_loo", "influence_pareto_k"))
-  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop=FALSE])
+  cols_to_summarize <- !(colnames(pointwise) %in%
+    c("mcse_elpd_loo", "influence_pareto_k"))
+  estimates <- table_of_estimates(pointwise[, cols_to_summarize, drop = FALSE])
 
   out <- nlist(estimates, pointwise, diagnostics)
   if (is.null(is_object)) {
@@ -467,7 +495,14 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
   }
 
   # maintain backwards compatibility
-  old_nms <- c("elpd_loo", "p_loo", "looic", "se_elpd_loo", "se_p_loo", "se_looic")
+  old_nms <- c(
+    "elpd_loo",
+    "p_loo",
+    "looic",
+    "se_elpd_loo",
+    "se_p_loo",
+    "se_looic"
+  )
   out <- c(out, setNames(as.list(estimates), old_nms))
 
   structure(
@@ -501,7 +536,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
       FUN = function(i) {
         # Variance in linear scale
         # Equation (6) in Vehtari et al. (2024)
-        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2) / r_eff[i]
+        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i])^2) / r_eff[i]
         # Compute variance in log scale by match the variance of a
         # log-normal approximation
         # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
@@ -577,16 +612,31 @@ NULL
 #' @keywords internal
 #' @export
 `[.loo` <- function(x, i) {
-  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
-            "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+  flags <- c(
+    "elpd_loo",
+    "se_elpd_loo",
+    "p_loo",
+    "se_p_loo",
+    "looic",
+    "se_looic",
+    "elpd_waic",
+    "se_elpd_waic",
+    "p_waic",
+    "se_p_waic",
+    "waic",
+    "se_waic"
+  )
 
   if (is.character(i)) {
     needs_warning <- which(flags == i)
     if (length(needs_warning)) {
       warning(
-        "Accessing ", flags[needs_warning], " using '[' is deprecated ",
+        "Accessing ",
+        flags[needs_warning],
+        " using '[' is deprecated ",
         "and will be removed in a future release. ",
-        "Please extract the ", flags[needs_warning],
+        "Please extract the ",
+        flags[needs_warning],
         " estimate from the 'estimates' component instead.",
         call. = FALSE
       )
@@ -598,17 +648,32 @@ NULL
 #' @rdname old-extractors
 #' @keywords internal
 #' @export
-`[[.loo` <- function(x, i, exact=TRUE) {
-  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
-             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+`[[.loo` <- function(x, i, exact = TRUE) {
+  flags <- c(
+    "elpd_loo",
+    "se_elpd_loo",
+    "p_loo",
+    "se_p_loo",
+    "looic",
+    "se_looic",
+    "elpd_waic",
+    "se_elpd_waic",
+    "p_waic",
+    "se_p_waic",
+    "waic",
+    "se_waic"
+  )
 
   if (is.character(i)) {
     needs_warning <- which(flags == i)
     if (length(needs_warning)) {
       warning(
-        "Accessing ", flags[needs_warning], " using '[[' is deprecated ",
+        "Accessing ",
+        flags[needs_warning],
+        " using '[[' is deprecated ",
         "and will be removed in a future release. ",
-        "Please extract the ", flags[needs_warning],
+        "Please extract the ",
+        flags[needs_warning],
         " estimate from the 'estimates' component instead.",
         call. = FALSE
       )
@@ -622,14 +687,29 @@ NULL
 #' @export
 #'
 `$.loo` <- function(x, name) {
-  flags <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo", "looic", "se_looic",
-             "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
+  flags <- c(
+    "elpd_loo",
+    "se_elpd_loo",
+    "p_loo",
+    "se_p_loo",
+    "looic",
+    "se_looic",
+    "elpd_waic",
+    "se_elpd_waic",
+    "p_waic",
+    "se_p_waic",
+    "waic",
+    "se_waic"
+  )
   needs_warning <- which(flags == name)
   if (length(needs_warning)) {
     warning(
-      "Accessing ", flags[needs_warning], " using '$' is deprecated ",
+      "Accessing ",
+      flags[needs_warning],
+      " using '$' is deprecated ",
       "and will be removed in a future release. ",
-      "Please extract the ", flags[needs_warning],
+      "Please extract the ",
+      flags[needs_warning],
       " estimate from the 'estimates' component instead.",
       call. = FALSE
     )
@@ -650,21 +730,44 @@ NULL
 #' @param N The total number of observations (i.e. `nrow(data)`).
 #' @param method See `is_method` for [loo()]
 #'
-parallel_psis_list <- function(N, .loo_i, .llfun,
-                               data, draws, r_eff,
-                               save_psis, cores,
-                               ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun,
-                                    data, draws, r_eff,
-                                    save_psis, cores,
-                                    method = "psis", ...)
+parallel_psis_list <- function(
+  N,
+  .loo_i,
+  .llfun,
+  data,
+  draws,
+  r_eff,
+  save_psis,
+  cores,
+  ...
+) {
+  parallel_importance_sampling_list(
+    N,
+    .loo_i,
+    .llfun,
+    data,
+    draws,
+    r_eff,
+    save_psis,
+    cores,
+    method = "psis",
+    ...
+  )
 }
 
 #' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
-                                              data, draws, r_eff,
-                                              save_psis, cores,
-                                              method, ...){
+parallel_importance_sampling_list <- function(
+  N,
+  .loo_i,
+  .llfun,
+  data,
+  draws,
+  r_eff,
+  save_psis,
+  cores,
+  method,
+  ...
+) {
   if (cores == 1) {
     psis_list <-
       lapply(

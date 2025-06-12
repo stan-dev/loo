@@ -86,13 +86,15 @@ loo_predictive_metric <- function(x, ...) {
 #' @rdname loo_predictive_metric
 #' @export
 loo_predictive_metric.matrix <-
-  function(x,
-           y,
-           log_lik,
-           ...,
-           metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
-           r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
+  function(
+    x,
+    y,
+    log_lik,
+    ...,
+    metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
+    r_eff = 1,
+    cores = getOption("mc.cores", 1)
+  ) {
     stopifnot(
       is.numeric(x),
       is.numeric(y),
@@ -101,10 +103,12 @@ loo_predictive_metric.matrix <-
     )
     metric <- match.arg(metric)
     psis_object <- psis(-log_lik, r_eff = r_eff, cores = cores)
-    pred_loo <- E_loo(x,
-                      psis_object = psis_object,
-                      log_ratios = -log_lik,
-                      ...)$value
+    pred_loo <- E_loo(
+      x,
+      psis_object = psis_object,
+      log_ratios = -log_lik,
+      ...
+    )$value
 
     predictive_metric_fun <- .loo_predictive_metric_fun(metric)
 
@@ -136,7 +140,7 @@ loo_predictive_metric.matrix <-
 #' @noRd
 #' @param y A vector of observed values
 #' @param yhat A vector of predictions
-.mae <-function(y, yhat) {
+.mae <- function(y, yhat) {
   stopifnot(length(y) == length(yhat))
   n <- length(y)
   e <- abs(y - yhat)
@@ -148,7 +152,7 @@ loo_predictive_metric.matrix <-
 #' @noRd
 #' @param y A vector of observed values
 #' @param yhat A vector of predictions
-.mse <-function(y, yhat) {
+.mse <- function(y, yhat) {
   stopifnot(length(y) == length(yhat))
   n <- length(y)
   e <- (y - yhat)^2
@@ -160,7 +164,7 @@ loo_predictive_metric.matrix <-
 #' @noRd
 #' @param y A vector of observed values
 #' @param yhat A vector of predictions
-.rmse <-function(y, yhat) {
+.rmse <- function(y, yhat) {
   est <- .mse(y, yhat)
   mean_mse <- est$estimate
   var_mse <- est$se^2
@@ -174,14 +178,16 @@ loo_predictive_metric.matrix <-
 #' @param y A vector of observed values
 #' @param yhat A vector of predictions
 .accuracy <- function(y, yhat) {
-  stopifnot(length(y) == length(yhat),
-            all(y <= 1 & y >= 0),
-            all(yhat <= 1 & yhat >= 0))
+  stopifnot(
+    length(y) == length(yhat),
+    all(y <= 1 & y >= 0),
+    all(yhat <= 1 & yhat >= 0)
+  )
   n <- length(y)
   yhat <- as.integer(yhat > 0.5)
   acc <- as.integer(yhat == y)
   est <- mean(acc)
-  list(estimate = est, se = sqrt(est * (1-est) / n) )
+  list(estimate = est, se = sqrt(est * (1 - est) / n))
 }
 
 #' Balanced classification accuracy
@@ -190,9 +196,11 @@ loo_predictive_metric.matrix <-
 #' @param y A vector of observed values
 #' @param yhat A vector of predictions
 .balanced_accuracy <- function(y, yhat) {
-  stopifnot(length(y) == length(yhat),
-            all(y <= 1 & y >= 0),
-            all(yhat <= 1 & yhat >= 0))
+  stopifnot(
+    length(y) == length(yhat),
+    all(y <= 1 & y >= 0),
+    all(yhat <= 1 & yhat >= 0)
+  )
   n <- length(y)
   yhat <- as.integer(yhat > 0.5)
   mask <- y == 0
@@ -205,4 +213,3 @@ loo_predictive_metric.matrix <-
   bls_acc_var <- (tp * (1 - tp) + tn * (1 - tn)) / 4
   list(estimate = bls_acc, se = sqrt(bls_acc_var / n))
 }
-

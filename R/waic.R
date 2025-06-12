@@ -97,17 +97,18 @@ waic.matrix <- function(x, ...) {
 #' **Methods (by class)** section below for details on these arguments.
 #'
 waic.function <-
-  function(x,
-           ...,
-           data = NULL,
-           draws = NULL) {
+  function(x, ..., data = NULL, draws = NULL) {
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
 
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
-    S <- length(as.vector(.llfun(data_i = data[1,, drop=FALSE], draws = draws, ...)))
+    S <- length(as.vector(.llfun(
+      data_i = data[1, , drop = FALSE],
+      draws = draws,
+      ...
+    )))
     waic_list <- lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
+      ll_i <- .llfun(data_i = data[i, , drop = FALSE], draws = draws, ...)
       ll_i <- as.vector(ll_i)
       lpd_i <- logMeanExp(ll_i)
       p_waic_i <- var(ll_i)
@@ -141,7 +142,14 @@ waic_object <- function(pointwise, dims) {
   estimates <- table_of_estimates(pointwise)
   out <- nlist(estimates, pointwise)
   # maintain backwards compatibility
-  old_nms <- c("elpd_waic", "p_waic", "waic", "se_elpd_waic", "se_p_waic", "se_waic")
+  old_nms <- c(
+    "elpd_waic",
+    "p_waic",
+    "waic",
+    "se_elpd_waic",
+    "se_p_waic",
+    "se_waic"
+  )
   out <- c(out, setNames(as.list(estimates), old_nms))
   structure(
     out,
@@ -157,11 +165,15 @@ throw_pwaic_warnings <- function(p, digits = 1, warn = TRUE) {
   if (any(badp)) {
     count <- sum(badp)
     prop <- count / length(badp)
-    msg <- paste0("\n", count, " (", .fr(100 * prop, digits),
-                  "%) p_waic estimates greater than 0.4. ",
-                  "We recommend trying loo instead.")
+    msg <- paste0(
+      "\n",
+      count,
+      " (",
+      .fr(100 * prop, digits),
+      "%) p_waic estimates greater than 0.4. ",
+      "We recommend trying loo instead."
+    )
     if (warn) .warn(msg) else cat(msg, "\n")
   }
   invisible(NULL)
 }
-

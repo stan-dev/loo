@@ -63,33 +63,41 @@ loo_moment_match <- function(x, ...) {
 #'   functions `post_draws`, `log_lik_i`, `unconstrain_pars`, `log_prob_upars`,
 #'   and `log_lik_i_upars`.
 #' @export
-loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
-                          unconstrain_pars, log_prob_upars,
-                          log_lik_i_upars, max_iters = 30L,
-                          k_threshold = NULL, split = TRUE,
-                          cov = TRUE, cores = getOption("mc.cores", 1),
-                          ...) {
-
+loo_moment_match.default <- function(
+  x,
+  loo,
+  post_draws,
+  log_lik_i,
+  unconstrain_pars,
+  log_prob_upars,
+  log_lik_i_upars,
+  max_iters = 30L,
+  k_threshold = NULL,
+  split = TRUE,
+  cov = TRUE,
+  cores = getOption("mc.cores", 1),
+  ...
+) {
   # input checks
-  checkmate::assertClass(loo,classes = "loo")
+  checkmate::assertClass(loo, classes = "loo")
   checkmate::assertFunction(post_draws)
   checkmate::assertFunction(log_lik_i)
   checkmate::assertFunction(unconstrain_pars)
   checkmate::assertFunction(log_prob_upars)
   checkmate::assertFunction(log_lik_i_upars)
   checkmate::assertNumber(max_iters)
-  checkmate::assertNumber(k_threshold, null.ok=TRUE)
+  checkmate::assertNumber(k_threshold, null.ok = TRUE)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
   checkmate::assertNumber(cores)
 
-
   if ("psis_loo" %in% class(loo)) {
     is_method <- "psis"
   } else {
-    stop("loo_moment_match currently supports only the \"psis\" importance sampling class.")
+    stop(
+      "loo_moment_match currently supports only the \"psis\" importance sampling class."
+    )
   }
-
 
   S <- dim(loo)[1]
   N <- dim(loo)[2]
@@ -108,33 +116,45 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   # loop over all observations whose Pareto k is high
   ks <- loo$diagnostics$pareto_k
-  kfs <- rep(0,N)
+  kfs <- rep(0, N)
   I <- which(ks > k_threshold)
 
   loo_moment_match_i_fun <- function(i) {
-    loo_moment_match_i(i = i, x = x, log_lik_i = log_lik_i,
-                       unconstrain_pars = unconstrain_pars,
-                       log_prob_upars = log_prob_upars,
-                       log_lik_i_upars = log_lik_i_upars,
-                       max_iters = max_iters, k_threshold = k_threshold,
-                       split = split, cov = cov, N = N, S = S, upars = upars,
-                       orig_log_prob = orig_log_prob, k = ks[i],
-                       is_method = is_method, npars = npars, ...)
+    loo_moment_match_i(
+      i = i,
+      x = x,
+      log_lik_i = log_lik_i,
+      unconstrain_pars = unconstrain_pars,
+      log_prob_upars = log_prob_upars,
+      log_lik_i_upars = log_lik_i_upars,
+      max_iters = max_iters,
+      k_threshold = k_threshold,
+      split = split,
+      cov = cov,
+      N = N,
+      S = S,
+      upars = upars,
+      orig_log_prob = orig_log_prob,
+      k = ks[i],
+      is_method = is_method,
+      npars = npars,
+      ...
+    )
   }
 
   if (cores == 1) {
     mm_list <- lapply(X = I, FUN = function(i) loo_moment_match_i_fun(i))
-  }
-  else {
+  } else {
     if (!os_is_windows()) {
-      mm_list <- parallel::mclapply(X = I, mc.cores = cores,
-                                    FUN = function(i) loo_moment_match_i_fun(i))
-    }
-    else {
+      mm_list <- parallel::mclapply(X = I, mc.cores = cores, FUN = function(i) {
+        loo_moment_match_i_fun(i)
+      })
+    } else {
       cl <- parallel::makePSOCKcluster(cores)
       on.exit(parallel::stopCluster(cl))
-      mm_list <- parallel::parLapply(cl = cl, X = I,
-                                    fun = function(i) loo_moment_match_i_fun(i))
+      mm_list <- parallel::parLapply(cl = cl, X = I, fun = function(i) {
+        loo_moment_match_i_fun(i)
+      })
     }
   }
 
@@ -155,23 +175,27 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     }
   }
   if (!is.null(loo$psis_object)) {
-    attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(loo$psis_object$log_weights)
+    attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(
+      loo$psis_object$log_weights
+    )
     loo$psis_object$diagnostics <- loo$diagnostics
   }
 
   # combined estimates
-  cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo",
-                                                        "influence_pareto_k"))
-  loo$estimates <- table_of_estimates(loo$pointwise[, cols_to_summarize,
-                                                    drop = FALSE])
+  cols_to_summarize <- !(colnames(loo$pointwise) %in%
+    c("mcse_elpd_loo", "influence_pareto_k"))
+  loo$estimates <- table_of_estimates(loo$pointwise[,
+    cols_to_summarize,
+    drop = FALSE
+  ])
 
   # these will be deprecated at some point
-  loo$elpd_loo <- loo$estimates["elpd_loo","Estimate"]
-  loo$p_loo <- loo$estimates["p_loo","Estimate"]
-  loo$looic <- loo$estimates["looic","Estimate"]
-  loo$se_elpd_loo <- loo$estimates["elpd_loo","SE"]
-  loo$se_p_loo <- loo$estimates["p_loo","SE"]
-  loo$se_looic <- loo$estimates["looic","SE"]
+  loo$elpd_loo <- loo$estimates["elpd_loo", "Estimate"]
+  loo$p_loo <- loo$estimates["p_loo", "Estimate"]
+  loo$looic <- loo$estimates["looic", "Estimate"]
+  loo$se_elpd_loo <- loo$estimates["elpd_loo", "SE"]
+  loo$se_p_loo <- loo$estimates["p_loo", "SE"]
+  loo$se_looic <- loo$estimates["looic", "SE"]
 
   # Warn if some Pareto ks are still high
   throw_pareto_warnings(loo$diagnostics$pareto_k, k_threshold)
@@ -184,10 +208,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 }
 
 
-
-
 # Internal functions ---------------
-
 
 #' Do moment matching for a single observation.
 #'
@@ -230,24 +251,26 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @param ... Further arguments passed to the custom functions documented above.
 #' @return List with the updated elpd values and diagnostics
 #'
-loo_moment_match_i <- function(i,
-                               x,
-                               log_lik_i,
-                               unconstrain_pars,
-                               log_prob_upars,
-                               log_lik_i_upars,
-                               max_iters,
-                               k_threshold,
-                               split,
-                               cov,
-                               N,
-                               S,
-                               upars,
-                               orig_log_prob,
-                               k,
-                               is_method,
-                               npars,
-                               ...) {
+loo_moment_match_i <- function(
+  i,
+  x,
+  log_lik_i,
+  unconstrain_pars,
+  log_prob_upars,
+  log_lik_i_upars,
+  max_iters,
+  k_threshold,
+  split,
+  cov,
+  N,
+  S,
+  upars,
+  orig_log_prob,
+  k,
+  is_method,
+  npars,
+  ...
+) {
   # initialize values for this LOO-fold
   uparsi <- upars
   ki <- k
@@ -260,12 +283,14 @@ loo_moment_match_i <- function(i,
   dim(log_liki) <- NULL
   lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
 
-  is_obj <- suppressWarnings(importance_sampling.default(-log_liki,
-                                                         method = is_method,
-                                                         r_eff = r_eff_i,
-                                                         cores = 1))
+  is_obj <- suppressWarnings(importance_sampling.default(
+    -log_liki,
+    method = is_method,
+    r_eff = r_eff_i,
+    cores = 1
+  ))
   lwi <- as.vector(weights(is_obj))
-  lwfi <- rep(-matrixStats::logSumExp(rep(0, S)),S)
+  lwfi <- rep(-matrixStats::logSumExp(rep(0, S)), S)
 
   # initialize objects that keep track of the total transformation
   total_shift <- rep(0, npars)
@@ -278,7 +303,6 @@ loo_moment_match_i <- function(i,
   # when transformation succeeds, start again from the first one
   iterind <- 1
   while (iterind <= max_iters && ki > k_threshold) {
-
     if (iterind == max_iters) {
       throw_moment_match_max_iters_warning()
     }
@@ -286,15 +310,18 @@ loo_moment_match_i <- function(i,
     # 1. match means
     trans <- shift(x, uparsi, lwi)
     # gather updated quantities
-    quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
-                                        orig_log_prob = orig_log_prob,
-                                        log_prob_upars = log_prob_upars,
-                                        log_lik_i_upars = log_lik_i_upars,
-                                        r_eff_i = r_eff_i,
-                                        cores = 1,
-                                        is_method = is_method,
-                                        ...)
-                        )
+    quantities_i <- try(update_quantities_i(
+      x,
+      trans$upars,
+      i = i,
+      orig_log_prob = orig_log_prob,
+      log_prob_upars = log_prob_upars,
+      log_lik_i_upars = log_lik_i_upars,
+      r_eff_i = r_eff_i,
+      cores = 1,
+      is_method = is_method,
+      ...
+    ))
     if (inherits(quantities_i, "try-error")) {
       # Stan log prob caused an exception probably due to under- or
       # overflow of parameters to invalid values
@@ -316,15 +343,18 @@ loo_moment_match_i <- function(i,
     # 2. match means and marginal variances
     trans <- shift_and_scale(x, uparsi, lwi)
     # gather updated quantities
-    quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
-                                        orig_log_prob = orig_log_prob,
-                                        log_prob_upars = log_prob_upars,
-                                        log_lik_i_upars = log_lik_i_upars,
-                                        r_eff_i = r_eff_i,
-                                        cores = 1,
-                                        is_method = is_method,
-                                        ...)
-                        )
+    quantities_i <- try(update_quantities_i(
+      x,
+      trans$upars,
+      i = i,
+      orig_log_prob = orig_log_prob,
+      log_prob_upars = log_prob_upars,
+      log_lik_i_upars = log_lik_i_upars,
+      r_eff_i = r_eff_i,
+      cores = 1,
+      is_method = is_method,
+      ...
+    ))
     if (inherits(quantities_i, "try-error")) {
       # Stan log prob caused an exception probably due to under- or
       # overflow of parameters to invalid values
@@ -348,15 +378,18 @@ loo_moment_match_i <- function(i,
     if (cov) {
       trans <- shift_and_cov(x, uparsi, lwi)
       # gather updated quantities
-      quantities_i <- try(update_quantities_i(x, trans$upars,  i = i,
-                                          orig_log_prob = orig_log_prob,
-                                          log_prob_upars = log_prob_upars,
-                                          log_lik_i_upars = log_lik_i_upars,
-                                          r_eff_i = r_eff_i,
-                                          cores = 1,
-                                          is_method = is_method,
-                                          ...)
-                          )
+      quantities_i <- try(update_quantities_i(
+        x,
+        trans$upars,
+        i = i,
+        orig_log_prob = orig_log_prob,
+        log_prob_upars = log_prob_upars,
+        log_lik_i_upars = log_lik_i_upars,
+        r_eff_i = r_eff_i,
+        cores = 1,
+        is_method = is_method,
+        ...
+      ))
 
       if (inherits(quantities_i, "try-error")) {
         # Stan log prob caused an exception probably due to under- or
@@ -389,16 +422,25 @@ loo_moment_match_i <- function(i,
   if (split && (iterind > 1)) {
     # compute split transformation
     split_obj <- loo_moment_match_split(
-      x, upars, cov, total_shift, total_scaling, total_mapping, i,
-      log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
-      cores = 1, r_eff_i = r_eff_i, is_method = is_method, ...
+      x,
+      upars,
+      cov,
+      total_shift,
+      total_scaling,
+      total_mapping,
+      i,
+      log_prob_upars = log_prob_upars,
+      log_lik_i_upars = log_lik_i_upars,
+      cores = 1,
+      r_eff_i = r_eff_i,
+      is_method = is_method,
+      ...
     )
     log_liki <- split_obj$log_liki
     lwi <- split_obj$lwi
     lwfi <- split_obj$lwfi
     r_eff_i <- split_obj$r_eff_i
-  }
-  else {
+  } else {
     dim(log_liki) <- c(S_per_chain, N_chains, 1)
     r_eff_i <- loo::relative_eff(exp(log_liki), cores = 1)
     dim(log_liki) <- NULL
@@ -407,23 +449,24 @@ loo_moment_match_i <- function(i,
   # pointwise estimates
   elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
   mcse_elpd_loo <- mcse_elpd(
-    ll = as.matrix(log_liki), lw = as.matrix(lwi),
-    E_elpd = exp(elpd_loo_i), r_eff = r_eff_i
+    ll = as.matrix(log_liki),
+    lw = as.matrix(lwi),
+    E_elpd = exp(elpd_loo_i),
+    r_eff = r_eff_i
   )
 
-  list(elpd_loo_i = elpd_loo_i,
-       p_loo = lpd - elpd_loo_i,
-       mcse_elpd_loo = mcse_elpd_loo,
-       looic = -2 * elpd_loo_i,
-       k = ki,
-       kf = kfi,
-       n_eff = min(1.0 / sum(exp(2 * lwi)),
-                   1.0 / sum(exp(2 * lwfi))) * r_eff_i,
-       lwi = lwi,
-       i = i)
+  list(
+    elpd_loo_i = elpd_loo_i,
+    p_loo = lpd - elpd_loo_i,
+    mcse_elpd_loo = mcse_elpd_loo,
+    looic = -2 * elpd_loo_i,
+    k = ki,
+    kf = kfi,
+    n_eff = min(1.0 / sum(exp(2 * lwi)), 1.0 / sum(exp(2 * lwfi))) * r_eff_i,
+    lwi = lwi,
+    i = i
+  )
 }
-
-
 
 
 #' Update the importance weights, Pareto diagnostic and log-likelihood
@@ -449,9 +492,17 @@ loo_moment_match_i <- function(i,
 #' @return List with the updated importance weights, Pareto diagnostics and
 #' log-likelihood values.
 #'
-update_quantities_i <- function(x, upars, i, orig_log_prob,
-                                log_prob_upars, log_lik_i_upars,
-                                r_eff_i, is_method, ...) {
+update_quantities_i <- function(
+  x,
+  upars,
+  i,
+  orig_log_prob,
+  log_prob_upars,
+  log_lik_i_upars,
+  r_eff_i,
+  is_method,
+  ...
+) {
   log_prob_new <- log_prob_upars(x, upars = upars, ...)
   log_liki_new <- log_lik_i_upars(x, upars = upars, i = i, ...)
   # compute new log importance weights
@@ -460,17 +511,21 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
   # replace the log ratio with -Inf
   lr <- -log_liki_new + log_prob_new - orig_log_prob
   lr[is.na(lr)] <- -Inf
-  is_obj_new <- suppressWarnings(importance_sampling.default(lr,
-                                                             method = is_method,
-                                                             r_eff = r_eff_i,
-                                                             cores = 1))
+  is_obj_new <- suppressWarnings(importance_sampling.default(
+    lr,
+    method = is_method,
+    r_eff = r_eff_i,
+    cores = 1
+  ))
   lwi_new <- as.vector(weights(is_obj_new))
   ki_new <- is_obj_new$diagnostics$pareto_k
 
-  is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new - orig_log_prob,
-                                                               method = is_method,
-                                                               r_eff = r_eff_i,
-                                                               cores = 1))
+  is_obj_f_new <- suppressWarnings(importance_sampling.default(
+    log_prob_new - orig_log_prob,
+    method = is_method,
+    r_eff = r_eff_i,
+    cores = 1
+  ))
   lwfi_new <- as.vector(weights(is_obj_f_new))
   kfi_new <- is_obj_f_new$diagnostics$pareto_k
 
@@ -483,7 +538,6 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
     log_liki = log_liki_new
   )
 }
-
 
 
 #' Shift a matrix of parameters to their weighted mean.
@@ -511,8 +565,6 @@ shift <- function(x, upars, lwi) {
 }
 
 
-
-
 #' Shift a matrix of parameters to their weighted mean and scale the marginal
 #' variances to match the weighted marginal variances. Also calls
 #' update_quantities_i which updates the importance weights based on
@@ -533,9 +585,9 @@ shift_and_scale <- function(x, upars, lwi) {
   mean_original <- colMeans(upars)
   mean_weighted <- colSums(exp(lwi) * upars)
   shift <- mean_weighted - mean_original
-  mii <- exp(lwi)* upars^2
+  mii <- exp(lwi) * upars^2
   mii <- colSums(mii) - mean_weighted^2
-  mii <- mii*S/(S-1)
+  mii <- mii * S / (S - 1)
   scaling <- sqrt(mii / matrixStats::colVars(upars))
   # transform posterior draws
   upars_new <- sweep(upars, 2, mean_original, "-")
@@ -573,15 +625,13 @@ shift_and_cov <- function(x, upars, lwi, ...) {
     {
       chol(wcovv)
     },
-    error = function(cond)
-    {
+    error = function(cond) {
       return(NULL)
     }
   )
   if (is.null(chol1)) {
     mapping <- diag(length(mean_original))
-  }
-  else {
+  } else {
     chol2 <- chol(covv)
     mapping <- t(chol1) %*% solve(t(chol2))
   }
@@ -622,4 +672,3 @@ throw_large_kf_warning <- function(kf, k_threshold) {
     )
   }
 }
-

@@ -92,7 +92,7 @@ kfold_split_stratified <- function(K = 10, x = NULL) {
     }
   }
   bins <- rep(NA, N)
-  bins[xids] <- rep(1:K, ceiling(N/K))[1:N]
+  bins[xids] <- rep(1:K, ceiling(N / K))[1:N]
   return(bins)
 }
 
@@ -117,9 +117,9 @@ kfold_split_grouped <- function(K = 10, x = NULL) {
   }
 
   # Otherwise we have Nlev > K
-  S1 <- ceiling(Nlev / K)  # number of levels in largest groups of levels
-  N_S2 <- S1 * K - Nlev    # number of groups of levels of size S1 - 1
-  N_S1 <- K - N_S2         # number of groups of levels of size S1
+  S1 <- ceiling(Nlev / K) # number of levels in largest groups of levels
+  N_S2 <- S1 * K - Nlev # number of groups of levels of size S1 - 1
+  N_S1 <- K - N_S2 # number of groups of levels of size S1
 
   perm <- sample.int(Nlev) # permute group levels
   brks <- seq(from = S1 + 0.5, by = S1, length.out = N_S1)
@@ -127,7 +127,7 @@ kfold_split_grouped <- function(K = 10, x = NULL) {
     brks2 <- seq(from = brks[N_S1] + S1 - 1, by = S1 - 1, length.out = N_S2 - 1)
     brks <- c(brks, brks2)
   }
-  grps <- findInterval(perm, vec = brks) + 1  # +1 so min is 1 not 0
+  grps <- findInterval(perm, vec = brks) + 1 # +1 so min is 1 not 0
 
   bins <- rep(NA, length(x))
   for (j in perm) {

@@ -31,9 +31,11 @@ pointwise.loo <- function(x, estimate, ...) {
   estimates <- colnames(pw)
   if (!(estimate %in% estimates)) {
     stop(
-      "'", estimate, "' not found.",
+      "'",
+      estimate,
+      "' not found.",
       " Available estimates are: \n",
-      paste(shQuote(estimates), collapse=", ")
+      paste(shQuote(estimates), collapse = ", ")
     )
   }
   pw[, estimate]

@@ -34,10 +34,15 @@
 #'
 #' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
 #'
-psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
-                   cores = getOption("mc.cores", 1),
-                   llfun = NULL, llargs = NULL,
-                   ...) {
+psislw <- function(
+  lw,
+  wcp = 0.2,
+  wtrunc = 3 / 4,
+  cores = getOption("mc.cores", 1),
+  llfun = NULL,
+  llargs = NULL,
+  ...
+) {
   .Deprecated("psis")
 
   cores <- loo_cores(cores)
@@ -51,18 +56,19 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
 
     tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH || all(x_tail == x_tail[1])) {
-      if (all(x_tail == x_tail[1]))
+      if (all(x_tail == x_tail[1])) {
         warning(
           "All tail values are the same. ",
           "Weights are truncated but not smoothed.",
           call. = FALSE
         )
-      else if (tail_len < MIN_TAIL_LENGTH)
+      } else if (tail_len < MIN_TAIL_LENGTH) {
         warning(
           "Too few tail samples to fit generalized Pareto distribution.\n",
           "Weights are truncated but not smoothed.",
           call. = FALSE
         )
+      }
 
       x_new <- x
       k <- Inf
@@ -72,7 +78,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       # body and gPd smoothed tail
       tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
-      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
+      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip = FALSE, min_grid_pts = 80)
       k <- fit$k
       sigma <- fit$sigma
       prb <- (seq_len(tail_len) - 0.5) / tail_len
@@ -91,19 +97,22 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
 
   .psis_loop <- function(i) {
     if (LL_FUN) {
-      ll_i <- llfun(i = i,
-                    data = llargs$data[i,, drop=FALSE],
-                    draws = llargs$draws)
+      ll_i <- llfun(
+        i = i,
+        data = llargs$data[i, , drop = FALSE],
+        draws = llargs$draws
+      )
       lw_i <- -1 * ll_i
     } else {
       lw_i <- lw[, i]
       ll_i <- -1 * lw_i
     }
     psis <- .psis(lw_i)
-    if (FROM_LOO)
+    if (FROM_LOO) {
       nlist(lse = logSumExp(ll_i + psis$lw_new), k = psis$k)
-    else
+    } else {
       psis
+    }
   }
 
   # minimal cutoff value. there must be at least 5 log-weights larger than this
@@ -111,17 +120,22 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
   MIN_CUTOFF <- -700
   MIN_TAIL_LENGTH <- 5
   dots <- list(...)
-  FROM_LOO <- if ("COMPUTE_LOOS" %in% names(dots))
-    dots$COMPUTE_LOOS else FALSE
+  FROM_LOO <- if ("COMPUTE_LOOS" %in% names(dots)) {
+    dots$COMPUTE_LOOS
+  } else {
+    FALSE
+  }
 
   if (!missing(lw)) {
-    if (!is.matrix(lw))
+    if (!is.matrix(lw)) {
       lw <- as.matrix(lw)
+    }
     N <- ncol(lw)
     LL_FUN <- FALSE
   } else {
-    if (is.null(llfun) || is.null(llargs))
+    if (is.null(llfun) || is.null(llargs)) {
       stop("Either 'lw' or 'llfun' and 'llargs' must be specified.")
+    }
     N <- llargs$N
     LL_FUN <- TRUE
   }
@@ -159,16 +173,18 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
 
 # internal ----------------------------------------------------------------
 lw_cutpoint <- function(y, wcp, min_cut) {
-  if (min_cut < log(.Machine$double.xmin))
+  if (min_cut < log(.Machine$double.xmin)) {
     min_cut <- -700
+  }
 
   cp <- quantile(y, 1 - wcp, names = FALSE)
   max(cp, min_cut)
 }
 
 lw_truncate <- function(y, wtrunc) {
-  if (wtrunc == 0)
+  if (wtrunc == 0) {
     return(y)
+  }
 
   logS <- log(length(y))
   lwtrunc <- wtrunc * logS - logS + logSumExp(y)
