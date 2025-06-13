@@ -43,6 +43,7 @@ jobs:
             any::rmarkdown
             any::Rcpp
             any::RcppEigen
+            any::RcppParallel
             any::rstan
             any::rstanarm
             any::rstantools
@@ -51,8 +52,18 @@ jobs:
             any::knitr
           needs: website
 
+      - uses: actions/cache@v4
+        with:
+          path: vignettes/**/_cache
+          key: knitr-${{ runner.os }}-${{ hashFiles('vignettes/**/*.Rmd') }}
+
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        run: |
+          pkgdown::build_site_github_pages(
+            new_process = FALSE,
+            install     = FALSE,
+            override    = list(lazy = TRUE)
+          )
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
