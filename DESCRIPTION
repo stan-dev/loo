@@ -36,7 +36,7 @@ Imports:
     checkmate,
     matrixStats (>= 0.52),
     parallel,
-    posterior (>= 1.6.2),
+    posterior (>= 1.6.1),
     stats
 Suggests:
     bayesplot (>= 1.7.0),
