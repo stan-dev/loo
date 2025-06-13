@@ -33,7 +33,19 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::., BH
+          extra-packages: |
+            any::pkgdown
+            local::.
+            any::bayesplot
+            any::rstanarm
+            any::brms
+            any::ggplot2
+            any::rmarkdown
+            any::rstan
+            any::rstanarm
+            any::rstantools
+            any::spdep
+            any::knitr
           needs: website
 
       - name: Build site
