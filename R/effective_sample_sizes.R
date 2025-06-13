@@ -63,14 +63,14 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
   if (cores == 1) {
-    n_eff_vec <- apply(x, 3, ess_rfun)
+    n_eff_vec <- apply(x, 3, posterior::ess_mean)
   } else {
     if (!os_is_windows()) {
       n_eff_list <-
         parallel::mclapply(
           mc.cores = cores,
           X = seq_len(dim(x)[3]),
-          FUN = function(i) ess_rfun(x[, , i, drop = TRUE])
+          FUN = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
         )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -79,7 +79,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(dim(x)[3]),
-          fun = function(i) ess_rfun(x[, , i, drop = TRUE])
+          fun = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
         )
     }
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
@@ -191,16 +191,4 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
     stop("r_eff must have length 1 or ncol(w).", call. = FALSE)
   }
   1 / ss * r_eff
-}
-
-#' MCMC effective sample size calculation
-#'
-#' @noRd
-#' @param sims An iterations by chains matrix of draws for a single parameter.
-#'   In the case of the **loo** package, this will be the **exponentiated**
-#'   log-likelihood values for the ith observation.
-#' @return MCMC effective sample size based on RStan's calculation.
-#'
-ess_rfun <- function(sims) {
-  posterior::ess_basic(sims)
 }

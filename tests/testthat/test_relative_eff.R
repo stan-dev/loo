@@ -16,7 +16,7 @@ test_that("relative_eff is equal to ESS / S", {
   ess <- r_eff <- rep(NA, dims[3])
   for (j in 1:dims[3]) {
     r_eff[j] <- relative_eff(LLarr[,,1, drop=FALSE])
-    ess[j] <- ess_rfun(LLarr[,,1])
+    ess[j] <- posterior::ess_mean(LLarr[,,1])
   }
   S <- prod(dim(LLarr)[1:2])
   expect_equal(r_eff, ess / S)
