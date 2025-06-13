@@ -36,6 +36,15 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
+            any::bayesplot
+            any::brms
+            any::ggplot2
+            any::rmarkdown
+            any::rstan
+            any::rstanarm
+            any::rstantools
+            any::spdep
+            any::knitr
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
