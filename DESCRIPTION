@@ -50,6 +50,7 @@ Suggests:
     rstantools,
     spdep,
     testthat (>= 2.1.0)
+Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
