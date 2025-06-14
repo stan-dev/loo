@@ -5,7 +5,7 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -19,7 +19,7 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -42,7 +42,7 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -76,26 +76,26 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -114,37 +114,32 @@ print(..., simplify=FALSE) to print a more detailed summary."><meta property="og
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loo_compare</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Default S3 method</span></span>
+<span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">loo_compare</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'compare.loo'</span></span>
+<span><span class="co"># S3 method for compare.loo</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, digits <span class="op">=</span> <span class="fl">1</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'compare.loo_ss'</span></span>
+<span><span class="co"># S3 method for compare.loo_ss</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, digits <span class="op">=</span> <span class="fl">1</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
+    <dl><dt>x</dt>
+<dd><p>An object of class <code>"loo"</code> or a list of such objects.</p></dd>
 
 
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>An object of class <code>"loo"</code> or a list of such objects. If a list is
-used then the list names will be used as the model names in the output. See
-<strong>Examples</strong>.</p></dd>
+<dt>...</dt>
+<dd><p>Additional objects of class <code>"loo"</code>.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional objects of class <code>"loo"</code>, if not passed in as a single
-list.</p></dd>
-
-
-<dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
+<dt>digits</dt>
 <dd><p>For the print method only, the number of digits to use when
 printing.</p></dd>
 
 
-<dt id="arg-simplify">simplify<a class="anchor" aria-label="anchor" href="#arg-simplify"></a></dt>
+<dt>simplify</dt>
 <dd><p>For the print method only, should only the essential columns
 of the summary matrix be printed? The entire matrix is always returned, but
 by default only the most important columns are printed.</p></dd>
@@ -152,7 +147,9 @@ by default only the most important columns are printed.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A matrix with class <code>"compare.loo"</code> that has its own
+    
+
+<p>A matrix with class <code>"compare.loo"</code> that has its own
 print method. See the <strong>Details</strong> section.</p>
     </div>
     <div id="details">
@@ -169,9 +166,9 @@ model and the model with the largest ELPD (the model in the first row). For
 this reason the <code>elpd_diff</code> column will always have the value <code>0</code> in the
 first row (i.e., the difference between the preferred model and itself) and
 negative values in subsequent rows for the remaining models.</p>
-<p>To compute the standard error of the difference in <a href="loo-glossary.html">ELPD</a> —
+<p>To compute the standard error of the difference in <a href="loo-glossary.html">ELPD</a> ---
 which should not be expected to equal the difference of the standard errors
-— we use a paired estimate to take advantage of the fact that the same
+--- we use a paired estimate to take advantage of the fact that the same
 set of \(N\) data points was used to fit both models. These calculations
 should be most useful when \(N\) is large, because then non-normality of
 the distribution is not such an issue when estimating the uncertainty in
@@ -193,15 +190,14 @@ projection predictive inference.</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
+<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
-Pareto smoothed importance sampling. <em>Journal of Machine Learning Research</em>,
-25(72):1-58.
-<a href="https://jmlr.org/papers/v25/19-556.html" class="external-link">PDF</a></p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
+Pareto smoothed importance sampling.
+<a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
 <p>Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
 Uncertainty in Bayesian leave-one-out cross-validation based model
 comparison. <a href="https://arxiv.org/abs/2008.10296v3" class="external-link">preprint arXiv:2008.10296v3.</a>.</p>
@@ -240,18 +236,24 @@ the <strong>loo</strong> website for answers to frequently asked questions.</p><
 <span class="r-out co"><span class="r-pr">#&gt;</span> model2 -32.000     0.000 -51.589    4.284       3.329   1.152  103.178   8.568 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model1 -64.000     0.000 -83.589    4.284       3.329   1.152  167.178   8.568 </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># can use a list of objects with custom names</span></span></span>
-<span class="r-in"><span><span class="co"># will use apple, banana, and cherry, as the names in the output</span></span></span>
-<span class="r-in"><span><span class="fu">loo_compare</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"apple"</span> <span class="op">=</span> <span class="va">loo1</span>, <span class="st">"banana"</span> <span class="op">=</span> <span class="va">loo2</span>, <span class="st">"cherry"</span> <span class="op">=</span> <span class="va">loo3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># can use a list of objects</span></span></span>
+<span class="r-in"><span><span class="fu">loo_compare</span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loo1</span>, <span class="va">loo2</span>, <span class="va">loo3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        elpd_diff se_diff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cherry   0.0       0.0  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> banana -32.0       0.0  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> apple  -64.0       0.0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model3   0.0       0.0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model2 -32.0       0.0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model1 -64.0       0.0  </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># works for waic (and kfold) too</span></span></span>
 <span class="r-in"><span><span class="fu">loo_compare</span><span class="op">(</span><span class="fu"><a href="waic.html">waic</a></span><span class="op">(</span><span class="va">LL</span><span class="op">)</span>, <span class="fu"><a href="waic.html">waic</a></span><span class="op">(</span><span class="va">LL</span> <span class="op">-</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        elpd_diff se_diff</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model1    0.0       0.0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model2 -320.0       0.0 </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -267,15 +269,15 @@ the <strong>loo</strong> website for answers to frequently asked questions.</p><
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

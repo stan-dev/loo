@@ -18,13 +18,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Holdout validation and K-fold cross-validation of Stan programs with the loo package">
+<meta property="og:description" content="loo">
+<meta property="og:image" content="https://mc-stan.org/loo/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -47,7 +49,7 @@
 <li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -62,7 +64,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -100,19 +102,19 @@
 <li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul>
@@ -123,7 +125,7 @@
 </div>
 <!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -133,7 +135,7 @@ of Stan programs with the loo package</h1>
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2025-06-12</h4>
+            <h4 data-toc-skip class="date">2024-07-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="hidden name"><code>loo2-elpd.Rmd</code></div>
@@ -146,8 +148,6 @@ Nicenboim</h4>
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Holdout validation and K-fold cross-validation of Stan programs with the loo package}
 -->
-<p><strong>NOTE: We recommend viewing the fully rendered version of this
-vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https://mc-stan.org/loo/articles/</a></strong></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -259,15 +259,17 @@ then is evaluated on the held-out “test” data.</p>
 <strong>rstan</strong> package:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compile</span></span>
-<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span>
-<span><span class="co"># Fit model</span></span>
+<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span></code></pre></div>
+<pre><code>Trying to compile a simple C file</code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Fit model</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">data_train</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>We recompute the generated quantities using the posterior draws
 conditional on the training data, but we now pass in the held-out data
 to get the log predictive densities for the test data. Because we are
 using independent data, the log predictive density coincides with the
 log likelihood of the test data.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
 <span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -276,8 +278,14 @@ log likelihood of the test data.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the test
 data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
+
+     Estimate    SE
+elpd  -1736.7 288.9
+ic     3473.5 577.9</code></pre>
 <p>When one wants to compare different models, the function
 <code><a href="../reference/loo_compare.html">loo_compare()</a></code> can be used to assess the difference in
 performance.</p>
@@ -294,7 +302,7 @@ Vehtari et al., 2017).</p>
 </h3>
 <p>We use the data that is already pre-processed and we divide it in 10
 random folds using <code>kfold_split_random</code></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare data</span></span>
 <span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">10</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -309,7 +317,7 @@ predictive densities for the left-out fold. Last, we store the
 predictive density for the observations of the left-out fold in a
 matrix. The output of this loop is a matrix of the log pointwise
 predictive densities of all the observations.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span></span>
 <span><span class="va">log_pd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">4000</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Loop over the folds</span></span>
@@ -342,8 +350,14 @@ predictive densities of all the observations.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the 10
 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
+
+     Estimate     SE
+elpd  -5552.7  727.9
+ic    11105.5 1455.8</code></pre>
 <p>If one wants to compare several models (with
 <code>loo_compare</code>), one should use the same folds for all the
 different models.</p>
@@ -366,7 +380,9 @@ model evaluation using leave-one-out cross-validation and WAIC.
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
@@ -379,16 +395,16 @@ model evaluation using leave-one-out cross-validation and WAIC.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>
 </div>
 
+  
 
 
-
-
+  
 
   </body>
 </html>

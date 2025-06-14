@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -25,7 +25,7 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -40,7 +40,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,26 +74,26 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -110,32 +110,30 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'array'</span></span>
+<span><span class="co"># S3 method for array</span></span>
 <span><span class="fu">sis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">sis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Default S3 method</span></span>
+<span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">sis</span><span class="op">(</span><span class="va">log_ratios</span>, <span class="va">...</span>, r_eff <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-log-ratios">log_ratios<a class="anchor" aria-label="anchor" href="#arg-log-ratios"></a></dt>
+    <dl><dt>log_ratios</dt>
 <dd><p>An array, matrix, or vector of importance ratios on the log
 scale (for Importance sampling LOO, these are <em>negative</em> log-likelihood
 values). See the <strong>Methods (by class)</strong> section below for a detailed
 description of how to specify the inputs for each method.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dt>...</dt>
 <dd><p>Arguments passed on to the various methods.</p></dd>
 
 
-<dt id="arg-r-eff">r_eff<a class="anchor" aria-label="anchor" href="#arg-r-eff"></a></dt>
+<dt>r_eff</dt>
 <dd><p>Vector of relative effective sample size estimates containing
 one element per observation. The values provided should be the relative
 effective sample sizes of <code>1/exp(log_ratios)</code> (i.e., <code>1/ratios</code>).
@@ -147,7 +145,7 @@ message thrown when not specifying <code>r_eff</code> can be disabled by
 setting <code>r_eff</code> to <code>NA</code>.</p></dd>
 
 
-<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dt>cores</dt>
 <dd><p>The number of cores to use for parallelization. This defaults to
 the option <code>mc.cores</code> which can be set for an entire R session by
 <code>options(mc.cores = NUMBER)</code>. The old option <code>loo.cores</code> is now
@@ -163,8 +161,12 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>sis()</code> methods return an object of class <code>"sis"</code>,
+    
+
+<p>The <code>sis()</code> methods return an object of class <code>"sis"</code>,
 which is a named list with the following components:</p>
+
+
 <dl><dt><code>log_weights</code></dt>
 <dd><p>Vector or matrix of smoothed but <em>unnormalized</em> log
 weights. To get normalized weights use the
@@ -198,7 +200,7 @@ and <code>N</code> (number of observations).</p></dd>
 </dl></div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
-
+    
 <ul><li><p><code>sis(array)</code>: An \(I\) by \(C\) by \(N\) array, where \(I\)
 is the number of MCMC iterations per chain, \(C\) is the number of
 chains, and \(N\) is the number of data points.</p></li>
@@ -209,15 +211,14 @@ of data points.</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
+<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
-Pareto smoothed importance sampling. <em>Journal of Machine Learning Research</em>,
-25(72):1-58.
-<a href="https://jmlr.org/papers/v25/19-556.html" class="external-link">PDF</a></p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
+Pareto smoothed importance sampling.
+<a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -268,15 +269,15 @@ Pareto smoothed importance sampling. <em>Journal of Machine Learning Research</e
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

@@ -4,7 +4,7 @@ the total sample size."><meta property="og:image" content="https://mc-stan.org/l
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -18,7 +18,7 @@ the total sample size."><meta property="og:image" content="https://mc-stan.org/l
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@ the total sample size."><meta property="og:image" content="https://mc-stan.org/l
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -41,7 +41,7 @@ the total sample size."><meta property="og:image" content="https://mc-stan.org/l
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,26 +75,26 @@ the total sample size."><meta property="og:image" content="https://mc-stan.org/l
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -112,16 +112,16 @@ the total sample size.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">relative_eff</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Default S3 method</span></span>
+<span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">relative_eff</span><span class="op">(</span><span class="va">x</span>, <span class="va">chain_id</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">relative_eff</span><span class="op">(</span><span class="va">x</span>, <span class="va">chain_id</span>, <span class="va">...</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'array'</span></span>
+<span><span class="co"># S3 method for array</span></span>
 <span><span class="fu">relative_eff</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class '`function`'</span></span>
+<span><span class="co"># S3 method for `function`</span></span>
 <span><span class="fu">relative_eff</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">chain_id</span>,</span>
@@ -131,15 +131,13 @@ the total sample size.</p>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'importance_sampling'</span></span>
+<span><span class="co"># S3 method for importance_sampling</span></span>
 <span><span class="fu">relative_eff</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+    <dl><dt>x</dt>
 <dd><p>A vector, matrix, 3-D array, or function. See the <strong>Methods (by
 class)</strong> section below for details on specifying <code>x</code>, but where
 "log-likelihood" is mentioned replace it with one of the following
@@ -151,7 +149,7 @@ of the importance ratios (i.e., <code>exp(-log_ratios)</code>).</p></li>
 </ul></dd>
 
 
-<dt id="arg-chain-id">chain_id<a class="anchor" aria-label="anchor" href="#arg-chain-id"></a></dt>
+<dt>chain_id</dt>
 <dd><p>A vector of length <code>NROW(x)</code> containing MCMC chain
 indexes for each each row of <code>x</code> (if a matrix) or each value in
 <code>x</code> (if a vector). No <code>chain_id</code> is needed if <code>x</code> is a 3-D
@@ -159,21 +157,23 @@ array. If there are <code>C</code> chains then valid chain indexes are values
 in <code>1:C</code>.</p></dd>
 
 
-<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dt>cores</dt>
 <dd><p>The number of cores to use for parallelization.</p></dd>
 
 
-<dt id="arg-data-draws-">data, draws, ...<a class="anchor" aria-label="anchor" href="#arg-data-draws-"></a></dt>
+<dt>data, draws, ...</dt>
 <dd><p>Same as for the <code><a href="loo.html">loo()</a></code> function method.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A vector of relative effective sample sizes.</p>
+    
+
+<p>A vector of relative effective sample sizes.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
-
+    
 <ul><li><p><code>relative_eff(default)</code>: A vector of length \(S\) (posterior sample size).</p></li>
 <li><p><code>relative_eff(matrix)</code>: An \(S\) by \(N\) matrix, where \(S\) is the size
 of the posterior sample (with all chains merged) and \(N\) is the number
@@ -236,15 +236,15 @@ the <code>r_eff</code> attribute of <code>x</code>.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

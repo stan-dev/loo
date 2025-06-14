@@ -3,7 +3,7 @@
 
 Stan Development Team
 This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2024), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
 Yao et al. (2018). To get started see the loo package
 vignettes, the
 loo() function for efficient approximate leave-one-out
@@ -14,7 +14,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -28,7 +28,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -36,7 +36,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -51,7 +51,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -85,26 +85,26 @@ predictive distributions from multiple models."><meta property="og:image" conten
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -117,7 +117,7 @@ predictive distributions from multiple models."><meta property="og:image" conten
     <div class="ref-description">
     <p><em>Stan Development Team</em></p>
 <p>This package implements the methods described in Vehtari, Gelman, and
-Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2024), and
+Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2022), and
 Yao et al. (2018). To get started see the <strong>loo</strong> package
 <a href="https://mc-stan.org/loo/articles/index.html">vignettes</a>, the
 <code><a href="loo.html">loo()</a></code> function for efficient approximate leave-one-out
@@ -138,9 +138,9 @@ values. LOO-CV and WAIC have various advantages over simpler estimates of
 predictive error such as AIC and DIC but are less used in practice because
 they involve additional computational steps. This package implements the
 fast and stable computations for approximate LOO-CV laid out in Vehtari,
-Gelman, and Gabry (2017). From existing posterior simulation draws, we
+Gelman, and Gabry (2017a). From existing posterior simulation draws, we
 compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-Simpson, Gelman, Yao, and Gabry, 2024), a new procedure for stabilizing
+Simpson, Gelman, Yao, and Gabry, 2022), a new procedure for stabilizing
 and diagnosing importance weights. As a byproduct of our calculations,
 we also obtain approximate standard errors for estimated predictive
 errors and for comparing of predictive errors between two models.</p>
@@ -150,15 +150,14 @@ estimates.</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+    <p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
+<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
-Pareto smoothed importance sampling. <em>Journal of Machine Learning Research</em>,
-25(72):1-58.
-<a href="https://jmlr.org/papers/v25/19-556.html" class="external-link">PDF</a></p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
+Pareto smoothed importance sampling.
+<a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
 <p>Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
 stacking to average Bayesian predictive distributions.
 <em>Bayesian Analysis</em>, advance publication,  doi:10.1214/17-BA1091.
@@ -167,7 +166,7 @@ stacking to average Bayesian predictive distributions.
 Leave-One-Out Cross-Validation for Large Data.
 In <em>Thirty-sixth International Conference on Machine Learning</em>,
 PMLR 97:4244-4253.</p>
-<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
+<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 In <em>Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)</em>, PMLR 108:341-351.</p>
@@ -236,15 +235,15 @@ for the generalized Pareto distribution. <em>Technometrics</em> <strong>51</stro
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

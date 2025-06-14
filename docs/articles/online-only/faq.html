@@ -18,13 +18,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../../pkgdown.css" rel="stylesheet">
 <script src="../../pkgdown.js"></script><meta property="og:title" content="Cross-validation FAQ">
+<meta property="og:description" content="loo">
+<meta property="og:image" content="https://mc-stan.org/loo/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -47,7 +49,7 @@
 <li>
   <a href="../../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -62,7 +64,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -100,19 +102,19 @@
 <li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul>
@@ -123,7 +125,7 @@
 </div>
 <!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -132,7 +134,7 @@
                         <h4 data-toc-skip class="author"><a href="https://users.aalto.fi/~ave/" class="external-link">Aki Vehtari</a></h4>
             
             <h4 data-toc-skip class="date">First version 2020-03-11.
-Last modified 2025-06-12.</h4>
+Last modified 2024-07-03.</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/online-only/faq.Rmd" class="external-link"><code>vignettes/online-only/faq.Rmd</code></a></small>
       <div class="hidden name"><code>faq.Rmd</code></div>
@@ -329,11 +331,9 @@ and comparison</a> <span class="citation">(<a href="#ref-Vehtari+Ojanen:2012">Ve
 e.g. leave-one-out (LOO), leave-one-group-out (LOGO), and
 leave-future-out (LFO)</li>
 <li>the utility or loss, e.g. expected log predictive density (ELPD),
-root mean square error (RMSE), explained variance
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>)</li>
+root mean square error (RMSE), explained variance (<span class="math inline">\(R^2\)</span>)</li>
 <li>the computational method use to compute leave-one-out predictive
-distributions,
-e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV,
+distributions, e.g. <span class="math inline">\(K\)</span>-fold-CV,
 Pareto smoothed importance sampling (PSIS),</li>
 <li>and the estimate obtained by combining these.</li>
 </ol>
@@ -370,8 +370,7 @@ sometimes better accuracy can be obtained with a different partitioning
 <p>First we need to define the utility or loss function which compares
 predictions to observations. These predictions can be considered to be
 for future observations, or for other exchangeable entities (see more in
-<a href="#id_%C2%A4whatis">What is cross-validation?</a>). Some
-examples:</p>
+<a href="#id_%C2%A4whatis">What is cross-validation?</a>). Some examples:</p>
 <ul>
 <li>LPD or LPPD: Log pointwise predictive density for a new observation.
 For simplicity the LPD acronym is used also for expected log pointwise
@@ -385,9 +384,8 @@ probabilities for discrete models.</li>
 <li>RMSE: Root mean square error.</li>
 <li>ACC: Classification accuracy.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>:
-Explained variance (see, e.g., <span class="citation">Gelman <em>et
-al.</em> (<a href="#ref-Gelman+etal:2019:BayesR2">2019</a>)</span>)</li>
+<span class="math inline">\(R^2\)</span>: Explained variance (see,
+e.g., <span class="citation">Gelman <em>et al.</em> (<a href="#ref-Gelman+etal:2019:BayesR2">2019</a>)</span>)</li>
 <li>90% quantile of absolute error (see, e.g., <span class="citation">Vehtari and Lampinen (<a href="#ref-Vehtari+Lampinen:2002b">2002</a>)</span>)</li>
 </ul>
 <p>These are examples of utility and loss functions for using the model
@@ -413,9 +411,7 @@ given different data partitions. For simplicity the ELPD acronym is used
 also for expected log pointwise predictive probabilities for discrete
 models.</li>
 </ul>
-<p>Similarly we can have expected RMSE, ACC,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>,
-etc.</p>
+<p>Similarly we can have expected RMSE, ACC, <span class="math inline">\(R^2\)</span>, etc.</p>
 </div>
 <div class="section level3">
 <h3 id="combination-of-data-division-and-utility-loss">Combination of data division and utility / loss<a class="anchor" aria-label="anchor" href="#combination-of-data-division-and-utility-loss"></a>
@@ -433,9 +429,7 @@ Vehtari (<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">2020</a>)</span>).</li
 <li>p_loo: This is not utility/loss as the others, but an estimate of
 effective complexity of the model, which can be used for diagnostics.
 See Vignette <a href="https://mc-stan.org/loo/reference/loo-glossary.html">LOO
-Glossary</a> for interpreting p_loo when
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-is large.</li>
+Glossary</a> for interpreting p_loo when Pareto-<span class="math inline">\(\hat{k}\)</span> is large.</li>
 </ul>
 <p>Similarly we can use the similar notation for other data divisions,
 and utility and loss functions. For example, when using LOO data
@@ -445,9 +439,8 @@ division</p>
 square error (RMSE).</li>
 <li>eACC_loo: The Bayesian LOO estimate of the expected classification
 accuracy (ACC).</li>
-<li>e<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>_loo:
-The Bayesian LOO estimate of the expected explained variance
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>).</li>
+<li>e<span class="math inline">\(R^2\)</span>_loo: The Bayesian LOO
+estimate of the expected explained variance (<span class="math inline">\(R^2\)</span>).</li>
 </ul>
 <p>These terms are not yet defining possible computational
 approximations.</p>
@@ -457,32 +450,20 @@ approximations.</p>
 distributions<a class="anchor" aria-label="anchor" href="#the-computational-method-used-to-compute-leave-one-out-predictive-distributions"></a>
 </h3>
 <p>The choice of partitions to leave out or metric of model performance
-is independent of the computational method (e.g. PSIS or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV).
-Different computational methods can be used to make the computation
-faster:</p>
+is independent of the computational method (e.g. PSIS or <span class="math inline">\(K\)</span>-fold-CV). Different computational
+methods can be used to make the computation faster:</p>
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV:
-Each cross-validation fold uses the same inference as is used for the
-full data. For example, if MCMC is used then MCMC inference needs to be
-run
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
-times.</li>
-<li>LOO with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV:
-If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">K=N</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-is the number of observations, then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
-is LOO. Sometimes this is called exact, naive or brute-force LOO. This
-can be time consuming as the inference needs to be repeated
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-times. Sometimes, efficient parallelization can make the wall clock time
-to be close to the time needed for one model fit
-[Cooper+etal:2023:parallelCV].</li>
+<span class="math inline">\(K\)</span>-fold-CV: Each
+cross-validation fold uses the same inference as is used for the full
+data. For example, if MCMC is used then MCMC inference needs to be run
+<span class="math inline">\(K\)</span> times.</li>
+<li>LOO with <span class="math inline">\(K\)</span>-fold-CV: If <span class="math inline">\(K=N\)</span>, where <span class="math inline">\(N\)</span> is the number of observations, then
+<span class="math inline">\(K\)</span>-fold-CV is LOO. Sometimes this is
+called exact, naive or brute-force LOO. This can be time consuming as
+the inference needs to be repeated <span class="math inline">\(N\)</span> times. Sometimes, efficient
+parallelization can make the wall clock time to be close to the time
+needed for one model fit [Cooper+etal:2023:parallelCV].</li>
 <li>PSIS-LOO: Pareto smoothed importance sampling leave-one-out
 cross-validation. Pareto smoothed importance sampling (PSIS, <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>,
 Vehtari+etal:PSIS:2024) is used to estimate leave-one-out predictive
@@ -492,14 +473,11 @@ Rethinking, 2nd ed.</li>
 <li>MM-LOO: Moment matching importance sampling leave-one-out
 cross-validation <span class="citation">(<a href="#ref-Paananen+etal:2021:implicit">Paananen <em>et al.</em>,
 2021</a>)</span>. Which works better than PSIS-LOO in challenging cases,
-but is still faster than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
+but is still faster than <span class="math inline">\(K\)</span>-fold-CV
 with K=N.</li>
-<li>RE-LOO: Run exact LOO (see LOO with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV)
-for those observations for which PSIS diagnostic indicates PSIS-LOO is
-not accurate (that is, re-fit the model for those leave-one-out
-cases).</li>
+<li>RE-LOO: Run exact LOO (see LOO with <span class="math inline">\(K\)</span>-fold-CV) for those observations for
+which PSIS diagnostic indicates PSIS-LOO is not accurate (that is,
+re-fit the model for those leave-one-out cases).</li>
 </ul>
 <p>We could write elpd_{psis-loo}, but often drop the specific
 computational method and report diagnostic information only if that
@@ -701,33 +679,22 @@ exchangeability and the data collection process we can proceed as if
 assuming conditional independence. See more in Chapter 5 of BDA3 <span class="citation">(<a href="#ref-BDA3">Gelman <em>et al.</em>,
 2013</a>)</span>. Cross-validation can also be used when the model
 doesn’t have conditional independence structure. In time series, the
-observations
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">y_1,\ldots,y_T</annotation></semantics></math>
-are not exchangeable as the index has additional information about the
-similarity in time. If we have model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_t \mid f_t)</annotation></semantics></math>,
-with latent values
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>t</mi></msub><annotation encoding="application/x-tex">f_t</annotation></semantics></math>
-then pairs
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>T</mi></msub><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(y_1,f_1),\ldots,(y_T,f_T)</annotation></semantics></math>
-are exchangeable (see Chapter 5 of BDA3 <span class="citation">(<a href="#ref-BDA3">Gelman <em>et al.</em>, 2013</a>)</span>) and we can
+observations <span class="math inline">\(y_1,\ldots,y_T\)</span> are not
+exchangeable as the index has additional information about the
+similarity in time. If we have model <span class="math inline">\(p(y_t
+\mid f_t)\)</span>, with latent values <span class="math inline">\(f_t\)</span> then pairs <span class="math inline">\((y_1,f_1),\ldots,(y_T,f_T)\)</span> are
+exchangeable (see Chapter 5 of BDA3 <span class="citation">(<a href="#ref-BDA3">Gelman <em>et al.</em>, 2013</a>)</span>) and we can
 factorize the likelihood trivially. We usually can present time series
-models with explicit latent values
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>t</mi></msub><annotation encoding="application/x-tex">f_t</annotation></semantics></math>
-, but sometimes we integrate them analytically out due to computational
-reasons and then get non-factorized likelihood for exactly the same
-model (see, e.g., <span class="citation">Vehtari <em>et al.</em> (<a href="#ref-Vehtari+etal:2016:LOO_for_GLVM">2016</a>)</span>,
+models with explicit latent values <span class="math inline">\(f_t\)</span> , but sometimes we integrate them
+analytically out due to computational reasons and then get
+non-factorized likelihood for exactly the same model (see, e.g., <span class="citation">Vehtari <em>et al.</em> (<a href="#ref-Vehtari+etal:2016:LOO_for_GLVM">2016</a>)</span>,
 Burkner+Gabry+Vehtari:LFO-CV:2020). .</p>
-<p>If we want to evaluate the goodness of the model part
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>t</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_t \mid f_t)</annotation></semantics></math>,
-LOO is fine. If we want to evaluate the goodness of the time series
-model part
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(f_1,\ldots,f_T)</annotation></semantics></math>,
-way may be interested in 1) goodness for predicting missing data in a
-middle (think about audio restoration of recorded music with missing
-parts, e.g. due to scratches in the medium) or 2) we may be interested
-in predicting future (think about stock market or disease transmission
-models).</p>
+<p>If we want to evaluate the goodness of the model part <span class="math inline">\(p(y_t \mid f_t)\)</span>, LOO is fine. If we want
+to evaluate the goodness of the time series model part <span class="math inline">\(p(f_1,\ldots,f_T)\)</span>, way may be interested
+in 1) goodness for predicting missing data in a middle (think about
+audio restoration of recorded music with missing parts, e.g. due to
+scratches in the medium) or 2) we may be interested in predicting future
+(think about stock market or disease transmission models).</p>
 <p>If the likelihood is factorizable (and if it’s not we can make it
 factorizable in some cases, see <a href="#timeseries">Can
 cross-validation be used for time series?</a>) then this shows in Stan
@@ -737,11 +704,9 @@ If the sums are related to exchangeable parts, we may use terms like
 leave-one-observation-out (LOO), leave-one-group-out (LOGO),
 leave-one-subject-out, leave-one-time-point-out, etc. If we want
 additionally restrict the information flow, for example, in time series
-we can add constraint that if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>t</mi></msub><annotation encoding="application/x-tex">y_t</annotation></semantics></math>
-is not observed then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">y_{t+1},\ldots,y_{T}</annotation></semantics></math>
-are not observed, we can use leave-future-out (LFO).</p>
+we can add constraint that if <span class="math inline">\(y_t\)</span>
+is not observed then <span class="math inline">\(y_{t+1},\ldots,y_{T}\)</span> are not observed, we
+can use leave-future-out (LFO).</p>
 <p>How do we then choose the level of what to leave out in
 cross-validation? It depends which level of the model is interesting and
 if many levels are interesting then we can do cross-validation at
@@ -812,43 +777,29 @@ Models: Conditional Versus Marginal Likelihoods. <em>Psychometrika</em>
 </h2>
 <p>The short answer is “Yes” (see, e.g. <span class="citation">Bürkner,
 Gabry and Vehtari (<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">2020</a>)</span> and <span class="citation">Cooper <em>et al.</em> (<a href="#ref-Cooper+etal:2023">2023</a>)</span>). If there is a model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i,\phi)</annotation></semantics></math>
-and joint time series prior for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(f_1,...,f_T)</annotation></semantics></math>
-then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i,\phi)</annotation></semantics></math>
-can be considered independent given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
-and likelihood is factorizable. This is true often and the past values
-are informative about future values, but conditionally we know
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>,
-the past values are not providing additional information. This should
-not be confused with that when we don’t know
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>
-and integrate over the posterior of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(f_1,...,f_T)</annotation></semantics></math>,
-as then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-are not conditionally independent given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>.
-Also they are not anymore exchangeable as we have the time ordering
-telling additional information.
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step
+<span class="math inline">\(p(y_i \mid f_i,\phi)\)</span> and joint time
+series prior for <span class="math inline">\((f_1,...,f_T)\)</span> then
+<span class="math inline">\(p(y_i \mid f_i,\phi)\)</span> can be
+considered independent given <span class="math inline">\(f_i\)</span>
+and <span class="math inline">\(\phi\)</span> and likelihood is
+factorizable. This is true often and the past values are informative
+about future values, but conditionally we know <span class="math inline">\(f_i\)</span>, the past values are not providing
+additional information. This should not be confused with that when we
+don’t know <span class="math inline">\(f_i\)</span> and integrate over
+the posterior of <span class="math inline">\((f_1,...,f_T)\)</span>, as
+then <span class="math inline">\(y_i\)</span> are not conditionally
+independent given <span class="math inline">\(\phi\)</span>. Also they
+are not anymore exchangeable as we have the time ordering telling
+additional information. <span class="math inline">\(M\)</span>-step
 ahead prediction (see <span class="citation">Bürkner, Gabry and Vehtari
 (<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">2020</a>)</span>) is
 more about the usual interest in predicting future and evaluating the
-time series model for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(f_1,...,f_T)</annotation></semantics></math>,
-but leave-one-out cross-validation is valid for assessing conditional
-part
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i)</annotation></semantics></math>.
-Even if we are interested in predicting the future,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
-with joint log score can have better model selection performance for
-time series models than LFO due to smaller variance <span class="citation">(<a href="#ref-Cooper+etal:2023">Cooper <em>et
-al.</em>, 2023</a>)</span>.</p>
+time series model for <span class="math inline">\((f_1,...,f_T)\)</span>, but leave-one-out
+cross-validation is valid for assessing conditional part <span class="math inline">\(p(y_i \mid f_i)\)</span>. Even if we are
+interested in predicting the future, <span class="math inline">\(K\)</span>-fold-CV with joint log score can have
+better model selection performance for time series models than LFO due
+to smaller variance <span class="citation">(<a href="#ref-Cooper+etal:2023">Cooper <em>et al.</em>,
+2023</a>)</span>.</p>
 <ul>
 <li>LOO is valid if the focus is in the conditional observation model.
 LOO can often already reveal problems in the model, and as LOO is often
@@ -860,8 +811,7 @@ more work, but often a fast approximated computation is sufficient <span class="
 Vehtari, 2020</a>)</span>. In leave-future-out, it is possible to
 consider also 1-step-ahead or M-step-ahead predictions depending on the
 prediction task.</li>
-<li>For model selection,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
+<li>For model selection, <span class="math inline">\(K\)</span>-fold-CV
 with joint log score is likely to have better performance than LFO <span class="citation">(<a href="#ref-Cooper+etal:2023">Cooper <em>et
 al.</em>, 2023</a>)</span>.</li>
 </ul>
@@ -877,36 +827,23 @@ models</a>
 <h2 id="spatial">Can cross-validation be used for spatial data?<a class="anchor" aria-label="anchor" href="#spatial"></a>
 </h2>
 <p>The short answer is “Yes”. This is closely related to <a href="#timeseries">the question about time series</a>. If there is a
-model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i,\phi)</annotation></semantics></math>
-and joint spatial prior for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(f_1,...,f_T)</annotation></semantics></math>
-then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i,\phi)</annotation></semantics></math>
-can be considered independent given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
-and likelihood is factorizable. This is true often and the observations
-in the nearby regions are correlated, but conditionally we know
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>,
-the nearby observations are not providing additional information. This
-should not be confused with that when we don’t know
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>i</mi></msub><annotation encoding="application/x-tex">f_i</annotation></semantics></math>
-and integrate over the posterior of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>f</mi><mi>T</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(f_1,...,f_T)</annotation></semantics></math>,
-as then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-are not conditionally independent given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>.
-Also they are not anymore exchangeable as we have the spatial ordering
-telling additional information.</p>
+model <span class="math inline">\(p(y_i \mid f_i,\phi)\)</span> and
+joint spatial prior for <span class="math inline">\((f_1,...,f_T)\)</span> then <span class="math inline">\(p(y_i \mid f_i,\phi)\)</span> can be considered
+independent given <span class="math inline">\(f_i\)</span> and <span class="math inline">\(\phi\)</span> and likelihood is factorizable. This
+is true often and the observations in the nearby regions are correlated,
+but conditionally we know <span class="math inline">\(f_i\)</span>, the
+nearby observations are not providing additional information. This
+should not be confused with that when we don’t know <span class="math inline">\(f_i\)</span> and integrate over the posterior of
+<span class="math inline">\((f_1,...,f_T)\)</span>, as then <span class="math inline">\(y_i\)</span> are not conditionally independent
+given <span class="math inline">\(\phi\)</span>. Also they are not
+anymore exchangeable as we have the spatial ordering telling additional
+information.</p>
 <ul>
 <li>LOO is valid if the focus is in the conditional observation model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>f</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \mid f_i)</annotation></semantics></math>.
-LOO can often already reveal problems in the model, and as LOO is often
-easy to compute, it is fine to start with LOO to investigate possible
-model issues.</li>
+<span class="math inline">\(p(y_i \mid f_i)\)</span>. LOO can often
+already reveal problems in the model, and as LOO is often easy to
+compute, it is fine to start with LOO to investigate possible model
+issues.</li>
 <li>Various spatially structured cross-validation approaches can be used
 when the there is interest in assessing extrapolation to new regions or
 otherwise focus the assessment to the spatial model part.</li>
@@ -925,11 +862,9 @@ density?<a class="anchor" aria-label="anchor" href="#otherutility"></a>
 </h2>
 <p>Short answer is “Yes”. <span class="citation">Vehtari, Gelman and
 Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span> state
-``Instead of the log predictive density
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo>∣</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log p(\tilde{y}_i  \mid y)</annotation></semantics></math>,
-other utility (or loss) functions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo>∣</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">u(p(\tilde{y}_i \mid y), \tilde{y})</annotation></semantics></math>
-could be used, such as classification error.’’ See also <span class="citation">Vehtari and Ojanen (<a href="#ref-Vehtari+Ojanen:2012">2012</a>)</span>.</p>
+``Instead of the log predictive density <span class="math inline">\(\log
+p(\tilde{y}_i  \mid y)\)</span>, other utility (or loss) functions <span class="math inline">\(u(p(\tilde{y}_i \mid y), \tilde{y})\)</span> could
+be used, such as classification error.’’ See also <span class="citation">Vehtari and Ojanen (<a href="#ref-Vehtari+Ojanen:2012">2012</a>)</span>.</p>
 <p>Vignette for <code>loo</code> package about other utility and loss
 functions is work in progress, but there are examples elsewhere:</p>
 <ul>
@@ -937,11 +872,9 @@ functions is work in progress, but there are examples elsewhere:</p>
 case study</a>, which illustrate how to compute LOO classification
 accuracy and LOO calibration plots.</li>
 <li>Section 2 in <a href="https://avehtari.github.io/bayes_R2/bayes_R2.html" class="external-link">Online appendix
-for Bayesian
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math></a>
-shows how to compute
-LOO-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>,
-which is just 1-(data variance scaled LOO-MSE).</li>
+for Bayesian <span class="math inline">\(R^2\)</span></a> shows how to
+compute LOO-<span class="math inline">\(R^2\)</span>, which is just
+1-(data variance scaled LOO-MSE).</li>
 <li>projpred case studies such as <a href="https://users.aalto.fi/~ave/modelselection/collinear.html" class="external-link">collinear</a>,
 <a href="https://users.aalto.fi/~ave/modelselection/diabetes.html" class="external-link">diabetes</a>,
 <a href="https://users.aalto.fi/~ave/modelselection/mesquite.html" class="external-link">mesquite</a>,
@@ -966,9 +899,8 @@ which can provide information whether the predictive accuracy is good
 enough in practice as compared to application expertise. It is possible
 that one model is better than others, but still not useful for practice.
 We are happy to get feedback on other utility and loss functions than
-log score, RMSE, ACC and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
-that would be even more application specific.</p>
+log score, RMSE, ACC and <span class="math inline">\(R^2\)</span> that
+would be even more application specific.</p>
 <p>See also</p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Scoring_rule" class="external-link">Scoring rule in
@@ -990,12 +922,10 @@ log probabilities.</p>
 problem computing <code>elpd_loo</code> with a beta-binomial model for
 data with 22 categories. Computed individual <code>elpd_loo</code>
 values for observations were around -461. For discrete model with
-uniform probability for 22 categories log probabilities would be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mi>/</mi><mn>22</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>−</mi><mn>3.1</mn></mrow><annotation encoding="application/x-tex">\log(1/22)\approx -3.1</annotation></semantics></math>,
-and thus there was two orders of magnitude error in log scale. With the
-fixed code individual <code>elpd_loo</code> values were about
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2.3</mn><mo>&gt;</mo><mi>−</mi><mn>3.1</mn></mrow><annotation encoding="application/x-tex">-2.3&gt;-3.1</annotation></semantics></math>,
-that is, the model was beating the uniform distribution.</p>
+uniform probability for 22 categories log probabilities would be <span class="math inline">\(\log(1/22)\approx -3.1\)</span>, and thus there
+was two orders of magnitude error in log scale. With the fixed code
+individual <code>elpd_loo</code> values were about <span class="math inline">\(-2.3&gt;-3.1\)</span>, that is, the model was
+beating the uniform distribution.</p>
 <p>The log densities are more difficult as they require knowing possible
 scaling or transformations of the data. See more in <a href="#differentmodels">Can cross-validation be used to compare
 different observation models / response distributions /
@@ -1021,22 +951,13 @@ difference (elpd_diff)?</a>.</p>
 <h2 id="differentmodels">Can cross-validation be used to compare different observation models
 / response distributions / likelihoods?<a class="anchor" aria-label="anchor" href="#differentmodels"></a>
 </h2>
-<p>Short answer is “Yes”. First to make the terms more clear,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y \mid \theta)</annotation></semantics></math>
-as a function of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-is an observation model and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>∣</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y \mid \theta)</annotation></semantics></math>
-as a function of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-is a likelihood. It is better to ask “Can cross-validation be used to
-compare different observation models?”</p>
+<p>Short answer is “Yes”. First to make the terms more clear, <span class="math inline">\(p(y \mid \theta)\)</span> as a function of <span class="math inline">\(y\)</span> is an observation model and <span class="math inline">\(p(y \mid \theta)\)</span> as a function of <span class="math inline">\(\theta\)</span> is a likelihood. It is better to
+ask “Can cross-validation be used to compare different observation
+models?”</p>
 <ul>
 <li>You can compare models given different discrete observation models
-and it’s also allowed to have different transformations of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-as long as the mapping is bijective (the probabilities will the stay the
-same).</li>
+and it’s also allowed to have different transformations of <span class="math inline">\(y\)</span> as long as the mapping is bijective
+(the probabilities will the stay the same).</li>
 <li>You can’t compare densities and probabilities directly. Thus you
 can’t compare model given continuous and discrete observation models,
 unless you compute probabilities in intervals from the continuous model
@@ -1044,15 +965,11 @@ unless you compute probabilities in intervals from the continuous model
 case study</a> includes an illustration how this discretisation can be
 easy for count data.</li>
 <li>You can compare models given different continuous observation models
-if you have exactly the same
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-(loo functions in <code>rstanarm</code> and <code>brms</code> check that
-the hash of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-is the same). If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-is transformed, then the Jacobian of that transformation needs to be
-included. There is an example of this in <a href="https://avehtari.github.io/ROS-Examples/Mesquite/mesquite.html" class="external-link">mesquite
+if you have exactly the same <span class="math inline">\(y\)</span> (loo
+functions in <code>rstanarm</code> and <code>brms</code> check that the
+hash of <span class="math inline">\(y\)</span> is the same). If <span class="math inline">\(y\)</span> is transformed, then the Jacobian of
+that transformation needs to be included. There is an example of this in
+<a href="https://avehtari.github.io/ROS-Examples/Mesquite/mesquite.html" class="external-link">mesquite
 case study</a>.</li>
 <li>Transformations of variables are briefly discussed in BDA3 p. 21
 <span class="citation">(<a href="#ref-BDA3">Gelman <em>et al.</em>,
@@ -1097,22 +1014,18 @@ separately, by summing the individual pointwise results for discrete and
 continuous separately.</p>
 </div>
 <div class="section level2">
-<h2 id="why-sqrtn-in-standard-error-se-of-loo">Why
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mi>n</mi></msqrt><annotation encoding="application/x-tex">\sqrt{n}</annotation></semantics></math>
-in Standard error (SE) of LOO?<a class="anchor" aria-label="anchor" href="#why-sqrtn-in-standard-error-se-of-loo"></a>
+<h2 id="why-sqrtn-in-standard-error-se-of-loo">Why <span class="math inline">\(\sqrt{n}\)</span> in Standard error
+(SE) of LOO?<a class="anchor" aria-label="anchor" href="#why-sqrtn-in-standard-error-se-of-loo"></a>
 </h2>
-<p>As we have only finite number
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+<p>As we have only finite number <span class="math inline">\(N\)</span>
 of observations which are used by cross-validation as a proxy of the
 future data, there is uncertainty in the LOO estimate.</p>
-<p>As
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mrow><mi mathvariant="normal">e</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">d</mi></mrow><mo accent="true">̂</mo></mover><mrow><mi mathvariant="normal">l</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">o</mi></mrow></msub><annotation encoding="application/x-tex">\widehat{\mathrm{elpd}}_\mathrm{loo}</annotation></semantics></math>
-is defined in Equation (4) by <span class="citation">Vehtari, Gelman and
+<p>As <span class="math inline">\(\widehat{\mathrm{elpd}}_\mathrm{loo}\)</span> is
+defined in Equation (4) by <span class="citation">Vehtari, Gelman and
 Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span> as a
 sum and not as a mean, we multiply the variance of individual terms by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mi>N</mi></msqrt><annotation encoding="application/x-tex">\sqrt{N}</annotation></semantics></math>
-instead of dividing by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mi>N</mi></msqrt><annotation encoding="application/x-tex">\sqrt{N}</annotation></semantics></math>.</p>
+<span class="math inline">\(\sqrt{N}\)</span> instead of dividing by
+<span class="math inline">\(\sqrt{N}\)</span>.</p>
 </div>
 <div class="section level2">
 <h2 id="se_diff">How to interpret in Standard error (SE) of elpd difference
@@ -1135,150 +1048,104 @@ SE is underestimated <span class="citation">(<a href="#ref-Sivula+etal:2020:loo_
 Vehtari, 2020</a>)</span>.</p>
 </div>
 <div class="section level2">
-<h2 id="high_khat">What to do if I have high Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>’s?<a class="anchor" aria-label="anchor" href="#high_khat"></a>
+<h2 id="high_khat">What to do if I have high Pareto <span class="math inline">\(\hat{k}\)</span>’s?<a class="anchor" aria-label="anchor" href="#high_khat"></a>
 </h2>
-<p>This is about
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
+<p>This is about Pareto-<span class="math inline">\(\hat{k}\)</span>
 (khat) diagnostic for PSIS-LOO.</p>
-<p>The
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-is a diagnostic for Pareto smoothed importance sampling (PSIS) <span class="citation">(<a href="#ref-Vehtari+etal:PSIS-LOO:2017">Vehtari,
+<p>The Pareto-<span class="math inline">\(\hat{k}\)</span> is a
+diagnostic for Pareto smoothed importance sampling (PSIS) <span class="citation">(<a href="#ref-Vehtari+etal:PSIS-LOO:2017">Vehtari,
 Gelman and Gabry, 2017</a>)</span>, which is used to compute components
 of <code>elpd_loo</code>. In importance-sampling LOO (the full posterior
-distribution is used as the proposal distribution), the
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-diagnostic estimates how far an individual leave-one-out distribution is
-from the full distribution. If leaving out an observation changes the
-posterior too much then importance sampling is not able to give reliable
-estimate. Pareto smoothing stabilizes importance sampling and guarantees
-a finite variance estimate at the cost of some bias.</p>
-<p>The diagnostic threshold for Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-depends on sample size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>.
-Sample size dependent threshold was introduced by <span class="citation">Vehtari <em>et al.</em> (<a href="#ref-Vehtari+etal:PSIS:2022">2022</a>)</span>, and before that
+distribution is used as the proposal distribution), the Pareto-<span class="math inline">\(\hat{k}\)</span> diagnostic estimates how far an
+individual leave-one-out distribution is from the full distribution. If
+leaving out an observation changes the posterior too much then
+importance sampling is not able to give reliable estimate. Pareto
+smoothing stabilizes importance sampling and guarantees a finite
+variance estimate at the cost of some bias.</p>
+<p>The diagnostic threshold for Pareto <span class="math inline">\(\hat{k}\)</span> depends on sample size <span class="math inline">\(S\)</span>. Sample size dependent threshold was
+introduced by <span class="citation">Vehtari <em>et al.</em> (<a href="#ref-Vehtari+etal:PSIS:2022">2022</a>)</span>, and before that
 fixed thresholds of 0.5 and 0.7 were recommended. For simplicity,
-<code>loo</code> package uses the nominal sample size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-when computing the sample size specific threshold. This provides an
-optimistic threshold if the effective sample size (ESS) is less than
-2200, but even then if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">E</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">S</mi></mrow><mi>/</mi><mi>S</mi><mo>&gt;</mo><mn>1</mn><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">\mathrm{ESS}/S
-&gt; 1/2</annotation></semantics></math> the difference is usually
-negligible. Thinning of MCMC draws can be used to improve the ratio
-$/S.</p>
+<code>loo</code> package uses the nominal sample size <span class="math inline">\(S\)</span> when computing the sample size specific
+threshold. This provides an optimistic threshold if the effective sample
+size (ESS) is less than 2200, but even then if <span class="math inline">\(\mathrm{ESS}/S
+&gt; 1/2\)</span> the difference is usually negligible. Thinning of MCMC
+draws can be used to improve the ratio $/S.</p>
 <ul>
-<li>If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>k</mi><mo accent="true">̂</mo></mover><mo>&lt;</mo><mo>min</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mn>1</mn><mi>/</mi><msub><mo>log</mo><mn>10</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mn>0.7</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\hat{k} &lt; \min(1 - 1 / \log_{10}(S), 0.7)</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-is the sample size, PSIS estimate and the corresponding Monte Carlo
-standard error estimate are reliable.</li>
-<li>If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mn>1</mn><mi>/</mi><msub><mo>log</mo><mn>10</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≤</mo><mover><mi>k</mi><mo accent="true">̂</mo></mover><mo>&lt;</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">1 - 1 / \log_{10}(S) \leq \hat{k} &lt; 0.7</annotation></semantics></math>,
-PSIS estimate and the corresponding Monte Carlo standard error estimate
-are not reliable, but increasing (effective) sample size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-above 2200 may help (this will increase the sample size specific
-threshold
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mn>1</mn><mi>/</mi><msub><mo>log</mo><mn>10</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>2200</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>&gt;</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">(1 - 1 / \log_{10}(2200) &gt; 0.7</annotation></semantics></math>
-and then the bias specific threshold 0.7 dominates).</li>
-<li>If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.7</mn><mo>≤</mo><mover><mi>k</mi><mo accent="true">̂</mo></mover><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">0.7 \leq \hat{k} &lt; 1</annotation></semantics></math>,
+<li>If <span class="math inline">\(\hat{k} &lt; \min(1 - 1 /
+\log_{10}(S), 0.7)\)</span>, where <span class="math inline">\(S\)</span> is the sample size, PSIS estimate and
+the corresponding Monte Carlo standard error estimate are reliable.</li>
+<li>If <span class="math inline">\(1 - 1 / \log_{10}(S) \leq \hat{k}
+&lt; 0.7\)</span>, PSIS estimate and the corresponding Monte Carlo
+standard error estimate are not reliable, but increasing (effective)
+sample size <span class="math inline">\(S\)</span> above 2200 may help
+(this will increase the sample size specific threshold <span class="math inline">\((1 - 1 / \log_{10}(2200) &gt; 0.7\)</span> and
+then the bias specific threshold 0.7 dominates).</li>
+<li>If <span class="math inline">\(0.7 \leq \hat{k} &lt; 1\)</span>,
 PSIS estimate and the corresponding Monte Carlo standard error have
 large bias and are not reliable. Increasing sample size may reduce the
-variability in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-estimate, which may result in a lower
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
+variability in <span class="math inline">\(\hat{k}\)</span> estimate,
+which may result in a lower <span class="math inline">\(\hat{k}\)</span>
 estimate, too.</li>
-<li>If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>k</mi><mo accent="true">̂</mo></mover><mo>≥</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\hat{k} \geq 1</annotation></semantics></math>,
-the target distribution is estimated to have non-finite mean. PSIS
-estimate and the corresponding Monte Carlo standard error are not well
-defined. Increasing sample size may reduce the variability in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-estimate, which may result in a lower
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-estimate, too.</li>
+<li>If <span class="math inline">\(\hat{k} \geq 1\)</span>, the target
+distribution is estimated to have non-finite mean. PSIS estimate and the
+corresponding Monte Carlo standard error are not well defined.
+Increasing sample size may reduce the variability in <span class="math inline">\(\hat{k}\)</span> estimate, which may result in a
+lower <span class="math inline">\(\hat{k}\)</span> estimate, too.</li>
 </ul>
-<p>Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-is also useful as a measure of influence of an observation. Highly
-influential observations have high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values. Very high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values often indicate model misspecification, outliers or mistakes in
-data processing. See Section 6 of <span class="citation">Gabry <em>et
+<p>Pareto-<span class="math inline">\(\hat{k}\)</span> is also useful as
+a measure of influence of an observation. Highly influential
+observations have high <span class="math inline">\(\hat{k}\)</span>
+values. Very high <span class="math inline">\(\hat{k}\)</span> values
+often indicate model misspecification, outliers or mistakes in data
+processing. See Section 6 of <span class="citation">Gabry <em>et
 al.</em> (<a href="#ref-Gabry+etal:2019:visualization">2019</a>)</span>
 for an example.</p>
-<p>If there are high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
+<p>If there are high <span class="math inline">\(\hat{k}\)</span>
 values, we can gain additional information by looking at
 <code>p_loo</code> reported, e.g. by <code>loo</code> package.
 <code>p_loo</code> is measure of effective number of parameters (see
 more in <a href="#p_loo">What is the interpretation of p_loo?</a>.</p>
-<p>If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>k</mi><mo accent="true">̂</mo></mover><mo>&gt;</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">\hat{k} &gt; 0.7</annotation></semantics></math>
-then we can also look at the p_loo estimate for some additional
-information about the problem:</p>
+<p>If <span class="math inline">\(\hat{k} &gt; 0.7\)</span> then we can
+also look at the p_loo estimate for some additional information about
+the problem:</p>
 <ul>
-<li>If p_loo
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≪</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">\ll p</annotation></semantics></math>
-(the total number of parameters in the model), then the model is likely
-to be misspecified. Posterior predictive checks (PPCs) are then likely
-to also detect the problem. Try using an overdispersed model, or add
-more structural information (nonlinearity, mixture model, etc.).</li>
-<li>If p_loo
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">&lt; p</annotation></semantics></math>
-and the number of parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
-is relatively large compared to the number of observations (e.g.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mi>N</mi><mi>/</mi><mn>5</mn></mrow><annotation encoding="application/x-tex">p&gt;N/5</annotation></semantics></math>),
-it is likely that the model is so flexible or the population prior so
-weak that it’s difficult to predict the left out observation. This can
-happen even when using the true model, in which case there is now way to
-improve the model, and we just have to improve the computation. This
-happens, for example, in the simulated 8 schools <span class="citation">(<a href="#ref-Vehtari+etal:PSIS-LOO:2017">Vehtari,
-Gelman and Gabry, 2017</a>)</span>, random effect models with a few
-observations per random effect, and Gaussian processes and spatial
-models with short correlation lengths.</li>
-<li>If p_loo
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">&gt; p</annotation></semantics></math>,
-then the model is likely to be badly misspecified. If the number of
-parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≪</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">p \ll N</annotation></semantics></math>,
-then PPCs are also likely to detect the problem. See for example the <a href="https://users.aalto.fi/~ave/modelselection/roaches.html" class="external-link">Roaches
-case study</a>. If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
-is relatively large compared to the number of observations, say
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mi>N</mi><mi>/</mi><mn>5</mn></mrow><annotation encoding="application/x-tex">p&gt;N/5</annotation></semantics></math>
-(more accurately we should count number of observations influencing each
-parameter as in hierarchical models some groups may have few
-observations and other groups many), it is possible that PPCs won’t
-detect the problem.</li>
+<li>If p_loo <span class="math inline">\(\ll p\)</span> (the total
+number of parameters in the model), then the model is likely to be
+misspecified. Posterior predictive checks (PPCs) are then likely to also
+detect the problem. Try using an overdispersed model, or add more
+structural information (nonlinearity, mixture model, etc.).</li>
+<li>If p_loo <span class="math inline">\(&lt; p\)</span> and the number
+of parameters <span class="math inline">\(p\)</span> is relatively large
+compared to the number of observations (e.g., <span class="math inline">\(p&gt;N/5\)</span>), it is likely that the model is
+so flexible or the population prior so weak that it’s difficult to
+predict the left out observation. This can happen even when using the
+true model, in which case there is now way to improve the model, and we
+just have to improve the computation. This happens, for example, in the
+simulated 8 schools <span class="citation">(<a href="#ref-Vehtari+etal:PSIS-LOO:2017">Vehtari, Gelman and Gabry,
+2017</a>)</span>, random effect models with a few observations per
+random effect, and Gaussian processes and spatial models with short
+correlation lengths.</li>
+<li>If p_loo <span class="math inline">\(&gt; p\)</span>, then the model
+is likely to be badly misspecified. If the number of parameters <span class="math inline">\(p \ll N\)</span>, then PPCs are also likely to
+detect the problem. See for example the <a href="https://users.aalto.fi/~ave/modelselection/roaches.html" class="external-link">Roaches
+case study</a>. If <span class="math inline">\(p\)</span> is relatively
+large compared to the number of observations, say <span class="math inline">\(p&gt;N/5\)</span> (more accurately we should count
+number of observations influencing each parameter as in hierarchical
+models some groups may have few observations and other groups many), it
+is possible that PPCs won’t detect the problem.</li>
 </ul>
-<p>Although high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values indicate problems with the models or computation, we don’t need
-always fix these problems. If we get high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values but the model is clearly bad (based on PPC or much much worse
-elpd), we can just discard that model without fixing the computation. If
-we get a small number of high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values in the initial part of the workflow, we may proceed without
-fixing the issues, but if in the final stages we are comparing models
-that have similar performance, there are some high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values, and we want to be minimize probability of wrong conclusions,
-it’s best to fix the problems. There is no threshold for how many high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-values would be acceptable.</p>
-<p>The number of high Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>’s
-can be reduced by</p>
+<p>Although high <span class="math inline">\(\hat{k}\)</span> values
+indicate problems with the models or computation, we don’t need always
+fix these problems. If we get high <span class="math inline">\(\hat{k}\)</span> values but the model is clearly
+bad (based on PPC or much much worse elpd), we can just discard that
+model without fixing the computation. If we get a small number of high
+<span class="math inline">\(\hat{k}\)</span> values in the initial part
+of the workflow, we may proceed without fixing the issues, but if in the
+final stages we are comparing models that have similar performance,
+there are some high <span class="math inline">\(\hat{k}\)</span> values,
+and we want to be minimize probability of wrong conclusions, it’s best
+to fix the problems. There is no threshold for how many high <span class="math inline">\(\hat{k}\)</span> values would be acceptable.</p>
+<p>The number of high Pareto <span class="math inline">\(\hat{k}\)</span>’s can be reduced by</p>
 <ul>
 <li>moment matching by <span class="citation">Paananen <em>et al.</em>
 (<a href="#ref-Paananen+etal:2021:implicit">2021</a>)</span>, which is
@@ -1313,11 +1180,9 @@ and machine learning</a> (50min)</li>
 <div class="section level2">
 <h2 id="more_parameters">Can I use PSIS-LOO if I have more parameters than observations?<a class="anchor" aria-label="anchor" href="#more_parameters"></a>
 </h2>
-<p>Yes, but you are likely to have many high Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>’s
-if prior is weak or if there are parameters which see the information
-only from one observation each (e.g. varying intercept (“random effect”)
-models). See an example in <a href="https://users.aalto.fi/~ave/modelselection/roaches.html#5_Poisson_model_with_varying_intercept_and_integrated_LOO" class="external-link">Section
+<p>Yes, but you are likely to have many high Pareto <span class="math inline">\(\hat{k}\)</span>’s if prior is weak or if there
+are parameters which see the information only from one observation each
+(e.g. varying intercept (“random effect”) models). See an example in <a href="https://users.aalto.fi/~ave/modelselection/roaches.html#5_Poisson_model_with_varying_intercept_and_integrated_LOO" class="external-link">Section
 ``Poisson model with varying intercepts’’ in Roaches cross-validation
 demo</a>.</p>
 </div>
@@ -1333,23 +1198,17 @@ it has diagnostic value. It describes how much more difficult it is to
 predict future data than the observed data. Asymptotically under certain
 regularity conditions, <code>p_loo</code> can be interpreted as the
 effective number of parameters. In well behaving cases
-<code>p_loo</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">&lt; N</annotation></semantics></math>
-and <code>p_loo</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">&lt; p</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
-is the total number of parameters in the model. <code>p_loo</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">&gt; N</annotation></semantics></math>
-or <code>p_loo</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">&gt; p</annotation></semantics></math>
-indicates that the model has very weak predictive capability. This can
-happen even in case of well specified model (as demonstrated in Figure 1
-in <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>), but may also
+<code>p_loo</code> <span class="math inline">\(&lt; N\)</span> and
+<code>p_loo</code> <span class="math inline">\(&lt; p\)</span>, where
+<span class="math inline">\(p\)</span> is the total number of parameters
+in the model. <code>p_loo</code> <span class="math inline">\(&gt;
+N\)</span> or <code>p_loo</code> <span class="math inline">\(&gt;
+p\)</span> indicates that the model has very weak predictive capability.
+This can happen even in case of well specified model (as demonstrated in
+Figure 1 in <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>), but may also
 indicate a severe model misspecification. See more in “Interpreting
-p_loo when
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>k</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{k}</annotation></semantics></math>
-is large” in <a href="https://mc-stan.org/loo/reference/loo-glossary.html">LOO
+p_loo when Pareto-<span class="math inline">\(\hat{k}\)</span> is large”
+in <a href="https://mc-stan.org/loo/reference/loo-glossary.html">LOO
 Glossary</a>.</p>
 </div>
 <div class="section level2">
@@ -1387,19 +1246,18 @@ cross-validation, it is easier to move to other cross-validation data
 division schemes.</p>
 <p><span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span> show that
 PSIS-LOO has usually smaller error in estimating ELPD than WAIC. The
-exception is the case when p_loo
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≪</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">\ll N</annotation></semantics></math>,
-as then WAIC tends to have slightly smaller error, but in that case both
-PSIS-LOO and WAIC have very small error and it doesn’t matter which
-computational approximation is used. On the other hand, for flexible
-models WAIC fails more easily, has significant bias and is less easy to
-diagnose for failures. WAIC has been included in <code>loo</code>
-package only for comparison purposes and to make it easy to replicate
-the results by <span class="citation">Vehtari, Gelman and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>.</p>
+exception is the case when p_loo <span class="math inline">\(\ll
+N\)</span>, as then WAIC tends to have slightly smaller error, but in
+that case both PSIS-LOO and WAIC have very small error and it doesn’t
+matter which computational approximation is used. On the other hand, for
+flexible models WAIC fails more easily, has significant bias and is less
+easy to diagnose for failures. WAIC has been included in
+<code>loo</code> package only for comparison purposes and to make it
+easy to replicate the results by <span class="citation">Vehtari, Gelman
+and Gabry (<a href="#ref-Vehtari+etal:PSIS-LOO:2017">2017</a>)</span>.</p>
 </div>
 <div class="section level2">
-<h2 id="LOOIC">How are LOOIC and elpd_loo related? Why LOOIC is
--2<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>*</mi><annotation encoding="application/x-tex">*</annotation></semantics></math>elpd_loo?<a class="anchor" aria-label="anchor" href="#LOOIC"></a>
+<h2 id="LOOIC">How are LOOIC and elpd_loo related? Why LOOIC is -2<span class="math inline">\(*\)</span>elpd_loo?<a class="anchor" aria-label="anchor" href="#LOOIC"></a>
 </h2>
 <p>Historically, some of the information criterion papers used to use -2
 * log score instead of simple log score. The reason for -2 dates to back
@@ -1445,40 +1303,33 @@ on any estimate</li>
 given posterior predictive distribution (ie integrating over the
 parameters)</li>
 </ul>
-<p>Assuming regular and true model, these are asymptotically (with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>→</mo><mi>∞</mi></mrow><annotation encoding="application/x-tex">N \rightarrow \infty</annotation></semantics></math>)
-the same. In finite case and singular models, WAIC and Bayesian LOO are
-the most sensible when doing Bayesian modeling. Bayesian LOO has
-benefits over WAIC as discussed in <a href="#LOO_WAIC">How are LOO and
-WAIC related?</a>.</p>
+<p>Assuming regular and true model, these are asymptotically (with <span class="math inline">\(N \rightarrow \infty\)</span>) the same. In finite
+case and singular models, WAIC and Bayesian LOO are the most sensible
+when doing Bayesian modeling. Bayesian LOO has benefits over WAIC as
+discussed in <a href="#LOO_WAIC">How are LOO and WAIC related?</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="LOO_and_BF">What is the relationship between LOO-CV and Bayes factor?<a class="anchor" aria-label="anchor" href="#LOO_and_BF"></a>
 </h2>
-<p>LOO-CV estimates the predictive performance given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">N-1</annotation></semantics></math>
-observations. Bayes factor can be presented as ratio of predictive
-performance estimates given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-observations. Alternatively Bayes factor can be interpreted as choosing
-the maximum a posterior model. - Bayes factor can be sensible when
-models are well specified and there is lot of data compared to the
-number of parameters, so that maximum a posteriori estimate is fine and
-the result is not sensitive to priors. - If there is not a lot of data
-compared to the number of parameters, Bayes factor can be much more
-sensitive to prior choice than LOO-CV. - If the models are not very
-close to the true model, Bayes factor can be more unstable than
-cross-validation <span class="citation">(<a href="#ref-Yao+etal:2018">Yao <em>et al.</em>, 2018</a>; <a href="#ref-Oelrich+etal:2020:overconfident">Oelrich <em>et al.</em>,
+<p>LOO-CV estimates the predictive performance given <span class="math inline">\(N-1\)</span> observations. Bayes factor can be
+presented as ratio of predictive performance estimates given <span class="math inline">\(0\)</span> observations. Alternatively Bayes
+factor can be interpreted as choosing the maximum a posterior model. -
+Bayes factor can be sensible when models are well specified and there is
+lot of data compared to the number of parameters, so that maximum a
+posteriori estimate is fine and the result is not sensitive to priors. -
+If there is not a lot of data compared to the number of parameters,
+Bayes factor can be much more sensitive to prior choice than LOO-CV. -
+If the models are not very close to the true model, Bayes factor can be
+more unstable than cross-validation <span class="citation">(<a href="#ref-Yao+etal:2018">Yao <em>et al.</em>, 2018</a>; <a href="#ref-Oelrich+etal:2020:overconfident">Oelrich <em>et al.</em>,
 2020</a>)</span>. - Computation of Bayes factor is more challenging. For
 example, if computed from MCMC sample, usually several orders of
 magnitude bigger sample sizes are needed for Bayes factor than for
 LOO-CV. - If the models are well specified, regular, and there is a lot
-of data compared to the number of parameters
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≫</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">n \gg p</annotation></semantics></math>),
-then Bayes factor may have smaller variance than LOO-CV. If the models
-are nested, instead of Bayes factor, it is also possible to look
-directly at the posterior of the interesting parameters (see also 2b in
-<a href="#manymodels">Using cross-validation for many models</a>).</p>
+of data compared to the number of parameters (<span class="math inline">\(n \gg p\)</span>), then Bayes factor may have
+smaller variance than LOO-CV. If the models are nested, instead of Bayes
+factor, it is also possible to look directly at the posterior of the
+interesting parameters (see also 2b in <a href="#manymodels">Using
+cross-validation for many models</a>).</p>
 </div>
 <div class="section level2">
 <h2 id="LOO-PIT">What is LOO-PIT<a class="anchor" aria-label="anchor" href="#LOO-PIT"></a>
@@ -1513,13 +1364,10 @@ the difference can be so small that we can’t see the difference, but
 that is why in the above we wrote
 <code>close to uniform'' instead of</code>uniform’’. The difference can
 be illustrated with a simple normal model. Assume that the data comes
-from a normal distribution and consider a model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">n</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>μ</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{normal}(\mu, \sigma)</annotation></semantics></math>
-with classic uninformative priors. The posterior predictive distribution
-can then be computed analytically and is a Student’s
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-distribution. PIT values from comparison of a Student’s
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+from a normal distribution and consider a model <span class="math inline">\(\mathrm{normal}(\mu, \sigma)\)</span> with classic
+uninformative priors. The posterior predictive distribution can then be
+computed analytically and is a Student’s <span class="math inline">\(t\)</span> distribution. PIT values from
+comparison of a Student’s <span class="math inline">\(t\)</span>
 distribution to the normal distributed data are not uniformly
 distributed, although with increasing data size, the predictive
 distribution will converge towards the true data generating distribution
@@ -1541,21 +1389,14 @@ negligible, and often by modifying the estimator we may even increase
 bias but reduce the variance a lot providing an overall improved
 performance.</p>
 <p>In CV the goal is to estimate the predictive performance for
-unobserved data given the observed data of size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>.
-CV has pessimistic bias due to using less than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
-observation to fit the models. In case of LOO-CV this bias is usually
-small and negligible. In case of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
-with a small
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>,
-the bias can be non-negligible, but if the effective number of
-parameters of the model is much less than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-then with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>&gt;</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">K&gt;10</annotation></semantics></math>
-the bias is also usually negligible compared to the variance.</p>
+unobserved data given the observed data of size <span class="math inline">\(n\)</span>. CV has pessimistic bias due to using
+less than <span class="math inline">\(n\)</span> observation to fit the
+models. In case of LOO-CV this bias is usually small and negligible. In
+case of <span class="math inline">\(K\)</span>-fold-CV with a small
+<span class="math inline">\(K\)</span>, the bias can be non-negligible,
+but if the effective number of parameters of the model is much less than
+<span class="math inline">\(n\)</span>, then with <span class="math inline">\(K&gt;10\)</span> the bias is also usually
+negligible compared to the variance.</p>
 <p>There is a bias correction approach by <span class="citation">Burman
 (<a href="#ref-Burman:1989">1989</a>)</span> (see also <span class="citation">Fushiki (<a href="#ref-Fushiki:2011">2011</a>)</span>)
 that reduces CV bias, but even in the cases with non-negligible bias
@@ -1564,14 +1405,12 @@ benefit (see, e.g. <span class="citation">Vehtari and Lampinen (<a href="#ref-Ve
 <p>For time series when the task is to predict future (there are other
 possibilities like missing data imputation) there are specific CV
 methods such as leave-future-out (LFO) that have lower bias than LOO-CV
-or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
-<span class="citation">(<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">Bürkner, Gabry and
+or <span class="math inline">\(K\)</span>-fold-CV <span class="citation">(<a href="#ref-Burkner+Gabry+Vehtari:LFO-CV:2020">Bürkner, Gabry and
 Vehtari, 2020</a>)</span>. There are sometimes comments that LOO-CV and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>-fold-CV
-would be invalid for time series. Although they tend to have a bigger
-bias than LFO, they are still valid and can be useful especially in
-model comparison where bias can cancel out.</p>
+<span class="math inline">\(K\)</span>-fold-CV would be invalid for time
+series. Although they tend to have a bigger bias than LFO, they are
+still valid and can be useful especially in model comparison where bias
+can cancel out.</p>
 <p><span class="citation">Cooper <em>et al.</em> (<a href="#ref-Cooper+etal:2023">2023</a>)</span> demonstrate how in time
 series model comparison variance is likely to dominate, it is more
 important to reduce the variance than bias, and leave-few-observations
@@ -1617,8 +1456,7 @@ extraction on the basis of microarray gene-expression data’</span>,
 </div>
 <div id="ref-Bengio+Grandvalet:2004" class="csl-entry">
 Bengio, Y. and Grandvalet, Y. (2004) <span>‘No unbiased estimator of the
-variance of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-fold
+variance of <span class="math inline">\(k\)</span>-fold
 cross-validation’</span>, <em>Journal of Machine Learning Research</em>,
 5, pp. 1089–1105.
 </div>
@@ -1630,8 +1468,7 @@ Simulation</em>, 90, pp. 2499–2523.
 </div>
 <div id="ref-Burman:1989" class="csl-entry">
 Burman, P. (1989) <span>‘A comparative study of ordinary
-cross-validation,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>-fold
+cross-validation, <span class="math inline">\(v\)</span>-fold
 cross-validation and the repeated learning-testing methods’</span>,
 <em>Biometrika</em>, 76(3), pp. 503–514.
 </div>
@@ -1814,7 +1651,9 @@ questions and discussing answers.</p>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
@@ -1827,16 +1666,16 @@ questions and discussing answers.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>
 </div>
 
+  
 
 
-
-
+  
 
   </body>
 </html>

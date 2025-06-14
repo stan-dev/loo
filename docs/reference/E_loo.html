@@ -10,7 +10,7 @@ development and will be added in a future release."><meta property="og:image" co
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -24,7 +24,7 @@ development and will be added in a future release."><meta property="og:image" co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -32,7 +32,7 @@ development and will be added in a future release."><meta property="og:image" co
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -47,7 +47,7 @@ development and will be added in a future release."><meta property="og:image" co
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -81,26 +81,26 @@ development and will be added in a future release."><meta property="og:image" co
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -124,7 +124,7 @@ development and will be added in a future release.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">x</span>, <span class="va">psis_object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Default S3 method</span></span>
+<span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">E_loo</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">psis_object</span>,</span>
@@ -134,7 +134,7 @@ development and will be added in a future release.</p>
 <span>  log_ratios <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">E_loo</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">psis_object</span>,</span>
@@ -147,30 +147,28 @@ development and will be added in a future release.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric vector or matrix.</p></dd>
 
 
-<dt id="arg-psis-object">psis_object<a class="anchor" aria-label="anchor" href="#arg-psis-object"></a></dt>
+<dt>psis_object</dt>
 <dd><p>An object returned by <code><a href="psis.html">psis()</a></code>.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dt>...</dt>
 <dd><p>Arguments passed to individual methods.</p></dd>
 
 
-<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dt>type</dt>
 <dd><p>The type of expectation to compute. The options are
 <code>"mean"</code>, <code>"variance"</code>, <code>"sd"</code>, and <code>"quantile"</code>.</p></dd>
 
 
-<dt id="arg-probs">probs<a class="anchor" aria-label="anchor" href="#arg-probs"></a></dt>
+<dt>probs</dt>
 <dd><p>For computing quantiles, a vector of probabilities.</p></dd>
 
 
-<dt id="arg-log-ratios">log_ratios<a class="anchor" aria-label="anchor" href="#arg-log-ratios"></a></dt>
+<dt>log_ratios</dt>
 <dd><p>Optionally, a vector or matrix (the same dimensions as <code>x</code>)
 of raw (not smoothed) log ratios. If working with log-likelihood values,
 the log ratios are the <strong>negative</strong> of those values. If <code>log_ratios</code> is
@@ -180,7 +178,9 @@ diagnostics specific to <code>E_loo()</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list with the following components:</p><dl><dt><code>value</code></dt>
+    
+
+<p>A named list with the following components:</p><dl><dt><code>value</code></dt>
 <dd><p>The result of the computation.</p>
 <p>For the matrix method, <code>value</code> is a vector with <code>ncol(x)</code>
 elements, with one exception: when <code>type="quantile"</code> and
@@ -200,11 +200,11 @@ the estimate is a scalar. If <code>log_ratios</code> is not specified when
 calling <code>E_loo()</code>, the smoothed log-weights are used to estimate
 Pareto-k's, which may produce optimistic estimates.</p>
 <p>For <code>type="mean"</code>, <code>type="var"</code>, and <code>type="sd"</code>, the returned Pareto-k is
-usually the maximum of the Pareto-k's for the left and right tail of \(hr\)
-and the right tail of \(r\), where \(r\) is the importance ratio and
-\(h=x\) for <code>type="mean"</code> and \(h=x^2\) for <code>type="var"</code> and <code>type="sd"</code>.
-If \(h\) is binary, constant, or not finite, or if <code>type="quantile"</code>, the
-returned Pareto-k is the Pareto-k for the right tail of \(r\).</p></dd>
+the maximum of the Pareto-k's for the left and right tail of \(hr\) and
+the right tail of \(r\), where \(r\) is the importance ratio and
+\(h=x\) for <code>type="mean"</code> and \(h=x^2\) for <code>type="var"</code> and
+<code>type="sd"</code>. For <code>type="quantile"</code>, the returned Pareto-k is the Pareto-k
+for the right tail of \(r\).</p></dd>
 
 
 </dl></div>
@@ -212,10 +212,15 @@ returned Pareto-k is the Pareto-k for the right tail of \(r\).</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rstanarm"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># Use rstanarm package to quickly fit a model and get both a log-likelihood</span></span></span>
 <span class="r-in"><span><span class="co"># matrix and draws from the posterior predictive distribution</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://mc-stan.org/rstanarm/" class="external-link">"rstanarm"</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Rcpp</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> This is rstanarm version 2.32.1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - For execution on a local, multicore CPU with excess RAM we recommend calling</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(mc.cores = parallel::detectCores())</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># data from help("lm")</span></span></span>
 <span class="r-in"><span><span class="va">ctl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.17</span>,<span class="fl">5.58</span>,<span class="fl">5.18</span>,<span class="fl">6.11</span>,<span class="fl">4.50</span>,<span class="fl">4.61</span>,<span class="fl">5.17</span>,<span class="fl">4.53</span>,<span class="fl">5.33</span>,<span class="fl">5.14</span><span class="op">)</span></span></span>
@@ -227,40 +232,56 @@ returned Pareto-k is the Pareto-k for the right tail of \(r\).</p></dd>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html" class="external-link">stan_glm</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">group</span>, data <span class="op">=</span> <span class="va">d</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">yrep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">yrep</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4000   20</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">log_ratios</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/log_lik.html" class="external-link">log_lik</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">log_ratios</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4000   20</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">r_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">log_ratios</span><span class="op">)</span>, chain_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, each <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">psis_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="psis.html">psis</a></span><span class="op">(</span><span class="va">log_ratios</span>, r_eff <span class="op">=</span> <span class="va">r_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is_constant(x_i):</span> could not find function "is_constant"</span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is_constant(x_i):</span> could not find function "is_constant"</span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"sd"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is_constant(x_i):</span> could not find function "is_constant"</span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, probs <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="co"># median</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.143318 4.990419 5.045964 4.893522 5.078653 5.088694 4.995732 5.106827</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.985569 5.044546 4.638359 4.719482 4.693008 4.770725 4.530231 4.727474</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.532588 4.644159 4.692495 4.642926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.15656938 0.21659000 0.13761689 0.30380728 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13090888 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.26787598 0.33112990 0.27326698 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 4.202947 4.024490 4.069320 3.975519 4.072362 4.100821 3.999408 4.086386</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 6.058854 5.971274 6.083626 5.812561 6.065001 6.079247 5.974741 6.080411</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,9]    [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.974495 3.985170 3.685336 3.742536 3.720220 3.838895 3.661197 3.758993</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 6.000139 6.057105 5.667853 5.731417 5.646776 5.683174 5.429682 5.687527</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         [,17]    [,18]    [,19]    [,20]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 3.652822 3.657359 3.702788 3.663643</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.394626 5.655873 5.676459 5.635945</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.15656938 0.21659000 0.13761689 0.30380728 0.15870293 0.13844575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.13090888 0.13384083 0.20959799 0.11930881 0.18298672 0.21539893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.07619255 0.26787598 0.33112990 0.27326698 0.42694305 0.16502194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.11863410 0.12681907</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># We can get more accurate Pareto k diagnostic if we also provide</span></span></span>
 <span class="r-in"><span><span class="co"># the log_ratios argument</span></span></span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"mean"</span>, log_ratios <span class="op">=</span> <span class="va">log_ratios</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Rcpp</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> This is rstanarm version 2.32.1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - For execution on a local, multicore CPU with excess RAM we recommend calling</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(mc.cores = parallel::detectCores())</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.136611 4.951887 5.027776 4.914588 5.079366 5.066390 5.006089 5.104669</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.996950 5.021188 4.638754 4.738736 4.692795 4.779924 4.544315 4.733389</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.532138 4.651862 4.706326 4.652503</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.29319010 0.13617097 0.03079260 0.32503600 0.20296064 0.21251155</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.06249427 0.13247578 0.08957165 0.03831693 0.15641989 0.19022634</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13] 0.19548818 0.26635622 0.30450037 0.23250416 0.37362848 0.11953514</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19] 0.15592760 0.18121361</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is_constant(x_i):</span> could not find function "is_constant"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -277,15 +298,15 @@ returned Pareto-k is the Pareto-k for the right tail of \(r\).</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

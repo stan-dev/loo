@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -25,7 +25,7 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -40,7 +40,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,26 +74,26 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -108,7 +108,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'psis_loo_ss'</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for psis_loo_ss</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -126,21 +126,19 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
+    <dl><dt>object</dt>
 <dd><p>A <code>psis_loo_ss</code> object to update.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dt>...</dt>
 <dd><p>Currently not used.</p></dd>
 
 
-<dt id="arg-data-draws">data, draws<a class="anchor" aria-label="anchor" href="#arg-data-draws"></a></dt>
+<dt>data, draws</dt>
 <dd><p>See <code><a href="loo_subsample.html">loo_subsample.function()</a></code>.</p></dd>
 
 
-<dt id="arg-observations">observations<a class="anchor" aria-label="anchor" href="#arg-observations"></a></dt>
+<dt>observations</dt>
 <dd><p>The subsample observations to use. The argument can take
 four (4) types of arguments:</p><ul><li><p><code>NULL</code> to use all observations. The algorithm then just uses
 standard <code><a href="loo.html">loo()</a></code> or <code><a href="loo_approximate_posterior.html">loo_approximate_posterior()</a></code>.</p></li>
@@ -153,7 +151,7 @@ previous call to <code><a href="loo_subsample.html">loo_subsample()</a></code>.<
 </ul></dd>
 
 
-<dt id="arg-r-eff">r_eff<a class="anchor" aria-label="anchor" href="#arg-r-eff"></a></dt>
+<dt>r_eff</dt>
 <dd><p>Vector of relative effective sample size estimates for the
 likelihood (<code>exp(log_lik)</code>) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
@@ -167,7 +165,7 @@ observations. The default value is 1. See the <code><a href="relative_eff.html">
 functions for help computing <code>r_eff</code>.</p></dd>
 
 
-<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dt>cores</dt>
 <dd><p>The number of cores to use for parallelization. This defaults to
 the option <code>mc.cores</code> which can be set for an entire R session by
 <code>options(mc.cores = NUMBER)</code>. The old option <code>loo.cores</code> is now
@@ -181,7 +179,7 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 </ul></dd>
 
 
-<dt id="arg-loo-approximation">loo_approximation<a class="anchor" aria-label="anchor" href="#arg-loo-approximation"></a></dt>
+<dt>loo_approximation</dt>
 <dd><p>What type of approximation of the loo_i's should be used?
 The default is <code>"plpd"</code> (the log predictive density using the posterior expectation).
 There are six different methods implemented to approximate loo_i's
@@ -205,26 +203,28 @@ likelihood function.</p></li>
 of the parameters are used.</p></dd>
 
 
-<dt id="arg-loo-approximation-draws">loo_approximation_draws<a class="anchor" aria-label="anchor" href="#arg-loo-approximation-draws"></a></dt>
+<dt>loo_approximation_draws</dt>
 <dd><p>The number of posterior draws used when
 integrating over the posterior. This is used if <code>loo_approximation</code> is set
 to <code>"lpd"</code>, <code>"waic"</code>, or <code>"tis"</code>.</p></dd>
 
 
-<dt id="arg-llgrad">llgrad<a class="anchor" aria-label="anchor" href="#arg-llgrad"></a></dt>
+<dt>llgrad</dt>
 <dd><p>The gradient of the log-likelihood. This
 is only used when <code>loo_approximation</code> is <code>"waic_grad"</code>,
 <code>"waic_grad_marginal"</code>, or <code>"waic_hess"</code>. The default is <code>NULL</code>.</p></dd>
 
 
-<dt id="arg-llhess">llhess<a class="anchor" aria-label="anchor" href="#arg-llhess"></a></dt>
+<dt>llhess</dt>
 <dd><p>The Hessian of the log-likelihood. This is only used
 with <code>loo_approximation = "waic_hess"</code>. The default is <code>NULL</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>psis_loo_ss</code> object.</p>
+    
+
+<p>A <code>psis_loo_ss</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -246,15 +246,15 @@ supplied, new observations will be sampled to reach the supplied sample size.</p
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

@@ -4,7 +4,7 @@ approximations"><meta property="og:image" content="https://mc-stan.org/loo/logo.
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -18,7 +18,7 @@ approximations"><meta property="og:image" content="https://mc-stan.org/loo/logo.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -26,7 +26,7 @@ approximations"><meta property="og:image" content="https://mc-stan.org/loo/logo.
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -41,7 +41,7 @@ approximations"><meta property="og:image" content="https://mc-stan.org/loo/logo.
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,26 +75,26 @@ approximations"><meta property="og:image" content="https://mc-stan.org/loo/logo.
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -112,7 +112,7 @@ approximations</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loo_approximate_posterior</span><span class="op">(</span><span class="va">x</span>, <span class="va">log_p</span>, <span class="va">log_g</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'array'</span></span>
+<span><span class="co"># S3 method for array</span></span>
 <span><span class="fu">loo_approximate_posterior</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">log_p</span>,</span>
@@ -122,7 +122,7 @@ approximations</p>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">loo_approximate_posterior</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">log_p</span>,</span>
@@ -132,7 +132,7 @@ approximations</p>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class '`function`'</span></span>
+<span><span class="co"># S3 method for `function`</span></span>
 <span><span class="fu">loo_approximate_posterior</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -147,31 +147,29 @@ approximations</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+    <dl><dt>x</dt>
 <dd><p>A log-likelihood array, matrix, or function.
 The <strong>Methods (by class)</strong> section, below, has detailed descriptions of how
 to specify the inputs for each method.</p></dd>
 
 
-<dt id="arg-log-p">log_p<a class="anchor" aria-label="anchor" href="#arg-log-p"></a></dt>
+<dt>log_p</dt>
 <dd><p>The log-posterior (target) evaluated at S samples from the
 proposal distribution (g). A vector of length S.</p></dd>
 
 
-<dt id="arg-log-g">log_g<a class="anchor" aria-label="anchor" href="#arg-log-g"></a></dt>
+<dt>log_g</dt>
 <dd><p>The log-density (proposal) evaluated at S samples from the
 proposal distribution (g). A vector of length S.</p></dd>
 
 
-<dt id="arg-save-psis">save_psis<a class="anchor" aria-label="anchor" href="#arg-save-psis"></a></dt>
+<dt>save_psis</dt>
 <dd><p>Should the <code>"psis"</code> object created internally by
 <code>loo_approximate_posterior()</code> be saved in the returned object? See
 <code><a href="loo.html">loo()</a></code> for details.</p></dd>
 
 
-<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dt>cores</dt>
 <dd><p>The number of cores to use for parallelization. This defaults to
 the option <code>mc.cores</code> which can be set for an entire R session by
 <code>options(mc.cores = NUMBER)</code>. The old option <code>loo.cores</code> is now
@@ -185,7 +183,7 @@ setting <code>mc.cores</code> interactively or in a script is fine).</p></li>
 </ul></dd>
 
 
-<dt id="arg-data-draws-">data, draws, ...<a class="anchor" aria-label="anchor" href="#arg-data-draws-"></a></dt>
+<dt>data, draws, ...</dt>
 <dd><p>For the <code>loo_approximate_posterior.function()</code> method,
 these are the data, posterior draws, and other arguments to pass to the
 log-likelihood function. See the <strong>Methods (by class)</strong> section below for
@@ -194,7 +192,9 @@ details on how to specify these arguments.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>loo_approximate_posterior()</code> methods return a named list with
+    
+
+<p>The <code>loo_approximate_posterior()</code> methods return a named list with
 class <code>c("psis_loo_ap", "psis_loo", "loo")</code>. It has the same structure
 as the objects returned by <code><a href="loo.html">loo()</a></code> but with the additional slot:</p><dl><dt><code>posterior_approximation</code></dt>
 <dd><p>A list with two vectors, <code>log_p</code> and <code>log_g</code> of the same length
@@ -213,7 +213,7 @@ density for the posterior approximation.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
-
+    
 <ul><li><p><code>loo_approximate_posterior(array)</code>: An \(I\) by \(C\) by \(N\) array, where \(I\)
 is the number of MCMC iterations per chain, \(C\) is the number of
 chains, and \(N\) is the number of data points.</p></li>
@@ -250,7 +250,7 @@ are recycled for each observation.</p></li>
 Leave-One-Out Cross-Validation for Large Data.
 In <em>Thirty-sixth International Conference on Machine Learning</em>,
 PMLR 97:4244-4253.</p>
-<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
+<p>Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2019).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 In <em>Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)</em>, PMLR 108:341-351.</p>
@@ -272,15 +272,15 @@ Intelligence and Statistics (AISTATS)</em>, PMLR 108:341-351.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

@@ -9,7 +9,7 @@ discussion on CRPS."><meta property="og:image" content="https://mc-stan.org/loo/
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -23,7 +23,7 @@ discussion on CRPS."><meta property="og:image" content="https://mc-stan.org/loo/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -31,7 +31,7 @@ discussion on CRPS."><meta property="og:image" content="https://mc-stan.org/loo/
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -46,7 +46,7 @@ discussion on CRPS."><meta property="og:image" content="https://mc-stan.org/loo/
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -80,26 +80,26 @@ discussion on CRPS."><meta property="og:image" content="https://mc-stan.org/loo/
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -128,13 +128,13 @@ discussion on CRPS.</p>
 <span></span>
 <span><span class="fu">loo_scrps</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">crps</span><span class="op">(</span><span class="va">x</span>, <span class="va">x2</span>, <span class="va">y</span>, <span class="va">...</span>, permutations <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'numeric'</span></span>
+<span><span class="co"># S3 method for numeric</span></span>
 <span><span class="fu">crps</span><span class="op">(</span><span class="va">x</span>, <span class="va">x2</span>, <span class="va">y</span>, <span class="va">...</span>, permutations <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">loo_crps</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">x2</span>,</span>
@@ -146,13 +146,13 @@ discussion on CRPS.</p>
 <span>  cores <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"mc.cores"</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">scrps</span><span class="op">(</span><span class="va">x</span>, <span class="va">x2</span>, <span class="va">y</span>, <span class="va">...</span>, permutations <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'numeric'</span></span>
+<span><span class="co"># S3 method for numeric</span></span>
 <span><span class="fu">scrps</span><span class="op">(</span><span class="va">x</span>, <span class="va">x2</span>, <span class="va">y</span>, <span class="va">...</span>, permutations <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">loo_scrps</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">x2</span>,</span>
@@ -167,28 +167,26 @@ discussion on CRPS.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+    <dl><dt>x</dt>
 <dd><p>A <code>S</code> by <code>N</code> matrix (draws by observations), or a vector of length
 <code>S</code> when only single observation is provided in <code>y</code>.</p></dd>
 
 
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dt>...</dt>
 <dd><p>Passed on to <code><a href="E_loo.html">E_loo()</a></code> in the <code>loo_*()</code> version of these
 functions.</p></dd>
 
 
-<dt id="arg-x-">x2<a class="anchor" aria-label="anchor" href="#arg-x-"></a></dt>
+<dt>x2</dt>
 <dd><p>Independent draws from the same distribution as draws in <code>x</code>.
 Should be of the identical dimension.</p></dd>
 
 
-<dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
+<dt>y</dt>
 <dd><p>A vector of observations or a single value.</p></dd>
 
 
-<dt id="arg-permutations">permutations<a class="anchor" aria-label="anchor" href="#arg-permutations"></a></dt>
+<dt>permutations</dt>
 <dd><p>An integer, with default value of 1,  specifying how many
 times the expected value of  |X - X'| (<code>|x - x2|</code>) is computed. The row
 order of <code>x2</code> is shuffled as elements <code>x</code> and <code>x2</code> are typically drawn
@@ -198,23 +196,25 @@ model. Generating more permutations is expected to decrease the variance of
 the computed expected value.</p></dd>
 
 
-<dt id="arg-log-lik">log_lik<a class="anchor" aria-label="anchor" href="#arg-log-lik"></a></dt>
+<dt>log_lik</dt>
 <dd><p>A log-likelihood matrix the same size as <code>x</code>.</p></dd>
 
 
-<dt id="arg-r-eff">r_eff<a class="anchor" aria-label="anchor" href="#arg-r-eff"></a></dt>
+<dt>r_eff</dt>
 <dd><p>An optional vector of relative effective sample size estimates
 containing one element per observation. See <code><a href="psis.html">psis()</a></code> for details.</p></dd>
 
 
-<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
+<dt>cores</dt>
 <dd><p>The number of cores to use for parallelization of <code>[psis()]</code>.
 See <code><a href="psis.html">psis()</a></code> for details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list containing two elements: <code>estimates</code> and <code>pointwise</code>.
+    
+
+<p>A list containing two elements: <code>estimates</code> and <code>pointwise</code>.
 The former reports estimator and standard error and latter the pointwise
 values.</p>
     </div>
@@ -237,16 +237,247 @@ Prediction, and Estimation. Journal of the American Statistical Association,
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># An example using rstanarm</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstanarm/" class="external-link">rstanarm</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"kidiq"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstanarm/reference/stan_glm.html" class="external-link">stan_glm</a></span><span class="op">(</span><span class="va">kid_score</span> <span class="op">~</span> <span class="va">mom_hs</span> <span class="op">+</span> <span class="va">mom_iq</span>, data <span class="op">=</span> <span class="va">kidiq</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Gradient evaluation took 2.6e-05 seconds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Adjust your expectations accordingly!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1:  Elapsed Time: 0.051 seconds (Warm-up)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1:                0.063 seconds (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1:                0.114 seconds (Total)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Gradient evaluation took 1.1e-05 seconds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Adjust your expectations accordingly!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2:  Elapsed Time: 0.076 seconds (Warm-up)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2:                0.071 seconds (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2:                0.147 seconds (Total)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 2: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Gradient evaluation took 1.3e-05 seconds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Adjust your expectations accordingly!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3:  Elapsed Time: 0.052 seconds (Warm-up)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3:                0.068 seconds (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3:                0.12 seconds (Total)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 3: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Gradient evaluation took 1.2e-05 seconds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Adjust your expectations accordingly!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4:  Elapsed Time: 0.058 seconds (Warm-up)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4:                0.062 seconds (Sampling)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4:                0.12 seconds (Total)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chain 4: </span>
 <span class="r-in"><span><span class="va">ypred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ypred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">crps</span><span class="op">(</span><span class="va">ypred1</span>, <span class="va">ypred2</span>, y <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $estimates</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Estimate          SE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -10.2289025   0.3452416 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $pointwise</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          1          2          3          4          5          6          7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -24.990099  -9.657260  -7.446334  -4.754076 -21.781540  -6.939491 -31.090066 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          8          9         10         11         12         13         14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.377036 -15.248244  -6.142388  -5.870952 -17.920907  -4.157854 -11.234899 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         15         16         17         18         19         20         21 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -11.631440  -6.526809  -5.191024  -4.660734  -4.408232 -12.844526  -5.705731 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         22         23         24         25         26         27         28 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -7.449201  -7.832754  -4.233057 -10.975285  -4.664320  -8.833488  -5.819207 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         29         30         31         32         33         34         35 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.244282  -4.281328 -15.787284 -30.400706  -6.543652 -11.570146  -5.365094 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         36         37         38         39         40         41         42 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -10.039881 -12.907251  -5.066769  -5.872869 -18.649738 -10.353712  -5.780542 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         43         44         45         46         47         48         49 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -7.948311  -4.292212 -19.103743  -5.837223 -24.585742  -4.507041 -17.647253 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         50         51         52         53         54         55         56 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.679263  -6.744241  -5.743212 -19.628792 -15.193175  -5.510478  -8.599100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         57         58         59         60         61         62         63 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -5.879795  -5.264341  -5.302749  -5.459433  -9.509765  -9.016372  -4.417851 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         64         65         66         67         68         69         70 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -6.229068 -23.648908 -25.582084 -13.216741  -4.283352  -5.174674  -5.239265 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         71         72         73         74         75         76         77 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -5.740032  -4.890393  -4.694475 -15.123030 -11.614009 -16.269604  -4.425453 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         78         79         80         81         82         83         84 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -3.985703 -19.914424  -4.869179 -11.808568 -15.787271  -8.495717 -10.265243 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         85         86         87         88         89         90         91 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -6.284692  -4.447534 -35.372187  -5.701886  -4.676611  -7.591189  -6.973633 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         92         93         94         95         96         97         98 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -10.311266  -8.454235  -4.948828 -12.294160  -4.893688  -4.091693  -6.053500 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         99        100        101        102        103        104        105 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -13.841933 -15.967705  -5.257588 -15.755618 -10.709925  -5.230169  -8.366270 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        106        107        108        109        110        111        112 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.699766 -13.235634  -7.650373  -5.811290  -8.271055 -30.021811 -12.808877 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        113        114        115        116        117        118        119 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -25.690976  -7.579447  -5.295584  -4.823782 -25.034339 -29.766666  -4.703118 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        120        121        122        123        124        125        126 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -15.814769 -11.796324  -5.321439  -4.894910  -4.866492 -18.634125 -13.633340 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        127        128        129        130        131        132        133 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -10.435583  -5.558117  -4.323684  -8.764079 -24.145383  -8.272895  -6.855163 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        134        135        136        137        138        139        140 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -5.680793  -7.667393 -27.461299 -12.903087  -8.124463  -4.205648  -6.941802 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        141        142        143        144        145        146        147 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.304912  -4.712101  -4.145628  -5.963981  -4.414419  -4.172647  -6.444587 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        148        149        150        151        152        153        154 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -22.406717 -15.149492 -13.283477  -5.211036 -28.989773  -4.116259  -9.207646 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        155        156        157        158        159        160        161 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -8.349683  -4.497955  -7.351267  -7.698720 -10.160305  -5.044352  -5.914767 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        162        163        164        165        166        167        168 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -7.305688  -5.942986  -5.897738  -5.220435  -8.471887  -8.523607  -4.379158 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        169        170        171        172        173        174        175 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -15.717298  -6.463893  -5.090596  -5.174440  -5.968395  -7.052573 -12.503024 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        176        177        178        179        180        181        182 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.257968  -4.151539  -6.436262  -5.037180  -4.481005  -5.102446  -5.276279 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        183        184        185        186        187        188        189 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.303738 -14.279255 -20.152343 -13.826707  -4.959577 -20.592879  -4.310917 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        190        191        192        193        194        195        196 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -10.245202  -8.206200  -4.327003  -7.032611  -6.891264  -7.731745  -4.833334 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        197        198        199        200        201        202        203 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -6.818601 -11.206995  -6.681627  -4.293995  -5.121928  -5.164004  -7.386156 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        204        205        206        207        208        209        210 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.545963  -8.056687  -7.632516  -7.401501  -4.169851 -16.423923  -4.641051 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        211        212        213        214        215        216        217 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -8.037991 -13.010750 -39.523277 -19.259364 -11.365988  -6.901006  -5.784103 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        218        219        220        221        222        223        224 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -8.667910  -4.746662  -6.066699  -8.123340 -23.402953  -4.773369  -5.343618 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        225        226        227        228        229        230        231 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -5.511369  -4.480713  -4.879941  -6.744629 -15.529893  -9.500877  -4.837963 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        232        233        234        235        236        237        238 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.352123  -9.559010  -6.614750  -6.257536  -4.833381  -7.676039  -4.607315 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        239        240        241        242        243        244        245 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.086174  -5.994318  -4.352820 -21.581770  -4.497125 -13.824002  -6.868494 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        246        247        248        249        250        251        252 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -16.223607  -4.326620 -27.018989  -6.645658  -5.128369  -5.138602  -8.851399 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        253        254        255        256        257        258        259 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -11.606303  -5.176009  -4.551235  -5.608509 -10.513894 -10.912436  -8.979487 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        260        261        262        263        264        265        266 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.479191  -5.093842  -6.521964  -6.528088 -15.025644  -6.212760  -6.337282 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        267        268        269        270        271        272        273 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -6.278270 -21.348668 -19.386367  -8.453199  -4.610565 -27.265781 -42.444792 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        274        275        276        277        278        279        280 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -9.983181  -5.747517  -8.426348 -16.350867  -4.237857 -17.538770  -6.118426 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        281        282        283        284        285        286        287 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -13.649757 -19.936231 -21.592292  -4.719718  -4.338067 -42.461423 -18.667060 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        288        289        290        291        292        293        294 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -22.304015  -4.352973 -17.930965  -9.453872 -11.265408 -22.047764  -6.028313 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        295        296        297        298        299        300        301 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -7.565701 -22.713323  -4.669132 -17.469485  -7.750113 -15.119233  -5.552908 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        302        303        304        305        306        307        308 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -22.968198  -4.752557  -6.035101  -4.152780  -4.523250 -36.486349  -5.668813 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        309        310        311        312        313        314        315 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.459167 -29.144196 -12.710347 -29.830408 -11.802292  -4.519779  -4.568674 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        316        317        318        319        320        321        322 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.474499  -6.063925  -6.560643  -9.741876  -7.005294  -4.986478  -4.376984 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        323        324        325        326        327        328        329 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -12.441260 -17.577987  -8.799388  -9.197150  -7.202683 -26.762243  -5.024355 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        330        331        332        333        334        335        336 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -5.951065  -4.354393 -18.842222 -27.313189 -15.229946  -6.646184 -12.086292 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        337        338        339        340        341        342        343 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -15.402234 -19.601663  -8.238985  -5.861255 -21.171311  -4.523171 -12.616253 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        344        345        346        347        348        349        350 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.303528 -17.032356 -15.928884 -29.005767 -16.610456  -5.470516  -7.039136 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        351        352        353        354        355        356        357 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -9.268780 -10.102659 -11.594327  -4.354506 -20.154592 -26.965057 -15.562839 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        358        359        360        361        362        363        364 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -19.996679  -4.328289  -5.086946  -4.522773 -10.254820  -4.486712  -4.616746 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        365        366        367        368        369        370        371 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -11.284862  -4.404655 -12.710210 -30.091597 -11.704346  -4.222466  -9.221634 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        372        373        374        375        376        377        378 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.233227  -9.017408  -5.236285 -15.313609 -15.953206 -18.322510  -4.285541 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        379        380        381        382        383        384        385 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.501041  -6.166170 -14.049663  -9.343921  -8.076468 -10.511973 -11.436564 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        386        387        388        389        390        391        392 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -13.109214 -11.114473  -4.760043  -5.524175  -9.720257  -9.001863  -4.996974 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        393        394        395        396        397        398        399 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -19.563169 -20.812703  -4.575574  -5.277737 -20.523523 -23.311206  -4.393605 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        400        401        402        403        404        405        406 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -6.755891  -4.453456  -4.687144  -6.067947  -4.303689 -13.890801  -5.598087 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        407        408        409        410        411        412        413 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -16.181107  -5.265551 -27.431619  -4.230414  -4.475243 -12.686568 -10.125541 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        414        415        416        417        418        419        420 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -4.770692  -6.470942  -7.015164  -4.135998 -18.012834  -4.656753 -17.092118 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        421        422        423        424        425        426        427 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -19.233416  -4.555802 -11.404717 -10.396064 -23.909090  -4.384484  -4.651913 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        428        429        430        431        432        433        434 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  -7.312231 -16.149626 -12.577736  -5.289945 -19.919982  -4.350266  -7.985258 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">loo_crps</span><span class="op">(</span><span class="va">ypred1</span>, <span class="va">ypred2</span>, y <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">y</span>, log_lik <span class="op">=</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/log_lik.html" class="external-link">log_lik</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is_constant(x_i):</span> could not find function "is_constant"</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -262,15 +493,15 @@ Prediction, and Estimation. Journal of the American Statistical Association,
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

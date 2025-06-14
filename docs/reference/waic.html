@@ -6,7 +6,7 @@ effective sample size and Monte Carlo estimates."><meta property="og:image" cont
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -20,7 +20,7 @@ effective sample size and Monte Carlo estimates."><meta property="og:image" cont
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ effective sample size and Monte Carlo estimates."><meta property="og:image" cont
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -43,7 +43,7 @@ effective sample size and Monte Carlo estimates."><meta property="og:image" cont
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -77,26 +77,26 @@ effective sample size and Monte Carlo estimates."><meta property="og:image" cont
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -116,13 +116,13 @@ effective sample size and Monte Carlo estimates.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">waic</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'array'</span></span>
+<span><span class="co"># S3 method for array</span></span>
 <span><span class="fu">waic</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'matrix'</span></span>
+<span><span class="co"># S3 method for matrix</span></span>
 <span><span class="fu">waic</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class '`function`'</span></span>
+<span><span class="co"># S3 method for `function`</span></span>
 <span><span class="fu">waic</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, data <span class="op">=</span> <span class="cn">NULL</span>, draws <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">is.waic</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
@@ -130,22 +130,24 @@ effective sample size and Monte Carlo estimates.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+    <dl><dt>x</dt>
 <dd><p>A log-likelihood array, matrix, or function. The <strong>Methods (by class)</strong>
 section, below, has detailed descriptions of how to specify the inputs for
 each method.</p></dd>
 
 
-<dt id="arg-draws-data-">draws, data, ...<a class="anchor" aria-label="anchor" href="#arg-draws-data-"></a></dt>
+<dt>draws, data, ...</dt>
 <dd><p>For the function method only. See the
 <strong>Methods (by class)</strong> section below for details on these arguments.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list (of class <code>c("waic", "loo")</code>) with components:</p>
+    
+
+<p>A named list (of class <code>c("waic", "loo")</code>) with components:</p>
+
+
 <dl><dt><code>estimates</code></dt>
 <dd><p>A matrix with two columns (<code>"Estimate"</code>, <code>"SE"</code>) and three
 rows (<code>"elpd_waic"</code>, <code>"p_waic"</code>, <code>"waic"</code>). This contains
@@ -163,7 +165,7 @@ measures (<code>elpd_waic</code>, <code>p_waic</code>, <code>waic</code>).</p></
 </dl></div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
-
+    
 <ul><li><p><code>waic(array)</code>: An \(I\) by \(C\) by \(N\) array, where \(I\)
 is the number of MCMC iterations per chain, \(C\) is the number of
 chains, and \(N\) is the number of data points.</p></li>
@@ -199,22 +201,21 @@ are recycled for each observation.</p></li>
     <p>Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
 widely application information criterion in singular learning theory.
 <em>Journal of Machine Learning Research</em> <strong>11</strong>, 3571-3594.</p>
-<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
-<em>Statistics and Computing</em>. 27(5), 1413–1432. doi:10.1007/s11222-016-9696-4
+<em>Statistics and Computing</em>. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (<a href="https://link.springer.com/article/10.1007/s11222-016-9696-4" class="external-link">journal version</a>,
 <a href="https://arxiv.org/abs/1507.04544" class="external-link">preprint arXiv:1507.04544</a>).</p>
-<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
-Pareto smoothed importance sampling. <em>Journal of Machine Learning Research</em>,
-25(72):1-58.
-<a href="https://jmlr.org/papers/v25/19-556.html" class="external-link">PDF</a></p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022).
+Pareto smoothed importance sampling.
+<a href="https://arxiv.org/abs/1507.02646" class="external-link">preprint arXiv:1507.02646</a></p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index">
 <ul><li><p>The <strong>loo</strong> package <a href="https://mc-stan.org/loo/articles/">vignettes</a> and
 Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao,
-and Gabry (2024) for more details on why we prefer <code><a href="loo.html">loo()</a></code> to <code>waic()</code>.</p></li>
+and Gabry (2022) for more details on why we prefer <code><a href="loo.html">loo()</a></code> to <code>waic()</code>.</p></li>
 <li><p><code><a href="loo_compare.html">loo_compare()</a></code> for comparing models on approximate LOO-CV or WAIC.</p></li>
 </ul></div>
     </div>
@@ -240,13 +241,21 @@ and Gabry (2024) for more details on why we prefer <code><a href="loo.html">loo(
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">log_lik1</span> <span class="op">&lt;-</span> <span class="fu"><a href="extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">stanfit1</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'stanfit1' not found</span>
 <span class="r-in"><span><span class="va">log_lik2</span> <span class="op">&lt;-</span> <span class="fu"><a href="extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">stanfit2</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'stanfit2' not found</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">waic1</span> <span class="op">&lt;-</span> <span class="fu">waic</span><span class="op">(</span><span class="va">log_lik1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'log_lik1' not found</span>
 <span class="r-in"><span><span class="op">(</span><span class="va">waic2</span> <span class="op">&lt;-</span> <span class="fu">waic</span><span class="op">(</span><span class="va">log_lik2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'log_lik2' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="compare.html">compare</a></span><span class="op">(</span><span class="va">waic1</span>, <span class="va">waic2</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'compare' is deprecated.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use 'loo_compare' instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See help("Deprecated")</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'waic1' not found</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -262,15 +271,15 @@ and Gabry (2024) for more details on why we prefer <code><a href="loo.html">loo(
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

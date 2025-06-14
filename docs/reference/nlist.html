@@ -5,7 +5,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc."><meta property=
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -19,7 +19,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc."><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -27,7 +27,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc."><meta property=
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -42,7 +42,7 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc."><meta property=
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -76,26 +76,26 @@ nlist(a,b) and list(a = a, b = 2) becomes nlist(a, b = 2), etc."><meta property=
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -117,15 +117,15 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+    <dl><dt>...</dt>
 <dd><p>Objects to include in the list.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A named list.</p>
+    
+
+<p>A named list.</p>
     </div>
 
     <div id="ref-examples">
@@ -136,23 +136,23 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mat.or.vec.html" class="external-link">mat.or.vec</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">nlist</span><span class="op">(</span><span class="va">a</span>,<span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $a</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] -1.28201735  0.43491262  0.62775584  0.26845933 -0.08916891  0.86577881</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  2.43727729 -0.99105513 -0.34274484  0.15760204 -0.34590829  0.70710961</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] -0.34420784  0.35122361 -1.36091708 -0.88963630 -0.57786186  0.39287853</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [19] -0.71130236  0.01273766  0.12562046 -0.34968048  0.37516215 -1.73575212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] -0.05117519  0.16517627 -0.05796315  1.32253967  0.07539235  1.57717896</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  1.49641035 -0.51403594  0.06457554 -0.14871888  0.25444098  0.76371675</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  0.91323798  1.14091338 -0.60698706  0.75772944 -0.67794823  1.00360049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]  0.19255242  0.78132373 -0.62046663 -0.17532368 -0.73710668  0.65080196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] -1.21428472 -0.14812666 -1.27851334  0.83947802 -0.05206098  0.10326899</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  1.59880177  0.48041613  0.55295331  0.68561668 -0.91756503  0.32984826</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  1.78893795 -1.23286732 -1.20310721  0.36671052  0.33381600  1.62112306</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  0.03764495 -0.09797660 -0.16622660 -0.61587031  1.46530802  0.07384489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] -0.21874320 -0.48893814 -1.41118628 -0.50967348 -0.61549183 -1.78277171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]  1.13210577 -0.39532909 -0.53921150  2.18315778  1.11052189 -0.11300859</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] -1.45921256 -1.38248303 -0.97706036 -1.28281166  0.88960610  1.07551157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  0.87165853  1.74091654  0.61500387  0.33595030 -0.68544156  0.90224105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]  1.70501137 -0.11119136  0.19051851 -0.10950033</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]  0.58303726 -1.18005670  2.02906483  0.04563914  1.18767113  0.13277372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  0.73074005  0.27421791 -0.98071223  0.89616912  0.09235610  1.42260024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]  1.63958660 -0.71554286 -1.72766531 -0.26474932  0.46402132  0.18328496</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  0.37014325 -0.46539846 -1.35699064 -0.94756588 -1.32675628  1.71944404</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] -0.87898014 -0.02435987 -0.35046913 -1.49272159 -1.34795616 -0.87239734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  0.36550662 -0.95172768 -0.20884901 -0.58875870 -0.71210362  2.55268532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37] -0.15015995  0.49893157  0.48499617 -0.46047212  0.47671215  1.44219503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] -0.53252713 -1.00355596 -0.79759812 -0.35212601 -0.12575206 -1.12890042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  1.81283778  0.54590031  0.27614100 -1.78703622 -0.69897022  0.66958072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  1.16590622 -0.10045622 -0.19541553  1.01477218 -0.29486217  1.95328836</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  0.22345390 -0.89055374 -0.21735722  0.64246743 -0.19687145 -0.92607721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  1.18453783  0.68133067 -0.22411617 -0.42614768  1.33986614 -0.72595917</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  0.54091251  0.71569348  0.08556613 -0.98998589  0.27201072 -2.00633480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79] -2.45095243  0.04180641  1.27960696  0.32538273 -0.45765369  0.78471577</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] -0.03627547  1.09984716 -0.93415634  1.16878532  0.71871116  0.68790149</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  0.28979210  0.69836408  1.10855493  0.27345095  0.98693726 -0.58554379</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] -0.01686564  0.88033592 -0.50875613  0.33882608</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $b</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
@@ -171,23 +171,23 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 <span class="r-in"><span><span class="co"># Define some variables in the call and take the rest from the environment</span></span></span>
 <span class="r-in"><span><span class="fu">nlist</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, veggies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lettuce"</span>, <span class="st">"spinach"</span><span class="op">)</span>, fruits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"banana"</span>, <span class="st">"papaya"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $a</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] -1.28201735  0.43491262  0.62775584  0.26845933 -0.08916891  0.86577881</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  2.43727729 -0.99105513 -0.34274484  0.15760204 -0.34590829  0.70710961</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] -0.34420784  0.35122361 -1.36091708 -0.88963630 -0.57786186  0.39287853</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [19] -0.71130236  0.01273766  0.12562046 -0.34968048  0.37516215 -1.73575212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] -0.05117519  0.16517627 -0.05796315  1.32253967  0.07539235  1.57717896</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  1.49641035 -0.51403594  0.06457554 -0.14871888  0.25444098  0.76371675</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  0.91323798  1.14091338 -0.60698706  0.75772944 -0.67794823  1.00360049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [43]  0.19255242  0.78132373 -0.62046663 -0.17532368 -0.73710668  0.65080196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] -1.21428472 -0.14812666 -1.27851334  0.83947802 -0.05206098  0.10326899</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  1.59880177  0.48041613  0.55295331  0.68561668 -0.91756503  0.32984826</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  1.78893795 -1.23286732 -1.20310721  0.36671052  0.33381600  1.62112306</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  0.03764495 -0.09797660 -0.16622660 -0.61587031  1.46530802  0.07384489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] -0.21874320 -0.48893814 -1.41118628 -0.50967348 -0.61549183 -1.78277171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [79]  1.13210577 -0.39532909 -0.53921150  2.18315778  1.11052189 -0.11300859</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] -1.45921256 -1.38248303 -0.97706036 -1.28281166  0.88960610  1.07551157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  0.87165853  1.74091654  0.61500387  0.33595030 -0.68544156  0.90224105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97]  1.70501137 -0.11119136  0.19051851 -0.10950033</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]  0.58303726 -1.18005670  2.02906483  0.04563914  1.18767113  0.13277372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7]  0.73074005  0.27421791 -0.98071223  0.89616912  0.09235610  1.42260024</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13]  1.63958660 -0.71554286 -1.72766531 -0.26474932  0.46402132  0.18328496</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  0.37014325 -0.46539846 -1.35699064 -0.94756588 -1.32675628  1.71944404</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] -0.87898014 -0.02435987 -0.35046913 -1.49272159 -1.34795616 -0.87239734</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31]  0.36550662 -0.95172768 -0.20884901 -0.58875870 -0.71210362  2.55268532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37] -0.15015995  0.49893157  0.48499617 -0.46047212  0.47671215  1.44219503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] -0.53252713 -1.00355596 -0.79759812 -0.35212601 -0.12575206 -1.12890042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49]  1.81283778  0.54590031  0.27614100 -1.78703622 -0.69897022  0.66958072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  1.16590622 -0.10045622 -0.19541553  1.01477218 -0.29486217  1.95328836</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61]  0.22345390 -0.89055374 -0.21735722  0.64246743 -0.19687145 -0.92607721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67]  1.18453783  0.68133067 -0.22411617 -0.42614768  1.33986614 -0.72595917</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  0.54091251  0.71569348  0.08556613 -0.98998589  0.27201072 -2.00633480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79] -2.45095243  0.04180641  1.27960696  0.32538273 -0.45765369  0.78471577</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] -0.03627547  1.09984716 -0.93415634  1.16878532  0.71871116  0.68790149</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  0.28979210  0.69836408  1.10855493  0.27345095  0.98693726 -0.58554379</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] -0.01686564  0.88033592 -0.50875613  0.33882608</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $b</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2] [,3]</span>
@@ -223,15 +223,15 @@ names of the objects in the list. The code <code>list(a = a, b = b)</code> becom
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 

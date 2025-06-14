@@ -6,7 +6,7 @@ stanfit objects that handles this internally."><meta property="og:image" content
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -20,7 +20,7 @@ stanfit objects that handles this internally."><meta property="og:image" content
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">loo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.8.0</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ stanfit objects that handles this internally."><meta property="og:image" content
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -43,7 +43,7 @@ stanfit objects that handles this internally."><meta property="og:image" content
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Other Packages
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -77,26 +77,26 @@ stanfit objects that handles this internally."><meta property="og:image" content
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://twitter.com/mcmc_stan" class="external-link">
     <span class="fa fa-twitter"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://github.com/stan-dev/loo" class="external-link">
     <span class="fa fa-github"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://discourse.mc-stan.org/" class="external-link">
     <span class="fa fa-users"></span>
-
+     
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -119,18 +119,16 @@ Note: recent versions of <span class="pkg">rstan</span> now include a <code><a h
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
-<dl><dt id="arg-stanfit">stanfit<a class="anchor" aria-label="anchor" href="#arg-stanfit"></a></dt>
+    <dl><dt>stanfit</dt>
 <dd><p>A <code>stanfit</code> object (<span class="pkg">rstan</span> package).</p></dd>
 
 
-<dt id="arg-parameter-name">parameter_name<a class="anchor" aria-label="anchor" href="#arg-parameter-name"></a></dt>
+<dt>parameter_name</dt>
 <dd><p>A character string naming the parameter (or generated
 quantity) in the Stan model corresponding to the log-likelihood.</p></dd>
 
 
-<dt id="arg-merge-chains">merge_chains<a class="anchor" aria-label="anchor" href="#arg-merge-chains"></a></dt>
+<dt>merge_chains</dt>
 <dd><p>If <code>TRUE</code> (the default), all Markov chains are
 merged together (i.e., stacked) and a matrix is returned. If <code>FALSE</code>
 they are kept separate and an array is returned.</p></dd>
@@ -138,7 +136,9 @@ they are kept separate and an array is returned.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If <code>merge_chains=TRUE</code>, an \(S\) by \(N\) matrix of
+    
+
+<p>If <code>merge_chains=TRUE</code>, an \(S\) by \(N\) matrix of
 (post-warmup) extracted draws, where \(S\) is the size of the posterior
 sample and \(N\) is the number of data points. If
 <code>merge_chains=FALSE</code>, an \(I\) by \(C\) by \(N\) array, where
@@ -181,15 +181,15 @@ coefficients <code>beta</code>, and standard deviation <code>sigma</code>:</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
 
+  
 
 
-
-
+  
 
   </body></html>
 
