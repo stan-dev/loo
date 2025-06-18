@@ -149,7 +149,7 @@ test_that("psis_n_eff_values extractor works", {
 test_that("mcse_loo extractor gives correct value", {
   mcse <- mcse_loo(loo1)
   expect_type(mcse, "double")
-  expect_equal_to_reference(mcse, "reference-results/mcse_loo.rds")
+  expect_snapshot_value(mcse, style = "serialize")
 })
 
 test_that("mcse_loo returns NA when it should", {

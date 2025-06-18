@@ -96,20 +96,20 @@ test_that("E_loo return types correct for default/vector method", {
   expect_length(E_test_quant_vec2$pareto_k, 1)
 })
 
-test_that("E_loo.default equal to reference", {
-  expect_equal_to_reference(E_test_mean_vec, test_path("reference-results/E_loo_default_mean.rds"))
-  expect_equal_to_reference(E_test_var_vec, test_path("reference-results/E_loo_default_var.rds"))
-  expect_equal_to_reference(E_test_sd_vec, test_path("reference-results/E_loo_default_sd.rds"))
-  expect_equal_to_reference(E_test_quant_vec, test_path("reference-results/E_loo_default_quantile_50.rds"))
-  expect_equal_to_reference(E_test_quant_vec2, test_path("reference-results/E_loo_default_quantile_10_50_90.rds"))
+test_that("E_loo.default equal to snapshots", {
+  expect_snapshot_value(E_test_mean_vec, style = "serialize")
+  expect_snapshot_value(E_test_var_vec, style = "serialize")
+  expect_snapshot_value(E_test_sd_vec, style = "serialize")
+  expect_snapshot_value(E_test_quant_vec, style = "serialize")
+  expect_snapshot_value(E_test_quant_vec2, style = "serialize")``
 })
 
-test_that("E_loo.matrix equal to reference", {
-  expect_equal_to_reference(E_test_mean, test_path("reference-results/E_loo_matrix_mean.rds"))
-  expect_equal_to_reference(E_test_var, test_path("reference-results/E_loo_matrix_var.rds"))
-  expect_equal_to_reference(E_test_sd, test_path("reference-results/E_loo_matrix_sd.rds"))
-  expect_equal_to_reference(E_test_quant, test_path("reference-results/E_loo_matrix_quantile_50.rds"))
-  expect_equal_to_reference(E_test_quant2, test_path("reference-results/E_loo_matrix_quantile_10_90.rds"))
+test_that("E_loo.matrix equal to snapshots", {
+  expect_snapshot_value(E_test_mean, style = "serialize")
+  expect_snapshot_value(E_test_var, style = "serialize")
+  expect_snapshot_value(E_test_sd, style = "serialize")
+  expect_snapshot_value(E_test_quant, style = "serialize")
+  expect_snapshot_value(E_test_quant2, style = "serialize")
 })
 
 test_that("E_loo throws correct errors and warnings", {

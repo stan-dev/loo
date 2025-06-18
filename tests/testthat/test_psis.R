@@ -14,7 +14,7 @@ r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
 
 test_that("psis results haven't changed", {
-  expect_equal_to_reference(psis1, "reference-results/psis.rds")
+    expect_snapshot_value(psis1, style = "serialize")
 })
 
 test_that("psis returns object with correct structure", {

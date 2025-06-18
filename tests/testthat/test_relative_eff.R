@@ -8,7 +8,7 @@ LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 
 test_that("relative_eff results haven't changed", {
-  expect_equal_to_reference(relative_eff(exp(LLarr)), "reference-results/relative_eff.rds")
+  expect_snapshot_value(relative_eff(exp(LLarr)), style = "serialize")
 })
 
 test_that("relative_eff is equal to ESS / S", {

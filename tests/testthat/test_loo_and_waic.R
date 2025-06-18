@@ -24,9 +24,9 @@ test_that("using loo.cores is deprecated", {
 })
 
 test_that("loo, waic and elpd results haven't changed", {
-  expect_equal_to_reference(loo1, "reference-results/loo.rds")
-  expect_equal_to_reference(waic1, "reference-results/waic.rds")
-  expect_equal_to_reference(elpd1, "reference-results/elpd.rds")
+  expect_snapshot_value(loo1, style = "serialize")
+  expect_snapshot_value(waic1, style = "serialize")
+  expect_snapshot_value(elpd1, style = "serialize")
 })
 
 test_that("loo with cores=1 and cores=2 gives same results", {

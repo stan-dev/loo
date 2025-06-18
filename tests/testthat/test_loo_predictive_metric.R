@@ -78,17 +78,17 @@ test_that('loo_predictive_metric return types are correct', {
   expect_named(bacc_quant, c('estimate', 'se'))
 })
 
-test_that('loo_predictive_metric is equal to reference', {
-  expect_equal_to_reference(mae_mean, 'reference-results/loo_predictive_metric_mae_mean.rds')
-  expect_equal_to_reference(mae_quant, 'reference-results/loo_predictive_metric_mae_quant.rds')
-  expect_equal_to_reference(rmse_mean, 'reference-results/loo_predictive_metric_rmse_mean.rds')
-  expect_equal_to_reference(rmse_quant, 'reference-results/loo_predictive_metric_rmse_quant.rds')
-  expect_equal_to_reference(mse_mean, 'reference-results/loo_predictive_metric_mse_mean.rds')
-  expect_equal_to_reference(mse_quant, 'reference-results/loo_predictive_metric_mse_quant.rds')
-  expect_equal_to_reference(acc_mean, 'reference-results/loo_predictive_metric_acc_mean.rds')
-  expect_equal_to_reference(acc_quant, 'reference-results/loo_predictive_metric_acc_quant.rds')
-  expect_equal_to_reference(bacc_mean, 'reference-results/loo_predictive_metric_bacc_mean.rds')
-  expect_equal_to_reference(bacc_quant, 'reference-results/loo_predictive_metric_bacc_quant.rds')
+test_that('loo_predictive_metric is equal to snapshot', {
+  expect_snapshot_value(mae_mean, style = "serialize")
+  expect_snapshot_value(mae_quant, style = "serialize")
+  expect_snapshot_value(rmse_mean, style = "serialize")
+  expect_snapshot_value(rmse_quant, style = "serialize")
+  expect_snapshot_value(mse_mean, style = "serialize")
+  expect_snapshot_value(mse_quant, style = "serialize")
+  expect_snapshot_value(acc_mean, style = "serialize")
+  expect_snapshot_value(acc_quant, style = "serialize")
+  expect_snapshot_value(bacc_mean, style = "serialize")
+  expect_snapshot_value(bacc_quant, style = "serialize")
 })
 
 test_that('MAE computation is correct', {
