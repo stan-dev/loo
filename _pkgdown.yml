@@ -52,7 +52,7 @@ home:
   - text: Ask a question
     href: https://discourse.mc-stan.org/
 articles:
-- title: Getting Started
+- title: Getting started
   desc: |
     These vignettes demonstrate how to use the **loo** package to perform approximate leave-one-out cross-validation or exact K-fold cross-validation for Bayesian models fit using MCMC, compare models on estimated predictive performance on new data, and weight models for averaging predictive distributions.
   contents:
@@ -70,9 +70,13 @@ articles:
   - loo2-moment-matching
   - loo2-mixis
 - title: Frequently asked questions
-  desc: |
-    Answers to frequently asked questions about cross-validation and the **loo** package.
-  contents: online-only/faq
+  contents:
+  - faq
+external-articles:
+- name: faq
+  title: Cross-validation FAQ
+  description: Answers to frequently asked questions about cross-validation and the **loo** package (links to external site).
+  href: https://users.aalto.fi/~ave/CV-FAQ.html
 reference:
 - title: Package description, glossary, and included data sets
   contents:
