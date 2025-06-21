@@ -3,8 +3,6 @@ options(mc.cores=1)
 options(loo.cores=NULL)
 set.seed(123)
 
-context("psis")
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
@@ -78,10 +76,7 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
 
   # tail length warnings
-  expect_warning(
-    psis(-LLarr[1:5,, ]),
-    "Not enough tail samples to fit the generalized Pareto distribution"
-  )
+  expect_snapshot(psis(-LLarr[1:5,, ]))
 
   # no NAs or non-finite values allowed
   LLmat[1,1] <- NA
@@ -147,7 +142,7 @@ test_that("psis_n_eff methods works properly", {
 
 test_that("do_psis_i throws warning if all tail values the same", {
   xx <- c(1,2,3,4,4,4,4,4,4,4,4)
-  val <- expect_warning(do_psis_i(xx, tail_len_i = 6), "all tail values are the same")
+  expect_warning(val <- do_psis_i(xx, tail_len_i = 6), "all tail values are the same")
   expect_equal(val$pareto_k, Inf)
 })
 

@@ -1,8 +1,6 @@
 library(loo)
 set.seed(1414)
 
-context("print, plot, diagnostics")
-
 LLarr <- example_loglik_array()
 waic1 <- suppressWarnings(waic(LLarr))
 loo1 <- suppressWarnings(loo(LLarr))

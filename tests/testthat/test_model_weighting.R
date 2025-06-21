@@ -1,7 +1,5 @@
 library(loo)
 
-context("loo_model_weights")
-
 # generate fake data
 set.seed(123)
 y<-rnorm(50,0,1)
@@ -22,7 +20,7 @@ loo_list <- lapply(1:length(ll_list), function(j) {
   loo(ll_list[[j]], r_eff = r_eff_list[[j]])
 })
 
-tol <- 0.01 # absoulte tolerance of weights
+tol <- 0.01 # absolute tolerance of weights
 
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(loo_model_weights(log_lik1), "list of matrices or a list of 'psis_loo' objects")
@@ -79,7 +77,7 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_length(w3, 3)
   expect_named(w3, paste0("model"  ,c(1:3)))
   expect_equal(as.numeric(w3), c(5.365279e-05, 9.999436e-01, 2.707028e-06),
-               tolerance  = tol, scale = 1)
+               tolerance  = tol)
   expect_output(print(w3), "Method: pseudo-BMA")
 
   w3_b <- loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)

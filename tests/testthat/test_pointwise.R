@@ -1,7 +1,5 @@
 library(loo)
 
-context("pointwise convenience function")
-
 loo1 <- suppressWarnings(loo(example_loglik_matrix()))
 
 test_that("pointwise throws the right errors", {
