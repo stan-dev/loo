@@ -27,9 +27,30 @@
 # compare returns expected result (2 models)
 
     Code
+      comp1
+    Output
+      elpd_diff        se 
+            0.0       0.0 
+
+---
+
+    Code
       comp2
     Output
-      <deprecatedWarning in loo::compare(w1, w2): 'loo::compare' is deprecated.
-      Use 'loo_compare' instead.
-      See help("Deprecated")>
+      elpd_diff        se 
+           -4.1       0.1 
+
+# compare returns expected result (3 models)
+
+    WAoAAAACAAQFAAACAwAAAAMOAAAAGAAAAAAAAAAAwBA6U1+cRe7AMA3KkbYEGAAAAAAAAAAA
+    P7ZqR7QvEwE/y6/t4TTtXsBU4fDdyUJYwFXllhPDBrnAWOVjgjbDYkARCD2zEXBfQBEalRIN
+    2T9AEPIF3GigE0AKKMBh1blTQCZnlesA0IpAQcjYUhrdCj/x/WXscvNeP/GbYJxtZ8c/8YDQ
+    kmfJX0Bk4fDdyUJYQGXllhPDBrlAaOVjgjbDYkAhCD2zEXBfQCEalRIN2T9AIPIF3GigEwAA
+    BAIAAAABAAQACQAAAANkaW0AAAANAAAAAgAAAAMAAAAIAAAEAgAAAAEABAAJAAAACGRpbW5h
+    bWVzAAAAEwAAAAIAAAAQAAAAAwAEAAkAAAACdzEABAAJAAAAAncyAAQACQAAAAJ3MwAAABAA
+    AAAIAAQACQAAAAllbHBkX2RpZmYABAAJAAAAB3NlX2RpZmYABAAJAAAACWVscGRfd2FpYwAE
+    AAkAAAAMc2VfZWxwZF93YWljAAQACQAAAAZwX3dhaWMABAAJAAAACXNlX3Bfd2FpYwAEAAkA
+    AAAEd2FpYwAEAAkAAAAHc2Vfd2FpYwAABAIAAAABAAQACQAAAAVjbGFzcwAAABAAAAAEAAQA
+    CQAAAAtjb21wYXJlLmxvbwAEAAkAAAAGbWF0cml4AAQACQAAAAVhcnJheQAEAAkAAAAPb2xk
+    X2NvbXBhcmUubG9vAAAA/g==
 
