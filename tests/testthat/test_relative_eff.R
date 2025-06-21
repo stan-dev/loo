@@ -2,8 +2,6 @@ library(loo)
 options(mc.cores = 1)
 set.seed(123)
 
-context("relative_eff methods")
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 
