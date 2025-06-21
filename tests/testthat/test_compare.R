@@ -1,16 +1,15 @@
 library(loo)
 set.seed(123)
-SW <- suppressWarnings
 
 LLarr <- example_loglik_array()
 LLarr2 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 0.5), dim = dim(LLarr))
 LLarr3 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 1), dim = dim(LLarr))
-w1 <- SW(waic(LLarr))
-w2 <- SW(waic(LLarr2))
+w1 <- suppressWarnings(waic(LLarr))
+w2 <- suppressWarnings(waic(LLarr2))
 
 test_that("loo_compare throws appropriate errors", {
-  w3 <- SW(waic(LLarr[,, -1]))
-  w4 <- SW(waic(LLarr[,, -(1:2)]))
+  w3 <- suppressWarnings(waic(LLarr[,, -1]))
+  w4 <- suppressWarnings(waic(LLarr[,, -(1:2)]))
 
   expect_error(loo_compare(2, 3), "must be a list if not a 'loo' object")
   expect_error(loo_compare(w1, w2, x = list(w1, w2)),
@@ -39,11 +38,11 @@ test_that("loo_compare throws appropriate warnings", {
   expect_warning(loo_compare(w3, w4), "Not all models have the same y variable")
 
   set.seed(123)
-  w_list <- lapply(1:25, function(x) SW(waic(LLarr + rnorm(1, 0, 0.1))))
+  w_list <- lapply(1:25, function(x) suppressWarnings(waic(LLarr + rnorm(1, 0, 0.1))))
   expect_warning(loo_compare(w_list),
                  "Difference in performance potentially due to chance")
 
-  w_list_short <- lapply(1:4, function(x) SW(waic(LLarr + rnorm(1, 0, 0.1))))
+  w_list_short <- lapply(1:4, function(x) suppressWarnings(waic(LLarr + rnorm(1, 0, 0.1))))
   expect_no_warning(loo_compare(w_list_short))
 })
 
@@ -75,7 +74,7 @@ test_that("loo_compare returns expected results (2 models)", {
 
 
 test_that("loo_compare returns expected result (3 models)", {
-  w3 <- SW(waic(LLarr3))
+  w3 <- suppressWarnings(waic(LLarr3))
   comp1 <- loo_compare(w1, w2, w3)
 
   expect_equal(colnames(comp1), comp_colnames)
@@ -114,7 +113,7 @@ test_that("compare returns expected result (2 models)", {
 })
 
 test_that("compare returns expected result (3 models)", {
-  w3 <- SW(waic(LLarr3))
+  w3 <- suppressWarnings(waic(LLarr3))
   expect_warning(comp1 <- loo::compare(w1, w2, w3), "Deprecated")
 
   expect_equal(
@@ -145,7 +144,7 @@ test_that("compare throws appropriate errors", {
   expect_error(suppressWarnings(loo::compare(x = list(w1))),
                "requires at least two models")
 
-  w3 <- SW(waic(LLarr2[,,-1]))
+  w3 <- suppressWarnings(waic(LLarr2[,,-1]))
   expect_error(suppressWarnings(loo::compare(x = list(w1, w3))),
                "same number of data points")
   expect_error(suppressWarnings(loo::compare(x = list(w1, w2, w3))),

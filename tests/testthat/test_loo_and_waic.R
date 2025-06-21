@@ -2,8 +2,6 @@ library(loo)
 options(mc.cores = 1)
 set.seed(123)
 
-context("loo, waic and elpd")
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
@@ -117,7 +115,7 @@ test_that("loo.array and loo.matrix give same result", {
 
   # the mcse_elpd_loo columns won't be identical because we use sampling
   expect_identical(loo1$pointwise[, -2], l2$pointwise[, -2])
-  expect_equal(loo1$pointwise[, 2], l2$pointwise[, 2], tol = 0.005)
+  expect_equal(loo1$pointwise[, 2], l2$pointwise[, 2], tolerance = 0.005)
 })
 
 test_that("loo.array runs with multiple cores", {

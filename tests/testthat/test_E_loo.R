@@ -1,7 +1,5 @@
 library(loo)
 
-context("E_loo")
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
@@ -101,7 +99,7 @@ test_that("E_loo.default equal to snapshots", {
   expect_snapshot_value(E_test_var_vec, style = "serialize")
   expect_snapshot_value(E_test_sd_vec, style = "serialize")
   expect_snapshot_value(E_test_quant_vec, style = "serialize")
-  expect_snapshot_value(E_test_quant_vec2, style = "serialize")``
+  expect_snapshot_value(E_test_quant_vec2, style = "serialize")
 })
 
 test_that("E_loo.matrix equal to snapshots", {

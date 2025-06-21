@@ -1,7 +1,5 @@
 library(loo)
 
-context("generalized pareto")
-
 test_that("gpdfit returns correct result", {
   set.seed(123)
   x <- rexp(100)

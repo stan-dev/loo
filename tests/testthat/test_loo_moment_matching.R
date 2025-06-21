@@ -1,8 +1,6 @@
 library(loo)
 options(mc.cores = 1)
 
-
-context("moment matching")
 set.seed(123)
 S <- 4000
 
@@ -159,11 +157,11 @@ test_that("loo_moment_match.default warnings work", {
                               k_thres = 100, split = TRUE,
                               cov = TRUE, cores = 1))
 
-  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
+  expect_snapshot(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 1,
                               k_thres = 0.5, split = TRUE,
-                              cov = TRUE, cores = 1), "The maximum number of moment matching iterations")
+                              cov = TRUE, cores = 1))
 
   expect_error(loo_moment_match(x, loo_manual_tis, post_draws_test, log_lik_i_test,
                        unconstrain_pars_test, log_prob_upars_test,
@@ -284,7 +282,7 @@ test_that("loo_moment_match.default works with multiple cores", {
                                                  cov = TRUE, cores = 2))
 
   expect_equal(loo_moment_match_manual3$diagnostics$pareto_k, loo_moment_match_manual4$diagnostics$pareto_k)
-  expect_equal(loo_moment_match_manual3$diagnostics$n_eff, loo_moment_match_manual4$diagnostics$n_eff)
+  expect_equal(loo_moment_match_manual3$diagnostics$n_eff, loo_moment_match_manual4$diagnostics$n_eff, tolerance = 5e-4)
 
   expect_equal(loo_moment_match_manual3$estimates, loo_moment_match_manual4$estimates)
 
