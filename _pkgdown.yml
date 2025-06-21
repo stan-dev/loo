@@ -3,6 +3,8 @@ destination: docs
 template:
   params:
     bootswatch: cosmo
+development:
+  mode: auto
 navbar:
   title: loo
   left:
