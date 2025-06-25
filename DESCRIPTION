@@ -49,7 +49,7 @@ Suggests:
     rstanarm (>= 2.19.0),
     rstantools,
     spdep,
-    testthat (>= 2.1.0)
+    testthat (>= 3.0)
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
