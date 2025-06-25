@@ -1,5 +1,4 @@
 library(loo)
-context("helper functions and example data")
 
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()

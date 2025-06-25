@@ -1,7 +1,5 @@
 suppressPackageStartupMessages(library(loo))
 
-context("loo_approximate_posterior")
-
 # Create test data
 # Checked by Mans M and Paul B 24th of June 2019
 set.seed(123)
@@ -58,8 +56,8 @@ test_that("loo_approximate_posterior.array works as loo_approximate_posterior.ma
   ll_array[,2,] <- ll[(S/2 + 1):S,]
 
   # Assert that they are ok
-  expect_equivalent(ll_array[1:2,1,1:2], ll[1:2,1:2])
-  expect_equivalent(ll_array[1:2,2,1:2], ll[(S/2+1):((S/2)+2),1:2])
+  expect_equal(ll_array[1:2,1,1:2], ll[1:2,1:2], ignore_attr = TRUE)
+  expect_equal(ll_array[1:2,2,1:2], ll[(S/2+1):((S/2)+2),1:2], ignore_attr = TRUE)
 
   # Compute aploo
   expect_silent(aploo1 <- loo_approximate_posterior.matrix(x = ll, log_p = log_p, log_g = log_g))

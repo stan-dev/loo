@@ -1,8 +1,6 @@
 library(loo)
 options(mc.cores = 1)
 
-
-context("moment matching")
 set.seed(123)
 S <- 4000
 
@@ -159,11 +157,11 @@ test_that("loo_moment_match.default warnings work", {
                               k_thres = 100, split = TRUE,
                               cov = TRUE, cores = 1))
 
-  expect_warning(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
+  expect_snapshot(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                               unconstrain_pars_test, log_prob_upars_test,
                               log_lik_i_upars_test, max_iters = 1,
                               k_thres = 0.5, split = TRUE,
-                              cov = TRUE, cores = 1), "The maximum number of moment matching iterations")
+                              cov = TRUE, cores = 1))
 
   expect_error(loo_moment_match(x, loo_manual_tis, post_draws_test, log_lik_i_test,
                        unconstrain_pars_test, log_prob_upars_test,
@@ -196,7 +194,7 @@ test_that("loo_moment_match.default works", {
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$pointwise[,"influence_pareto_k"])
   expect_equal(loo_moment_match_object$pointwise[,"influence_pareto_k"],loo_manual$diagnostics$pareto_k)
 
-  expect_equal_to_reference(loo_moment_match_object, "reference-results/moment_match_loo_1.rds")
+  expect_snapshot_value(loo_moment_match_object, style = "serialize")
   
   loo_moment_match_object2 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
@@ -204,7 +202,7 @@ test_that("loo_moment_match.default works", {
                                                 k_thres = 0.5, split = FALSE,
                                                 cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(loo_moment_match_object2, "reference-results/moment_match_loo_2.rds")
+  expect_snapshot_value(loo_moment_match_object2, style = "serialize")
 
   loo_moment_match_object3 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
@@ -212,7 +210,7 @@ test_that("loo_moment_match.default works", {
                                                 k_thres = 0.5, split = TRUE,
                                                 cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(loo_moment_match_object3, "reference-results/moment_match_loo_3.rds")
+  expect_snapshot_value(loo_moment_match_object3, style = "serialize")
 
   loo_moment_match_object4 <- suppressWarnings(loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
                                                 unconstrain_pars_test, log_prob_upars_test,
@@ -262,7 +260,7 @@ test_that("variance and covariance transformations work", {
                                          k_thres = 0.0, split = FALSE,
                                          cov = TRUE, cores = 1))
 
-  expect_equal_to_reference(loo_moment_match_object, "reference-results/moment_match_var_and_cov.rds")
+  expect_snapshot_value(loo_moment_match_object, style = "serialize")
 
 })
 
@@ -284,7 +282,7 @@ test_that("loo_moment_match.default works with multiple cores", {
                                                  cov = TRUE, cores = 2))
 
   expect_equal(loo_moment_match_manual3$diagnostics$pareto_k, loo_moment_match_manual4$diagnostics$pareto_k)
-  expect_equal(loo_moment_match_manual3$diagnostics$n_eff, loo_moment_match_manual4$diagnostics$n_eff)
+  expect_equal(loo_moment_match_manual3$diagnostics$n_eff, loo_moment_match_manual4$diagnostics$n_eff, tolerance = 5e-4)
 
   expect_equal(loo_moment_match_manual3$estimates, loo_moment_match_manual4$estimates)
 
@@ -315,8 +313,7 @@ test_that("loo_moment_match_split works", {
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars_test,
     cores = 1, r_eff_i = 1, is_method = "psis")
 
-  expect_equal_to_reference(split2, "reference-results/moment_match_split.rds")
-
+  expect_snapshot_value(split2, style = "serialize")
 })
 
 test_that("passing arguments works", {

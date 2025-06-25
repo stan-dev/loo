@@ -1,8 +1,6 @@
 library(loo)
 set.seed(14014)
 
-context("kfold helper functions")
-
 test_that("kfold_split_random works", {
   fold_rand <- kfold_split_random(10, 100)
   expect_length(fold_rand, 100)

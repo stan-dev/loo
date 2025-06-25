@@ -1,8 +1,6 @@
 library(loo)
 SW <- suppressWarnings
 
-context("psislw")
-
 set.seed(123)
 x <- matrix(rnorm(5000), 100, 50)
 
@@ -16,17 +14,8 @@ test_that("psislw throws deprecation warning", {
 
 
 test_that("psislw handles special cases, throws appropriate errors/warnings", {
-  expect_warning(
-    psis <- psislw(x[, 1], wcp = 0.01),
-    regexp = "All tail values are the same. Weights are truncated but not smoothed"
-  )
+  expect_snapshot(psis <- psislw(x[, 1], wcp = 0.01))
   expect_true(is.infinite(psis$pareto_k))
-
-  expect_warning(
-    psislw(x[, 1], wcp = 0.01),
-    regexp = "Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details",
-    fixed = TRUE
-  )
 
   expect_error(
     expect_deprecated(psislw(wcp = 0.2)),

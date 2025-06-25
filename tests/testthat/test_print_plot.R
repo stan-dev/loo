@@ -1,8 +1,6 @@
 library(loo)
 set.seed(1414)
 
-context("print, plot, diagnostics")
-
 LLarr <- example_loglik_array()
 waic1 <- suppressWarnings(waic(LLarr))
 loo1 <- suppressWarnings(loo(LLarr))
@@ -149,7 +147,7 @@ test_that("psis_n_eff_values extractor works", {
 test_that("mcse_loo extractor gives correct value", {
   mcse <- mcse_loo(loo1)
   expect_type(mcse, "double")
-  expect_equal_to_reference(mcse, "reference-results/mcse_loo.rds")
+  expect_snapshot_value(mcse, style = "serialize")
 })
 
 test_that("mcse_loo returns NA when it should", {

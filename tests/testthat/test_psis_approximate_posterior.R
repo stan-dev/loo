@@ -1,7 +1,5 @@
 library(loo)
 
-context("psis_approximate_posterior")
-
 load(test_path("data-for-tests/test_data_psis_approximate_posterior.rda"))
 
 test_that("Laplace approximation, independent posterior", {
