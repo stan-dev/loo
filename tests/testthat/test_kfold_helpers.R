@@ -1,4 +1,3 @@
-library(loo)
 set.seed(14014)
 
 test_that("kfold_split_random works", {
@@ -27,7 +26,9 @@ test_that("kfold_split_stratified works", {
   expect_silent(fold_strat <- kfold_split_stratified(5, y)) # used to be a warning before fixing issue #277
   tab <- table(fold_strat, y)
   expect_equal(tab[1, ], c("1" = 4, "2" = 8, "3" = 1))
-  for (i in 2:nrow(tab)) expect_equal(tab[i, ], c("1" = 4, "2" = 8, "3" = 0))
+  for (i in 2:nrow(tab)) {
+    expect_equal(tab[i, ], c("1" = 4, "2" = 8, "3" = 0))
+  }
 })
 
 test_that("kfold_split_grouped works", {
@@ -45,33 +46,93 @@ test_that("kfold_split_grouped works", {
   fold_group <- kfold_split_grouped(K = 10, x = grp)
   expect_equal(sum(table(fold_group)), length(grp) - 4)
 
-  grp <- rep(c("A","B"), each = 20)
+  grp <- rep(c("A", "B"), each = 20)
   fold_group <- kfold_split_grouped(K = 2, x = grp)
   expect_equal(fold_group, as.integer(as.factor(grp)))
 })
 
 test_that("kfold helpers throw correct errors", {
   expect_error(kfold_split_random(10), "!is.null(N) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(10.5, 100), "K == as.integer(K) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(10, 100.5), "N == as.integer(N) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(K = c(1,1), N = 100), "length(K) == 1 is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(N = c(100, 100)), "length(N) == 1 is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(K = 5, N = 4), "K <= N is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_random(K = 1, N = 4), "K > 1 is not TRUE", fixed = TRUE)
+  expect_error(
+    kfold_split_random(10.5, 100),
+    "K == as.integer(K) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_random(10, 100.5),
+    "N == as.integer(N) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_random(K = c(1, 1), N = 100),
+    "length(K) == 1 is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_random(N = c(100, 100)),
+    "length(N) == 1 is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_random(K = 5, N = 4),
+    "K <= N is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_random(K = 1, N = 4),
+    "K > 1 is not TRUE",
+    fixed = TRUE
+  )
 
   y <- sample(c(0, 1), size = 200, replace = TRUE, prob = c(0.05, 0.95))
-  expect_error(kfold_split_stratified(10), "!is.null(x) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_stratified(10.5, y), "K == as.integer(K) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_stratified(K = c(1,1), y), "length(K) == 1 is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_stratified(K = 201, y), "K <= length(x) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_stratified(K = 1, y), "K > 1 is not TRUE", fixed = TRUE)
+  expect_error(
+    kfold_split_stratified(10),
+    "!is.null(x) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_stratified(10.5, y),
+    "K == as.integer(K) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_stratified(K = c(1, 1), y),
+    "length(K) == 1 is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_stratified(K = 201, y),
+    "K <= length(x) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_stratified(K = 1, y),
+    "K > 1 is not TRUE",
+    fixed = TRUE
+  )
 
   grp <- gl(n = 50, k = 15)
   expect_error(kfold_split_grouped(10), "!is.null(x) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_grouped(3, c(1,1,1)), "'K' must not be bigger than the number of levels/groups in 'x'", fixed = TRUE)
-  expect_error(kfold_split_grouped(10.5, grp), "K == as.integer(K) is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_grouped(K = c(1,1), grp), "length(K) == 1 is not TRUE", fixed = TRUE)
-  expect_error(kfold_split_grouped(K = 1, grp), "K > 1 is not TRUE", fixed = TRUE)
+  expect_error(
+    kfold_split_grouped(3, c(1, 1, 1)),
+    "'K' must not be bigger than the number of levels/groups in 'x'",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_grouped(10.5, grp),
+    "K == as.integer(K) is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_grouped(K = c(1, 1), grp),
+    "length(K) == 1 is not TRUE",
+    fixed = TRUE
+  )
+  expect_error(
+    kfold_split_grouped(K = 1, grp),
+    "K > 1 is not TRUE",
+    fixed = TRUE
+  )
 })
 
 
@@ -82,4 +143,3 @@ test_that("print_dims.kfold works", {
   attr(xx, "K") <- NULL
   expect_silent(print_dims(xx))
 })
-

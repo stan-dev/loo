@@ -1,4 +1,3 @@
-library(loo)
 options(mc.cores = 1)
 set.seed(123)
 
@@ -13,8 +12,8 @@ test_that("relative_eff is equal to ESS / S", {
   dims <- dim(LLarr)
   ess <- r_eff <- rep(NA, dims[3])
   for (j in 1:dims[3]) {
-    r_eff[j] <- relative_eff(LLarr[,,1, drop=FALSE])
-    ess[j] <- posterior::ess_mean(LLarr[,,1])
+    r_eff[j] <- relative_eff(LLarr[,, 1, drop = FALSE])
+    ess[j] <- posterior::ess_mean(LLarr[,, 1])
   }
   S <- prod(dim(LLarr)[1:2])
   expect_equal(r_eff, ess / S)
@@ -30,7 +29,13 @@ test_that("relative_eff matrix and function methods return identical output", {
   source(test_path("data-for-tests/function_method_stuff.R"))
   chain <- rep(1, nrow(draws))
   r_eff_mat <- relative_eff(llmat_from_fn, chain_id = chain)
-  r_eff_fn <- relative_eff(llfun, chain_id = chain, data = data, draws = draws, cores = 1)
+  r_eff_fn <- relative_eff(
+    llfun,
+    chain_id = chain,
+    data = data,
+    draws = draws,
+    cores = 1
+  )
   expect_identical(r_eff_mat, r_eff_fn)
 })
 

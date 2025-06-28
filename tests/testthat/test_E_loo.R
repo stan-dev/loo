@@ -1,5 +1,3 @@
-library(loo)
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
@@ -17,15 +15,54 @@ log_rats <- -LLmat
 E_test_mean <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)
 E_test_var <- E_loo(x, psis_mat, type = "var", log_ratios = log_rats)
 E_test_sd <- E_loo(x, psis_mat, type = "sd", log_ratios = log_rats)
-E_test_quant <- E_loo(x, psis_mat, type = "quantile", probs = 0.5, log_ratios = log_rats)
-E_test_quant2 <- E_loo(x, psis_mat, type = "quantile", probs = c(0.1, 0.9), log_ratios = log_rats)
+E_test_quant <- E_loo(
+  x,
+  psis_mat,
+  type = "quantile",
+  probs = 0.5,
+  log_ratios = log_rats
+)
+E_test_quant2 <- E_loo(
+  x,
+  psis_mat,
+  type = "quantile",
+  probs = c(0.1, 0.9),
+  log_ratios = log_rats
+)
 
 # vector method
-E_test_mean_vec <- E_loo(x[, 1], psis_vec, type = "mean", log_ratios = log_rats[,1])
-E_test_var_vec <- E_loo(x[, 1], psis_vec, type = "var", log_ratios = log_rats[,1])
-E_test_sd_vec <- E_loo(x[, 1], psis_vec, type = "sd", log_ratios = log_rats[,1])
-E_test_quant_vec <- E_loo(x[, 1], psis_vec, type = "quant", probs = 0.5, log_ratios = log_rats[,1])
-E_test_quant_vec2 <- E_loo(x[, 1], psis_vec, type = "quant", probs = c(0.1, 0.5, 0.9), log_ratios = log_rats[,1])
+E_test_mean_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "mean",
+  log_ratios = log_rats[, 1]
+)
+E_test_var_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "var",
+  log_ratios = log_rats[, 1]
+)
+E_test_sd_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "sd",
+  log_ratios = log_rats[, 1]
+)
+E_test_quant_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "quant",
+  probs = 0.5,
+  log_ratios = log_rats[, 1]
+)
+E_test_quant_vec2 <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "quant",
+  probs = c(0.1, 0.5, 0.9),
+  log_ratios = log_rats[, 1]
+)
 
 # E_loo_khat
 khat <- loo:::E_loo_khat.matrix(x, psis_mat, log_rats)
@@ -114,11 +151,11 @@ test_that("E_loo throws correct errors and warnings", {
   # warnings
   expect_no_warning(E_loo.matrix(x, psis_mat))
   # no warnings if x is constant, binary, NA, NaN, Inf
-  expect_no_warning(E_loo.matrix(x*0, psis_mat))
-  expect_no_warning(E_loo.matrix(0+(x>0), psis_mat))
-  expect_no_warning(E_loo.matrix(x+NA, psis_mat))   
-  expect_no_warning(E_loo.matrix(x*NaN, psis_mat))
-  expect_no_warning(E_loo.matrix(x*Inf, psis_mat))
+  expect_no_warning(E_loo.matrix(x * 0, psis_mat))
+  expect_no_warning(E_loo.matrix(0 + (x > 0), psis_mat))
+  expect_no_warning(E_loo.matrix(x + NA, psis_mat))
+  expect_no_warning(E_loo.matrix(x * NaN, psis_mat))
+  expect_no_warning(E_loo.matrix(x * Inf, psis_mat))
   expect_no_warning(E_test <- E_loo.default(x[, 1], psis_vec))
   expect_length(E_test$pareto_k, 1)
 
@@ -160,7 +197,6 @@ test_that("weighted quantiles work", {
     xx <- sample(x, size = n_sims, replace = TRUE, prob = w / sum(w))
     quantile(xx, probs, names = FALSE)
   }
-
 
   set.seed(123)
   pr <- seq(0.025, 0.975, 0.025)
