@@ -1,4 +1,3 @@
-library(loo)
 options(mc.cores = 1)
 set.seed(123)
 
