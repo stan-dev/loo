@@ -3,8 +3,6 @@
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -53,10 +51,10 @@ jobs:
             any::knitr
           needs: website
 
-      - uses: actions/cache@v4
-        with:
-          path: vignettes/**/_cache
-          key: knitr-${{ runner.os }}-${{ hashFiles('vignettes/**/*.Rmd') }}
+      # - uses: actions/cache@v4
+      #   with:
+      #     path: vignettes/**/_cache
+      #     key: knitr-${{ runner.os }}-${{ hashFiles('vignettes/**/*.Rmd') }}
 
       - name: Build site
         run: |
