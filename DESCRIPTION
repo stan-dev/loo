@@ -55,3 +55,4 @@ Encoding: UTF-8
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+Config/Needs/website: VisruthSK/pkgdownConfig
