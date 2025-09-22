@@ -59,7 +59,7 @@ jobs:
       - name: Build site
         run: |
           pkgdown::build_site_github_pages(
-            lazy = TRUE
+            lazy = TRUE,
             install = TRUE,
             run_dont_run = TRUE,
             new_process = TRUE
