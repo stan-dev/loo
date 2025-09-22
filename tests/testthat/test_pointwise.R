@@ -1,7 +1,3 @@
-library(loo)
-
-context("pointwise convenience function")
-
 loo1 <- suppressWarnings(loo(example_loglik_matrix()))
 
 test_that("pointwise throws the right errors", {
@@ -29,8 +25,14 @@ test_that("pointwise throws the right errors", {
 
 test_that("pointwise returns correct estimate", {
   expect_equal(pointwise(loo1, "elpd_loo"), loo1$pointwise[, "elpd_loo"])
-  expect_equal(pointwise(loo1, "mcse_elpd_loo"), loo1$pointwise[, "mcse_elpd_loo"])
+  expect_equal(
+    pointwise(loo1, "mcse_elpd_loo"),
+    loo1$pointwise[, "mcse_elpd_loo"]
+  )
   expect_equal(pointwise(loo1, "p_loo"), loo1$pointwise[, "p_loo"])
   expect_equal(pointwise(loo1, "looic"), loo1$pointwise[, "looic"])
-  expect_equal(pointwise(loo1, "influence_pareto_k"), loo1$pointwise[, "influence_pareto_k"])
+  expect_equal(
+    pointwise(loo1, "influence_pareto_k"),
+    loo1$pointwise[, "influence_pareto_k"]
+  )
 })

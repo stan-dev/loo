@@ -1,35 +1,35 @@
-Package: loo
 Type: Package
+Package: loo
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
 Version: 2.8.0.9000
 Date: 2024-07-03
-Authors@R: c(person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = c("aut")),
-             person("Jonah", "Gabry", email = "jsg2201@columbia.edu", role = c("cre", "aut")),
-             person("Måns", "Magnusson", role = c("aut")),
-             person("Yuling", "Yao", role = c("aut")),
-             person("Paul-Christian", "Bürkner", role = c("aut")),
-             person("Topi", "Paananen", role = c("aut")),
-             person("Andrew", "Gelman", role = c("aut")),
-             person("Ben", "Goodrich", role = c("ctb")),
-             person("Juho", "Piironen", role = c("ctb")), 
-             person("Bruno", "Nicenboim", role = c("ctb")), 
-             person("Leevi", "Lindgren", role = c("ctb")))
+Authors@R: c(
+    person("Aki", "Vehtari", , "Aki.Vehtari@aalto.fi", role = "aut"),
+    person("Jonah", "Gabry", , "jsg2201@columbia.edu", role = c("cre", "aut")),
+    person("Måns", "Magnusson", role = "aut"),
+    person("Yuling", "Yao", role = "aut"),
+    person("Paul-Christian", "Bürkner", role = "aut"),
+    person("Topi", "Paananen", role = "aut"),
+    person("Andrew", "Gelman", role = "aut"),
+    person("Ben", "Goodrich", role = "ctb"),
+    person("Juho", "Piironen", role = "ctb"),
+    person("Bruno", "Nicenboim", role = "ctb"),
+    person("Leevi", "Lindgren", role = "ctb")
+  )
 Maintainer: Jonah Gabry <jsg2201@columbia.edu>
+Description: Efficient approximate leave-one-out cross-validation (LOO)
+    for Bayesian models fit using Markov chain Monte Carlo, as described
+    in Vehtari, Gelman, and Gabry (2017) <doi:10.1007/s11222-016-9696-4>.
+    The approximation uses Pareto smoothed importance sampling (PSIS), a
+    new procedure for regularizing importance weights.  As a byproduct of
+    the calculations, we also obtain approximate standard errors for
+    estimated predictive errors and for the comparison of predictive
+    errors between models. The package also provides methods for using
+    stacking and other model weighting techniques to average Bayesian
+    predictive distributions.
+License: GPL (>=3)
 URL: https://mc-stan.org/loo/, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
-Description: Efficient approximate leave-one-out cross-validation (LOO)
-    for Bayesian models fit using Markov chain Monte Carlo, as 
-    described in Vehtari, Gelman, and Gabry (2017) 
-    <doi:10.1007/s11222-016-9696-4>. 
-    The approximation uses Pareto smoothed importance sampling (PSIS), 
-    a new procedure for regularizing importance weights. 
-    As a byproduct of the calculations, we also obtain approximate 
-    standard errors for estimated predictive errors and for the comparison 
-    of predictive errors between models. The package also provides methods 
-    for using stacking and other model weighting techniques to average 
-    Bayesian predictive distributions.
-License: GPL (>=3)
-LazyData: TRUE
 Depends:
     R (>= 3.1.2)
 Imports:
@@ -49,10 +49,15 @@ Suggests:
     rstanarm (>= 2.19.0),
     rstantools,
     spdep,
-    testthat (>= 2.1.0)
-VignetteBuilder: knitr
-Encoding: UTF-8
-SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
-RoxygenNote: 7.3.2
-Roxygen: list(markdown = TRUE)
+    testthat (>= 3.0)
+VignetteBuilder: 
+    knitr
 Config/Needs/website: VisruthSK/pkgdownConfig
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+Config/testthat/start-first: loo_subsampling_cases, loo_subsampling
+Encoding: UTF-8
+LazyData: TRUE
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc

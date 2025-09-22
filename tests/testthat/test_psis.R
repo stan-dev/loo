@@ -1,9 +1,6 @@
-library(loo)
-options(mc.cores=1)
-options(loo.cores=NULL)
+options(mc.cores = 1)
+options(loo.cores = NULL)
 set.seed(123)
-
-context("psis")
 
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
@@ -14,7 +11,7 @@ r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
 psis1 <- psis(log_ratios = -LLarr, r_eff = r_eff_arr)
 
 test_that("psis results haven't changed", {
-  expect_equal_to_reference(psis1, "reference-results/psis.rds")
+  expect_snapshot_value(psis1, style = "serialize")
 })
 
 test_that("psis returns object with correct structure", {
@@ -48,12 +45,12 @@ test_that("psis throws correct errors and warnings", {
   # r_eff=NULL no warnings
   expect_silent(psis(-LLarr, r_eff = NULL))
   expect_silent(psis(-LLmat, r_eff = NULL))
-  expect_silent(psis(-LLmat[,1], r_eff = NULL))
+  expect_silent(psis(-LLmat[, 1], r_eff = NULL))
 
   # r_eff=NA disables warnings
   expect_silent(psis(-LLarr, r_eff = NA))
   expect_silent(psis(-LLmat, r_eff = NA))
-  expect_silent(psis(-LLmat[,1], r_eff = NA))
+  expect_silent(psis(-LLmat[, 1], r_eff = NA))
 
   # r_eff default and r_eff=NA give same answer
   expect_equal(
@@ -63,7 +60,7 @@ test_that("psis throws correct errors and warnings", {
 
   # r_eff=NULL and r_eff=NA give same answer
   expect_equal(
-    suppressWarnings(psis(-LLarr, r_eff=NULL)),
+    suppressWarnings(psis(-LLarr, r_eff = NULL)),
     psis(-LLarr, r_eff = NA)
   )
 
@@ -78,16 +75,13 @@ test_that("psis throws correct errors and warnings", {
   expect_error(psis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
 
   # tail length warnings
-  expect_warning(
-    psis(-LLarr[1:5,, ]),
-    "Not enough tail samples to fit the generalized Pareto distribution"
-  )
+  expect_snapshot(psis(-LLarr[1:5, , ]))
 
   # no NAs or non-finite values allowed
-  LLmat[1,1] <- NA
+  LLmat[1, 1] <- NA
   expect_error(psis(-LLmat), "NAs not allowed in input")
 
-  LLmat[1,1] <- 1
+  LLmat[1, 1] <- 1
   LLmat[10, 2] <- -Inf
   expect_error(psis(-LLmat), "All input values must be finite or -Inf")
   # log ratio of -Inf is allowed
@@ -95,7 +89,10 @@ test_that("psis throws correct errors and warnings", {
   expect_no_error(psis(-LLmat))
 
   # no lists allowed
-  expect_error(expect_warning(psis(as.list(-LLvec))), "List not allowed as input")
+  expect_error(
+    expect_warning(psis(as.list(-LLvec))),
+    "List not allowed as input"
+  )
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
@@ -110,10 +107,11 @@ test_that("throw_tail_length_warnings gives correct output", {
   expect_silent(throw_tail_length_warnings(10))
   expect_equal(throw_tail_length_warnings(10), 10)
   expect_warning(throw_tail_length_warnings(1), "Not enough tail samples")
-  expect_warning(throw_tail_length_warnings(c(1, 10, 2)),
-                 "Skipping the following columns: 1, 3")
-  expect_warning(throw_tail_length_warnings(rep(1, 21)),
-                 "11 more not printed")
+  expect_warning(
+    throw_tail_length_warnings(c(1, 10, 2)),
+    "Skipping the following columns: 1, 3"
+  )
+  expect_warning(throw_tail_length_warnings(rep(1, 21)), "11 more not printed")
 })
 
 
@@ -146,8 +144,11 @@ test_that("psis_n_eff methods works properly", {
 
 
 test_that("do_psis_i throws warning if all tail values the same", {
-  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
-  val <- expect_warning(do_psis_i(xx, tail_len_i = 6), "all tail values are the same")
+  xx <- c(1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4)
+  expect_warning(
+    val <- do_psis_i(xx, tail_len_i = 6),
+    "all tail values are the same"
+  )
   expect_equal(val$pareto_k, Inf)
 })
 
@@ -155,9 +156,8 @@ test_that("psis_smooth_tail returns original tail values if k is infinite", {
   # skip on M1 Mac until we figure out why this test fails only on M1 Mac
   skip_if(Sys.info()[["sysname"]] == "Darwin" && R.version$arch == "aarch64")
 
-  xx <- c(1,2,3,4,4,4,4,4,4,4,4)
+  xx <- c(1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4)
   val <- suppressWarnings(psis_smooth_tail(xx, 3))
   expect_equal(val$tail, xx)
   expect_equal(val$k, Inf)
 })
-
