@@ -45,21 +45,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
-<li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+<li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -97,7 +96,7 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2025-09-21</h4>
+            <h4 data-toc-skip class="date">2025-09-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
@@ -109,8 +108,6 @@ Nicenboim</h4>
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Holdout validation and K-fold cross-validation of Stan programs with the loo package}
 -->
-<p><strong>NOTE: We recommend viewing the fully rendered version of this
-vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https://mc-stan.org/loo/articles/</a></strong></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -222,15 +219,38 @@ then is evaluated on the held-out “test” data.</p>
 <strong>rstan</strong> package:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compile</span></span>
-<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span>
-<span><span class="co"># Fit model</span></span>
+<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span></code></pre></div>
+<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
+
+Please download and install the appropriate version of Rtools for 4.5.1 from
+https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
+<pre><code>Trying to compile a simple C file</code></pre>
+<pre><code>Running "C:/PROGRA~1/R/R-45~1.1/bin/x64/Rcmd.exe" SHLIB foo.c
+using C compiler: 'gcc.exe (GCC) 14.2.0'
+gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG   -I"C:/Users/visru/AppData/Local/R/win-library/4.5/Rcpp/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/unsupported"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/BH/include" -I"C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/src/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -I"C:/Users/visru/AppData/Local/R/win-library/4.5/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include "C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/stan/math/prim/fun/Eigen.hpp"  -std=c++1y    -I"C:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c foo.c -o foo.o
+cc1.exe: warning: command-line option '-std=c++14' is valid for C++/ObjC++ but not for C
+In file included from C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/Core:19,
+                 from C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/Dense:1,
+                 from C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: foo.o] Error 1</code></pre>
+<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
+
+Please download and install the appropriate version of Rtools for 4.5.1 from
+https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Fit model</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">data_train</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>We recompute the generated quantities using the posterior draws
 conditional on the training data, but we now pass in the held-out data
 to get the log predictive densities for the test data. Because we are
 using independent data, the log predictive density coincides with the
 log likelihood of the test data.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
 <span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -239,8 +259,14 @@ log likelihood of the test data.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the test
 data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
+
+     Estimate    SE
+elpd  -1745.4 292.2
+ic     3490.8 584.3</code></pre>
 <p>When one wants to compare different models, the function
 <code><a href="../reference/loo_compare.html">loo_compare()</a></code> can be used to assess the difference in
 performance.</p>
@@ -257,7 +283,7 @@ Vehtari et al., 2017).</p>
 </h3>
 <p>We use the data that is already pre-processed and we divide it in 10
 random folds using <code>kfold_split_random</code></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare data</span></span>
 <span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">10</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -272,7 +298,7 @@ predictive densities for the left-out fold. Last, we store the
 predictive density for the observations of the left-out fold in a
 matrix. The output of this loop is a matrix of the log pointwise
 predictive densities of all the observations.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span></span>
 <span><span class="va">log_pd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">4000</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Loop over the folds</span></span>
@@ -305,8 +331,14 @@ predictive densities of all the observations.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the 10
 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
+
+     Estimate     SE
+elpd  -5549.7  726.3
+ic    11099.4 1452.6</code></pre>
 <p>If one wants to compare several models (with
 <code>loo_compare</code>), one should use the same folds for all the
 different models.</p>

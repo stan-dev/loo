@@ -6,7 +6,9 @@ output:
   html_vignette:
     toc: yes
 params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+  # TODO: REVERT
+  EVAL: FALSE
+  # EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}

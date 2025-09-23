@@ -45,21 +45,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
-<li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+<li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -97,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-09-21</h4>
+            <h4 data-toc-skip class="date">2025-09-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-non-factorized.Rmd</code></div>
@@ -109,8 +108,6 @@ Paul Bürkner and Jonah Gabry</h4>
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Leave-one-out cross-validation for non-factorized models}
 -->
-<p><strong>NOTE: We recommend viewing the fully rendered version of this
-vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https://mc-stan.org/loo/articles/</a></strong></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -511,6 +508,10 @@ thefts per thousand households in the neighbood</li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">COL.OLD</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRIME"</span>, <span class="st">"HOVAL"</span>, <span class="st">"INC"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code>'data.frame':   49 obs. of  3 variables:
+ $ CRIME: num  18.802 32.388 38.426 0.178 15.726 ...
+ $ HOVAL: num  44.6 33.2 37.1 75 80.5 ...
+ $ INC  : num  21.23 4.48 11.34 8.44 19.53 ...</code></pre>
 <p>We will also use the object <code>COL.nb</code>, which is a list
 containing information about which neighborhoods border each other. From
 this list we will be able to construct the weight matrix to used to help
@@ -521,7 +522,7 @@ account for the spatial dependency among the observations.</p>
 <p>A model predicting <code>CRIME</code> from <code>INC</code> and
 <code>HOVAL</code>, while accounting for the spatial dependency via an
 SAR structure, can be specified in <strong>brms</strong> as follows.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
 <span>  <span class="va">CRIME</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>, </span>
 <span>  data <span class="op">=</span> <span class="va">COL.OLD</span>,</span>
@@ -536,12 +537,13 @@ income and higher housing value predict lower crime rates in the
 neighborhood. Moreover, there seems to be substantial spatial
 correlation between adjacent neighborhoods, as indicated by the
 posterior distribution of the <code>lagsar</code> parameter.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lagsar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span>, pars <span class="op">=</span> <span class="st">"lagsar"</span><span class="op">)</span></span>
 <span><span class="va">estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">lagsar</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/MCMC-distributions.html" class="external-link">mcmc_hist</a></span><span class="op">(</span><span class="va">lagsar</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-helpers.html" class="external-link">vline_at</a></span><span class="op">(</span><span class="va">estimates</span>, linetype <span class="op">=</span> <span class="fl">2</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"lagsar: posterior median and 50% central interval"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-non-factorized_files/figure-html/plot-lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="approximate-loo-cv">Approximate LOO-CV<a class="anchor" aria-label="anchor" href="#approximate-loo-cv"></a>
@@ -549,7 +551,7 @@ posterior distribution of the <code>lagsar</code> parameter.</p>
 <p>After fitting the model, the next step is to compute the pointwise
 log-likelihood values needed for approximate LOO-CV. To do this we will
 use the recipe laid out in the previous sections.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">posterior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">CRIME</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
@@ -559,7 +561,7 @@ use the recipe laid out in the previous sections.</p>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">S</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">posterior</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span></span>
 <span>  <span class="va">eta</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">b_Intercept</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_INC</span> <span class="op">*</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">INC</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_HOVAL</span> <span class="op">*</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">HOVAL</span></span>
-<span>  <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu">nb2mat</span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span></span>
+<span>  <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span></span>
 <span>  <span class="va">Cinv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">W_tilde</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">W_tilde</span> <span class="op">/</span> <span class="va">p</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span></span>
 <span>  <span class="va">g</span> <span class="op">&lt;-</span> <span class="va">Cinv</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">W_tilde</span>, <span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">Cinv</span><span class="op">)</span></span>
@@ -578,12 +580,13 @@ approximation is robust up to values of
 (Vehtari et al, 2017, 2024). In the plot below, we see that the fourth
 observation is problematic and so may reduce the accuracy of the LOO-CV
 approximation.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">psis_result</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-non-factorized_files/figure-html/plot-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also check that the conditional leave-one-out predictive
 distribution equations work correctly, for instance, using the last
 posterior draw:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yloo_sub</span> <span class="op">&lt;-</span> <span class="va">yloo</span><span class="op">[</span><span class="va">S</span>, <span class="op">]</span></span>
 <span><span class="va">sdloo_sub</span> <span class="op">&lt;-</span> <span class="va">sdloo</span><span class="op">[</span><span class="va">S</span>, <span class="op">]</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -600,11 +603,29 @@ posterior draw:</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span>, size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-non-factorized_files/figure-html/checklast-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>Finally, we use PSIS-LOO to approximate the expected log predictive
 density (ELPD) for new data, which we will validate using exact LOO-CV
 in the upcoming section.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">psis_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 49 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo   -187.4 11.3
+p_loo         8.6  5.7
+looic       374.8 22.7
+------
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+Pareto k diagnostic values:
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     48    98.0%   650     
+   (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;    
+   (1, Inf)   (very bad)  1     2.0%   &lt;NA&gt;    
+See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div class="section level4">
 <h4 id="exact-loo-cv">Exact LOO-CV<a class="anchor" aria-label="anchor" href="#exact-loo-cv"></a>
@@ -615,7 +636,7 @@ need to re-fit the model
 times and each time model the held-out data point as a parameter. First,
 we create an empty dummy model that we will update below as we loop over
 the observations.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># see help("mi", "brms") for details on the mi() usage</span></span>
 <span><span class="va">fit_dummy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/brm.html" class="external-link">brm</a></span><span class="op">(</span></span>
 <span>  <span class="va">CRIME</span> <span class="op">|</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/mi.html" class="external-link">mi</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="va">INC</span> <span class="op">+</span> <span class="va">HOVAL</span> <span class="op">+</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/sar.html" class="external-link">sar</a></span><span class="op">(</span><span class="va">COL.nb</span>, type <span class="op">=</span> <span class="st">"lag"</span><span class="op">)</span>, </span>
@@ -631,7 +652,7 @@ takes much longer than the approximation we computed above, but it is
 necessary in order to validate the approximate LOO-CV method. Thanks to
 the PSIS-LOO approximation, in general doing these slow exact
 computations can be avoided.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fl">500</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">N</span><span class="op">)</span></span>
 <span><span class="va">loglik</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">S</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span>
@@ -648,7 +669,7 @@ computations can be avoided.</p>
 <span>    <span class="va">y_miss_i</span> <span class="op">&lt;-</span> <span class="va">y</span></span>
 <span>    <span class="va">y_miss_i</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">Ymi</span></span>
 <span>    <span class="va">eta</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">b_Intercept</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_INC</span> <span class="op">*</span> <span class="va">fit_i</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">INC</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">b_HOVAL</span> <span class="op">*</span> <span class="va">fit_i</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">HOVAL</span></span>
-<span>    <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu">nb2mat</span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span></span>
+<span>    <span class="va">W_tilde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="op">-</span> <span class="va">p</span><span class="op">$</span><span class="va">lagsar</span> <span class="op">*</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">COL.nb</span><span class="op">)</span></span>
 <span>    <span class="va">Cinv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">W_tilde</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">W_tilde</span> <span class="op">/</span> <span class="va">p</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span></span>
 <span>    <span class="va">g</span> <span class="op">&lt;-</span> <span class="va">Cinv</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">y_miss_i</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">W_tilde</span>, <span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">Cinv</span><span class="op">)</span>;</span>
@@ -673,14 +694,15 @@ these two distributions for the first four observations and see that
 they match very closely (as is the case for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>49</mn><annotation encoding="application/x-tex">49</annotation></semantics></math>
 observations of in this example).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_sub</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">obs</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">y</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="st">"obs"</span>, scales <span class="op">=</span> <span class="st">"fixed"</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>In the final step, we compute the ELPD based on the exact LOO-CV and
 compare it to the approximate PSIS-LOO result computed earlier.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_mean_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># more stable than log(mean(exp(x)))</span></span>
 <span>  <span class="va">max_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -689,11 +711,12 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] -189.2</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate
 against the exact pointwise ELPD values.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  approx_elpd <span class="op">=</span> <span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>, <span class="st">"elpd_loo"</span><span class="op">]</span>,</span>
 <span>  exact_elpd <span class="op">=</span> <span class="va">exact_elpds</span></span>
@@ -705,18 +728,21 @@ against the exact pointwise ELPD values.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Approximate elpds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Exact elpds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-non-factorized_files/figure-html/compare-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as
 problematic by the PSIS-LOO approximation— is colored in red and is the
 clear outlier. Otherwise, the correspondence between the exact and
 approximate values is strong. In fact, summing over the pointwise ELPD
 values and leaving out the fourth observation yields practically
 equivalent results for approximate and exact LOO-CV:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">without_pt_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  approx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span>, <span class="st">"elpd_loo"</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>  exact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>  </span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">without_pt_4</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<pre><code>approx  exact 
+-173.0 -173.2 </code></pre>
 <p>From this we can conclude that the difference we found when including
 <em>all</em> observations does not indicate a bug in our implementation
 of the approximate LOO-CV but rather a violation of its assumptions.</p>
@@ -734,76 +760,76 @@ directly. The Stan code brms generates is human readable and so we can
 use it to learn some of the essential aspects of Stan and the particular
 model we are implementing. The Stan program below is a slightly modified
 version of the code extracted via <code>stancode(fit_dummy)</code>:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>functions {</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span> </span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a> <span class="sc">*</span> </span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>                          real rho, matrix W) {</span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>    vector[N] half_pred;</span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>  }</span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a>}</span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a>data {</span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
-<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
-<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
-<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
-<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a>}</span>
-<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a>transformed data {</span>
-<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
-<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
-<span id="cb16-39"><a href="#cb16-39" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
-<span id="cb16-40"><a href="#cb16-40" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
-<span id="cb16-41"><a href="#cb16-41" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
-<span id="cb16-42"><a href="#cb16-42" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
-<span id="cb16-43"><a href="#cb16-43" tabindex="-1"></a>  }</span>
-<span id="cb16-44"><a href="#cb16-44" tabindex="-1"></a>}</span>
-<span id="cb16-45"><a href="#cb16-45" tabindex="-1"></a>parameters {</span>
-<span id="cb16-46"><a href="#cb16-46" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
-<span id="cb16-47"><a href="#cb16-47" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
-<span id="cb16-48"><a href="#cb16-48" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
-<span id="cb16-49"><a href="#cb16-49" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
-<span id="cb16-50"><a href="#cb16-50" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
-<span id="cb16-51"><a href="#cb16-51" tabindex="-1"></a>}</span>
-<span id="cb16-52"><a href="#cb16-52" tabindex="-1"></a>transformed parameters {</span>
-<span id="cb16-53"><a href="#cb16-53" tabindex="-1"></a>}</span>
-<span id="cb16-54"><a href="#cb16-54" tabindex="-1"></a>model {</span>
-<span id="cb16-55"><a href="#cb16-55" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
-<span id="cb16-56"><a href="#cb16-56" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
-<span id="cb16-57"><a href="#cb16-57" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
-<span id="cb16-58"><a href="#cb16-58" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
-<span id="cb16-59"><a href="#cb16-59" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
-<span id="cb16-60"><a href="#cb16-60" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
-<span id="cb16-61"><a href="#cb16-61" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
-<span id="cb16-62"><a href="#cb16-62" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
-<span id="cb16-63"><a href="#cb16-63" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
-<span id="cb16-64"><a href="#cb16-64" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
-<span id="cb16-65"><a href="#cb16-65" tabindex="-1"></a>  }</span>
-<span id="cb16-66"><a href="#cb16-66" tabindex="-1"></a>}</span>
-<span id="cb16-67"><a href="#cb16-67" tabindex="-1"></a>generated quantities {</span>
-<span id="cb16-68"><a href="#cb16-68" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
-<span id="cb16-69"><a href="#cb16-69" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
-<span id="cb16-70"><a href="#cb16-70" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>functions {</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span> </span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a> <span class="sc">*</span> </span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>                          real rho, matrix W) {</span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>    vector[N] half_pred;</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>  }</span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>}</span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>data {</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a>}</span>
+<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a>transformed data {</span>
+<span id="cb20-37"><a href="#cb20-37" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
+<span id="cb20-38"><a href="#cb20-38" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
+<span id="cb20-39"><a href="#cb20-39" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
+<span id="cb20-40"><a href="#cb20-40" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
+<span id="cb20-41"><a href="#cb20-41" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
+<span id="cb20-42"><a href="#cb20-42" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
+<span id="cb20-43"><a href="#cb20-43" tabindex="-1"></a>  }</span>
+<span id="cb20-44"><a href="#cb20-44" tabindex="-1"></a>}</span>
+<span id="cb20-45"><a href="#cb20-45" tabindex="-1"></a>parameters {</span>
+<span id="cb20-46"><a href="#cb20-46" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
+<span id="cb20-47"><a href="#cb20-47" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
+<span id="cb20-48"><a href="#cb20-48" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
+<span id="cb20-49"><a href="#cb20-49" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
+<span id="cb20-50"><a href="#cb20-50" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
+<span id="cb20-51"><a href="#cb20-51" tabindex="-1"></a>}</span>
+<span id="cb20-52"><a href="#cb20-52" tabindex="-1"></a>transformed parameters {</span>
+<span id="cb20-53"><a href="#cb20-53" tabindex="-1"></a>}</span>
+<span id="cb20-54"><a href="#cb20-54" tabindex="-1"></a>model {</span>
+<span id="cb20-55"><a href="#cb20-55" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
+<span id="cb20-56"><a href="#cb20-56" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
+<span id="cb20-57"><a href="#cb20-57" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
+<span id="cb20-58"><a href="#cb20-58" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
+<span id="cb20-59"><a href="#cb20-59" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
+<span id="cb20-60"><a href="#cb20-60" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
+<span id="cb20-61"><a href="#cb20-61" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
+<span id="cb20-62"><a href="#cb20-62" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
+<span id="cb20-63"><a href="#cb20-63" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
+<span id="cb20-64"><a href="#cb20-64" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
+<span id="cb20-65"><a href="#cb20-65" tabindex="-1"></a>  }</span>
+<span id="cb20-66"><a href="#cb20-66" tabindex="-1"></a>}</span>
+<span id="cb20-67"><a href="#cb20-67" tabindex="-1"></a>generated quantities {</span>
+<span id="cb20-68"><a href="#cb20-68" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
+<span id="cb20-69"><a href="#cb20-69" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
+<span id="cb20-70"><a href="#cb20-70" tabindex="-1"></a>}</span></code></pre></div>
 <p>Here we want to focus on two aspects of the Stan code. First, because
 there is no built-in function in Stan that calculates the log-likelihood
 for the lag-SAR model, we define a new <code>normal_lagsar_lpdf</code>
@@ -833,7 +859,7 @@ we recommend using <code><a href="https://paulbuerkner.com/brms/reference/stanco
 <code>save_model</code> argument to write the Stan program to a file.
 The corresponding data can be prepared with <code><a href="https://paulbuerkner.com/brms/reference/standata.html" class="external-link">make_standata()</a></code>
 and then manually amended if needed. Once the code and data have been
-edited, they can be passed to RStan’s <code><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan()</a></code> function via
+edited, they can be passed to RStan’s <code>stan()</code> function via
 the <code>file</code> and <code>data</code> arguments.</p>
 </div>
 <div class="section level2">

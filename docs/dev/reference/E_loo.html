@@ -36,20 +36,19 @@ development and will be added in a future release."><meta property="og:image" co
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages"><li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages"><li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://mc-stan.org/about/">About Stan</a></li>
@@ -212,22 +211,16 @@ returned Pareto-k is the Pareto-k for the right tail of \(r\).</p></dd>
 <span class="r-in"><span><span class="co"># the log_ratios argument</span></span></span>
 <span class="r-in"><span><span class="fu">E_loo</span><span class="op">(</span><span class="va">yrep</span>, <span class="va">psis_object</span>, type <span class="op">=</span> <span class="st">"mean"</span>, log_ratios <span class="op">=</span> <span class="va">log_ratios</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Rcpp</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> This is rstanarm version 2.32.1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Default priors may change, so it's safest to specify priors, even if equivalent to the defaults.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - For execution on a local, multicore CPU with excess RAM we recommend calling</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(mc.cores = parallel::detectCores())</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.131954 4.967800 5.031841 4.914655 5.080588 5.059209 5.010974 5.106554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 5.003389 5.011058 4.625078 4.735981 4.687077 4.803049 4.537262 4.740391</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.528024 4.647292 4.711261 4.655076</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 5.138343 4.977074 5.003910 4.934799 5.106227 5.054057 5.021758 5.107148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 4.986780 5.021601 4.632789 4.738509 4.695477 4.788853 4.492651 4.763751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 4.500139 4.636341 4.704360 4.677666</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.21674449  0.17534687 -0.01410136  0.35904536  0.17327506  0.17116531</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.06837645  0.14851909  0.09690605  0.03933481  0.15113021  0.23111002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.14069666  0.30735210  0.38311515  0.33997556  0.48811604  0.05212933</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.19624192  0.08372699</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.233399989  0.073664298  0.117702427  0.328056902  0.180429212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.150664794 -0.023508396  0.161947959  0.102910565  0.006427037</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11]  0.090717927  0.230447557  0.232173035  0.413687601  0.332522606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16]  0.341583757  0.469863165  0.143520946  0.252265048  0.065325564</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

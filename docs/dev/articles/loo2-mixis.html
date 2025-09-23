@@ -45,21 +45,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
-<li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+<li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -97,7 +96,7 @@
                         <h4 data-toc-skip class="author">Luca Silva and
 Giacomo Zanella</h4>
             
-            <h4 data-toc-skip class="date">2025-09-21</h4>
+            <h4 data-toc-skip class="date">2025-09-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-mixis.Rmd" class="external-link"><code>vignettes/loo2-mixis.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-mixis.Rmd</code></div>
@@ -109,8 +108,6 @@ Giacomo Zanella</h4>
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Mixture IS leave-one-out cross-validation for high-dimensional Bayesian models}
 -->
-<p><strong>NOTE: We recommend viewing the fully rendered version of this
-vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https://mc-stan.org/loo/articles/</a></strong></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -243,11 +240,38 @@ diagnostics.</p>
 <code class="sourceCode R"><span><span class="va">chains</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">n_iter</span> <span class="op">&lt;-</span> <span class="fl">2000</span></span>
 <span><span class="va">warm_iter</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
-<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode_horseshoe</span><span class="op">)</span></span>
-<span><span class="va">fit_post</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode_horseshoe</span><span class="op">)</span></span></code></pre></div>
+<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
+
+Please download and install the appropriate version of Rtools for 4.5.1 from
+https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
+<pre><code>Trying to compile a simple C file</code></pre>
+<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
+
+Please download and install the appropriate version of Rtools for 4.5.1 from
+https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_post</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">loo_post</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit_post</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_post</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 126 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo    -42.2  6.9
+p_loo        23.8  5.0
+looic        84.4 13.9
+------
+MCSE of elpd_loo is NA.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
+
+Pareto k diagnostic values:
+                         Count Pct.    Min. ESS
+(-Inf, 0.7]   (good)     96    76.2%   204     
+   (0.7, 1]   (bad)      21    16.7%   &lt;NA&gt;    
+   (1, Inf)   (very bad)  9     7.1%   &lt;NA&gt;    
+See help('pareto-k-diagnostic') for details.</code></pre>
 <p>As we can see the diagnostics signal either “bad” or “very bad”
 Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 values for roughly
@@ -270,14 +294,14 @@ contribution to account for the last term in the equation above.</p>
     target += log_sum_exp(-log_lik);
   }</code></pre>
 <p>We sample from the mixture and collect the log-likelihoods term.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">standata</span><span class="op">$</span><span class="va">mixis</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">fit_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span>, pars <span class="op">=</span> <span class="st">"log_lik"</span><span class="op">)</span></span>
 <span><span class="va">log_lik_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">fit_mix</span><span class="op">)</span><span class="op">$</span><span class="va">log_lik</span></span></code></pre></div>
 <p>We now compute the mixture estimators, following the numerically
 stable implementation in Appendix A.2 of <a href="https://arxiv.org/abs/2209.09190" class="external-link">Silva and Zanella (2022)</a>.
 The code below makes use of the package “matrixStats”.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">l_common_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/matrixStats/man/rowLogSumExps.html" class="external-link">rowLogSumExps</a></span><span class="op">(</span><span class="op">-</span><span class="va">log_lik_mix</span><span class="op">)</span></span>
 <span><span class="va">log_weights</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="va">log_lik_mix</span> <span class="op">-</span> <span class="va">l_common_mix</span></span>
 <span><span class="va">elpd_mixis</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/matrixStats/man/logSumExp.html" class="external-link">logSumExp</a></span><span class="op">(</span><span class="op">-</span><span class="va">l_common_mix</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/pkg/matrixStats/man/rowLogSumExps.html" class="external-link">rowLogSumExps</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">log_weights</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -296,15 +320,18 @@ samples from each and discarding the first
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mi>k</mi></mrow><annotation encoding="application/x-tex">10k</annotation></semantics></math>
 as warmup. This is computationally heavy, hence we have saved the
 results and we just load them in the current vignette.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">voice_loo</span><span class="op">)</span></span>
 <span><span class="va">elpd_loo</span> <span class="op">&lt;-</span> <span class="va">voice_loo</span><span class="op">$</span><span class="va">elpd_loo</span></span></code></pre></div>
 <p>We can then compute the root mean squared error (RMSE) of the PSIS
 and mixture estimators relative to such benchmark values.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">elpd_psis</span> <span class="op">&lt;-</span> <span class="va">loo_post</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"RMSE(PSIS) ="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">-</span><span class="va">elpd_psis</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> ,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"RMSE(MixIS) ="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">-</span><span class="va">elpd_mixis</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> ,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"RMSE(PSIS) ="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">-</span><span class="va">elpd_psis</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> ,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "RMSE(PSIS) = 0.09"</code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"RMSE(MixIS) ="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">-</span><span class="va">elpd_mixis</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> ,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "RMSE(MixIS) = 0.04"</code></pre>
 <p>Here mixture estimator provides a reduction in RMSE. Note that this
 value would increase with the number of samples drawn from the posterior
 and mixture, since in this example the RMSE of MixIS will exhibit a
@@ -314,11 +341,16 @@ size; see also Figure 3 of Silva and Zanella (2022) for analogous
 results).</p>
 <p>We then compare the overall ELPD estimates with the brute force
 one.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">elpd_psis</span> <span class="op">&lt;-</span> <span class="va">loo_post</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (PSIS)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_psis</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (MixIS)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_mixis</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (brute force)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (PSIS)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_psis</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "ELPD (PSIS)= -42.21"</code></pre>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (MixIS)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_mixis</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "ELPD (MixIS)= -45.02"</code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ELPD (brute force)="</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">elpd_loo</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "ELPD (brute force)= -45.63"</code></pre>
 <p>In this example, MixIS provides a more accurate ELPD estimate closer
 to the brute force estimate, while PSIS severely overestimates the ELPD.
 Note that low accuracy of the PSIS ELPD estimate is expected in this

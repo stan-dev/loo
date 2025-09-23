@@ -45,21 +45,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
-<li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+<li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -97,7 +96,7 @@
                         <h4 data-toc-skip class="author">Paul Bürkner,
 Jonah Gabry, Aki Vehtari</h4>
             
-            <h4 data-toc-skip class="date">2025-09-21</h4>
+            <h4 data-toc-skip class="date">2025-09-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-lfo.Rmd" class="external-link"><code>vignettes/loo2-lfo.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-lfo.Rmd</code></div>
@@ -109,8 +108,6 @@ Jonah Gabry, Aki Vehtari</h4>
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Approximate leave-future-out cross-validation for Bayesian time series models}
 -->
-<p><strong>NOTE: We recommend viewing the fully rendered version of this
-vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https://mc-stan.org/loo/articles/</a></strong></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -436,6 +433,7 @@ and then look at the time series.</p>
 <span>    x <span class="op">=</span> <span class="st">"Year"</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/hurondata-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The above plot shows rather strong autocorrelation of the time-series
 as well as some trend towards lower levels for later points in time.</p>
 <p>We can specify an AR(4) model for these data using the
@@ -468,6 +466,7 @@ plotted, which reveals a rather good fit to the data.</p>
 <span>    title <span class="op">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/plotpreds-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>To allow for reasonable predictions of future values, we will require
 at least
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>20</mn></mrow><annotation encoding="application/x-tex">L = 20</annotation></semantics></math>
@@ -480,6 +479,19 @@ for the 1-SAP case.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo_cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="fu"><a href="https://mc-stan.org/rstantools/reference/log_lik.html" class="external-link">log_lik</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">[</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="va">N</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_cv</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Computed from 4000 by 78 log-likelihood matrix.
+
+         Estimate   SE
+elpd_loo    -88.5  6.4
+p_loo         4.7  1.0
+looic       177.1 12.8
+------
+MCSE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k &lt; 0.7).
+See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div class="section level2">
 <h2 id="step-ahead-predictions-leaving-out-all-future-values">1-step-ahead predictions leaving out all future values<a class="anchor" aria-label="anchor" href="#step-ahead-predictions-leaving-out-all-future-values"></a>
@@ -500,7 +512,7 @@ values of
 exact LFO-CV for the 1-SAP case so we can use it as a benchmark later.
 The initial step for the exact computation is to calculate the
 log-predictive densities by refitting the model many times:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loglik_exact</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fu"><a href="https://mc-stan.org/posterior/reference/draws-index.html" class="external-link">ndraws</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="va">L</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">past</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">i</span></span>
@@ -511,7 +523,7 @@ log-predictive densities by refitting the model many times:</p>
 <span>  <span class="va">loglik_exact</span><span class="op">[</span>, <span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/log_lik.html" class="external-link">log_lik</a></span><span class="op">(</span><span class="va">fit_i</span>, newdata <span class="op">=</span> <span class="va">df_oos</span>, oos <span class="op">=</span> <span class="va">oos</span><span class="op">)</span><span class="op">[</span>, <span class="va">oos</span><span class="op">]</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Then we compute the exact expected log predictive density (ELPD):</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># some helper functions we'll use throughout</span></span>
 <span></span>
 <span><span class="co"># more stable than log(sum(exp(x))) </span></span>
@@ -536,7 +548,7 @@ log-predictive densities by refitting the model many times:</p>
 <span><span class="va">rbind_print</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exact_elpds_1sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik_exact</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd_1sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ELPD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds_1sap</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">L</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -544,6 +556,9 @@ log-predictive densities by refitting the model many times:</p>
 <span>  <span class="st">"LOO"</span> <span class="op">=</span> <span class="va">loo_cv</span><span class="op">$</span><span class="va">estimates</span><span class="op">[</span><span class="st">"elpd_loo"</span>, <span class="st">"Estimate"</span><span class="op">]</span>,</span>
 <span>  <span class="st">"LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_1sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code><span>      <span class="va">ELPD</span></span>
+<span><span class="va">LOO</span> <span class="op">-</span><span class="fl">88.53</span></span>
+<span><span class="va">LFO</span> <span class="op">-</span><span class="fl">92.48</span></span></code></pre>
 <p>We see that the ELPD from LFO-CV for 1-step-ahead predictions is
 lower than the ELPD estimate from LOO-CV, which should be expected since
 LOO-CV is making use of more of the time series. That is, since the
@@ -559,13 +574,13 @@ Pareto
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 estimate exceeds the threshold of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.7</mn><annotation encoding="application/x-tex">0.7</annotation></semantics></math>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_thres</span> <span class="op">&lt;-</span> <span class="fl">0.7</span></span></code></pre></div>
 <p>The code becomes a little bit more involved as compared to the exact
 LFO-CV. Note that we can compute exact 1-SAP at the refitting points,
 which comes with no additional computational costs since we had to refit
 the model anyway.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">approx_elpds_1sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">N</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># initialize the process for i = L</span></span>
@@ -608,7 +623,7 @@ the model anyway.</p>
 Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-estimates
 are mostly well below the threshold and that we only needed to refit the
 model a few times:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_ks</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ks</span>, <span class="va">ids</span>, <span class="va">thres</span> <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">dat_ks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ks <span class="op">=</span> <span class="va">ks</span>, ids <span class="op">=</span> <span class="va">ids</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dat_ks</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ids</span>, y <span class="op">=</span> <span class="va">ks</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -618,25 +633,30 @@ model a few times:</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Data point"</span>, y <span class="op">=</span> <span class="st">"Pareto k"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">ylim</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">1.5</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Using threshold "</span>, <span class="va">k_thres</span>, </span>
 <span>    <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">refits</span><span class="op">)</span>, </span>
-<span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span></code></pre></div>
+<pre><code>Using threshold  0.7 , model was refit  3  times, at observations 20 45 78</code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP
 ELPD computed above, which indicates our algorithm to compute
 approximate 1-SAP worked well for the present data and model.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">approx_elpd_1sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">approx_elpds_1sap</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu">rbind_print</span><span class="op">(</span></span>
 <span>  <span class="st">"approx LFO"</span> <span class="op">=</span> <span class="va">approx_elpd_1sap</span>,</span>
 <span>  <span class="st">"exact LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_1sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code>             ELPD
+approx LFO -92.48
+exact LFO  -92.48</code></pre>
 <p>Plotting exact against approximate predictions, we see that no
 approximation value deviates far from its exact counterpart, providing
 further evidence for the good quality of our approximation.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dat_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  approx_elpd <span class="op">=</span> <span class="va">approx_elpds_1sap</span>,</span>
 <span>  exact_elpd <span class="op">=</span> <span class="va">exact_elpds_1sap</span></span>
@@ -646,10 +666,11 @@ further evidence for the good quality of our approximation.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Approximate ELPDs"</span>, y <span class="op">=</span> <span class="st">"Exact ELPDs"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/plot1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also look at the maximum difference and average difference
 between the approximate and exact ELPD calculations, which also indicate
 a ver close approximation:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">max_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dat_elpd</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">approx_elpd</span> <span class="op">-</span> <span class="va">exact_elpd</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">dat_elpd</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">approx_elpd</span> <span class="op">-</span> <span class="va">exact_elpd</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -657,6 +678,9 @@ a ver close approximation:</p>
 <span>  <span class="st">"Max diff"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">max_diff</span>, <span class="fl">2</span><span class="op">)</span>, </span>
 <span>  <span class="st">"Mean diff"</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">mean_diff</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code>          [,1]
+Max diff  0.09
+Mean diff 0.01</code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -681,7 +705,7 @@ stability of the PSIS approximation actually stays the same for all
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
 as it only depends on the number of observations we leave out, not on
 the number of observations we predict.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">loglikm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fu"><a href="https://mc-stan.org/posterior/reference/draws-index.html" class="external-link">ndraws</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="va">L</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="va">M</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -693,9 +717,11 @@ the number of observations we predict.</p>
 <span>  <span class="va">loglik</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/log_lik.html" class="external-link">log_lik</a></span><span class="op">(</span><span class="va">fit_past</span>, newdata <span class="op">=</span> <span class="va">df_oos</span>, oos <span class="op">=</span> <span class="va">oos</span><span class="op">)</span></span>
 <span>  <span class="va">loglikm</span><span class="op">[</span>, <span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">[</span>, <span class="va">oos</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exact_elpds_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglikm</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="op">(</span><span class="va">exact_elpd_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ELPD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds_4sap</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span>     <span class="va">ELPD</span> </span>
+<span><span class="op">-</span><span class="fl">405.0813</span> </span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="approximate-m-step-ahead-predictions">Approximate
@@ -705,7 +731,7 @@ predictions<a class="anchor" aria-label="anchor" href="#approximate-m-step-ahead
 <p>Computing the approximate PSIS-LFO-CV for the 4-SAP case is a little
 bit more involved than the approximate version for the 1-SAP case,
 although the underlying principles remain the same.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">approx_elpds_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">N</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># initialize the process for i = L</span></span>
@@ -751,12 +777,14 @@ although the underlying principles remain the same.</p>
 Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-estimates
 are mostly well below the threshold and that we only needed to refit the
 model a few times:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Using threshold "</span>, <span class="va">k_thres</span>, </span>
 <span>    <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">refits</span><span class="op">)</span>, </span>
-<span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="va">M</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span></code></pre></div>
+<pre><code>Using threshold  0.7 , model was refit  3  times, at observations 20 50 90</code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="va">M</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate ELPD computed for the 4-SAP case is not as close to
 its exact counterpart as in the 1-SAP case. In general, the larger
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>,
@@ -766,16 +794,19 @@ It turns out that the ELPD estimates of AR-models with
 show particular variation due to their predictions’ dependency on other
 predicted values. In Bürkner et al. (2020) we provide further
 explanation and simulations for these cases.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">approx_elpd_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">approx_elpds_4sap</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu">rbind_print</span><span class="op">(</span></span>
 <span>  <span class="st">"Approx LFO"</span> <span class="op">=</span> <span class="va">approx_elpd_4sap</span>,</span>
 <span>  <span class="st">"Exact LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_4sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code>              ELPD
+Approx LFO -405.35
+Exact LFO  -405.08</code></pre>
 <p>Plotting exact against approximate pointwise predictions confirms
 that, for a few specific data points, the approximate predictions
 underestimate the exact predictions.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dat_elpd_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  approx_elpd <span class="op">=</span> <span class="va">approx_elpds_4sap</span>,</span>
 <span>  exact_elpd <span class="op">=</span> <span class="va">exact_elpds_4sap</span></span>
@@ -785,6 +816,7 @@ underestimate the exact predictions.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Approximate ELPDs"</span>, y <span class="op">=</span> <span class="st">"Exact ELPDs"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="loo2-lfo_files/figure-html/plot4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -825,8 +857,58 @@ Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html" cl
 <div class="section level3">
 <h3 id="appendix-session-information">Appendix: Session information<a class="anchor" aria-label="anchor" href="#appendix-session-information"></a>
 </h3>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>R version 4.5.1 (2025-06-13 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 26100)
+
+Matrix products: default
+  LAPACK version 3.12.1
+
+locale:
+[1] LC_COLLATE=English_United States.utf8 
+[2] LC_CTYPE=English_United States.utf8   
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.utf8    
+
+time zone: America/Los_Angeles
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.0.9000 bayesplot_1.13.0   loo_2.8.0.9000     brms_2.22.0       
+[5] Rcpp_1.1.0         knitr_1.50        
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6         tensorA_0.36.2.1     xfun_0.53           
+ [4] bslib_0.9.0          QuickJSR_1.8.0       htmlwidgets_1.6.4   
+ [7] processx_3.8.6       inline_0.3.21        lattice_0.22-7      
+[10] callr_3.7.6          ps_1.9.1             vctrs_0.6.5         
+[13] tools_4.5.1          generics_0.1.4       stats4_4.5.1        
+[16] curl_7.0.0           parallel_4.5.1       tibble_3.3.0        
+[19] pkgconfig_2.0.3      Matrix_1.7-4         checkmate_2.3.3     
+[22] RColorBrewer_1.1-3   S7_0.2.0             desc_1.4.3          
+[25] distributional_0.5.0 RcppParallel_5.1.10  lifecycle_1.0.4     
+[28] compiler_4.5.1       farver_2.1.2         stringr_1.5.2       
+[31] textshaping_1.0.3    Brobdingnag_1.2-9    codetools_0.2-20    
+[34] htmltools_0.5.8.1    sass_0.4.10          yaml_2.3.10         
+[37] pillar_1.11.1        pkgdown_2.1.3        jquerylib_0.1.4     
+[40] cachem_1.1.0         StanHeaders_2.32.10  bridgesampling_1.1-2
+[43] abind_1.4-8          nlme_3.1-168         posterior_1.6.1     
+[46] rstan_2.32.7         tidyselect_1.2.1     digest_0.6.37       
+[49] mvtnorm_1.3-3        stringi_1.8.7        dplyr_1.1.4.9000    
+[52] labeling_0.4.3       fastmap_1.2.0        grid_4.5.1          
+[55] colorspace_2.1-1     cli_3.6.5            magrittr_2.0.4      
+[58] pkgbuild_1.4.8       withr_3.0.2          scales_1.4.0        
+[61] backports_1.5.0      rmarkdown_2.29       matrixStats_1.5.0   
+[64] gridExtra_2.3        ragg_1.5.0           coda_0.19-4.1       
+[67] evaluate_1.0.5       V8_6.0.5             rstantools_2.4.0    
+[70] rlang_1.1.6          glue_1.8.0           jsonlite_2.0.0      
+[73] R6_2.6.1             systemfonts_1.2.3    fs_1.6.6            </code></pre>
 </div>
 <div class="section level3">
 <h3 id="appendix-licenses">Appendix: Licenses<a class="anchor" aria-label="anchor" href="#appendix-licenses"></a>

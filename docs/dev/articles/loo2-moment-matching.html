@@ -45,21 +45,20 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-other-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Other Packages</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
-<li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
+<li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
-    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
-    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/shinystan">shinystan</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstantools">rstantools</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -97,7 +96,7 @@
                         <h4 data-toc-skip class="author">Topi Paananen,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-09-21</h4>
+            <h4 data-toc-skip class="date">2025-09-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-moment-matching.Rmd</code></div>
@@ -219,12 +218,20 @@ package:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">roaches</span>, package <span class="op">=</span> <span class="st">"rstanarm"</span><span class="op">)</span></span>
 <span><span class="va">roaches</span><span class="op">$</span><span class="va">roach1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">$</span><span class="va">roach1</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">roaches</span><span class="op">$</span><span class="va">y</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">roaches</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span>,<span class="st">"exposure2"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">roaches</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"roach1"</span>, <span class="st">"treatment"</span>, <span class="st">"senior"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">[</span>, <span class="st">"exposure2"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
 <span></span>
-<span><span class="va">standata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>N <span class="op">=</span> <span class="va">n</span>, K <span class="op">=</span> <span class="va">k</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">y</span>, offset <span class="op">=</span> <span class="va">offset</span>, beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>, alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span><span class="op">)</span></span>
+<span><span class="va">standata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  N <span class="op">=</span> <span class="va">n</span>,</span>
+<span>  K <span class="op">=</span> <span class="va">k</span>,</span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span>,</span>
+<span>  offset <span class="op">=</span> <span class="va">offset</span>,</span>
+<span>  beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compile</span></span>
 <span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span>
@@ -384,7 +391,9 @@ look like this:</p>
 <span><span class="va">.create_skeleton</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">pars</span>, <span class="va">dims</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">pars</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">len_dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dims</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">len_dims</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">len_dims</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fl">0</span>, dim <span class="op">=</span> <span class="va">dims</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">pars</span></span>
@@ -399,7 +408,7 @@ look like this:</p>
 <span><span class="co"># compute a matrix of log-likelihood values for the ith observation</span></span>
 <span><span class="co"># matrix contains information about the number of MCMC chains</span></span>
 <span><span class="va">log_lik_i_stanfit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">i</span>, <span class="va">parameter_name</span> <span class="op">=</span> <span class="st">"log_lik"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">parameter_name</span>, merge_chains <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span>, , <span class="va">i</span><span class="op">]</span></span>
+<span>  <span class="fu">loo</span><span class="fu">::</span><span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">parameter_name</span>, merge_chains <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span>,, <span class="va">i</span><span class="op">]</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># transform parameters to the unconstraint space</span></span>
@@ -417,13 +426,24 @@ look like this:</p>
 <span></span>
 <span><span class="co"># compute log_prob for each posterior draws on the unconstrained space</span></span>
 <span><span class="va">log_prob_upars_stanfit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">upars</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">upars</span>, <span class="fl">1</span>, <span class="fu">rstan</span><span class="fu">::</span><span class="va"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html" class="external-link">log_prob</a></span>, object <span class="op">=</span> <span class="va">x</span>,</span>
-<span>        adjust_transform <span class="op">=</span> <span class="cn">TRUE</span>, gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span></span>
+<span>    <span class="va">upars</span>,</span>
+<span>    <span class="fl">1</span>,</span>
+<span>    <span class="fu">rstan</span><span class="fu">::</span><span class="va"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html" class="external-link">log_prob</a></span>,</span>
+<span>    object <span class="op">=</span> <span class="va">x</span>,</span>
+<span>    adjust_transform <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    gradient <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># compute log_lik values based on the unconstrained parameters</span></span>
-<span><span class="va">log_lik_i_upars_stanfit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">upars</span>, <span class="va">i</span>, <span class="va">parameter_name</span> <span class="op">=</span> <span class="st">"log_lik"</span>,</span>
-<span>                                  <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">log_lik_i_upars_stanfit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">upars</span>,</span>
+<span>  <span class="va">i</span>,</span>
+<span>  <span class="va">parameter_name</span> <span class="op">=</span> <span class="st">"log_lik"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">upars</span><span class="op">)</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>

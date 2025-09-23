@@ -50,6 +50,7 @@ jobs:
             any::StanHeaders
             any::knitr
             any::withr
+            any::spdep
           needs: website
 
       # - uses: actions/cache@v4
