@@ -70,11 +70,7 @@ jobs:
           )
         shell: Rscript {0}
 
-      - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+      - uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          clean: false
-          branch: master
-          folder: docs
-          target-folder: docs
+          commit_message: "pkgdown: update docs [skip CI]"
+          file_pattern: docs/**
