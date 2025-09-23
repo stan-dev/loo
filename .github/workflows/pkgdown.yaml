@@ -49,6 +49,7 @@ jobs:
             any::spdep
             any::StanHeaders
             any::knitr
+            any::withr
           needs: website
 
       # - uses: actions/cache@v4
@@ -58,11 +59,14 @@ jobs:
 
       - name: Build site
         run: |
-          pkgdown::build_site_github_pages(
-            lazy = TRUE,
-            install = TRUE,
-            run_dont_run = TRUE,
-            new_process = TRUE
+          withr::with_envvar(
+            c("NOT_CRAN" = "true"),
+            pkgdown::build_site_github_pages(
+              lazy = FALSE, # change to TRUE if runner times out.
+              install = TRUE,
+              run_dont_run = TRUE,
+              new_process = TRUE
+            )
           )
         shell: Rscript {0}
 
