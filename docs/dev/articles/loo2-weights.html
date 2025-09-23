@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Jonah Gabry</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-weights.Rmd" class="external-link"><code>vignettes/loo2-weights.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-weights.Rmd" class="external-link"><code>vignettes/loo2-weights.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-weights.Rmd</code></div>
     </div>
 
@@ -126,10 +132,10 @@ Analysis, :10.1214/17-BA1091. <a href="https://projecteuclid.org/euclid.ba/15160
 vignette. Here we just quote from the abstract of the paper:</p>
 <blockquote>
 <p><strong>Abstract</strong>: Bayesian model averaging is flawed in the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℳ</mi><annotation encoding="application/x-tex">\mathcal{M}</annotation></semantics></math>-open
-setting in which the true data-generating process is not one of the
-candidate models being fit. We take the idea of stacking from the point
-estimation literature and generalize to the combination of predictive
+<span class="math inline">\(\mathcal{M}\)</span>-open setting in which
+the true data-generating process is not one of the candidate models
+being fit. We take the idea of stacking from the point estimation
+literature and generalize to the combination of predictive
 distributions. We extend the utility function to any proper scoring rule
 and use Pareto smoothed importance sampling to efficiently compute the
 required leave-one-out posterior distributions. We compare stacking of
@@ -294,8 +300,7 @@ MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
 All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>One benefit of PSIS-LOO over WAIC is better diagnostics. Here for
-both models 3 and 4 all
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>&lt;</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">k&lt;0.7</annotation></semantics></math>
+both models 3 and 4 all <span class="math inline">\(k&lt;0.7\)</span>
 and the Monte Carlo SE of <code>elpd_loo</code> is 0.1 or less, and we
 can expect the model comparison to be reliable.</p>
 <p>Next we compute and compare 1) WAIC weights, 2) Pseudo-BMA weights
@@ -415,78 +420,74 @@ informative priors as in <em>Statistical Rethinking</em>).</p>
 as the conditional observation model.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit10</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Warning: Found 3 observation(s) with a pareto_k &gt; 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 3 times to compute the ELPDs for the problematic observations directly.</code></pre>
+<pre><code>Warning: Found 2 observation(s) with a pareto_k &gt; 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 2 times to compute the ELPDs for the problematic observations directly.</code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 10 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo    -40.6  6.1
-p_loo         5.4  1.9
-looic        81.3 12.1
+elpd_loo    -40.9  6.1
+p_loo         5.7  2.0
+looic        81.7 12.2
 ------
 MCSE of elpd_loo is NA.
-MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 0.8]).
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 0.7]).
 
 Pareto k diagnostic values:
                          Count Pct.    Min. ESS
-(-Inf, 0.7]   (good)     7     70.0%   327     
-   (0.7, 1]   (bad)      3     30.0%   &lt;NA&gt;    
+(-Inf, 0.7]   (good)     8     80.0%   160     
+   (0.7, 1]   (bad)      2     20.0%   &lt;NA&gt;    
    (1, Inf)   (very bad) 0      0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
-<p>We get at least one observation with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>&gt;</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">k&gt;0.7</annotation></semantics></math>
-and the estimated effective number of parameters <code>p_loo</code> is
-larger than the total number of parameters in the model. This indicates
-that Poisson might be too narrow. A negative binomial model might be
-better, but with so few observations it is not so clear.</p>
+<p>We get at least one observation with <span class="math inline">\(k&gt;0.7\)</span> and the estimated effective
+number of parameters <code>p_loo</code> is larger than the total number
+of parameters in the model. This indicates that Poisson might be too
+narrow. A negative binomial model might be better, but with so few
+observations it is not so clear.</p>
 <p>We can compute LOO more accurately by running Stan again for the
-leave-one-out folds with high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+leave-one-out folds with high <span class="math inline">\(k\)</span>
 estimates. When using <strong>rstanarm</strong> this can be done by
 specifying the <code>k_threshold</code> argument:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit10</span>, k_threshold<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span></span></code></pre></div>
-<pre><code>3 problematic observation(s) found.
-Model will be refit 3 times.</code></pre>
+<pre><code>2 problematic observation(s) found.
+Model will be refit 2 times.</code></pre>
 <pre><code>
-Fitting model 1 out of 3 (leaving out observation 4)</code></pre>
+Fitting model 1 out of 2 (leaving out observation 6)</code></pre>
 <pre><code>
-Fitting model 2 out of 3 (leaving out observation 6)</code></pre>
-<pre><code>
-Fitting model 3 out of 3 (leaving out observation 10)</code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+Fitting model 2 out of 2 (leaving out observation 10)</code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 10 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo    -40.8  5.9
-p_loo         5.6  1.9
-looic        81.6 11.9
+elpd_loo    -41.1  6.0
+p_loo         5.9  2.0
+looic        82.2 12.1
 ------
 MCSE of elpd_loo is 0.2.
-MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 0.8]).
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 0.7]).
 
 All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>In this case we see that there is not much difference, and thus it is
 relatively safe to continue.</p>
 <p>As a comparison we also compute WAIC:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">waic10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/waic.html">waic</a></span><span class="op">(</span><span class="va">fit10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: 
 4 (40.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">waic10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 10 log-likelihood matrix.
 
           Estimate   SE
-elpd_waic    -40.1  6.0
-p_waic         4.9  1.8
-waic          80.2 11.9
+elpd_waic    -40.2  6.0
+p_waic         5.0  1.8
+waic          80.4 12.0
 
 4 (40.0%) p_waic estimates greater than 0.4. We recommend trying loo instead. </code></pre>
 <p>The WAIC computation is giving warnings and the estimated ELPD is
@@ -494,10 +495,10 @@ slightly more optimistic. We recommend using the PSIS-LOO results
 instead.</p>
 <p>To assess whether the contact rate and interaction term are useful,
 we can make a comparison to models without these terms.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit11</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit10</span>, formula <span class="op">=</span> <span class="va">total_tools</span> <span class="op">~</span> <span class="va">log_pop</span> <span class="op">+</span> <span class="va">contact_high</span><span class="op">)</span></span>
 <span><span class="va">fit12</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit10</span>, formula <span class="op">=</span> <span class="va">total_tools</span> <span class="op">~</span> <span class="va">log_pop</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">loo11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit11</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 10 log-likelihood matrix.
@@ -512,7 +513,7 @@ MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
 
 All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">loo12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit12</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: Found 1 observation(s) with a pareto_k &gt; 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.</code></pre>
 <pre><code>
@@ -532,17 +533,17 @@ Pareto k diagnostic values:
    (0.7, 1]   (bad)      1     10.0%   &lt;NA&gt;    
    (1, Inf)   (very bad) 0      0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit11</span>, k_threshold<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span></span></code></pre></div>
 <pre><code>All pareto_k estimates below user-specified threshold of 0.7. 
 Returning loo object.</code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit12</span>, k_threshold<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span></span></code></pre></div>
 <pre><code>1 problematic observation(s) found.
 Model will be refit 1 times.</code></pre>
 <pre><code>
 Fitting model 1 out of 1 (leaving out observation 10)</code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lpd_point</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  <span class="va">loo10</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>, <span class="st">"elpd_loo"</span><span class="op">]</span>, </span>
 <span>  <span class="va">loo11</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>, <span class="st">"elpd_loo"</span><span class="op">]</span>, </span>
@@ -550,15 +551,15 @@ Fitting model 1 out of 1 (leaving out observation 10)</code></pre>
 <span><span class="op">)</span></span></code></pre></div>
 <p>For comparison we’ll also compute WAIC values for these additional
 models:</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">waic11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/waic.html">waic</a></span><span class="op">(</span><span class="va">fit11</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: 
 3 (30.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">waic12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/waic.html">waic</a></span><span class="op">(</span><span class="va">fit12</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: 
 5 (50.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.</code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">waics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="va">waic10</span><span class="op">$</span><span class="va">estimates</span><span class="op">[</span><span class="st">"elpd_waic"</span>, <span class="fl">1</span><span class="op">]</span>, </span>
 <span>  <span class="va">waic11</span><span class="op">$</span><span class="va">estimates</span><span class="op">[</span><span class="st">"elpd_waic"</span>, <span class="fl">1</span><span class="op">]</span>, </span>
@@ -569,16 +570,16 @@ PSIS-LOO instead.</p>
 <p>Finally, we compute 1) WAIC weights, 2) Pseudo-BMA weights without
 Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian bootstrap, and
 4) Bayesian stacking weights.</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">waic_wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">waics</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">waics</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pbma_wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo_model_weights.html">pseudobma_weights</a></span><span class="op">(</span><span class="va">lpd_point</span>, BB<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">pbma_BB_wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo_model_weights.html">pseudobma_weights</a></span><span class="op">(</span><span class="va">lpd_point</span><span class="op">)</span> <span class="co"># default is BB=TRUE</span></span>
 <span><span class="va">stacking_wts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo_model_weights.html">stacking_weights</a></span><span class="op">(</span><span class="va">lpd_point</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">waic_wts</span>, <span class="va">pbma_wts</span>, <span class="va">pbma_BB_wts</span>, <span class="va">stacking_wts</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code>       waic_wts pbma_wts pbma_BB_wts stacking_wts
-model1     0.34     0.24        0.22          0.0
-model2     0.62     0.75        0.63          0.8
-model3     0.04     0.02        0.15          0.2</code></pre>
+model1     0.32     0.19        0.18          0.0
+model2     0.64     0.79        0.69          0.8
+model3     0.04     0.02        0.14          0.2</code></pre>
 <p>All weights favor the second model with the log population and the
 contact rate. WAIC weights and Pseudo-BMA weights (without Bayesian
 bootstrap) are similar, while Pseudo-BMA+ is more cautious and closer to
@@ -607,7 +608,7 @@ model objects from <strong>rstanarm</strong>) as well as fitted model
 objects from other packages (e.g. <strong>brms</strong>) that do the
 preparation work for the user (see, e.g., the examples at
 <code><a href="https://mc-stan.org/loo/reference/loo_model_weights.html">help("loo_model_weights", package = "rstanarm")</a></code>).</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># using list of loo objects</span></span>
 <span><span class="va">loo_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">loo10</span>, <span class="va">loo11</span>, <span class="va">loo12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/loo_model_weights.html">loo_model_weights</a></span><span class="op">(</span><span class="va">loo_list</span><span class="op">)</span></span></code></pre></div>
@@ -617,22 +618,22 @@ preparation work for the user (see, e.g., the examples at
 fit10 0.000 
 fit11 0.802 
 fit12 0.198 </code></pre>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/loo_model_weights.html">loo_model_weights</a></span><span class="op">(</span><span class="va">loo_list</span>, method <span class="op">=</span> <span class="st">"pseudobma"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Method: pseudo-BMA+ with Bayesian bootstrap
 ------
       weight
-fit10 0.210 
-fit11 0.640 
-fit12 0.150 </code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+fit10 0.169 
+fit11 0.644 
+fit12 0.187 </code></pre>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/loo_model_weights.html">loo_model_weights</a></span><span class="op">(</span><span class="va">loo_list</span>, method <span class="op">=</span> <span class="st">"pseudobma"</span>, BB <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Method: pseudo-BMA
 ------
       weight
-fit10 0.237 
-fit11 0.745 
-fit12 0.018 </code></pre>
+fit10 0.189 
+fit11 0.792 
+fit12 0.019 </code></pre>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

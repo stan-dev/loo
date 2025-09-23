@@ -1,4 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://mc-stan.org/loo/dev/CONTRIBUTING.html</loc></url>
+<url><loc>https://mc-stan.org/loo/dev/LICENSE-text.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/articles/index.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/articles/loo2-elpd.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/articles/loo2-example.html</loc></url>
@@ -10,10 +12,9 @@
 <url><loc>https://mc-stan.org/loo/dev/articles/loo2-weights.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/articles/loo2-with-rstan.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/authors.html</loc></url>
-<url><loc>https://mc-stan.org/loo/dev/CONTRIBUTING.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/index.html</loc></url>
-<url><loc>https://mc-stan.org/loo/dev/LICENSE-text.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/news/index.html</loc></url>
+<url><loc>https://mc-stan.org/loo/dev/reference/E_loo.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/ap_psis.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/compare.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/crps.html</loc></url>
@@ -23,7 +24,6 @@
 <url><loc>https://mc-stan.org/loo/dev/reference/elpd.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/example_loglik_array.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/extract_log_lik.html</loc></url>
-<url><loc>https://mc-stan.org/loo/dev/reference/E_loo.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/find_model_names.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/gpdfit.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/importance_sampling.html</loc></url>
@@ -51,8 +51,8 @@
 <url><loc>https://mc-stan.org/loo/dev/reference/print.loo.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/print_dims.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/psis.html</loc></url>
-<url><loc>https://mc-stan.org/loo/dev/reference/psislw.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/psis_approximate_posterior.html</loc></url>
+<url><loc>https://mc-stan.org/loo/dev/reference/psislw.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/relative_eff.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/sis.html</loc></url>
 <url><loc>https://mc-stan.org/loo/dev/reference/tis.html</loc></url>

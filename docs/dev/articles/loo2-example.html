@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Jonah Gabry</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-example.Rmd</code></div>
     </div>
 
@@ -118,10 +124,8 @@ package to carry out Pareto smoothed importance-sampling leave-one-out
 cross-validation (PSIS-LOO) for purposes of model checking and model
 comparison.</p>
 <p>In this vignette we can’t provide all necessary background
-information on PSIS-LOO and its diagnostics (Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-and effective sample size), so we encourage readers to refer to the
-following papers for more details:</p>
+information on PSIS-LOO and its diagnostics (Pareto <span class="math inline">\(k\)</span> and effective sample size), so we
+encourage readers to refer to the following papers for more details:</p>
 <ul>
 <li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian
 model evaluation using leave-one-out cross-validation and WAIC.
@@ -167,12 +171,9 @@ apartments. Here is how Gelman and Hill describe the experiment and data
 (pg. 161):</p>
 <blockquote>
 <p>the treatment and control were applied to 160 and 104 apartments,
-respectively, and the outcome measurement
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-in each apartment
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-was the number of roaches caught in a set of traps. Different apartments
-had traps for different numbers of days</p>
+respectively, and the outcome measurement <span class="math inline">\(y_i\)</span> in each apartment <span class="math inline">\(i\)</span> was the number of roaches caught in a
+set of traps. Different apartments had traps for different numbers of
+days</p>
 </blockquote>
 <p>In addition to an intercept, the regression predictors for the model
 are <code>roach1</code>, the pre-treatment number of roaches (rescaled
@@ -243,24 +244,17 @@ not able to correct the difference. We can see more details by printing
 the <code>loo</code> object.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo1</span><span class="op">)</span></span></code></pre></div>
-<p>The table shows us a summary of Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostic, which is used to assess the reliability of the estimates. In
-addition to the proportion of leave-one-out folds with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values in different intervals, the minimum of the effective sample sizes
-in that category is shown to give idea why higher
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values are bad. Since we have some
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k&gt;1</annotation></semantics></math>,
-we are not able to compute an estimate for the Monte Carlo standard
-error (SE) of the expected log predictive density
-(<code>elpd_loo</code>) and <code>NA</code> is displayed. (Full details
-on the interpretation of the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostics are available in the Vehtari, Gelman, and Gabry (2017) and
-Vehtari, Simpson, Gelman, Yao, and Gabry (2024) papers referenced at the
-top of this vignette.)</p>
+<p>The table shows us a summary of Pareto <span class="math inline">\(k\)</span> diagnostic, which is used to assess the
+reliability of the estimates. In addition to the proportion of
+leave-one-out folds with <span class="math inline">\(k\)</span> values
+in different intervals, the minimum of the effective sample sizes in
+that category is shown to give idea why higher <span class="math inline">\(k\)</span> values are bad. Since we have some
+<span class="math inline">\(k&gt;1\)</span>, we are not able to compute
+an estimate for the Monte Carlo standard error (SE) of the expected log
+predictive density (<code>elpd_loo</code>) and <code>NA</code> is
+displayed. (Full details on the interpretation of the Pareto <span class="math inline">\(k\)</span> diagnostics are available in the
+Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao, and
+Gabry (2024) papers referenced at the top of this vignette.)</p>
 <p>In this case the <code>elpd_loo</code> estimate should not be
 considered reliable. If we had a well-specified model we would expect
 the estimated effective number of parameters (<code>p_loo</code>) to be
@@ -270,26 +264,21 @@ number of parameters in the model, indicating severe model
 misspecification.</p>
 </div>
 <div class="section level4">
-<h4 id="plotting-pareto-k-diagnostics">Plotting Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+<h4 id="plotting-pareto-k-diagnostics">Plotting Pareto <span class="math inline">\(k\)</span>
 diagnostics<a class="anchor" aria-label="anchor" href="#plotting-pareto-k-diagnostics"></a>
 </h4>
 <p>Using the <code>plot</code> method on our <code>loo1</code> object
-produces a plot of the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values (in the same order as the observations in the dataset used to fit
-the model) with horizontal lines corresponding to the same categories as
-in the printed output above.</p>
+produces a plot of the <span class="math inline">\(k\)</span> values (in
+the same order as the observations in the dataset used to fit the model)
+with horizontal lines corresponding to the same categories as in the
+printed output above.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loo1</span><span class="op">)</span></span></code></pre></div>
-<p>This plot is useful to quickly see the distribution of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values, but it’s often also possible to see structure with respect to
-data ordering. In our case this is mild, but there seems to be a block
-of data that is somewhat easier to predict (indices around 90–150).
-Unfortunately even for these data points we see some high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values.</p>
+<p>This plot is useful to quickly see the distribution of <span class="math inline">\(k\)</span> values, but it’s often also possible to
+see structure with respect to data ordering. In our case this is mild,
+but there seems to be a block of data that is somewhat easier to predict
+(indices around 90–150). Unfortunately even for these data points we see
+some high <span class="math inline">\(k\)</span> values.</p>
 </div>
 <div class="section level4">
 <h4 id="marginal-posterior-predictive-checks">Marginal posterior predictive checks<a class="anchor" aria-label="anchor" href="#marginal-posterior-predictive-checks"></a>
@@ -297,13 +286,11 @@ values.</p>
 <p>The <code>loo</code> package can be used in combination with the
 <code>bayesplot</code> package for leave-one-out cross-validation
 marginal posterior predictive checks <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al (2018)</a>. LOO-PIT
-values are cumulative probabilities for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-computed using the LOO marginal predictive distributions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i|y_{-i})</annotation></semantics></math>.
-For a good model, the distribution of LOO-PIT values should be uniform.
-In the following QQ-plot the LOO-PIT values for our model (y-axi) is
-compared to standard uniform distribution (x-axis).</p>
+values are cumulative probabilities for <span class="math inline">\(y_i\)</span> computed using the LOO marginal
+predictive distributions <span class="math inline">\(p(y_i|y_{-i})\)</span>. For a good model, the
+distribution of LOO-PIT values should be uniform. In the following
+QQ-plot the LOO-PIT values for our model (y-axi) is compared to standard
+uniform distribution (x-axis).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yrep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
 <span></span>
@@ -324,9 +311,7 @@ model that allows for greater dispersion.</p>
 binomial</a> regression, which is commonly used for overdispersed count
 data.<br>
 Unlike the Poisson distribution, the negative binomial distribution
-allows the conditional mean and variance of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-to differ.</p>
+allows the conditional mean and variance of <span class="math inline">\(y\)</span> to differ.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fit1</span>, family <span class="op">=</span> <span class="va">neg_binomial_2</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -334,30 +319,22 @@ to differ.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loo2</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>Using the <code>label_points</code> argument will label any
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values larger than the diagnostic threshold with the index of the
-corresponding data point. These high values are often the result of
-model misspecification and frequently correspond to data points that
-would be considered ``outliers’’ in the data and surprising according to
-the model <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al
-(2019)</a>. Unfortunately, while large
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values are a useful indicator of model misspecification, small
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values are not a guarantee that a model is well-specified.</p>
-<p>If there are a small number of problematic
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values then we can use a feature in <strong>rstanarm</strong> that lets
-us refit the model once for each of these problematic observations. Each
-time the model is refit, one of the observations with a high
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-value is omitted and the LOO calculations are performed exactly for that
+<p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than the diagnostic
+threshold with the index of the corresponding data point. These high
+values are often the result of model misspecification and frequently
+correspond to data points that would be considered ``outliers’’ in the
+data and surprising according to the model <a href="https://arxiv.org/abs/1709.01449" class="external-link">Gabry et al (2019)</a>.
+Unfortunately, while large <span class="math inline">\(k\)</span> values
+are a useful indicator of model misspecification, small <span class="math inline">\(k\)</span> values are not a guarantee that a model
+is well-specified.</p>
+<p>If there are a small number of problematic <span class="math inline">\(k\)</span> values then we can use a feature in
+<strong>rstanarm</strong> that lets us refit the model once for each of
+these problematic observations. Each time the model is refit, one of the
+observations with a high <span class="math inline">\(k\)</span> value is
+omitted and the LOO calculations are performed exactly for that
 observation. The results are then recombined with the approximate LOO
 calculations already carried out for the observations without
-problematic
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values:</p>
+problematic <span class="math inline">\(k\)</span> values:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="../reference/pareto-k-diagnostic.html">pareto_k_values</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit2</span>, save_psis <span class="op">=</span> <span class="cn">TRUE</span>, k_threshold <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></span>

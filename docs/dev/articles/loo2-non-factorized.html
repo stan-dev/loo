@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Paul Bürkner and Jonah Gabry</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-non-factorized.Rmd</code></div>
     </div>
 
@@ -112,100 +118,74 @@ Paul Bürkner and Jonah Gabry</h4>
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>When computing ELPD-based LOO-CV for a Bayesian model we need to
-compute the log leave-one-out predictive densities
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\log{p(y_i | y_{-i})}</annotation></semantics></math>
-for every response value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.222em"></mspace><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">y_i, \: i = 1, \ldots, N</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">y_{-i}</annotation></semantics></math>
-denotes all response values except observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
-To obtain
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i | y_{-i})</annotation></semantics></math>,
-we need to have access to the pointwise likelihood
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i\,|\, y_{-i}, \theta)</annotation></semantics></math>
-and integrate over the model parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>∫</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>θ</mi></mrow><annotation encoding="application/x-tex">
+compute the log leave-one-out predictive densities <span class="math inline">\(\log{p(y_i | y_{-i})}\)</span> for every response
+value <span class="math inline">\(y_i, \: i = 1, \ldots, N\)</span>,
+where <span class="math inline">\(y_{-i}\)</span> denotes all response
+values except observation <span class="math inline">\(i\)</span>. To
+obtain <span class="math inline">\(p(y_i | y_{-i})\)</span>, we need to
+have access to the pointwise likelihood <span class="math inline">\(p(y_i\,|\, y_{-i}, \theta)\)</span> and integrate
+over the model parameters <span class="math inline">\(\theta\)</span>:</p>
+<p><span class="math display">\[
 p(y_i\,|\,y_{-i}) =
   \int p(y_i\,|\, y_{-i}, \theta) \, p(\theta\,|\, y_{-i}) \,d \theta
-</annotation></semantics></math></p>
-<p>Here,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta\,|\, y_{-i})</annotation></semantics></math>
-is the leave-one-out posterior distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
-that is, the posterior distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-obtained by fitting the model while holding out the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
-observation (we will later show how refitting the model to data
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">y_{-i}</annotation></semantics></math>
+\]</span></p>
+<p>Here, <span class="math inline">\(p(\theta\,|\, y_{-i})\)</span> is
+the leave-one-out posterior distribution for <span class="math inline">\(\theta\)</span>, that is, the posterior
+distribution for <span class="math inline">\(\theta\)</span> obtained by
+fitting the model while holding out the <span class="math inline">\(i\)</span>th observation (we will later show how
+refitting the model to data <span class="math inline">\(y_{-i}\)</span>
 can be avoided).</p>
 <p>If the observation model is formulated directly as the product of the
 pointwise observation models, we call it a <em>factorized</em> model. In
 this case, the likelihood is also the product of the pointwise
-likelihood contributions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i\,|\, y_{-i}, \theta)</annotation></semantics></math>.
-To better illustrate possible structures of the observation models, we
-formally divide
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-into two parts, observation-specific latent variables
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>f</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f = (f_1, \ldots, f_N)</annotation></semantics></math>
-and hyperparameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math>,
-so that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i\,|\, y_{-i}, \theta) = p(y_i\,|\, y_{-i}, f_i, \psi)</annotation></semantics></math>.
-Depending on the model, one of the two parts of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-may also be empty. In very simple models, such as linear regression
-models, latent variables are not explicitly presented and response
-values are conditionally independent given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math>,
-so that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>f</mi><mi>i</mi></msub><mo>,</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i\,|\, y_{-i}, f_i, \psi) = p(y_i \,|\, \psi)</annotation></semantics></math>.
-The full likelihood can then be written in the familiar form</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+likelihood contributions <span class="math inline">\(p(y_i\,|\, y_{-i},
+\theta)\)</span>. To better illustrate possible structures of the
+observation models, we formally divide <span class="math inline">\(\theta\)</span> into two parts,
+observation-specific latent variables <span class="math inline">\(f =
+(f_1, \ldots, f_N)\)</span> and hyperparameters <span class="math inline">\(\psi\)</span>, so that <span class="math inline">\(p(y_i\,|\, y_{-i}, \theta) = p(y_i\,|\, y_{-i},
+f_i, \psi)\)</span>. Depending on the model, one of the two parts of
+<span class="math inline">\(\theta\)</span> may also be empty. In very
+simple models, such as linear regression models, latent variables are
+not explicitly presented and response values are conditionally
+independent given <span class="math inline">\(\psi\)</span>, so that
+<span class="math inline">\(p(y_i\,|\, y_{-i}, f_i, \psi) = p(y_i \,|\,
+\psi)\)</span>. The full likelihood can then be written in the familiar
+form</p>
+<p><span class="math display">\[
 p(y \,|\, \psi) = \prod_{i=1}^N p(y_i \,|\, \psi),
-</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y = (y_1, \ldots, y_N)</annotation></semantics></math>
+\]</span></p>
+<p>where <span class="math inline">\(y = (y_1, \ldots, y_N)\)</span>
 denotes the vector of all responses. When the likelihood factorizes this
 way, the conditional pointwise log-likelihood can be obtained easily by
-computing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i\,|\, \psi)</annotation></semantics></math>
-for each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-with computational cost
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math>.</p>
+computing <span class="math inline">\(p(y_i\,|\, \psi)\)</span> for each
+<span class="math inline">\(i\)</span> with computational cost <span class="math inline">\(O(n)\)</span>.</p>
 <p>Yet, there are several reasons why a <em>non-factorized</em>
 observation model may be necessary or preferred. In non-factorized
-models, the joint likelihood of the response values
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y \,|\, \theta)</annotation></semantics></math>
-is not factorized into observation-specific components, but rather given
-directly as one joint expression. For some models, an analytic
-factorized formulation is simply not available in which case we speak of
-a <em>non-factorizable</em> model. Even in models whose observation
-model can be factorized in principle, it may still be preferable to use
-a non-factorized form for reasons of efficiency and numerical stability
+models, the joint likelihood of the response values <span class="math inline">\(p(y \,|\, \theta)\)</span> is not factorized into
+observation-specific components, but rather given directly as one joint
+expression. For some models, an analytic factorized formulation is
+simply not available in which case we speak of a
+<em>non-factorizable</em> model. Even in models whose observation model
+can be factorized in principle, it may still be preferable to use a
+non-factorized form for reasons of efficiency and numerical stability
 (Bürkner et al. 2020).</p>
 <p>Whether a non-factorized model is used by necessity or for efficiency
 and stability, it comes at the cost of having no direct access to the
 leave-one-out predictive densities and thus to the overall leave-one-out
 predictive accuracy. In theory, we can express the observation-specific
 likelihoods in terms of the joint likelihood via</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mo>∫</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><msub><mi>y</mi><mi>i</mi></msub></mrow></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
-p(y_i \,|\, y_{i-1}, \theta) = 
-  \frac{p(y \,|\, \theta)}{p(y_{-i} \,|\, \theta)} = 
+<p><span class="math display">\[
+p(y_i \,|\, y_{i-1}, \theta) =
+  \frac{p(y \,|\, \theta)}{p(y_{-i} \,|\, \theta)} =
   \frac{p(y \,|\, \theta)}{\int p(y \,|\, \theta) \, d y_i},
-</annotation></semantics></math></p>
+\]</span></p>
 <p>but the expression on the right-hand side may not always have an
-analytical solution. Computing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log p(y_i \,|\, y_{-i},
-\theta)</annotation></semantics></math> for non-factorized models is
-therefore often impossible, or at least inefficient and numerically
-unstable. However, there is a large class of multivariate normal and
-Student-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-models for which there are efficient analytical solutions available.</p>
+analytical solution. Computing <span class="math inline">\(\log p(y_i
+\,|\, y_{-i},
+\theta)\)</span> for non-factorized models is therefore often
+impossible, or at least inefficient and numerically unstable. However,
+there is a large class of multivariate normal and Student-<span class="math inline">\(t\)</span> models for which there are efficient
+analytical solutions available.</p>
 <p>More details can be found in our paper about LOO-CV for
 non-factorized models (Bürkner, Gabry, &amp; Vehtari, 2020), which is
 available as a preprint on arXiv (<a href="https://arxiv.org/abs/1810.10559" class="external-link uri">https://arxiv.org/abs/1810.10559</a>).</p>
@@ -216,165 +196,121 @@ available as a preprint on arXiv (<a href="https://arxiv.org/abs/1810.10559" cla
 <p>In this vignette, we will focus on non-factorized multivariate normal
 models. Based on results of Sundararajan and Keerthi (2001), Bürkner et
 al. (2020) show that, for multivariate normal models with coriance
-matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>,
-the LOO predictive mean and standard deviation can be computed as
-follows:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>μ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msubsup><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><msub><mi>g</mi><mi>i</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>σ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msqrt><msubsup><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msubsup></msqrt><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+matrix <span class="math inline">\(C\)</span>, the LOO predictive mean
+and standard deviation can be computed as follows:</p>
+<p><span class="math display">\[\begin{align}
   \mu_{\tilde{y},-i} &amp;= y_i-\bar{c}_{ii}^{-1} g_i \nonumber \\
   \sigma_{\tilde{y},-i} &amp;= \sqrt{\bar{c}_{ii}^{-1}},
-\end{align}</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>g</mi><mi>i</mi></msub><annotation encoding="application/x-tex">g_i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">\bar{c}_{ii}</annotation></semantics></math>
-are
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>g</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>C</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>y</mi><mo stretchy="true" form="postfix">]</mo></mrow><mi>i</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>C</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mi>i</mi><mi>i</mi></mrow></msub><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+\end{align}\]</span> where <span class="math inline">\(g_i\)</span> and
+<span class="math inline">\(\bar{c}_{ii}\)</span> are <span class="math display">\[\begin{align}
   g_i &amp;= \left[C^{-1} y\right]_i \nonumber \\
   \bar{c}_{ii} &amp;= \left[C^{-1}\right]_{ii}.
-\end{align}</annotation></semantics></math></p>
-<p>Using these results, the log predictive density of the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
-observation is then computed as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>−</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><msubsup><mi>σ</mi><mrow><mi>−</mi><mi>i</mi></mrow><mn>2</mn></msubsup><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mi>μ</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><msubsup><mi>σ</mi><mrow><mi>−</mi><mi>i</mi></mrow><mn>2</mn></msubsup></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\end{align}\]</span></p>
+<p>Using these results, the log predictive density of the <span class="math inline">\(i\)</span>th observation is then computed as</p>
+<p><span class="math display">\[
   \log p(y_i \,|\, y_{-i},\theta)
   = - \frac{1}{2}\log(2\pi)
   - \frac{1}{2}\log \sigma^2_{-i}
   - \frac{1}{2}\frac{(y_i-\mu_{-i})^2}{\sigma^2_{-i}}.
-</annotation></semantics></math></p>
-<p>Expressing this same equation in terms of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>g</mi><mi>i</mi></msub><annotation encoding="application/x-tex">g_i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">\bar{c}_{ii}</annotation></semantics></math>,
-the log predictive density becomes:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>−</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><msub><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><msubsup><mi>g</mi><mi>i</mi><mn>2</mn></msubsup><msub><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow></msub></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\]</span></p>
+<p>Expressing this same equation in terms of <span class="math inline">\(g_i\)</span> and <span class="math inline">\(\bar{c}_{ii}\)</span>, the log predictive density
+becomes:</p>
+<p><span class="math display">\[
   \log p(y_i \,|\, y_{-i},\theta)
   = - \frac{1}{2}\log(2\pi)
   + \frac{1}{2}\log \bar{c}_{ii}
   - \frac{1}{2}\frac{g_i^2}{\bar{c}_{ii}}.
-</annotation></semantics></math> (Note that Vehtari et al. (2016) has a
-typo in the corresponding Equation 34.)</p>
+\]</span> (Note that Vehtari et al. (2016) has a typo in the
+corresponding Equation 34.)</p>
 <p>From these equations we can now derive a recipe for obtaining the
 conditional pointwise log-likelihood for <em>all</em> models that can be
 expressed conditionally in terms of a multivariate normal with
-invertible covariance matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>.</p>
+invertible covariance matrix <span class="math inline">\(C\)</span>.</p>
 <div class="section level3">
 <h3 id="approximate-loo-cv-using-integrated-importance-sampling">Approximate LOO-CV using integrated importance-sampling<a class="anchor" aria-label="anchor" href="#approximate-loo-cv-using-integrated-importance-sampling"></a>
 </h3>
 <p>The above LOO equations for multivariate normal models are
-conditional on parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>.
-Therefore, to obtain the leave-one-out predictive density
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_i \,|\, y_{-i})</annotation></semantics></math>
-we need to integrate over
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>∫</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>θ</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
+conditional on parameters <span class="math inline">\(\theta\)</span>.
+Therefore, to obtain the leave-one-out predictive density <span class="math inline">\(p(y_i \,|\, y_{-i})\)</span> we need to integrate
+over <span class="math inline">\(\theta\)</span>,</p>
+<p><span class="math display">\[
 p(y_i\,|\,y_{-i}) =
   \int p(y_i\,|\,y_{-i}, \theta) \, p(\theta\,|\,y_{-i}) \,d\theta.
-</annotation></semantics></math></p>
-<p>Here,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta\,|\,y_{-i})</annotation></semantics></math>
-is the leave-one-out posterior distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
-that is, the posterior distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-obtained by fitting the model while holding out the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
-observation.</p>
-<p>To avoid the cost of sampling from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-leave-one-out posteriors, it is possible to take the posterior draws
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>,</mo><mspace width="0.167em"></mspace><mi>s</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">\theta^{(s)}, \, s=1,\ldots,S</annotation></semantics></math>,
-from the posterior
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta\,|\,y)</annotation></semantics></math>,
-and then approximate the above integral using integrated importance
-sampling (Vehtari et al., 2016, Section 3.6.1):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mspace width="0.167em"></mspace><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><mrow><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
- p(y_i\,|\,y_{-i}) \approx
-   \frac{ \sum_{s=1}^S p(y_i\,|\,y_{-i},\,\theta^{(s)}) \,w_i^{(s)}}{ \sum_{s=1}^S w_i^{(s)}},
-</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">w_i^{(s)}</annotation></semantics></math>
-are importance weights. First we compute the raw importance ratios</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>∝</mo><mfrac><mn>1</mn><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mspace width="0.167em"></mspace><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\]</span></p>
+<p>Here, <span class="math inline">\(p(\theta\,|\,y_{-i})\)</span> is
+the leave-one-out posterior distribution for <span class="math inline">\(\theta\)</span>, that is, the posterior
+distribution for <span class="math inline">\(\theta\)</span> obtained by
+fitting the model while holding out the <span class="math inline">\(i\)</span>th observation.</p>
+<p>To avoid the cost of sampling from <span class="math inline">\(N\)</span> leave-one-out posteriors, it is
+possible to take the posterior draws <span class="math inline">\(\theta^{(s)}, \, s=1,\ldots,S\)</span>, from the
+posterior <span class="math inline">\(p(\theta\,|\,y)\)</span>, and then
+approximate the above integral using integrated importance sampling
+(Vehtari et al., 2016, Section 3.6.1):</p>
+<p><span class="math display">\[
+p(y_i\,|\,y_{-i}) \approx
+   \frac{ \sum_{s=1}^S p(y_i\,|\,y_{-i},\,\theta^{(s)}) \,w_i^{(s)}}{
+\sum_{s=1}^S w_i^{(s)}},
+\]</span></p>
+<p>where <span class="math inline">\(w_i^{(s)}\)</span> are importance
+weights. First we compute the raw importance ratios</p>
+<p><span class="math display">\[
   r_i^{(s)} \propto \frac{1}{p(y_i \,|\, y_{-i}, \,\theta^{(s)})},
-</annotation></semantics></math></p>
+\]</span></p>
 <p>and then stabilize them using Pareto smoothed importance sampling
-(PSIS, Vehtari et al, 2019) to obtain the weights
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">w_i^{(s)}</annotation></semantics></math>.
-The resulting approximation is referred to as PSIS-LOO (Vehtari et al,
-2017).</p>
+(PSIS, Vehtari et al, 2019) to obtain the weights <span class="math inline">\(w_i^{(s)}\)</span>. The resulting approximation is
+referred to as PSIS-LOO (Vehtari et al, 2017).</p>
 </div>
 <div class="section level3">
 <h3 id="exact-loo-cv-with-re-fitting">Exact LOO-CV with re-fitting<a class="anchor" aria-label="anchor" href="#exact-loo-cv-with-re-fitting"></a>
 </h3>
 <p>In order to validate the approximate LOO procedure, and also in order
 to allow exact computations to be made for a small number of
-leave-one-out folds for which the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostic (Vehtari et al, 2024) indicates an unstable approximation, we
-need to consider how we might to do <em>exact</em> leave-one-out CV for
-a non-factorized model. In the case of a Gaussian process that has the
-marginalization property, we could just drop the one row and column of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
-corresponding to the held out out observation. This does not hold in
-general for multivariate normal models, however, and to keep the
-original prior we may need to maintain the full covariance matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
-even when one of the observations is left out.</p>
-<p>The solution is to model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-as a missing observation and estimate it along with all of the other
-model parameters. For a conditional multivariate normal model,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log p(y_i\,|\,y_{-i})</annotation></semantics></math>
-can be computed as follows. First, we model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-as missing and denote the corresponding parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>i</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow></msubsup><annotation encoding="application/x-tex">y_i^{\mathrm{mis}}</annotation></semantics></math>.
-Then, we define</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mrow><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><msubsup><mi>y</mi><mi>i</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow></msubsup><mo>,</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
-y_{\mathrm{mis}(i)} = (y_1, \ldots, y_{i-1}, y_i^{\mathrm{mis}}, y_{i+1}, \ldots, y_N).
-</annotation></semantics></math> to be the same as the full set of
-observations
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>,
-except replacing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-with the parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>i</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow></msubsup><annotation encoding="application/x-tex">y_i^{\mathrm{mis}}</annotation></semantics></math>.</p>
+leave-one-out folds for which the Pareto <span class="math inline">\(k\)</span> diagnostic (Vehtari et al, 2024)
+indicates an unstable approximation, we need to consider how we might to
+do <em>exact</em> leave-one-out CV for a non-factorized model. In the
+case of a Gaussian process that has the marginalization property, we
+could just drop the one row and column of <span class="math inline">\(C\)</span> corresponding to the held out out
+observation. This does not hold in general for multivariate normal
+models, however, and to keep the original prior we may need to maintain
+the full covariance matrix <span class="math inline">\(C\)</span> even
+when one of the observations is left out.</p>
+<p>The solution is to model <span class="math inline">\(y_i\)</span> as
+a missing observation and estimate it along with all of the other model
+parameters. For a conditional multivariate normal model, <span class="math inline">\(\log p(y_i\,|\,y_{-i})\)</span> can be computed as
+follows. First, we model <span class="math inline">\(y_i\)</span> as
+missing and denote the corresponding parameter <span class="math inline">\(y_i^{\mathrm{mis}}\)</span>. Then, we define</p>
+<p><span class="math display">\[
+y_{\mathrm{mis}(i)} = (y_1, \ldots, y_{i-1}, y_i^{\mathrm{mis}},
+y_{i+1}, \ldots, y_N).
+\]</span> to be the same as the full set of observations <span class="math inline">\(y\)</span>, except replacing <span class="math inline">\(y_i\)</span> with the parameter <span class="math inline">\(y_i^{\mathrm{mis}}\)</span>.</p>
 <p>Second, we compute the LOO predictive mean and standard deviations as
-above, but replace
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mrow><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><annotation encoding="application/x-tex">y_{\mathrm{mis}(i)}</annotation></semantics></math>
-in the computation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">\mu_{\tilde{y},-i}</annotation></semantics></math>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>y</mi><mrow><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>−</mo><msubsup><mover><mi>c</mi><mo accent="true">‾</mo></mover><mrow><mi>i</mi><mi>i</mi></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><msub><mi>g</mi><mi>i</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
+above, but replace <span class="math inline">\(y\)</span> with <span class="math inline">\(y_{\mathrm{mis}(i)}\)</span> in the computation of
+<span class="math inline">\(\mu_{\tilde{y},-i}\)</span>:</p>
+<p><span class="math display">\[
 \mu_{\tilde{y},-i} = y_{{\mathrm{mis}}(i)}-\bar{c}_{ii}^{-1}g_i,
-</annotation></semantics></math></p>
+\]</span></p>
 <p>where in this case we have</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><msub><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>C</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><msub><mi>y</mi><mrow><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mi>i</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 g_i = \left[ C^{-1} y_{\mathrm{mis}(i)} \right]_i.
-</annotation></semantics></math></p>
+\]</span></p>
 <p>The conditional log predictive density is then computed with the
-above
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">\mu_{\tilde{y},-i}</annotation></semantics></math>
-and the left out observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>−</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>log</mo><msubsup><mi>σ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow><mn>2</mn></msubsup><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mi>μ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><msubsup><mi>σ</mi><mrow><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo>,</mo><mi>−</mi><mi>i</mi></mrow><mn>2</mn></msubsup></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
+above <span class="math inline">\(\mu_{\tilde{y},-i}\)</span> and the
+left out observation <span class="math inline">\(y_i\)</span>:</p>
+<p><span class="math display">\[
   \log p(y_i\,|\,y_{-i},\theta)
   = - \frac{1}{2}\log(2\pi)
   - \frac{1}{2}\log \sigma^2_{\tilde{y},-i}
-  - \frac{1}{2}\frac{(y_i-\mu_{\tilde{y},-i})^2}{\sigma^2_{\tilde{y},-i}}.
-</annotation></semantics></math></p>
+  -
+\frac{1}{2}\frac{(y_i-\mu_{\tilde{y},-i})^2}{\sigma^2_{\tilde{y},-i}}.
+\]</span></p>
 <p>Finally, the leave-one-out predictive distribution can then be
 estimated as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mi>−</mi><mi>i</mi></mrow></msub><mo>,</mo><msubsup><mi>θ</mi><mrow><mi>−</mi><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
- p(y_i\,|\,y_{-i}) \approx \sum_{s=1}^S p(y_i\,|\,y_{-i}, \theta_{-i}^{(s)}),
-</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>θ</mi><mrow><mi>−</mi><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\theta_{-i}^{(s)}</annotation></semantics></math>
-are draws from the posterior distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta\,|\,y_{\mathrm{mis}(i)})</annotation></semantics></math>.</p>
+<p><span class="math display">\[
+p(y_i\,|\,y_{-i}) \approx \sum_{s=1}^S p(y_i\,|\,y_{-i},
+\theta_{-i}^{(s)}),
+\]</span></p>
+<p>where <span class="math inline">\(\theta_{-i}^{(s)}\)</span> are
+draws from the posterior distribution <span class="math inline">\(p(\theta\,|\,y_{\mathrm{mis}(i)})\)</span>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -383,43 +319,26 @@ are draws from the posterior distribution
 <p>A common non-factorized multivariate normal model is the
 simultaneously autoregressive (SAR) model, which is frequently used for
 spatially correlated data. The lagged SAR model is defined as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mi>ρ</mi><mi>W</mi><mi>y</mi><mo>+</mo><mi>η</mi><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 y = \rho Wy + \eta + \epsilon
-</annotation></semantics></math> or equivalently
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>y</mi><mo>=</mo><mi>η</mi><mo>+</mo><mi>ϵ</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\]</span> or equivalently <span class="math display">\[
 (I - \rho W)y = \eta + \epsilon,
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math>
-is the spatial correlation parameter and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
-is a user-defined weight matrix. The matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
-has entries
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">w_{ii} = 0</annotation></semantics></math>
-along the diagonal and the off-diagonal entries
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">w_{ij}</annotation></semantics></math>
-are larger when areas
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
-are closer to each other. In a linear model, the predictor term
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math>
-is given by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><mi>X</mi><mi>β</mi></mrow><annotation encoding="application/x-tex">\eta = X \beta</annotation></semantics></math>
-with design matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
-and regression coefficients
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
-However, since the above equation holds for arbitrary
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math>,
-these results are not restricted to linear models.</p>
-<p>If we have
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϵ</mi><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mspace width="0.167em"></mspace><msup><mi>σ</mi><mn>2</mn></msup><mi>I</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\epsilon \sim {\mathrm N}(0, \,\sigma^2 I)</annotation></semantics></math>,
-it follows that
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>y</mi><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>η</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi>I</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\]</span> where <span class="math inline">\(\rho\)</span> is the spatial
+correlation parameter and <span class="math inline">\(W\)</span> is a
+user-defined weight matrix. The matrix <span class="math inline">\(W\)</span> has entries <span class="math inline">\(w_{ii} = 0\)</span> along the diagonal and the
+off-diagonal entries <span class="math inline">\(w_{ij}\)</span> are
+larger when areas <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> are closer to each other. In a linear
+model, the predictor term <span class="math inline">\(\eta\)</span> is
+given by <span class="math inline">\(\eta = X \beta\)</span> with design
+matrix <span class="math inline">\(X\)</span> and regression
+coefficients <span class="math inline">\(\beta\)</span>. However, since
+the above equation holds for arbitrary <span class="math inline">\(\eta\)</span>, these results are not restricted to
+linear models.</p>
+<p>If we have <span class="math inline">\(\epsilon \sim {\mathrm N}(0,
+\,\sigma^2 I)\)</span>, it follows that <span class="math display">\[
 (I - \rho W)y \sim {\mathrm N}(\eta, \sigma^2 I),
-</annotation></semantics></math> which corresponds to the following log
-PDF coded in <strong>Stan</strong>:</p>
+\]</span> which corresponds to the following log PDF coded in
+<strong>Stan</strong>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span> </span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a> <span class="sc">*</span> </span>
@@ -446,30 +365,19 @@ PDF coded in <strong>Stan</strong>:</p>
 <span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>         <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
 <span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>}</span></code></pre></div>
 <p>For the purpose of computing LOO-CV, it makes sense to rewrite the
-SAR model in slightly different form. Conditional on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>,
-if we write</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>y</mi><mo>−</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msup><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mi>T</mi></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
-y-(I-\rho W)^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(I-\rho W)^{-1}(I-\rho W)^{-T}),
-\end{align}</annotation></semantics></math> or more compactly, with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>W</mi><mo accent="true">̃</mo></mover><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>I</mi><mo>−</mo><mi>ρ</mi><mi>W</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widetilde{W}=(I-\rho W)</annotation></semantics></math>,
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>y</mi><mo>−</mo><msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mi>T</mi></msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
-y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(\widetilde{W}^{T}\widetilde{W})^{-1}),
-\end{align}</annotation></semantics></math></p>
+SAR model in slightly different form. Conditional on <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\eta\)</span>, and <span class="math inline">\(\sigma\)</span>, if we write</p>
+<p><span class="math display">\[\begin{align}
+y-(I-\rho W)^{-1}\eta &amp;\sim {\mathrm N}(0, \sigma^2(I-\rho
+W)^{-1}(I-\rho W)^{-T}),
+\end{align}\]</span> or more compactly, with <span class="math inline">\(\widetilde{W}=(I-\rho W)\)</span>, <span class="math display">\[\begin{align}
+y-\widetilde{W}^{-1}\eta &amp;\sim {\mathrm N}(0,
+\sigma^2(\widetilde{W}^{T}\widetilde{W})^{-1}),
+\end{align}\]</span></p>
 <p>then this has the same form as the zero mean Gaussian process from
 above. Accordingly, we can compute the leave-one-out predictive
 densities with the equations from Sundararajan and Keerthi (2001),
-replacing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>−</mo><msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>η</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(y-\widetilde{W}^{-1}\eta)</annotation></semantics></math>
-and taking the covariance matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
-to be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mi>T</mi></msup><mover><mi>W</mi><mo accent="true">̃</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sigma^2(\widetilde{W}^{T}\widetilde{W})^{-1}</annotation></semantics></math>.</p>
+replacing <span class="math inline">\(y\)</span> with <span class="math inline">\((y-\widetilde{W}^{-1}\eta)\)</span> and taking the
+covariance matrix <span class="math inline">\(C\)</span> to be <span class="math inline">\(\sigma^2(\widetilde{W}^{T}\widetilde{W})^{-1}\)</span>.</p>
 <div class="section level3">
 <h3 id="case-study-neighborhood-crime-in-columbus-ohio">Case Study: Neighborhood Crime in Columbus, Ohio<a class="anchor" aria-label="anchor" href="#case-study-neighborhood-crime-in-columbus-ohio"></a>
 </h3>
@@ -575,11 +483,9 @@ use the recipe laid out in the previous sections.</p>
 <span><span class="va">psis_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/psis.html">psis</a></span><span class="op">(</span><span class="va">log_ratios</span><span class="op">)</span></span></code></pre></div>
 <p>The quality of the PSIS-LOO approximation can be investigated
 graphically by plotting the Pareto-k estimate for each observation. The
-approximation is robust up to values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.7</mn><annotation encoding="application/x-tex">0.7</annotation></semantics></math>
-(Vehtari et al, 2017, 2024). In the plot below, we see that the fourth
-observation is problematic and so may reduce the accuracy of the LOO-CV
-approximation.</p>
+approximation is robust up to values of <span class="math inline">\(0.7\)</span> (Vehtari et al, 2017, 2024). In the
+plot below, we see that the fourth observation is problematic and so may
+reduce the accuracy of the LOO-CV approximation.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">psis_result</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loo2-non-factorized_files/figure-html/plot-1.png" width="60%" style="display: block; margin: auto;"></p>
@@ -613,28 +519,27 @@ in the upcoming section.</p>
 Computed from 4000 by 49 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo   -187.4 11.3
-p_loo         8.6  5.7
-looic       374.8 22.7
+elpd_loo   -186.9 10.9
+p_loo         8.1  5.2
+looic       373.8 21.8
 ------
 MCSE of elpd_loo is NA.
 MCSE and ESS estimates assume independent draws (r_eff=1).
 
 Pareto k diagnostic values:
                          Count Pct.    Min. ESS
-(-Inf, 0.7]   (good)     48    98.0%   650     
-   (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;    
-   (1, Inf)   (very bad)  1     2.0%   &lt;NA&gt;    
+(-Inf, 0.7]   (good)     48    98.0%   550     
+   (0.7, 1]   (bad)       1     2.0%   &lt;NA&gt;    
+   (1, Inf)   (very bad)  0     0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div class="section level4">
 <h4 id="exact-loo-cv">Exact LOO-CV<a class="anchor" aria-label="anchor" href="#exact-loo-cv"></a>
 </h4>
 <p>Exact LOO-CV for the above example is somewhat more involved, as we
-need to re-fit the model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-times and each time model the held-out data point as a parameter. First,
-we create an empty dummy model that we will update below as we loop over
+need to re-fit the model <span class="math inline">\(N\)</span> times
+and each time model the held-out data point as a parameter. First, we
+create an empty dummy model that we will update below as we loop over
 the observations.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># see help("mi", "brms") for details on the mi() usage</span></span>
@@ -644,15 +549,26 @@ the observations.</p>
 <span>  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,</span>
 <span>  chains <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Next, we fit the model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-times, each time leaving out a single observation and then computing the
-log predictive density for that observation. For obvious reasons, this
-takes much longer than the approximation we computed above, but it is
+<pre><code>Running /opt/R/4.5.1/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
+gcc -std=gnu2x -I"/opt/R/4.5.1/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
+                 from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
+                 from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+                 from &lt;command-line&gt;:
+/home/runner/work/_temp/Library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+compilation terminated.
+make: *** [/opt/R/4.5.1/lib/R/etc/Makeconf:202: foo.o] Error 1</code></pre>
+<p>Next, we fit the model <span class="math inline">\(N\)</span> times,
+each time leaving out a single observation and then computing the log
+predictive density for that observation. For obvious reasons, this takes
+much longer than the approximation we computed above, but it is
 necessary in order to validate the approximate LOO-CV method. Thanks to
 the PSIS-LOO approximation, in general doing these slow exact
 computations can be avoided.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fl">500</span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="va">N</span><span class="op">)</span></span>
 <span><span class="va">loglik</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">S</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span>
@@ -685,16 +601,13 @@ computations can be avoided.</p>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p>A first step in the validation of the pointwise predictive density is
 to compare the distribution of the implied response values for the
-left-out observation to the distribution of the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>y</mi><mi>i</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">s</mi></mrow></msubsup><annotation encoding="application/x-tex">y_i^{\mathrm{mis}}</annotation></semantics></math>
-posterior-predictive values estimated as part of the model. If the
-pointwise predictive density is correct, the two distributions should
-match very closely (up to sampling error). In the plot below, we overlay
-these two distributions for the first four observations and see that
-they match very closely (as is the case for all
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>49</mn><annotation encoding="application/x-tex">49</annotation></semantics></math>
-observations of in this example).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+left-out observation to the distribution of the <span class="math inline">\(y_i^{\mathrm{mis}}\)</span> posterior-predictive
+values estimated as part of the model. If the pointwise predictive
+density is correct, the two distributions should match very closely (up
+to sampling error). In the plot below, we overlay these two
+distributions for the first four observations and see that they match
+very closely (as is the case for all <span class="math inline">\(49\)</span> observations of in this example).</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_sub</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">obs</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">y</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
@@ -702,7 +615,7 @@ observations of in this example).</p>
 <p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>In the final step, we compute the ELPD based on the exact LOO-CV and
 compare it to the approximate PSIS-LOO result computed earlier.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_mean_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># more stable than log(mean(exp(x)))</span></span>
 <span>  <span class="va">max_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -711,12 +624,12 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] -189.2</code></pre>
+<pre><code>[1] -189</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate
 against the exact pointwise ELPD values.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  approx_elpd <span class="op">=</span> <span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span>, <span class="st">"elpd_loo"</span><span class="op">]</span>,</span>
 <span>  exact_elpd <span class="op">=</span> <span class="va">exact_elpds</span></span>
@@ -735,14 +648,14 @@ clear outlier. Otherwise, the correspondence between the exact and
 approximate values is strong. In fact, summing over the pointwise ELPD
 values and leaving out the fourth observation yields practically
 equivalent results for approximate and exact LOO-CV:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">without_pt_4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  approx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">psis_loo</span><span class="op">$</span><span class="va">pointwise</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span>, <span class="st">"elpd_loo"</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>  exact <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>  </span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">without_pt_4</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <pre><code>approx  exact 
--173.0 -173.2 </code></pre>
+-173.0 -173.1 </code></pre>
 <p>From this we can conclude that the difference we found when including
 <em>all</em> observations does not indicate a bug in our implementation
 of the approximate LOO-CV but rather a violation of its assumptions.</p>
@@ -760,76 +673,76 @@ directly. The Stan code brms generates is human readable and so we can
 use it to learn some of the essential aspects of Stan and the particular
 model we are implementing. The Stan program below is a slightly modified
 version of the code extracted via <code>stancode(fit_dummy)</code>:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>functions {</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span> </span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a> <span class="sc">*</span> </span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a> <span class="sc">*</span></span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>                          real rho, matrix W) {</span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>    vector[N] half_pred;</span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
-<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
-<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>  }</span>
-<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>}</span>
-<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>data {</span>
-<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
-<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
-<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
-<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
-<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
-<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
-<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
-<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
-<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a>}</span>
-<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a>transformed data {</span>
-<span id="cb20-37"><a href="#cb20-37" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
-<span id="cb20-38"><a href="#cb20-38" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
-<span id="cb20-39"><a href="#cb20-39" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
-<span id="cb20-40"><a href="#cb20-40" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
-<span id="cb20-41"><a href="#cb20-41" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
-<span id="cb20-42"><a href="#cb20-42" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
-<span id="cb20-43"><a href="#cb20-43" tabindex="-1"></a>  }</span>
-<span id="cb20-44"><a href="#cb20-44" tabindex="-1"></a>}</span>
-<span id="cb20-45"><a href="#cb20-45" tabindex="-1"></a>parameters {</span>
-<span id="cb20-46"><a href="#cb20-46" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
-<span id="cb20-47"><a href="#cb20-47" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
-<span id="cb20-48"><a href="#cb20-48" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
-<span id="cb20-49"><a href="#cb20-49" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
-<span id="cb20-50"><a href="#cb20-50" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
-<span id="cb20-51"><a href="#cb20-51" tabindex="-1"></a>}</span>
-<span id="cb20-52"><a href="#cb20-52" tabindex="-1"></a>transformed parameters {</span>
-<span id="cb20-53"><a href="#cb20-53" tabindex="-1"></a>}</span>
-<span id="cb20-54"><a href="#cb20-54" tabindex="-1"></a>model {</span>
-<span id="cb20-55"><a href="#cb20-55" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
-<span id="cb20-56"><a href="#cb20-56" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
-<span id="cb20-57"><a href="#cb20-57" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
-<span id="cb20-58"><a href="#cb20-58" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
-<span id="cb20-59"><a href="#cb20-59" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
-<span id="cb20-60"><a href="#cb20-60" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
-<span id="cb20-61"><a href="#cb20-61" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
-<span id="cb20-62"><a href="#cb20-62" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
-<span id="cb20-63"><a href="#cb20-63" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
-<span id="cb20-64"><a href="#cb20-64" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
-<span id="cb20-65"><a href="#cb20-65" tabindex="-1"></a>  }</span>
-<span id="cb20-66"><a href="#cb20-66" tabindex="-1"></a>}</span>
-<span id="cb20-67"><a href="#cb20-67" tabindex="-1"></a>generated quantities {</span>
-<span id="cb20-68"><a href="#cb20-68" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
-<span id="cb20-69"><a href="#cb20-69" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
-<span id="cb20-70"><a href="#cb20-70" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="sc">/</span><span class="er">/</span> generated with brms <span class="dv">2</span>.<span class="fl">2.0</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>functions {</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="sc">/</span><span class="er">**</span> </span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a> <span class="er">*</span> Normal log<span class="sc">-</span>pdf <span class="cf">for</span> spatially lagged responses</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a> <span class="sc">*</span> </span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>param y Vector of response values.</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param mu Mean parameter vector.</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param sigma Positive scalar residual standard deviation.</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param rho Positive scalar autoregressive parameter.</span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a> <span class="sc">*</span> <span class="er">@</span>param W Spatial weight matrix.</span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a> <span class="sc">*</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a> <span class="er">*</span> <span class="er">@</span>return A scalar to be added to the log posterior.</span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a> <span class="sc">*</span><span class="er">/</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a>  real <span class="fu">normal_lagsar_lpdf</span>(vector y, vector mu, real sigma,</span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a>                          real rho, matrix W) {</span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a>    int N <span class="ot">=</span> <span class="fu">rows</span>(y);</span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a>    real inv_sigma2 <span class="ot">=</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">square</span>(sigma);</span>
+<span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a>    matrix[N, N] W_tilde <span class="ot">=</span> <span class="sc">-</span>rho <span class="sc">*</span> W;</span>
+<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a>    vector[N] half_pred;</span>
+<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a>    <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) W_tilde[n, n] <span class="sc">+</span><span class="er">=</span> <span class="dv">1</span>;</span>
+<span id="cb21-21"><a href="#cb21-21" tabindex="-1"></a>    half_pred <span class="ot">=</span> W_tilde <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">mdivide_left</span>(W_tilde, mu));</span>
+<span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a>    return <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">log_determinant</span>(<span class="fu">crossprod</span>(W_tilde) <span class="sc">*</span> inv_sigma2) <span class="sc">-</span></span>
+<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a>           <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">dot_self</span>(half_pred) <span class="sc">*</span> inv_sigma2;</span>
+<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a>  }</span>
+<span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a>}</span>
+<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a>data {</span>
+<span id="cb21-27"><a href="#cb21-27" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> N;  <span class="sc">/</span><span class="er">/</span> total number of observations</span>
+<span id="cb21-28"><a href="#cb21-28" tabindex="-1"></a>  vector[N] Y;  <span class="sc">/</span><span class="er">/</span> response variable</span>
+<span id="cb21-29"><a href="#cb21-29" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> Nmi;  <span class="sc">/</span><span class="er">/</span> number of missings</span>
+<span id="cb21-30"><a href="#cb21-30" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> Jmi[Nmi];  <span class="sc">/</span><span class="er">/</span> positions of missings</span>
+<span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a>  int<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> K;  <span class="sc">/</span><span class="er">/</span> number of population<span class="sc">-</span>level effects</span>
+<span id="cb21-32"><a href="#cb21-32" tabindex="-1"></a>  matrix[N, K] X;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level design matrix</span>
+<span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a>  matrix[N, N] W;  <span class="sc">/</span><span class="er">/</span> spatial weight matrix</span>
+<span id="cb21-34"><a href="#cb21-34" tabindex="-1"></a>  int prior_only;  <span class="sc">/</span><span class="er">/</span> should the likelihood be ignored?</span>
+<span id="cb21-35"><a href="#cb21-35" tabindex="-1"></a>}</span>
+<span id="cb21-36"><a href="#cb21-36" tabindex="-1"></a>transformed data {</span>
+<span id="cb21-37"><a href="#cb21-37" tabindex="-1"></a>  int Kc <span class="ot">=</span> K <span class="sc">-</span> <span class="dv">1</span>;</span>
+<span id="cb21-38"><a href="#cb21-38" tabindex="-1"></a>  matrix[N, K <span class="sc">-</span> <span class="dv">1</span>] Xc;  <span class="sc">/</span><span class="er">/</span> centered version of X</span>
+<span id="cb21-39"><a href="#cb21-39" tabindex="-1"></a>  vector[K <span class="sc">-</span> <span class="dv">1</span>] means_X;  <span class="sc">/</span><span class="er">/</span> column means of X before centering</span>
+<span id="cb21-40"><a href="#cb21-40" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>K) {</span>
+<span id="cb21-41"><a href="#cb21-41" tabindex="-1"></a>    means_X[i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> <span class="fu">mean</span>(X[, i]);</span>
+<span id="cb21-42"><a href="#cb21-42" tabindex="-1"></a>    Xc[, i <span class="sc">-</span> <span class="dv">1</span>] <span class="ot">=</span> X[, i] <span class="sc">-</span> means_X[i <span class="sc">-</span> <span class="dv">1</span>];</span>
+<span id="cb21-43"><a href="#cb21-43" tabindex="-1"></a>  }</span>
+<span id="cb21-44"><a href="#cb21-44" tabindex="-1"></a>}</span>
+<span id="cb21-45"><a href="#cb21-45" tabindex="-1"></a>parameters {</span>
+<span id="cb21-46"><a href="#cb21-46" tabindex="-1"></a>  vector[Nmi] Ymi;  <span class="sc">/</span><span class="er">/</span> estimated missings</span>
+<span id="cb21-47"><a href="#cb21-47" tabindex="-1"></a>  vector[Kc] b;  <span class="sc">/</span><span class="er">/</span> population<span class="sc">-</span>level effects</span>
+<span id="cb21-48"><a href="#cb21-48" tabindex="-1"></a>  real temp_Intercept;  <span class="sc">/</span><span class="er">/</span> temporary intercept</span>
+<span id="cb21-49"><a href="#cb21-49" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span><span class="sc">&gt;</span> sigma;  <span class="sc">/</span><span class="er">/</span> residual SD</span>
+<span id="cb21-50"><a href="#cb21-50" tabindex="-1"></a>  real<span class="sc">&lt;</span>lower<span class="ot">=</span><span class="dv">0</span>,upper<span class="ot">=</span><span class="dv">1</span><span class="sc">&gt;</span> lagsar;  <span class="sc">/</span><span class="er">/</span> SAR parameter</span>
+<span id="cb21-51"><a href="#cb21-51" tabindex="-1"></a>}</span>
+<span id="cb21-52"><a href="#cb21-52" tabindex="-1"></a>transformed parameters {</span>
+<span id="cb21-53"><a href="#cb21-53" tabindex="-1"></a>}</span>
+<span id="cb21-54"><a href="#cb21-54" tabindex="-1"></a>model {</span>
+<span id="cb21-55"><a href="#cb21-55" tabindex="-1"></a>  vector[N] Yl <span class="ot">=</span> Y;</span>
+<span id="cb21-56"><a href="#cb21-56" tabindex="-1"></a>  vector[N] mu <span class="ot">=</span> Xc <span class="sc">*</span> b <span class="sc">+</span> temp_Intercept;</span>
+<span id="cb21-57"><a href="#cb21-57" tabindex="-1"></a>  Yl[Jmi] <span class="ot">=</span> Ymi;</span>
+<span id="cb21-58"><a href="#cb21-58" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> priors including all constants</span>
+<span id="cb21-59"><a href="#cb21-59" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(temp_Intercept <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">34</span>, <span class="dv">17</span>);</span>
+<span id="cb21-60"><a href="#cb21-60" tabindex="-1"></a>  target <span class="sc">+</span><span class="er">=</span> <span class="fu">student_t_lpdf</span>(sigma <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>)</span>
+<span id="cb21-61"><a href="#cb21-61" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span> <span class="sc">*</span> <span class="fu">student_t_lccdf</span>(<span class="dv">0</span> <span class="sc">|</span> <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">17</span>);</span>
+<span id="cb21-62"><a href="#cb21-62" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> likelihood including all constants</span>
+<span id="cb21-63"><a href="#cb21-63" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>prior_only) {</span>
+<span id="cb21-64"><a href="#cb21-64" tabindex="-1"></a>    target <span class="sc">+</span><span class="er">=</span> <span class="fu">normal_lagsar_lpdf</span>(Yl <span class="sc">|</span> mu, sigma, lagsar, W);</span>
+<span id="cb21-65"><a href="#cb21-65" tabindex="-1"></a>  }</span>
+<span id="cb21-66"><a href="#cb21-66" tabindex="-1"></a>}</span>
+<span id="cb21-67"><a href="#cb21-67" tabindex="-1"></a>generated quantities {</span>
+<span id="cb21-68"><a href="#cb21-68" tabindex="-1"></a>  <span class="sc">/</span><span class="er">/</span> actual population<span class="sc">-</span>level intercept</span>
+<span id="cb21-69"><a href="#cb21-69" tabindex="-1"></a>  real b_Intercept <span class="ot">=</span> temp_Intercept <span class="sc">-</span> <span class="fu">dot_product</span>(means_X, b);</span>
+<span id="cb21-70"><a href="#cb21-70" tabindex="-1"></a>}</span></code></pre></div>
 <p>Here we want to focus on two aspects of the Stan code. First, because
 there is no built-in function in Stan that calculates the log-likelihood
 for the lag-SAR model, we define a new <code>normal_lagsar_lpdf</code>
@@ -859,7 +772,7 @@ we recommend using <code><a href="https://paulbuerkner.com/brms/reference/stanco
 <code>save_model</code> argument to write the Stan program to a file.
 The corresponding data can be prepared with <code><a href="https://paulbuerkner.com/brms/reference/standata.html" class="external-link">make_standata()</a></code>
 and then manually amended if needed. Once the code and data have been
-edited, they can be passed to RStan’s <code>stan()</code> function via
+edited, they can be passed to RStan’s <code><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan()</a></code> function via
 the <code>file</code> and <code>data</code> arguments.</p>
 </div>
 <div class="section level2">

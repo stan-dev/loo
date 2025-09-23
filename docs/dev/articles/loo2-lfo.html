@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Jonah Gabry, Aki Vehtari</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-lfo.Rmd" class="external-link"><code>vignettes/loo2-lfo.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-lfo.Rmd" class="external-link"><code>vignettes/loo2-lfo.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-lfo.Rmd</code></div>
     </div>
 
@@ -113,21 +119,12 @@ Jonah Gabry, Aki Vehtari</h4>
 </h2>
 <p>One of the most common goals of a time series analysis is to use the
 observed series to inform predictions for future observations. We will
-refer to this task of predicting a sequence of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
-future observations as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
-prediction
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP).
-Fortunately, once we have fit a model and can sample from the posterior
-predictive distribution, it is straightforward to generate predictions
-as far into the future as we want. It is also straightforward to
-evaluate the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-performance of a time series model by comparing the predictions to the
-observed sequence of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
-future data points once they become available.</p>
+refer to this task of predicting a sequence of <span class="math inline">\(M\)</span> future observations as <span class="math inline">\(M\)</span>-step-ahead prediction (<span class="math inline">\(M\)</span>-SAP). Fortunately, once we have fit a
+model and can sample from the posterior predictive distribution, it is
+straightforward to generate predictions as far into the future as we
+want. It is also straightforward to evaluate the <span class="math inline">\(M\)</span>-SAP performance of a time series model
+by comparing the predictions to the observed sequence of <span class="math inline">\(M\)</span> future data points once they become
+available.</p>
 <p>Unfortunately, we are often in the position of having to use a model
 to inform decisions <em>before</em> we can collect the future
 observations required for assessing the predictive performance. If we
@@ -138,30 +135,23 @@ for approximating the expected predictive performance of our models
 using only the observations of the time series we already have.</p>
 <p>If there were no time dependence in the data or if the focus is to
 assess the non-time-dependent part of the model, we could use methods
-like leave-one-out cross-validation (LOO-CV). For a data set with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-observations, we refit the model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-times, each time leaving out one of the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-observations and assessing how well the model predicts the left-out
-observation. LOO-CV is very expensive computationally in most realistic
-settings, but the Pareto smoothed importance sampling (PSIS, Vehtari et
-al, 2017, 2024) algorithm provided by the <em>loo</em> package allows
-for approximating exact LOO-CV with PSIS-LOO-CV. PSIS-LOO-CV requires
-only a single fit of the full model and comes with diagnostics for
-assessing the validity of the approximation.</p>
+like leave-one-out cross-validation (LOO-CV). For a data set with <span class="math inline">\(N\)</span> observations, we refit the model <span class="math inline">\(N\)</span> times, each time leaving out one of the
+<span class="math inline">\(N\)</span> observations and assessing how
+well the model predicts the left-out observation. LOO-CV is very
+expensive computationally in most realistic settings, but the Pareto
+smoothed importance sampling (PSIS, Vehtari et al, 2017, 2024) algorithm
+provided by the <em>loo</em> package allows for approximating exact
+LOO-CV with PSIS-LOO-CV. PSIS-LOO-CV requires only a single fit of the
+full model and comes with diagnostics for assessing the validity of the
+approximation.</p>
 <p>With a time series we can do something similar to LOO-CV but, except
 in a few cases, it does not make sense to leave out observations one at
 a time because then we are allowing information from the future to
-influence predictions of the past (i.e., times
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn><mo>,</mo><mi>t</mi><mo>+</mo><mn>2</mn><mo>,</mo><mi>…</mi></mrow><annotation encoding="application/x-tex">t + 1, t+2, \ldots</annotation></semantics></math>
-should not be used to predict for time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>).
-To apply the idea of cross-validation to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-case, instead of leave-<em>one</em>-out cross-validation we need some
-form of leave-<em>future</em>-out cross-validation (LFO-CV). As we will
+influence predictions of the past (i.e., times <span class="math inline">\(t + 1, t+2, \ldots\)</span> should not be used to
+predict for time <span class="math inline">\(t\)</span>). To apply the
+idea of cross-validation to the <span class="math inline">\(M\)</span>-SAP case, instead of
+leave-<em>one</em>-out cross-validation we need some form of
+leave-<em>future</em>-out cross-validation (LFO-CV). As we will
 demonstrate in this case study, LFO-CV does not refer to one particular
 prediction task but rather to various possible cross-validation
 approaches that all involve some form of prediction for new time series
@@ -184,221 +174,139 @@ on arXiv (<a href="https://arxiv.org/abs/1902.06281" class="external-link uri">h
 </div>
 <div class="section level2">
 <h2 id="m-step-ahead-predictions">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
-predictions<a class="anchor" aria-label="anchor" href="#m-step-ahead-predictions"></a>
+<span class="math inline">\(M\)</span>-step-ahead predictions<a class="anchor" aria-label="anchor" href="#m-step-ahead-predictions"></a>
 </h2>
-<p>Assume we have a time series of observations
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>N</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y = (y_1, y_2, \ldots, y_N)</annotation></semantics></math>
-and let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
-be the <em>minimum</em> number of observations from the series that we
-will require before making predictions for future data. Depending on the
-application and how informative the data is, it may not be possible to
-make reasonable predictions for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">y_{i+1}</annotation></semantics></math>
-based on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(y_1, \dots, y_{i})</annotation></semantics></math>
-until
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-is large enough so that we can learn enough about the time series to
-predict future observations. Setting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">L=10</annotation></semantics></math>,
-for example, means that we will only assess predictive performance
-starting with observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mn>11</mn></msub><annotation encoding="application/x-tex">y_{11}</annotation></semantics></math>,
-so that we always have at least 10 previous observations to condition
-on.</p>
-<p>In order to assess
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
+<p>Assume we have a time series of observations <span class="math inline">\(y = (y_1, y_2, \ldots, y_N)\)</span> and let <span class="math inline">\(L\)</span> be the <em>minimum</em> number of
+observations from the series that we will require before making
+predictions for future data. Depending on the application and how
+informative the data is, it may not be possible to make reasonable
+predictions for <span class="math inline">\(y_{i+1}\)</span> based on
+<span class="math inline">\((y_1, \dots, y_{i})\)</span> until <span class="math inline">\(i\)</span> is large enough so that we can learn
+enough about the time series to predict future observations. Setting
+<span class="math inline">\(L=10\)</span>, for example, means that we
+will only assess predictive performance starting with observation <span class="math inline">\(y_{11}\)</span>, so that we always have at least
+10 previous observations to condition on.</p>
+<p>In order to assess <span class="math inline">\(M\)</span>-SAP
 performance we would like to compute the predictive densities</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
-p(y_{i+1:M} \,|\, y_{1:i}) = 
-  p(y_{i+1}, \ldots, y_{i + M} \,|\, y_{1},...,y_{i}) 
-</annotation></semantics></math></p>
-<p>for each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mi>L</mi><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi><mo>−</mo><mi>M</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i \in \{L, \ldots, N - M\}</annotation></semantics></math>.
-The quantities
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{i+1:M} \,|\, y_{1:i})</annotation></semantics></math>
-can be computed with the help of the posterior distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta \,|\, y_{1:i})</annotation></semantics></math>
-of the parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-conditional on only the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-observations of the time-series:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mo>∫</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo>,</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>d</mi><mi>θ</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
-p(y_{i+1:M} \,| \, y_{1:i}) = 
-  \int p(y_{i+1:M} \,| \, y_{1:i}, \theta) \, p(\theta\,|\,y_{1:i}) \,d\theta. 
-</annotation></semantics></math></p>
-<p>Having obtained
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-draws
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>θ</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>,</mo><mi>…</mi><mo>,</mo><msubsup><mi>θ</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\theta_{1:i}^{(1)}, \ldots, \theta_{1:i}^{(S)})</annotation></semantics></math>
-from the posterior distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta\,|\,y_{1:i})</annotation></semantics></math>,
-we can estimate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{i+1:M} | y_{1:i})</annotation></semantics></math>
-as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mfrac><mn>1</mn><mi>S</mi></mfrac><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo>,</mo><msubsup><mi>θ</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
-p(y_{i+1:M} \,|\, y_{1:i}) \approx \frac{1}{S}\sum_{s=1}^S p(y_{i+1:M} \,|\, y_{1:i}, \theta_{1:i}^{(s)}).
-</annotation></semantics></math></p>
+<p><span class="math display">\[
+p(y_{i+1:M} \,|\, y_{1:i}) =
+  p(y_{i+1}, \ldots, y_{i + M} \,|\, y_{1},...,y_{i})
+\]</span></p>
+<p>for each <span class="math inline">\(i \in \{L, \ldots, N -
+M\}\)</span>. The quantities <span class="math inline">\(p(y_{i+1:M}
+\,|\, y_{1:i})\)</span> can be computed with the help of the posterior
+distribution <span class="math inline">\(p(\theta \,|\,
+y_{1:i})\)</span> of the parameters <span class="math inline">\(\theta\)</span> conditional on only the first
+<span class="math inline">\(i\)</span> observations of the
+time-series:</p>
+<p><span class="math display">\[
+p(y_{i+1:M} \,| \, y_{1:i}) =
+  \int p(y_{i+1:M} \,| \, y_{1:i}, \theta) \, p(\theta\,|\,y_{1:i})
+\,d\theta.
+\]</span></p>
+<p>Having obtained <span class="math inline">\(S\)</span> draws <span class="math inline">\((\theta_{1:i}^{(1)}, \ldots,
+\theta_{1:i}^{(S)})\)</span> from the posterior distribution <span class="math inline">\(p(\theta\,|\,y_{1:i})\)</span>, we can estimate
+<span class="math inline">\(p(y_{i+1:M} | y_{1:i})\)</span> as</p>
+<p><span class="math display">\[
+p(y_{i+1:M} \,|\, y_{1:i}) \approx \frac{1}{S}\sum_{s=1}^S p(y_{i+1:M}
+\,|\, y_{1:i}, \theta_{1:i}^{(s)}).
+\]</span></p>
 </div>
 <div class="section level2">
-<h2 id="approximate_MSAP">Approximate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-using importance-sampling<a class="anchor" aria-label="anchor" href="#approximate_MSAP"></a>
+<h2 id="approximate_MSAP">Approximate <span class="math inline">\(M\)</span>-SAP using
+importance-sampling<a class="anchor" aria-label="anchor" href="#approximate_MSAP"></a>
 </h2>
 <p>Unfortunately, the math above makes use of the posterior
 distributions from many different fits of the model to different subsets
-of the data. That is, to obtain the predictive density
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{i+1:M} \,|\, y_{1:i})</annotation></semantics></math>
-requires fitting a model to only the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-data points, and we will need to do this for every value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-under consideration (all
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mi>L</mi><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi><mo>−</mo><mi>M</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">i \in \{L, \ldots, N - M\}</annotation></semantics></math>).</p>
+of the data. That is, to obtain the predictive density <span class="math inline">\(p(y_{i+1:M} \,|\, y_{1:i})\)</span> requires
+fitting a model to only the first <span class="math inline">\(i\)</span>
+data points, and we will need to do this for every value of <span class="math inline">\(i\)</span> under consideration (all <span class="math inline">\(i \in \{L, \ldots, N - M\}\)</span>).</p>
 <p>To reduce the number of models that need to be fit for the purpose of
-obtaining each of the densities
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{i+1:M} \,|\, y_{1:i})</annotation></semantics></math>,
-we propose the following algorithm. First, we refit the model using the
-first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
-observations of the time series and then perform a single exact
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
-prediction step for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>L</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>L</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{L+1:M} \,|\, y_{1:L})</annotation></semantics></math>.
-Recall that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
-is the minimum number of observations we have deemed acceptable for
-making predictions (setting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">L=0</annotation></semantics></math>
-means the first data point will be predicted only based on the prior).
-We define
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>i</mi><mo>⋆</mo></msup><mo>=</mo><mi>L</mi></mrow><annotation encoding="application/x-tex">i^\star = L</annotation></semantics></math>
-as the current point of refit. Next, starting with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><msup><mi>i</mi><mo>⋆</mo></msup><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">i = i^\star + 1</annotation></semantics></math>,
-we approximate each
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{i+1:M} \,|\, y_{1:i})</annotation></semantics></math>
-via</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mspace width="0.167em"></mspace><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo>,</mo><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
- p(y_{i+1:M} \,|\, y_{1:i}) \approx
-   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i+1:M} \,|\, y_{1:i}, \theta^{(s)})}
+obtaining each of the densities <span class="math inline">\(p(y_{i+1:M}
+\,|\, y_{1:i})\)</span>, we propose the following algorithm. First, we
+refit the model using the first <span class="math inline">\(L\)</span>
+observations of the time series and then perform a single exact <span class="math inline">\(M\)</span>-step-ahead prediction step for <span class="math inline">\(p(y_{L+1:M} \,|\, y_{1:L})\)</span>. Recall that
+<span class="math inline">\(L\)</span> is the minimum number of
+observations we have deemed acceptable for making predictions (setting
+<span class="math inline">\(L=0\)</span> means the first data point will
+be predicted only based on the prior). We define <span class="math inline">\(i^\star = L\)</span> as the current point of
+refit. Next, starting with <span class="math inline">\(i = i^\star +
+1\)</span>, we approximate each <span class="math inline">\(p(y_{i+1:M}
+\,|\, y_{1:i})\)</span> via</p>
+<p><span class="math display">\[
+p(y_{i+1:M} \,|\, y_{1:i}) \approx
+   \frac{ \sum_{s=1}^S w_i^{(s)}\, p(y_{i+1:M} \,|\, y_{1:i},
+\theta^{(s)})}
         { \sum_{s=1}^S w_i^{(s)}},
-</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>=</mo><msubsup><mi>θ</mi><mrow><mn>1</mn><mo>:</mo><msup><mi>i</mi><mo>⋆</mo></msup></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">\theta^{(s)} = \theta^{(s)}_{1:i^\star}</annotation></semantics></math>
-are draws from the posterior distribution based on the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mo>⋆</mo></msup><annotation encoding="application/x-tex">i^\star</annotation></semantics></math>
-observations and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>w</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">w_i^{(s)}</annotation></semantics></math>
-are the PSIS weights obtained in two steps. First, we compute the raw
-importance ratios</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>r</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>=</mo><mfrac><mrow><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><msup><mi>i</mi><mo>⋆</mo></msup></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>∝</mo><munder><mo>∏</mo><mrow><mi>j</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>i</mi><mo>⋆</mo></msup><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>:</mo><mi>i</mi></mrow></munder><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>j</mi></msub><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>,</mo><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\]</span></p>
+<p>where <span class="math inline">\(\theta^{(s)} =
+\theta^{(s)}_{1:i^\star}\)</span> are draws from the posterior
+distribution based on the first <span class="math inline">\(i^\star\)</span> observations and <span class="math inline">\(w_i^{(s)}\)</span> are the PSIS weights obtained
+in two steps. First, we compute the raw importance ratios</p>
+<p><span class="math display">\[
 r_i^{(s)} =
-\frac{f_{1:i}(\theta^{(s)})}{f_{1:i^\star}(\theta^{(s)})} 
-\propto \prod_{j \in (i^\star + 1):i} p(y_j \,|\, y_{1:(j-1)}, \theta^{(s)}),
-</annotation></semantics></math></p>
-<p>and then stabilize them using PSIS. The function
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">f_{1:i}</annotation></semantics></math>
-denotes the posterior distribution based on the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-observations, that is,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">|</mo><mspace width="0.167em"></mspace><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_{1:i} = p(\theta \,|\, y_{1:i})</annotation></semantics></math>,
-with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><msup><mi>i</mi><mo>⋆</mo></msup></mrow></msub><annotation encoding="application/x-tex">f_{1:i^\star}</annotation></semantics></math>
-defined analogously. The index set
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>i</mi><mo>⋆</mo></msup><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>:</mo><mi>i</mi></mrow><annotation encoding="application/x-tex">(i^\star + 1):i</annotation></semantics></math>
-indicates all observations which are part of the data for the model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">f_{1:i}</annotation></semantics></math>
-whose predictive performance we are trying to approximate but not for
-the actually fitted model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mrow><mn>1</mn><mo>:</mo><msup><mi>i</mi><mo>⋆</mo></msup></mrow></msub><annotation encoding="application/x-tex">f_{1:i^\star}</annotation></semantics></math>.
-The proportional statement arises from the fact that we ignore the
-normalizing constants
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{1:i})</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mrow><mn>1</mn><mo>:</mo><msup><mi>i</mi><mo>⋆</mo></msup></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(y_{1:i^\star})</annotation></semantics></math>
-of the compared posteriors, which leads to a self-normalized variant of
-PSIS (see Vehtari et al, 2017).</p>
-<p>Continuing with the next observation, we gradually increase
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-(we move forward in time) and repeat the process. At some observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-the variability of the importance ratios
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>r</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">r_i^{(s)}</annotation></semantics></math>
-will become too large and importance sampling will fail. We will refer
-to this particular value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>i</mi><mn>1</mn><mo>⋆</mo></msubsup><annotation encoding="application/x-tex">i^\star_1</annotation></semantics></math>.
-To identify the value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>i</mi><mn>1</mn><mo>⋆</mo></msubsup><annotation encoding="application/x-tex">i^\star_1</annotation></semantics></math>,
-we check for which value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-does the estimated shape parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-of the generalized Pareto distribution first cross a certain threshold
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
-(Vehtari et al, 2024). Only then do we refit the model using the
-observations up to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>i</mi><mn>1</mn><mo>⋆</mo></msubsup><annotation encoding="application/x-tex">i^\star_1</annotation></semantics></math>
-and restart the process from there by setting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>=</mo><msubsup><mi>θ</mi><mrow><mn>1</mn><mo>:</mo><msubsup><mi>i</mi><mn>1</mn><mo>⋆</mo></msubsup></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">\theta^{(s)} = \theta^{(s)}_{1:i^\star_1}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>i</mi><mo>⋆</mo></msup><mo>=</mo><msubsup><mi>i</mi><mn>1</mn><mo>⋆</mo></msubsup></mrow><annotation encoding="application/x-tex">i^\star = i^\star_1</annotation></semantics></math>
-until the next refit.</p>
+\frac{f_{1:i}(\theta^{(s)})}{f_{1:i^\star}(\theta^{(s)})}
+\propto \prod_{j \in (i^\star + 1):i} p(y_j \,|\, y_{1:(j-1)},
+\theta^{(s)}),
+\]</span></p>
+<p>and then stabilize them using PSIS. The function <span class="math inline">\(f_{1:i}\)</span> denotes the posterior
+distribution based on the first <span class="math inline">\(i\)</span>
+observations, that is, <span class="math inline">\(f_{1:i} = p(\theta
+\,|\, y_{1:i})\)</span>, with <span class="math inline">\(f_{1:i^\star}\)</span> defined analogously. The
+index set <span class="math inline">\((i^\star + 1):i\)</span> indicates
+all observations which are part of the data for the model <span class="math inline">\(f_{1:i}\)</span> whose predictive performance we
+are trying to approximate but not for the actually fitted model <span class="math inline">\(f_{1:i^\star}\)</span>. The proportional statement
+arises from the fact that we ignore the normalizing constants <span class="math inline">\(p(y_{1:i})\)</span> and <span class="math inline">\(p(y_{1:i^\star})\)</span> of the compared
+posteriors, which leads to a self-normalized variant of PSIS (see
+Vehtari et al, 2017).</p>
+<p>Continuing with the next observation, we gradually increase <span class="math inline">\(i\)</span> by <span class="math inline">\(1\)</span> (we move forward in time) and repeat
+the process. At some observation <span class="math inline">\(i\)</span>,
+the variability of the importance ratios <span class="math inline">\(r_i^{(s)}\)</span> will become too large and
+importance sampling will fail. We will refer to this particular value of
+<span class="math inline">\(i\)</span> as <span class="math inline">\(i^\star_1\)</span>. To identify the value of <span class="math inline">\(i^\star_1\)</span>, we check for which value of
+<span class="math inline">\(i\)</span> does the estimated shape
+parameter <span class="math inline">\(k\)</span> of the generalized
+Pareto distribution first cross a certain threshold <span class="math inline">\(\tau\)</span> (Vehtari et al, 2024). Only then do
+we refit the model using the observations up to <span class="math inline">\(i^\star_1\)</span> and restart the process from
+there by setting <span class="math inline">\(\theta^{(s)} =
+\theta^{(s)}_{1:i^\star_1}\)</span> and <span class="math inline">\(i^\star = i^\star_1\)</span> until the next
+refit.</p>
 <p>In some cases we may only need to refit once and in other cases we
-will find a value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>i</mi><mn>2</mn><mo>⋆</mo></msubsup><annotation encoding="application/x-tex">i^\star_2</annotation></semantics></math>
-that requires a second refitting, maybe an
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>i</mi><mn>3</mn><mo>⋆</mo></msubsup><annotation encoding="application/x-tex">i^\star_3</annotation></semantics></math>
-that requires a third refitting, and so on. We refit as many times as is
-required (only when
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>&gt;</mo><mi>τ</mi></mrow><annotation encoding="application/x-tex">k &gt; \tau</annotation></semantics></math>)
-until we arrive at observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mi>N</mi><mo>−</mo><mi>M</mi></mrow><annotation encoding="application/x-tex">i = N - M</annotation></semantics></math>.
-For LOO, assuming posterior sample size is 4000 or larger, we recommend
-to use a threshold of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>=</mo><mn>0.7</mn></mrow><annotation encoding="application/x-tex">\tau = 0.7</annotation></semantics></math>
-(Vehtari et al, 2017, 2024) and it turns out this is a reasonable
-threshold for LFO as well (Bürkner et al. 2020).</p>
+will find a value <span class="math inline">\(i^\star_2\)</span> that
+requires a second refitting, maybe an <span class="math inline">\(i^\star_3\)</span> that requires a third
+refitting, and so on. We refit as many times as is required (only when
+<span class="math inline">\(k &gt; \tau\)</span>) until we arrive at
+observation <span class="math inline">\(i = N - M\)</span>. For LOO,
+assuming posterior sample size is 4000 or larger, we recommend to use a
+threshold of <span class="math inline">\(\tau = 0.7\)</span> (Vehtari et
+al, 2017, 2024) and it turns out this is a reasonable threshold for LFO
+as well (Bürkner et al. 2020).</p>
 </div>
 <div class="section level2">
 <h2 id="autoregressive-models">Autoregressive models<a class="anchor" aria-label="anchor" href="#autoregressive-models"></a>
 </h2>
 <p>Autoregressive (AR) models are some of the most commonly used
 time-series models. An AR(p) model —an autoregressive model of order
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>—
-can be defined as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><msub><mi>η</mi><mi>i</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>p</mi></munderover><msub><mi>φ</mi><mi>k</mi></msub><msub><mi>y</mi><mrow><mi>i</mi><mo>−</mo><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>ε</mi><mi>i</mi></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">
+<span class="math inline">\(p\)</span>— can be defined as</p>
+<p><span class="math display">\[
 y_i = \eta_i + \sum_{k = 1}^p \varphi_k y_{i - k} + \varepsilon_i,
-</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>η</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\eta_i</annotation></semantics></math>
-is the linear predictor for the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
-observation,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϕ</mi><mi>k</mi></msub><annotation encoding="application/x-tex">\phi_k</annotation></semantics></math>
-are the autoregressive parameters and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ε</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\varepsilon_i</annotation></semantics></math>
-are pairwise independent errors, which are usually assumed to be
-normally distributed with equal variance
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>.
-The model implies a recursive formula that allows for computing the
-right-hand side of the above equation for observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-based on the values of the equations for previous observations.</p>
+\]</span></p>
+<p>where <span class="math inline">\(\eta_i\)</span> is the linear
+predictor for the <span class="math inline">\(i\)</span>th observation,
+<span class="math inline">\(\phi_k\)</span> are the autoregressive
+parameters and <span class="math inline">\(\varepsilon_i\)</span> are
+pairwise independent errors, which are usually assumed to be normally
+distributed with equal variance <span class="math inline">\(\sigma^2\)</span>. The model implies a recursive
+formula that allows for computing the right-hand side of the above
+equation for observation <span class="math inline">\(i\)</span> based on
+the values of the equations for previous observations.</p>
 </div>
 <div class="section level2">
 <h2 id="case-study-annual-measurements-of-the-level-of-lake-huron">Case Study: Annual measurements of the level of Lake Huron<a class="anchor" aria-label="anchor" href="#case-study-annual-measurements-of-the-level-of-lake-huron"></a>
 </h2>
 <p>To illustrate the application of PSIS-LFO-CV for estimating expected
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-performance, we will fit a model for 98 annual measurements of the water
-level (in feet) of <a href="https://en.wikipedia.org/wiki/Lake_Huron" class="external-link">Lake Huron</a> from the
+<span class="math inline">\(M\)</span>-SAP performance, we will fit a
+model for 98 annual measurements of the water level (in feet) of <a href="https://en.wikipedia.org/wiki/Lake_Huron" class="external-link">Lake Huron</a> from the
 years 1875–1972. This data set is found in the <strong>datasets</strong>
 R package, which is installed automatically with <strong>R</strong>.</p>
 <p>In addition to the <strong>loo</strong> package, for this analysis we
@@ -468,9 +376,8 @@ plotted, which reveals a rather good fit to the data.</p>
 <span>  <span class="op">)</span> </span></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/plotpreds-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>To allow for reasonable predictions of future values, we will require
-at least
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>20</mn></mrow><annotation encoding="application/x-tex">L = 20</annotation></semantics></math>
-historical observations (20 years) to make predictions.</p>
+at least <span class="math inline">\(L = 20\)</span> historical
+observations (20 years) to make predictions.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">L</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></code></pre></div>
 <p>We first perform approximate leave-one-out cross-validation (LOO-CV)
@@ -483,9 +390,9 @@ for the 1-SAP case.</p>
 Computed from 4000 by 78 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo    -88.5  6.4
-p_loo         4.7  1.0
-looic       177.1 12.8
+elpd_loo    -88.7  6.4
+p_loo         4.8  1.0
+looic       177.4 12.7
 ------
 MCSE of elpd_loo is 0.0.
 MCSE and ESS estimates assume independent draws (r_eff=1).
@@ -496,15 +403,9 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <div class="section level2">
 <h2 id="step-ahead-predictions-leaving-out-all-future-values">1-step-ahead predictions leaving out all future values<a class="anchor" aria-label="anchor" href="#step-ahead-predictions-leaving-out-all-future-values"></a>
 </h2>
-<p>The most basic version of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-is 1-SAP, in which we predict only one step ahead. In this case,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>:</mo><mi>M</mi></mrow></msub><annotation encoding="application/x-tex">y_{i+1:M}</annotation></semantics></math>
-simplifies to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_{i}</annotation></semantics></math>
-and the LFO-CV algorithm becomes considerably simpler than for larger
-values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>.</p>
+<p>The most basic version of <span class="math inline">\(M\)</span>-SAP
+is 1-SAP, in which we predict only one step ahead. In this case, <span class="math inline">\(y_{i+1:M}\)</span> simplifies to <span class="math inline">\(y_{i}\)</span> and the LFO-CV algorithm becomes
+considerably simpler than for larger values of <span class="math inline">\(M\)</span>.</p>
 <div class="section level3">
 <h3 id="exact-1-step-ahead-predictions">Exact 1-step-ahead predictions<a class="anchor" aria-label="anchor" href="#exact-1-step-ahead-predictions"></a>
 </h3>
@@ -557,8 +458,8 @@ log-predictive densities by refitting the model many times:</p>
 <span>  <span class="st">"LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_1sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span>      <span class="va">ELPD</span></span>
-<span><span class="va">LOO</span> <span class="op">-</span><span class="fl">88.53</span></span>
-<span><span class="va">LFO</span> <span class="op">-</span><span class="fl">92.48</span></span></code></pre>
+<span><span class="va">LOO</span> <span class="op">-</span><span class="fl">88.68</span></span>
+<span><span class="va">LFO</span> <span class="op">-</span><span class="fl">92.31</span></span></code></pre>
 <p>We see that the ELPD from LFO-CV for 1-step-ahead predictions is
 lower than the ELPD estimate from LOO-CV, which should be expected since
 LOO-CV is making use of more of the time series. That is, since the
@@ -570,10 +471,8 @@ observation, we should expect to see the larger ELPD from LOO-CV.</p>
 <h3 id="approximate-1-step-ahead-predictions">Approximate 1-step-ahead predictions<a class="anchor" aria-label="anchor" href="#approximate-1-step-ahead-predictions"></a>
 </h3>
 <p>We compute approximate 1-SAP with refit at observations where the
-Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-estimate exceeds the threshold of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.7</mn><annotation encoding="application/x-tex">0.7</annotation></semantics></math>.</p>
+Pareto <span class="math inline">\(k\)</span> estimate exceeds the
+threshold of <span class="math inline">\(0.7\)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_thres</span> <span class="op">&lt;-</span> <span class="fl">0.7</span></span></code></pre></div>
 <p>The code becomes a little bit more involved as compared to the exact
@@ -619,10 +518,8 @@ the model anyway.</p>
 <span>    <span class="va">approx_elpds_1sap</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">log_sum_exp</span><span class="op">(</span><span class="va">lw</span> <span class="op">+</span> <span class="va">loglik</span><span class="op">[</span>, <span class="va">oos</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span> </span></code></pre></div>
-<p>We see that the final
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-estimates
-are mostly well below the threshold and that we only needed to refit the
-model a few times:</p>
+<p>We see that the final Pareto-<span class="math inline">\(k\)</span>-estimates are mostly well below the
+threshold and that we only needed to refit the model a few times:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_ks</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ks</span>, <span class="va">ids</span>, <span class="va">thres</span> <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">dat_ks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ks <span class="op">=</span> <span class="va">ks</span>, ids <span class="op">=</span> <span class="va">ids</span><span class="op">)</span></span>
@@ -637,7 +534,7 @@ model a few times:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Using threshold "</span>, <span class="va">k_thres</span>, </span>
 <span>    <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">refits</span><span class="op">)</span>, </span>
 <span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Using threshold  0.7 , model was refit  3  times, at observations 20 45 78</code></pre>
+<pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 54</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
@@ -651,8 +548,8 @@ approximate 1-SAP worked well for the present data and model.</p>
 <span>  <span class="st">"exact LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_1sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>             ELPD
-approx LFO -92.48
-exact LFO  -92.48</code></pre>
+approx LFO -92.44
+exact LFO  -92.31</code></pre>
 <p>Plotting exact against approximate predictions, we see that no
 approximation value deviates far from its exact counterpart, providing
 further evidence for the good quality of our approximation.</p>
@@ -679,32 +576,29 @@ a ver close approximation:</p>
 <span>  <span class="st">"Mean diff"</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">mean_diff</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>          [,1]
-Max diff  0.09
+Max diff  0.08
 Mean diff 0.01</code></pre>
 </div>
 </div>
 <div class="section level2">
 <h2 id="m-step-ahead-predictions-leaving-out-all-future-values">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
-predictions leaving out all future values<a class="anchor" aria-label="anchor" href="#m-step-ahead-predictions-leaving-out-all-future-values"></a>
+<span class="math inline">\(M\)</span>-step-ahead predictions
+leaving out all future values<a class="anchor" aria-label="anchor" href="#m-step-ahead-predictions-leaving-out-all-future-values"></a>
 </h2>
-<p>To illustrate the application of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-SAP
-for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">M &gt; 1</annotation></semantics></math>,
-we next compute exact and approximate LFO-CV for the 4-SAP case.</p>
+<p>To illustrate the application of <span class="math inline">\(M\)</span>-SAP for <span class="math inline">\(M
+&gt; 1\)</span>, we next compute exact and approximate LFO-CV for the
+4-SAP case.</p>
 <div class="section level3">
-<h3 id="exact-m-step-ahead-predictions">Exact
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
+<h3 id="exact-m-step-ahead-predictions">Exact <span class="math inline">\(M\)</span>-step-ahead
 predictions<a class="anchor" aria-label="anchor" href="#exact-m-step-ahead-predictions"></a>
 </h3>
 <p>The necessary steps are the same as for 1-SAP with the exception that
 the log-density values of interest are now the sums of the log
 predictive densities of four consecutive observations. Further, the
 stability of the PSIS approximation actually stays the same for all
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
-as it only depends on the number of observations we leave out, not on
-the number of observations we predict.</p>
+<span class="math inline">\(M\)</span> as it only depends on the number
+of observations we leave out, not on the number of observations we
+predict.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">loglikm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fu"><a href="https://mc-stan.org/posterior/reference/draws-index.html" class="external-link">ndraws</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span>
@@ -721,11 +615,10 @@ the number of observations we predict.</p>
 <code class="sourceCode R"><span><span class="va">exact_elpds_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglikm</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="op">(</span><span class="va">exact_elpd_4sap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ELPD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds_4sap</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span>     <span class="va">ELPD</span> </span>
-<span><span class="op">-</span><span class="fl">405.0813</span> </span></code></pre>
+<span><span class="op">-</span><span class="fl">405.5225</span> </span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="approximate-m-step-ahead-predictions">Approximate
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
+<h3 id="approximate-m-step-ahead-predictions">Approximate <span class="math inline">\(M\)</span>-step-ahead
 predictions<a class="anchor" aria-label="anchor" href="#approximate-m-step-ahead-predictions"></a>
 </h3>
 <p>Computing the approximate PSIS-LFO-CV for the 4-SAP case is a little
@@ -773,24 +666,20 @@ although the underlying principles remain the same.</p>
 <span>    <span class="va">approx_elpds_4sap</span><span class="op">[</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">log_sum_exp</span><span class="op">(</span><span class="va">lw</span> <span class="op">+</span> <span class="va">loglikm</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span> </span></code></pre></div>
-<p>Again, we see that the final
-Pareto-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-estimates
-are mostly well below the threshold and that we only needed to refit the
-model a few times:</p>
+<p>Again, we see that the final Pareto-<span class="math inline">\(k\)</span>-estimates are mostly well below the
+threshold and that we only needed to refit the model a few times:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Using threshold "</span>, <span class="va">k_thres</span>, </span>
 <span>    <span class="st">", model was refit "</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">refits</span><span class="op">)</span>, </span>
 <span>    <span class="st">" times, at observations"</span>, <span class="va">refits</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Using threshold  0.7 , model was refit  3  times, at observations 20 50 90</code></pre>
+<pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 54</code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="va">M</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate ELPD computed for the 4-SAP case is not as close to
-its exact counterpart as in the 1-SAP case. In general, the larger
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>,
-the larger the variation of the approximate ELPD around the exact ELPD.
-It turns out that the ELPD estimates of AR-models with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">M&gt;1</annotation></semantics></math>
+its exact counterpart as in the 1-SAP case. In general, the larger <span class="math inline">\(M\)</span>, the larger the variation of the
+approximate ELPD around the exact ELPD. It turns out that the ELPD
+estimates of AR-models with <span class="math inline">\(M&gt;1\)</span>
 show particular variation due to their predictions’ dependency on other
 predicted values. In Bürkner et al. (2020) we provide further
 explanation and simulations for these cases.</p>
@@ -801,8 +690,8 @@ explanation and simulations for these cases.</p>
 <span>  <span class="st">"Exact LFO"</span> <span class="op">=</span> <span class="va">exact_elpd_4sap</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>              ELPD
-Approx LFO -405.35
-Exact LFO  -405.08</code></pre>
+Approx LFO -409.08
+Exact LFO  -405.52</code></pre>
 <p>Plotting exact against approximate pointwise predictions confirms
 that, for a few specific data points, the approximate predictions
 underestimate the exact predictions.</p>
@@ -823,13 +712,11 @@ underestimate the exact predictions.</p>
 <h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
 <p>In this case study we have shown how to do carry out exact and
-approximate leave-future-out cross-validation for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>-step-ahead
-prediction tasks. For the data and model used in our example, the
-PSIS-LFO-CV algorithm provides reasonably stable and accurate results
-despite not requiring us to refit the model nearly as many times. For
-more details on approximate LFO-CV, we refer to Bürkner et
-al. (2020).</p>
+approximate leave-future-out cross-validation for <span class="math inline">\(M\)</span>-step-ahead prediction tasks. For the
+data and model used in our example, the PSIS-LFO-CV algorithm provides
+reasonably stable and accurate results despite not requiring us to refit
+the model nearly as many times. For more details on approximate LFO-CV,
+we refer to Bürkner et al. (2020).</p>
 <p><br></p>
 </div>
 <div class="section level2">
@@ -859,56 +746,55 @@ Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html" cl
 </h3>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code>R version 4.5.1 (2025-06-13 ucrt)
-Platform: x86_64-w64-mingw32/x64
-Running under: Windows 11 x64 (build 26100)
+<pre><code>R version 4.5.1 (2025-06-13)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
 
 Matrix products: default
-  LAPACK version 3.12.1
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
 
 locale:
-[1] LC_COLLATE=English_United States.utf8 
-[2] LC_CTYPE=English_United States.utf8   
-[3] LC_MONETARY=English_United States.utf8
-[4] LC_NUMERIC=C                          
-[5] LC_TIME=English_United States.utf8    
+ [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
+ [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
+ [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
+[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
 
-time zone: America/Los_Angeles
-tzcode source: internal
+time zone: UTC
+tzcode source: system (glibc)
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_4.0.0.9000 bayesplot_1.13.0   loo_2.8.0.9000     brms_2.22.0       
-[5] Rcpp_1.1.0         knitr_1.50        
+[1] ggplot2_4.0.0    bayesplot_1.14.0 loo_2.8.0.9000   brms_2.23.0     
+[5] Rcpp_1.1.0       knitr_1.50      
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6         tensorA_0.36.2.1     xfun_0.53           
- [4] bslib_0.9.0          QuickJSR_1.8.0       htmlwidgets_1.6.4   
- [7] processx_3.8.6       inline_0.3.21        lattice_0.22-7      
-[10] callr_3.7.6          ps_1.9.1             vctrs_0.6.5         
-[13] tools_4.5.1          generics_0.1.4       stats4_4.5.1        
-[16] curl_7.0.0           parallel_4.5.1       tibble_3.3.0        
-[19] pkgconfig_2.0.3      Matrix_1.7-4         checkmate_2.3.3     
-[22] RColorBrewer_1.1-3   S7_0.2.0             desc_1.4.3          
-[25] distributional_0.5.0 RcppParallel_5.1.10  lifecycle_1.0.4     
-[28] compiler_4.5.1       farver_2.1.2         stringr_1.5.2       
-[31] textshaping_1.0.3    Brobdingnag_1.2-9    codetools_0.2-20    
-[34] htmltools_0.5.8.1    sass_0.4.10          yaml_2.3.10         
-[37] pillar_1.11.1        pkgdown_2.1.3        jquerylib_0.1.4     
-[40] cachem_1.1.0         StanHeaders_2.32.10  bridgesampling_1.1-2
-[43] abind_1.4-8          nlme_3.1-168         posterior_1.6.1     
-[46] rstan_2.32.7         tidyselect_1.2.1     digest_0.6.37       
-[49] mvtnorm_1.3-3        stringi_1.8.7        dplyr_1.1.4.9000    
-[52] labeling_0.4.3       fastmap_1.2.0        grid_4.5.1          
-[55] colorspace_2.1-1     cli_3.6.5            magrittr_2.0.4      
-[58] pkgbuild_1.4.8       withr_3.0.2          scales_1.4.0        
-[61] backports_1.5.0      rmarkdown_2.29       matrixStats_1.5.0   
-[64] gridExtra_2.3        ragg_1.5.0           coda_0.19-4.1       
-[67] evaluate_1.0.5       V8_6.0.5             rstantools_2.4.0    
-[70] rlang_1.1.6          glue_1.8.0           jsonlite_2.0.0      
-[73] R6_2.6.1             systemfonts_1.2.3    fs_1.6.6            </code></pre>
+ [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.53            
+ [4] bslib_0.9.0           QuickJSR_1.8.1        htmlwidgets_1.6.4    
+ [7] processx_3.8.6        inline_0.3.21         lattice_0.22-7       
+[10] callr_3.7.6           ps_1.9.1              vctrs_0.6.5          
+[13] tools_4.5.1           generics_0.1.4        stats4_4.5.1         
+[16] parallel_4.5.1        tibble_3.3.0          pkgconfig_2.0.3      
+[19] Matrix_1.7-3          checkmate_2.3.3       RColorBrewer_1.1-3   
+[22] S7_0.2.0              desc_1.4.3            distributional_0.5.0 
+[25] RcppParallel_5.1.11-1 lifecycle_1.0.4       compiler_4.5.1       
+[28] farver_2.1.2          stringr_1.5.2         textshaping_1.0.3    
+[31] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.8.1    
+[34] sass_0.4.10           yaml_2.3.10           pillar_1.11.1        
+[37] pkgdown_2.1.3         jquerylib_0.1.4       cachem_1.1.0         
+[40] StanHeaders_2.32.10   bridgesampling_1.1-2  abind_1.4-8          
+[43] nlme_3.1-168          posterior_1.6.1       rstan_2.32.7         
+[46] tidyselect_1.2.1      digest_0.6.37         mvtnorm_1.3-3        
+[49] stringi_1.8.7         dplyr_1.1.4           labeling_0.4.3       
+[52] fastmap_1.2.0         grid_4.5.1            cli_3.6.5            
+[55] magrittr_2.0.4        pkgbuild_1.4.8        withr_3.0.2          
+[58] scales_1.4.0          backports_1.5.0       rmarkdown_2.29       
+[61] matrixStats_1.5.0     gridExtra_2.3         ragg_1.5.0           
+[64] coda_0.19-4.1         evaluate_1.0.5        rstantools_2.5.0     
+[67] rlang_1.1.6           glue_1.8.0            jsonlite_2.0.0       
+[70] R6_2.6.1              systemfonts_1.2.3     fs_1.6.6             </code></pre>
 </div>
 <div class="section level3">
 <h3 id="appendix-licenses">Appendix: Licenses<a class="anchor" aria-label="anchor" href="#appendix-licenses"></a>

@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Jonah Gabry</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-with-rstan.Rmd" class="external-link"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-with-rstan.Rmd" class="external-link"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-with-rstan.Rmd</code></div>
     </div>
 
@@ -142,12 +148,11 @@ various information about the households (Gelman and Hill, 2007). Here
 we fit a model for the well-switching response given two predictors: the
 arsenic level of the water in the resident’s home, and the distance of
 the house from the nearest safe well.</p>
-<p>The sample size in this example is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>3020</mn></mrow><annotation encoding="application/x-tex">N=3020</annotation></semantics></math>,
-which is not huge but is large enough that it is important to have a
-computational method for LOO that is fast for each data point. On the
-plus side, with such a large dataset, the influence of any given
-observation is small, and so the computations should be stable.</p>
+<p>The sample size in this example is <span class="math inline">\(N=3020\)</span>, which is not huge but is large
+enough that it is important to have a computational method for LOO that
+is fast for each data point. On the plus side, with such a large
+dataset, the influence of any given observation is small, and so the
+computations should be stable.</p>
 <div class="section level3">
 <h3 id="coding-the-stan-model">Coding the Stan model<a class="anchor" aria-label="anchor" href="#coding-the-stan-model"></a>
 </h3>
@@ -180,13 +185,9 @@ generated quantities {
 individual terms will be saved by Stan. After running Stan,
 <code>log_lik</code> can be extracted (using the
 <code>extract_log_lik</code> function provided in the
-<strong>loo</strong> package) as an
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>×</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">S \times N</annotation></semantics></math>
-matrix, where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-is the number of simulations (posterior draws) and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-is the number of data points.</p>
+<strong>loo</strong> package) as an <span class="math inline">\(S \times
+N\)</span> matrix, where <span class="math inline">\(S\)</span> is the
+number of simulations (posterior draws) and <span class="math inline">\(N\)</span> is the number of data points.</p>
 </div>
 <div class="section level3">
 <h3 id="fitting-the-model-with-rstan">Fitting the model with RStan<a class="anchor" aria-label="anchor" href="#fitting-the-model-with-rstan"></a>
@@ -247,20 +248,17 @@ MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.3]).
 All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
 <p>The printed output from the <code>loo</code> function shows the
-estimates <span class="math inline">$\widehat{\mbox{elpd}}_{\rm
-loo}$</span> (expected log predictive density), <span class="math inline">$\widehat{p}_{\rm loo}$</span> (effective number of
-parameters), and <span class="math inline">${\rm looic} =-2\,
-\widehat{\mbox{elpd}}_{\rm loo}$</span> (the LOO information
+estimates <span class="math inline">\(\widehat{\mbox{elpd}}_{\rm
+loo}\)</span> (expected log predictive density), <span class="math inline">\(\widehat{p}_{\rm loo}\)</span> (effective number
+of parameters), and <span class="math inline">\({\rm looic} =-2\,
+\widehat{\mbox{elpd}}_{\rm loo}\)</span> (the LOO information
 criterion).</p>
 <p>The line at the bottom of the printed output provides information
 about the reliability of the LOO approximation (the interpretation of
-the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-parameter is explained in <code><a href="../reference/pareto-k-diagnostic.html">help('pareto-k-diagnostic')</a></code> and
-in greater detail in Vehtari, Simpson, Gelman, Yao, and Gabry (2019)).
-In this case the message tells us that all of the estimates for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-are fine.</p>
+the <span class="math inline">\(k\)</span> parameter is explained in
+<code><a href="../reference/pareto-k-diagnostic.html">help('pareto-k-diagnostic')</a></code> and in greater detail in
+Vehtari, Simpson, Gelman, Yao, and Gabry (2019)). In this case the
+message tells us that all of the estimates for <span class="math inline">\(k\)</span> are fine.</p>
 </div>
 <div class="section level3">
 <h3 id="comparing-models">Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"></a>

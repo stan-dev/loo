@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-moment-matching.Rmd</code></div>
     </div>
 
@@ -116,28 +122,24 @@ vignette online at <a href="https://mc-stan.org/loo/articles/" class="uri">https
 <p>This vignette demonstrates how to improve the Monte Carlo sampling
 accuracy of leave-one-out cross-validation with the <strong>loo</strong>
 package and Stan. The <strong>loo</strong> package automatically
-monitors the sampling accuracy using Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostics for each observation. Here, we present a method for quickly
-improving the accuracy when the Pareto diagnostics indicate problems.
-This is done by performing some additional computations using the
-existing posterior sample. If successful, this will decrease the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values, making the model assessment more reliable. <strong>loo</strong>
-also stores the original Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values with the name <code>influence_pareto_k</code> which are not
-changed. They can be used as a diagnostic of how much each observation
-influences the posterior distribution.</p>
+monitors the sampling accuracy using Pareto <span class="math inline">\(k\)</span> diagnostics for each observation. Here,
+we present a method for quickly improving the accuracy when the Pareto
+diagnostics indicate problems. This is done by performing some
+additional computations using the existing posterior sample. If
+successful, this will decrease the Pareto <span class="math inline">\(k\)</span> values, making the model assessment
+more reliable. <strong>loo</strong> also stores the original Pareto
+<span class="math inline">\(k\)</span> values with the name
+<code>influence_pareto_k</code> which are not changed. They can be used
+as a diagnostic of how much each observation influences the posterior
+distribution.</p>
 <p>The methodology presented is based on the paper</p>
 <ul>
 <li>Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
 Implicitly Adaptive Importance Sampling. <a href="https://arxiv.org/abs/1906.08850" class="external-link">arXiv preprint
 arXiv:1906.08850</a>.</li>
 </ul>
-<p>More information about the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostics is given in the following papers</p>
+<p>More information about the Pareto <span class="math inline">\(k\)</span> diagnostics is given in the following
+papers</p>
 <ul>
 <li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian
 model evaluation using leave-one-out cross-validation and WAIC.
@@ -247,8 +249,8 @@ package:</p>
 <p>The <code><a href="../reference/loo.html">loo()</a></code> function output warnings that there are some
 observations which are highly influential, and thus the accuracy of
 importance sampling is compromised as indicated by the large Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostic values (&gt; 0.7). As discussed in the vignette <a href="https://mc-stan.org/loo/articles/loo2-example.html"><em>Using the
+<span class="math inline">\(k\)</span> diagnostic values (&gt; 0.7). As
+discussed in the vignette <a href="https://mc-stan.org/loo/articles/loo2-example.html"><em>Using the
 loo package (version &gt;= 2.0.0)</em></a>, this may be an indication of
 model misspecification. Despite that, it is still beneficial to be able
 to evaluate the predictive performance of the model accurately.</p>
@@ -259,11 +261,10 @@ to evaluate the predictive performance of the model accurately.</p>
 <p>To improve the accuracy of the <code><a href="../reference/loo.html">loo()</a></code> result above, we
 could perform leave-one-out cross-validation by explicitly leaving out
 single observations and refitting the model using MCMC repeatedly.
-However, the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostics indicate that there are 19 observations which are
-problematic. This would require 19 model refits which may require a lot
-of computation time.</p>
+However, the Pareto <span class="math inline">\(k\)</span> diagnostics
+indicate that there are 19 observations which are problematic. This
+would require 19 model refits which may require a lot of computation
+time.</p>
 <p>Instead of refitting with MCMC, we can perform a faster moment
 matching correction to the importance sampling for the problematic
 observations. This can be done with the <code><a href="../reference/loo_moment_match.html">loo_moment_match()</a></code>
@@ -276,44 +277,29 @@ using the existing <code>stanfit</code> object.</p>
 using <strong>rstan</strong>. It only requires setting the argument
 <code>moment_match</code> to <code>TRUE</code> in the <code><a href="../reference/loo.html">loo()</a></code>
 function. Optionally, you can also set the argument
-<code>k_threshold</code> which determines the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-threshold, above which moment matching is used. By default, it operates
-on all observations whose Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-value is larger than the sample size
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>)
-specific threshold
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>min</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mn>1</mn><mi>/</mi><msub><mo>log</mo><mn>10</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mn>0.7</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\min(1 - 1 / \log_{10}(S), 0.7)</annotation></semantics></math>
-(which is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.7</mn><annotation encoding="application/x-tex">0.7</annotation></semantics></math>
-for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>&gt;</mo><mn>2200</mn></mrow><annotation encoding="application/x-tex">S&gt;2200</annotation></semantics></math>).</p>
+<code>k_threshold</code> which determines the Pareto <span class="math inline">\(k\)</span> threshold, above which moment matching
+is used. By default, it operates on all observations whose Pareto <span class="math inline">\(k\)</span> value is larger than the sample size
+(<span class="math inline">\(S\)</span>) specific threshold <span class="math inline">\(\min(1 - 1 / \log_{10}(S), 0.7)\)</span> (which is
+<span class="math inline">\(0.7\)</span> for <span class="math inline">\(S&gt;2200\)</span>).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># available in rstan &gt;= 2.21</span></span>
 <span><span class="va">loo2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit</span>, moment_match <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">loo2</span></span></code></pre></div>
 <p>After the moment matching, all observations have the diagnostic
-Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-less than 0.7, meaning that the estimates are now reliable. The total
-<code>elpd_loo</code> estimate also changed from <code>-5457.8</code> to
-<code>-5478.5</code>, showing that before moment matching,
-<code><a href="../reference/loo.html">loo()</a></code> overestimated the predictive performance of the
-model.</p>
-<p>The updated Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values stored in <code>loo2$diagnostics$pareto_k</code> are considered
+Pareto <span class="math inline">\(k\)</span> less than 0.7, meaning
+that the estimates are now reliable. The total <code>elpd_loo</code>
+estimate also changed from <code>-5457.8</code> to <code>-5478.5</code>,
+showing that before moment matching, <code><a href="../reference/loo.html">loo()</a></code> overestimated
+the predictive performance of the model.</p>
+<p>The updated Pareto <span class="math inline">\(k\)</span> values
+stored in <code>loo2$diagnostics$pareto_k</code> are considered
 algorithmic diagnostic values that indicate the sampling accuracy. The
-original Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-values are stored in <code>loo2$pointwise[,"influence_pareto_k"]</code>
-and these are not modified by the moment matching. These can be
-considered as diagnostics for how big influence each observation has on
-the posterior distribution. In addition to the Pareto
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-diagnostics, moment matching also updates the effective sample size
-estimates.</p>
+original Pareto <span class="math inline">\(k\)</span> values are stored
+in <code>loo2$pointwise[,"influence_pareto_k"]</code> and these are not
+modified by the moment matching. These can be considered as diagnostics
+for how big influence each observation has on the posterior
+distribution. In addition to the Pareto <span class="math inline">\(k\)</span> diagnostics, moment matching also
+updates the effective sample size estimates.</p>
 </div>
 </div>
 <div class="section level2">

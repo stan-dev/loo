@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -98,7 +104,7 @@ Nicenboim</h4>
             
             <h4 data-toc-skip class="date">2025-09-23</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/HEAD/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/reformat-packagedown-workflow/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
     </div>
 
@@ -220,29 +226,20 @@ then is evaluated on the held-out “test” data.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compile</span></span>
 <span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span></code></pre></div>
-<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
-
-Please download and install the appropriate version of Rtools for 4.5.1 from
-https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
 <pre><code>Trying to compile a simple C file</code></pre>
-<pre><code>Running "C:/PROGRA~1/R/R-45~1.1/bin/x64/Rcmd.exe" SHLIB foo.c
-using C compiler: 'gcc.exe (GCC) 14.2.0'
-gcc  -I"C:/PROGRA~1/R/R-45~1.1/include" -DNDEBUG   -I"C:/Users/visru/AppData/Local/R/win-library/4.5/Rcpp/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/unsupported"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/BH/include" -I"C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/src/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/"  -I"C:/Users/visru/AppData/Local/R/win-library/4.5/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -I"C:/Users/visru/AppData/Local/R/win-library/4.5/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include "C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/stan/math/prim/fun/Eigen.hpp"  -std=c++1y    -I"C:/rtools45/x86_64-w64-mingw32.static.posix/include"      -O2 -Wall -std=gnu2x  -mfpmath=sse -msse2 -mstackrealign   -c foo.c -o foo.o
-cc1.exe: warning: command-line option '-std=c++14' is valid for C++/ObjC++ but not for C
-In file included from C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/Core:19,
-                 from C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/Dense:1,
-                 from C:/Users/visru/AppData/Local/R/win-library/4.5/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
+<pre><code>Running /opt/R/4.5.1/lib/R/bin/R CMD SHLIB foo.c
+using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
+gcc -std=gnu2x -I"/opt/R/4.5.1/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
+                 from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
+                 from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
                  from &lt;command-line&gt;:
-C:/Users/visru/AppData/Local/R/win-library/4.5/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
+/home/runner/work/_temp/Library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
   679 | #include &lt;cmath&gt;
       |          ^~~~~~~
 compilation terminated.
-make: *** [C:/PROGRA~1/R/R-45~1.1/etc/x64/Makeconf:289: foo.o] Error 1</code></pre>
-<pre><code>WARNING: Rtools is required to build R packages, but is not currently installed.
-
-Please download and install the appropriate version of Rtools for 4.5.1 from
-https://cran.r-project.org/bin/windows/Rtools/.</code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+make: *** [/opt/R/4.5.1/lib/R/etc/Makeconf:202: foo.o] Error 1</code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fit model</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">data_train</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>We recompute the generated quantities using the posterior draws
@@ -250,7 +247,7 @@ conditional on the training data, but we now pass in the held-out data
 to get the log predictive densities for the test data. Because we are
 using independent data, the log predictive density coincides with the
 log likelihood of the test data.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
 <span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -259,14 +256,14 @@ log likelihood of the test data.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the test
 data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
 
      Estimate    SE
-elpd  -1745.4 292.2
-ic     3490.8 584.3</code></pre>
+elpd  -1741.0 290.7
+ic     3482.1 581.5</code></pre>
 <p>When one wants to compare different models, the function
 <code><a href="../reference/loo_compare.html">loo_compare()</a></code> can be used to assess the difference in
 performance.</p>
@@ -283,7 +280,7 @@ Vehtari et al., 2017).</p>
 </h3>
 <p>We use the data that is already pre-processed and we divide it in 10
 random folds using <code>kfold_split_random</code></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare data</span></span>
 <span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">10</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -298,7 +295,7 @@ predictive densities for the left-out fold. Last, we store the
 predictive density for the observations of the left-out fold in a
 matrix. The output of this loop is a matrix of the log pointwise
 predictive densities of all the observations.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span></span>
 <span><span class="va">log_pd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">4000</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Loop over the folds</span></span>
@@ -331,14 +328,14 @@ predictive densities of all the observations.</p>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the 10
 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
 
      Estimate     SE
-elpd  -5549.7  726.3
-ic    11099.4 1452.6</code></pre>
+elpd  -5560.1  730.0
+ic    11120.2 1460.1</code></pre>
 <p>If one wants to compare several models (with
 <code>loo_compare</code>), one should use the same folds for all the
 different models.</p>
