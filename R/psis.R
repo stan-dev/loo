@@ -362,7 +362,8 @@ prepare_psis_r_eff <- function(r_eff, len) {
   } else if (length(r_eff) != len) {
     stop("'r_eff' must have one value or one value per observation.", call. = FALSE)
   } else if (anyNA(r_eff)) {
-    stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
+    message("If `r_eff` has length `len` but has `NA`s then `NA`s are replaced with 1's.")
+    r_eff[is.na(r_eff)] <- 1
   }
   r_eff
 }
