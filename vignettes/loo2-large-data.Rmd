@@ -1,0 +1,613 @@
+---
+title: "Using Leave-one-out cross-validation for large data"
+author: "Mans Magnusson, Paul Bürkner, Aki Vehtari and Jonah Gabry"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Using Leave-one-out cross-validation for large data}
+-->
+
+```{r settings, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+This vignette demonstrates how to do leave-one-out cross-validation for large
+data using the __loo__ package and Stan. There are two approaches covered:
+LOO with subsampling and LOO using approximations to posterior distributions. 
+Some sections from this vignette are excerpted from the papers
+
+* Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. [arXiv preprint arXiv:2001.00980](https://arxiv.org/abs/2001.00980).
+
+* Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253
+[online](http://proceedings.mlr.press/v97/magnusson19a.html), 
+[arXiv preprint arXiv:1904.10679](https://arxiv.org/abs/1904.10679).
+
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. _Statistics and Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links: [published](https://link.springer.com/article/10.1007/s11222-016-9696-4) | [arXiv preprint](https://arxiv.org/abs/1507.04544).
+
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto smoothed importance sampling. [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+
+which provide important background for understanding the methods implemented in
+the package.
+
+# Setup 
+
+In addition to the __loo__ package, we'll also be using __rstan__:
+
+```{r setup, message=FALSE}
+library("rstan")
+library("loo")
+set.seed(4711)
+```
+
+
+# Example: Well water in Bangladesh
+
+We will use the same example as in the vignette [_Writing Stan programs for use
+with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html).
+See that vignette for a description of the problem and data.
+
+The sample size in this example is only $N=3020$, which is not large enough to
+_require_ the special methods for large data described in this vignette, but
+is sufficient for demonstration purposes in this tutorial.
+
+## Coding the Stan model
+
+Here is the Stan code for fitting the logistic regression model, which 
+we save in a file called `logistic.stan`:
+
+```
+// Note: some syntax used in this program requires RStan >= 2.26 (or CmdStanR)
+// To use an older version of RStan change the line declaring `y` to:
+//    int<lower=0,upper=1> y[N];
+data {
+  int<lower=0> N;             // number of data points
+  int<lower=0> P;             // number of predictors (including intercept)
+  matrix[N,P] X;              // predictors (including 1s for intercept)
+  array[N] int<lower=0,upper=1> y;  // binary outcome
+}
+parameters {
+  vector[P] beta;
+}
+model {
+  beta ~ normal(0, 1);
+  y ~ bernoulli_logit(X * beta);
+}
+```
+
+Importantly, unlike the general approach recommended in 
+[_Writing Stan programs for use with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html), 
+we do _not_ compute the log-likelihood for each observation in the 
+`generated quantities` block of the Stan program. Here we are assuming we have a
+large data set (larger than the one we're actually using in this demonstration)
+and so it is preferable to instead define a function in R to compute the
+log-likelihood for each data point when needed rather than storing all of the
+log-likelihood values in memory.
+
+The log-likelihood in R can be coded as follows:
+```{r llfun_logistic}
+# we'll add an argument log to toggle whether this is a log-likelihood or 
+# likelihood function. this will be useful later in the vignette.
+llfun_logistic <- function(data_i, draws, log = TRUE) {
+  x_i <- as.matrix(data_i[, which(grepl(colnames(data_i), pattern = "X")), drop=FALSE])
+  logit_pred <- draws %*% t(x_i)
+  dbinom(x = data_i$y, size = 1, prob = 1/(1 + exp(-logit_pred)), log = log)
+}
+```
+
+The function `llfun_logistic()` needs to have arguments `data_i` and `draws`. 
+Below we will test that the function is working by using the `loo_i()` function.
+
+## Fitting the model with RStan
+
+Next we fit the model in Stan using the **rstan** package:
+
+```{r, eval=FALSE}
+# Prepare data
+url <- "http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"
+wells <- read.table(url)
+wells$dist100 <- with(wells, dist / 100)
+X <- model.matrix(~ dist100 + arsenic, wells)
+standata <- list(y = wells$switch, X = X, N = nrow(X), P = ncol(X))
+
+# Compile
+stan_mod <- stan_model("logistic.stan")
+
+# Fit model
+fit_1 <- sampling(stan_mod, data = standata, seed = 4711)
+print(fit_1, pars = "beta")
+```
+
+```
+         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
+beta[1]  0.00       0 0.08 -0.15 -0.05  0.00  0.06  0.16  1933    1
+beta[2] -0.89       0 0.10 -1.09 -0.96 -0.89 -0.82 -0.69  2332    1
+beta[3]  0.46       0 0.04  0.38  0.43  0.46  0.49  0.54  2051    1
+```
+
+Before we move on to computing LOO we can now test that the log-likelihood
+function we wrote is working as it should. The `loo_i()` function is a helper
+function that can be used to test a log-likelihood function on a single observation.
+
+```{r, eval=FALSE}
+# used for draws argument to loo_i
+parameter_draws_1 <- extract(fit_1)$beta
+
+# used for data argument to loo_i
+stan_df_1 <- as.data.frame(standata)
+
+# compute relative efficiency (this is slow and optional but is recommended to allow 
+# for adjusting PSIS effective sample size based on MCMC effective sample size)
+r_eff <- relative_eff(llfun_logistic, 
+                      log = FALSE, # relative_eff wants likelihood not log-likelihood values
+                      chain_id = rep(1:4, each = 1000), 
+                      data = stan_df_1, 
+                      draws = parameter_draws_1, 
+                      cores = 2)
+
+loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)
+```
+
+```
+$pointwise
+    elpd_loo mcse_elpd_loo        p_loo     looic influence_pareto_k
+1 -0.3314552  0.0002887608 0.0003361772 0.6629103        -0.05679886
+...
+```
+
+# Approximate LOO-CV using PSIS-LOO and subsampling
+
+We can then use the `loo_subsample()` function to compute the efficient PSIS-LOO
+approximation to exact LOO-CV using subsampling:
+
+```{r, eval=FALSE}
+set.seed(4711)
+loo_ss_1 <-
+  loo_subsample(
+    llfun_logistic,
+    observations = 100, # take a subsample of size 100
+    cores = 2,
+    # these next objects were computed above
+    r_eff = r_eff, 
+    draws = parameter_draws_1,
+    data = stan_df_1
+  )
+print(loo_ss_1)
+```
+
+```
+Computed from 4000 by 100 subsampled log-likelihood
+values from 3020 total observations.
+
+         Estimate   SE subsampling SE
+elpd_loo  -1968.5 15.6            0.3
+p_loo         3.1  0.1            0.4
+looic      3936.9 31.2            0.6
+------
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+The `loo_subsample()` function creates an object of class `psis_loo_ss`, that
+inherits from `psis_loo, loo` (the classes of regular `loo` objects).
+
+The printed output above shows the estimates
+$\widehat{\mbox{elpd}}_{\rm loo}$ (expected log predictive density),
+$\widehat{p}_{\rm loo}$ (effective number of parameters), and ${\rm looic} =-2\,
+\widehat{\mbox{elpd}}_{\rm loo}$ (the LOO information criterion). Unlike when 
+using `loo()`, when using `loo_subsample()` there is an additional column 
+giving the "subsampling SE", which reflects the additional uncertainty due 
+to the subsampling used. 
+
+The line at the bottom of the printed output provides information about the
+reliability of the LOO approximation (the interpretation of the $k$ parameter is
+explained in `help('pareto-k-diagnostic')` and in greater detail in Vehtari,
+Simpson, Gelman, Yao, and Gabry (2019)). In this case, the message tells us that all of the
+estimates for $k$ are fine _for this given subsample_.
+
+
+## Adding additional subsamples
+
+If we are not satisfied with the subsample size (i.e., the accuracy) we can
+simply add more samples until we are satisfied using the `update()` method.
+
+```{r, eval=FALSE}
+set.seed(4711)
+loo_ss_1b <-
+  update(
+    loo_ss_1,
+    observations = 200, # subsample 200 instead of 100
+    r_eff = r_eff,
+    draws = parameter_draws_1,
+    data = stan_df_1
+  ) 
+print(loo_ss_1b)
+```
+
+```
+Computed from 4000 by 200 subsampled log-likelihood
+values from 3020 total observations.
+
+         Estimate   SE subsampling SE
+elpd_loo  -1968.3 15.6            0.2
+p_loo         3.2  0.1            0.4
+looic      3936.7 31.2            0.5
+------
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+## Specifying estimator and sampling method
+
+The performance relies on two components: the estimation method and the
+approximation used for the elpd. See the documentation for `loo_subsample()`
+more information on which estimators and approximations are implemented. The
+default implementation is using the point log predictive density evaluated at
+the mean of the posterior (`loo_approximation="plpd"`) and the difference
+estimator (`estimator="diff_srs"`). This combination has a focus on fast
+inference. But we can easily use other estimators as well as other elpd
+approximations, for example:
+
+```{r, eval=FALSE}
+set.seed(4711)
+loo_ss_1c <-
+  loo_subsample(
+    x = llfun_logistic,
+    r_eff = r_eff,
+    draws = parameter_draws_1,
+    data = stan_df_1,
+    observations = 100,
+    estimator = "hh_pps", # use Hansen-Hurwitz
+    loo_approximation = "lpd", # use lpd instead of plpd
+    loo_approximation_draws = 100,
+    cores = 2
+  )
+print(loo_ss_1c)
+```
+
+
+```
+Computed from 4000 by 100 subsampled log-likelihood
+values from 3020 total observations.
+
+         Estimate   SE subsampling SE
+elpd_loo  -1968.9 15.4            0.5
+p_loo         3.5  0.2            0.5
+looic      3937.9 30.7            1.1
+------
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.9, 1.0]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+See the documentation and references for `loo_subsample()` for details on
+the implemented approximations.
+
+
+# Approximate LOO-CV using PSIS-LOO with posterior approximations
+
+Using posterior approximations, such as variational inference and Laplace
+approximations, can further speed-up LOO-CV for large data. Here we demonstrate
+using a Laplace approximation in Stan.
+
+```{r, eval=FALSE}
+fit_laplace <- optimizing(stan_mod, data = standata, draws = 2000, 
+                          importance_resampling = TRUE)
+parameter_draws_laplace <- fit_laplace$theta_tilde # draws from approximate posterior
+log_p <- fit_laplace$log_p # log density of the posterior
+log_g <- fit_laplace$log_g # log density of the approximation
+```
+
+Using the posterior approximation we can then do LOO-CV by correcting for the
+posterior approximation when we compute the elpd. To do this we use the 
+`loo_approximate_posterior()` function.
+
+```{r, eval=FALSE}
+set.seed(4711)
+loo_ap_1 <-
+  loo_approximate_posterior(
+    x = llfun_logistic,
+    draws = parameter_draws_laplace,
+    data = stan_df_1,
+    log_p = log_p,
+    log_g = log_g,
+    cores = 2
+  )
+print(loo_ap_1)
+```
+
+The function creates a class, `psis_loo_ap` that inherits from `psis_loo, loo`.
+
+```
+Computed from 2000 by 3020 log-likelihood matrix
+
+         Estimate   SE
+elpd_loo  -1968.4 15.6
+p_loo         3.2  0.2
+looic      3936.8 31.2
+------
+Posterior approximation correction used.
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+## Combining the posterior approximation method with subsampling
+
+The posterior approximation correction can also be used together with
+subsampling:
+
+```{r, eval=FALSE}
+set.seed(4711)
+loo_ap_ss_1 <-
+  loo_subsample(
+    x = llfun_logistic,
+    draws = parameter_draws_laplace,
+    data = stan_df_1,
+    log_p = log_p,
+    log_g = log_g,
+    observations = 100,
+    cores = 2
+  )
+print(loo_ap_ss_1)
+```
+
+```
+Computed from 2000 by 100 subsampled log-likelihood
+values from 3020 total observations.
+
+         Estimate   SE subsampling SE
+elpd_loo  -1968.2 15.6            0.4
+p_loo         2.9  0.1            0.5
+looic      3936.4 31.1            0.8
+------
+Posterior approximation correction used.
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+The object created is of class `psis_loo_ss`, which inherits from the
+`psis_loo_ap` class previously described.
+
+
+## Comparing models
+
+To compare this model to an alternative model for the same data we can use the
+`loo_compare()` function just as we would if using `loo()` instead of
+`loo_subsample()` or `loo_approximate_posterior()`. First we'll fit a second
+model to the well-switching data, using `log(arsenic)` instead of `arsenic` as a
+predictor:
+
+```{r, eval=FALSE}
+standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
+fit_2 <- sampling(stan_mod, data = standata) 
+parameter_draws_2 <- extract(fit_2)$beta
+stan_df_2 <- as.data.frame(standata)
+
+# recompute subsampling loo for first model for demonstration purposes
+
+# compute relative efficiency (this is slow and optional but is recommended to allow 
+# for adjusting PSIS effective sample size based on MCMC effective sample size)
+r_eff_1 <- relative_eff(
+  llfun_logistic,
+  log = FALSE, # relative_eff wants likelihood not log-likelihood values
+  chain_id = rep(1:4, each = 1000),
+  data = stan_df_1,
+  draws = parameter_draws_1,
+  cores = 2
+)
+
+set.seed(4711)
+loo_ss_1 <- loo_subsample(
+  x = llfun_logistic,
+  r_eff = r_eff_1,
+  draws = parameter_draws_1,
+  data = stan_df_1,
+  observations = 200,
+  cores = 2
+)
+
+# compute subsampling loo for a second model (with log-arsenic)
+
+r_eff_2 <- relative_eff(
+  llfun_logistic,
+  log = FALSE, # relative_eff wants likelihood not log-likelihood values
+  chain_id = rep(1:4, each = 1000),
+  data = stan_df_2,
+  draws = parameter_draws_2,
+  cores = 2
+)
+loo_ss_2 <- loo_subsample(
+  x = llfun_logistic,
+  r_eff = r_eff_2, 
+  draws = parameter_draws_2,
+  data = stan_df_2,
+  observations = 200,
+  cores = 2
+)
+
+print(loo_ss_2)
+```
+
+```
+Computed from 4000 by 100 subsampled log-likelihood
+values from 3020 total observations.
+
+         Estimate   SE subsampling SE
+elpd_loo  -1952.0 16.2            0.2
+p_loo         2.6  0.1            0.3
+looic      3903.9 32.4            0.4
+------
+Monte Carlo SE of elpd_loo is 0.0.
+MCSE and ESS estimates assume MCMC draws (r_eff in [1.0, 1.1]).
+
+All Pareto k estimates are good (k < 0.7).
+See help('pareto-k-diagnostic') for details.
+```
+
+We can now compare the models on LOO using the `loo_compare` function:
+
+```{r, eval=FALSE}
+# Compare
+comp <- loo_compare(loo_ss_1, loo_ss_2)
+print(comp)
+```
+
+```
+Warning: Different subsamples in 'model2' and 'model1'. Naive diff SE is used.
+
+       elpd_diff se_diff subsampling_se_diff
+model2  0.0       0.0     0.0               
+model1 16.5      22.5     0.4               
+```
+
+This new object `comp` contains the estimated difference of expected
+leave-one-out prediction errors between the two models, along with the standard
+error. As the warning indicates, because different subsamples were used the
+comparison will not take the correlations between different observations into
+account. Here we see that the naive SE is 22.5 and we cannot see any difference
+in performance between the models.
+
+To force subsampling to use the same observations for each of the models 
+we can simply extract the observations used in `loo_ss_1` and use them in 
+`loo_ss_2` by supplying the `loo_ss_1` object to the `observations` argument.
+
+
+```{r, eval=FALSE}
+loo_ss_2 <-
+  loo_subsample(
+    x = llfun_logistic,
+    r_eff = r_eff_2,
+    draws = parameter_draws_2,
+    data = stan_df_2,
+    observations = loo_ss_1,
+    cores = 2
+  )
+```
+
+We could also supply the subsampling indices using the `obs_idx()`
+helper function:
+
+```{r, eval=FALSE}
+idx <- obs_idx(loo_ss_1)
+loo_ss_2 <- loo_subsample(
+  x = llfun_logistic,
+  r_eff = r_eff_2, 
+  draws = parameter_draws_2,
+  data = stan_df_2,
+  observations = idx,
+  cores = 2
+)
+```
+
+```
+Simple random sampling with replacement assumed.
+```
+
+This results in a message indicating that we assume these observations to have
+been sampled with simple random sampling, which is true because we had used the
+default `"diff_srs"` estimator for `loo_ss_1`.
+
+We can now compare the models and estimate the difference based on the same
+subsampled observations.
+
+```{r, eval=FALSE}
+comp <- loo_compare(loo_ss_1, loo_ss_2)
+print(comp) 
+```
+
+```
+       elpd_diff se_diff subsampling_se_diff
+model2  0.0       0.0     0.0               
+model1 16.1       4.4     0.1               
+```
+
+First, notice that now the `se_diff` is now around 4 (as opposed to 20 when using
+different subsamples). The first column shows the difference in ELPD relative to
+the model with the largest ELPD. In this case, the difference in `elpd` and its
+scale relative to the approximate standard error of the difference) indicates a
+preference for the second model (`model2`). Since the subsampling uncertainty is
+so small in this case it can effectively be ignored. If we need larger
+subsamples we can simply add samples using the `update()` method demonstrated
+earlier.
+
+It is also possible to compare a subsampled loo computation with a full loo object.
+
+```{r, eval=FALSE}
+# use loo() instead of loo_subsample() to compute full PSIS-LOO for model 2
+loo_full_2 <- loo(
+  x = llfun_logistic,
+  r_eff = r_eff_2,
+  draws = parameter_draws_2,
+  data = stan_df_2,
+  cores = 2
+)
+loo_compare(loo_ss_1, loo_full_2)
+```
+
+```
+Estimated elpd_diff using observations included in loo calculations for all models.
+```
+
+Because we are comparing a non-subsampled loo calculation to a subsampled
+calculation we get the message that only the observations that are included in
+the loo calculations for both `model1` and `model2` are included in the
+computations for the comparison.
+
+```
+       elpd_diff se_diff subsampling_se_diff
+model2  0.0       0.0     0.0               
+model1 16.3       4.4     0.3   
+```
+
+Here we actually see an increase in `subsampling_se_diff`, but this is due to a
+technical detail not elaborated here. In general, the difference should be
+better or negligible.
+
+# References
+
+Gelman, A., and Hill, J. (2007).  *Data Analysis Using Regression and Multilevel Hierarchical Models.*  Cambridge University Press.
+
+Stan Development Team (2017). _The Stan C++ Library, Version 2.17.0._   https://mc-stan.org/
+
+Stan Development Team (2018) _RStan: the R interface to Stan, Version 2.17.3._   https://mc-stan.org/
+
+Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS), in PMLR 108. [arXiv preprint arXiv:2001.00980](https://arxiv.org/abs/2001.00980).
+
+Magnusson, M., Andersen, M., Jonasson, J. & Vehtari, A. (2019). Bayesian leave-one-out cross-validation for large data. Proceedings of the 36th International Conference on Machine Learning, in PMLR 97:4244-4253
+[online](http://proceedings.mlr.press/v97/magnusson19a.html), 
+[arXiv preprint arXiv:1904.10679](https://arxiv.org/abs/1904.10679).
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. _Statistics and
+Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
+[online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
+[arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2022). Pareto
+smoothed importance sampling.
+[arXiv preprint arXiv:1507.02646](https://arxiv.org/abs/1507.02646).
