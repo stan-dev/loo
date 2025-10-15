@@ -1,5 +1,5 @@
 url: https://mc-stan.org/loo/
-destination: docs
+destination: "docs/"
 template:
   package: pkgdownConfig
 development:

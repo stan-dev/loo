@@ -1,22 +1,23 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  # push:
-  #   branches: [main, master]
+  # build dev site on merged pushes
+  push:
+    branches: [main, master]
+  # build full site on releases
   release:
     types: [published]
   workflow_dispatch:
 
 name: pkgdown.yaml
 
-permissions: read-all
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    concurrency:
-      group: pkgdown-${{ github.run_id }}
-      cancel-in-progress: true
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -50,7 +51,6 @@ jobs:
             any::StanHeaders
             any::knitr
             any::withr
-            any::spdep
           needs: website
 
       # - uses: actions/cache@v4
@@ -71,7 +71,9 @@ jobs:
           )
         shell: Rscript {0}
 
-      - uses: stefanzweifel/git-auto-commit-action@v6
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
-          commit_message: "pkgdown: update docs [skip CI]"
-          file_pattern: docs/**
+          clean: true
+          branch: gh-pages
+          folder: docs
