@@ -116,15 +116,22 @@ loo_compare.default <- function(x, ...) {
   diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
+  # compute probabilities that a model has worse elpd than the best model
+  # using a normal approximation (Sivula et al., 2025)
   p_worse <- pnorm(0, elpd_diff, se_diff)
   p_worse[elpd_diff==0] <- NA
   N <- nrow(diffs)
+  # diagnostics to assess whether the normal approximation can be trusted
   if (N<100) {
+    # small N (Sivula et al., 2025)
     diag_pnorm <- rep("N < 100", length(elpd_diff))
     diag_pnorm[elpd_diff==0] = ""
   } else {
     diag_pnorm <- rep("", length(elpd_diff))
+    # similar predictions (Sivula et al., 2025)
     diag_pnorm[elpd_diff>-4 & elpd_diff!=0] <- "similar predictions"
+    # possible outliers in differences (Sivula et al., 2025;
+    # Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) posterior::pareto_khat(x, tail="both"))
     diag_pnorm[khat_diff > ps_khat_threshold(N)] <- paste0("khat_diff > ", .fr(ps_khat_threshold(N), 2))
@@ -147,9 +154,10 @@ loo_compare.default <- function(x, ...) {
 #' @param digits For the print method only, the number of digits to use when
 #'   printing.
 #' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed? The entire matrix is always returned, but
-#'   by default only the most important columns are printed.
-print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
+#'   of the summary matrix be printed? The entire matrix is always returned, bu#' @param pnorm For the print method only, should we include the normal
+#'   approximation based probability of model having worse performance than
+#'   the best model
+print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, pnorm = FALSE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
     if (NCOL(xcopy) >= 2 && simplify) {
@@ -159,10 +167,14 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
   } else if (NCOL(xcopy) >= 2 && simplify) {
      xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
-  print(cbind(.fr(xcopy, digits), p_worse=.fr(x[,"p_worse"],2), diag_pnorm=x[, "diag_pnorm"]), quote = FALSE)
-  invisible(x)
+  if (p_worse) {
+    print(cbind(.fr(xcopy, digits), p_worse=.fr(x[,"p_worse"],2), diag_pnorm=x[, "diag_pnorm"]), quote = FALSE)
+    invisible(x)
+  } else {
+    print(cbind(.fr(xcopy, digits), quote = FALSE))
+    invisible(x)
+  }
 }
-
 
 
 # internal ----------------------------------------------------------------
