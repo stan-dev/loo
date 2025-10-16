@@ -82,16 +82,16 @@ See \code{\link[=psis]{psis()}} for details.}
 \value{
 A list containing two elements: \code{estimates} and \code{pointwise}.
 The former reports estimator and standard error and latter the pointwise
-values.
+values. Following Bolin & Wallin (2023), a larger value is better.
 }
 \description{
 The \code{crps()} and \code{scrps()} functions and their \verb{loo_*()} counterparts can be
 used to compute the continuously ranked probability score (CRPS) and scaled
-CRPS (SCRPS) (see Bolin and Wallin, 2022). CRPS is a proper scoring rule, and
+CRPS (SCRPS) (as defined by Bolin and Wallin, 2023). CRPS is a proper scoring rule, and
 strictly proper when the first moment of the predictive distribution is
 finite. Both can be expressed in terms of samples form the predictive
-distribution. See e.g. Gneiting and Raftery (2007) for a comprehensive
-discussion on CRPS.
+distribution. See, for example, a paper by Gneiting and Raftery (2007)
+for a comprehensive discussion on CRPS.
 }
 \details{
 To compute (S)CRPS, the user needs to provide two sets of draws, \code{x} and
@@ -114,8 +114,8 @@ loo_crps(ypred1, ypred2, y = fit$y, log_lik = log_lik(fit))
 
 }
 \references{
-Bolin, D., & Wallin, J. (2022). Local scale invariance and robustness of
-proper scoring rules. arXiv. \doi{10.48550/arXiv.1912.05642}
+Bolin, D., & Wallin, J. (2023). Local scale invariance and robustness of
+proper scoring rules. Statistical Science, 38(1):140-159.
 
 Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 Prediction, and Estimation. Journal of the American Statistical Association,
