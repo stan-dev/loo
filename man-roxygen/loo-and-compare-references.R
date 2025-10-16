@@ -10,10 +10,12 @@
 #' 25(72):1-58.
 #' [PDF](https://jmlr.org/papers/v25/19-556.html)
 #'
-#' Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
+#' Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2025).
 #' Uncertainty in Bayesian leave-one-out cross-validation based model
-#' comparison. [preprint arXiv:2008.10296v3.](https://arxiv.org/abs/2008.10296v3).
+#' comparison. *Bayesian Analysis*, accepted for publication.
+#' [preprint arXiv:2008.10296v5.](https://arxiv.org/abs/2008.10296v5).
 #' 
-#' McLatchie, Y., and Vehtari, A. (2023).  Efficient estimation and
+#' McLatchie, Y., and Vehtari, A. (2024).  Efficient estimation and
 #' correction of selection-induced bias with order statistics.
-#' [preprint arXiv:2309.03742](https://arxiv.org/abs/2309.03742)
+#' *Statistics and Computing*. 34(132). 
+#' [doi:10.1007/s11222-024-10442-4](https://doi.org/10.1007/s11222-024-10442-4)

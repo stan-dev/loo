@@ -13,20 +13,25 @@ __loo__ is an R package that allows users to compute efficient approximate
 leave-one-out cross-validation for fitted Bayesian models, as well as model
 weights that can be used to average predictive distributions. 
 The __loo__ package package implements the fast and stable computations for 
-approximate LOO-CV and WAIC from
+approximate LOO-CV
 
 * Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model 
 evaluation using leave-one-out cross-validation and WAIC. 
 _Statistics and Computing_. 27(5), 1413--1432. 
-doi:10.1007/s11222-016-9696-4. [Online](https://link.springer.com/article/10.1007/s11222-016-9696-4), 
+doi:10.1007/s11222-016-9696-4. [Online](https://dx.doi.org/10.1007/s11222-016-9696-4), 
 [arXiv preprint arXiv:1507.04544](https://arxiv.org/abs/1507.04544).
+
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. *Journal of Machine Learning Research*,
+25(72):1-58.
+[Online](https://jmlr.org/papers/v25/19-556.html)
 
 and computes model weights as described in
 
 * Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018). Using
 stacking to average Bayesian predictive distributions. In Bayesian
 Analysis, doi:10.1214/17-BA1091. 
-[Online](https://projecteuclid.org/euclid.ba/1516093227),
+[Online](https://dx.doi.org/10.1214/17-BA1091),
 [arXiv preprint arXiv:1704.02030](https://arxiv.org/abs/1704.02030).
 
 From existing posterior simulation draws, we compute approximate LOO-CV using
