@@ -41,11 +41,11 @@
 #'   standard approach of comparing differences of deviances to a Chi-squared
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
-#' 
-#'   The values in `p_worse` column are computed using the normal
+#'
+#'   The values in the `p_worse` column are computed using the normal
 #'   approximation and values from the columns `elpd_diff` and
 #'   `se_diff`. Sivula et al. (2025) discuss the conditions when the
-#'   normal approximation used for SE and `se_diff` is good., and
+#'   normal approximation used for SE and `se_diff` is good, and the
 #'   column `diag_pnorm` contains possible diagnostic messages: 1)
 #'   small data (N < 100), 2) similar predictions (|elpd_diff| < 4),
 #'   or 3) possible outliers (khat > 0.5).
@@ -58,7 +58,7 @@
 #'   selection process. In that case users are recommended to avoid model
 #'   selection based on LOO-CV, and instead to favor model averaging/stacking or
 #'   projection predictive inference.
-#' 
+#'
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
@@ -122,24 +122,28 @@ loo_compare.default <- function(x, ...) {
   diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
+
   # compute probabilities that a model has worse elpd than the best model
   # using a normal approximation (Sivula et al., 2025)
   p_worse <- stats::pnorm(0, elpd_diff, se_diff)
-  p_worse[elpd_diff==0] <- NA
-  N <- nrow(diffs)
+  p_worse[elpd_diff == 0] <- NA
+
   # diagnostics to assess whether the normal approximation can be trusted
-  if (N<100) {
+  N <- nrow(diffs)
+  if (N < 100) {
     # small N (Sivula et al., 2025)
     diag_pnorm <- rep("N < 100", length(elpd_diff))
-    diag_pnorm[elpd_diff==0] = ""
+    diag_pnorm[elpd_diff == 0] <- ""
   } else {
     diag_pnorm <- rep("", length(elpd_diff))
     # similar predictions (Sivula et al., 2025)
-    diag_pnorm[elpd_diff>-4 & elpd_diff!=0] <- "similar predictions"
-    # possible outliers in differences (Sivula et al., 2025;
-    # Vehtari et al., 2024)
+    diag_pnorm[elpd_diff > -4 & elpd_diff != 0] <- "similar predictions"
+    # possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
-    khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) ifelse(length(unique(x))<=20, NA, posterior::pareto_khat(x, tail="both")))
+    khat_diff[elpd_diff != 0] <- apply(
+      diffs[, elpd_diff != 0, drop = FALSE], 2,
+      \(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
+    ))
     diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
   rownames(comp) <- rnms
@@ -159,29 +163,25 @@ loo_compare.default <- function(x, ...) {
 #' @export
 #' @param digits For the print method only, the number of digits to use when
 #'   printing.
-#' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed? The entire matrix is always returned, but
-#'   by default only the most important columns are printed.
-#' @param pnorm For the print method only, should we include the normal
+#' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
-#'   the best model?
-print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, p_worse = TRUE) {
+#'   the best model? The default is `TRUE`.
+print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   xcopy <- x
-  if (inherits(xcopy, "old_compare.loo")) {
-    if (NCOL(xcopy) >= 2 && simplify) {
-      patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
-      xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
-    }
-  } else if (NCOL(xcopy) >= 2 && simplify) {
-     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
+  if (NCOL(xcopy) >= 2) {
+    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
   if (p_worse) {
-    print(cbind(.fr(xcopy, digits), p_worse=.fr(x[,"p_worse"],2), diag_pnorm=x[, "diag_pnorm"]), quote = FALSE)
-    invisible(x)
+    print(
+      cbind(.fr(xcopy, digits),
+            p_worse = .fr(x[, "p_worse"], 2),
+            diag_pnorm = x[, "diag_pnorm"]),
+      quote = FALSE
+    )
   } else {
     print(cbind(.fr(xcopy, digits)), quote = FALSE)
-    invisible(x)
   }
+  invisible(x)
 }
 
 

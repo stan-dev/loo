@@ -11,7 +11,7 @@ loo_compare(x, ...)
 
 \method{loo_compare}{default}(x, ...)
 
-\method{print}{compare.loo}(x, ..., digits = 1, simplify = TRUE)
+\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE)
 
 \method{print}{compare.loo_ss}(x, ..., digits = 1, simplify = TRUE)
 }
@@ -26,9 +26,9 @@ list.}
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
 
-\item{simplify}{For the print method only, should only the essential columns
-of the summary matrix be printed? The entire matrix is always returned, but
-by default only the most important columns are printed.}
+\item{p_worse}{For the print method only, should we include the normal
+approximation based probability of each model having worse performance than
+the best model? The default is \code{TRUE}.}
 }
 \value{
 A matrix with class \code{"compare.loo"} that has its own
@@ -66,8 +66,14 @@ better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
-Sivula et al. (2022) discuss the conditions when the normal
-approximation used for SE and \code{se_diff} is good.
+
+The values in the \code{p_worse} column are computed using the normal
+approximation and values from the columns \code{elpd_diff} and
+\code{se_diff}. Sivula et al. (2025) discuss the conditions when the
+normal approximation used for SE and \code{se_diff} is good, and the
+column \code{diag_pnorm} contains possible diagnostic messages: 1)
+small data (N < 100), 2) similar predictions (|elpd_diff| < 4),
+or 3) possible outliers (khat > 0.5).
 
 If more than \eqn{11} models are compared, we internally recompute the model
 differences using the median model by ELPD as the baseline model. We then
