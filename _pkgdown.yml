@@ -1,7 +1,7 @@
 url: https://mc-stan.org/loo/
 destination: "docs/"
 template:
-  package: pkgdownConfig
+  package: pkgdownconfig
 development:
   mode: auto
 
