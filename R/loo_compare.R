@@ -139,7 +139,7 @@ loo_compare.default <- function(x, ...) {
     # possible outliers in differences (Sivula et al., 2025;
     # Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
-    khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) posterior::pareto_khat(x, tail="both"))
+    khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) ifelse(length(unique(x))<=20, NA, posterior::pareto_khat(x, tail="both")))
     diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
   rownames(comp) <- rnms
