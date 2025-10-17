@@ -140,7 +140,6 @@ loo_compare.default <- function(x, ...) {
     ))
     diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
-  rownames(comp) <- rnms
   comp <- cbind(data.frame(elpd_diff = elpd_diff, se_diff = se_diff,
                 p_worse = p_worse, diag_pnorm = diag_pnorm),
                 as.data.frame(comp))
@@ -165,7 +164,9 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
-  if (p_worse && !inherits(x, "old_compare.loo")) {
+  if (p_worse &&
+      "p_worse" %in% colnames(xcopy) &&
+      !inherits(x, "old_compare.loo")) {
     print(
       cbind(.fr(xcopy, digits),
             p_worse = .fr(x[, "p_worse"], 2),
