@@ -72,7 +72,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
       # body and gPd smoothed tail
       tail_ord <- order(x_tail)
       exp_cutoff <- exp(cutoff)
-      fit <- gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
+      fit <- posterior::gpdfit(exp(x_tail) - exp_cutoff, wip=FALSE, min_grid_pts = 80)
       k <- fit$k
       sigma <- fit$sigma
       prb <- (seq_len(tail_len) - 0.5) / tail_len
