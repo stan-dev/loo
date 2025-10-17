@@ -140,7 +140,7 @@ loo_compare.default <- function(x, ...) {
     # Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) posterior::pareto_khat(x, tail="both"))
-    diag_pnorm[khat_diff > ps_khat_threshold(N)] <- paste0("khat_diff > 0.5")
+    diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
   rownames(comp) <- rnms
   comp <- cbind(data.frame(elpd_diff = elpd_diff, se_diff = se_diff,
