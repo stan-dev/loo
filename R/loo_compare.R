@@ -136,7 +136,7 @@ loo_compare.default <- function(x, ...) {
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff != 0] <- apply(
       diffs[, elpd_diff != 0, drop = FALSE], 2,
-      function (x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
+      function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
     ))
     diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
