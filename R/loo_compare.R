@@ -159,7 +159,7 @@ loo_compare.default <- function(x, ...) {
 #' @param pnorm For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the best model?
-print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, pnorm = FALSE) {
+print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, p_worse = TRUE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
     if (NCOL(xcopy) >= 2 && simplify) {
