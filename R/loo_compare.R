@@ -113,6 +113,7 @@ loo_compare.default <- function(x, ...) {
   # compute elpd_diff and se_elpd_diff relative to best model
   rnms <- rownames(comp)
   diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
+  colnames(diffs) <- rnms
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
 
@@ -135,7 +136,7 @@ loo_compare.default <- function(x, ...) {
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff != 0] <- apply(
       diffs[, elpd_diff != 0, drop = FALSE], 2,
-      \(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
+      function (x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
     ))
     diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
   }
