@@ -118,7 +118,7 @@ loo_compare.default <- function(x, ...) {
   se_diff <- apply(diffs, 2, se_elpd_diff)
   # compute probabilities that a model has worse elpd than the best model
   # using a normal approximation (Sivula et al., 2025)
-  p_worse <- pnorm(0, elpd_diff, se_diff)
+  p_worse <- stats::pnorm(0, elpd_diff, se_diff)
   p_worse[elpd_diff==0] <- NA
   N <- nrow(diffs)
   # diagnostics to assess whether the normal approximation can be trusted
@@ -154,9 +154,11 @@ loo_compare.default <- function(x, ...) {
 #' @param digits For the print method only, the number of digits to use when
 #'   printing.
 #' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed? The entire matrix is always returned, bu#' @param pnorm For the print method only, should we include the normal
-#'   approximation based probability of model having worse performance than
-#'   the best model
+#'   of the summary matrix be printed? The entire matrix is always returned, but
+#'   by default only the most important columns are printed.
+#' @param pnorm For the print method only, should we include the normal
+#'   approximation based probability of each model having worse performance than
+#'   the best model?
 print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, pnorm = FALSE) {
   xcopy <- x
   if (inherits(xcopy, "old_compare.loo")) {
@@ -171,7 +173,7 @@ print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE, pnorm = FALSE
     print(cbind(.fr(xcopy, digits), p_worse=.fr(x[,"p_worse"],2), diag_pnorm=x[, "diag_pnorm"]), quote = FALSE)
     invisible(x)
   } else {
-    print(cbind(.fr(xcopy, digits), quote = FALSE))
+    print(cbind(.fr(xcopy, digits)), quote = FALSE)
     invisible(x)
   }
 }
