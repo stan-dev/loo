@@ -9,7 +9,7 @@
 #' @param ... Additional objects of class `"loo"`, if not passed in as a single
 #'   list.
 #'
-#' @return A matrix with class `"compare.loo"` that has its own
+#' @return A data frame with class `"compare.loo"` that has its own
 #'   print method. See the **Details** section.
 #'
 #' @details
@@ -164,7 +164,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
-  if (p_worse) {
+  if (p_worse && !inherits(x, "old_compare.loo")) {
     print(
       cbind(.fr(xcopy, digits),
             p_worse = .fr(x[, "p_worse"], 2),
@@ -172,7 +172,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
       quote = FALSE
     )
   } else {
-    print(cbind(.fr(xcopy, digits)), quote = FALSE)
+    print(.fr(xcopy, digits), quote = FALSE)
   }
   invisible(x)
 }

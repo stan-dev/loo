@@ -31,7 +31,7 @@ approximation based probability of each model having worse performance than
 the best model? The default is \code{TRUE}.}
 }
 \value{
-A matrix with class \code{"compare.loo"} that has its own
+A data frame with class \code{"compare.loo"} that has its own
 print method. See the \strong{Details} section.
 }
 \description{
