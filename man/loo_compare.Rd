@@ -13,7 +13,7 @@ loo_compare(x, ...)
 
 \method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE)
 
-\method{print}{compare.loo_ss}(x, ..., digits = 1, simplify = TRUE)
+\method{print}{compare.loo_ss}(x, ..., digits = 1)
 }
 \arguments{
 \item{x}{An object of class \code{"loo"} or a list of such objects. If a list is
@@ -36,9 +36,6 @@ print method. See the \strong{Details} section.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD}.
-
-By default the print method shows only the most important information. Use
-\code{print(..., simplify=FALSE)} to print a more detailed summary.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
@@ -93,10 +90,6 @@ loo3 <- loo(LL + 2) # should be best model when compared
 
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
-
-# show more details with simplify=FALSE
-# (will be the same for all models in this artificial example)
-print(comp, simplify = FALSE, digits = 3)
 
 # can use a list of objects with custom names
 # will use apple, banana, and cherry, as the names in the output

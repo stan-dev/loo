@@ -2,9 +2,6 @@
 #'
 #' @description Compare fitted models based on [ELPD][loo-glossary].
 #'
-#'   By default the print method shows only the most important information. Use
-#'   `print(..., simplify=FALSE)` to print a more detailed summary.
-#'
 #' @export
 #' @param x An object of class `"loo"` or a list of such objects. If a list is
 #'   used then the list names will be used as the model names in the output. See
@@ -73,10 +70,6 @@
 #'
 #' comp <- loo_compare(loo1, loo2, loo3)
 #' print(comp, digits = 2)
-#'
-#' # show more details with simplify=FALSE
-#' # (will be the same for all models in this artificial example)
-#' print(comp, simplify = FALSE, digits = 3)
 #'
 #' # can use a list of objects with custom names
 #' # will use apple, banana, and cherry, as the names in the output
