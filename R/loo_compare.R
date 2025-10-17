@@ -41,8 +41,14 @@
 #'   standard approach of comparing differences of deviances to a Chi-squared
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
-#'   Sivula et al. (2022) discuss the conditions when the normal
-#'   approximation used for SE and `se_diff` is good.
+#' 
+#'   The values in `p_worse` column are computed using the normal
+#'   approximation and values from the columns `elpd_diff` and
+#'   `se_diff`. Sivula et al. (2025) discuss the conditions when the
+#'   normal approximation used for SE and `se_diff` is good., and
+#'   column `diag_pnorm` contains possible diagnostic messages: 1)
+#'   small data (N < 100), 2) similar predictions (|elpd_diff| < 4),
+#'   or 3) possible outliers (khat > 0.5).
 #'
 #'   If more than \eqn{11} models are compared, we internally recompute the model
 #'   differences using the median model by ELPD as the baseline model. We then
@@ -134,7 +140,7 @@ loo_compare.default <- function(x, ...) {
     # Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff!=0] <- apply(diffs[,elpd_diff!=0, drop = FALSE], 2, \(x) posterior::pareto_khat(x, tail="both"))
-    diag_pnorm[khat_diff > ps_khat_threshold(N)] <- paste0("khat_diff > ", .fr(ps_khat_threshold(N), 2))
+    diag_pnorm[khat_diff > ps_khat_threshold(N)] <- paste0("khat_diff > 0.5")
   }
   rownames(comp) <- rnms
   comp <- cbind(data.frame(elpd_diff = elpd_diff, se_diff = se_diff,
