@@ -164,8 +164,9 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
+  browser()
   if (p_worse &&
-      "p_worse" %in% colnames(xcopy) &&
+      "p_worse" %in% colnames(x) &&
       !inherits(x, "old_compare.loo")) {
     print(
       cbind(.fr(xcopy, digits),
