@@ -109,3 +109,83 @@ test_that("loo_compare returns expected result (3 models)", {
   # except rownames) to using 'x' argument
   expect_equal(comp1, loo_compare(x = list(w1, w2, w3)), ignore_attr = TRUE)
 })
+
+# Tests for deprecated compare() ------------------------------------------
+
+test_that("compare throws deprecation warnings", {
+  expect_warning(loo::compare(w1, w2), "Deprecated")
+  expect_warning(loo::compare(w1, w1, w2), "Deprecated")
+})
+
+test_that("compare returns expected result (2 models)", {
+  expect_warning(comp1 <- loo::compare(w1, w1), "Deprecated")
+  expect_snapshot(comp1)
+  expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
+
+  expect_warning(comp2 <- loo::compare(w1, w2), "Deprecated")
+  expect_snapshot(comp2)
+  expect_named(comp2, c("elpd_diff", "se"))
+  expect_s3_class(comp2, "compare.loo")
+
+  # specifying objects via ... and via arg x gives equal results
+  expect_warning(comp_via_list <- loo::compare(x = list(w1, w2)), "Deprecated")
+  expect_equal(comp2, comp_via_list)
+})
+
+test_that("compare returns expected result (3 models)", {
+  w3 <- suppressWarnings(waic(LLarr3))
+  expect_warning(comp1 <- loo::compare(w1, w2, w3), "Deprecated")
+
+  expect_equal(
+    colnames(comp1),
+    c(
+      "elpd_diff",
+      "se_diff",
+      "elpd_waic",
+      "se_elpd_waic",
+      "p_waic",
+      "se_p_waic",
+      "waic",
+      "se_waic"
+    )
+  )
+  expect_equal(rownames(comp1), c("w1", "w2", "w3"))
+  expect_equal(comp1[1, 1], 0)
+  expect_s3_class(comp1, "compare.loo")
+  expect_s3_class(comp1, "matrix")
+  expect_snapshot_value(comp1, style = "serialize")
+
+  # specifying objects via '...' gives equivalent results (equal
+  # except rownames) to using 'x' argument
+  expect_warning(
+    comp_via_list <- loo::compare(x = list(w1, w2, w3)),
+    "Deprecated"
+  )
+  expect_equal(comp1, comp_via_list, ignore_attr = TRUE)
+})
+
+test_that("compare throws appropriate errors", {
+  expect_error(
+    suppressWarnings(loo::compare(w1, w2, x = list(w1, w2))),
+    "should not be specified"
+  )
+  expect_error(suppressWarnings(loo::compare(x = 2)), "must be a list")
+  expect_error(
+    suppressWarnings(loo::compare(x = list(2))),
+    "should have class 'loo'"
+  )
+  expect_error(
+    suppressWarnings(loo::compare(x = list(w1))),
+    "requires at least two models"
+  )
+
+  w3 <- suppressWarnings(waic(LLarr2[,, -1]))
+  expect_error(
+    suppressWarnings(loo::compare(x = list(w1, w3))),
+    "same number of data points"
+  )
+  expect_error(
+    suppressWarnings(loo::compare(x = list(w1, w2, w3))),
+    "same number of data points"
+  )
+})
