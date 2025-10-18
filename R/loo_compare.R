@@ -175,6 +175,9 @@ loo_compare.default <- function(x, ...) {
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
+  if (!inherits(x, "data.frame")) {
+    class(x) <- c(class(x), "data.frame")
+  }
   xcopy <- x
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
