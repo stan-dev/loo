@@ -184,6 +184,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
       "or run unclass() on the object to print it.",
       call. = FALSE
     )
+  }
   if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
   }
