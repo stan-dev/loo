@@ -33,24 +33,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: |
-            any::pkgdown
-            local::.
-            any::bayesplot
-            any::BH
-            any::brms
-            any::ggplot2
-            any::rmarkdown
-            any::Rcpp
-            any::RcppEigen
-            any::RcppParallel
-            any::rstan
-            any::rstanarm
-            any::rstantools
-            any::spdep
-            any::StanHeaders
-            any::knitr
-            any::withr
+          extra-packages: any::pkgdown, local::., any::withr
           needs: website
 
       # - uses: actions/cache@v4
@@ -64,7 +47,6 @@ jobs:
             c("NOT_CRAN" = "true"),
             pkgdown::build_site_github_pages(
               lazy = FALSE, # change to TRUE if runner times out.
-              install = TRUE,
               run_dont_run = TRUE,
               new_process = TRUE
             )
