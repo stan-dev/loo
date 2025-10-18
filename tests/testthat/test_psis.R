@@ -70,9 +70,9 @@ test_that("psis throws correct errors and warnings", {
   # r_eff non-scalar wrong length is error
   expect_error(psis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")
 
-  # r_eff has some NA values causes error
+  # r_eff has some NA values which are replaced with 1
   r_eff_arr[2] <- NA
-  expect_error(psis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
+  expect_snapshot(psis(-LLarr, r_eff = r_eff_arr))
 
   # tail length warnings
   expect_snapshot(psis(-LLarr[1:5, , ]))
