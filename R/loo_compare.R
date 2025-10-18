@@ -47,9 +47,9 @@
 #'   approximation used for SE and `se_diff` is good, and the column
 #'   `diag_pnorm` contains possible diagnostic messages:
 #'
-#'   * small data (`N < 100`),
-#'   * similar predictions (`|elpd_diff| < 4`)
-#'   * possible outliers (`khat > 0.5`)
+#'   * `N < 100` (small data)
+#'   * `|elpd_diff| < 4` (models make similar predictions)
+#'   * `khat > 0.5` (possible outliers)
 #'
 #'   If any of these diagnostic messages is shown, the normal approximation is
 #'   not well calibrated and the probabilities can be too large (small data or
@@ -81,7 +81,7 @@
 #' print(comp, digits = 2)
 #'
 #' # can use a list of objects with custom names
-#' # will use apple, banana, and cherry, as the names in the output
+#' # the names will be used in the output
 #' loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 #'
 #' \dontrun{
@@ -109,17 +109,17 @@ loo_compare.default <- function(x, ...) {
     loos <- x
   }
 
-  # If subsampling is used
+  # if subsampling is used
   if (any(sapply(loos, inherits, "psis_loo_ss"))) {
     return(loo_compare.psis_loo_ss_list(loos))
   }
 
+  # run pre-comparison checks
   loo_compare_checks(loos)
 
+  # compute elpd_diff and se_elpd_diff relative to best model
   comp <- loo_compare_matrix(loos)
   ord <- loo_compare_order(loos)
-
-  # compute elpd_diff and se_elpd_diff relative to best model
   rnms <- rownames(comp)
   diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
   colnames(diffs) <- rnms
@@ -132,33 +132,39 @@ loo_compare.default <- function(x, ...) {
   p_worse[elpd_diff == 0] <- NA
 
   # diagnostics to assess whether the normal approximation can be trusted
+  # * N < 100: small data (Sivula et al., 2025)
+  # * |elpd_diff| < 4: similar predictions (Sivula et al., 2025)
+  # * khat_diff > 0.5: possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
   N <- nrow(diffs)
   if (N < 100) {
-    # small N (Sivula et al., 2025)
     diag_pnorm <- rep("N < 100", length(elpd_diff))
     diag_pnorm[elpd_diff == 0] <- ""
   } else {
     diag_pnorm <- rep("", length(elpd_diff))
-    # similar predictions (Sivula et al., 2025)
     diag_pnorm[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
-    # possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff != 0] <- apply(
       diffs[, elpd_diff != 0, drop = FALSE], 2,
       function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
     ))
-    diag_pnorm[khat_diff > 0.5] <- paste0("khat_diff > 0.5")
+    diag_pnorm[khat_diff > 0.5] <- "khat_diff > 0.5"
   }
-  comp <- cbind(data.frame(elpd_diff = elpd_diff, se_diff = se_diff,
-                p_worse = p_worse, diag_pnorm = diag_pnorm),
-                as.data.frame(comp))
+  comp <- cbind(
+    data.frame(
+      elpd_diff = elpd_diff,
+      se_diff = se_diff,
+      p_worse = p_worse,
+      diag_pnorm = diag_pnorm
+    ),
+    as.data.frame(comp)
+  )
   rownames(comp) <- rnms
 
-  # run order statistics-based checks on models
+  # run order statistics-based checks for many model comparisons
   loo_order_stat_check(loos, ord)
 
   class(comp) <- c("compare.loo", class(comp))
-  return(comp)
+  comp
 }
 
 #' @rdname loo_compare

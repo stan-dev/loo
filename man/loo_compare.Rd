@@ -74,9 +74,9 @@ with a normal approximation using the values from \code{elpd_diff} and
 approximation used for SE and \code{se_diff} is good, and the column
 \code{diag_pnorm} contains possible diagnostic messages:
 \itemize{
-\item small data (\code{N < 100}),
-\item similar predictions (\verb{|elpd_diff| < 4})
-\item possible outliers (\code{khat > 0.5})
+\item \code{N < 100} (small data)
+\item \verb{|elpd_diff| < 4} (models make similar predictions)
+\item \code{khat > 0.5} (possible outliers)
 }
 
 If any of these diagnostic messages is shown, the normal approximation is
@@ -107,7 +107,7 @@ comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
 
 # can use a list of objects with custom names
-# will use apple, banana, and cherry, as the names in the output
+# the names will be used in the output
 loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 
 \dontrun{
