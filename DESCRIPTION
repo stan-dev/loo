@@ -52,9 +52,6 @@ Suggests:
     testthat (>= 3.0)
 VignetteBuilder: 
     knitr
-Remotes: 
-    stan-dev/pkgdown-config
-Config/Needs/website: pkgdownconfig
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: loo_subsampling_cases, loo_subsampling

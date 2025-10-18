@@ -33,9 +33,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          dependencies: '"all"'
-          extra-packages: any::pkgdown, local::., any::withr
-          needs: website
+          extra-packages: any::pkgdown, local::., any::withr, stan-dev/pkgdown-config
 
       # - uses: actions/cache@v4
       #   with:
