@@ -178,12 +178,7 @@ loo_compare.default <- function(x, ...) {
 #'   the best model? The default is `TRUE`.
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (inherits(x, "old_compare.loo")) {
-    stop(
-      "Output from old loo::compare() detected. ",
-      "Please rerun loo_compare() to get updated output ",
-      "or run unclass() on the object to print it.",
-      call. = FALSE
-    )
+    return(unclass(x))
   }
   if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
