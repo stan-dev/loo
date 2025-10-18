@@ -39,13 +39,18 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#'   The values in the `p_worse` column are computed using the normal
-#'   approximation and values from the columns `elpd_diff` and
-#'   `se_diff`. Sivula et al. (2025) discuss the conditions when the
-#'   normal approximation used for SE and `se_diff` is good, and the
-#'   column `diag_pnorm` contains possible diagnostic messages: 1)
-#'   small data (N < 100), 2) similar predictions (|elpd_diff| < 4),
-#'   or 3) possible outliers (khat > 0.5).
+#'   The values in the `p_worse` column show the probabilities for models
+#'   having worse ELPD than the best model. These probabilities are
+#'   computed using the normal approximation and values from the
+#'   columns `elpd_diff` and `se_diff`. Sivula et al. (2025) present
+#'   the conditions when the normal approximation used for SE and
+#'   `se_diff` is good, and the column `diag_pnorm` contains possible
+#'   diagnostic messages: 1) small data (N < 100), 2) similar
+#'   predictions (|elpd_diff| < 4), or 3) possible outliers (khat > 0.5).
+#'   If any of these diagnostic messages is shown, the normal
+#'   approximation is not well calibrated and the shown probabilities
+#'   can be too large (small data or similar predictions) or too small
+#'   (outliers).
 #'
 #'   If more than \eqn{11} models are compared, we internally recompute the model
 #'   differences using the median model by ELPD as the baseline model. We then
