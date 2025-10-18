@@ -62,6 +62,8 @@ test_that("loo_compare throws appropriate warnings", {
 comp_colnames <- c(
   "elpd_diff",
   "se_diff",
+  "p_worse",
+  "diag_pnorm",
   "elpd_waic",
   "se_elpd_waic",
   "p_waic",
@@ -73,6 +75,7 @@ comp_colnames <- c(
 test_that("loo_compare returns expected results (2 models)", {
   comp1 <- loo_compare(w1, w1)
   expect_s3_class(comp1, "compare.loo")
+  expect_s3_class(comp1, "data.frame")
   expect_equal(colnames(comp1), comp_colnames)
   expect_equal(rownames(comp1), c("model1", "model2"))
   expect_output(print(comp1), "elpd_diff")
@@ -98,7 +101,7 @@ test_that("loo_compare returns expected result (3 models)", {
   expect_equal(rownames(comp1), c("model1", "model2", "model3"))
   expect_equal(comp1[1, 1], 0)
   expect_s3_class(comp1, "compare.loo")
-  expect_s3_class(comp1, "matrix")
+  expect_s3_class(comp1, "data.frame")
 
   expect_snapshot_value(comp1, style = "serialize")
 

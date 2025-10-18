@@ -11,9 +11,9 @@ loo_compare(x, ...)
 
 \method{loo_compare}{default}(x, ...)
 
-\method{print}{compare.loo}(x, ..., digits = 1, simplify = TRUE)
+\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE)
 
-\method{print}{compare.loo_ss}(x, ..., digits = 1, simplify = TRUE)
+\method{print}{compare.loo_ss}(x, ..., digits = 1)
 }
 \arguments{
 \item{x}{An object of class \code{"loo"} or a list of such objects. If a list is
@@ -26,34 +26,31 @@ list.}
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
 
-\item{simplify}{For the print method only, should only the essential columns
-of the summary matrix be printed? The entire matrix is always returned, but
-by default only the most important columns are printed.}
+\item{p_worse}{For the print method only, should we include the normal
+approximation based probability of each model having worse performance than
+the best model? The default is \code{TRUE}.}
 }
 \value{
-A matrix with class \code{"compare.loo"} that has its own
+A data frame with class \code{"compare.loo"} that has its own
 print method. See the \strong{Details} section.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD}.
-
-By default the print method shows only the most important information. Use
-\code{print(..., simplify=FALSE)} to print a more detailed summary.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their
 expected predictive accuracy by the difference in
 \code{\link[=loo-glossary]{elpd_loo}} or \code{elpd_waic} (or multiplied by \eqn{-2}, if
 desired, to be on the deviance scale).
+\subsection{\code{elpd_diff} and \code{se_diff}}{
 
-When using \code{loo_compare()}, the returned matrix will have one row per model
-and several columns of estimates. The values in the
-\code{\link[=loo-glossary]{elpd_diff}} and \code{\link[=loo-glossary]{se_diff}} columns of the
-returned matrix are computed by making pairwise comparisons between each
-model and the model with the largest ELPD (the model in the first row). For
-this reason the \code{elpd_diff} column will always have the value \code{0} in the
-first row (i.e., the difference between the preferred model and itself) and
-negative values in subsequent rows for the remaining models.
+When using \code{loo_compare()}, the returned data frame will have one row per
+model and several columns of estimates. The values of
+\code{\link[=loo-glossary]{elpd_diff}} and \code{\link[=loo-glossary]{se_diff}} are computed by
+making pairwise comparisons between each model and the model with the
+largest ELPD (the model listed first). Therefore, the first \code{elpd_diff}
+value will always be \code{0} (i.e., the difference between the preferred model
+and itself) and the rest of the values will be negative.
 
 To compute the standard error of the difference in \link[=loo-glossary]{ELPD} ---
 which should not be expected to equal the difference of the standard errors
@@ -66,8 +63,28 @@ better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
-Sivula et al. (2022) discuss the conditions when the normal
-approximation used for SE and \code{se_diff} is good.
+}
+
+\subsection{\code{p_worse} and \code{diag_pnorm}}{
+
+The values in the \code{p_worse} column show the probability of each model
+having worse ELPD than the best model. These probabilities are computed
+with a normal approximation using the values from \code{elpd_diff} and
+\code{se_diff}. Sivula et al. (2025) present the conditions when the normal
+approximation used for SE and \code{se_diff} is good, and the column
+\code{diag_pnorm} contains possible diagnostic messages:
+\itemize{
+\item \code{N < 100} (small data)
+\item \verb{|elpd_diff| < 4} (models make similar predictions)
+\item \code{khat > 0.5} (possible outliers)
+}
+
+If any of these diagnostic messages is shown, the normal approximation is
+not well calibrated and the probabilities can be too large (small data or
+similar predictions) or too small (outliers).
+}
+
+\subsection{Warnings for many model comparisons}{
 
 If more than \eqn{11} models are compared, we internally recompute the model
 differences using the median model by ELPD as the baseline model. We then
@@ -77,6 +94,7 @@ a warning if it is deemed that there is a risk of over-fitting due to the
 selection process. In that case users are recommended to avoid model
 selection based on LOO-CV, and instead to favor model averaging/stacking or
 projection predictive inference.
+}
 }
 \examples{
 # very artificial example, just for demonstration!
@@ -88,12 +106,8 @@ loo3 <- loo(LL + 2) # should be best model when compared
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
 
-# show more details with simplify=FALSE
-# (will be the same for all models in this artificial example)
-print(comp, simplify = FALSE, digits = 3)
-
 # can use a list of objects with custom names
-# will use apple, banana, and cherry, as the names in the output
+# the names will be used in the output
 loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 
 \dontrun{
