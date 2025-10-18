@@ -149,8 +149,10 @@ loo_compare.default <- function(x, ...) {
     ))
     diag_pnorm[khat_diff > 0.5] <- "khat_diff > 0.5"
   }
+
   comp <- cbind(
     data.frame(
+      model = rnms,
       elpd_diff = elpd_diff,
       se_diff = se_diff,
       p_worse = p_worse,
@@ -158,7 +160,7 @@ loo_compare.default <- function(x, ...) {
     ),
     as.data.frame(comp)
   )
-  rownames(comp) <- rnms
+  rownames(comp) <- NULL
 
   # run order statistics-based checks for many model comparisons
   loo_order_stat_check(loos, ord)
@@ -175,22 +177,27 @@ loo_compare.default <- function(x, ...) {
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
+  if (inherits(x, "old_compare.loo")) {
+    stop(
+      "Output from old loo::compare() detected. ",
+      "Please rerun loo_compare() to get updated output ",
+      "or run unclass() on the object to print it.",
+      call. = FALSE
+    )
+  }
   xcopy <- x
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
   }
-  if (p_worse &&
-      "p_worse" %in% colnames(x) &&
-      !inherits(x, "old_compare.loo")) {
-    print(
-      cbind(.fr(xcopy, digits),
-            p_worse = .fr(x[, "p_worse"], 2),
-            diag_pnorm = x[, "diag_pnorm"]),
-      quote = FALSE
+  xcopy <- cbind(model = x$model, .fr(xcopy, digits))
+  if (p_worse && "p_worse" %in% colnames(x)) {
+    xcopy <- cbind(
+      xcopy,
+      p_worse = .fr(x[, "p_worse"], 2),
+      diag_pnorm = x[, "diag_pnorm"]
     )
-  } else {
-    print(.fr(xcopy, digits), quote = FALSE)
   }
+  print(xcopy, quote = FALSE)
   invisible(x)
 }
 
