@@ -18,14 +18,14 @@
 #'   [`elpd_loo`][loo-glossary] or `elpd_waic` (or multiplied by \eqn{-2}, if
 #'   desired, to be on the deviance scale).
 #'
-#'   When using `loo_compare()`, the returned matrix will have one row per model
-#'   and several columns of estimates. The values in the
-#'   [`elpd_diff`][loo-glossary] and [`se_diff`][loo-glossary] columns of the
-#'   returned matrix are computed by making pairwise comparisons between each
-#'   model and the model with the largest ELPD (the model in the first row). For
-#'   this reason the `elpd_diff` column will always have the value `0` in the
-#'   first row (i.e., the difference between the preferred model and itself) and
-#'   negative values in subsequent rows for the remaining models.
+#' ## `elpd_diff` and `se_diff`
+#'   When using `loo_compare()`, the returned data frame will have one row per
+#'   model and several columns of estimates. The values of
+#'   [`elpd_diff`][loo-glossary] and [`se_diff`][loo-glossary] are computed by
+#'   making pairwise comparisons between each model and the model with the
+#'   largest ELPD (the model listed first). Therefore, the first `elpd_diff`
+#'   value will always be `0` (i.e., the difference between the preferred model
+#'   and itself) and the rest of the values will be negative.
 #'
 #'   To compute the standard error of the difference in [ELPD][loo-glossary] ---
 #'   which should not be expected to equal the difference of the standard errors
@@ -39,19 +39,23 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#'   The values in the `p_worse` column show the probabilities for models
-#'   having worse ELPD than the best model. These probabilities are
-#'   computed using the normal approximation and values from the
-#'   columns `elpd_diff` and `se_diff`. Sivula et al. (2025) present
-#'   the conditions when the normal approximation used for SE and
-#'   `se_diff` is good, and the column `diag_pnorm` contains possible
-#'   diagnostic messages: 1) small data (N < 100), 2) similar
-#'   predictions (|elpd_diff| < 4), or 3) possible outliers (khat > 0.5).
-#'   If any of these diagnostic messages is shown, the normal
-#'   approximation is not well calibrated and the shown probabilities
-#'   can be too large (small data or similar predictions) or too small
-#'   (outliers).
+#' ## `p_worse` and `diag_pnorm`
+#'   The values in the `p_worse` column show the probability of each model
+#'   having worse ELPD than the best model. These probabilities are computed
+#'   with a normal approximation using the values from `elpd_diff` and
+#'   `se_diff`. Sivula et al. (2025) present the conditions when the normal
+#'   approximation used for SE and `se_diff` is good, and the column
+#'   `diag_pnorm` contains possible diagnostic messages:
 #'
+#'   * small data (`N < 100`),
+#'   * similar predictions (`|elpd_diff| < 4`)
+#'   * possible outliers (`khat > 0.5`)
+#'
+#'   If any of these diagnostic messages is shown, the normal approximation is
+#'   not well calibrated and the probabilities can be too large (small data or
+#'   similar predictions) or too small (outliers).
+#'
+#' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
 #'   differences using the median model by ELPD as the baseline model. We then
 #'   estimate whether the differences in predictive performance are potentially
