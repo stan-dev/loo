@@ -131,7 +131,7 @@ loo_compare.default <- function(x, ...) {
   } else {
     diag_pnorm <- rep("", length(elpd_diff))
     # similar predictions (Sivula et al., 2025)
-    diag_pnorm[elpd_diff > -4 & elpd_diff != 0] <- "similar predictions"
+    diag_pnorm[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
     # possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff != 0] <- apply(
