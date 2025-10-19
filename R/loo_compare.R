@@ -183,6 +183,10 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
   }
+  if (!all(c("model", "elpd_diff", "se_diff") %in% colnames(x))) {
+    print(as.data.frame(x))
+    return(x)
+  }
   x2 <- cbind(
     model = x$model,
     .fr(x[, c("elpd_diff", "se_diff")], digits)
