@@ -46,6 +46,15 @@
       1 model1       0.0     0.0      NA           
       2 model2      -4.1     0.1    1.00    N < 100
 
+---
+
+    Code
+      print(comp2, p_worse = FALSE)
+    Output
+         model elpd_diff se_diff
+      1 model1       0.0     0.0
+      2 model2      -4.1     0.1
+
 # loo_compare returns expected result (3 models)
 
     WAoAAAACAAQEAgACAwAAAAMTAAAACwAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v

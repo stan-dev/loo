@@ -183,19 +183,18 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
   }
-  xcopy <- x
-  if (NCOL(xcopy) >= 2) {
-    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
-  }
-  xcopy <- cbind(model = x$model, .fr(xcopy, digits))
+  x2 <- cbind(
+    model = x$model,
+    .fr(x[, c("elpd_diff", "se_diff")], digits)
+  )
   if (p_worse && "p_worse" %in% colnames(x)) {
-    xcopy <- cbind(
-      xcopy,
-      p_worse = .fr(x[, "p_worse"], 2),
+    x2 <- cbind(
+      x2,
+      p_worse = .fr(x[, "p_worse"], digits = 2),
       diag_pnorm = x[, "diag_pnorm"]
     )
   }
-  print(xcopy, quote = FALSE)
+  print(x2, quote = FALSE)
   invisible(x)
 }
 
