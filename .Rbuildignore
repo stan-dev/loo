@@ -16,6 +16,7 @@ vignettes/loo2-non-factorizable_cache/*
 ^\.appveyor\.yml$
 ^\.codecov\.yml$
 .github/*
+.vscode/*
 ^\.github$
 ^vignettes/online-only$
 
