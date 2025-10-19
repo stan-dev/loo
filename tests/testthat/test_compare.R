@@ -18,8 +18,16 @@ test_that("loo_compare throws appropriate errors", {
   expect_error(loo_compare(w1, list(1, 2, 3)), "class 'loo'")
   expect_error(loo_compare(w1), "requires at least two models")
   expect_error(loo_compare(x = list(w1)), "requires at least two models")
-  expect_error(loo_compare(w1, w3), "same number of data points")
-  expect_error(loo_compare(w1, w2, w3), "same number of data points")
+  expect_error(
+    loo_compare(w1, w3),
+    "All models must have the same number of observations, but models have inconsistent observation counts: 'model1' (32), 'model2' (31)",
+    fixed = TRUE
+  )
+  expect_error(
+    loo_compare(w1, w2, w3),
+    "All models must have the same number of observations, but models have inconsistent observation counts: 'model1' (32), 'model2' (32), 'model3' (31)",
+    fixed = TRUE
+  )
 })
 
 test_that("loo_compare throws appropriate warnings", {
