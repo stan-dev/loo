@@ -33,12 +33,25 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::., any::withr, stan-dev/pkgdown-config
-
-      # - uses: actions/cache@v4
-      #   with:
-      #     path: vignettes/**/_cache
-      #     key: knitr-${{ runner.os }}-${{ hashFiles('vignettes/**/*.Rmd') }}
+          extra-packages: |
+            any::pkgdown
+            local::.
+            any::bayesplot
+            any::BH
+            any::brms
+            any::ggplot2
+            any::rmarkdown
+            any::Rcpp
+            any::RcppEigen
+            any::RcppParallel
+            any::rstan
+            any::rstanarm
+            any::rstantools
+            any::spdep
+            any::StanHeaders
+            any::knitr
+            any::withr
+            stan-dev/pkgdown-config
 
       - name: Build site
         run: |
