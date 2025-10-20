@@ -22,3 +22,5 @@ vignettes/loo2-non-factorizable_cache/*
 
 ^CRAN-SUBMISSION$
 ^release-prep\.R$
+^_pkgdown\.yml$
+^pkgdown$
