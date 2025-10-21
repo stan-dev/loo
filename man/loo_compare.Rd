@@ -32,7 +32,7 @@ the best model? The default is \code{TRUE}.}
 }
 \value{
 A data frame with class \code{"compare.loo"} that has its own
-print method. See the \strong{Details} section.
+print method. See the \strong{Details} and \strong{Examples} sections.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD}.
@@ -65,14 +65,14 @@ distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
 }
 
-\subsection{\code{p_worse} and \code{diag_pnorm}}{
+\subsection{\code{p_worse} and \code{diag_diff}}{
 
 The values in the \code{p_worse} column show the probability of each model
 having worse ELPD than the best model. These probabilities are computed
 with a normal approximation using the values from \code{elpd_diff} and
 \code{se_diff}. Sivula et al. (2025) present the conditions when the normal
 approximation used for SE and \code{se_diff} is good, and the column
-\code{diag_pnorm} contains possible diagnostic messages:
+\code{diag_diff} contains possible diagnostic messages:
 \itemize{
 \item \code{N < 100} (small data)
 \item \verb{|elpd_diff| < 4} (models make similar predictions)

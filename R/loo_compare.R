@@ -10,7 +10,7 @@
 #'   list.
 #'
 #' @return A data frame with class `"compare.loo"` that has its own
-#'   print method. See the **Details** section.
+#'   print method. See the **Details** and **Examples** sections.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -149,8 +149,10 @@ loo_compare.default <- function(x, ...) {
     ))
     diag_diff[khat_diff > 0.5] <- "khat_diff > 0.5"
   }
+
   comp <- cbind(
     data.frame(
+      model = rnms,
       elpd_diff = elpd_diff,
       se_diff = se_diff,
       p_worse = p_worse,
@@ -158,7 +160,7 @@ loo_compare.default <- function(x, ...) {
     ),
     as.data.frame(comp)
   )
-  rownames(comp) <- rnms
+  rownames(comp) <- NULL
 
   # run order statistics-based checks for many model comparisons
   loo_order_stat_check(loos, ord)
@@ -175,25 +177,28 @@ loo_compare.default <- function(x, ...) {
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
-  if (!inherits(x, "data.frame") && !inherits(x, "old_compare.loo")) {
+  if (inherits(x, "old_compare.loo")) {
+    return(unclass(x))
+  }
+  if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
   }
-  xcopy <- x
-  if (NCOL(xcopy) >= 2) {
-    xcopy <- xcopy[, c("elpd_diff", "se_diff")]
+  if (!all(c("model", "elpd_diff", "se_diff") %in% colnames(x))) {
+    print(as.data.frame(x))
+    return(x)
   }
-  if (p_worse &&
-      "p_worse" %in% colnames(x) &&
-      !inherits(x, "old_compare.loo")) {
-    print(
-      cbind(.fr(xcopy, digits),
-            p_worse = .fr(x[, "p_worse"], 2),
-            diag_diff = x[, "diag_diff"]),
-      quote = FALSE
+  x2 <- cbind(
+    model = x$model,
+    .fr(x[, c("elpd_diff", "se_diff")], digits)
+  )
+  if (p_worse && "p_worse" %in% colnames(x)) {
+    x2 <- cbind(
+      x2,
+      p_worse = .fr(x[, "p_worse"], digits = 2),
+      diag_diff = x[, "diag_diff"]
     )
-  } else {
-    print(.fr(xcopy, digits), quote = FALSE)
   }
+  print(x2, quote = FALSE)
   invisible(x)
 }
 
