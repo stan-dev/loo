@@ -28,6 +28,11 @@ test_that("loo_compare throws appropriate errors", {
     "All models must have the same number of observations, but models have inconsistent observation counts: 'model1' (32), 'model2' (32), 'model3' (31)",
     fixed = TRUE
   )
+  expect_error(
+    loo_compare(x = list("Model A" = w1, "Model B" = w2, "Model C" = w3)),
+    "All models must have the same number of observations, but models have inconsistent observation counts: 'Model A' (32), 'Model B' (32), 'Model C' (31)",
+    fixed = TRUE
+  )
 })
 
 test_that("loo_compare throws appropriate warnings", {
