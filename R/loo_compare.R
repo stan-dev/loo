@@ -39,13 +39,13 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#' ## `p_worse` and `diag_pnorm`
+#' ## `p_worse` and `diag_diff`
 #'   The values in the `p_worse` column show the probability of each model
 #'   having worse ELPD than the best model. These probabilities are computed
 #'   with a normal approximation using the values from `elpd_diff` and
 #'   `se_diff`. Sivula et al. (2025) present the conditions when the normal
 #'   approximation used for SE and `se_diff` is good, and the column
-#'   `diag_pnorm` contains possible diagnostic messages:
+#'   `diag_diff` contains possible diagnostic messages:
 #'
 #'   * `N < 100` (small data)
 #'   * `|elpd_diff| < 4` (models make similar predictions)
@@ -137,24 +137,24 @@ loo_compare.default <- function(x, ...) {
   # * khat_diff > 0.5: possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
   N <- nrow(diffs)
   if (N < 100) {
-    diag_pnorm <- rep("N < 100", length(elpd_diff))
-    diag_pnorm[elpd_diff == 0] <- ""
+    diag_diff <- rep("N < 100", length(elpd_diff))
+    diag_diff[elpd_diff == 0] <- ""
   } else {
-    diag_pnorm <- rep("", length(elpd_diff))
-    diag_pnorm[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
+    diag_diff <- rep("", length(elpd_diff))
+    diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
     khat_diff <- rep(NA, length(elpd_diff))
     khat_diff[elpd_diff != 0] <- apply(
       diffs[, elpd_diff != 0, drop = FALSE], 2,
       function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
     ))
-    diag_pnorm[khat_diff > 0.5] <- "khat_diff > 0.5"
+    diag_diff[khat_diff > 0.5] <- "khat_diff > 0.5"
   }
   comp <- cbind(
     data.frame(
       elpd_diff = elpd_diff,
       se_diff = se_diff,
       p_worse = p_worse,
-      diag_pnorm = diag_pnorm
+      diag_diff = diag_diff
     ),
     as.data.frame(comp)
   )
@@ -188,7 +188,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
     print(
       cbind(.fr(xcopy, digits),
             p_worse = .fr(x[, "p_worse"], 2),
-            diag_pnorm = x[, "diag_pnorm"]),
+            diag_diff = x[, "diag_diff"]),
       quote = FALSE
     )
   } else {
