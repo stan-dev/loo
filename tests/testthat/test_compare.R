@@ -63,7 +63,7 @@ comp_colnames <- c(
   "elpd_diff",
   "se_diff",
   "p_worse",
-  "diag_pnorm",
+  "diag_diff",
   "elpd_waic",
   "se_elpd_waic",
   "p_waic",
