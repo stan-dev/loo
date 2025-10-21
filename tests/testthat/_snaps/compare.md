@@ -18,9 +18,9 @@
     Code
       print(comp1)
     Output
-         model elpd_diff se_diff p_worse diag_diff
-      1 model1       0.0     0.0      NA          
-      2 model2       0.0     0.0      NA          
+        model elpd_diff se_diff p_worse diag_diff
+       model1       0.0     0.0      NA          
+       model2       0.0     0.0      NA          
 
 ---
 
@@ -42,18 +42,18 @@
     Code
       print(comp2)
     Output
-         model elpd_diff se_diff p_worse diag_diff
-      1 model1       0.0     0.0      NA          
-      2 model2      -4.1     0.1    1.00   N < 100
+        model elpd_diff se_diff p_worse diag_diff
+       model1       0.0     0.0      NA          
+       model2      -4.1     0.1    1.00   N < 100
 
 ---
 
     Code
       print(comp2, p_worse = FALSE)
     Output
-         model elpd_diff se_diff
-      1 model1       0.0     0.0
-      2 model2      -4.1     0.1
+        model elpd_diff se_diff
+       model1       0.0     0.0
+       model2      -4.1     0.1
 
 # loo_compare returns expected result (3 models)
 
@@ -77,10 +77,10 @@
     Code
       print(comp1)
     Output
-         model elpd_diff se_diff p_worse diag_diff
-      1 model1       0.0     0.0      NA          
-      2 model2      -4.1     0.1    1.00   N < 100
-      3 model3     -16.1     0.2    1.00   N < 100
+        model elpd_diff se_diff p_worse diag_diff
+       model1       0.0     0.0      NA          
+       model2      -4.1     0.1    1.00   N < 100
+       model3     -16.1     0.2    1.00   N < 100
 
 # compare returns expected result (3 models)
 

@@ -198,7 +198,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
       diag_diff = x[, "diag_diff"]
     )
   }
-  print(x2, quote = FALSE)
+  print(x2, quote = FALSE, row.names = FALSE)
   invisible(x)
 }
 
