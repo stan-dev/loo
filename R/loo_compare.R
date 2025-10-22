@@ -49,7 +49,7 @@
 #'
 #'   * `N < 100` (small data)
 #'   * `|elpd_diff| < 4` (models make similar predictions)
-#'   * `khat > 0.5` (possible outliers)
+#'   * `k_diff > 0.5` (possible outliers)
 #'
 #'   If any of these diagnostic messages is shown, the error distribution is
 #'   skewed or thick tailed and the normal approximation based on `elpd_diff`
@@ -58,16 +58,17 @@
 #'   (outliers). `elpd_diff` and `se_diff` are still indicative of the
 #'   differences and uncertainties, and for example, if `|elpd_diff|` is
 #'   many times larger than `se_diff` the difference is quite certain.
-#'   The `khat` value for the `diag_diff` column is computed using
-#'   the pointwise elpd differences (and is different frin `khat`s in PSIS-LOO
-#'   diagnostic).  While `khat > 0.5` indicates possibility of outliers, it is
+#'   The `k_diff` value for the `diag_diff` column is computed using
+#'   the pointwise elpd differences (and is different from Pareto k's in PSIS-LOO
+#'   diagnostic).  While `k_diff > 0.5` indicates possibility of outliers, it is
 #'   also possible that both models compared seem to be well specified based
 #'   on model checking, but the pointwise ELPD differences have such thick
 #'   tails that the normal approximation for the sum is not good (Vehtari et
-#'   al., 2024).
+#'   al., 2024). Threshold 0.5 is used for `k_diff` as we do not do automatic
+#'   Pareto smoothing for the pointwise differences (Vehtari et al., 2024).
 #'
 #'   The column `diag_elpd` shows diagnostic for the pointwise ELPD
-#'   computations for each model. If `k khat_psis > 0.7` is shown,
+#'   computations for each model. If `k_psis > 0.7` is shown,
 #'   where `k` is the number of high high Pareto k values in Pareto
 #'   smoothed importance sampling computation, then there may be
 #'   significant bias in `elpd_diff` favoring models with a large
@@ -152,7 +153,7 @@ loo_compare.default <- function(x, ...) {
   # diagnostics to assess whether the normal approximation can be trusted
   # * N < 100: small data (Sivula et al., 2025)
   # * |elpd_diff| < 4: similar predictions (Sivula et al., 2025)
-  # * khat_diff > 0.5: possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
+  # * k_diff > 0.5: possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
   N <- nrow(diffs)
   if (N < 100) {
     diag_diff <- rep("N < 100", length(elpd_diff))
@@ -160,34 +161,30 @@ loo_compare.default <- function(x, ...) {
   } else {
     diag_diff <- rep("", length(elpd_diff))
     diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
-    khat_diff <- rep(NA, length(elpd_diff))
-    khat_diff[elpd_diff != 0] <- apply(
+    k_diff <- rep(NA, length(elpd_diff))
+    k_diff[elpd_diff != 0] <- apply(
       diffs[, elpd_diff != 0, drop = FALSE], 2,
       function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
     ))
-    diag_diff[khat_diff > 0.5] <- "khat_diff > 0.5"
+    diag_diff[k_diff > 0.5] <- "k_diff > 0.5"
   }
 
   # get khats for PSIS
-  khat_psis <- sapply(loos[ord],
-                      function(loo) {
-                        k <- loo$diagnostics[["pareto_k"]]
-                        if (is.null(k)) {
-                          out = ""
-                        } else {
-                          S <- dim(loo)[1]
-                          khat_threshold <- ps_khat_threshold(S)
-                          K <- sum(k > khat_threshold)
-                          if (K==0) {
-                            out <- ""
-                          } else {
-                            out <- paste0(K, " khat_psis > ", round(khat_threshold, 2))
-                          }
-                        }
-                        out
-                      }
-                      )
-  
+  k_psis <- sapply(loos[ord],
+                   function(loo) {
+                     k <- loo$diagnostics[["pareto_k"]]
+                     if (is.null(k)) {
+                       out = ""
+                     } else {
+                       S <- dim(loo)[1]
+                       khat_threshold <- ps_khat_threshold(S)
+                       K <- sum(k > khat_threshold)
+                       out <- ifelse(K==0, "", paste0(K, " k_psis > ", round(khat_threshold, 2)))
+                     }
+                     out
+                   }
+                   )
+
   comp <- cbind(
     data.frame(
       model = rnms,
@@ -195,7 +192,7 @@ loo_compare.default <- function(x, ...) {
       se_diff = se_diff,
       p_worse = p_worse,
       diag_diff = diag_diff,
-      diag_elpd = khat_psis
+      diag_elpd = k_psis
     ),
     as.data.frame(comp)
   )
