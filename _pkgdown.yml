@@ -1,7 +1,10 @@
 url: https://mc-stan.org/loo/
+
 destination: "docs/"
+
 template:
   package: pkgdownconfig
+
 development:
   mode: auto
 
@@ -9,38 +12,29 @@ navbar:
   title: "loo"
 
   structure:
-    left: [home, vignettes, functions, pkgs, news, stan]
-    right: [search, bluesky, twitter, forum, github, lightswitch]
+    left: [home, vignettes, functions, news, pkgs, stan]
+    right: [search, bluesky, forum, github, lightswitch]
 
   components:
-    home:
-      icon: fa-home fa-lg
-      href: index.html
-    vignettes:
-      text: Vignettes
-      href: articles/index.html
-    functions:
-      text: Functions
-      href: reference/index.html
     pkgs:
       text: Other Packages
       menu:
-        - text: rstan
-          href: https://mc-stan.org/rstan
-        - text: cmdstanr
-          href: https://mc-stan.org/cmdstanr
-        - text: rstanarm
-          href: https://mc-stan.org/rstanarm
         - text: bayesplot
           href: https://mc-stan.org/bayesplot
-        - text: shinystan
-          href: https://mc-stan.org/shinystan
-        - text: projpred
-          href: https://mc-stan.org/projpred
-        - text: rstantools
-          href: https://mc-stan.org/rstantools
+        - text: cmdstanr
+          href: https://mc-stan.org/cmdstanr
         - text: posterior
           href: https://mc-stan.org/posterior
+        - text: projpred
+          href: https://mc-stan.org/projpred
+        - text: rstan
+          href: https://mc-stan.org/rstan
+        - text: rstanarm
+          href: https://mc-stan.org/rstanarm
+        - text: rstantools
+          href: https://mc-stan.org/rstantools
+        - text: shinystan
+          href: https://mc-stan.org/shinystan
 
 articles:
   - title: Getting started
