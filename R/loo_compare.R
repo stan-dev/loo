@@ -60,8 +60,10 @@
 #'   many times larger than `se_diff` the difference is quite certain.
 #'   While `khat > 0.5` indicates possibility of outliers, it is also
 #'   possible that both models compared seem to be well specified based
-#'   on model checking, but the pointwise ELPD differences have such thick tails
-#'   that the normal approximation for the sum is not good.
+#'   on model checking, but the pointwise ELPD differences have such thick
+#'   tails that the normal approximation for the sum is not good (note that
+#'   `khat`s in `diag_diff` column are different from the `khat`s in PSIS-LOO
+#'   diagnostic). 
 #'
 #'   The column `diag_elpd` shows diagnostic for the pointwise ELPD
 #'   computations for each model. If `k khat_psis > 0.7` is shown,
