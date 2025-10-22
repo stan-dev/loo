@@ -53,26 +53,28 @@
 #'
 #'   If any of these diagnostic messages is shown, the error distribution is
 #'   skewed or thick tailed and the normal approximation based on `elpd_diff`
-#'   and `se_diff` is not well calibrated. The probabilities `p_worse` are
-#'   likely to be too large (small data or similar predictions) or too small
-#'   (outliers). `elpd_diff` and `se_diff` are still indicative of the
-#'   differences and uncertainties, and for example, if `|elpd_diff|` is
-#'   many times larger than `se_diff` the difference is quite certain.
-#'   The `k_diff` value for the `diag_diff` column is computed using
-#'   the pointwise elpd differences (and is different from Pareto k's in PSIS-LOO
-#'   diagnostic).  While `k_diff > 0.5` indicates possibility of outliers, it is
-#'   also possible that both models compared seem to be well specified based
-#'   on model checking, but the pointwise ELPD differences have such thick
-#'   tails that the normal approximation for the sum is not good (Vehtari et
-#'   al., 2024). Threshold 0.5 is used for `k_diff` as we do not do automatic
-#'   Pareto smoothing for the pointwise differences (Vehtari et al., 2024).
+#'   and `se_diff` is not well calibrated. In that case, the probabilities
+#'   `p_worse` are likely to be too large (small data or similar predictions) or
+#'   too small (outliers). However, `elpd_diff` and `se_diff` will still be
+#'   indicative of the differences and uncertainties (for example, if
+#'   `|elpd_diff|` is many times larger than `se_diff` the difference is quite
+#'   certain).
 #'
-#'   The column `diag_elpd` shows diagnostic for the pointwise ELPD
-#'   computations for each model. If `k_psis > 0.7` is shown,
-#'   where `k` is the number of high high Pareto k values in Pareto
-#'   smoothed importance sampling computation, then there may be
-#'   significant bias in `elpd_diff` favoring models with a large
-#'   number of high Pareto k values.
+#'   The `k_diff` value for the `diag_diff` column is computed using the
+#'   pointwise ELPD differences (and is different from the Pareto k's in
+#'   PSIS-LOO diagnostic).  While `k_diff > 0.5` indicates the *possibility* of
+#'   outliers, it is also possible that both models compared seem to be well
+#'   specified based on model checking, but the pointwise ELPD differences have
+#'   such thick tails that the normal approximation for the sum is not good
+#'   (Vehtari et al., 2024). A threshold of 0.5 is used for `k_diff` as we do
+#'   not do automatic Pareto smoothing for the pointwise differences (Vehtari et
+#'   al., 2024).
+#'
+#'   The column `diag_elpd` shows the PSIS-LOO Pareto k diagnostic for the
+#'   pointwise ELPD computations for each model. If `K k_psis > 0.7` is shown,
+#'   where `K` is the number of high high Pareto k values in the PSIS
+#'   computation, then there may be significant bias in `elpd_diff` favoring
+#'   models with a large number of high Pareto k values.
 #'
 #' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
@@ -150,49 +152,14 @@ loo_compare.default <- function(x, ...) {
   p_worse <- stats::pnorm(0, elpd_diff, se_diff)
   p_worse[elpd_diff == 0] <- NA
 
-  # diagnostics to assess whether the normal approximation can be trusted
-  # * N < 100: small data (Sivula et al., 2025)
-  # * |elpd_diff| < 4: similar predictions (Sivula et al., 2025)
-  # * k_diff > 0.5: possible outliers in differences (Sivula et al., 2025; Vehtari et al., 2024)
-  N <- nrow(diffs)
-  if (N < 100) {
-    diag_diff <- rep("N < 100", length(elpd_diff))
-    diag_diff[elpd_diff == 0] <- ""
-  } else {
-    diag_diff <- rep("", length(elpd_diff))
-    diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
-    k_diff <- rep(NA, length(elpd_diff))
-    k_diff[elpd_diff != 0] <- apply(
-      diffs[, elpd_diff != 0, drop = FALSE], 2,
-      function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
-    ))
-    diag_diff[k_diff > 0.5] <- "k_diff > 0.5"
-  }
-
-  # get khats for PSIS
-  k_psis <- sapply(loos[ord],
-                   function(loo) {
-                     k <- loo$diagnostics[["pareto_k"]]
-                     if (is.null(k)) {
-                       out = ""
-                     } else {
-                       S <- dim(loo)[1]
-                       khat_threshold <- ps_khat_threshold(S)
-                       K <- sum(k > khat_threshold)
-                       out <- ifelse(K==0, "", paste0(K, " k_psis > ", round(khat_threshold, 2)))
-                     }
-                     out
-                   }
-                   )
-
   comp <- cbind(
     data.frame(
       model = rnms,
       elpd_diff = elpd_diff,
       se_diff = se_diff,
       p_worse = p_worse,
-      diag_diff = diag_diff,
-      diag_elpd = k_psis
+      diag_diff = diag_diff(nrow(diffs), elpd_diff),
+      diag_elpd = diag_elpd(loos[ord])
     ),
     as.data.frame(comp)
   )
@@ -311,7 +278,6 @@ loo_compare_checks <- function(loos) {
 #' Find the model names associated with `"loo"` objects
 #'
 #' @export
-#' @keywords internal
 #' @param x List of `"loo"` objects.
 #' @return Character vector of model names the same length as `x.`
 #'
@@ -340,7 +306,6 @@ find_model_names <- function(x) {
 
 
 #' Compute the loo_compare matrix
-#' @keywords internal
 #' @noRd
 #' @param loos List of `"loo"` objects.
 loo_compare_matrix <- function(loos){
@@ -362,7 +327,6 @@ loo_compare_matrix <- function(loos){
 
 #' Computes the order of loos for comparison
 #' @noRd
-#' @keywords internal
 #' @param loos List of `"loo"` objects.
 loo_compare_order <- function(loos){
   tmp <- sapply(loos, function(x) {
@@ -377,7 +341,6 @@ loo_compare_order <- function(loos){
 
 #' Perform checks on `"loo"` objects __after__ comparison
 #' @noRd
-#' @keywords internal
 #' @param loos List of `"loo"` objects.
 #' @param ord List of `"loo"` object orderings.
 #' @return Nothing, just possibly throws errors/warnings.
@@ -419,18 +382,57 @@ loo_order_stat_check <- function(loos, ord) {
 
 #' Returns the middle index of a vector
 #' @noRd
-#' @keywords internal
 #' @param vec A vector.
 #' @return Integer index value.
 middle_idx <- function(vec) floor(length(vec) / 2)
 
 #' Computes maximum order statistic from K Gaussians
 #' @noRd
-#' @keywords internal
 #' @param K Number of Gaussians.
 #' @param c Scaling of the order statistic.
 #' @return Numeric expected maximum from K samples from a Gaussian with mean
 #' zero and scale `"c"`
 order_stat_heuristic <- function(K, c) {
   qnorm(p = 1 - 1 / (K * 2), mean = 0, sd = c)
+}
+
+#' Count number of high Pareto k values in PSIS-LOO and create diagnostic message
+#' @noRd
+#' @param loos Ordered list of loo objects.
+#' @return Character vector of diagnostic messages.
+diag_elpd <- function(loos) {
+  sapply(loos, function(loo) {
+    k <- loo$diagnostics[["pareto_k"]]
+    if (is.null(k)) {
+      out <- ""
+    } else {
+      S <- dim(loo)[1]
+      khat_threshold <- ps_khat_threshold(S)
+      K <- sum(k > khat_threshold)
+      out <- ifelse(K == 0, "", paste0(K, " k_psis > ", round(khat_threshold, 2)))
+    }
+    out
+  })
+}
+
+#' Create diagnostic for elpd differences
+#' @noRd
+#' @param N Number of data points.
+#' @param elpd_diff Vector of elpd differences.
+#' @return Character vector of diagnostic messages.
+diag_diff <- function(N, elpd_diff) {
+  if (N < 100) {
+    diag_diff <- rep("N < 100", length(elpd_diff))
+    diag_diff[elpd_diff == 0] <- ""
+  } else {
+    diag_diff <- rep("", length(elpd_diff))
+    diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
+    k_diff <- rep(NA, length(elpd_diff))
+    k_diff[elpd_diff != 0] <- apply(
+      diffs[, elpd_diff != 0, drop = FALSE], 2,
+      function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
+      ))
+    diag_diff[k_diff > 0.5] <- "k_diff > 0.5"
+  }
+  diag_diff
 }

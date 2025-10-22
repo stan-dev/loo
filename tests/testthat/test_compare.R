@@ -65,6 +65,7 @@ comp_colnames <- c(
   "se_diff",
   "p_worse",
   "diag_diff",
+  "diag_elpd",
   "elpd_waic",
   "se_elpd_waic",
   "p_waic",
@@ -88,6 +89,9 @@ test_that("loo_compare returns expected results (2 models)", {
   comp2 <- loo_compare(w1, w2)
   expect_s3_class(comp2, "compare.loo")
   expect_equal(colnames(comp2), comp_colnames)
+  expect_equal(comp2$p_worse, c(NA, 1))
+  expect_equal(comp2$diag_diff, c("", "N < 100"))
+  expect_equal(comp2$diag_elpd, c("", ""))
   expect_snapshot_value(comp2, style = "serialize")
   expect_snapshot(print(comp2))
   expect_snapshot(print(comp2, p_worse = FALSE))
@@ -108,6 +112,7 @@ test_that("loo_compare returns expected result (3 models)", {
   expect_equal(colnames(comp1), comp_colnames)
   expect_equal(comp1$model, c("model1", "model2", "model3"))
   expect_equal(comp1$p_worse, c(NA, 1, 1))
+  expect_equal(comp1$diag_diff, c("", "N < 100", "N < 100"))
   expect_s3_class(comp1, "compare.loo")
   expect_s3_class(comp1, "data.frame")
   expect_snapshot_value(comp1, style = "serialize")
