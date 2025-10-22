@@ -169,7 +169,7 @@ loo_compare.default <- function(x, ...) {
 
   # get khats for PSIS
   khat_psis <- sapply(loos[ord],
-                      \(loo) {
+                      function(loo) {
                         k <- loo$diagnostics[["pareto_k"]]
                         if (is.null(k)) {
                           out = ""
