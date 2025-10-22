@@ -16,8 +16,11 @@ vignettes/loo2-non-factorizable_cache/*
 ^\.appveyor\.yml$
 ^\.codecov\.yml$
 .github/*
+.vscode/*
 ^\.github$
 ^vignettes/online-only$
 
 ^CRAN-SUBMISSION$
 ^release-prep\.R$
+^_pkgdown\.yml$
+^pkgdown$
