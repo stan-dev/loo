@@ -39,7 +39,7 @@
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
 #'
-#' ## `p_worse` and `diag_diff`
+#' ## `p_worse`, `diag_diff`, and `diag_elpd`
 #'   The values in the `p_worse` column show the probability of each model
 #'   having worse ELPD than the best model. These probabilities are computed
 #'   with a normal approximation using the values from `elpd_diff` and
@@ -51,9 +51,24 @@
 #'   * `|elpd_diff| < 4` (models make similar predictions)
 #'   * `khat > 0.5` (possible outliers)
 #'
-#'   If any of these diagnostic messages is shown, the normal approximation is
-#'   not well calibrated and the probabilities can be too large (small data or
-#'   similar predictions) or too small (outliers).
+#'   If any of these diagnostic messages is shown, the error distribution is
+#'   skewed or thick tailed and the normal approximation based on `elpd_diff`
+#'   and `se_diff` is not well calibrated. The probabilities `p_worse` are
+#'   likely to be too large (small data or similar predictions) or too small
+#'   (outliers). `elpd_diff` and `se_diff` are still indicative of the
+#'   differences and uncertainties, and for example, if `|elpd_diff|` is
+#'   many times larger than `se_diff` the difference is quite certain.
+#'   While `khat > 0.5` indicates possibility of outliers, it is also
+#'   possible that both models compared seem to be well specified based
+#'   on model checking, but the pointwise ELPD differences have such thick tails
+#'   that the normal approximation for the sum is not good.
+#'
+#'   The column `diag_elpd` shows diagnostic for the pointwise ELPD
+#'   computations for each model. If `k khat_psis > 0.7` is shown,
+#'   where `k` is the number of high high Pareto k values in Pareto
+#'   smoothed importance sampling computation, then there may be
+#'   significant bias in `elpd_diff` favoring models with a large
+#'   number of high Pareto k values.
 #'
 #' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
