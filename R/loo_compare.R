@@ -150,13 +150,34 @@ loo_compare.default <- function(x, ...) {
     diag_diff[khat_diff > 0.5] <- "khat_diff > 0.5"
   }
 
+  # get khats for PSIS
+  khat_psis <- sapply(loos[ord],
+                      \(loo) {
+                        k <- loo$diagnostics[["pareto_k"]]
+                        if (is.null(k)) {
+                          out = ""
+                        } else {
+                          S <- dim(loo)[1]
+                          khat_threshold <- ps_khat_threshold(S)
+                          K <- sum(k > khat_threshold)
+                          if (K==0) {
+                            out <- ""
+                          } else {
+                            out <- paste0(K, " khat_psis > ", round(khat_threshold, 2))
+                          }
+                        }
+                        out
+                      }
+                      )
+  
   comp <- cbind(
     data.frame(
       model = rnms,
       elpd_diff = elpd_diff,
       se_diff = se_diff,
       p_worse = p_worse,
-      diag_diff = diag_diff
+      diag_diff = diag_diff,
+      diag_elpd = khat_psis
     ),
     as.data.frame(comp)
   )
@@ -195,7 +216,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
     x2 <- cbind(
       x2,
       p_worse = .fr(x[, "p_worse"], digits = 2),
-      diag_diff = x[, "diag_diff"]
+      diag_diff = x[, "diag_diff"],
+      diag_elpd = x[, "diag_elpd"]
     )
   }
   print(x2, quote = FALSE, row.names = FALSE)
