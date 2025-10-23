@@ -1,4 +1,4 @@
-# loo <img src="man/figures/stanlogo.png" align="right" width="120" />
+# loo <img src="man/figures/logo.svg" align="right" width="120" />
 
 <!-- badges: start -->
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/loo?color=blue)](https://cran.r-project.org/web/packages/loo)
