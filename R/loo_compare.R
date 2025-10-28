@@ -2,9 +2,6 @@
 #'
 #' @description Compare fitted models based on [ELPD][loo-glossary].
 #'
-#'   By default the print method shows only the most important information. Use
-#'   `print(..., simplify=FALSE)` to print a more detailed summary.
-#'
 #' @export
 #' @param x An object of class `"loo"` or a list of such objects. If a list is
 #'   used then the list names will be used as the model names in the output. See
@@ -12,8 +9,8 @@
 #' @param ... Additional objects of class `"loo"`, if not passed in as a single
 #'   list.
 #'
-#' @return A matrix with class `"compare.loo"` that has its own
-#'   print method. See the **Details** section.
+#' @return A data frame with class `"compare.loo"` that has its own
+#'   print method. See the **Details** and **Examples** sections.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -21,14 +18,14 @@
 #'   [`elpd_loo`][loo-glossary] or `elpd_waic` (or multiplied by \eqn{-2}, if
 #'   desired, to be on the deviance scale).
 #'
-#'   When using `loo_compare()`, the returned matrix will have one row per model
-#'   and several columns of estimates. The values in the
-#'   [`elpd_diff`][loo-glossary] and [`se_diff`][loo-glossary] columns of the
-#'   returned matrix are computed by making pairwise comparisons between each
-#'   model and the model with the largest ELPD (the model in the first row). For
-#'   this reason the `elpd_diff` column will always have the value `0` in the
-#'   first row (i.e., the difference between the preferred model and itself) and
-#'   negative values in subsequent rows for the remaining models.
+#' ## `elpd_diff` and `se_diff`
+#'   When using `loo_compare()`, the returned data frame will have one row per
+#'   model and several columns of estimates. The values of
+#'   [`elpd_diff`][loo-glossary] and [`se_diff`][loo-glossary] are computed by
+#'   making pairwise comparisons between each model and the model with the
+#'   largest ELPD (the model listed first). Therefore, the first `elpd_diff`
+#'   value will always be `0` (i.e., the difference between the preferred model
+#'   and itself) and the rest of the values will be negative.
 #'
 #'   To compute the standard error of the difference in [ELPD][loo-glossary] ---
 #'   which should not be expected to equal the difference of the standard errors
@@ -41,9 +38,45 @@
 #'   standard approach of comparing differences of deviances to a Chi-squared
 #'   distribution, a practice derived for Gaussian linear models or
 #'   asymptotically, and which only applies to nested models in any case.
-#'   Sivula et al. (2022) discuss the conditions when the normal
-#'   approximation used for SE and `se_diff` is good.
 #'
+#' ## `p_worse`, `diag_diff`, and `diag_elpd`
+#'   The values in the `p_worse` column show the probability of each model
+#'   having worse ELPD than the best model. These probabilities are computed
+#'   with a normal approximation using the values from `elpd_diff` and
+#'   `se_diff`. Sivula et al. (2025) present the conditions when the normal
+#'   approximation used for SE and `se_diff` is good, and the column
+#'   `diag_diff` contains possible diagnostic messages:
+#'
+#'   * `N < 100` (small data)
+#'   * `|elpd_diff| < 4` (models make similar predictions)
+#'   * `k_diff > 0.5` (possible outliers)
+#'
+#'   If any of these diagnostic messages is shown, the error distribution is
+#'   skewed or thick tailed and the normal approximation based on `elpd_diff`
+#'   and `se_diff` is not well calibrated. In that case, the probabilities
+#'   `p_worse` are likely to be too large (small data or similar predictions) or
+#'   too small (outliers). However, `elpd_diff` and `se_diff` will still be
+#'   indicative of the differences and uncertainties (for example, if
+#'   `|elpd_diff|` is many times larger than `se_diff` the difference is quite
+#'   certain).
+#'
+#'   The `k_diff` value for the `diag_diff` column is computed using the
+#'   pointwise ELPD differences (and is different from the Pareto k's in
+#'   PSIS-LOO diagnostic).  While `k_diff > 0.5` indicates the *possibility* of
+#'   outliers, it is also possible that both models compared seem to be well
+#'   specified based on model checking, but the pointwise ELPD differences have
+#'   such thick tails that the normal approximation for the sum is not good
+#'   (Vehtari et al., 2024). A threshold of 0.5 is used for `k_diff` as we do
+#'   not do automatic Pareto smoothing for the pointwise differences (Vehtari et
+#'   al., 2024).
+#'
+#'   The column `diag_elpd` shows the PSIS-LOO Pareto k diagnostic for the
+#'   pointwise ELPD computations for each model. If `K k_psis > 0.7` is shown,
+#'   where `K` is the number of high high Pareto k values in the PSIS
+#'   computation, then there may be significant bias in `elpd_diff` favoring
+#'   models with a large number of high Pareto k values.
+#'
+#' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
 #'   differences using the median model by ELPD as the baseline model. We then
 #'   estimate whether the differences in predictive performance are potentially
@@ -52,7 +85,7 @@
 #'   selection process. In that case users are recommended to avoid model
 #'   selection based on LOO-CV, and instead to favor model averaging/stacking or
 #'   projection predictive inference.
-#' 
+#'
 #' @seealso
 #' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
@@ -68,12 +101,8 @@
 #' comp <- loo_compare(loo1, loo2, loo3)
 #' print(comp, digits = 2)
 #'
-#' # show more details with simplify=FALSE
-#' # (will be the same for all models in this artificial example)
-#' print(comp, simplify = FALSE, digits = 3)
-#'
 #' # can use a list of objects with custom names
-#' # will use apple, banana, and cherry, as the names in the output
+#' # the names will be used in the output
 #' loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 #'
 #' \dontrun{
@@ -101,52 +130,81 @@ loo_compare.default <- function(x, ...) {
     loos <- x
   }
 
-  # If subsampling is used
+  # if subsampling is used
   if (any(sapply(loos, inherits, "psis_loo_ss"))) {
     return(loo_compare.psis_loo_ss_list(loos))
   }
 
+  # run pre-comparison checks
   loo_compare_checks(loos)
 
+  # compute elpd_diff and se_elpd_diff relative to best model
   comp <- loo_compare_matrix(loos)
   ord <- loo_compare_order(loos)
-
-  # compute elpd_diff and se_elpd_diff relative to best model
   rnms <- rownames(comp)
   diffs <- mapply(FUN = elpd_diffs, loos[ord[1]], loos[ord])
+  colnames(diffs) <- rnms
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
-  comp <- cbind(elpd_diff = elpd_diff, se_diff = se_diff, comp)
-  rownames(comp) <- rnms
 
-  # run order statistics-based checks on models
+  # compute probabilities that a model has worse elpd than the best model
+  # using a normal approximation (Sivula et al., 2025)
+  p_worse <- stats::pnorm(0, elpd_diff, se_diff)
+  p_worse[elpd_diff == 0] <- NA
+
+  comp <- cbind(
+    data.frame(
+      model = rnms,
+      elpd_diff = elpd_diff,
+      se_diff = se_diff,
+      p_worse = p_worse,
+      diag_diff = diag_diff(nrow(diffs), elpd_diff),
+      diag_elpd = diag_elpd(loos[ord])
+    ),
+    as.data.frame(comp)
+  )
+  rownames(comp) <- NULL
+
+  # run order statistics-based checks for many model comparisons
   loo_order_stat_check(loos, ord)
 
   class(comp) <- c("compare.loo", class(comp))
-  return(comp)
+  comp
 }
 
 #' @rdname loo_compare
 #' @export
 #' @param digits For the print method only, the number of digits to use when
 #'   printing.
-#' @param simplify For the print method only, should only the essential columns
-#'   of the summary matrix be printed? The entire matrix is always returned, but
-#'   by default only the most important columns are printed.
-print.compare.loo <- function(x, ..., digits = 1, simplify = TRUE) {
-  xcopy <- x
-  if (inherits(xcopy, "old_compare.loo")) {
-    if (NCOL(xcopy) >= 2 && simplify) {
-      patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
-      xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
-    }
-  } else if (NCOL(xcopy) >= 2 && simplify) {
-     xcopy <- xcopy[, c("elpd_diff", "se_diff")]
+#' @param p_worse For the print method only, should we include the normal
+#'   approximation based probability of each model having worse performance than
+#'   the best model? The default is `TRUE`.
+print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
+  if (inherits(x, "old_compare.loo")) {
+    return(unclass(x))
   }
-  print(.fr(xcopy, digits), quote = FALSE)
+  if (!inherits(x, "data.frame")) {
+    class(x) <- c(class(x), "data.frame")
+  }
+  if (!all(c("model", "elpd_diff", "se_diff") %in% colnames(x))) {
+    print(as.data.frame(x))
+    return(x)
+  }
+  x2 <- cbind(
+    model = x$model,
+    .fr(x[, c("elpd_diff", "se_diff")], digits)
+  )
+  if (p_worse && "p_worse" %in% colnames(x)) {
+    x2 <- cbind(
+      x2,
+      p_worse = .fr(x[, "p_worse"], digits = 2),
+      diag_diff = x[, "diag_diff"],
+      diag_elpd = x[, "diag_elpd"]
+    )
+  }
+  print(x2, quote = FALSE, row.names = FALSE)
   invisible(x)
 }
-
 
 
 # internal ----------------------------------------------------------------
@@ -171,7 +229,6 @@ se_elpd_diff <- function(diffs) {
   # of the N components and multiplying by `sqrt(N)`.
   sqrt(N) * sd(diffs)
 }
-
 
 #' Perform checks on `"loo"` objects before comparison
 #' @noRd
@@ -227,7 +284,6 @@ loo_compare_checks <- function(loos) {
 #' Find the model names associated with `"loo"` objects
 #'
 #' @export
-#' @keywords internal
 #' @param x List of `"loo"` objects.
 #' @return Character vector of model names the same length as `x.`
 #'
@@ -256,7 +312,6 @@ find_model_names <- function(x) {
 
 
 #' Compute the loo_compare matrix
-#' @keywords internal
 #' @noRd
 #' @param loos List of `"loo"` objects.
 loo_compare_matrix <- function(loos){
@@ -278,7 +333,6 @@ loo_compare_matrix <- function(loos){
 
 #' Computes the order of loos for comparison
 #' @noRd
-#' @keywords internal
 #' @param loos List of `"loo"` objects.
 loo_compare_order <- function(loos){
   tmp <- sapply(loos, function(x) {
@@ -293,7 +347,6 @@ loo_compare_order <- function(loos){
 
 #' Perform checks on `"loo"` objects __after__ comparison
 #' @noRd
-#' @keywords internal
 #' @param loos List of `"loo"` objects.
 #' @param ord List of `"loo"` object orderings.
 #' @return Nothing, just possibly throws errors/warnings.
@@ -335,18 +388,57 @@ loo_order_stat_check <- function(loos, ord) {
 
 #' Returns the middle index of a vector
 #' @noRd
-#' @keywords internal
 #' @param vec A vector.
 #' @return Integer index value.
 middle_idx <- function(vec) floor(length(vec) / 2)
 
 #' Computes maximum order statistic from K Gaussians
 #' @noRd
-#' @keywords internal
 #' @param K Number of Gaussians.
 #' @param c Scaling of the order statistic.
 #' @return Numeric expected maximum from K samples from a Gaussian with mean
 #' zero and scale `"c"`
 order_stat_heuristic <- function(K, c) {
   qnorm(p = 1 - 1 / (K * 2), mean = 0, sd = c)
+}
+
+#' Count number of high Pareto k values in PSIS-LOO and create diagnostic message
+#' @noRd
+#' @param loos Ordered list of loo objects.
+#' @return Character vector of diagnostic messages.
+diag_elpd <- function(loos) {
+  sapply(loos, function(loo) {
+    k <- loo$diagnostics[["pareto_k"]]
+    if (is.null(k)) {
+      out <- ""
+    } else {
+      S <- dim(loo)[1]
+      khat_threshold <- ps_khat_threshold(S)
+      K <- sum(k > khat_threshold)
+      out <- ifelse(K == 0, "", paste0(K, " k_psis > ", round(khat_threshold, 2)))
+    }
+    out
+  })
+}
+
+#' Create diagnostic for elpd differences
+#' @noRd
+#' @param N Number of data points.
+#' @param elpd_diff Vector of elpd differences.
+#' @return Character vector of diagnostic messages.
+diag_diff <- function(N, elpd_diff) {
+  if (N < 100) {
+    diag_diff <- rep("N < 100", length(elpd_diff))
+    diag_diff[elpd_diff == 0] <- ""
+  } else {
+    diag_diff <- rep("", length(elpd_diff))
+    diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
+    k_diff <- rep(NA, length(elpd_diff))
+    k_diff[elpd_diff != 0] <- apply(
+      diffs[, elpd_diff != 0, drop = FALSE], 2,
+      function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
+      ))
+    diag_diff[k_diff > 0.5] <- "k_diff > 0.5"
+  }
+  diag_diff
 }
