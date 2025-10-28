@@ -446,7 +446,7 @@ pointwise_loo_calcs <- function(ll, psis_object) {
 #' @param diagnostics Named list containing vector `pareto_k` and vector `n_eff`.
 #' @param dims Log likelihood matrix dimensions (attribute of `"psis"` object).
 #' @template is_method
-#' @param is_object An object of class `"psis"/"tis"/"sis"`, as returned by the [psis()/tis()/sis()] function.
+#' @param is_object An object of class `"psis"/"tis"/"sis"`, as returned by the `psis()`/`tis()`/`sis()` function.
 #' @return A `'importance_sampling_loo'` object as described in the Value section of the [loo()]
 #'   function documentation.
 #'

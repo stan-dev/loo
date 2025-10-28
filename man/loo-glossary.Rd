@@ -175,8 +175,8 @@ Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research}
 
 Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2025).
 Uncertainty in Bayesian leave-one-out cross-validation based model
-comparison. \emph{Bayesian Analysis}, accepted for publication.
-\href{https://arxiv.org/abs/2008.10296v5}{preprint arXiv:2008.10296v5.}.
+comparison. \emph{Bayesian Analysis},
+\href{https://doi.org/10.1214/25-BA1569}{doi:10.1214/25-BA1569}.
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
 Gelman, A. (2019), Visualization in Bayesian workflow.
