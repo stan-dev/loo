@@ -471,7 +471,7 @@ estimator_choices <- function() {
 
 #' Utility function to apply user-specified log-likelihood to a single data point
 #' @details
-#' See [elpd_loo_approximation] and [compute_lpds] for usage examples
+#' See `elpd_loo_approximation` and `compute_lpds` for usage examples
 #' @noRd
 #'
 #' @return lpd value for a single data point i
@@ -487,7 +487,7 @@ lpd_i <- function(i, llfun, data, draws) {
 #' using platform-dependent parallel backends when cores > 1
 #'
 #' @details
-#' See [elpd_loo_approximation] for usage examples
+#' See `elpd_loo_approximation` for usage examples
 #'
 #' @noRd
 #' @return a vector of computed log probability densities
