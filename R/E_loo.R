@@ -1,13 +1,14 @@
 #' Compute weighted expectations
 #'
 #' The `E_loo()` function computes weighted expectations (means, variances,
-#' quantiles) using the importance weights obtained from the
-#' [PSIS][psis()] smoothing procedure. The expectations estimated by the
-#' `E_loo()` function assume that the PSIS approximation is working well.
+#' quantiles) using the importance weights obtained from the [PSIS][psis()]
+#' smoothing procedure. The expectations estimated by the `E_loo()` function
+#' assume that the PSIS approximation is working well.
 #' **A small [Pareto k][pareto-k-diagnostic] estimate is necessary,
-#' but not sufficient, for `E_loo()` to give reliable estimates.** Additional
-#' diagnostic checks for gauging the reliability of the estimates are in
-#' development and will be added in a future release.
+#' but not sufficient, for `E_loo()` to give reliable estimates**. If the
+#' `log_ratios` argument is provided, `E_loo()` also computes a function
+#' specific Pareto k diagnostic, which must also be small for a reliable
+#' estimate. See more details below.
 #'
 #' @export
 #' @param x A numeric vector or matrix.
