@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Paul Bürkner,
 Jonah Gabry, Aki Vehtari</h4>
             
-            <h4 data-toc-skip class="date">2025-10-30</h4>
+            <h4 data-toc-skip class="date">2025-11-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-lfo.Rmd" class="external-link"><code>vignettes/loo2-lfo.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-lfo.Rmd</code></div>
@@ -340,7 +340,7 @@ and then look at the time series.</p>
 <span>    x <span class="op">=</span> <span class="st">"Year"</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/hurondata-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/hurondata-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>The above plot shows rather strong autocorrelation of the time-series
 as well as some trend towards lower levels for later points in time.</p>
 <p>We can specify an AR(4) model for these data using the
@@ -373,7 +373,7 @@ plotted, which reveals a rather good fit to the data.</p>
 <span>    title <span class="op">=</span> <span class="st">"Water Level in Lake Huron (1875-1972)"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"Mean (blue) and 90% predictive intervals (gray) vs. observed data (black)"</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/plotpreds-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/plotpreds-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>To allow for reasonable predictions of future values, we will require
 at least <span class="math inline">\(L = 20\)</span> historical
 observations (20 years) to make predictions.</p>
@@ -536,7 +536,7 @@ threshold and that we only needed to refit the model a few times:</p>
 <pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 54</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/refitsummary1sap-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate 1-SAP ELPD is remarkably similar to the exact 1-SAP
 ELPD computed above, which indicates our algorithm to compute
 approximate 1-SAP worked well for the present data and model.</p>
@@ -562,7 +562,7 @@ further evidence for the good quality of our approximation.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Approximate ELPDs"</span>, y <span class="op">=</span> <span class="st">"Exact ELPDs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/plot1sap-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/plot1sap-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also look at the maximum difference and average difference
 between the approximate and exact ELPD calculations, which also indicate
 a ver close approximation:</p>
@@ -674,7 +674,7 @@ threshold and that we only needed to refit the model a few times:</p>
 <pre><code>Using threshold  0.7 , model was refit  2  times, at observations 20 54</code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_ks</span><span class="op">(</span><span class="va">ks</span>, <span class="op">(</span><span class="va">L</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">N</span> <span class="op">-</span> <span class="va">M</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/refitsummary4sap-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>The approximate ELPD computed for the 4-SAP case is not as close to
 its exact counterpart as in the 1-SAP case. In general, the larger <span class="math inline">\(M\)</span>, the larger the variation of the
 approximate ELPD around the exact ELPD. It turns out that the ELPD
@@ -704,7 +704,7 @@ underestimate the exact predictions.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Approximate ELPDs"</span>, y <span class="op">=</span> <span class="st">"Exact ELPDs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-lfo_files/figure-html/plot4sap-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-lfo_files/figure-html/plot4sap-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -745,7 +745,7 @@ Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html" cl
 </h3>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code>R version 4.5.1 (2025-06-13)
+<pre><code>R version 4.5.2 (2025-10-31)
 Platform: x86_64-pc-linux-gnu
 Running under: Ubuntu 24.04.3 LTS
 
@@ -770,24 +770,24 @@ other attached packages:
 [5] Rcpp_1.1.0       knitr_1.50      
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.53            
+ [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.54            
  [4] bslib_0.9.0           QuickJSR_1.8.1        htmlwidgets_1.6.4    
  [7] processx_3.8.6        inline_0.3.21         lattice_0.22-7       
 [10] callr_3.7.6           ps_1.9.1              vctrs_0.6.5          
-[13] tools_4.5.1           generics_0.1.4        stats4_4.5.1         
-[16] parallel_4.5.1        tibble_3.3.0          pkgconfig_2.0.3      
-[19] Matrix_1.7-3          checkmate_2.3.3       RColorBrewer_1.1-3   
+[13] tools_4.5.2           generics_0.1.4        stats4_4.5.2         
+[16] parallel_4.5.2        tibble_3.3.0          pkgconfig_2.0.3      
+[19] Matrix_1.7-4          checkmate_2.3.3       RColorBrewer_1.1-3   
 [22] S7_0.2.0              desc_1.4.3            distributional_0.5.0 
-[25] RcppParallel_5.1.11-1 lifecycle_1.0.4       compiler_4.5.1       
-[28] farver_2.1.2          stringr_1.5.2         textshaping_1.0.4    
+[25] RcppParallel_5.1.11-1 lifecycle_1.0.4       compiler_4.5.2       
+[28] farver_2.1.2          stringr_1.6.0         textshaping_1.0.4    
 [31] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.8.1    
 [34] sass_0.4.10           yaml_2.3.10           pillar_1.11.1        
-[37] pkgdown_2.1.3         jquerylib_0.1.4       cachem_1.1.0         
+[37] pkgdown_2.2.0         jquerylib_0.1.4       cachem_1.1.0         
 [40] StanHeaders_2.32.10   bridgesampling_1.1-2  abind_1.4-8          
 [43] nlme_3.1-168          posterior_1.6.1       rstan_2.32.7         
 [46] tidyselect_1.2.1      digest_0.6.37         mvtnorm_1.3-3        
 [49] stringi_1.8.7         dplyr_1.1.4           labeling_0.4.3       
-[52] fastmap_1.2.0         grid_4.5.1            cli_3.6.5            
+[52] fastmap_1.2.0         grid_4.5.2            cli_3.6.5            
 [55] magrittr_2.0.4        pkgbuild_1.4.8        withr_3.0.2          
 [58] scales_1.4.0          backports_1.5.0       rmarkdown_2.30       
 [61] matrixStats_1.5.0     gridExtra_2.3         ragg_1.5.0           
@@ -817,7 +817,7 @@ CC-BY-NC 4.0).</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

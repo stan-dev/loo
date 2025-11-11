@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-10-30</h4>
+            <h4 data-toc-skip class="date">2025-11-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-non-factorized.Rmd</code></div>
@@ -450,7 +450,7 @@ posterior distribution of the <code>lagsar</code> parameter.</p>
 <span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/MCMC-distributions.html" class="external-link">mcmc_hist</a></span><span class="op">(</span><span class="va">lagsar</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://mc-stan.org/bayesplot/reference/bayesplot-helpers.html" class="external-link">vline_at</a></span><span class="op">(</span><span class="va">estimates</span>, linetype <span class="op">=</span> <span class="fl">2</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"lagsar: posterior median and 50% central interval"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-non-factorized_files/figure-html/plot-lagsar-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorized_files/figure-html/plot-lagsar-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="approximate-loo-cv">Approximate LOO-CV<a class="anchor" aria-label="anchor" href="#approximate-loo-cv"></a>
@@ -487,7 +487,7 @@ plot below, we see that the fourth observation is problematic and so may
 reduce the accuracy of the LOO-CV approximation.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">psis_result</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-non-factorized_files/figure-html/plot-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorized_files/figure-html/plot-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>We can also check that the conditional leave-one-out predictive
 distribution equations work correctly, for instance, using the last
 posterior draw:</p>
@@ -508,7 +508,7 @@ posterior draw:</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"gray30"</span>, size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-non-factorized_files/figure-html/checklast-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorized_files/figure-html/checklast-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>Finally, we use PSIS-LOO to approximate the expected log predictive
 density (ELPD) for new data, which we will validate using exact LOO-CV
 in the upcoming section.</p>
@@ -548,9 +548,9 @@ the observations.</p>
 <span>  data2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>COL.nb <span class="op">=</span> <span class="va">COL.nb</span><span class="op">)</span>,</span>
 <span>  chains <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code>Running /opt/R/4.5.1/lib/R/bin/R CMD SHLIB foo.c
+<pre><code>Running /opt/R/4.5.2/lib/R/bin/R CMD SHLIB foo.c
 using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
-gcc -std=gnu2x -I"/opt/R/4.5.1/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+gcc -std=gnu2x -I"/opt/R/4.5.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
 In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
                  from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
                  from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
@@ -559,7 +559,7 @@ In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Co
   679 | #include &lt;cmath&gt;
       |          ^~~~~~~
 compilation terminated.
-make: *** [/opt/R/4.5.1/lib/R/etc/Makeconf:202: foo.o] Error 1</code></pre>
+make: *** [/opt/R/4.5.2/lib/R/etc/Makeconf:202: foo.o] Error 1</code></pre>
 <p>Next, we fit the model <span class="math inline">\(N\)</span> times,
 each time leaving out a single observation and then computing the log
 predictive density for that observation. For obvious reasons, this takes
@@ -611,7 +611,7 @@ very closely (as is the case for all <span class="math inline">\(49\)</span> obs
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">res_sub</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">y</span>, fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="st">"obs"</span>, scales <span class="op">=</span> <span class="st">"fixed"</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorized_files/figure-html/yplots-1.png" class="r-plt" width="95%" style="display: block; margin: auto;"></p>
 <p>In the final step, we compute the ELPD based on the exact LOO-CV and
 compare it to the approximate PSIS-LOO result computed earlier.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -640,7 +640,7 @@ against the exact pointwise ELPD values.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Approximate elpds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Exact elpds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-non-factorized_files/figure-html/compare-1.png" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-non-factorized_files/figure-html/compare-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
 <p>In the plot above the fourth data point —the observation flagged as
 problematic by the PSIS-LOO approximation— is colored in red and is the
 clear outlier. Otherwise, the correspondence between the exact and
@@ -822,7 +822,7 @@ Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html" cl
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
