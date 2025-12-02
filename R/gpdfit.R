@@ -29,7 +29,7 @@
 #' for the generalized Pareto distribution. *Technometrics* **51**, 316-325.
 #'
 gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
-  # See section 4 of Zhang and Stephens (2009)
+  # see section 4 of Zhang and Stephens (2009)
   if (sort_x) {
     x <- sort.int(x)
   }
@@ -38,48 +38,36 @@ gpdfit <- function(x, wip = TRUE, min_grid_pts = 30, sort_x = TRUE) {
   M <- min_grid_pts + floor(sqrt(N))
   jj <- seq_len(M)
   xstar <- x[floor(N / 4 + 0.5)] # first quartile of sample
-  theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
-  l_theta <- N * lx(theta, x) # profile log-lik
-  w_theta <- exp(l_theta - matrixStats::logSumExp(l_theta)) # normalize
-  theta_hat <- sum(theta * w_theta)
-  k <- mean.default(log1p(-theta_hat * x))
-  sigma <- -k / theta_hat
+  if (xstar > x[1])  {
+    # first quantile is bigger than the minimum
+    theta <- 1 / x[N] + (1 - sqrt(M / (jj - 0.5))) / prior / xstar
+    k <- matrixStats::rowMeans2(log1p(-theta %o% x))
+    l_theta <- N * (log(-theta / k) - k - 1) # profile log-lik
+    w_theta <- exp(l_theta - matrixStats::logSumExp(l_theta)) # normalize
+    theta_hat <- sum(theta * w_theta)
+    k_hat <- mean.default(log1p(-theta_hat * x))
+    sigma_hat <- -k_hat / theta_hat
 
-  if (wip) {
-    k <- adjust_k_wip(k, n = N)
+    # adjust k_hat based on weakly informative prior, Gaussian centered on 0.5.
+    # this stabilizes estimates for very small Monte Carlo sample sizes and low ess
+    # (see Vehtari et al., 2024 for details)
+    if (wip) {
+      k_hat <- (k_hat * N + 0.5 * 10) / (N + 10)
+    }
+    if (is.na(k_hat)) {
+      k_hat <- Inf
+      sigma_hat <- NaN
+    }
+  } else {
+    # first quantile is not bigger than the minimum, which indicates
+    # that the distribution is far from a generalized Pareto
+    # distribution
+    k_hat <- NA
+    sigma_hat <- NA
   }
 
-  if (is.na(k)) {
-    k <- Inf
-  }
-
-  nlist(k, sigma)
+  list(k = k_hat, sigma = sigma_hat)
 }
-
-
-# internal ----------------------------------------------------------------
-
-lx <- function(a,x) {
-  a <- -a
-  k <- vapply(a, FUN = function(a_i) mean(log1p(a_i * x)), FUN.VALUE = numeric(1))
-  log(a / k) - k - 1
-}
-
-#' Adjust k based on weakly informative prior, Gaussian centered on 0.5. This
-#' will stabilize estimates for very small Monte Carlo sample sizes and low neff
-#' cases.
-#'
-#' @noRd
-#' @param k Scalar khat estimate.
-#' @param n Integer number of tail samples used to fit GPD.
-#' @return Scalar adjusted khat estimate.
-#'
-adjust_k_wip <- function(k, n) {
-  a <- 10
-  n_plus_a <- n + a
-  k * n / n_plus_a + a * 0.5 / n_plus_a
-}
-
 
 #' Inverse CDF of generalized Pareto distribution
 #' (assuming location parameter is 0)
