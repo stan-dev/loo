@@ -731,7 +731,7 @@ sessionInfo()
     [25] RcppParallel_5.1.11-1 lifecycle_1.0.4       compiler_4.5.2       
     [28] farver_2.1.2          stringr_1.6.0         textshaping_1.0.4    
     [31] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.8.1    
-    [34] sass_0.4.10           yaml_2.3.10           pillar_1.11.1        
+    [34] sass_0.4.10           yaml_2.3.11           pillar_1.11.1        
     [37] pkgdown_2.2.0         jquerylib_0.1.4       cachem_1.1.0         
     [40] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
     [43] nlme_3.1-168          posterior_1.6.1       rstan_2.32.7         
