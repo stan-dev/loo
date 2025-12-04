@@ -15,4 +15,3 @@ Character vector of model names the same length as \code{x.}
 \description{
 Find the model names associated with \code{"loo"} objects
 }
-\keyword{internal}

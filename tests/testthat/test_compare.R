@@ -73,8 +73,12 @@ test_that("loo_compare throws appropriate warnings", {
 
 
 comp_colnames <- c(
+  "model",
   "elpd_diff",
   "se_diff",
+  "p_worse",
+  "diag_diff",
+  "diag_elpd",
   "elpd_waic",
   "se_elpd_waic",
   "p_waic",
@@ -86,20 +90,31 @@ comp_colnames <- c(
 test_that("loo_compare returns expected results (2 models)", {
   comp1 <- loo_compare(w1, w1)
   expect_s3_class(comp1, "compare.loo")
+  expect_s3_class(comp1, "data.frame")
   expect_equal(colnames(comp1), comp_colnames)
-  expect_equal(rownames(comp1), c("model1", "model2"))
-  expect_output(print(comp1), "elpd_diff")
-  expect_equal(comp1[1:2, 1], c(0, 0), ignore_attr = TRUE)
-  expect_equal(comp1[1:2, 2], c(0, 0), ignore_attr = TRUE)
+  expect_equal(comp1$model, c("model1", "model2"))
+  expect_equal(comp1$elpd_diff, c(0, 0), ignore_attr = TRUE)
+  expect_equal(comp1$se_diff, c(0, 0), ignore_attr = TRUE)
+  expect_equal(comp1$p_worse, c(NA_real_, NA_real_), ignore_attr = TRUE)
+  expect_snapshot_value(comp1, style = "serialize")
+  expect_snapshot(print(comp1))
 
   comp2 <- loo_compare(w1, w2)
   expect_s3_class(comp2, "compare.loo")
   expect_equal(colnames(comp2), comp_colnames)
-
+  expect_equal(comp2$p_worse, c(NA, 1))
+  expect_equal(comp2$diag_diff, c("", "N < 100"))
+  expect_equal(comp2$diag_elpd, c("", ""))
   expect_snapshot_value(comp2, style = "serialize")
+  expect_snapshot(print(comp2))
+  expect_snapshot(print(comp2, p_worse = FALSE))
 
   # specifying objects via ... and via arg x gives equal results
   expect_equal(comp2, loo_compare(x = list(w1, w2)))
+
+  # custom naming works
+  comp3 <- loo_compare(x = list("A" = w2, "B" = w1))
+  expect_equal(comp3$model, c("B", "A"))
 })
 
 
@@ -108,12 +123,13 @@ test_that("loo_compare returns expected result (3 models)", {
   comp1 <- loo_compare(w1, w2, w3)
 
   expect_equal(colnames(comp1), comp_colnames)
-  expect_equal(rownames(comp1), c("model1", "model2", "model3"))
-  expect_equal(comp1[1, 1], 0)
+  expect_equal(comp1$model, c("model1", "model2", "model3"))
+  expect_equal(comp1$p_worse, c(NA, 1, 1))
+  expect_equal(comp1$diag_diff, c("", "N < 100", "N < 100"))
   expect_s3_class(comp1, "compare.loo")
-  expect_s3_class(comp1, "matrix")
-
+  expect_s3_class(comp1, "data.frame")
   expect_snapshot_value(comp1, style = "serialize")
+  expect_snapshot(print(comp1))
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
@@ -129,13 +145,11 @@ test_that("compare throws deprecation warnings", {
 
 test_that("compare returns expected result (2 models)", {
   expect_warning(comp1 <- loo::compare(w1, w1), "Deprecated")
-  expect_snapshot(comp1)
   expect_equal(comp1[1:2], c(elpd_diff = 0, se = 0))
 
   expect_warning(comp2 <- loo::compare(w1, w2), "Deprecated")
-  expect_snapshot(comp2)
-  expect_named(comp2, c("elpd_diff", "se"))
-  expect_s3_class(comp2, "compare.loo")
+  expect_equal(round(comp2[1:2], 3), c(elpd_diff = -4.057, se = 0.088))
+  expect_s3_class(comp2, "old_compare.loo")
 
   # specifying objects via ... and via arg x gives equal results
   expect_warning(comp_via_list <- loo::compare(x = list(w1, w2)), "Deprecated")
