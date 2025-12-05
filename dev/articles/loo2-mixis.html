@@ -101,9 +101,9 @@
                         <h4 data-toc-skip class="author">Luca Silva and
 Giacomo Zanella</h4>
             
-            <h4 data-toc-skip class="date">2025-12-05</h4>
+            <h4 data-toc-skip class="date">2025-12-03</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/clean-pages-branch-before-build/vignettes/loo2-mixis.Rmd" class="external-link"><code>vignettes/loo2-mixis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-mixis.Rmd" class="external-link"><code>vignettes/loo2-mixis.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-mixis.Rmd</code></div>
     </div>
 
@@ -235,10 +235,10 @@ distribution, and inspect the associated Pareto-<span class="math inline">\(k\)<
 <code class="sourceCode R"><span><span class="va">chains</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">n_iter</span> <span class="op">&lt;-</span> <span class="fl">2000</span></span>
 <span><span class="va">warm_iter</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
-<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode_horseshoe</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode_horseshoe</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Trying to compile a simple C file</code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit_post</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit_post</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">loo_post</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit_post</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_post</span><span class="op">)</span></span></code></pre></div>
@@ -282,8 +282,8 @@ account for the last term in the equation above.</p>
 <p>We sample from the mixture and collect the log-likelihoods term.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">standata</span><span class="op">$</span><span class="va">mixis</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">fit_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span>, pars <span class="op">=</span> <span class="st">"log_lik"</span><span class="op">)</span></span>
-<span><span class="va">log_lik_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">fit_mix</span><span class="op">)</span><span class="op">$</span><span class="va">log_lik</span></span></code></pre></div>
+<span><span class="va">fit_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, chains <span class="op">=</span> <span class="va">chains</span>, iter <span class="op">=</span> <span class="va">n_iter</span>, warmup <span class="op">=</span> <span class="va">warm_iter</span>, refresh <span class="op">=</span> <span class="fl">0</span>, pars <span class="op">=</span> <span class="st">"log_lik"</span><span class="op">)</span></span>
+<span><span class="va">log_lik_mix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-extract.html" class="external-link">extract</a></span><span class="op">(</span><span class="va">fit_mix</span><span class="op">)</span><span class="op">$</span><span class="va">log_lik</span></span></code></pre></div>
 <p>We now compute the mixture estimators, following the numerically
 stable implementation in Appendix A.2 of <a href="https://arxiv.org/abs/2209.09190" class="external-link">Silva and Zanella (2022)</a>.
 The code below makes use of the package “matrixStats”.</p>

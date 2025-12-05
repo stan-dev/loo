@@ -27,7 +27,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/stan-dev/loo/blob/clean-pages-branch-before-build/inst/CITATION)
+[`inst/CITATION`](https://github.com/stan-dev/loo/blob/master/inst/CITATION)
 
 (2024). “loo: Efficient leave-one-out cross-validation and WAIC for
 Bayesian models.” R package version 2.8.0.9000,

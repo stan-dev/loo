@@ -101,9 +101,9 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-12-05</h4>
+            <h4 data-toc-skip class="date">2025-12-03</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/clean-pages-branch-before-build/vignettes/loo2-with-rstan.Rmd" class="external-link"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-with-rstan.Rmd" class="external-link"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-with-rstan.Rmd</code></div>
     </div>
 
@@ -204,7 +204,7 @@ package:</p>
 <span><span class="va">standata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">wells</span><span class="op">$</span><span class="va">switch</span>, X <span class="op">=</span> <span class="va">X</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, P <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Fit model</span></span>
-<span><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan.html" class="external-link">stan</a></span><span class="op">(</span><span class="st">"logistic.stan"</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span></span>
+<span><span class="va">fit_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan</a></span><span class="op">(</span><span class="st">"logistic.stan"</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_1</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>         mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
 beta[1]  0.00       0 0.08 -0.16 -0.05  0.00  0.05  0.15  1964    1
@@ -269,7 +269,7 @@ well-switching data, using <code>log(arsenic)</code> instead of
 <code>arsenic</code> as a predictor:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">standata</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>, <span class="st">"arsenic"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">standata</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>, <span class="st">"arsenic"</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan.html" class="external-link">stan</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">fit_1</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span> </span>
+<span><span class="va">fit_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan.html" class="external-link">stan</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">fit_1</span>, data <span class="op">=</span> <span class="va">standata</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">log_lik_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">fit_2</span>, merge_chains <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">r_eff_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">log_lik_2</span><span class="op">)</span><span class="op">)</span></span>

@@ -1,0 +1,18 @@
+language: r
+r:
+  - release
+  - devel
+cache: packages
+
+r_github_packages:
+  - r-lib/covr
+
+r_build_args: '--no-build-vignettes'
+r_check_args: '--ignore-vignettes'
+warnings_are_errors: true
+
+env:
+- _R_CHECK_FORCE_SUGGESTS_=false NOT_CRAN=true MAKEFLAGS=-j2
+
+after_success:
+  - Rscript -e 'covr::codecov(function_exclusions = c("convert\\_old*"), line_exclusions = list("R/zzz.R", "R/extract_log_lik.R", "R/psislw.R"))'
