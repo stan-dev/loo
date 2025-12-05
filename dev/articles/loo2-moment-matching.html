@@ -101,9 +101,9 @@
                         <h4 data-toc-skip class="author">Topi Paananen,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-12-03</h4>
+            <h4 data-toc-skip class="date">2025-12-05</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/clean-pages-branch-before-build/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-moment-matching.Rmd</code></div>
     </div>
 
@@ -233,7 +233,7 @@ package:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Compile</span></span>
-<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">stanmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stan_model.html" class="external-link">stan_model</a></span><span class="op">(</span>model_code <span class="op">=</span> <span class="va">stancode</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Running /opt/R/4.5.2/lib/R/bin/R CMD SHLIB foo.c
 using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
 gcc -std=gnu2x -I"/opt/R/4.5.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
@@ -248,7 +248,7 @@ compilation terminated.
 make: *** [/opt/R/4.5.2/lib/R/etc/Makeconf:202: foo.o] Error 1</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fit model</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">stanmodel</span>, data <span class="op">=</span> <span class="va">standata</span>, seed <span class="op">=</span> <span class="va">seed</span>, refresh <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span>, pars <span class="op">=</span> <span class="st">"beta"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Inference for Stan model: anon_model.
 4 chains, each with iter=2000; warmup=1000; thin=1; 
@@ -259,7 +259,7 @@ beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2318    1
 beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
 beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
 
-Samples were drawn using NUTS(diag_e) at Wed Dec  3 18:33:06 2025.
+Samples were drawn using NUTS(diag_e) at Fri Dec  5 18:14:01 2025.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -458,7 +458,7 @@ look like this:</p>
 <span><span class="va">unconstrain_pars_stanfit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">pars</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">skeleton</span> <span class="op">&lt;-</span> <span class="fu">.create_skeleton</span><span class="op">(</span><span class="va">x</span><span class="op">@</span><span class="va">sim</span><span class="op">$</span><span class="va">pars_oi</span>, <span class="va">x</span><span class="op">@</span><span class="va">par_dims</span><span class="op">[</span><span class="va">x</span><span class="op">@</span><span class="va">sim</span><span class="op">$</span><span class="va">pars_oi</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="va">upars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">pars</span>, <span class="fl">1</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu">rstan</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html" class="external-link">unconstrain_pars</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu">.rstan_relist</span><span class="op">(</span><span class="va">theta</span>, <span class="va">skeleton</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">rstan</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html" class="external-link">unconstrain_pars</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu">.rstan_relist</span><span class="op">(</span><span class="va">theta</span>, <span class="va">skeleton</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span>  <span class="co"># for one parameter models</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">upars</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -472,7 +472,7 @@ look like this:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span></span>
 <span>    <span class="va">upars</span>,</span>
 <span>    <span class="fl">1</span>,</span>
-<span>    <span class="fu">rstan</span><span class="fu">::</span><span class="va"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html" class="external-link">log_prob</a></span>,</span>
+<span>    <span class="fu">rstan</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html" class="external-link">log_prob</a></span>,</span>
 <span>    object <span class="op">=</span> <span class="va">x</span>,</span>
 <span>    adjust_transform <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    gradient <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -490,7 +490,7 @@ look like this:</p>
 <span>  <span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">upars</span><span class="op">)</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">out</span><span class="op">[</span><span class="va">s</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">rstan</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/rstan/reference/stanfit-method-logprob.html" class="external-link">constrain_pars</a></span><span class="op">(</span><span class="va">x</span>, upars <span class="op">=</span> <span class="va">upars</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="va">parameter_name</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
+<span>    <span class="va">out</span><span class="op">[</span><span class="va">s</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">rstan</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rstan/man/stanfit-method-logprob.html" class="external-link">constrain_pars</a></span><span class="op">(</span><span class="va">x</span>, upars <span class="op">=</span> <span class="va">upars</span><span class="op">[</span><span class="va">s</span>, <span class="op">]</span><span class="op">)</span><span class="op">[[</span><span class="va">parameter_name</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">out</span></span>
 <span><span class="op">}</span></span></code></pre></div>

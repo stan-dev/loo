@@ -699,8 +699,8 @@ file. The corresponding data can be prepared with
 [`make_standata()`](https://paulbuerkner.com/brms/reference/standata.html)
 and then manually amended if needed. Once the code and data have been
 edited, they can be passed to RStan’s
-[`stan()`](https://mc-stan.org/rstan/reference/stan.html) function via
-the `file` and `data` arguments.
+[`stan()`](https://rdrr.io/pkg/rstan/man/stan.html) function via the
+`file` and `data` arguments.
 
 ## Conclusion
 

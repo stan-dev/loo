@@ -1,2 +1,0 @@
-**NOTE: We recommend viewing the fully rendered version of this vignette online at
-https://mc-stan.org/loo/articles/**
