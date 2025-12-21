@@ -1,20 +1,20 @@
 # loo 2.9.0
 
-* Avoid under and overflows in stacking by @avehtari in https://github.com/stan-dev/loo/pull/273
-* Fix `kfold_split_stratified()` when a group has 1 observation by @jgabry in https://github.com/stan-dev/loo/pull/278
-* Fix `plot_diagnostic(..., label_points = TRUE)` by @annariha in https://github.com/stan-dev/loo/pull/288
-* Use testthat 3e and rely on posterior for ESS by @VisruthSK in https://github.com/stan-dev/loo/pull/289
-* Fixed NAs in `psis_r_eff()`  by @VisruthSK in https://github.com/stan-dev/loo/pull/301
-* Print unequal sample sizes in loo_compare by @VisruthSK in https://github.com/stan-dev/loo/pull/307
-* New website theme and pkgdown workflow by @VisruthSK in https://github.com/stan-dev/loo/pull/292
-* Small fix in `loo_model_weights()` doc by @avehtari in https://github.com/stan-dev/loo/pull/276
-* loo_moment_match.R: fix doc for default k_threshold by @jgabry in https://github.com/stan-dev/loo/pull/279
-* Update scrps reference and improve doc by @avehtari in https://github.com/stan-dev/loo/pull/280
-* Fix url in vignette by @jgabry in https://github.com/stan-dev/loo/pull/282
-* Update stacking citation in inst/CITATION by @jgabry in https://github.com/stan-dev/loo/pull/284
-* Added contribution section. by @VisruthSK in https://github.com/stan-dev/loo/pull/286
-* Update LOO uncertainty paper to use BA doi by @avehtari in https://github.com/stan-dev/loo/pull/311
-* Update documentation for `E_loo()` function by @avehtari in https://github.com/stan-dev/loo/pull/312
+* Avoid under and overflows in stacking by @avehtari in #273
+* Fix `kfold_split_stratified()` when a group has 1 observation by @jgabry in #278
+* Fix `plot_diagnostic(..., label_points = TRUE)` by @annariha in #288
+* Use testthat 3e and rely on posterior for ESS by @VisruthSK in #289
+* Fixed NAs in `psis_r_eff()`  by @VisruthSK in #301
+* Print unequal sample sizes in loo_compare by @VisruthSK in #307
+* New website theme and pkgdown workflow by @VisruthSK in #292
+* Small fix in `loo_model_weights()` doc by @avehtari in #276
+* loo_moment_match.R: fix doc for default k_threshold by @jgabry in #279
+* Update scrps reference and improve doc by @avehtari in #280
+* Fix url in vignette by @jgabry in #282
+* Update stacking citation in inst/CITATION by @jgabry in #284
+* Added contribution section. by @VisruthSK in #286
+* Update LOO uncertainty paper to use BA doi by @avehtari in #311
+* Update documentation for `E_loo()` function by @avehtari in #312
 
 
 
