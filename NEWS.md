@@ -17,7 +17,6 @@
 * Update documentation for `E_loo()` function by @avehtari in #312
 
 
-
 # loo 2.8.0
 
 * make E_loo Pareto-k diagnostic more robust by @avehtari in #251
