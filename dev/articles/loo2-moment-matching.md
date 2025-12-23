@@ -57,7 +57,7 @@ data {
   int<lower=1> N;
   matrix[N,K] x;
   array[N] int y;
-  vector[N] offset;
+  vector[N] offset_; // offset is reserved keyword in Stan so use offset_
 
   real beta_prior_scale;
   real alpha_prior_scale;
@@ -67,14 +67,15 @@ parameters {
   real intercept;
 }
 model {
-  y ~ poisson(exp(x * beta + intercept + offset));
+  y ~ poisson(exp(x * beta + intercept + offset_));
   beta ~ normal(0,beta_prior_scale);
   intercept ~ normal(0,alpha_prior_scale);
 }
 generated quantities {
   vector[N] log_lik;
-  for (n in 1:N)
-    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));
+  for (n in 1:N) {
+    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset_[n]));
+  }
 }
 "
 ```
@@ -116,7 +117,7 @@ standata <- list(
   K = k,
   x = as.matrix(x),
   y = y,
-  offset = offset,
+  offset_ = offset,
   beta_prior_scale = 2.5,
   alpha_prior_scale = 5.0
 )
@@ -153,7 +154,7 @@ print(fit, pars = "beta")
     beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
     beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
 
-    Samples were drawn using NUTS(diag_e) at Wed Dec  3 18:33:06 2025.
+    Samples were drawn using NUTS(diag_e) at Tue Dec 23 20:07:01 2025.
     For each parameter, n_eff is a crude measure of effective sample size,
     and Rhat is the potential scale reduction factor on split chains (at 
     convergence, Rhat=1).

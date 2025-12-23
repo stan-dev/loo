@@ -11,13 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
-  window.MathJax = {
-    chtml: {
-      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
-    }
-  };
-</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js" integrity="sha256-qoRlVrS5NAnXSSSiMfFXwK8C9obG11Iybe4h2+bQYR4=" crossorigin="anonymous">
+  </script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -42,7 +37,7 @@
       loo
     </a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.8.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.9.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +96,7 @@
                         <h4 data-toc-skip class="author">Topi Paananen,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-12-03</h4>
+            <h4 data-toc-skip class="date">2025-12-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-moment-matching.Rmd</code></div>
@@ -170,7 +165,7 @@ we will use for modeling the number of roaches.</p>
 <span><span class="st">  int&lt;lower=1&gt; N;</span></span>
 <span><span class="st">  matrix[N,K] x;</span></span>
 <span><span class="st">  array[N] int y;</span></span>
-<span><span class="st">  vector[N] offset;</span></span>
+<span><span class="st">  vector[N] offset_; // offset is reserved keyword in Stan so use offset_</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">  real beta_prior_scale;</span></span>
 <span><span class="st">  real alpha_prior_scale;</span></span>
@@ -180,14 +175,15 @@ we will use for modeling the number of roaches.</p>
 <span><span class="st">  real intercept;</span></span>
 <span><span class="st">}</span></span>
 <span><span class="st">model {</span></span>
-<span><span class="st">  y ~ poisson(exp(x * beta + intercept + offset));</span></span>
+<span><span class="st">  y ~ poisson(exp(x * beta + intercept + offset_));</span></span>
 <span><span class="st">  beta ~ normal(0,beta_prior_scale);</span></span>
 <span><span class="st">  intercept ~ normal(0,alpha_prior_scale);</span></span>
 <span><span class="st">}</span></span>
 <span><span class="st">generated quantities {</span></span>
 <span><span class="st">  vector[N] log_lik;</span></span>
-<span><span class="st">  for (n in 1:N)</span></span>
-<span><span class="st">    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));</span></span>
+<span><span class="st">  for (n in 1:N) {</span></span>
+<span><span class="st">    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset_[n]));</span></span>
+<span><span class="st">  }</span></span>
 <span><span class="st">}</span></span>
 <span><span class="st">"</span></span></code></pre></div>
 <p>Following the usual approach recommended in <a href="http://mc-stan.org/loo/articles/loo2-with-rstan.html" class="external-link"><em>Writing
@@ -227,7 +223,7 @@ package:</p>
 <span>  K <span class="op">=</span> <span class="va">k</span>,</span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">y</span>,</span>
-<span>  offset <span class="op">=</span> <span class="va">offset</span>,</span>
+<span>  offset_ <span class="op">=</span> <span class="va">offset</span>,</span>
 <span>  beta_prior_scale <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  alpha_prior_scale <span class="op">=</span> <span class="fl">5.0</span></span>
 <span><span class="op">)</span></span>
@@ -259,7 +255,7 @@ beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2318    1
 beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
 beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
 
-Samples were drawn using NUTS(diag_e) at Wed Dec  3 18:33:06 2025.
+Samples were drawn using NUTS(diag_e) at Tue Dec 23 20:07:01 2025.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>

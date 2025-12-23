@@ -47,11 +47,10 @@ these kinds of models.
 
 #### Roaches data
 
-The example data we’ll use comes from Chapter 8.3 of [Gelman and Hill
-(2007)](https://sites.stat.columbia.edu/gelman/arm/). We want to make
-inferences about the efficacy of a certain pest management system at
-reducing the number of roaches in urban apartments. Here is how Gelman
-and Hill describe the experiment and data (pg. 161):
+The example data we’ll use comes from Chapter 8.3 of Gelman and Hill
+(2007). We want to make inferences about the efficacy of a certain pest
+management system at reducing the number of roaches in urban apartments.
+Here is how Gelman and Hill describe the experiment and data (pg. 161):
 
 > the treatment and control were applied to 160 and 104 apartments,
 > respectively, and the outcome measurement \\y_i\\ in each apartment

@@ -11,13 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
-  window.MathJax = {
-    chtml: {
-      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
-    }
-  };
-</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js" integrity="sha256-qoRlVrS5NAnXSSSiMfFXwK8C9obG11Iybe4h2+bQYR4=" crossorigin="anonymous">
+  </script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
@@ -42,7 +37,7 @@
       loo
     </a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.8.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.9.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2025-12-03</h4>
+            <h4 data-toc-skip class="date">2025-12-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-example.Rmd</code></div>
@@ -161,11 +156,11 @@ these kinds of models.</p>
 <div class="section level4">
 <h4 id="roaches-data">Roaches data<a class="anchor" aria-label="anchor" href="#roaches-data"></a>
 </h4>
-<p>The example data we’ll use comes from Chapter 8.3 of <a href="https://sites.stat.columbia.edu/gelman/arm/" class="external-link">Gelman and Hill
-(2007)</a>. We want to make inferences about the efficacy of a certain
-pest management system at reducing the number of roaches in urban
-apartments. Here is how Gelman and Hill describe the experiment and data
-(pg. 161):</p>
+<p>The example data we’ll use comes from Chapter 8.3 of Gelman and Hill
+(2007). We want to make inferences about the efficacy of a certain pest
+management system at reducing the number of roaches in urban apartments.
+Here is how Gelman and Hill describe the experiment and data (pg.
+161):</p>
 <blockquote>
 <p>the treatment and control were applied to 160 and 104 apartments,
 respectively, and the outcome measurement <span class="math inline">\(y_i\)</span> in each apartment <span class="math inline">\(i\)</span> was the number of roaches caught in a
@@ -295,7 +290,7 @@ with horizontal lines corresponding to the same categories as in the
 printed output above.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loo1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-example_files/figure-html/plot-loo1-1.png" class="r-plt" width="70%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-example_files/figure-html/plot-loo1-1.png" class="r-plt" alt="" width="70%" style="display: block; margin: auto;"></p>
 <p>This plot is useful to quickly see the distribution of <span class="math inline">\(k\)</span> values, but it’s often also possible to
 see structure with respect to data ordering. In our case this is mild,
 but there seems to be a block of data that is somewhat easier to predict
@@ -324,7 +319,7 @@ uniform distribution (x-axis).</p>
 <pre><code>Some PIT values larger than 1! Largest:  1 
 Rounding PIT &gt; 1 to 1.</code></pre>
 <pre><code>Warning in .loo_pit(y = y, yrep = object, lw = lw):</code></pre>
-<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-1.png" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 <p>The excessive number of LOO-PIT values close to 0 indicates that the
 model is under-dispersed compared to the data, and we should consider a
 model that allows for greater dispersion.</p>
@@ -364,7 +359,7 @@ Pareto k diagnostic values:
 See help('pareto-k-diagnostic') for details.</code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">loo2</span>, label_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-example_files/figure-html/plot-loo2-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-example_files/figure-html/plot-loo2-1.png" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 <p>Using the <code>label_points</code> argument will label any <span class="math inline">\(k\)</span> values larger than the diagnostic
 threshold with the index of the corresponding data point. These high
 values are often the result of model misspecification and frequently
@@ -415,7 +410,7 @@ estimate for the Poisson model.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yrep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstantools/reference/posterior_predict.html" class="external-link">posterior_predict</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/PPC-loo.html" class="external-link">ppc_loo_pit_qq</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">$</span><span class="va">y</span>, <span class="va">yrep</span>, lw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">loo2</span><span class="op">$</span><span class="va">psis_object</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-negbin-1.png" class="r-plt" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="loo2-example_files/figure-html/ppc_loo_pit_overlay-negbin-1.png" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 <p>The plot for the negative binomial model looks better than the
 Poisson plot, but we still see that this model is not capturing all of
 the essential features in the data.</p>

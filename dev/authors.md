@@ -24,19 +24,21 @@
 
 - **Leevi Lindgren**. Contributor.
 
+- **Visruth Srimath Kandali**. Contributor.
+
 ## Citation
 
 Source:
 [`inst/CITATION`](https://github.com/stan-dev/loo/blob/master/inst/CITATION)
 
-(2024). “loo: Efficient leave-one-out cross-validation and WAIC for
-Bayesian models.” R package version 2.8.0.9000,
+(2025). “loo: Efficient leave-one-out cross-validation and WAIC for
+Bayesian models.” R package version 2.9.0.9000,
 <https://mc-stan.org/loo/>.
 
     @Misc{,
       title = {loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models},
-      year = {2024},
-      note = {R package version 2.8.0.9000},
+      year = {2025},
+      note = {R package version 2.9.0.9000},
       url = {https://mc-stan.org/loo/},
     }
 

@@ -107,8 +107,8 @@ Research*, 25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
 
 Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2025).
 Uncertainty in Bayesian leave-one-out cross-validation based model
-comparison. *Bayesian Analysis*,
-[doi:10.1214/25-BA1569](https://doi.org/10.1214/25-BA1569).
+comparison. *Bayesian Analysis*.
+[doi:10.1214/25-BA1569](https://doi.org/10.1214/25-BA1569)
 
 McLatchie, Y., and Vehtari, A. (2024). Efficient estimation and
 correction of selection-induced bias with order statistics. *Statistics

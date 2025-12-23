@@ -1,8 +1,58 @@
 # Changelog
 
-## loo 2.8.0.9000
+## loo (development version)
 
-Items for next release go here
+## loo 2.9.0
+
+CRAN release: 2025-12-23
+
+- Avoid under and overflows in stacking by
+  [@avehtari](https://github.com/avehtari) in
+  [\#273](https://github.com/stan-dev/loo/issues/273)
+- Fix
+  [`kfold_split_stratified()`](https://mc-stan.org/loo/dev/reference/kfold-helpers.md)
+  when a group has 1 observation by [@jgabry](https://github.com/jgabry)
+  in [\#278](https://github.com/stan-dev/loo/issues/278)
+- Fix `plot_diagnostic(..., label_points = TRUE)` by
+  [@annariha](https://github.com/annariha) in
+  [\#288](https://github.com/stan-dev/loo/issues/288)
+- Use testthat 3e and rely on posterior for ESS by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#289](https://github.com/stan-dev/loo/issues/289)
+- Fixed NAs in `psis_r_eff()` by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#301](https://github.com/stan-dev/loo/issues/301)
+- Print unequal sample sizes in loo_compare by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#307](https://github.com/stan-dev/loo/issues/307)
+- New website theme and pkgdown workflow by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#292](https://github.com/stan-dev/loo/issues/292)
+- Small fix in
+  [`loo_model_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
+  doc by [@avehtari](https://github.com/avehtari) in
+  [\#276](https://github.com/stan-dev/loo/issues/276)
+- loo_moment_match.R: fix doc for default k_threshold by
+  [@jgabry](https://github.com/jgabry) in
+  [\#279](https://github.com/stan-dev/loo/issues/279)
+- Update scrps reference and improve doc by
+  [@avehtari](https://github.com/avehtari) in
+  [\#280](https://github.com/stan-dev/loo/issues/280)
+- Fix url in vignette by [@jgabry](https://github.com/jgabry) in
+  [\#282](https://github.com/stan-dev/loo/issues/282)
+- Update stacking citation in inst/CITATION by
+  [@jgabry](https://github.com/jgabry) in
+  [\#284](https://github.com/stan-dev/loo/issues/284)
+- Added contribution section. by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#286](https://github.com/stan-dev/loo/issues/286)
+- Update LOO uncertainty paper to use BA doi by
+  [@avehtari](https://github.com/avehtari) in
+  [\#311](https://github.com/stan-dev/loo/issues/311)
+- Update documentation for
+  [`E_loo()`](https://mc-stan.org/loo/dev/reference/E_loo.md) function
+  by [@avehtari](https://github.com/avehtari) in
+  [\#312](https://github.com/stan-dev/loo/issues/312)
 
 ## loo 2.8.0
 

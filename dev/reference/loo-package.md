@@ -117,7 +117,7 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Jonah Gabry <jsg2201@columbia.edu>
+**Maintainer**: Jonah Gabry <jgabry@gmail.com>
 
 Authors:
 
@@ -142,3 +142,5 @@ Other contributors:
 - Bruno Nicenboim \[contributor\]
 
 - Leevi Lindgren \[contributor\]
+
+- Visruth Srimath Kandali \[contributor\]
