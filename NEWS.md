@@ -1,3 +1,5 @@
+# loo (development version)
+
 # loo 2.9.0
 
 * Avoid under and overflows in stacking by @avehtari in #273
