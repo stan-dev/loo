@@ -1,8 +1,8 @@
 Type: Package
 Package: loo
 Title: Efficient Leave-One-Out Cross-Validation and WAIC for Bayesian Models
-Version: 2.8.0.9000
-Date: 2024-07-03
+Version: 2.9.0
+Date: 2025-12-22
 Authors@R: c(
     person("Aki", "Vehtari", email = "Aki.Vehtari@aalto.fi", role = "aut"),
     person("Jonah", "Gabry", email = "jgabry@gmail.com", role = c("cre", "aut")),
@@ -14,7 +14,8 @@ Authors@R: c(
     person("Ben", "Goodrich", role = "ctb"),
     person("Juho", "Piironen", role = "ctb"),
     person("Bruno", "Nicenboim", role = "ctb"),
-    person("Leevi", "Lindgren", role = "ctb")
+    person("Leevi", "Lindgren", role = "ctb"),
+    person("Visruth", "Srimath Kandali", role = "ctb")
   )
 Maintainer: Jonah Gabry <jgabry@gmail.com>
 Description: Efficient approximate leave-one-out cross-validation (LOO)
