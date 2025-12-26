@@ -254,12 +254,12 @@ psis_smooth_tail <- function(x, cutoff) {
   exp_cutoff <- exp(cutoff)
 
   # save time not sorting since x already sorted
-  fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
+  fit <- posterior::gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
   if (is.finite(k)) {
     p <- (seq_len(len) - 0.5) / len
-    qq <- qgpd(p, k, sigma) + exp_cutoff
+    qq <- posterior::qgeneralized_pareto(p, 0, sigma, k) + exp_cutoff
     tail <- log(qq)
   } else {
     tail <- x
