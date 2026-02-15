@@ -49,26 +49,17 @@
 #'
 #'   * `N < 100` (small data)
 #'   * `|elpd_diff| < 4` (models make similar predictions)
-#'   * `k_diff > 0.5` (possible outliers)
 #'
-#'   If any of these diagnostic messages is shown, the error distribution is
+#'   If either of these diagnostic messages is shown, the error distribution is
 #'   skewed or thick tailed and the normal approximation based on `elpd_diff`
 #'   and `se_diff` is not well calibrated. In that case, the probabilities
-#'   `p_worse` are likely to be too large (small data or similar predictions) or
-#'   too small (outliers). However, `elpd_diff` and `se_diff` will still be
-#'   indicative of the differences and uncertainties (for example, if
-#'   `|elpd_diff|` is many times larger than `se_diff` the difference is quite
-#'   certain).
-#'
-#'   The `k_diff` value for the `diag_diff` column is computed using the
-#'   pointwise ELPD differences (and is different from the Pareto k's in
-#'   PSIS-LOO diagnostic).  While `k_diff > 0.5` indicates the *possibility* of
-#'   outliers, it is also possible that both models compared seem to be well
-#'   specified based on model checking, but the pointwise ELPD differences have
-#'   such thick tails that the normal approximation for the sum is not good
-#'   (Vehtari et al., 2024). A threshold of 0.5 is used for `k_diff` as we do
-#'   not do automatic Pareto smoothing for the pointwise differences (Vehtari et
-#'   al., 2024).
+#'   `p_worse` are likely to be too large. However, `elpd_diff` and `se_diff`
+#'   will still be indicative of the differences and uncertainties (for example,
+#'   if `|elpd_diff|` is many times larger than `se_diff` the difference is quite
+#'   certain). In addition, if the model is not well specificed and there are
+#'   outliers, the error distribution can also be skewed or thick tailed and the
+#'   normal approximation is not well calibrated. Possible model misspecification
+#'   and outliers can be diagnosed with usual predictive checking methods.
 #'
 #'   The column `diag_elpd` shows the PSIS-LOO Pareto k diagnostic for the
 #'   pointwise ELPD computations for each model. If `K k_psis > 0.7` is shown,
@@ -433,12 +424,6 @@ diag_diff <- function(N, elpd_diff) {
   } else {
     diag_diff <- rep("", length(elpd_diff))
     diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
-    k_diff <- rep(NA, length(elpd_diff))
-    k_diff[elpd_diff != 0] <- apply(
-      diffs[, elpd_diff != 0, drop = FALSE], 2,
-      function(x) ifelse(length(unique(x)) <= 20, NA, posterior::pareto_khat(x, tail = "both")
-      ))
-    diag_diff[k_diff > 0.5] <- "k_diff > 0.5"
   }
   diag_diff
 }
