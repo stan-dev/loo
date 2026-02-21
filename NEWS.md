@@ -1,5 +1,7 @@
 # loo (development version)
 
+* Rename `diagnostics$n_eff` to `diagnostics$ess`. The `diagnostics` list now has class `"loo_diagnostics"`, with custom `$`, `[[`, and `[` methods that emit a deprecation warning when `n_eff` is accessed. The internal column name in `pareto_k_table` is now `"Min. ESS"`. (#192)
+
 # loo 2.9.0
 
 * Avoid under and overflows in stacking by @avehtari in #273

@@ -141,9 +141,9 @@ loo_approximate_posterior.function <-
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
-      diagnostics <- list(
+      diagnostics <- loo_diagnostics(
         pareto_k = psis_apply(diagnostics_list, "pareto_k"),
-        n_eff = psis_apply(diagnostics_list, "n_eff")
+        ess = psis_apply(diagnostics_list, "ess")
       )
     }
 

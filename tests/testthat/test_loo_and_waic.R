@@ -78,7 +78,7 @@ test_that("loo returns object with correct structure", {
       "se_looic"
     )
   )
-  expect_named(loo1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
+  expect_named(loo1$diagnostics, c("pareto_k", "ess", "n_eff", "r_eff"))
   expect_equal(dimnames(loo1$estimates)[[1]], c("elpd_loo", "p_loo", "looic"))
   expect_equal(dimnames(loo1$estimates)[[2]], c("Estimate", "SE"))
   expect_equal(
@@ -195,7 +195,7 @@ test_that("loo_i results match loo results for ith data point", {
     loo_i_val$diagnostics$pareto_k,
     loo_with_fn$diagnostics$pareto_k[2]
   )
-  expect_equal(loo_i_val$diagnostics$n_eff, loo_with_fn$diagnostics$n_eff[2])
+  expect_equal(loo_i_val$diagnostics$ess, loo_with_fn$diagnostics$ess[2])
 })
 
 test_that("function and matrix methods return same result", {

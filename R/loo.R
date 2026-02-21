@@ -71,12 +71,14 @@
 #'  }
 #'
 #'  \item{`diagnostics`}{
-#'  A named list containing two vectors:
+#'  A named list (of class `"loo_diagnostics"`) containing:
 #'    * `pareto_k`: Importance sampling reliability diagnostics. By default,
 #'      these are equal to the `influence_pareto_k` in `pointwise`.
 #'      Some algorithms can improve importance sampling reliability and
 #'      modify these diagnostics. See the [pareto-k-diagnostic] page for details.
-#'    * `n_eff`: PSIS effective sample size estimates.
+#'    * `ess`: PSIS effective sample size estimates.
+#'    * `n_eff`: Deprecated alias for `ess`. Accessing `n_eff` will
+#'      produce a deprecation warning.
 #'  }
 #'
 #'  \item{`psis_object`}{
@@ -286,9 +288,9 @@ loo.function <-
       diagnostics <- psis_out$diagnostics
     } else {
       diagnostics_list <- lapply(psis_list, "[[", "diagnostics")
-      diagnostics <- list(
+      diagnostics <- loo_diagnostics(
         pareto_k = psis_apply(diagnostics_list, "pareto_k"),
-        n_eff = psis_apply(diagnostics_list, "n_eff"),
+        ess = psis_apply(diagnostics_list, "ess"),
         r_eff = psis_apply(diagnostics_list, "r_eff")
       )
     }
@@ -545,9 +547,9 @@ list2importance_sampling <- function(objects) {
   structure(
     list(
       log_weights = log_weights,
-      diagnostics = list(
+      diagnostics = loo_diagnostics(
         pareto_k = psis_apply(diagnostics, item = "pareto_k"),
-        n_eff = psis_apply(diagnostics, item = "n_eff"),
+        ess = psis_apply(diagnostics, item = "ess"),
         r_eff = psis_apply(diagnostics, item = "r_eff")
       )
     ),

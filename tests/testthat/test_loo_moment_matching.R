@@ -445,8 +445,8 @@ test_that("loo_moment_match.default works with multiple cores", {
     loo_moment_match_manual4$diagnostics$pareto_k
   )
   expect_equal(
-    loo_moment_match_manual3$diagnostics$n_eff,
-    loo_moment_match_manual4$diagnostics$n_eff,
+    loo_moment_match_manual3$diagnostics$ess,
+    loo_moment_match_manual4$diagnostics$ess,
     tolerance = 5e-4
   )
 

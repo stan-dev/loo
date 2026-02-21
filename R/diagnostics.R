@@ -114,7 +114,7 @@ NULL
 #' @export
 #' @return `pareto_k_table()` returns an object of class
 #'   `"pareto_k_table"`, which is a matrix with columns `"Count"`,
-#'   `"Proportion"`, and `"Min. n_eff"`, and has its own print method.
+#'   `"Proportion"`, and `"Min. ESS"`, and has its own print method.
 #'
 pareto_k_table <- function(x) {
   k <- pareto_k_values(x)
@@ -132,7 +132,7 @@ pareto_k_table <- function(x) {
   out <- cbind(
     Count = count,
     Proportion = prop.table(count),
-    "Min. n_eff" = min_n_eff
+    "Min. ESS" = min_n_eff
   )
   attr(out, "k_threshold") <- k_threshold
   structure(out, class = c("pareto_k_table", class(out)))
@@ -152,8 +152,7 @@ print.pareto_k_table <- function(x, digits = 1, ...) {
       " " = c("(good)", "(bad)", "(very bad)"),
       "Count" = .fr(count, 0),
       "Pct.   " = paste0(.fr(100 * x[, "Proportion"], digits), "%"),
-      # Print ESS as n_eff terms has been deprecated
-      "Min. ESS" = round(x[, "Min. n_eff"])
+      "Min. ESS" = round(x[, "Min. ESS"])
     )
     tab2 <- rbind(tab)
     cat("Pareto k diagnostic values:\n")
@@ -214,12 +213,15 @@ pareto_k_influence_values <- function(x) {
 #' @return `psis_n_eff_values()` returns a vector of the estimated PSIS
 #'   effective sample sizes.
 psis_n_eff_values <- function(x) {
-  n_eff <- x$diagnostics[["n_eff"]]
-  if (is.null(n_eff)) {
-    # Print ESS as n_eff terms has been deprecated
-    stop("No PSIS ESS estimates found.", call. = FALSE)
+  ess <- x$diagnostics[["ess"]]
+  if (!is.null(ess)) {
+    return(ess)
   }
-  return(n_eff)
+  n_eff <- x$diagnostics[["n_eff"]]
+  if (!is.null(n_eff)) {
+    return(n_eff)
+  }
+  stop("No PSIS ESS estimates found.", call. = FALSE)
 }
 
 #' @rdname pareto-k-diagnostic
@@ -437,4 +439,84 @@ min_n_eff_by_k <- function(n_eff, kcut) {
 #' @noRd
 ps_khat_threshold <- function(S, ...) {
   min(1 - 1 / log10(S), 0.7)
+}
+
+
+# loo_diagnostics class --------------------------------------------------
+
+#' Create a diagnostics list with class `"loo_diagnostics"`
+#'
+#' @noRd
+#' @param pareto_k Vector of Pareto k estimates.
+#' @param ess Vector of PSIS effective sample size estimates.
+#' @param r_eff Vector of relative MCMC effective sample sizes (optional).
+#' @return A list with class `"loo_diagnostics"` containing `pareto_k`, `ess`,
+#'   `n_eff` (kept for backward compatibility), and optionally `r_eff`.
+loo_diagnostics <- function(pareto_k, ess, r_eff = NULL) {
+  out <- list(pareto_k = pareto_k, ess = ess, n_eff = ess, r_eff = r_eff)
+  structure(out, class = "loo_diagnostics")
+}
+
+#' @export
+`$.loo_diagnostics` <- function(x, name) {
+  if (identical(name, "n_eff")) {
+    warning(
+      "Accessing 'n_eff' using '$' is deprecated. ",
+      "Please use 'ess' instead.",
+      call. = FALSE
+    )
+  }
+  NextMethod()
+}
+
+#' @export
+`[[.loo_diagnostics` <- function(x, i, exact = TRUE) {
+  if (is.character(i) && identical(i, "n_eff")) {
+    warning(
+      "Accessing 'n_eff' using '[[' is deprecated. ",
+      "Please use 'ess' instead.",
+      call. = FALSE
+    )
+  }
+  NextMethod()
+}
+
+#' @export
+`[.loo_diagnostics` <- function(x, i) {
+  if (is.character(i) && identical(i, "n_eff")) {
+    warning(
+      "Accessing 'n_eff' using '[' is deprecated. ",
+      "Please use 'ess' instead.",
+      call. = FALSE
+    )
+  }
+  NextMethod()
+}
+
+#' @export
+`$<-.loo_diagnostics` <- function(x, name, value) {
+  if (identical(name, "n_eff")) {
+    x <- unclass(x)
+    x[["n_eff"]] <- value
+    x[["ess"]] <- value
+    return(structure(x, class = "loo_diagnostics"))
+  }
+  if (identical(name, "ess")) {
+    x <- unclass(x)
+    x[["ess"]] <- value
+    x[["n_eff"]] <- value
+    return(structure(x, class = "loo_diagnostics"))
+  }
+  NextMethod()
+}
+
+#' @export
+`[[<-.loo_diagnostics` <- function(x, i, value) {
+  if (is.character(i) && i %in% c("n_eff", "ess")) {
+    x <- unclass(x)
+    x[["n_eff"]] <- value
+    x[["ess"]] <- value
+    return(structure(x, class = "loo_diagnostics"))
+  }
+  NextMethod()
 }
