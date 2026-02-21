@@ -41,16 +41,16 @@ test_that("plot methods throw appropriate errors/warnings", {
 lldim_msg <- paste0(
   "Computed from ",
   prod(dim(LLarr)[1:2]),
-  " by ",
+  " posterior draws and ",
   dim(LLarr)[3],
-  " log-likelihood matrix"
+  " log-likelihood terms"
 )
 lwdim_msg <- paste0(
   "Computed from ",
   prod(dim(LLarr)[1:2]),
-  " by ",
+  " posterior draws and ",
   dim(LLarr)[3],
-  " log-weights matrix"
+  " log-weight terms"
 )
 
 test_that("print.waic output is ok", {
