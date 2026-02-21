@@ -136,7 +136,7 @@ test_that("pareto_k_table gives correct output", {
   tab <- pareto_k_table(psis1)
 
   expect_output(print(tab), "Pareto k diagnostic values")
-  expect_identical(colnames(tab), c("Count", "Proportion", "Min. n_eff"))
+  expect_identical(colnames(tab), c("Count", "Proportion", "Min. ESS"))
   expect_equal(sum(tab[, "Count"]), length(k))
   expect_equal(sum(tab[, "Proportion"]), 1)
 

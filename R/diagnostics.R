@@ -213,13 +213,12 @@ pareto_k_influence_values <- function(x) {
 #' @return `psis_n_eff_values()` returns a vector of the estimated PSIS
 #'   effective sample sizes.
 psis_n_eff_values <- function(x) {
-  ess <- x$diagnostics[["ess"]]
-  if (!is.null(ess)) {
-    return(ess)
+  diag <- unclass(x$diagnostics)
+  if (!is.null(diag[["ess"]])) {
+    return(diag[["ess"]])
   }
-  n_eff <- x$diagnostics[["n_eff"]]
-  if (!is.null(n_eff)) {
-    return(n_eff)
+  if (!is.null(diag[["n_eff"]])) {
+    return(diag[["n_eff"]])
   }
   stop("No PSIS ESS estimates found.", call. = FALSE)
 }
