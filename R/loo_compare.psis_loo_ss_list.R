@@ -31,7 +31,7 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
   return(comp)
 }
 
-#' Compare a reference loo object with a comaprison loo object
+#' Compare a reference loo object with a comparison loo object
 #' @noRd
 #' @param ref_loo A named list with a `psis_loo_ss` object.
 #' @param compare_loo A named list with a  `psis_loo_ss` object.
