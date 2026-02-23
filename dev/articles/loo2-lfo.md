@@ -716,19 +716,19 @@ sessionInfo()
     [1] stats     graphics  grDevices utils     datasets  methods   base     
 
     other attached packages:
-    [1] ggplot2_4.0.1    bayesplot_1.15.0 loo_2.9.0.9000   brms_2.23.0     
-    [5] Rcpp_1.1.0       knitr_1.51      
+    [1] ggplot2_4.0.2    bayesplot_1.15.0 loo_2.9.0.9000   brms_2.23.0     
+    [5] Rcpp_1.1.1       knitr_1.51      
 
     loaded via a namespace (and not attached):
-     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.55            
-     [4] bslib_0.9.0           QuickJSR_1.8.1        htmlwidgets_1.6.4    
+     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.56            
+     [4] bslib_0.10.0          QuickJSR_1.9.0        htmlwidgets_1.6.4    
      [7] processx_3.8.6        inline_0.3.21         lattice_0.22-7       
-    [10] callr_3.7.6           ps_1.9.1              vctrs_0.6.5          
+    [10] callr_3.7.6           ps_1.9.1              vctrs_0.7.1          
     [13] tools_4.5.2           generics_0.1.4        stats4_4.5.2         
-    [16] parallel_4.5.2        tibble_3.3.0          pkgconfig_2.0.3      
-    [19] Matrix_1.7-4          checkmate_2.3.3       RColorBrewer_1.1-3   
-    [22] S7_0.2.1              desc_1.4.3            distributional_0.5.0 
-    [25] RcppParallel_5.1.11-1 lifecycle_1.0.4       compiler_4.5.2       
+    [16] parallel_4.5.2        tibble_3.3.1          pkgconfig_2.0.3      
+    [19] Matrix_1.7-4          checkmate_2.3.4       RColorBrewer_1.1-3   
+    [22] S7_0.2.1              desc_1.4.3            distributional_0.6.0 
+    [25] RcppParallel_5.1.11-1 lifecycle_1.0.5       compiler_4.5.2       
     [28] farver_2.1.2          stringr_1.6.0         textshaping_1.0.4    
     [31] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
     [34] sass_0.4.10           yaml_2.3.12           pillar_1.11.1        
@@ -736,13 +736,13 @@ sessionInfo()
     [40] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
     [43] nlme_3.1-168          posterior_1.6.1       rstan_2.32.7         
     [46] tidyselect_1.2.1      digest_0.6.39         mvtnorm_1.3-3        
-    [49] stringi_1.8.7         dplyr_1.1.4           labeling_0.4.3       
+    [49] stringi_1.8.7         dplyr_1.2.0           labeling_0.4.3       
     [52] fastmap_1.2.0         grid_4.5.2            cli_3.6.5            
     [55] magrittr_2.0.4        pkgbuild_1.4.8        withr_3.0.2          
     [58] scales_1.4.0          backports_1.5.0       rmarkdown_2.30       
     [61] matrixStats_1.5.0     otel_0.2.0            gridExtra_2.3        
     [64] ragg_1.5.0            coda_0.19-4.1         evaluate_1.0.5       
-    [67] rstantools_2.5.0      rlang_1.1.6           glue_1.8.0           
+    [67] rstantools_2.6.0      rlang_1.1.7           glue_1.8.0           
     [70] jsonlite_2.0.0        R6_2.6.1              systemfonts_1.3.1    
     [73] fs_1.6.6             
 
