@@ -171,17 +171,17 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   ))
   expect_failure(expect_output(
     print(full_loo),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood\nterms"
   ))
 
   expect_failure(expect_output(
     print(loo_ss),
     "Posterior approximation correction used\\."
   ))
-  expect_output(print(loo_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ss), "subsampled log-likelihood\nterms")
 
   expect_output(print(loo_ap_ss), "Posterior approximation correction used\\.")
-  expect_output(print(loo_ap_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ap_ss), "subsampled log-likelihood\nterms")
 
   expect_output(
     print(loo_ap_ss_full),
@@ -189,7 +189,7 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   )
   expect_failure(expect_output(
     print(loo_ap_ss_full),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood\nterms"
   ))
 
   # Test conversion of objects
