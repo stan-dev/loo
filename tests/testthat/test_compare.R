@@ -62,7 +62,8 @@ test_that("loo_compare throws appropriate warnings", {
   })
   expect_warning(
     loo_compare(w_list),
-    "Difference in performance potentially due to chance. See McLatchie and Vehtari (2023) for details."
+    "Difference in performance potentially due to chance. See McLatchie and Vehtari (2023) for details.",
+    fixed = TRUE
   )
 
   w_list_short <- lapply(1:4, function(x) {
