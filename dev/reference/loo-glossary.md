@@ -1,6 +1,6 @@
 # LOO package glossary
 
-The pages provides definitions to key terms. Also see the [FAQ
+This page provides definitions of key terms. Also see the [FAQ
 page](https://mc-stan.org/loo/articles/online-only/faq.html) on the
 **loo** website for answers to frequently asked questions.
 

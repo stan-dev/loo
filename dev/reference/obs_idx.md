@@ -19,7 +19,7 @@ obs_idx(x, rep = TRUE)
   If sampling with replacement is used, an observation can have multiple
   samples and these are then repeated in the returned object if
   `rep=TRUE` (e.g., a vector `c(1,1,2)` indicates that observation 1 has
-  been subampled two times). If `rep=FALSE` only the unique indices are
+  been subsampled two times). If `rep=FALSE` only the unique indices are
   returned.
 
 ## Value

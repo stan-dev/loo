@@ -54,7 +54,7 @@ plot(
 - threshold:
 
   For `pareto_k_ids()`, `threshold` is the minimum \\k\\ value to flag
-  (default is a sample size `S` dependend threshold `1 - 1 / log10(S)`).
+  (default is a sample size `S` dependent threshold `1 - 1 / log10(S)`).
   For `mcse_loo()`, if any \\k\\ estimates are greater than `threshold`
   the MCSE estimate is returned as `NA` See **Details** for the
   motivation behind these defaults.
