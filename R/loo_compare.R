@@ -327,7 +327,7 @@ loo_order_stat_check <- function(loos, ord) {
 
   if (max(elpd_diff) <= order_stat) {
     # flag warning if we suspect no model is theoretically better than the baseline
-    warning("Difference in performance potentially due to chance.",
+    warning("Difference in performance potentially due to chance. ",
             "See McLatchie and Vehtari (2023) for details.",
             call. = FALSE)
   }
