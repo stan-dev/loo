@@ -419,18 +419,18 @@ in the upcoming section.
     Computed from 4000 by 49 log-likelihood matrix.
 
              Estimate   SE
-    elpd_loo   -186.8 10.9
-    p_loo         8.0  5.2
-    looic       373.7 21.7
+    elpd_loo   -186.9 10.9
+    p_loo         8.1  5.2
+    looic       373.8 21.8
     ------
     MCSE of elpd_loo is NA.
     MCSE and ESS estimates assume independent draws (r_eff=1).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     48    98.0%   960     
-       (0.7, 1]   (bad)       0     0.0%   <NA>    
-       (1, Inf)   (very bad)  1     2.0%   <NA>    
+    (-Inf, 0.7]   (good)     48    98.0%   550     
+       (0.7, 1]   (bad)       1     2.0%   <NA>    
+       (1, Inf)   (very bad)  0     0.0%   <NA>    
     See help('pareto-k-diagnostic') for details.
 
 #### Exact LOO-CV
@@ -537,7 +537,7 @@ exact_elpd <- sum(exact_elpds)
 round(exact_elpd, 1)
 ```
 
-    [1] -187.9
+    [1] -189
 
 The results of the approximate and exact LOO-CV are similar but not as
 close as we would expect if there were no problematic observations. We
@@ -576,7 +576,7 @@ round(without_pt_4, 1)
 ```
 
     approx  exact 
-    -172.9 -173.3 
+    -173.0 -173.1 
 
 From this we can conclude that the difference we found when including
 *all* observations does not indicate a bug in our implementation of the
