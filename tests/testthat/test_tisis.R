@@ -224,3 +224,16 @@ test_that("tis_loo and sis_loo are returned", {
   expect_output(print(loo_tis), regexp = "tis_loo")
   expect_output(print(loo_sis), regexp = "sis_loo")
 })
+
+test_that("invalid IS method gives informative error listing valid methods", {
+  LLmat <- example_loglik_matrix()
+  expect_error(
+    loo(LLmat, r_eff = NA, is_method = "bad_method"),
+    "'arg' should be one of"
+  )
+  expect_error(
+    importance_sampling(-LLmat, method = "not_a_method", r_eff = NA),
+    "Implemented methods: 'psis', 'tis', 'sis'",
+    fixed = TRUE
+  )
+})
