@@ -36,11 +36,13 @@
 #'     class `"psis"`.
 #'   }
 #'  \item{`diagnostics`}{
-#'    A named list containing two vectors:
+#'    A named list (of class `"loo_diagnostics"`) containing:
 #'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
 #'      generalized Pareto distribution. See the [pareto-k-diagnostic]
 #'      page for details.
-#'    * `n_eff`: PSIS effective sample size estimates.
+#'    * `ess`: PSIS effective sample size estimates.
+#'    * `n_eff`: Deprecated alias for `ess`. Accessing `n_eff` will
+#'      produce a deprecation warning.
 #'  }
 #' }
 #'

@@ -727,7 +727,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_equal(dim(loo_ss2)[2] - dim(loo_ss)[2], expected = 100)
   expect_equal(dim(loo_ss2)[2], expected = dim(loo_ss2$pointwise)[1])
   expect_length(loo_ss2$diagnostics$pareto_k, 600)
-  expect_length(loo_ss2$diagnostics$n_eff, 600)
+  expect_length(loo_ss2$diagnostics$ess, 600)
   for (i in 1:nrow(loo_ss2$estimates)) {
     expect_lt(
       loo_ss2$estimates[i, "subsampling SE"],
@@ -745,7 +745,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_equal(loo_ss2b$estimates, loo_ss$estimates)
   expect_equal(loo_ss2b$pointwise, loo_ss$pointwise)
   expect_equal(loo_ss2b$diagnostics$pareto_k, loo_ss$diagnostics$pareto_k)
-  expect_equal(loo_ss2b$diagnostics$n_eff, loo_ss$diagnostics$n_eff)
+  expect_equal(loo_ss2b$diagnostics$ess, loo_ss$diagnostics$ess)
 
   expect_silent(
     loo_ss3 <- update(
@@ -758,7 +758,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_equal(loo_ss3$estimates, loo_ss$estimates)
   expect_equal(loo_ss3$pointwise, loo_ss$pointwise)
   expect_equal(loo_ss3$diagnostics$pareto_k, loo_ss$diagnostics$pareto_k)
-  expect_equal(loo_ss3$diagnostics$n_eff, loo_ss$diagnostics$n_eff)
+  expect_equal(loo_ss3$diagnostics$ess, loo_ss$diagnostics$ess)
 
   expect_silent(
     loo_ss4 <- update(
@@ -796,7 +796,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
     loo_ss4$diagnostics$pareto_k[ss4_order],
     loo_ss5$diagnostics$pareto_k
   )
-  expect_equal(loo_ss4$diagnostics$n_eff[ss4_order], loo_ss5$diagnostics$n_eff)
+  expect_equal(loo_ss4$diagnostics$ess[ss4_order], loo_ss5$diagnostics$ess)
   expect_equal(
     loo_ss4$pointwise[ss4_order, c(1, 3, 4)],
     true_loo$pointwise[, c(1, 3, 4)]
@@ -805,7 +805,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
     loo_ss4$diagnostics$pareto_k[ss4_order],
     true_loo$diagnostics$pareto_k
   )
-  expect_equal(loo_ss4$diagnostics$n_eff[ss4_order], true_loo$diagnostics$n_eff)
+  expect_equal(loo_ss4$diagnostics$ess[ss4_order], true_loo$diagnostics$ess)
 
   expect_error(
     loo_ss_min <- update(
@@ -881,7 +881,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   expect_equal(dim(loo_ss_lpd)[2], dim(loo_ss)[2])
   expect_equal(dim(loo_ss_lpd)[2], dim(loo_ss_lpd$pointwise)[1])
   expect_length(loo_ss_lpd$diagnostics$pareto_k, 500)
-  expect_length(loo_ss_lpd$diagnostics$n_eff, 500)
+  expect_length(loo_ss_lpd$diagnostics$ess, 500)
   expect_failure(expect_equal(
     loo_ss_lpd$estimates[1, "subsampling SE"],
     loo_ss$estimates[1, "subsampling SE"]

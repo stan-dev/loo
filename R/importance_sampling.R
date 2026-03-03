@@ -153,7 +153,7 @@ importance_sampling_object <-
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
-        diagnostics = list(pareto_k = pareto_k, n_eff = NULL, r_eff = r_eff)
+        diagnostics = loo_diagnostics(pareto_k = pareto_k, ess = NULL, r_eff = r_eff)
       ),
       # attributes
       norm_const_log = norm_const_log,
@@ -166,7 +166,8 @@ importance_sampling_object <-
 
     # need normalized weights (not on log scale) for psis_n_eff
     w <- weights(out, normalize = TRUE, log = FALSE)
-    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
+    ess_val <- psis_n_eff(w, r_eff)
+    out$diagnostics <- loo_diagnostics(pareto_k = pareto_k, ess = ess_val, r_eff = r_eff)
     return(out)
   }
 

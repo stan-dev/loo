@@ -147,7 +147,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     loo$pointwise[i, "looic"] <- mm_list[[ii]]$looic
 
     loo$diagnostics$pareto_k[i] <- mm_list[[ii]]$k
-    loo$diagnostics$n_eff[i] <- mm_list[[ii]]$n_eff
+    loo$diagnostics[["ess"]][i] <- mm_list[[ii]]$n_eff
     kfs[i] <- mm_list[[ii]]$kf
 
     if (!is.null(loo$psis_object)) {

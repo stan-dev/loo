@@ -38,8 +38,8 @@ test_that("tis() and sis() returns object with correct structure for tis/sis", {
   expect_named(tis1, c("log_weights", "diagnostics"))
   expect_named(is1, c("log_weights", "diagnostics"))
 
-  expect_named(tis1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
-  expect_named(is1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
+  expect_named(tis1$diagnostics, c("pareto_k", "ess", "n_eff", "r_eff"))
+  expect_named(is1$diagnostics, c("pareto_k", "ess", "n_eff", "r_eff"))
 
   expect_equal(dim(tis1), dim(LLmat))
   expect_equal(dim(is1), dim(LLmat))
@@ -47,8 +47,8 @@ test_that("tis() and sis() returns object with correct structure for tis/sis", {
   expect_length(tis1$diagnostics$pareto_k, dim(psis1)[2])
   expect_length(is1$diagnostics$pareto_k, dim(psis1)[2])
 
-  expect_length(tis1$diagnostics$n_eff, dim(psis1)[2])
-  expect_length(is1$diagnostics$n_eff, dim(psis1)[2])
+  expect_length(tis1$diagnostics$ess, dim(psis1)[2])
+  expect_length(is1$diagnostics$ess, dim(psis1)[2])
 
   expect_equal(attr(psis1, "method")[1], "psis")
   expect_equal(attr(tis1, "method")[1], "tis")

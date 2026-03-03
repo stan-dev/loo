@@ -34,7 +34,8 @@
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
 #'    * `pareto_k`: Not used in `tis`, all set to 0.
-#'    * `n_eff`: Effective sample size estimates.
+#'    * `ess`: Effective sample size estimates.
+#'    * `n_eff`: Deprecated alias for `ess`.
 #'  }
 #' }
 #'
