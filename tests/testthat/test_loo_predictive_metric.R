@@ -170,4 +170,14 @@ test_that('Balanced accuracy computation is correct', {
     'all(yhat <= 1 & yhat >= 0) is not TRUE',
     fixed = TRUE
   )
+  expect_error(
+    .balanced_accuracy(c(1, 1, 1, 1), c(0.8, 0.6, 0.7, 0.9)),
+    'Balanced accuracy requires both classes',
+    fixed = TRUE
+  )
+  expect_error(
+    .balanced_accuracy(c(0, 0, 0, 0), c(0.1, 0.2, 0.3, 0.4)),
+    'Balanced accuracy requires both classes',
+    fixed = TRUE
+  )
 })

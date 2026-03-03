@@ -197,6 +197,11 @@ loo_predictive_metric.matrix <-
   yhat <- as.integer(yhat > 0.5)
   mask <- y == 0
 
+  if (all(mask) || !any(mask)) {
+    stop("Balanced accuracy requires both classes (0 and 1) to be present in 'y'.",
+         call. = FALSE)
+  }
+
   tn <- mean(yhat[mask] == y[mask]) # True negatives
   tp <- mean(yhat[!mask] == y[!mask]) # True positives
 
