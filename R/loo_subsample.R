@@ -1164,12 +1164,31 @@ loo_subsample_estimation_diff_srs <- function(x) {
   update_psis_loo_ss_estimates(x)
 }
 
-#' Difference estimation using SRS-WOR sampling (Magnusson et al., 2020)
-#' @noRd
+#' @title Difference estimation using SRS-WOR sampling
+#'
+#' @description This paragraph describes the function.
+#'
+#' @return A list with estimates. Function 9 of Magnusson et al. (2020).
+#'
+#' @details
+#' Implements Equations 7-9 of Magnusson et al. (2020).
+#'
+#'
 #' @param y_approx Approximated values of all observations.
 #' @param y The values observed.
 #' @param y_idx The index of `y` in `y_approx`.
-#' @return A list with estimates.
+#'
+#' @references
+#' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
+#' Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+#' In _Proceedings of the 23rd International Conference on Artificial
+#' Intelligence and Statistics (AISTATS)_, PMLR 108:341-351.
+#'
+#' @seealso [loo_subsample()]
+#' @export
+#'
+#' @examples
+#' print(42)
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
