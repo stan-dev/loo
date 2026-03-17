@@ -14,7 +14,7 @@ srs_diff_est(y_approx, y, y_idx)
 \item{y_idx}{The index of \code{y} in \code{y_approx}.}
 }
 \value{
-A list with estimates.
+A list with estimates. Function 9 of Magnusson et al. (2020).
 }
 \description{
 This paragraph describes the function.
@@ -31,5 +31,6 @@ Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 In \emph{Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 }
+\seealso{
 \code{\link[=loo_subsample]{loo_subsample()}}
 }
