@@ -3,9 +3,7 @@
 \name{loo_subsample}
 \alias{loo_subsample}
 \alias{loo_subsample.function}
-\title{Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
-so that less costly and more approximate computation is made for all LOO-fold,
-and more costly and accurate computations are made only for m<N LOO-folds.}
+\title{Efficient approximate LOO-CV}
 \usage{
 loo_subsample(x, ...)
 
@@ -143,8 +141,8 @@ for the individual draws.
 }
 }
 \description{
-Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
-so that less costly and more approximate computation is made for all LOO-fold,
+Efficiently approximates leave-one-out cross-validation (LOO-CV) via subsampling.
+Less costly and more approximate computation is made for all LOO-fold,
 and more costly and accurate computations are made only for m<N LOO-folds.
 }
 \details{
