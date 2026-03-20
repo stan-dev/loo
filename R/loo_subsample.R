@@ -1,5 +1,7 @@
-#' Efficient approximate leave-one-out cross-validation (LOO) using subsampling,
-#' so that less costly and more approximate computation is made for all LOO-fold,
+#' Efficient approximate LOO-CV using subsampling
+#'
+#' @description Efficiently approximates leave-one-out cross-validation (LOO-CV) via subsampling.
+#' Less costly and more approximate computation is made for all LOO-fold,
 #' and more costly and accurate computations are made only for m<N LOO-folds.
 #'
 #' @param x A function. The **Methods (by class)** section, below, has detailed
