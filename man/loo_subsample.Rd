@@ -3,7 +3,7 @@
 \name{loo_subsample}
 \alias{loo_subsample}
 \alias{loo_subsample.function}
-\title{Efficient approximate LOO-CV}
+\title{Efficient approximate LOO-CV using subsampling}
 \usage{
 loo_subsample(x, ...)
 
