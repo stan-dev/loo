@@ -24,10 +24,7 @@ diagnostics.
   [`is.psis_loo()`](https://mc-stan.org/loo/dev/reference/loo.md) :
   Efficient approximate leave-one-out cross-validation (LOO)
 - [`loo_subsample()`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
-  : Efficient approximate leave-one-out cross-validation (LOO) using
-  subsampling, so that less costly and more approximate computation is
-  made for all LOO-fold, and more costly and accurate computations are
-  made only for m\<N LOO-folds.
+  : Efficient approximate LOO-CV using subsampling
 - [`loo_approximate_posterior()`](https://mc-stan.org/loo/dev/reference/loo_approximate_posterior.md)
   : Efficient approximate leave-one-out cross-validation (LOO) for
   posterior approximations
