@@ -1,4 +1,4 @@
-#' @title Efficient approximate LOO-CV
+#' Efficient approximate LOO-CV
 #'
 #' @description Efficiently approximates leave-one-out cross-validation (LOO-CV) via subsampling.
 #' Less costly and more approximate computation is made for all LOO-fold,
