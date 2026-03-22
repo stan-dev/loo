@@ -2,25 +2,41 @@
 % Please edit documentation in R/loo_subsample.R
 \name{srs_diff_est}
 \alias{srs_diff_est}
-\title{Difference estimation using SRS-WOR sampling}
+\title{Difference estimator with simple random sampling without replacement.}
 \usage{
 srs_diff_est(y_approx, y, y_idx)
 }
 \arguments{
-\item{y_approx}{Approximated values of all observations.}
+\item{y_approx}{(numeric) \code{n} approximated values.}
 
-\item{y}{The values observed.}
+\item{y}{(numeric) \code{m<n} subsampled values.}
 
-\item{y_idx}{The index of \code{y} in \code{y_approx}.}
+\item{y_idx}{(integerish) The index of \code{y} in \code{y_approx}.}
 }
 \value{
 A list with estimates. Function 9 of Magnusson et al. (2020).
+
+A named list containing numeric values:
+\itemize{
+\item \code{y_hat}: estimated mean of $y$ (Eq 7),
+\item \code{v_y_hat}: variance of the mean estimate (Eq 8), and
+\item \code{hat_v_y}: estimated variance of $y$ (Eq 9).
+}
 }
 \description{
-This paragraph describes the function.
+The difference estimator \code{srs_diff()} estimates
+the expectation $nE\link[ggplot2:aes_position]{ggplot2::y}$ when we have $n$ approximate values $\tilde{y}_i$,
+$i=1,\ldots,n$ and $m<n$ accurate values $y_j$, $j \in
+\mathcal{S}$, where $m$ is the subsample size and $\mathcal{S}$ is
+a simple random subsample without replacement.  The original
+approach is by Cochran (1977) and we follow the equations 7--9 by
+Magnusson et al. (2020).
 }
 \details{
-Implements Equations 7-9 of Magnusson et al. (2020).
+Magnusson et al. (2020) Eq (9) first row second \code{+} should
+be \code{-}. Supplementary material Eq (6) has this correct.
+As \code{srs_diff_est()} in \code{loo} package is used for $nE\link[ggplot2:aes_position]{ggplot2::y}$, there is
+a proportional difference of $1/n$ compared to the paper.
 }
 \examples{
 print(42)
