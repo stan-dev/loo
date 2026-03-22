@@ -17,6 +17,7 @@
 * Added contribution section. by @VisruthSK in #286
 * Update LOO uncertainty paper to use BA doi by @avehtari in #311
 * Update documentation for `E_loo()` function by @avehtari in #312
+* Export `srs_diff_est()` function by @vinniott in #340
 
 
 # loo 2.8.0
