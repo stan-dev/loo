@@ -1176,8 +1176,6 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' approach is by Cochran (1977) and we follow the equations 7--9 by
 #' Magnusson et al. (2020).
 #'
-#' @return A list with estimates. Function 9 of Magnusson et al. (2020).
-#'
 #' @details Magnusson et al. (2020) Eq (9) first row second `+` should
 #'   be `-`. Supplementary material Eq (6) has this correct.
 #'   As `srs_diff_est()` in `loo` package is used for $nE[y]$, there is
@@ -1186,6 +1184,7 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' @param y_approx (numeric) `n` approximated values.
 #' @param y (numeric) `m<n` subsampled values.
 #' @param y_idx (integerish) The index of `y` in `y_approx`.
+#'
 #' @return A named list containing numeric values:
 #' * `y_hat`: estimated mean of $y$ (Eq 7),
 #' * `v_y_hat`: variance of the mean estimate (Eq 8), and
