@@ -1200,9 +1200,6 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #'
 #' @seealso [loo_subsample()]
 #' @export
-#'
-#' @examples
-#' print(42)
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
