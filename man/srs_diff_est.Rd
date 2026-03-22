@@ -46,6 +46,8 @@ Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
 In \emph{Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
+
+Cochran, W. G. (1977). \emph{Sampling Techniques, 3rd Edition}. John Wiley.
 }
 \seealso{
 \code{\link[=loo_subsample]{loo_subsample()}}
