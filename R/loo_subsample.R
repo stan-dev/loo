@@ -1169,26 +1169,26 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' Difference estimator with simple random sampling without replacement.
 #'
 #' The difference estimator `srs_diff()` estimates
-#' the expectation $nE[y]$ when we have $n$ approximate values $\tilde{y}_i$,
-#' $i=1,\ldots,n$ and $m<n$ accurate values $y_j$, $j \in
-#' \mathcal{S}$, where $m$ is the subsample size and $\mathcal{S}$ is
+#' the expectation \eqn{n E[y]} when we have \eqn{n} approximate values \eqn{\tilde{y}_i},
+#' \eqn{i = 1, \ldots, n} and \eqn{m < n} accurate values \eqn{y_j}, \eqn{j \in \mathcal{S}},
+#' where \eqn{m} is the subsample size and \eqn{\mathcal{S}} is
 #' a simple random subsample without replacement.  The original
 #' approach is by Cochran (1977) and we follow the equations 7--9 by
 #' Magnusson et al. (2020).
 #'
-#' @details Magnusson et al. (2020) Eq (9) first row second `+` should
-#'   be `-`. Supplementary material Eq (6) has this correct.
-#'   As `srs_diff_est()` in `loo` package is used for $nE[y]$, there is
-#'   a proportional difference of $1/n$ compared to the paper.
+#' @details In Magnusson et al. (2020) Eq (9) first row, the second `+` should
+#'   be a `-`; Supplementary Material Eq (6) has this correct.
+#'   As `srs_diff_est()` in the `loo` package is used for \eqn{n E[y]}, there is
+#'   a proportional difference of \eqn{1/n} compared to the paper.
 #'
 #' @param y_approx (numeric) `n` approximated values.
 #' @param y (numeric) `m<n` subsampled values.
 #' @param y_idx (integerish) The index of `y` in `y_approx`.
 #'
 #' @return A named list containing numeric values:
-#' * `y_hat`: estimated mean of $y$ (Eq 7),
+#' * `y_hat`: estimated mean of \eqn{y} (Eq 7),
 #' * `v_y_hat`: variance of the mean estimate (Eq 8), and
-#' * `hat_v_y`: estimated variance of $y$ (Eq 9).
+#' * `hat_v_y`: estimated variance of \eqn{y} (Eq 9).
 #'
 #' @references
 #' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
