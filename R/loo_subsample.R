@@ -1197,6 +1197,8 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' In _Proceedings of the 23rd International Conference on Artificial
 #' Intelligence and Statistics (AISTATS)_, PMLR 108:341-351.
 #'
+#' Cochran, W. G. (1977). _Sampling Techniques, 3rd Edition_. John Wiley.
+#'
 #' @seealso [loo_subsample()]
 #' @export
 #'
