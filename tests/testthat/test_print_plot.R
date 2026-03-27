@@ -185,3 +185,24 @@ test_that("mcse_loo returns NA when it should", {
 test_that("mcse_loo errors if not psis_loo object", {
   expect_error(mcse_loo(psis1), "psis_loo")
 })
+
+# print.loo kfold objects --------------------------------------------------
+
+test_that("print.loo supports kfold with pareto-k diagnostics - calibrated", {
+  kfold1 <- readRDS("data-for-tests/kfold-calibrated.Rds")
+
+  expect_output(print(kfold1), "All Pareto k estimates are good")
+})
+
+test_that("print.loo supports kfold with pareto-k diagnostics - miscalibrated", {
+  kfold1 <- readRDS("data-for-tests/kfold-miscalibrated.Rds")
+
+  expect_output(print(kfold1), "Pareto k diagnostic values:")
+})
+
+test_that("print.loo supports kfold without pareto-k diagnostics", {
+  kfold1 <- readRDS("data-for-tests/kfold-miscalibrated.Rds")
+  kfold1$diagnostics <- NULL
+
+  expect_output(print(kfold1), "Based on 10-fold cross-validation.")
+})
