@@ -22,18 +22,6 @@ print.loo <- function(x, digits = 1, ...) {
   }
   cat("\n")
   print(.fr(as.data.frame(x$estimates), digits), quote = FALSE)
-
-  if (inherits(x, "kfold") & "diagnostics" %in% names(x)) {
-    cat("------\n")
-    S <- dim(x)[1]
-    k_threshold <- ps_khat_threshold(S)
-    if (length(pareto_k_ids(x, threshold = k_threshold))) {
-      cat("\n")
-    }
-    print(pareto_k_table(x), digits = digits)
-    cat(.k_help())
-  }
-
   return(invisible(x))
 }
 
@@ -116,6 +104,28 @@ print.importance_sampling <- function(x, digits = 1, plot_k = FALSE, ...) {
   }
   invisible(x)
 }
+
+#' @export
+#' @rdname print.loo
+print.kfold <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.loo(x, digits = digits, ...)
+
+  if ("diagnostics" %in% names(x)) {
+    cat("------\n")
+    S <- dim(x)[1]
+    k_threshold <- ps_khat_threshold(S)
+    if (length(pareto_k_ids(x, threshold = k_threshold))) {
+      cat("\n")
+    }
+    print(pareto_k_table(x), digits = digits)
+    cat(.k_help())
+  
+    if (plot_k) {
+      graphics::plot(x, ...)
+    }
+  }
+  return(invisible(x))
+  }
 
 # internal ----------------------------------------------------------------
 
