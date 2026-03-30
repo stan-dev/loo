@@ -697,7 +697,7 @@ sessionInfo()
 
     R version 4.5.3 (2026-03-11)
     Platform: x86_64-pc-linux-gnu
-    Running under: Ubuntu 24.04.3 LTS
+    Running under: Ubuntu 24.04.4 LTS
 
     Matrix products: default
     BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -720,10 +720,10 @@ sessionInfo()
     [5] Rcpp_1.1.1       knitr_1.51      
 
     loaded via a namespace (and not attached):
-     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.56            
+     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
      [4] bslib_0.10.0          QuickJSR_1.9.0        htmlwidgets_1.6.4    
      [7] processx_3.8.6        inline_0.3.21         lattice_0.22-9       
-    [10] callr_3.7.6           ps_1.9.1              vctrs_0.7.1          
+    [10] callr_3.7.6           ps_1.9.1              vctrs_0.7.2          
     [13] tools_4.5.3           generics_0.1.4        stats4_4.5.3         
     [16] parallel_4.5.3        tibble_3.3.1          pkgconfig_2.0.3      
     [19] Matrix_1.7-4          checkmate_2.3.4       RColorBrewer_1.1-3   
@@ -739,12 +739,12 @@ sessionInfo()
     [49] stringi_1.8.7         dplyr_1.2.0           labeling_0.4.3       
     [52] fastmap_1.2.0         grid_4.5.3            cli_3.6.5            
     [55] magrittr_2.0.4        pkgbuild_1.4.8        withr_3.0.2          
-    [58] scales_1.4.0          backports_1.5.0       rmarkdown_2.30       
+    [58] scales_1.4.0          backports_1.5.0       rmarkdown_2.31       
     [61] matrixStats_1.5.0     otel_0.2.0            gridExtra_2.3        
-    [64] ragg_1.5.1            coda_0.19-4.1         evaluate_1.0.5       
+    [64] ragg_1.5.2            coda_0.19-4.1         evaluate_1.0.5       
     [67] rstantools_2.6.0      rlang_1.1.7           glue_1.8.0           
     [70] jsonlite_2.0.0        R6_2.6.1              systemfonts_1.3.2    
-    [73] fs_1.6.7             
+    [73] fs_2.0.1             
 
 ### Appendix: Licenses
 
