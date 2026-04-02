@@ -194,6 +194,17 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
     )
   }
   print(x2, quote = FALSE, row.names = FALSE)
+
+  # show glossary for diagnostic flags
+  has_diag <- any(nzchar(x[["diag_diff"]], keepNA = FALSE), na.rm = TRUE) ||
+              any(nzchar(x[["diag_elpd"]], keepNA = FALSE), na.rm = TRUE)
+  if (has_diag && p_worse) {
+    message(
+      "\nDiagnostic flags present. ",
+      "See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`) ",
+      "or https://mc-stan.org/loo/reference/loo-glossary.html."
+    )
+  }
   invisible(x)
 }
 

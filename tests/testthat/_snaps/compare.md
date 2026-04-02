@@ -47,6 +47,9 @@
         model elpd_diff se_diff p_worse diag_diff diag_elpd
        model1       0.0     0.0      NA                    
        model2      -4.1     0.1    1.00   N < 100          
+    Message
+      
+      Diagnostic flags present. See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`) or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 ---
 
@@ -84,6 +87,9 @@
        model1       0.0     0.0      NA                    
        model2      -4.1     0.1    1.00   N < 100          
        model3     -16.1     0.2    1.00   N < 100          
+    Message
+      
+      Diagnostic flags present. See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`) or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 # compare returns expected result (3 models)
 
