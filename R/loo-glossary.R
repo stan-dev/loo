@@ -237,7 +237,7 @@
 #'
 #' This label indicates that K observations for this model have Pareto-k values
 #' above the PSIS reliability threshold `t` used by `loo` for that fit. The
-#' threshold is sample-size dependent, and in many practical cases is close to
+#' threshold is sample-size dependent, and in many practical cases close to
 #' 0.7. When this flag appears, the PSIS approximation can be unreliable for
 #' those observations, and the resulting `elpd_loo` may be biased. Because
 #' `elpd_diff` is a direct difference of two models' `elpd_loo` values, bias in
@@ -245,6 +245,6 @@
 #' This is qualitatively different from the calibration issues flagged by
 #' `diag_diff`: here the estimate itself may be wrong, not just uncertain.
 #'
-#' See for further information on Pareto-k values see the "Pareto k estimates"
+#' See for further information on Pareto-k values the "Pareto k estimates"
 #' section.
 NULL
