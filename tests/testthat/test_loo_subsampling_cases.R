@@ -171,17 +171,17 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   ))
   expect_failure(expect_output(
     print(full_loo),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood terms"
   ))
 
   expect_failure(expect_output(
     print(loo_ss),
     "Posterior approximation correction used\\."
   ))
-  expect_output(print(loo_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ss), "subsampled log-likelihood terms")
 
   expect_output(print(loo_ap_ss), "Posterior approximation correction used\\.")
-  expect_output(print(loo_ap_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ap_ss), "subsampled log-likelihood terms")
 
   expect_output(
     print(loo_ap_ss_full),
@@ -189,7 +189,7 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   )
   expect_failure(expect_output(
     print(loo_ap_ss_full),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood terms"
   ))
 
   # Test conversion of objects
@@ -344,9 +344,9 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(looss_1),
-    "Computed from 4000 by 100 subsampled log-likelihood"
+    "faster but more biased computation with 4000 posterior draws and 3020 log-likelihood terms"
   )
-  expect_output(print(looss_1), "values from 3020 total observations.")
+  expect_output(print(looss_1), "slower but more accurate computation with 4000 posterior draws and 100 subsampled log-likelihood terms")
   expect_output(
     print(looss_1),
     "MCSE and ESS estimates assume independent draws"
@@ -366,9 +366,9 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(looss_1b),
-    "Computed from 4000 by 200 subsampled log-likelihood"
+    "faster but more biased computation with 4000 posterior draws and 3020 log-likelihood terms"
   )
-  expect_output(print(looss_1b), "values from 3020 total observations.")
+  expect_output(print(looss_1b), "slower but more accurate computation with 4000 posterior draws and 200 subsampled log-likelihood terms")
   expect_output(
     print(looss_1b),
     "MCSE and ESS estimates assume independent draws"
@@ -391,9 +391,9 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(looss_2),
-    "Computed from 4000 by 100 subsampled log-likelihood"
+    "faster but more biased computation with 4000 posterior draws and 3020 log-likelihood terms"
   )
-  expect_output(print(looss_2), "values from 3020 total observations.")
+  expect_output(print(looss_2), "slower but more accurate computation with 4000 posterior draws and 100 subsampled log-likelihood terms")
   expect_output(
     print(looss_2),
     "MCSE and ESS estimates assume independent draws"
@@ -415,7 +415,7 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(aploo_1),
-    "Computed from 2000 by 3020 log-likelihood matrix"
+    "Computed from 2000 posterior draws and 3020 log-likelihood terms"
   )
   expect_output(
     print(aploo_1),
@@ -441,13 +441,13 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(looapss_1),
-    "Computed from 2000 by 100 subsampled log-likelihood"
+    "faster but more biased computation with 2000 posterior draws and 3020 log-likelihood terms"
   )
   expect_output(
     print(looapss_1),
     "MCSE and ESS estimates assume independent draws"
   )
-  expect_output(print(looapss_1), "values from 3020 total observations.")
+  expect_output(print(looapss_1), "slower but more accurate computation with 2000 posterior draws and 100 subsampled log-likelihood terms")
   expect_output(print(looapss_1), "elpd_loo  -1968.2 15.6            0.4")
   expect_output(print(looapss_1), "p_loo         2.9  0.1            0.5")
   expect_output(print(looapss_1), "All Pareto k estimates are good")
@@ -474,13 +474,13 @@ test_that("Test the vignette", {
   )
   expect_output(
     print(looss_2),
-    "Computed from 4000 by 100 subsampled log-likelihood"
+    "faster but more biased computation with 4000 posterior draws and 3020 log-likelihood terms"
   )
   expect_output(
     print(looss_2),
     "MCSE and ESS estimates assume independent draws"
   )
-  expect_output(print(looss_2), "values from 3020 total observations.")
+  expect_output(print(looss_2), "slower but more accurate computation with 4000 posterior draws and 100 subsampled log-likelihood terms")
   expect_output(print(looss_2), "elpd_loo  -1952.0 16.2            0.2")
   expect_output(print(looss_2), "p_loo         2.6  0.1            0.3")
 

@@ -119,40 +119,40 @@ print_dims <- function(x, ...) UseMethod("print_dims")
 #' @rdname print_dims
 #' @export
 print_dims.importance_sampling <- function(x, ...) {
+  dims <- dim(x)
   cat(
-    "Computed from",
-    paste(dim(x), collapse = " by "),
-    "log-weights matrix.\n"
+    "Computed from", dims[1], "posterior draws and",
+    dims[2], "log-weight terms.\n"
   )
 }
 
 #' @rdname print_dims
 #' @export
 print_dims.psis_loo <- function(x, ...) {
+  dims <- dim(x)
   cat(
-    "Computed from",
-    paste(dim(x), collapse = " by "),
-    "log-likelihood matrix.\n"
+    "Computed from", dims[1], "posterior draws and",
+    dims[2], "log-likelihood terms.\n"
   )
 }
 
 #' @rdname print_dims
 #' @export
 print_dims.importance_sampling_loo <- function(x, ...) {
+  dims <- dim(x)
   cat(
-    "Computed from",
-    paste(dim(x), collapse = " by "),
-    "log-likelihood matrix using", class(x)[1], ".\n"
+    "Computed from", dims[1], "posterior draws and",
+    dims[2], "log-likelihood terms using", class(x)[1], ".\n"
   )
 }
 
 #' @rdname print_dims
 #' @export
 print_dims.waic <- function(x, ...) {
+  dims <- dim(x)
   cat(
-    "Computed from",
-    paste(dim(x), collapse = " by "),
-    "log-likelihood matrix.\n"
+    "Computed from", dims[1], "posterior draws and",
+    dims[2], "log-likelihood terms.\n"
   )
 }
 
@@ -169,11 +169,12 @@ print_dims.kfold <- function(x, ...) {
 #' @export
 print_dims.psis_loo_ss <- function(x, ...) {
   cat(
-    "Computed from",
-    paste(c(dim(x)[1], nobs(x)) , collapse = " by "),
-    "subsampled log-likelihood\nvalues from",
-    length(x$loo_subsampling$elpd_loo_approx),
-    "total observations.\n"
+    "Subsampling loo uses 1) faster but more biased computation with",
+    dim(x)[1], "posterior draws and",
+    length(x$loo_subsampling$elpd_loo_approx), "log-likelihood terms,",
+    "and 2) slower but more accurate computation with",
+    dim(x)[1], "posterior draws and",
+    nobs(x), "subsampled log-likelihood terms.\n"
   )
 }
 

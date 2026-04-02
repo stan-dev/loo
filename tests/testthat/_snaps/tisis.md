@@ -5,7 +5,7 @@
     Message
       Replacing NAs in `r_eff` with 1s
     Output
-      Computed from 1000 by 32 log-weights matrix.
+      Computed from 1000 posterior draws and 32 log-weight terms.
       MCSE and ESS estimates assume MCMC draws (r_eff in [0.6, 1.0]).
       
       All Pareto k estimates are good (k < 0.67).

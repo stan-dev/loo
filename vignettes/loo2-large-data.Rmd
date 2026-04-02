@@ -188,8 +188,8 @@ print(loo_ss_1)
 ```
 
 ```
-Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+Computed from 4000 posterior draws and 100 subsampled log-likelihood
+terms from 3020 total observations.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.5 15.6            0.3
@@ -240,8 +240,8 @@ print(loo_ss_1b)
 ```
 
 ```
-Computed from 4000 by 200 subsampled log-likelihood
-values from 3020 total observations.
+Computed from 4000 posterior draws and 200 subsampled log-likelihood
+terms from 3020 total observations.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.3 15.6            0.2
@@ -285,8 +285,8 @@ print(loo_ss_1c)
 
 
 ```
-Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+Computed from 4000 posterior draws and 100 subsampled log-likelihood
+terms from 3020 total observations.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.9 15.4            0.5
@@ -339,7 +339,7 @@ print(loo_ap_1)
 The function creates a class, `psis_loo_ap` that inherits from `psis_loo, loo`.
 
 ```
-Computed from 2000 by 3020 log-likelihood matrix
+Computed from 2000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1968.4 15.6
@@ -375,8 +375,8 @@ print(loo_ap_ss_1)
 ```
 
 ```
-Computed from 2000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+Computed from 2000 posterior draws and 100 subsampled log-likelihood
+terms from 3020 total observations.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.2 15.6            0.4
@@ -455,8 +455,8 @@ print(loo_ss_2)
 ```
 
 ```
-Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+Computed from 4000 posterior draws and 100 subsampled log-likelihood
+terms from 3020 total observations.
 
          Estimate   SE subsampling SE
 elpd_loo  -1952.0 16.2            0.2

@@ -1,5 +1,7 @@
 # loo (development version)
 
+* Clarify print output to say "posterior draws" and "log-likelihood terms" instead of the ambiguous "X by Y matrix" format (#198)
+
 # loo 2.9.0
 
 * Avoid under and overflows in stacking by @avehtari in #273
