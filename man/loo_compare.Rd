@@ -76,31 +76,22 @@ approximation used for SE and \code{se_diff} is good, and the column
 \itemize{
 \item \code{N < 100} (small data)
 \item \verb{|elpd_diff| < 4} (models make similar predictions)
-\item \code{k_diff > 0.5} (possible outliers)
 }
 
-If any of these diagnostic messages is shown, the error distribution is
+If either of these diagnostic messages is shown, the error distribution is
 skewed or thick tailed and the normal approximation based on \code{elpd_diff}
 and \code{se_diff} is not well calibrated. In that case, the probabilities
-\code{p_worse} are likely to be too large (small data or similar predictions) or
-too small (outliers). However, \code{elpd_diff} and \code{se_diff} will still be
-indicative of the differences and uncertainties (for example, if
-\verb{|elpd_diff|} is many times larger than \code{se_diff} the difference is quite
-certain).
-
-The \code{k_diff} value for the \code{diag_diff} column is computed using the
-pointwise ELPD differences (and is different from the Pareto k's in
-PSIS-LOO diagnostic).  While \code{k_diff > 0.5} indicates the \emph{possibility} of
-outliers, it is also possible that both models compared seem to be well
-specified based on model checking, but the pointwise ELPD differences have
-such thick tails that the normal approximation for the sum is not good
-(Vehtari et al., 2024). A threshold of 0.5 is used for \code{k_diff} as we do
-not do automatic Pareto smoothing for the pointwise differences (Vehtari et
-al., 2024).
+\code{p_worse} are likely to be too large. However, \code{elpd_diff} and \code{se_diff}
+will still be indicative of the differences and uncertainties (for example,
+if \verb{|elpd_diff|} is many times larger than \code{se_diff} the difference is quite
+certain). In addition, if the model is not well specificed and there are
+outliers, the error distribution can also be skewed or thick tailed and the
+normal approximation is not well calibrated. Possible model misspecification
+and outliers can be diagnosed with usual predictive checking methods.
 
 The column \code{diag_elpd} shows the PSIS-LOO Pareto k diagnostic for the
 pointwise ELPD computations for each model. If \verb{K k_psis > 0.7} is shown,
-where \code{K} is the number of high high Pareto k values in the PSIS
+where \code{K} is the number of high Pareto k values in the PSIS
 computation, then there may be significant bias in \code{elpd_diff} favoring
 models with a large number of high Pareto k values.
 }

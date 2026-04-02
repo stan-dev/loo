@@ -63,7 +63,7 @@
 #'
 #'   The column `diag_elpd` shows the PSIS-LOO Pareto k diagnostic for the
 #'   pointwise ELPD computations for each model. If `K k_psis > 0.7` is shown,
-#'   where `K` is the number of high high Pareto k values in the PSIS
+#'   where `K` is the number of high Pareto k values in the PSIS
 #'   computation, then there may be significant bias in `elpd_diff` favoring
 #'   models with a large number of high Pareto k values.
 #'
