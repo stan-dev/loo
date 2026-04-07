@@ -129,6 +129,7 @@ of predictive distributions or pseudo-BMA weighting.
   [`print(`*`<psis_loo_ap>`*`)`](https://mc-stan.org/loo/dev/reference/print.loo.md)
   [`print(`*`<psis>`*`)`](https://mc-stan.org/loo/dev/reference/print.loo.md)
   [`print(`*`<importance_sampling>`*`)`](https://mc-stan.org/loo/dev/reference/print.loo.md)
+  [`print(`*`<kfold>`*`)`](https://mc-stan.org/loo/dev/reference/print.loo.md)
   : Print methods
 
 - [`nobs(`*`<psis_loo_ss>`*`)`](https://mc-stan.org/loo/dev/reference/nobs.psis_loo_ss.md)
