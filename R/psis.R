@@ -221,7 +221,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
     )
   }
 
-  smoothed <- posterior::pareto_smooth_tail(
+  smoothed <- posterior::ps_tail(
     x = lw_i,
     ndraws_tail = tail_len_i,
     tail = "right",
