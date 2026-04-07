@@ -4801,6 +4801,70 @@
       Warning:
       Not enough tail samples to fit the generalized Pareto distribution in some or all columns of matrix of log importance ratios. Skipping the following columns: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ... [22 more not printed].
       Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
+      Can't fit generalized Pareto distribution because ndraws_tail is less than 5.
+      Warning:
       Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.
     Output
       Computed from 10 by 32 log-weights matrix.
