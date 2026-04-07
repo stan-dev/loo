@@ -68,7 +68,7 @@ data {
   int<lower=1> N;
   matrix[N,K] x;
   array[N] int y;
-  vector[N] offset;
+  vector[N] offset_; // offset is reserved keyword in Stan so use offset_
 
   real beta_prior_scale;
   real alpha_prior_scale;
@@ -78,14 +78,15 @@ parameters {
   real intercept;
 }
 model {
-  y ~ poisson(exp(x * beta + intercept + offset));
+  y ~ poisson(exp(x * beta + intercept + offset_));
   beta ~ normal(0,beta_prior_scale);
   intercept ~ normal(0,alpha_prior_scale);
 }
 generated quantities {
   vector[N] log_lik;
-  for (n in 1:N)
-    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));
+  for (n in 1:N) {
+    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset_[n]));
+  }
 }
 "
 ```
@@ -117,12 +118,20 @@ Next we fit the model in Stan using the __rstan__ package:
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
 y <- roaches$y
-x <- roaches[,c("roach1", "treatment", "senior")]
-offset <- log(roaches[,"exposure2"])
+x <- roaches[, c("roach1", "treatment", "senior")]
+offset <- log(roaches[, "exposure2"])
 n <- dim(x)[1]
 k <- dim(x)[2]
 
-standata <- list(N = n, K = k, x = as.matrix(x), y = y, offset = offset, beta_prior_scale = 2.5, alpha_prior_scale = 5.0)
+standata <- list(
+  N = n,
+  K = k,
+  x = as.matrix(x),
+  y = y,
+  offset_ = offset,
+  beta_prior_scale = 2.5,
+  alpha_prior_scale = 5.0
+)
 
 # Compile
 stanmodel <- stan_model(model_code = stancode)
@@ -239,7 +248,9 @@ __rstan__ objects, the functions look like this:
 .create_skeleton <- function(pars, dims) {
   out <- lapply(seq_along(pars), function(i) {
     len_dims <- length(dims[[i]])
-    if (len_dims < 1) return(0)
+    if (len_dims < 1) {
+      return(0)
+    }
     return(array(0, dim = dims[[i]]))
   })
   names(out) <- pars
@@ -254,7 +265,7 @@ post_draws_stanfit <- function(x, ...) {
 # compute a matrix of log-likelihood values for the ith observation
 # matrix contains information about the number of MCMC chains
 log_lik_i_stanfit <- function(x, i, parameter_name = "log_lik", ...) {
-  loo::extract_log_lik(x, parameter_name, merge_chains = FALSE)[, , i]
+  loo::extract_log_lik(x, parameter_name, merge_chains = FALSE)[,, i]
 }
 
 # transform parameters to the unconstraint space
@@ -272,13 +283,24 @@ unconstrain_pars_stanfit <- function(x, pars, ...) {
 
 # compute log_prob for each posterior draws on the unconstrained space
 log_prob_upars_stanfit <- function(x, upars, ...) {
-  apply(upars, 1, rstan::log_prob, object = x,
-        adjust_transform = TRUE, gradient = FALSE)
+  apply(
+    upars,
+    1,
+    rstan::log_prob,
+    object = x,
+    adjust_transform = TRUE,
+    gradient = FALSE
+  )
 }
 
 # compute log_lik values based on the unconstrained parameters
-log_lik_i_upars_stanfit <- function(x, upars, i, parameter_name = "log_lik",
-                                  ...) {
+log_lik_i_upars_stanfit <- function(
+  x,
+  upars,
+  i,
+  parameter_name = "log_lik",
+  ...
+) {
   S <- nrow(upars)
   out <- numeric(S)
   for (s in seq_len(S)) {

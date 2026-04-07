@@ -7,7 +7,7 @@
 #'
 #' @export
 #' @param x A list of `"psis_loo"` objects (objects returned by [loo()]) or
-#'   pointwise log-likelihood matrices or , one for each model. If the list
+#'   pointwise log-likelihood matrices, one for each model. If the list
 #'   elements are named the names will be used to label the models in the
 #'   results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 #'   where \eqn{S} is the size of the posterior sample (with all chains merged)

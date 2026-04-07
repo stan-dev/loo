@@ -4,7 +4,7 @@
 \alias{loo-glossary}
 \title{LOO package glossary}
 \description{
-The pages provides definitions to key terms. Also see the
+This page provides definitions of key terms. Also see the
 \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
 the \strong{loo} website for answers to frequently asked questions.
 
@@ -173,9 +173,9 @@ Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research}
 25(72):1-58.
 \href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 
-Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari,
-A. (2022).  Uncertainty in Bayesian leave-one-out
-cross-validation based model comparison. \href{https://arxiv.org/abs/2008.10296v3}{preprint arXiv:2008.10296v3.}.
+Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2025).
+Uncertainty in Bayesian leave-one-out cross-validation based model
+comparison. \emph{Bayesian Analysis}. \doi{10.1214/25-BA1569}.
 
 Gabry, J. , Simpson, D. , Vehtari, A. , Betancourt, M. and
 Gelman, A. (2019), Visualization in Bayesian workflow.

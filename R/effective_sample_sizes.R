@@ -63,14 +63,14 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
   if (cores == 1) {
-    n_eff_vec <- apply(x, 3, ess_rfun)
+    n_eff_vec <- apply(x, 3, posterior::ess_mean)
   } else {
     if (!os_is_windows()) {
       n_eff_list <-
         parallel::mclapply(
           mc.cores = cores,
           X = seq_len(dim(x)[3]),
-          FUN = function(i) ess_rfun(x[, , i, drop = TRUE])
+          FUN = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
         )
     } else {
       cl <- parallel::makePSOCKcluster(cores)
@@ -79,7 +79,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
         parallel::parLapply(
           cl = cl,
           X = seq_len(dim(x)[3]),
-          fun = function(i) ess_rfun(x[, , i, drop = TRUE])
+          fun = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
         )
     }
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
@@ -191,83 +191,4 @@ psis_n_eff.matrix <- function(w, r_eff = NULL, ...) {
     stop("r_eff must have length 1 or ncol(w).", call. = FALSE)
   }
   1 / ss * r_eff
-}
-
-#' MCMC effective sample size calculation
-#'
-#' @noRd
-#' @param sims An iterations by chains matrix of draws for a single parameter.
-#'   In the case of the **loo** package, this will be the **exponentiated**
-#'   log-likelihood values for the ith observation.
-#' @return MCMC effective sample size based on RStan's calculation.
-#'
-ess_rfun <- function(sims) {
-  if (is.vector(sims)) dim(sims) <- c(length(sims), 1)
-  chains <- ncol(sims)
-  n_samples <- nrow(sims)
-  acov <- lapply(1:chains, FUN = function(i) posterior::autocovariance(sims[,i]))
-  acov <- do.call(cbind, acov)
-  chain_mean <- colMeans(sims)
-  mean_var <- mean(acov[1,]) * n_samples / (n_samples - 1)
-  var_plus <- mean_var * (n_samples - 1) / n_samples
-  if (chains > 1)
-    var_plus <- var_plus + var(chain_mean)
-  # Geyer's initial positive sequence
-  rho_hat_t <- rep.int(0, n_samples)
-  t <- 0
-  rho_hat_even <- 1
-  rho_hat_t[t + 1] <- rho_hat_even
-  rho_hat_odd <- 1 - (mean_var - mean(acov[t + 2, ])) / var_plus
-  rho_hat_t[t + 2] <- rho_hat_odd
-  while (t < nrow(acov) - 5 && !is.nan(rho_hat_even + rho_hat_odd) &&
-         (rho_hat_even + rho_hat_odd > 0)) {
-    t <- t + 2
-    rho_hat_even = 1 - (mean_var - mean(acov[t + 1, ])) / var_plus
-    rho_hat_odd = 1 - (mean_var - mean(acov[t + 2, ])) / var_plus
-    if ((rho_hat_even + rho_hat_odd) >= 0) {
-      rho_hat_t[t + 1] <- rho_hat_even
-      rho_hat_t[t + 2] <- rho_hat_odd
-    }
-  }
-  max_t <- t
-  # this is used in the improved estimate
-  if (rho_hat_even>0)
-      rho_hat_t[max_t + 1] <- rho_hat_even
-
-  # Geyer's initial monotone sequence
-  t <- 0
-  while (t <= max_t - 4) {
-    t <- t + 2
-    if (rho_hat_t[t + 1] + rho_hat_t[t + 2] >
-        rho_hat_t[t - 1] + rho_hat_t[t]) {
-      rho_hat_t[t + 1] = (rho_hat_t[t - 1] + rho_hat_t[t]) / 2;
-      rho_hat_t[t + 2] = rho_hat_t[t + 1];
-    }
-  }
-  ess <- chains * n_samples
-  # Geyer's truncated estimate
-  # tau_hat <- -1 + 2 * sum(rho_hat_t[1:max_t])
-  # Improved estimate reduces variance in antithetic case
-  tau_hat <- -1 + 2 * sum(rho_hat_t[1:max_t]) + rho_hat_t[max_t+1]
-  # Safety check for negative values and with max ess equal to ess*log10(ess)
-  tau_hat <- max(tau_hat, 1/log10(ess))
-  ess <- ess / tau_hat
-  ess
-}
-
-
-fft_next_good_size <- function(N) {
-  # Find the optimal next size for the FFT so that
-  # a minimum number of zeros are padded.
-  if (N <= 2)
-    return(2)
-  while (TRUE) {
-    m = N
-    while ((m %% 2) == 0) m = m / 2
-    while ((m %% 3) == 0) m = m / 3
-    while ((m %% 5) == 0) m = m / 5
-    if (m <= 1)
-      return(N)
-    N = N + 1
-  }
 }

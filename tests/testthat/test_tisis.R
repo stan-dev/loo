@@ -1,9 +1,6 @@
-library(loo)
-options(mc.cores=1)
-options(loo.cores=NULL)
+options(mc.cores = 1)
+options(loo.cores = NULL)
 set.seed(123)
-
-context("tis and is")
 
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
@@ -25,7 +22,6 @@ test_that("tis and is runs", {
 })
 
 test_that("tis() and sis() returns object with correct structure for tis/sis", {
-
   expect_false(is.psis(tis1))
   expect_false(is.psis(is1))
   expect_true(is.tis(tis1))
@@ -77,7 +73,6 @@ test_that("psis methods give same results", {
 })
 
 
-
 test_that("tis throws correct errors and warnings", {
   # r_eff default no warnings
   expect_silent(tis(-LLarr))
@@ -87,23 +82,23 @@ test_that("tis throws correct errors and warnings", {
   # r_eff=NULL no warnings
   expect_silent(tis(-LLarr, r_eff = NULL))
   expect_silent(tis(-LLmat, r_eff = NULL))
-  expect_silent(tis(-LLmat[,1], r_eff = NULL))
+  expect_silent(tis(-LLmat[, 1], r_eff = NULL))
 
   # r_eff=NA no warnings
   expect_silent(tis(-LLarr, r_eff = NA))
   expect_silent(tis(-LLmat, r_eff = NA))
-  expect_silent(tis(-LLmat[,1], r_eff = NA))
+  expect_silent(tis(-LLmat[, 1], r_eff = NA))
 
   # r_eff default and r_eff=NA give same answer
   expect_equal(
     suppressWarnings(tis(-LLarr)),
-                     tis(-LLarr, r_eff = NA)
+    tis(-LLarr, r_eff = NA)
   )
 
   # r_eff=NULL and r_eff=NA give same answer
   expect_equal(
     suppressWarnings(tis(-LLarr, r_eff = NULL)),
-                     tis(-LLarr, r_eff = NA)
+    tis(-LLarr, r_eff = NA)
   )
 
   # r_eff scalar is fine
@@ -112,22 +107,25 @@ test_that("tis throws correct errors and warnings", {
   # r_eff wrong length is error
   expect_error(tis(-LLarr, r_eff = r_eff_arr[-1]), "one value per observation")
 
-  # r_eff has some NA values causes error
+  # r_eff has some NA values which are replaced with 1
   r_eff_arr[2] <- NA
-  expect_error(tis(-LLarr, r_eff = r_eff_arr), "mix NA and not NA values")
+  expect_snapshot(psis(-LLarr, r_eff = r_eff_arr))
 
   # no NAs or non-finite values allowed
-  LLmat[1,1] <- NA
+  LLmat[1, 1] <- NA
   expect_error(tis(-LLmat), "NAs not allowed in input")
 
-  LLmat[1,1] <- 1
+  LLmat[1, 1] <- 1
   LLmat[10, 2] <- -Inf
   expect_error(tis(-LLmat), "All input values must be finite or -Inf")
   LLmat[10, 2] <- Inf
   expect_no_error(tis(-LLmat))
 
   # no lists allowed
-  expect_error(expect_warning(tis(as.list(-LLvec)), "List not allowed as input"))
+  expect_error(expect_warning(
+    tis(as.list(-LLvec)),
+    "List not allowed as input"
+  ))
 
   # if array, must be 3-D array
   dim(LLarr) <- c(2, 250, 2, 32)
@@ -142,21 +140,73 @@ test_that("tis throws correct errors and warnings", {
 test_that("explict test of values for 'sis' and 'tis'", {
   lw <- 1:16
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
-  expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               c(-14.0723, -13.0723, -12.0723, -11.0723, -10.0723, -9.0723, -8.0723, -7.0723, -6.0723, -5.0723, -4.0723, -3.0723, -2.0723, -1.0723, -0.0723, 0.) + 15.07238, tol = 0.001)
+  expect_equal(
+    as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
+    c(
+      -14.0723,
+      -13.0723,
+      -12.0723,
+      -11.0723,
+      -10.0723,
+      -9.0723,
+      -8.0723,
+      -7.0723,
+      -6.0723,
+      -5.0723,
+      -4.0723,
+      -3.0723,
+      -2.0723,
+      -1.0723,
+      -0.0723,
+      0.
+    ) +
+      15.07238,
+    tolerance = 0.001
+  )
   expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
-  expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
-               lw, tol = 0.00001)
+  expect_equal(
+    as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
+    lw,
+    tolerance = 0.00001
+  )
 
-  lw <- c(0.7609420, 1.3894140, 0.4158346, 2.5307927, 4.3379119, 2.4159240, 2.2462172, 0.8057697, 0.9333107, 1.5599302)
+  lw <- c(
+    0.7609420,
+    1.3894140,
+    0.4158346,
+    2.5307927,
+    4.3379119,
+    2.4159240,
+    2.2462172,
+    0.8057697,
+    0.9333107,
+    1.5599302
+  )
 
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
-  expect_equal(as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
-               c(-2.931, -2.303, -3.276, -1.161,  0, -1.276, -1.446, -2.886, -2.759, -2.132) + 3.692668,
-               tol = 0.001)
+  expect_equal(
+    as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
+    c(
+      -2.931,
+      -2.303,
+      -3.276,
+      -1.161,
+      0,
+      -1.276,
+      -1.446,
+      -2.886,
+      -2.759,
+      -2.132
+    ) +
+      3.692668,
+    tolerance = 0.001
+  )
   expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
-  expect_equal(as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
-               lw, tol = 0.00001)
+  expect_equal(
+    as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
+    lw,
+    tolerance = 0.00001
+  )
 })
 
 

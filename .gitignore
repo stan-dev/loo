@@ -1,14 +1,18 @@
 # History files
 .Rhistory
 .Rapp.history
-
 loo.Rproj
 
 # Example code in package build process
 *-Ex.R
+
 # RStudio files
 .Rproj.user/
 .Rproj.user
+
+# vscode/positron/etc settings
+.vscode/*
+
 # produced vignettes
 vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*

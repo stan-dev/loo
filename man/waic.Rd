@@ -116,7 +116,7 @@ print(compare(waic1, waic2), digits = 2)
 }
 \references{
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-widely application information criterion in singular learning theory.
+widely applicable information criterion in singular learning theory.
 \emph{Journal of Machine Learning Research} \strong{11}, 3571-3594.
 
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model

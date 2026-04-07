@@ -101,7 +101,7 @@ Stan Development Team (2018). RStan: the R interface to Stan, Version 2.17.3.
 \url{https://mc-stan.org}.
 
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-widely application information criterion in singular learning theory.
+widely applicable information criterion in singular learning theory.
 \emph{Journal of Machine Learning Research} \strong{11}, 3571-3594.
 
 Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
@@ -118,7 +118,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jonah Gabry \email{jsg2201@columbia.edu}
+\strong{Maintainer}: Jonah Gabry \email{jgabry@gmail.com}
 
 Authors:
 \itemize{
@@ -136,6 +136,7 @@ Other contributors:
   \item Juho Piironen [contributor]
   \item Bruno Nicenboim [contributor]
   \item Leevi Lindgren [contributor]
+  \item Visruth Srimath Kandali [contributor]
 }
 
 }
