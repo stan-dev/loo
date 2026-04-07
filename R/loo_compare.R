@@ -186,9 +186,15 @@ loo_compare_checks <- function(loos) {
     stop("All inputs should have class 'loo'.", call.=FALSE)
   }
 
-  Ns <- sapply(loos, function(x) nrow(x$pointwise))
-  if (!all(Ns == Ns[1L])) {
-    stop("Not all models have the same number of data points.", call.=FALSE)
+  Ns <- vapply(loos, function(x) nrow(x$pointwise), integer(1))
+  if (any(Ns != Ns[1L])) {
+    stop(
+      paste0(
+        "All models must have the same number of observations, but models have inconsistent observation counts: ",
+        paste(paste0("'", find_model_names(loos), "' (", Ns, ")"), collapse = ", ")
+      ), 
+      call. = FALSE
+    )
   }
 
   ## warnings
@@ -321,7 +327,7 @@ loo_order_stat_check <- function(loos, ord) {
 
   if (max(elpd_diff) <= order_stat) {
     # flag warning if we suspect no model is theoretically better than the baseline
-    warning("Difference in performance potentially due to chance.",
+    warning("Difference in performance potentially due to chance. ",
             "See McLatchie and Vehtari (2023) for details.",
             call. = FALSE)
   }

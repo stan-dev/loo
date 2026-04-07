@@ -114,13 +114,13 @@ Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research}
 25(72):1-58.
 \href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 
-Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2022).
+Sivula, T, Magnusson, M., Matamoros A. A., and Vehtari, A. (2025).
 Uncertainty in Bayesian leave-one-out cross-validation based model
-comparison. \href{https://arxiv.org/abs/2008.10296v3}{preprint arXiv:2008.10296v3.}.
+comparison. \emph{Bayesian Analysis}. \doi{10.1214/25-BA1569}
 
-McLatchie, Y., and Vehtari, A. (2023).  Efficient estimation and
+McLatchie, Y., and Vehtari, A. (2024).  Efficient estimation and
 correction of selection-induced bias with order statistics.
-\href{https://arxiv.org/abs/2309.03742}{preprint arXiv:2309.03742}
+\emph{Statistics and Computing}. 34(132). \doi{10.1007/s11222-024-10442-4}
 }
 \seealso{
 \itemize{
