@@ -89,13 +89,14 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_s3_class(comp1, "compare.loo")
   expect_equal(colnames(comp1), comp_colnames)
   expect_equal(rownames(comp1), c("model1", "model2"))
-  expect_output(print(comp1), "elpd_diff")
+  expect_snapshot(print(comp1))
   expect_equal(comp1[1:2, 1], c(0, 0), ignore_attr = TRUE)
   expect_equal(comp1[1:2, 2], c(0, 0), ignore_attr = TRUE)
 
   comp2 <- loo_compare(w1, w2)
   expect_s3_class(comp2, "compare.loo")
   expect_equal(colnames(comp2), comp_colnames)
+  expect_snapshot(print(comp2))
 
   expect_snapshot_value(comp2, style = "serialize")
 
@@ -113,6 +114,7 @@ test_that("loo_compare returns expected result (3 models)", {
   expect_equal(comp1[1, 1], 0)
   expect_s3_class(comp1, "compare.loo")
   expect_s3_class(comp1, "matrix")
+  expect_snapshot(print(comp1))
 
   expect_snapshot_value(comp1, style = "serialize")
 

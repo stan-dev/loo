@@ -1,6 +1,24 @@
 # loo_compare returns expected results (2 models)
 
-    WAoAAAACAAQFAAACAwAAAAMOAAAAEAAAAAAAAAAAwBA6U1+cRe4AAAAAAAAAAD+2ake0LxMB
+    Code
+      print(comp1)
+    Output
+             elpd_diff se_diff
+      model1 0.0       0.0    
+      model2 0.0       0.0    
+
+---
+
+    Code
+      print(comp2)
+    Output
+             elpd_diff se_diff
+      model1  0.0       0.0   
+      model2 -4.1       0.1   
+
+---
+
+    WAoAAAACAAQFAgACAwAAAAMOAAAAEAAAAAAAAAAAwBA6U1+cRe4AAAAAAAAAAD+2ake0LxMB
     wFTh8N3JQljAVeWWE8MGuUARCD2zEXBfQBEalRIN2T9ACijAYdW5U0AmZ5XrANCKP/H9Zexy
     814/8ZtgnG1nx0Bk4fDdyUJYQGXllhPDBrlAIQg9sxFwX0AhGpUSDdk/AAAEAgAAAAEABAAJ
     AAAAA2RpbQAAAA0AAAACAAAAAgAAAAgAAAQCAAAAAQAEAAkAAAAIZGltbmFtZXMAAAATAAAA
@@ -12,8 +30,18 @@
 
 # loo_compare returns expected result (3 models)
 
-    WAoAAAACAAQFAAACAwAAAAMOAAAAGAAAAAAAAAAAwBA6U1+cRe7AMA3KkbYEGAAAAAAAAAAA
-    P7ZqR7QvEwE/y6/t4TTtXsBU4fDdyUJYwFXllhPDBrnAWOVjgjbDYkARCD2zEXBfQBEalRIN
+    Code
+      print(comp1)
+    Output
+             elpd_diff se_diff
+      model1   0.0       0.0  
+      model2  -4.1       0.1  
+      model3 -16.1       0.2  
+
+---
+
+    WAoAAAACAAQFAgACAwAAAAMOAAAAGAAAAAAAAAAAwBA6U1+cRe7AMA3KkbYEGAAAAAAAAAAA
+    P7ZqR7QvEwE/y6/t4TTtYMBU4fDdyUJYwFXllhPDBrnAWOVjgjbDYkARCD2zEXBfQBEalRIN
     2T9AEPIF3GigE0AKKMBh1blTQCZnlesA0IpAQcjYUhrdCj/x/WXscvNeP/GbYJxtZ8c/8YDQ
     kmfJX0Bk4fDdyUJYQGXllhPDBrlAaOVjgjbDYkAhCD2zEXBfQCEalRIN2T9AIPIF3GigEwAA
     BAIAAAABAAQACQAAAANkaW0AAAANAAAAAgAAAAMAAAAIAAAEAgAAAAEABAAJAAAACGRpbW5h
