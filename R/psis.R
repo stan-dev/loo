@@ -221,12 +221,12 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
     )
   }
 
-  smoothed <- posterior::ps_tail(
+  smoothed <- suppressWarnings(posterior::ps_tail(
     x = lw_i,
     ndraws_tail = tail_len_i,
     tail = "right",
     are_log_weights = TRUE
-  )
+  ))
 
   lw_i <- smoothed$x
   khat <- smoothed$k
