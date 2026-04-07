@@ -193,7 +193,7 @@
 #'
 #' When the number of observations is small, we may assume `se_diff` to be
 #' underestimated. As a rough heuristic one can multiply `se_diff` by 2 to
-#' make a more conservative estimate (Bengio and Grandvalet, 2004).
+#' make a more conservative estimate.
 #'
 #' ### `|elpd_diff| < 4`
 #'

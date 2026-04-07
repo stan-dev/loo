@@ -204,7 +204,7 @@ The column \code{diag_diff} currently flags two problems:
 
 When the number of observations is small, we may assume \code{se_diff} to be
 underestimated. As a rough heuristic one can multiply \code{se_diff} by 2 to
-make a more conservative estimate (Bengio and Grandvalet, 2004).
+make a more conservative estimate.
 }
 
 \subsection{\verb{|elpd_diff| < 4}}{
