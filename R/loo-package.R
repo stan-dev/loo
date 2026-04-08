@@ -1,7 +1,5 @@
 #' Efficient LOO-CV and WAIC for Bayesian models
 #'
-#' @keywords internal
-#'
 #' @importFrom stats sd var quantile setNames weights rnorm qnorm
 #' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
