@@ -212,24 +212,34 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   # shift log ratios for safer exponentation
   lw_i <- log_ratios_i - max(log_ratios_i)
+  khat <- Inf
+  smooth_tail <- TRUE
 
-  if (length(unique(utils::tail(sort(log_ratios_i), tail_len_i))) == 1) {
-    warning(
-      "Can't fit generalized Pareto distribution ",
-      "because all tail values are the same.",
-      call. = FALSE
-    )
+  if (
+    enough_tail_samples(tail_len_i)
+  ) {
+    lw_tail <- utils::tail(sort.int(lw_i), tail_len_i)
+    if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
+      warning(
+        "Can't fit generalized Pareto distribution ",
+        "because all tail values are the same.",
+        call. = FALSE
+      )
+      smooth_tail <- FALSE
+    }
   }
 
-  smoothed <- suppressWarnings(posterior::ps_tail(
-    x = lw_i,
-    ndraws_tail = tail_len_i,
-    tail = "right",
-    are_log_weights = TRUE
-  ))
+  if (smooth_tail) {
+    smoothed <- suppressWarnings(posterior::ps_tail(
+      x = lw_i,
+      ndraws_tail = tail_len_i,
+      tail = "right",
+      are_log_weights = TRUE
+    ))
 
-  lw_i <- smoothed$x
-  khat <- smoothed$k
+    lw_i <- smoothed$x
+    khat <- smoothed$k
+  }
 
   # truncate at max of raw wts (i.e., 0 since max has been subtracted)
   lw_i[lw_i > 0] <- 0
