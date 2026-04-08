@@ -150,4 +150,11 @@ test_that("do_psis_i throws warning if all tail values the same", {
     "all tail values are the same"
   )
   expect_equal(val$pareto_k, Inf)
+
+  xx <- c(4, 1, 4, 4, 4, 4, 4, 2, 3, 4, 4)
+  expect_warning(
+    val <- do_psis_i(xx, tail_len_i = 6),
+    "all tail values are the same"
+  )
+  expect_equal(val$pareto_k, Inf)
 })
