@@ -1,25 +1,18 @@
 name: Continuous Benchmarks (Receive)
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
-on: 
+on:
   pull_request:
-
-permissions:
-  contents: read
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest 
-    if:
-      true &&
-      (
-        github.event.pull_request.author_association == 'OWNER' ||
-        github.event.pull_request.author_association == 'MEMBER' ||
-        github.event.pull_request.author_association == 'COLLABORATOR' 
-      )
+    runs-on: ubuntu-latest
     outputs:
       config: ${{ steps.read_touchstone_config.outputs.config }}
     steps:
@@ -30,13 +23,8 @@ jobs:
 
       - id: read_touchstone_config
         run: |
-          content=`cat ./touchstone/config.json`
-          # the following lines are only required for multi line json
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          # end of optional handling for multi line json
-          echo "::set-output name=config::$content"
+          echo "config=$(jq -c . ./touchstone/config.json)" >> $GITHUB_OUTPUT
+
   build:
     needs: prepare
     runs-on: ${{ matrix.config.os }}
@@ -45,16 +33,11 @@ jobs:
       matrix:
         config:
           - ${{ fromJson(needs.prepare.outputs.config) }}
-    env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: lorenzwalthert/touchstone/actions/receive@v1
+      - name: Checkout repo
+        uses: actions/checkout@v6
         with:
-          cache-version: 1
-          benchmarking_repo: ${{ matrix.config.benchmarking_repo }}
-          benchmarking_ref: ${{ matrix.config.benchmarking_ref }}
-          benchmarking_path: ${{ matrix.config.benchmarking_path }} 
-          force_upstream: true
+          fetch-depth: 0
+      - uses: lorenzwalthert/touchstone/actions/receive@main
+        with:
           r-version: ${{ matrix.config.r }}
