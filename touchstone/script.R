@@ -9,7 +9,7 @@ touchstone::branch_install()
 touchstone::benchmark_run(
   expr_before_benchmark = {
     suppressPackageStartupMessages(library(loo))
-    matrix_r_eff <- rep(1, matrix_obs)
+    matrix_r_eff <- rep(1, ncol(loo:::.wine_log_lik_matrix))
   },
   loo_matrix = {
     suppressWarnings(
