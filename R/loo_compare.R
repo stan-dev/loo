@@ -200,8 +200,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
               any(nzchar(x[["diag_elpd"]], keepNA = FALSE), na.rm = TRUE)
   if (has_diag && p_worse) {
     message(
-      "\nDiagnostic flags present. ",
-      "See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`) ",
+      "\nDiagnostic flags present.\n",
+      "See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)\n",
       "or https://mc-stan.org/loo/reference/loo-glossary.html."
     )
   }
@@ -251,7 +251,7 @@ loo_compare_checks <- function(loos) {
       paste0(
         "All models must have the same number of observations, but models have inconsistent observation counts: ",
         paste(paste0("'", find_model_names(loos), "' (", Ns, ")"), collapse = ", ")
-      ), 
+      ),
       call. = FALSE
     )
   }
