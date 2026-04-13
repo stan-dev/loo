@@ -11,7 +11,7 @@
 #' @name pareto-k-diagnostic
 #' @param x An object created by [loo()] or [psis()].
 #' @param threshold For `pareto_k_ids()`, `threshold` is the minimum \eqn{k}
-#'   value to flag (default is a sample size `S` dependend threshold
+#'   value to flag (default is a sample size `S` dependent threshold
 #'   `1 - 1 / log10(S)`). For `mcse_loo()`, if any \eqn{k} estimates are
 #'   greater than `threshold` the MCSE estimate is returned as `NA`
 #'   See **Details** for the motivation behind these defaults.
@@ -430,7 +430,7 @@ min_n_eff_by_k <- function(n_eff, kcut) {
 #' with bigger sample size S we can achieve estimates with small
 #' probability of large error, it is difficult to get accurate MCSE
 #' estimates as the bias starts to dominate when k > 0.7 (see Section 3.2.3).
-#' Thus the sample size dependend k-ht threshold is capped at 0.7.
+#' Thus the sample size dependent k-hat threshold is capped at 0.7.
 #' @param S sample size
 #' @param ... unused
 #' @return threshold

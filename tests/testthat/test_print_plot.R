@@ -38,36 +38,14 @@ test_that("plot methods throw appropriate errors/warnings", {
 
 
 # printing ----------------------------------------------------------------
-lldim_msg <- paste0(
-  "Computed from ",
-  prod(dim(LLarr)[1:2]),
-  " by ",
-  dim(LLarr)[3],
-  " log-likelihood matrix"
-)
-lwdim_msg <- paste0(
-  "Computed from ",
-  prod(dim(LLarr)[1:2]),
-  " by ",
-  dim(LLarr)[3],
-  " log-weights matrix"
-)
-
 test_that("print.waic output is ok", {
-  expect_output(print(waic1), lldim_msg)
-  expect_output(
-    print(waic1),
-    "p_waic estimates greater than 0.4. We recommend trying loo instead."
-  )
+  expect_snapshot(print(waic1))
 })
 
 test_that("print.psis_loo and print.psis output ok", {
-  expect_output(print(psis1), lwdim_msg)
-  expect_output(print(psis1), "Pareto k estimates are good")
-  expect_output(print(loo1), lldim_msg)
-  expect_output(print(loo1), "MCSE and ESS estimates assume independent draws")
-  expect_output(print(loo1_r_eff), "MCSE and ESS estimates assume MCMC draws")
-  expect_output(print(loo1), "Pareto k estimates are good")
+  expect_snapshot(print(psis1))
+  expect_snapshot(print(loo1))
+  expect_snapshot(print(loo1_r_eff))
 
   loo1$diagnostics$pareto_k <- psis1$diagnostics$pareto_k <- runif(32, 0, .49)
   expect_output(print(loo1), regexp = "Pareto k estimates are good")
@@ -184,4 +162,25 @@ test_that("mcse_loo returns NA when it should", {
 
 test_that("mcse_loo errors if not psis_loo object", {
   expect_error(mcse_loo(psis1), "psis_loo")
+})
+
+# print.loo kfold objects --------------------------------------------------
+
+test_that("print.loo supports kfold with pareto-k diagnostics - calibrated", {
+  kfold1 <- readRDS("data-for-tests/kfold-calibrated.Rds")
+
+  expect_snapshot(print(kfold1))
+})
+
+test_that("print.loo supports kfold with pareto-k diagnostics - miscalibrated", {
+  kfold1 <- readRDS("data-for-tests/kfold-miscalibrated.Rds")
+  
+  expect_snapshot(print(kfold1))
+})
+
+test_that("print.loo supports kfold without pareto-k diagnostics", {
+  kfold1 <- readRDS("data-for-tests/kfold-miscalibrated.Rds")
+  kfold1$diagnostics <- NULL
+
+  expect_snapshot(print(kfold1))
 })

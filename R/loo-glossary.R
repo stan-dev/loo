@@ -7,7 +7,7 @@
 #' @template bayesvis-reference
 #'
 #' @description
-#'   The pages provides definitions to key terms. Also see the
+#'   This page provides definitions of key terms. Also see the
 #'   [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
 #'   the __loo__ website for answers to frequently asked questions.
 #'

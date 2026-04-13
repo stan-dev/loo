@@ -4,7 +4,7 @@
 \alias{loo-glossary}
 \title{LOO package glossary}
 \description{
-The pages provides definitions to key terms. Also see the
+This page provides definitions of key terms. Also see the
 \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
 the \strong{loo} website for answers to frequently asked questions.
 
