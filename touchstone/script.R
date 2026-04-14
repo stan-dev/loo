@@ -5,15 +5,16 @@
 touchstone::branch_install()
 
 touchstone::pin_assets("touchstone/wine.rds")
-wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
-  "touchstone/wine.rds"
-))
 
 # These synthetic workloads are large enough to expose real slowdowns in the
 # core `loo()` paths, but still short enough to keep PR feedback reasonably fast.
 touchstone::benchmark_run(
   expr_before_benchmark = {
     suppressPackageStartupMessages(library(loo))
+    # benchmark_run() evaluates in a callr subprocess, so load pinned assets here.
+    wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
+      "touchstone/wine.rds"
+    ))
     matrix_r_eff <- rep(1, ncol(wine_log_lik_matrix))
   },
   loo_matrix = {
@@ -31,6 +32,9 @@ touchstone::benchmark_run(
 touchstone::benchmark_run(
   expr_before_benchmark = {
     suppressPackageStartupMessages(library(loo))
+    wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
+      "touchstone/wine.rds"
+    ))
     function_r_eff <- rep(1, ncol(wine_log_lik_matrix))
     wine_data <- data.frame(obs = seq_len(ncol(wine_log_lik_matrix)))
     wine_llfun <- function(data_i, draws) draws[, data_i$obs, drop = FALSE]
