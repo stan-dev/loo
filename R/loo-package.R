@@ -1,8 +1,5 @@
 #' Efficient LOO-CV and WAIC for Bayesian models
 #'
-#' @docType package
-#' @name loo-package
-#'
 #' @importFrom stats sd var quantile setNames weights rnorm qnorm
 #' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
@@ -89,4 +86,4 @@
 #' for the generalized Pareto distribution. *Technometrics* **51**,
 #' 316-325.
 #'
-NULL
+"_PACKAGE"
