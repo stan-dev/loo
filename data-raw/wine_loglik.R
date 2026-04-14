@@ -17,5 +17,4 @@ fitos <- read.delim("data-raw/winequality-red.csv", sep = ";") |>
     refresh = 0
   )
 
-.wine_log_lik_matrix <- log_lik(fitos)
-usethis::use_data(.wine_log_lik_matrix, internal = TRUE, overwrite = TRUE)
+saveRDS(log_lik(fitos), "touchstone/wine.rds")
