@@ -5,7 +5,9 @@
 touchstone::branch_install()
 
 touchstone::pin_assets("touchstone/wine.rds")
-wine_log_lik_matrix <- readRDS(path_pinned_asset("touchstone/wine.rds"))
+wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
+  "touchstone/wine.rds"
+))
 
 # These synthetic workloads are large enough to expose real slowdowns in the
 # core `loo()` paths, but still short enough to keep PR feedback reasonably fast.
