@@ -4,14 +4,12 @@
 # installs branches to benchmark
 touchstone::branch_install()
 
+# make log lik available to tests
 touchstone::pin_assets("touchstone/wine.rds")
 
-# These synthetic workloads are large enough to expose real slowdowns in the
-# core `loo()` paths, but still short enough to keep PR feedback reasonably fast.
 touchstone::benchmark_run(
   expr_before_benchmark = {
     suppressPackageStartupMessages(library(loo))
-    # benchmark_run() evaluates in a callr subprocess, so load pinned assets here.
     wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
       "touchstone/wine.rds"
     ))
