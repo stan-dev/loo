@@ -24,7 +24,7 @@ touchstone::benchmark_run(
       )
     )
   },
-  n = 30
+  n = 50
 )
 
 touchstone::benchmark_run(
@@ -48,7 +48,7 @@ touchstone::benchmark_run(
       )
     )
   },
-  n = 30
+  n = 50
 )
 
 # create artifacts used downstream in the GitHub Action
