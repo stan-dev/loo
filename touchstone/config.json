@@ -1,6 +1,6 @@
 {
-  "os": "ubuntu-22.04",
-  "r": "4.4.3",
+  "os": "ubuntu-24.04",
+  "r": "4.5.3",
   "rspm": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
   "benchmarking_repo": "",
   "benchmarking_ref": "",
