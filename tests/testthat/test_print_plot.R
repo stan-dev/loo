@@ -114,7 +114,7 @@ test_that("pareto_k_table gives correct output", {
   tab <- pareto_k_table(psis1)
 
   expect_output(print(tab), "Pareto k diagnostic values")
-  expect_identical(colnames(tab), c("Count", "Proportion", "Min. n_eff"))
+  expect_identical(colnames(tab), c("Count", "Proportion", "Min. ESS"))
   expect_equal(sum(tab[, "Count"]), length(k))
   expect_equal(sum(tab[, "Proportion"]), 1)
 
@@ -122,11 +122,11 @@ test_that("pareto_k_table gives correct output", {
   expect_equal(sum(k > threshold & k <= 1), tab[2, 1])
   expect_equal(sum(k > 1), tab[3, 1])
 
-  # if n_eff is NULL
-  psis1$diagnostics$n_eff <- NULL
+  # if ess is NULL
+  psis1$diagnostics$ess <- NULL
   tab2 <- pareto_k_table(psis1)
   expect_output(print(tab2), "<NA>")
-  expect_equal(unname(tab2[, "Min. n_eff"]), rep(NA_real_, 3))
+  expect_equal(unname(tab2[, "Min. ESS"]), rep(NA_real_, 3))
 
   psis1$diagnostics$pareto_k[1:32] <- 0.4
   expect_output(
@@ -139,12 +139,12 @@ test_that("pareto_k_table gives correct output", {
 
 # psis_neff and mcse_loo --------------------------------------------------
 test_that("psis_n_eff_values extractor works", {
-  n_eff_psis <- psis1$diagnostics$n_eff
-  expect_type(n_eff_psis, "double")
-  expect_identical(psis_n_eff_values(psis1), n_eff_psis)
+  ess_psis <- psis1$diagnostics$ess
+  expect_type(ess_psis, "double")
+  expect_identical(psis_n_eff_values(psis1), ess_psis)
   expect_identical(psis_n_eff_values(psis1), psis_n_eff_values(loo1))
 
-  psis1$diagnostics$n_eff <- NULL
+  psis1$diagnostics$ess <- NULL
   expect_error(psis_n_eff_values(psis1), "No PSIS ESS estimates found")
 })
 

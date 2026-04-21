@@ -983,10 +983,15 @@ rbind_psis_loo_ss <- function(object, x) {
   checkmate::assert_disjunct(object$pointwise[, "idx"], x$pointwise[, "idx"])
 
   object$pointwise <- rbind(object$pointwise, x$pointwise)
-  object$diagnostics$pareto_k <-
-    c(object$diagnostics$pareto_k, x$diagnostics$pareto_k)
-  object$diagnostics$n_eff <- c(object$diagnostics$n_eff, x$diagnostics$n_eff)
-  object$diagnostics$r_eff <- c(object$diagnostics$r_eff, x$diagnostics$r_eff)
+  new_diag <- unclass(object$diagnostics)
+  x_diag <- unclass(x$diagnostics)
+  new_ess <- if (!is.null(new_diag$ess)) new_diag$ess else new_diag$n_eff
+  x_ess <- if (!is.null(x_diag$ess)) x_diag$ess else x_diag$n_eff
+  object$diagnostics <- loo_diagnostics(
+    pareto_k = c(new_diag$pareto_k, x_diag$pareto_k),
+    ess = c(new_ess, x_ess),
+    r_eff = c(new_diag$r_eff, x_diag$r_eff)
+  )
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
@@ -1008,9 +1013,13 @@ remove_idx.psis_loo_ss <- function(object, idxs) {
   row_map <- merge(row_map, idxs, by = "idx", all.y = TRUE)
 
   object$pointwise <- object$pointwise[-row_map$row_no,,drop = FALSE]
-  object$diagnostics$pareto_k <- object$diagnostics$pareto_k[-row_map$row_no]
-  object$diagnostics$n_eff <- object$diagnostics$n_eff[-row_map$row_no]
-  object$diagnostics$r_eff <- object$diagnostics$r_eff[-row_map$row_no]
+  d <- unclass(object$diagnostics)
+  d_ess <- if (!is.null(d$ess)) d$ess else d$n_eff
+  object$diagnostics <- loo_diagnostics(
+    pareto_k = d$pareto_k[-row_map$row_no],
+    ess = d_ess[-row_map$row_no],
+    r_eff = d$r_eff[-row_map$row_no]
+  )
   attr(object, "dims")[2] <- nrow(object$pointwise)
   object
 }
@@ -1030,9 +1039,13 @@ order.psis_loo_ss <- function(x, observations) {
   row_map_obs <- data.frame(row_no_obs = 1:length(observations), idx = observations)
   row_map <- merge(row_map_obs, row_map_x, by = "idx", sort = FALSE)
   x$pointwise <- x$pointwise[row_map$row_no_x,,drop = FALSE]
-  x$diagnostics$pareto_k <- x$diagnostics$pareto_k[row_map$row_no_x]
-  x$diagnostics$n_eff <- x$diagnostics$n_eff[row_map$row_no_x]
-  x$diagnostics$r_eff <- x$diagnostics$r_eff[row_map$row_no_x]
+  d <- unclass(x$diagnostics)
+  d_ess <- if (!is.null(d$ess)) d$ess else d$n_eff
+  x$diagnostics <- loo_diagnostics(
+    pareto_k = d$pareto_k[row_map$row_no_x],
+    ess = d_ess[row_map$row_no_x],
+    r_eff = d$r_eff[row_map$row_no_x]
+  )
   x
 }
 

@@ -20,10 +20,11 @@ test_that("psis returns object with correct structure", {
   expect_false(is.psis_loo(psis1))
 
   expect_named(psis1, c("log_weights", "diagnostics"))
-  expect_named(psis1$diagnostics, c("pareto_k", "n_eff", "r_eff"))
+  expect_named(psis1$diagnostics, c("pareto_k", "ess", "n_eff", "r_eff"))
+  expect_s3_class(psis1$diagnostics, "loo_diagnostics")
   expect_equal(dim(psis1), dim(LLmat))
   expect_length(psis1$diagnostics$pareto_k, dim(psis1)[2])
-  expect_length(psis1$diagnostics$n_eff, dim(psis1)[2])
+  expect_length(psis1$diagnostics$ess, dim(psis1)[2])
 })
 
 
