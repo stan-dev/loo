@@ -137,6 +137,7 @@ Other contributors:
   \item Bruno Nicenboim [contributor]
   \item Leevi Lindgren [contributor]
   \item Visruth Srimath Kandali [contributor]
+  \item Florence Bockting [contributor]
 }
 
 }
