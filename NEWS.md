@@ -1,5 +1,17 @@
 # loo (development version)
 
+## Breaking changes
+
+* `loo_compare()` now returns a data frame instead of a matrix and has 
+  additional columns. Code that relies on matrix-specific behaviour will need to
+  be updated accordingly by @florence-bockting in #300
+
+## New features
+
+* `loo_compare()` output now includes additional columns: `p_worse`,
+  `diag_diff`, and `diag_elpd`, providing richer diagnostics for model
+  comparison by @florence-bockting in #300
+
 # loo 2.9.0
 
 * Avoid under and overflows in stacking by @avehtari in #273

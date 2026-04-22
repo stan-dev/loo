@@ -50,42 +50,44 @@ setting \code{mc.cores} interactively or in a script is fine).
 }}
 }
 \value{
-The `tis()` methods return an object of class `"tis"`,
-  which is a named list with the following components:
+The \code{tis()} methods return an object of class \code{"tis"},
+which is a named list with the following components:
 
 \describe{
-  \item{`log_weights`}{
-    Vector or matrix of smoothed (and truncated) but *unnormalized* log
-    weights. To get normalized weights use the
-    [`weights()`][weights.importance_sampling] method provided for objects of
-    class `tis`.
-  }
- \item{`diagnostics`}{
-   A named list containing one vector:
-   * `pareto_k`: Not used in `tis`, all set to 0.
-   * `n_eff`: Effective sample size estimates.
- }
+\item{\code{log_weights}}{
+Vector or matrix of smoothed (and truncated) but \emph{unnormalized} log
+weights. To get normalized weights use the
+\code{\link[=weights.importance_sampling]{weights()}} method provided for objects of
+class \code{tis}.
+}
+\item{\code{diagnostics}}{
+A named list containing one vector:
+\itemize{
+\item \code{pareto_k}: Not used in \code{tis}, all set to 0.
+\item \code{n_eff}: Effective sample size estimates.
+}
+}
 }
 
-Objects of class `"tis"` also have the following [attributes][attributes()]:
+Objects of class \code{"tis"} also have the following \link[=attributes]{attributes}:
 \describe{
-  \item{`norm_const_log`}{
-    Vector of precomputed values of `colLogSumExps(log_weights)` that are
-    used internally by the [weights()]method to normalize the log weights.
-  }
-  \item{`r_eff`}{
-    If specified, the user's `r_eff` argument.
-  }
-  \item{`tail_len`}{
-    Not used for `tis`.
-  }
-  \item{`dims`}{
-    Integer vector of length 2 containing `S` (posterior sample size)
-    and `N` (number of observations).
-  }
-  \item{`method`}{
-    Method used for importance sampling, here `tis`.
-  }
+\item{\code{norm_const_log}}{
+Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
+used internally by the \code{\link[=weights]{weights()}}method to normalize the log weights.
+}
+\item{\code{r_eff}}{
+If specified, the user's \code{r_eff} argument.
+}
+\item{\code{tail_len}}{
+Not used for \code{tis}.
+}
+\item{\code{dims}}{
+Integer vector of length 2 containing \code{S} (posterior sample size)
+and \code{N} (number of observations).
+}
+\item{\code{method}}{
+Method used for importance sampling, here \code{tis}.
+}
 }
 }
 \description{
