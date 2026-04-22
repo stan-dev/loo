@@ -177,7 +177,10 @@
 #' `elpd_diff` is biased due to an unreliable LOO approximation, `p_worse` can
 #' point in the wrong direction entirely. When any of these conditions are
 #' present, `diag_diff` or `diag_elpd` will be flagged in the `loo_compare()`
-#' output. See those sections below for further guidance.
+#' output. 
+#' For further guidance, see the sections below and the case study on
+#' [Uncertainty in Bayesian LOO-CV Model Comparison](
+#' https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html).
 #'
 #' @section `diag_diff` (pairwise comparison diagnostics):
 #'
@@ -224,6 +227,10 @@
 #'   situation, `se_diff` exists and is not heavily biased in scale, but the
 #'   shape of the approximation is wrong, making `p_worse` unreliable.
 #'
+#' For further guidance, see the case study on
+#' [Uncertainty in Bayesian LOO-CV Model Comparison](
+#' https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html).
+#' 
 #' @section `diag_elpd`:
 #'
 #' `diag_elpd` is a diagnostic column in the `loo_compare()` output that flags

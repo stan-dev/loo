@@ -187,7 +187,9 @@ appear more clearly worse than the data actually support. Conversely, when
 \code{elpd_diff} is biased due to an unreliable LOO approximation, \code{p_worse} can
 point in the wrong direction entirely. When any of these conditions are
 present, \code{diag_diff} or \code{diag_elpd} will be flagged in the \code{loo_compare()}
-output. See those sections below for further guidance.
+output.
+For further guidance, see the sections below and the case study on
+\href{https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html}{Uncertainty in Bayesian LOO-CV Model Comparison}.
 }
 
 \section{\code{diag_diff} (pairwise comparison diagnostics)}{
@@ -236,6 +238,9 @@ skewness of the error distribution (Sivula et al., 2025). In this
 situation, \code{se_diff} exists and is not heavily biased in scale, but the
 shape of the approximation is wrong, making \code{p_worse} unreliable.
 }
+
+For further guidance, see the case study on
+\href{https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html}{Uncertainty in Bayesian LOO-CV Model Comparison}.
 }
 }
 
