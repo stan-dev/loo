@@ -2,19 +2,20 @@
 # Users are given access via example_loglik() functions, see loo/R/example_loglik_objects.R
 
 
-# Loglik array
+# .example_loglik_array
 library(rstanarm)
 fit <- stan_glm(mpg ~ wt, data = mtcars, chains = 2, iter = 1000, warmup = 500)
 ll <- log_lik(fit)
 .example_loglik_array <- loo:::llmatrix_to_array(ll, chain_id = rep(1:2, each = 500))
 
 
-# Wine loglik matrix
+# .example_wine_loglik_matrix
+library(dplyr)
 library(brms)
 options(brms.backend = "cmdstanr")
 options(mc.cores = 4)
 
-wine <- read.delim(root("winequality-red", "winequality-red.csv"), sep = ";") |> distinct()
+wine <- read.delim("data-raw/winequality-red.csv", sep = ";") |> distinct()
 
 wine_scaled <- as.data.frame(scale(wine))
 

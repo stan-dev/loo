@@ -1229,7 +1229,23 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' #
 #' # wine_loglik_matrix <- log_lik(fitos)
 #' wine_loglik_matrix <- example_wine_loglik_matrix()  # Installed with loo to save time of fitting model shown above
+#' N <- 1359 # nrow(wine_scaled), see above
+#' Nsub <- 100
+#' # posterior log-score
+#' lpd <- elpd(wine_loglik_matrix)
+#' sum(lpd$pointwise[,"elpd"])
 #'
+#' # Use PSIS-LOO for subsample of Nsub randomly selected observations
+#' set.seed(1)
+#' idx <- sample(1:N, Nsub)
+#' elpd_loo_sub <- loo(wine_loglik_matrix[,idx])
+#' sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
+#'
+#' # Use difference estimator to combine fast result and subsampled accurate result
+#' loo:::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#'
+#' # Comparison to using PSIS-LOO for all observations
+#' loo(wine_loglik_matrix)
 #'
 #' @export
 srs_diff_est <- function(y_approx, y, y_idx) {
