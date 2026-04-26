@@ -37,7 +37,31 @@ As \code{srs_diff_est()} in the \code{loo} package is used for \eqn{n E[y]}, the
 a proportional difference of \eqn{1/n} compared to the paper.
 }
 \examples{
-print("Hello, World!")
+### This example predicts wine quality (data from Cortez et al., 2009).
+## The following, commented out code shows how you to fit the model
+## to generate the wine_log_lik_matrix.
+## The matrix is part of loo as wine_log_lik_matrix()
+# library(dplyr)
+# library(brms)
+# options(brms.backend = "cmdstanr")
+# options(mc.cores = 4)
+# library(loo)
+#
+# wine <- read.delim(root("winequality-red", "winequality-red.csv"), sep = ";") |>
+#   distinct()
+#
+# wine_scaled <- as.data.frame(scale(wine))
+#
+# fitos <- brm(ordered(quality) ~ .,
+#              family = cumulative("logit"),
+#              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
+#              data = wine_scaled,
+#              seed = 1,
+#              silent = 2,
+#              refresh = 0)
+#
+# wine_log_lik_matrix <- log_lik(fitos)
+wine_log_lik_matrix <- "hi"
 
 
 }
@@ -48,6 +72,10 @@ In \emph{Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 
 Cochran, W. G. (1977). \emph{Sampling Techniques, 3rd Edition}. John Wiley.
+
+Cortez, P., Cerdeira, A.L., Almeida, F., Matos, T., & Reis, J. (2009).
+Modeling wine preferences by data mining from physicochemical properties.
+\emph{Decis. Support Syst.}, \emph{47}, 547-553.
 }
 \seealso{
 \code{\link[=loo_subsample]{loo_subsample()}}

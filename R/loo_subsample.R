@@ -1198,10 +1198,37 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #'
 #' Cochran, W. G. (1977). _Sampling Techniques, 3rd Edition_. John Wiley.
 #'
+#' Cortez, P., Cerdeira, A.L., Almeida, F., Matos, T., & Reis, J. (2009).
+#' Modeling wine preferences by data mining from physicochemical properties.
+#' _Decis. Support Syst._, _47_, 547-553.
+#'
 #' @seealso [loo_subsample()]
 #'
 #' @examples
-#' print("Hello, World!")
+#' ### This example predicts wine quality (data from Cortez et al., 2009).
+#' ## First, commented out code shows to generate a loglik_matrix.
+#' ## Second, running code illustrates how to use srs_diff_est().
+#' # library(dplyr)
+#' # library(brms)
+#' # options(brms.backend = "cmdstanr")
+#' # options(mc.cores = 4)
+#' # library(loo)
+#' #
+#' # wine <- read.delim(root("winequality-red", "winequality-red.csv"), sep = ";") |>
+#' #   distinct()
+#' #
+#' # wine_scaled <- as.data.frame(scale(wine))
+#' #
+#' # fitos <- brm(ordered(quality) ~ .,
+#' #              family = cumulative("logit"),
+#' #              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
+#' #              data = wine_scaled,
+#' #              seed = 1,
+#' #              silent = 2,
+#' #              refresh = 0)
+#' #
+#' # wine_loglik_matrix <- log_lik(fitos)
+#' wine_loglik_matrix <- example_wine_loglik_matrix()  # Installed with loo to save time of fitting model shown above
 #'
 #'
 #' @export
