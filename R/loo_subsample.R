@@ -1199,6 +1199,11 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' Cochran, W. G. (1977). _Sampling Techniques, 3rd Edition_. John Wiley.
 #'
 #' @seealso [loo_subsample()]
+#'
+#' @examples
+#' print("Hello, World!")
+#'
+#'
 #' @export
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
