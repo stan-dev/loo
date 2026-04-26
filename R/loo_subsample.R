@@ -24,7 +24,7 @@
 #'   same length containing the posterior density and the approximation density
 #'   for the individual draws.
 #'
-#' @seealso [loo()], [psis()], [loo_compare()]
+#' @seealso [loo()], [psis()], [loo_compare()], [srs_diff_est()]
 #' @template loo-large-data-references
 #'
 #' @export loo_subsample loo_subsample.function
@@ -1166,12 +1166,88 @@ loo_subsample_estimation_diff_srs <- function(x) {
   update_psis_loo_ss_estimates(x)
 }
 
-#' Difference estimation using SRS-WOR sampling (Magnusson et al., 2020)
-#' @noRd
-#' @param y_approx Approximated values of all observations.
-#' @param y The values observed.
-#' @param y_idx The index of `y` in `y_approx`.
-#' @return A list with estimates.
+#' Difference estimator with simple random sampling without replacement.
+#'
+#' The difference estimator `srs_diff()` estimates
+#' the expectation \eqn{n E[y]} when we have \eqn{n} approximate values \eqn{\tilde{y}_i},
+#' \eqn{i = 1, \ldots, n} and \eqn{m < n} accurate values \eqn{y_j}, \eqn{j \in \mathcal{S}},
+#' where \eqn{m} is the subsample size and \eqn{\mathcal{S}} is
+#' a simple random subsample without replacement.  The original
+#' approach is by Cochran (1977) and we follow the equations 7--9 by
+#' Magnusson et al. (2020).
+#'
+#' @details In Magnusson et al. (2020) Eq (9) first row, the second `+` should
+#'   be a `-`; Supplementary Material Eq (6) has this correct.
+#'   As `srs_diff_est()` in the `loo` package is used for \eqn{n E[y]}, there is
+#'   a proportional difference of \eqn{1/n} compared to the paper.
+#'
+#' @param y_approx (numeric) `n` approximated values.
+#' @param y (numeric) `m<n` subsampled values.
+#' @param y_idx (integerish) The index of `y` in `y_approx`.
+#'
+#' @return A named list containing numeric values:
+#' * `y_hat`: estimated mean of \eqn{y} (Eq 7),
+#' * `v_y_hat`: variance of the mean estimate (Eq 8), and
+#' * `hat_v_y`: estimated variance of \eqn{y} (Eq 9).
+#'
+#' @references
+#' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
+#' Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+#' In _Proceedings of the 23rd International Conference on Artificial
+#' Intelligence and Statistics (AISTATS)_, PMLR 108:341-351.
+#'
+#' Cochran, W. G. (1977). _Sampling Techniques, 3rd Edition_. John Wiley.
+#'
+#' Cortez, P., Cerdeira, A.L., Almeida, F., Matos, T., & Reis, J. (2009).
+#' Modeling wine preferences by data mining from physicochemical properties.
+#' _Decis. Support Syst._, _47_, 547-553.
+#'
+#' @seealso [loo_subsample()]
+#'
+#' @examples
+#' ### This example predicts wine quality (data from Cortez et al., 2009).
+#' ## First, commented out code shows to generate a loglik_matrix.
+#' ## Second, running code illustrates how to use srs_diff_est().
+#' # library(dplyr)
+#' # library(brms)
+#' # options(brms.backend = "cmdstanr")
+#' # options(mc.cores = 4)
+#' # library(loo)
+#' #
+#' # wine <- read.delim(root("winequality-red", "winequality-red.csv"), sep = ";") |>
+#' #   distinct()
+#' #
+#' # wine_scaled <- as.data.frame(scale(wine))
+#' #
+#' # fitos <- brm(ordered(quality) ~ .,
+#' #              family = cumulative("logit"),
+#' #              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
+#' #              data = wine_scaled,
+#' #              seed = 1,
+#' #              silent = 2,
+#' #              refresh = 0)
+#' #
+#' # wine_loglik_matrix <- log_lik(fitos)
+#' wine_loglik_matrix <- example_wine_loglik_matrix()  # Installed with loo to save time of fitting model shown above
+#' N <- 1359 # nrow(wine_scaled), see above
+#' Nsub <- 100
+#' # posterior log-score
+#' lpd <- elpd(wine_loglik_matrix)
+#' sum(lpd$pointwise[,"elpd"])
+#'
+#' # Use PSIS-LOO for subsample of Nsub randomly selected observations
+#' set.seed(1)
+#' idx <- sample(1:N, Nsub)
+#' elpd_loo_sub <- loo(wine_loglik_matrix[,idx])
+#' sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
+#'
+#' # Use difference estimator to combine fast result and subsampled accurate result
+#' loo:::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#'
+#' # Comparison to using PSIS-LOO for all observations
+#' loo(wine_loglik_matrix)
+#'
+#' @export
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))

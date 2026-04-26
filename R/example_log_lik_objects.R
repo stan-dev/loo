@@ -36,3 +36,7 @@ example_loglik_matrix <- function() {
   return(llarray_to_matrix(ll))
 }
 
+#' @export
+example_wine_loglik_matrix <- function() {
+  return(.example_wine_loglik_matrix)
+}
