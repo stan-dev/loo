@@ -36,6 +36,11 @@ be a \code{-}; Supplementary Material Eq (6) has this correct.
 As \code{srs_diff_est()} in the \code{loo} package is used for \eqn{n E[y]}, there is
 a proportional difference of \eqn{1/n} compared to the paper.
 }
+\examples{
+print("Hello, World!")
+
+
+}
 \references{
 Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
 Leave-One-Out Cross-Validation for Model Comparison in Large Data.
