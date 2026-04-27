@@ -4,7 +4,7 @@
 
 * `loo_compare()` now returns a data frame instead of a matrix and has 
   additional columns. Code that relies on matrix-specific behaviour will need to
-  be updated accordingly by @florence-bockting in #300
+  be updated accordingly by @jgabry, @avehtari, @florence-bockting in #300
 
 ## New features
 
