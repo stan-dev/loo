@@ -1206,8 +1206,9 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #'
 #' @examples
 #' ### This example predicts wine quality (data from Cortez et al., 2009).
-#' ## First, commented out code shows to generate a loglik_matrix.
-#' ## Second, running code illustrates how to use srs_diff_est().
+#' ## The code is commented out for easier installation of the package
+#' ## because brm() takes two or three seconds to fit.
+#' ## A log_lik_matrix is generated from a fit, then it is used for srs_diff_est().
 #' # library(dplyr)
 #' # library(brms)
 #' # options(brms.backend = "cmdstanr")
@@ -1227,10 +1228,25 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' #              silent = 2,
 #' #              refresh = 0)
 #' #
-#' # wine_loglik_matrix <- log_lik(fitos)
-#' wine_loglik_matrix <- example_wine_loglik_matrix()  # Installed with loo to save time of fitting model shown above
-#'
-#'
+#' # log_lik_matrix <- log_lik(fitos)
+#' #
+#' # N <- nrow(wine_scaled)
+#' # Nsub <- 100
+#' #
+#' # # posterior log-score
+#' # lpd <- elpd(log_lik_matrix)
+#' # sum(lpd$pointwise[,"elpd"])
+#' # # Use PSIS-LOO for subsample of Nsub randomly selected observations
+#' # set.seed(1)
+#' # idx <- sample(1:N, Nsub)
+#' # elpd_loo_sub <- loo(log_lik_matrix[,idx])
+#' # sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
+#' #
+#' # # Use difference estimator to combine fast result and subsampled accurate result
+#' # loo:::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#' #
+#' # # Comparison to using PSIS-LOO for all observations
+#' # loo(log_lik_matrix)
 #' @export
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
