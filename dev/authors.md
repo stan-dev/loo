@@ -26,6 +26,8 @@
 
 - **Visruth Srimath Kandali**. Contributor.
 
+- **Florence Bockting**. Contributor.
+
 ## Citation
 
 Source:

@@ -115,6 +115,11 @@ of predictive distributions or pseudo-BMA weighting.
 - [`relative_eff()`](https://mc-stan.org/loo/dev/reference/relative_eff.md)
   : Convenience function for computing relative efficiencies
 
+- [`find_model_names()`](https://mc-stan.org/loo/dev/reference/find_model_names.md)
+  :
+
+  Find the model names associated with `"loo"` objects
+
 - [`gpdfit()`](https://mc-stan.org/loo/dev/reference/gpdfit.md) :
   Estimate parameters of the Generalized Pareto distribution
 

@@ -40,6 +40,7 @@ implemented in the package.
 In addition to the **loo** package, we’ll also be using **rstan**:
 
 ``` r
+
 library("rstan")
 library("loo")
 set.seed(4711)
@@ -91,6 +92,7 @@ rather than storing all of the log-likelihood values in memory.
 The log-likelihood in R can be coded as follows:
 
 ``` r
+
 # we'll add an argument log to toggle whether this is a log-likelihood or 
 # likelihood function. this will be useful later in the vignette.
 llfun_logistic <- function(data_i, draws, log = TRUE) {
@@ -109,6 +111,7 @@ The function `llfun_logistic()` needs to have arguments `data_i` and
 Next we fit the model in Stan using the **rstan** package:
 
 ``` r
+
 # Prepare data
 url <- "http://stat.columbia.edu/~gelman/arm/examples/arsenic/wells.dat"
 wells <- read.table(url)
@@ -136,6 +139,7 @@ helper function that can be used to test a log-likelihood function on a
 single observation.
 
 ``` r
+
 # used for draws argument to loo_i
 parameter_draws_1 <- extract(fit_1)$beta
 
@@ -167,6 +171,7 @@ function to compute the efficient PSIS-LOO approximation to exact LOO-CV
 using subsampling:
 
 ``` r
+
 set.seed(4711)
 loo_ss_1 <-
   loo_subsample(
@@ -225,6 +230,7 @@ can simply add more samples until we are satisfied using the
 [`update()`](https://rdrr.io/r/stats/update.html) method.
 
 ``` r
+
 set.seed(4711)
 loo_ss_1b <-
   update(
@@ -264,6 +270,7 @@ a focus on fast inference. But we can easily use other estimators as
 well as other elpd approximations, for example:
 
 ``` r
+
 set.seed(4711)
 loo_ss_1c <-
   loo_subsample(
@@ -305,6 +312,7 @@ Laplace approximations, can further speed-up LOO-CV for large data. Here
 we demonstrate using a Laplace approximation in Stan.
 
 ``` r
+
 fit_laplace <- optimizing(stan_mod, data = standata, draws = 2000, 
                           importance_resampling = TRUE)
 parameter_draws_laplace <- fit_laplace$theta_tilde # draws from approximate posterior
@@ -319,6 +327,7 @@ use the
 function.
 
 ``` r
+
 set.seed(4711)
 loo_ap_1 <-
   loo_approximate_posterior(
@@ -355,6 +364,7 @@ The posterior approximation correction can also be used together with
 subsampling:
 
 ``` r
+
 set.seed(4711)
 loo_ap_ss_1 <-
   loo_subsample(
@@ -401,6 +411,7 @@ First we’ll fit a second model to the well-switching data, using
 `log(arsenic)` instead of `arsenic` as a predictor:
 
 ``` r
+
 standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
 fit_2 <- sampling(stan_mod, data = standata) 
 parameter_draws_2 <- extract(fit_2)$beta
@@ -468,6 +479,7 @@ print(loo_ss_2)
 We can now compare the models on LOO using the `loo_compare` function:
 
 ``` r
+
 # Compare
 comp <- loo_compare(loo_ss_1, loo_ss_2)
 print(comp)
@@ -492,6 +504,7 @@ in `loo_ss_2` by supplying the `loo_ss_1` object to the `observations`
 argument.
 
 ``` r
+
 loo_ss_2 <-
   loo_subsample(
     x = llfun_logistic,
@@ -508,6 +521,7 @@ We could also supply the subsampling indices using the
 function:
 
 ``` r
+
 idx <- obs_idx(loo_ss_1)
 loo_ss_2 <- loo_subsample(
   x = llfun_logistic,
@@ -529,6 +543,7 @@ We can now compare the models and estimate the difference based on the
 same subsampled observations.
 
 ``` r
+
 comp <- loo_compare(loo_ss_1, loo_ss_2)
 print(comp) 
 ```
@@ -552,6 +567,7 @@ It is also possible to compare a subsampled loo computation with a full
 loo object.
 
 ``` r
+
 # use loo() instead of loo_subsample() to compute full PSIS-LOO for model 2
 loo_full_2 <- loo(
   x = llfun_logistic,

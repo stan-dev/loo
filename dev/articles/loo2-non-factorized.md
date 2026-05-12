@@ -272,6 +272,7 @@ In addition to the **loo** package, for this analysis we will use the
 and also the **bayesplot** and **ggplot2** packages for plotting.
 
 ``` r
+
 library("loo")
 library("brms")
 library("bayesplot")
@@ -295,6 +296,7 @@ The three variables in the data set relevant to this example are:
 - `INC`: household income in units of \$1000 USD
 
 ``` r
+
 str(COL.OLD[, c("CRIME", "HOVAL", "INC")])
 ```
 
@@ -315,6 +317,7 @@ the spatial dependency via an SAR structure, can be specified in
 **brms** as follows.
 
 ``` r
+
 fit <- brm(
   CRIME ~ INC + HOVAL + sar(COL.nb, type = "lag"), 
   data = COL.OLD,
@@ -332,6 +335,7 @@ be substantial spatial correlation between adjacent neighborhoods, as
 indicated by the posterior distribution of the `lagsar` parameter.
 
 ``` r
+
 lagsar <- as.matrix(fit, pars = "lagsar")
 estimates <- quantile(lagsar, probs = c(0.25, 0.5, 0.75))
 mcmc_hist(lagsar) + 
@@ -348,6 +352,7 @@ log-likelihood values needed for approximate LOO-CV. To do this we will
 use the recipe laid out in the previous sections.
 
 ``` r
+
 posterior <- as.data.frame(fit)
 y <- fit$data$CRIME
 N <- length(y)
@@ -378,6 +383,7 @@ approximation is robust up to values of \\0.7\\ (Vehtari et al, 2017,
 problematic and so may reduce the accuracy of the LOO-CV approximation.
 
 ``` r
+
 plot(psis_result, label_points = TRUE)
 ```
 
@@ -388,6 +394,7 @@ distribution equations work correctly, for instance, using the last
 posterior draw:
 
 ``` r
+
 yloo_sub <- yloo[S, ]
 sdloo_sub <- sdloo[S, ]
 df <- data.frame(
@@ -413,24 +420,26 @@ density (ELPD) for new data, which we will validate using exact LOO-CV
 in the upcoming section.
 
 ``` r
+
 (psis_loo <- loo(loglik))
 ```
+
 
     Computed from 4000 by 49 log-likelihood matrix.
 
              Estimate   SE
-    elpd_loo   -186.8 10.9
-    p_loo         8.0  5.2
-    looic       373.7 21.7
+    elpd_loo   -186.9 10.9
+    p_loo         8.1  5.2
+    looic       373.8 21.8
     ------
     MCSE of elpd_loo is NA.
     MCSE and ESS estimates assume independent draws (r_eff=1).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     48    98.0%   960     
-       (0.7, 1]   (bad)       0     0.0%   <NA>    
-       (1, Inf)   (very bad)  1     2.0%   <NA>    
+    (-Inf, 0.7]   (good)     48    98.0%   550     
+       (0.7, 1]   (bad)       1     2.0%   <NA>    
+       (1, Inf)   (very bad)  0     0.0%   <NA>    
     See help('pareto-k-diagnostic') for details.
 
 #### Exact LOO-CV
@@ -441,6 +450,7 @@ point as a parameter. First, we create an empty dummy model that we will
 update below as we loop over the observations.
 
 ``` r
+
 # see help("mi", "brms") for details on the mi() usage
 fit_dummy <- brm(
   CRIME | mi() ~ INC + HOVAL + sar(COL.nb, type = "lag"), 
@@ -450,9 +460,9 @@ fit_dummy <- brm(
 )
 ```
 
-    Running /opt/R/4.5.3/lib/R/bin/R CMD SHLIB foo.c
+    Running /opt/R/4.6.0/lib/R/bin/R CMD SHLIB foo.c
     using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.5.3/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    gcc -std=gnu2x -I"/opt/R/4.6.0/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
                      from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
                      from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
@@ -461,7 +471,7 @@ fit_dummy <- brm(
       679 | #include <cmath>
           |          ^~~~~~~
     compilation terminated.
-    make: *** [/opt/R/4.5.3/lib/R/etc/Makeconf:202: foo.o] Error 1
+    make: *** [/opt/R/4.6.0/lib/R/etc/Makeconf:190: foo.o] Error 1
 
 Next, we fit the model \\N\\ times, each time leaving out a single
 observation and then computing the log predictive density for that
@@ -472,6 +482,7 @@ approximation, in general doing these slow exact computations can be
 avoided.
 
 ``` r
+
 S <- 500
 res <- vector("list", N)
 loglik <- matrix(nrow = S, ncol = N)
@@ -515,6 +526,7 @@ they match very closely (as is the case for all \\49\\ observations of
 in this example).
 
 ``` r
+
 res_sub <- res[res$obs %in% 1:4, ]
 ggplot(res_sub, aes(y, fill = type)) +
   geom_density(alpha = 0.6) +
@@ -527,6 +539,7 @@ In the final step, we compute the ELPD based on the exact LOO-CV and
 compare it to the approximate PSIS-LOO result computed earlier.
 
 ``` r
+
 log_mean_exp <- function(x) {
   # more stable than log(mean(exp(x)))
   max_x <- max(x)
@@ -537,7 +550,7 @@ exact_elpd <- sum(exact_elpds)
 round(exact_elpd, 1)
 ```
 
-    [1] -187.9
+    [1] -189
 
 The results of the approximate and exact LOO-CV are similar but not as
 close as we would expect if there were no problematic observations. We
@@ -545,6 +558,7 @@ can investigate this issue more closely by plotting the approximate
 against the exact pointwise ELPD values.
 
 ``` r
+
 df <- data.frame(
   approx_elpd = psis_loo$pointwise[, "elpd_loo"],
   exact_elpd = exact_elpds
@@ -568,6 +582,7 @@ values and leaving out the fourth observation yields practically
 equivalent results for approximate and exact LOO-CV:
 
 ``` r
+
 without_pt_4 <- c(
   approx = sum(psis_loo$pointwise[-4, "elpd_loo"]),
   exact = sum(exact_elpds[-4])  
@@ -576,7 +591,7 @@ round(without_pt_4, 1)
 ```
 
     approx  exact 
-    -172.9 -173.3 
+    -173.0 -173.1 
 
 From this we can conclude that the difference we found when including
 *all* observations does not indicate a bug in our implementation of the

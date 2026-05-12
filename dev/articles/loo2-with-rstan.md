@@ -81,6 +81,7 @@ draws) and \\N\\ is the number of data points.
 Next we fit the model in Stan using the **rstan** package:
 
 ``` r
+
 library("rstan")
 
 # Prepare data 
@@ -106,6 +107,7 @@ We can then use the **loo** package to compute the efficient PSIS-LOO
 approximation to exact LOO-CV:
 
 ``` r
+
 library("loo")
 
 # Extract pointwise log-likelihood
@@ -159,6 +161,7 @@ second model to the well-switching data, using `log(arsenic)` instead of
 `arsenic` as a predictor:
 
 ``` r
+
 standata$X[, "arsenic"] <- log(standata$X[, "arsenic"])
 fit_2 <- stan(fit = fit_1, data = standata) 
 
@@ -184,6 +187,7 @@ print(loo_2)
 We can now compare the models on LOO using the `loo_compare` function:
 
 ``` r
+
 # Compare
 comp <- loo_compare(loo_1, loo_2)
 ```
@@ -193,6 +197,7 @@ leave-one-out prediction errors between the two models, along with the
 standard error:
 
 ``` r
+
 print(comp) # can set simplify=FALSE for more detailed print output
 ```
 

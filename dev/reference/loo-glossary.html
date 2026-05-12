@@ -230,6 +230,115 @@ individual models due to correlation (i.e., if some observations are easier
 and some more difficult to predict for all models).</p>
     </div>
     <div class="section level2">
+    <h2 id="p-worse-probability-of-worse-predictive-performance-"><code>p_worse</code> (probability of worse predictive performance)<a class="anchor" aria-label="anchor" href="#p-worse-probability-of-worse-predictive-performance-"></a></h2>
+
+
+
+<p><code>p_worse</code> is the estimated probability that a model has worse predictive
+performance than the best-ranked model in the comparison, based on the normal
+approximation to the uncertainty in <code>elpd_diff</code>. It is computed as</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>p_worse <span class="ot">=</span> <span class="fu">pnorm</span>(<span class="dv">0</span>, elpd_diff, se_diff).</span></code></pre><p></p></div>
+<p>The best-ranked model (the first row in the <code><a href="loo_compare.html">loo_compare()</a></code> output, where
+<code>elpd_diff = 0</code>) always receives <code>NA</code>, since the comparison is defined
+relative to that model.</p>
+<p>Because models are ordered by <code>elpd_loo</code> before computing <code>p_worse</code>, all
+reported values are at least 0.5 by construction. A value close to 0.5
+indicates that the models are nearly indistinguishable in predictive
+performance and that the ranking could easily be reversed with different
+data. A value close to 1 indicates that the lower-ranked model is almost
+certainly worse. <code>p_worse</code> inherits all the limitations of <code>se_diff</code> and the
+normal approximation on which it is based. In particular, when <code>se_diff</code> is
+underestimated, <code>p_worse</code> will be estimated too close to 1, making a model
+appear more clearly worse than the data actually support. Conversely, when
+<code>elpd_diff</code> is biased due to an unreliable LOO approximation, <code>p_worse</code> can
+point in the wrong direction entirely. When any of these conditions are
+present, <code>diag_diff</code> or <code>diag_elpd</code> will be flagged in the <code><a href="loo_compare.html">loo_compare()</a></code>
+output.
+For further guidance, see the sections below and the case study on
+<a href="https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html" class="external-link">Uncertainty in Bayesian LOO-CV Model Comparison</a>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="diag-diff-pairwise-comparison-diagnostics-"><code>diag_diff</code> (pairwise comparison diagnostics)<a class="anchor" aria-label="anchor" href="#diag-diff-pairwise-comparison-diagnostics-"></a></h2>
+
+
+
+<p><code>diag_diff</code> is a diagnostic column in the <code><a href="loo_compare.html">loo_compare()</a></code> output for each
+model comparison against the current reference model. It flags conditions
+under which the normal approximation behind <code>se_diff</code> and <code>p_worse</code> is likely
+to be poorly calibrated. The column contains a short label when a condition
+is detected, and is empty otherwise.</p>
+<p>The column <code>diag_diff</code> currently flags two problems:</p><div class="section">
+<h3 id="n-lt-"><code>N &lt; 100</code><a class="anchor" aria-label="anchor" href="#n-lt-"></a></h3>
+
+
+<p>When the number of observations is small, we may assume <code>se_diff</code> to be
+underestimated. As a rough heuristic one can multiply <code>se_diff</code> by 2 to
+make a more conservative estimate.</p>
+</div>
+
+<div class="section">
+<h3 id="-elpd-diff-lt-"><code>|elpd_diff| &lt; 4</code><a class="anchor" aria-label="anchor" href="#-elpd-diff-lt-"></a></h3>
+
+
+<p>When <code>|elpd_diff|</code> is below 4, the models have very similar predictive
+performance. In this setting, Sivula et al. (2025) show that skewness in
+the error distribution can make the normal approximation for <code>se_diff</code>
+and <code>p_worse</code> miscalibrated, even for large N. In practice, this usually
+supports treating the models as predictively similar.</p>
+</div>
+
+<div class="section">
+<h3 id="relation-between-n-lt-and-elpd-diff-lt-">Relation between <code>N &lt; 100</code> and <code>|elpd_diff| &lt; 4</code><a class="anchor" aria-label="anchor" href="#relation-between-n-lt-and-elpd-diff-lt-"></a></h3>
+
+
+<p>The conditions flagged by <code>diag_diff</code> are not independent: they tend to
+co-occur, and when they do, some flags carry more information than others.
+<code><a href="loo_compare.html">loo_compare()</a></code> therefore follows a priority hierarchy and shows only the
+most critical flag in the table output.</p>
+<p>The hierarchy is as follows:</p><ul><li><p><strong><code>N &lt; 100</code> takes highest priority.</strong> A small sample size undermines the
+reliability of <code>se_diff</code> by underestimating uncertainty. Because of this,
+even if <code>|elpd_diff| &lt; 4</code> is also true for a comparison, the table will only
+show <code>N &lt; 100</code>. The small sample size renders the <code>|elpd_diff| &lt; 4</code>
+diagnostic less meaningful.</p></li>
+<li><p><strong><code>|elpd_diff| &lt; 4</code> takes second priority.</strong> When N &gt;= 100 and the
+difference is small, the normal approximation is miscalibrated due to the
+skewness of the error distribution (Sivula et al., 2025). In this
+situation, <code>se_diff</code> exists and is not heavily biased in scale, but the
+shape of the approximation is wrong, making <code>p_worse</code> unreliable.</p></li>
+</ul><p>For further guidance, see the case study on
+<a href="https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html" class="external-link">Uncertainty in Bayesian LOO-CV Model Comparison</a>.</p>
+</div>
+
+    </div>
+    <div class="section level2">
+    <h2 id="diag-elpd"><code>diag_elpd</code><a class="anchor" aria-label="anchor" href="#diag-elpd"></a></h2>
+
+
+
+<p><code>diag_elpd</code> is a diagnostic column in the <code><a href="loo_compare.html">loo_compare()</a></code> output that flags
+when the PSIS-LOO approximation for an individual model is unreliable. Unlike
+<code>diag_diff</code>, which concerns the <em>comparison</em> between models, <code>diag_elpd</code>
+concerns the quality of the <code>elpd_loo</code> estimate for each model individually.
+It contains a short text label when a problem is detected, and is empty
+otherwise.</p><div class="section">
+<h3 id="k-k-psis-gt-t-k-observations-with-pareto-k-values-gt-t-"><code>K k_psis &gt; t</code> (K observations with Pareto-k values &gt; t)<a class="anchor" aria-label="anchor" href="#k-k-psis-gt-t-k-observations-with-pareto-k-values-gt-t-"></a></h3>
+
+
+<p>This label indicates that K observations for this model have Pareto-k values
+above the PSIS reliability threshold <code>t</code> used by <code>loo</code> for that fit. The
+threshold is sample-size dependent, and in many practical cases close to
+0.7. When this flag appears, the PSIS approximation can be unreliable for
+those observations, and the resulting <code>elpd_loo</code> may be biased. Because
+<code>elpd_diff</code> is a direct difference of two models' <code>elpd_loo</code> values, bias in
+either model's estimate propagates directly into <code>elpd_diff</code> and <code>p_worse</code>.
+This is qualitatively different from the calibration issues flagged by
+<code>diag_diff</code>: here the estimate itself may be wrong, not just uncertain.</p>
+<p>See for further information on Pareto-k values the "Pareto k estimates"
+section.</p>
+</div>
+
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.

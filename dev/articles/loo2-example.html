@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-04-17</h4>
+            <h4 data-toc-skip class="date">2026-05-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-example.Rmd</code></div>
@@ -422,9 +422,13 @@ the essential features in the data.</p>
 models on expected log predictive density (ELPD) for new data:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loo1</span>, <span class="va">loo2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>     elpd_diff se_diff
-fit2     0.0       0.0
-fit1 -5352.0     709.2</code></pre>
+<pre><code> model elpd_diff se_diff p_worse diag_diff       diag_elpd
+  fit2       0.0     0.0      NA                      &lt;NA&gt;
+  fit1   -5352.0   709.2    1.00           17 k_psis &gt; 0.7</code></pre>
+<pre><code>
+Diagnostic flags present.
+See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+or https://mc-stan.org/loo/reference/loo-glossary.html.</code></pre>
 <p>The difference in ELPD is much larger than several times the
 estimated standard error of the difference again indicating that the
 negative-binomial model is xpected to have better predictive performance

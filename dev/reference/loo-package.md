@@ -144,3 +144,5 @@ Other contributors:
 - Leevi Lindgren \[contributor\]
 
 - Visruth Srimath Kandali \[contributor\]
+
+- Florence Bockting \[contributor\]

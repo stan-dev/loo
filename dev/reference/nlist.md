@@ -24,6 +24,7 @@ A named list.
 ## Examples
 
 ``` r
+
 # All variables already defined
 a <- rnorm(100)
 b <- mat.or.vec(10, 3)

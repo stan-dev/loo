@@ -58,6 +58,7 @@ In addition to the **loo** package we will also load the **rstanarm**
 package for fitting the models.
 
 ``` r
+
 library(rstanarm)
 library(loo)
 ```
@@ -75,6 +76,7 @@ primate milk example as follows:
 > masking that hides the relationships among the variables.
 
 ``` r
+
 data(milk)
 d <- milk[complete.cases(milk),]
 d$neocortex <- d$neocortex.perc /100
@@ -98,6 +100,7 @@ priors in **rstanarm**, while flat priors were used in *Statistical
 Rethinking*).
 
 ``` r
+
 fit1 <- stan_glm(kcal.per.g ~ 1, data = d, seed = 2030)
 fit2 <- update(fit1, formula = kcal.per.g ~ neocortex)
 fit3 <- update(fit1, formula = kcal.per.g ~ log(mass))
@@ -114,6 +117,7 @@ from the **loo** package), which allows us to just pass in our fitted
 model objects instead of first extracting the log-likelihood values.
 
 ``` r
+
 waic1 <- waic(fit1)
 waic2 <- waic(fit2)
 waic3 <- waic(fit3)
@@ -123,6 +127,7 @@ waic3 <- waic(fit3)
     1 (5.9%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 
 ``` r
+
 waic4 <- waic(fit4)
 ```
 
@@ -130,6 +135,7 @@ waic4 <- waic(fit4)
     2 (11.8%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 
 ``` r
+
 waics <- c(
   waic1$estimates["elpd_waic", 1],
   waic2$estimates["elpd_waic", 1],
@@ -150,6 +156,7 @@ fitting Stan models, e.g. **brms**, also provide similar methods for
 interfacing with the **loo** package.)
 
 ``` r
+
 # note: the loo function accepts a 'cores' argument that we recommend specifying
 # when working with bigger datasets
 
@@ -170,8 +177,10 @@ illustration of good results, we display the diagnostic details for
 these models anyway.
 
 ``` r
+
 print(loo3)
 ```
+
 
     Computed from 4000 by 17 log-likelihood matrix.
 
@@ -187,8 +196,10 @@ print(loo3)
     See help('pareto-k-diagnostic') for details.
 
 ``` r
+
 print(loo4)
 ```
+
 
     Computed from 4000 by 17 log-likelihood matrix.
 
@@ -212,6 +223,7 @@ without Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian
 bootstrap, and 4) Bayesian stacking weights.
 
 ``` r
+
 waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
@@ -244,6 +256,7 @@ performance. WAIC weights for such a scenario would be close to the
 following:
 
 ``` r
+
 waic_wts_demo <- 
   exp(waics[c(1,1,1,1,1,1,1,1,1,1,2,3,4)]) /
   sum(exp(waics[c(1,1,1,1,1,1,1,1,1,1,2,3,4)]))
@@ -267,6 +280,7 @@ share their weight while more unique models keep their original weights.
 In our example we can see this difference clearly:
 
 ``` r
+
 stacking_weights(lpd_point[,c(1,1,1,1,1,1,1,1,1,1,2,3,4)])
 ```
 
@@ -307,6 +321,7 @@ We build models predicting the total number of tools given the log
 population size and the contact rate (high vs. low).
 
 ``` r
+
 data(Kline)
 d <- Kline
 d$log_pop <- log(d$population)
@@ -328,6 +343,7 @@ the contact rate, and an interaction term between them (priors are
 informative priors as in *Statistical Rethinking*).
 
 ``` r
+
 fit10 <-
   stan_glm(
     total_tools ~ log_pop + contact_high + log_pop * contact_high,
@@ -343,14 +359,17 @@ Before running other models, we check whether Poisson is good choice as
 the conditional observation model.
 
 ``` r
+
 loo10 <- loo(fit10)
 ```
 
     Warning: Found 2 observation(s) with a pareto_k > 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 2 times to compute the ELPDs for the problematic observations directly.
 
 ``` r
+
 print(loo10)
 ```
+
 
     Computed from 4000 by 10 log-likelihood matrix.
 
@@ -380,19 +399,24 @@ leave-one-out folds with high \\k\\ estimates. When using **rstanarm**
 this can be done by specifying the `k_threshold` argument:
 
 ``` r
+
 loo10 <- loo(fit10, k_threshold=0.7)
 ```
 
     2 problematic observation(s) found.
     Model will be refit 2 times.
 
+
     Fitting model 1 out of 2 (leaving out observation 6)
+
 
     Fitting model 2 out of 2 (leaving out observation 10)
 
 ``` r
+
 print(loo10)
 ```
+
 
     Computed from 4000 by 10 log-likelihood matrix.
 
@@ -413,6 +437,7 @@ relatively safe to continue.
 As a comparison we also compute WAIC:
 
 ``` r
+
 waic10 <- waic(fit10)
 ```
 
@@ -420,8 +445,10 @@ waic10 <- waic(fit10)
     4 (40.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 
 ``` r
+
 print(waic10)
 ```
+
 
     Computed from 4000 by 10 log-likelihood matrix.
 
@@ -440,13 +467,16 @@ To assess whether the contact rate and interaction term are useful, we
 can make a comparison to models without these terms.
 
 ``` r
+
 fit11 <- update(fit10, formula = total_tools ~ log_pop + contact_high)
 fit12 <- update(fit10, formula = total_tools ~ log_pop)
 ```
 
 ``` r
+
 (loo11 <- loo(fit11))
 ```
+
 
     Computed from 4000 by 10 log-likelihood matrix.
 
@@ -462,10 +492,12 @@ fit12 <- update(fit10, formula = total_tools ~ log_pop)
     See help('pareto-k-diagnostic') for details.
 
 ``` r
+
 (loo12 <- loo(fit12))
 ```
 
     Warning: Found 1 observation(s) with a pareto_k > 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.
+
 
     Computed from 4000 by 10 log-likelihood matrix.
 
@@ -485,6 +517,7 @@ fit12 <- update(fit10, formula = total_tools ~ log_pop)
     See help('pareto-k-diagnostic') for details.
 
 ``` r
+
 loo11 <- loo(fit11, k_threshold=0.7)
 ```
 
@@ -492,15 +525,18 @@ loo11 <- loo(fit11, k_threshold=0.7)
     Returning loo object.
 
 ``` r
+
 loo12 <- loo(fit12, k_threshold=0.7)
 ```
 
     1 problematic observation(s) found.
     Model will be refit 1 times.
 
+
     Fitting model 1 out of 1 (leaving out observation 10)
 
 ``` r
+
 lpd_point <- cbind(
   loo10$pointwise[, "elpd_loo"], 
   loo11$pointwise[, "elpd_loo"], 
@@ -512,6 +548,7 @@ For comparison we’ll also compute WAIC values for these additional
 models:
 
 ``` r
+
 waic11 <- waic(fit11)
 ```
 
@@ -519,6 +556,7 @@ waic11 <- waic(fit11)
     3 (30.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 
 ``` r
+
 waic12 <- waic(fit12)
 ```
 
@@ -526,6 +564,7 @@ waic12 <- waic(fit12)
     5 (50.0%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 
 ``` r
+
 waics <- c(
   waic10$estimates["elpd_waic", 1], 
   waic11$estimates["elpd_waic", 1], 
@@ -541,6 +580,7 @@ Bayesian bootstrap, 3) Pseudo-BMA+ weights with Bayesian bootstrap, and
 4) Bayesian stacking weights.
 
 ``` r
+
 waic_wts <- exp(waics) / sum(exp(waics))
 pbma_wts <- pseudobma_weights(lpd_point, BB=FALSE)
 pbma_BB_wts <- pseudobma_weights(lpd_point) # default is BB=TRUE
@@ -582,6 +622,7 @@ other packages (e.g. **brms**) that do the preparation work for the user
 [`help("loo_model_weights", package = "rstanarm")`](https://mc-stan.org/loo/reference/loo_model_weights.html)).
 
 ``` r
+
 # using list of loo objects
 loo_list <- list(loo10, loo11, loo12)
 loo_model_weights(loo_list)
@@ -595,6 +636,7 @@ loo_model_weights(loo_list)
     fit12 0.197 
 
 ``` r
+
 loo_model_weights(loo_list, method = "pseudobma")
 ```
 
@@ -606,6 +648,7 @@ loo_model_weights(loo_list, method = "pseudobma")
     fit12 0.187 
 
 ``` r
+
 loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
 ```
 

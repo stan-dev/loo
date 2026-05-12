@@ -28,6 +28,7 @@ In addition to the **loo** package, we’ll also be using **rstanarm** and
 **bayesplot**:
 
 ``` r
+
 library("rstanarm")
 library("bayesplot")
 library("loo")
@@ -67,6 +68,7 @@ were used is not the same for all apartments in the sample, we use the
 the linear predictor.
 
 ``` r
+
 # the 'roaches' data frame is included with the rstanarm package
 data(roaches)
 str(roaches)
@@ -80,6 +82,7 @@ str(roaches)
      $ exposure2: num  0.8 0.6 1 1 1.14 ...
 
 ``` r
+
 # rescale to units of hundreds of roaches
 roaches$roach1 <- roaches$roach1 / 100
 ```
@@ -90,6 +93,7 @@ We’ll fit a simple Poisson regression model using the `stan_glm`
 function from the **rstanarm** package.
 
 ``` r
+
 fit1 <-
   stan_glm(
     formula = y ~ roach1 + treatment + senior,
@@ -127,6 +131,7 @@ We’ll also use the argument `save_psis = TRUE` to save some intermediate
 results to be re-used later.
 
 ``` r
+
 loo1 <- loo(fit1, save_psis = TRUE)
 ```
 
@@ -139,8 +144,10 @@ correct the difference. We can see more details by printing the `loo`
 object.
 
 ``` r
+
 print(loo1)
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 
@@ -186,6 +193,7 @@ to fit the model) with horizontal lines corresponding to the same
 categories as in the printed output above.
 
 ``` r
+
 plot(loo1)
 ```
 
@@ -209,6 +217,7 @@ QQ-plot the LOO-PIT values for our model (y-axi) is compared to standard
 uniform distribution (x-axis).
 
 ``` r
+
 yrep <- posterior_predict(fit1)
 
 ppc_loo_pit_qq(
@@ -238,18 +247,22 @@ Unlike the Poisson distribution, the negative binomial distribution
 allows the conditional mean and variance of \\y\\ to differ.
 
 ``` r
+
 fit2 <- update(fit1, family = neg_binomial_2)
 ```
 
 ``` r
+
 loo2 <- loo(fit2, save_psis = TRUE, cores = 2)
 ```
 
     Warning: Found 1 observation(s) with a pareto_k > 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.
 
 ``` r
+
 print(loo2)
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 
@@ -269,6 +282,7 @@ print(loo2)
     See help('pareto-k-diagnostic') for details.
 
 ``` r
+
 plot(loo2, label_points = TRUE)
 ```
 
@@ -292,6 +306,7 @@ recombined with the approximate LOO calculations already carried out for
 the observations without problematic \\k\\ values:
 
 ``` r
+
 if (any(pareto_k_values(loo2) > 0.7)) {
   loo2 <- loo(fit2, save_psis = TRUE, k_threshold = 0.7)
 }
@@ -300,11 +315,14 @@ if (any(pareto_k_values(loo2) > 0.7)) {
     1 problematic observation(s) found.
     Model will be refit 1 times.
 
+
     Fitting model 1 out of 1 (leaving out observation 93)
 
 ``` r
+
 print(loo2)
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 
@@ -330,6 +348,7 @@ is much better than the `p_loo` estimate for the Poisson model.
 For further model checking we again examine the LOO-PIT values.
 
 ``` r
+
 yrep <- posterior_predict(fit2)
 ppc_loo_pit_qq(roaches$y, yrep, lw = weights(loo2$psis_object))
 ```
@@ -346,12 +365,18 @@ We can use the `loo_compare` function to compare our two models on
 expected log predictive density (ELPD) for new data:
 
 ``` r
+
 loo_compare(loo1, loo2)
 ```
 
-         elpd_diff se_diff
-    fit2     0.0       0.0
-    fit1 -5352.0     709.2
+     model elpd_diff se_diff p_worse diag_diff       diag_elpd
+      fit2       0.0     0.0      NA                      <NA>
+      fit1   -5352.0   709.2    1.00           17 k_psis > 0.7
+
+
+    Diagnostic flags present.
+    See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+    or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 The difference in ELPD is much larger than several times the estimated
 standard error of the difference again indicating that the

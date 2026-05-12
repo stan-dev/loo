@@ -197,6 +197,7 @@ In addition to the **loo** package, for this analysis we will use the
 and also the **bayesplot** and **ggplot2** packages for plotting.
 
 ``` r
+
 library("brms")
 library("loo")
 library("bayesplot")
@@ -213,6 +214,7 @@ Before fitting a model, we will first put the data into a data frame and
 then look at the time series.
 
 ``` r
+
 N <- length(LakeHuron)
 df <- data.frame(
   y = as.numeric(LakeHuron),
@@ -238,6 +240,7 @@ We can specify an AR(4) model for these data using the **brms** package
 as follows:
 
 ``` r
+
 fit <- brm(
   y ~ ar(time, p = 4), 
   data = df, 
@@ -252,6 +255,7 @@ The model implied predictions along with the observed values can be
 plotted, which reveals a rather good fit to the data.
 
 ``` r
+
 preds <- posterior_predict(fit)
 preds <- cbind(
   Estimate = colMeans(preds), 
@@ -276,6 +280,7 @@ To allow for reasonable predictions of future values, we will require at
 least \\L = 20\\ historical observations (20 years) to make predictions.
 
 ``` r
+
 L <- 20
 ```
 
@@ -284,9 +289,11 @@ the purpose of later comparison with exact and approximate LFO-CV for
 the 1-SAP case.
 
 ``` r
+
 loo_cv <- loo(log_lik(fit)[, (L + 1):N])
 print(loo_cv)
 ```
+
 
     Computed from 4000 by 78 log-likelihood matrix.
 
@@ -316,6 +323,7 @@ The initial step for the exact computation is to calculate the
 log-predictive densities by refitting the model many times:
 
 ``` r
+
 loglik_exact <- matrix(nrow = ndraws(fit), ncol = N)
 for (i in L:(N - 1)) {
   past <- 1:i
@@ -330,6 +338,7 @@ for (i in L:(N - 1)) {
 Then we compute the exact expected log predictive density (ELPD):
 
 ``` r
+
 # some helper functions we'll use throughout
 
 # more stable than log(sum(exp(x))) 
@@ -357,6 +366,7 @@ rbind_print <- function(...) {
 ```
 
 ``` r
+
 exact_elpds_1sap <- apply(loglik_exact, 2, log_mean_exp)
 exact_elpd_1sap <- c(ELPD = sum(exact_elpds_1sap[-(1:L)]))
 
@@ -383,6 +393,7 @@ We compute approximate 1-SAP with refit at observations where the Pareto
 \\k\\ estimate exceeds the threshold of \\0.7\\.
 
 ``` r
+
 k_thres <- 0.7
 ```
 
@@ -392,6 +403,7 @@ which comes with no additional computational costs since we had to refit
 the model anyway.
 
 ``` r
+
 approx_elpds_1sap <- rep(NA, N)
 
 # initialize the process for i = L
@@ -436,6 +448,7 @@ We see that the final Pareto-\\k\\-estimates are mostly well below the
 threshold and that we only needed to refit the model a few times:
 
 ``` r
+
 plot_ks <- function(ks, ids, thres = 0.6) {
   dat_ks <- data.frame(ks = ks, ids = ids)
   ggplot(dat_ks, aes(x = ids, y = ks)) + 
@@ -448,6 +461,7 @@ plot_ks <- function(ks, ids, thres = 0.6) {
 ```
 
 ``` r
+
 cat("Using threshold ", k_thres, 
     ", model was refit ", length(refits), 
     " times, at observations", refits)
@@ -456,6 +470,7 @@ cat("Using threshold ", k_thres,
     Using threshold  0.7 , model was refit  2  times, at observations 20 54
 
 ``` r
+
 plot_ks(ks, (L + 1):(N - 1))
 ```
 
@@ -466,6 +481,7 @@ computed above, which indicates our algorithm to compute approximate
 1-SAP worked well for the present data and model.
 
 ``` r
+
 approx_elpd_1sap <- sum(approx_elpds_1sap, na.rm = TRUE)
 rbind_print(
   "approx LFO" = approx_elpd_1sap,
@@ -482,6 +498,7 @@ approximation value deviates far from its exact counterpart, providing
 further evidence for the good quality of our approximation.
 
 ``` r
+
 dat_elpd <- data.frame(
   approx_elpd = approx_elpds_1sap,
   exact_elpd = exact_elpds_1sap
@@ -500,6 +517,7 @@ between the approximate and exact ELPD calculations, which also indicate
 a ver close approximation:
 
 ``` r
+
 max_diff <- with(dat_elpd, max(abs(approx_elpd - exact_elpd), na.rm = TRUE))
 mean_diff <- with(dat_elpd, mean(abs(approx_elpd - exact_elpd), na.rm = TRUE))
 
@@ -528,6 +546,7 @@ stability of the PSIS approximation actually stays the same for all
 on the number of observations we predict.
 
 ``` r
+
 M <- 4
 loglikm <- matrix(nrow = ndraws(fit), ncol = N)
 for (i in L:(N - M)) {
@@ -542,6 +561,7 @@ for (i in L:(N - M)) {
 ```
 
 ``` r
+
 exact_elpds_4sap <- apply(loglikm, 2, log_mean_exp)
 (exact_elpd_4sap <- c(ELPD = sum(exact_elpds_4sap, na.rm = TRUE)))
 ```
@@ -556,6 +576,7 @@ more involved than the approximate version for the 1-SAP case, although
 the underlying principles remain the same.
 
 ``` r
+
 approx_elpds_4sap <- rep(NA, N)
 
 # initialize the process for i = L
@@ -604,6 +625,7 @@ below the threshold and that we only needed to refit the model a few
 times:
 
 ``` r
+
 cat("Using threshold ", k_thres, 
     ", model was refit ", length(refits), 
     " times, at observations", refits)
@@ -612,6 +634,7 @@ cat("Using threshold ", k_thres,
     Using threshold  0.7 , model was refit  2  times, at observations 20 54
 
 ``` r
+
 plot_ks(ks, (L + 1):(N - M))
 ```
 
@@ -626,6 +649,7 @@ predicted values. In Bürkner et al. (2020) we provide further
 explanation and simulations for these cases.
 
 ``` r
+
 approx_elpd_4sap <- sum(approx_elpds_4sap, na.rm = TRUE)
 rbind_print(
   "Approx LFO" = approx_elpd_4sap,
@@ -642,6 +666,7 @@ for a few specific data points, the approximate predictions
 underestimate the exact predictions.
 
 ``` r
+
 dat_elpd_4sap <- data.frame(
   approx_elpd = approx_elpds_4sap,
   exact_elpd = exact_elpds_4sap
@@ -692,10 +717,11 @@ Research*, 25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
 ### Appendix: Session information
 
 ``` r
+
 sessionInfo()
 ```
 
-    R version 4.5.3 (2026-03-11)
+    R version 4.6.0 (2026-04-24)
     Platform: x86_64-pc-linux-gnu
     Running under: Ubuntu 24.04.4 LTS
 
@@ -716,35 +742,35 @@ sessionInfo()
     [1] stats     graphics  grDevices utils     datasets  methods   base     
 
     other attached packages:
-    [1] ggplot2_4.0.2    bayesplot_1.15.0 loo_2.9.0.9000   brms_2.23.0     
-    [5] Rcpp_1.1.1       knitr_1.51      
+    [1] ggplot2_4.0.3    bayesplot_1.15.0 loo_2.9.0.9000   brms_2.23.0     
+    [5] Rcpp_1.1.1-1.1   knitr_1.51      
 
     loaded via a namespace (and not attached):
      [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
-     [4] bslib_0.10.0          QuickJSR_1.9.1        htmlwidgets_1.6.4    
-     [7] processx_3.8.7        inline_0.3.21         lattice_0.22-9       
-    [10] callr_3.7.6           ps_1.9.2              vctrs_0.7.3          
-    [13] tools_4.5.3           generics_0.1.4        stats4_4.5.3         
-    [16] parallel_4.5.3        tibble_3.3.1          pkgconfig_2.0.3      
-    [19] Matrix_1.7-4          checkmate_2.3.4       RColorBrewer_1.1-3   
-    [22] S7_0.2.1              desc_1.4.3            distributional_0.7.0 
-    [25] RcppParallel_5.1.11-2 lifecycle_1.0.5       compiler_4.5.3       
+     [4] bslib_0.10.0          QuickJSR_1.9.2        htmlwidgets_1.6.4    
+     [7] processx_3.9.0        inline_0.3.21         lattice_0.22-9       
+    [10] callr_3.7.6           ps_1.9.3              vctrs_0.7.3          
+    [13] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
+    [16] parallel_4.6.0        tibble_3.3.1          pkgconfig_2.0.3      
+    [19] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
+    [22] S7_0.2.2              desc_1.4.3            distributional_0.7.0 
+    [25] RcppParallel_5.1.11-2 lifecycle_1.0.5       compiler_4.6.0       
     [28] farver_2.1.2          stringr_1.6.0         textshaping_1.0.5    
     [31] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
     [34] sass_0.4.10           yaml_2.3.12           pillar_1.11.1        
     [37] pkgdown_2.2.0         jquerylib_0.1.4       cachem_1.1.0         
     [40] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
-    [43] nlme_3.1-168          posterior_1.7.0       rstan_2.32.7         
-    [46] tidyselect_1.2.1      digest_0.6.39         mvtnorm_1.3-6        
+    [43] nlme_3.1-169          posterior_1.7.0       rstan_2.32.7         
+    [46] tidyselect_1.2.1      digest_0.6.39         mvtnorm_1.3-7        
     [49] stringi_1.8.7         dplyr_1.2.1           labeling_0.4.3       
-    [52] fastmap_1.2.0         grid_4.5.3            cli_3.6.6            
+    [52] fastmap_1.2.0         grid_4.6.0            cli_3.6.6            
     [55] magrittr_2.0.5        pkgbuild_1.4.8        withr_3.0.2          
     [58] scales_1.4.0          backports_1.5.1       rmarkdown_2.31       
     [61] matrixStats_1.5.0     otel_0.2.0            gridExtra_2.3        
     [64] ragg_1.5.2            coda_0.19-4.1         evaluate_1.0.5       
-    [67] rstantools_2.6.0      rlang_1.2.0           glue_1.8.0           
+    [67] rstantools_2.6.0      rlang_1.2.0           glue_1.8.1           
     [70] jsonlite_2.0.0        R6_2.6.1              systemfonts_1.3.2    
-    [73] fs_2.0.1             
+    [73] fs_2.1.0             
 
 ### Appendix: Licenses
 

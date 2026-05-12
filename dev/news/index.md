@@ -2,6 +2,24 @@
 
 ## loo (development version)
 
+### Breaking changes
+
+- [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
+  now returns a data frame instead of a matrix and has additional
+  columns. Code that relies on matrix-specific behaviour will need to be
+  updated accordingly by [@jgabry](https://github.com/jgabry),
+  [@avehtari](https://github.com/avehtari),
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#300](https://github.com/stan-dev/loo/issues/300)
+
+### New features
+
+- [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
+  output now includes additional columns: `p_worse`, `diag_diff`, and
+  `diag_elpd`, providing richer diagnostics for model comparison by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#300](https://github.com/stan-dev/loo/issues/300)
+
 ## loo 2.9.0
 
 CRAN release: 2025-12-23
