@@ -24,3 +24,4 @@ vignettes/loo2-non-factorized_cache/*
 ^release-prep\.R$
 ^_pkgdown\.yml$
 ^pkgdown$
+^touchstone$

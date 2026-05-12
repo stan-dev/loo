@@ -1,0 +1,43 @@
+name: Continuous Benchmarks (Receive)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      config: ${{ steps.read_touchstone_config.outputs.config }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - id: read_touchstone_config
+        run: |
+          echo "config=$(jq -c . ./touchstone/config.json)" >> $GITHUB_OUTPUT
+
+  build:
+    needs: prepare
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - ${{ fromJson(needs.prepare.outputs.config) }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: lorenzwalthert/touchstone/actions/receive@main
+        with:
+          r-version: ${{ matrix.config.r }}

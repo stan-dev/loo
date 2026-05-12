@@ -68,7 +68,7 @@ data {
   int<lower=1> N;
   matrix[N,K] x;
   array[N] int y;
-  vector[N] offset;
+  vector[N] offset_; // offset is reserved keyword in Stan so use offset_
 
   real beta_prior_scale;
   real alpha_prior_scale;
@@ -78,14 +78,15 @@ parameters {
   real intercept;
 }
 model {
-  y ~ poisson(exp(x * beta + intercept + offset));
+  y ~ poisson(exp(x * beta + intercept + offset_));
   beta ~ normal(0,beta_prior_scale);
   intercept ~ normal(0,alpha_prior_scale);
 }
 generated quantities {
   vector[N] log_lik;
-  for (n in 1:N)
-    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset[n]));
+  for (n in 1:N) {
+    log_lik[n] = poisson_lpmf(y[n] | exp(x[n] * beta + intercept + offset_[n]));
+  }
 }
 "
 ```
@@ -127,7 +128,7 @@ standata <- list(
   K = k,
   x = as.matrix(x),
   y = y,
-  offset = offset,
+  offset_ = offset,
   beta_prior_scale = 2.5,
   alpha_prior_scale = 5.0
 )

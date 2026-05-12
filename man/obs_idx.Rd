@@ -12,7 +12,7 @@ obs_idx(x, rep = TRUE)
 \item{rep}{If sampling with replacement is used, an observation can have
 multiple samples and these are then repeated in the returned object if
 \code{rep=TRUE} (e.g., a vector \code{c(1,1,2)} indicates that observation 1 has been
-subampled two times). If \code{rep=FALSE} only the unique indices are returned.}
+subsampled two times). If \code{rep=FALSE} only the unique indices are returned.}
 }
 \value{
 An integer vector.

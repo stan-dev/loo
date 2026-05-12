@@ -45,7 +45,7 @@ mcse_loo(x, threshold = NULL)
 \item{x}{An object created by \code{\link[=loo]{loo()}} or \code{\link[=psis]{psis()}}.}
 
 \item{threshold}{For \code{pareto_k_ids()}, \code{threshold} is the minimum \eqn{k}
-value to flag (default is a sample size \code{S} dependend threshold
+value to flag (default is a sample size \code{S} dependent threshold
 \code{1 - 1 / log10(S)}). For \code{mcse_loo()}, if any \eqn{k} estimates are
 greater than \code{threshold} the MCSE estimate is returned as \code{NA}
 See \strong{Details} for the motivation behind these defaults.}

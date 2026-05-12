@@ -114,7 +114,7 @@ assert_importance_sampling_method_is_implemented <- function(x){
     stop("Importance sampling method '",
          x,
          "' is not implemented. Implemented methods: '",
-         paste0(implemented_is_methods, collapse = "', '"),
+         paste0(implemented_is_methods(), collapse = "', '"),
          "'")
   }
 }

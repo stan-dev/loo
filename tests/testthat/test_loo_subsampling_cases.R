@@ -342,17 +342,7 @@ test_that("Test the vignette", {
       observations = 100
     )
   )
-  expect_output(
-    print(looss_1),
-    "Computed from 4000 by 100 subsampled log-likelihood"
-  )
-  expect_output(print(looss_1), "values from 3020 total observations.")
-  expect_output(
-    print(looss_1),
-    "MCSE and ESS estimates assume independent draws"
-  )
-  expect_output(print(looss_1), "elpd_loo  -1968.5 15.6            0.3")
-  expect_output(print(looss_1), "p_loo         3.1  0.1            0.4")
+  expect_snapshot(print(looss_1))
   expect_s3_class(looss_1, c("psis_loo_ss", "psis_loo", "loo"))
 
   set.seed(4711)
@@ -364,17 +354,7 @@ test_that("Test the vignette", {
       observations = 200
     )
   )
-  expect_output(
-    print(looss_1b),
-    "Computed from 4000 by 200 subsampled log-likelihood"
-  )
-  expect_output(print(looss_1b), "values from 3020 total observations.")
-  expect_output(
-    print(looss_1b),
-    "MCSE and ESS estimates assume independent draws"
-  )
-  expect_output(print(looss_1b), "elpd_loo  -1968.3 15.6            0.2")
-  expect_output(print(looss_1b), "p_loo         3.2  0.1            0.4")
+  expect_snapshot(print(looss_1b))
   expect_s3_class(looss_1b, c("psis_loo_ss", "psis_loo", "loo"))
 
   set.seed(4711)
@@ -413,18 +393,7 @@ test_that("Test the vignette", {
       log_g = log_g
     )
   )
-  expect_output(
-    print(aploo_1),
-    "Computed from 2000 by 3020 log-likelihood matrix"
-  )
-  expect_output(
-    print(aploo_1),
-    "MCSE and ESS estimates assume independent draws"
-  )
-  expect_output(print(aploo_1), "elpd_loo  -1968.4 15.6")
-  expect_output(print(aploo_1), "p_loo         3.2  0.2")
-  expect_output(print(aploo_1), "Posterior approximation correction used.")
-  expect_output(print(aploo_1), "All Pareto k estimates are good")
+  expect_snapshot(print(aploo_1))
   expect_equal(length(pareto_k_ids(aploo_1, threshold = 0.5)), 31)
   expect_s3_class(aploo_1, c("psis_loo_ap", "psis_loo", "loo"))
 
@@ -439,18 +408,7 @@ test_that("Test the vignette", {
       observations = 100
     )
   )
-  expect_output(
-    print(looapss_1),
-    "Computed from 2000 by 100 subsampled log-likelihood"
-  )
-  expect_output(
-    print(looapss_1),
-    "MCSE and ESS estimates assume independent draws"
-  )
-  expect_output(print(looapss_1), "values from 3020 total observations.")
-  expect_output(print(looapss_1), "elpd_loo  -1968.2 15.6            0.4")
-  expect_output(print(looapss_1), "p_loo         2.9  0.1            0.5")
-  expect_output(print(looapss_1), "All Pareto k estimates are good")
+  expect_snapshot(print(looapss_1))
   expect_equal(length(pareto_k_ids(looapss_1, threshold = 0.5)), 3)
 
   # Loo compare
@@ -472,23 +430,13 @@ test_that("Test the vignette", {
       observations = 100
     )
   )
-  expect_output(
-    print(looss_2),
-    "Computed from 4000 by 100 subsampled log-likelihood"
-  )
-  expect_output(
-    print(looss_2),
-    "MCSE and ESS estimates assume independent draws"
-  )
-  expect_output(print(looss_2), "values from 3020 total observations.")
-  expect_output(print(looss_2), "elpd_loo  -1952.0 16.2            0.2")
-  expect_output(print(looss_2), "p_loo         2.6  0.1            0.3")
+  expect_snapshot(print(looss_2))
 
   expect_warning(
     comp <- loo_compare(looss_1, looss_2),
     "Different subsamples in 'model2' and 'model1'. Naive diff SE is used."
   )
-  expect_output(print(comp), "model1 16.5      22.5     0.4")
+  expect_snapshot(print(comp))
 
   set.seed(4712)
   expect_no_warning(
@@ -510,7 +458,7 @@ test_that("Test the vignette", {
   )
 
   expect_silent(comp <- loo_compare(looss_1, looss_2_m))
-  expect_output(print(comp), "model1 16.1       4.4     0.1")
+  expect_snapshot(print(comp))
 
   set.seed(4712)
   expect_no_warning(
@@ -530,7 +478,7 @@ test_that("Test the vignette", {
     )
   )
   expect_silent(comp2 <- loo_compare(looss_1, looss_2_m))
-  expect_output(print(comp2), "model1 16.3       4.4     0.1")
+  expect_snapshot(print(comp2))
 
   expect_no_warning(
     looss_2_full <- loo(
@@ -543,5 +491,5 @@ test_that("Test the vignette", {
     comp3 <- loo_compare(x = list(looss_1, looss_2_full)),
     "Estimated elpd_diff using observations included in loo calculations for all models."
   )
-  expect_output(print(comp3), "model1 16.5       4.4     0.3")
+  expect_snapshot(print(comp3))
 })

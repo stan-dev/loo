@@ -21,7 +21,7 @@
 #'   returns a matrix of log-posterior density values of the unconstrained
 #'   posterior draws passed via `upars`.
 #' @param log_lik_i_upars A function that takes arguments `x`, `upars`, and `i`
-#'   and returns a vector of log-likeliood draws of the `i`th observation based
+#'   and returns a vector of log-likelihood draws of the `i`th observation based
 #'   on the unconstrained posterior draws passed via `upars`.
 #' @param r_eff_i MCMC relative effective sample size of the `i`'th log
 #'   likelihood draws.
