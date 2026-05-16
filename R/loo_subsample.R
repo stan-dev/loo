@@ -1205,48 +1205,49 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' @seealso [loo_subsample()]
 #'
 #' @examples
-#' ### This example predicts wine quality (data from Cortez et al., 2009).
-#' ## The code is commented out for easier installation of the package
-#' ## because brm() takes two or three seconds to fit.
-#' ## A log_lik_matrix is generated from a fit, then it is used for srs_diff_est().
-#' # library(dplyr)
-#' # library(brms)
-#' # options(brms.backend = "cmdstanr")
-#' # options(mc.cores = 4)
-#' # library(loo)
-#' #
-#' # wine <- read.delim(root("winequality-red", "winequality-red.csv"), sep = ";") |>
-#' #   distinct()
-#' #
-#' # wine_scaled <- as.data.frame(scale(wine))
-#' #
-#' # fitos <- brm(ordered(quality) ~ .,
-#' #              family = cumulative("logit"),
-#' #              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
-#' #              data = wine_scaled,
-#' #              seed = 1,
-#' #              silent = 2,
-#' #              refresh = 0)
-#' #
-#' # log_lik_matrix <- log_lik(fitos)
-#' #
-#' # N <- nrow(wine_scaled)
-#' # Nsub <- 100
-#' #
-#' # # posterior log-score
-#' # lpd <- elpd(log_lik_matrix)
-#' # sum(lpd$pointwise[,"elpd"])
-#' # # Use PSIS-LOO for subsample of Nsub randomly selected observations
-#' # set.seed(1)
-#' # idx <- sample(1:N, Nsub)
-#' # elpd_loo_sub <- loo(log_lik_matrix[,idx])
-#' # sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
-#' #
-#' # # Use difference estimator to combine fast result and subsampled accurate result
-#' # loo:::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
-#' #
-#' # # Comparison to using PSIS-LOO for all observations
-#' # loo(log_lik_matrix)
+#' ## This example predicts wine quality (data from Cortez et al., 2009).
+#' # The code is commented as ## Not run: because brm() takes two or three seconds to fit.
+#' # Copy the code to your console to execute it.
+#' # A log_lik_matrix is generated from a fit, then it is used for srs_diff_est().
+#' \dontrun{
+#' library(dplyr)
+#' library(brms)
+#' options(brms.backend = "cmdstanr")
+#' options(mc.cores = 4)
+#'
+#' wine <- read.delim("../data-raw/winequality-red.csv", sep = ";") |>
+#'   distinct()
+#'
+#' wine_scaled <- as.data.frame(scale(wine))
+#'
+#' fitos <- brm(ordered(quality) ~ .,
+#'              family = cumulative("logit"),
+#'              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
+#'              data = wine_scaled,
+#'              seed = 1,
+#'              silent = 2,
+#'              refresh = 0)
+#'
+#' log_lik_matrix <- log_lik(fitos)
+#'
+#' N <- nrow(wine_scaled)
+#' Nsub <- 100
+#'
+#' # posterior log-score
+#' lpd <- elpd(log_lik_matrix)
+#' sum(lpd$pointwise[,"elpd"])
+#' # Use PSIS-LOO for subsample of Nsub randomly selected observations
+#' set.seed(1)
+#' idx <- sample(1:N, Nsub)
+#' elpd_loo_sub <- loo(log_lik_matrix[,idx])
+#' sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
+#'
+#' # Use difference estimator to combine fast result and subsampled accurate result
+#' loo::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#'
+#' # Comparison to using PSIS-LOO for all observations
+#' loo(log_lik_matrix)
+#' }
 #' @export
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
