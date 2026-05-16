@@ -1168,7 +1168,7 @@ loo_subsample_estimation_diff_srs <- function(x) {
 
 #' Difference estimator with simple random sampling without replacement.
 #'
-#' The difference estimator `srs_diff()` estimates
+#' The difference estimator `srs_diff_est()` estimates
 #' the expectation \eqn{n E[y]} when we have \eqn{n} approximate values \eqn{\tilde{y}_i},
 #' \eqn{i = 1, \ldots, n} and \eqn{m < n} accurate values \eqn{y_j}, \eqn{j \in \mathcal{S}},
 #' where \eqn{m} is the subsample size and \eqn{\mathcal{S}} is
