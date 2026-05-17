@@ -38,19 +38,18 @@ a proportional difference of \eqn{1/n} compared to the paper.
 }
 \examples{
 ## This example predicts wine quality (data from Cortez et al., 2009).
-# The code is commented as ## Not run: because brm() takes two or three seconds to fit.
+# The code is commented as ## Not run: because brm() takes a few seconds to fit.
 # Copy the code to your console to execute it.
 # A log_lik_matrix is generated from a fit, then it is used for srs_diff_est().
 \dontrun{
-library(dplyr)
 library(brms)
 options(brms.backend = "cmdstanr")
 options(mc.cores = 4)
 
-wine <- read.delim("../data-raw/winequality-red.csv", sep = ";") |>
-  distinct()
-
-wine_scaled <- as.data.frame(scale(wine))
+wine_scaled <- read.delim(
+  "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
+  sep = ";"
+) |> unique() |> scale() |> as.data.frame()
 
 fitos <- brm(ordered(quality) ~ .,
              family = cumulative("logit"),
