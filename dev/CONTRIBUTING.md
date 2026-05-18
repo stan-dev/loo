@@ -71,3 +71,6 @@ if this process is new to you.
 Please note that the loo project follows the Stan project’s [Code of
 Conduct](https://discourse.mc-stan.org/t/announcing-our-new-stan-code-of-conduct/23764).
 By contributing to this project you agree to abide by its terms.
+
+All contributions must follow the [Stan AI Contribution
+Policy](https://github.com/stan-dev/stan/wiki/AI-Contribution-Policy).

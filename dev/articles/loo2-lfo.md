@@ -747,7 +747,7 @@ sessionInfo()
 
     loaded via a namespace (and not attached):
      [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
-     [4] bslib_0.10.0          QuickJSR_1.9.2        htmlwidgets_1.6.4    
+     [4] bslib_0.11.0          QuickJSR_1.9.2        htmlwidgets_1.6.4    
      [7] processx_3.9.0        inline_0.3.21         lattice_0.22-9       
     [10] callr_3.7.6           ps_1.9.3              vctrs_0.7.3          
     [13] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
