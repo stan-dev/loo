@@ -1232,14 +1232,15 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' # posterior log-score
 #' lpd <- elpd(log_lik_matrix)
 #' sum(lpd$pointwise[,"elpd"])
-#' # Use PSIS-LOO for subsample of Nsub randomly selected observations
+#'
+#' # Use PSIS-LOO for subsample of 100 randomly selected observations
 #' set.seed(1)
 #' idx <- sample(1:N, Nsub)
 #' elpd_loo_sub <- loo(log_lik_matrix[,idx])
 #' sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
 #'
 #' # Use difference estimator to combine fast result and subsampled accurate result
-#' loo::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#' srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
 #'
 #' # Comparison to using PSIS-LOO for all observations
 #' loo(log_lik_matrix)
