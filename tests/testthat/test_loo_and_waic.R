@@ -135,8 +135,8 @@ test_that("waic.array and waic.matrix give same result", {
 })
 
 test_that("elpd.array and elpd.matrix give same result", {
-  elpd2 <- suppressWarnings(elpd(LLmat))
-  expect_identical(elpd1, elpd2)
+  elpd <- suppressWarnings(elpd(LLmat))
+  expect_identical(elpd1, elpd)
 })
 
 test_that("loo, waic, and elpd error with vector input", {

@@ -4,7 +4,6 @@
 #' pointwise predictive density for a new dataset or the log pointwise
 #' predictive density of the observed data (an overestimate of the elpd).
 #'
-#' @export
 #' @param x A log-likelihood array or matrix. The **Methods (by class)**
 #'   section, below, has detailed descriptions of how to specify the inputs for
 #'   each method.
@@ -19,8 +18,8 @@
 #'
 #' @examples
 #' # Calculate the lpd of the observed data
-#' LLarr <- example_loglik_array()
-#' elpd(LLarr)
+#' # LLarr <- example_loglik_array()
+#' # elpd(LLarr)
 #'
 elpd <- function(x, ...) {
   UseMethod("elpd")

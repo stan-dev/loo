@@ -16,6 +16,8 @@ loo.Rproj
 # produced vignettes
 vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*
+vignettes/articles-online-only/data-for-vignettes/
+vignettes/articles-online-only/*.html
 vignettes/*.html
 vignettes/*.pdf
 inst/doc

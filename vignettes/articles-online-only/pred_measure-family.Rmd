@@ -1,0 +1,459 @@
+---
+title: "Computing predictive performance: The `pred_measure`-family"
+author: "Florence Bockting"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: TRUE
+vignette: >
+  %\VignetteIndexEntry{Computing predictive performance: The `pred_measure`-family}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  eval = params$EVAL,
+  fig.width = 7,
+  fig.height = 4,
+  fig.align = "center"
+)
+if (requireNamespace("pred_measures", quietly = TRUE)) {
+  library(pred_measures)
+} else {
+  devtools::load_all("..")
+}
+library(brms)
+library(dplyr)
+library(ggplot2)
+```
+
+## Introduction
+
+After fitting a Bayesian model, you often want predictive performance measures
+that are comparable across evaluation strategies: in-sample, PSIS-LOO,
+k-fold, and holdout data. The **pred_measures** package provides a unified
+workflow through four entry points:
+
+- `insample_pred_measure()` for in-sample evaluation
+- `loo_pred_measure()` for PSIS-LOO cross-validation
+- `kfold_pred_measure()` for k-fold cross-validation
+- `test_pred_measure()` for holdout / new data
+
+Each entry point can compute any supported measure in a single call when you
+supply the required inputs and pass the `measure` argument. 
+For the argument `measure` you can either specify a vector with predefined measure names whereby supported measures
+are:
+
+- **Density scores:** `elpd`, `mlpd`
+- **Distributional scores:** `crps2`, `scrps2`, `rps`, `srps`
+- **Point metrics:** `mae`, `mse`, `rmse`, `r2`, `acc`, `bacc`
+
+Base measures (`elpd`, `ic`) are always included automatically; pass any
+additional names from the list above through the `measure` argument. You can 
+also obtain a list of supported measures via `supported_measures_list`:
+
+```{r supported-measures}
+supported_measures_list
+```
+
+When you want to compute a measure that is not yet supported, you can pass a custom function to the `measure` argument (see [Passing a custom function for a measure](#passing-a-custom-function-for-a-measure) below). In this case, the argument `measure` should be a list, whereby you can pass both predefined measure names and custom functions (e.g., `list("crps", "my_fun" = my_fun)`). The custom function must accept the same required arguments as the built-in version of that measure (see [Input requirements by measure](#input-requirements-by-measure) below), and you can pass additional arguments through `control`.
+
+For measure definitions and formulas, see the companion vignette 
+"overview-measures" [TODO].
+
+Besides computing all desired measures in one call, `pred_measure()` lets you 
+**add** measures to an existing result without recomputing what is already 
+stored (see [Adding measures incrementally](#adding-measures-incrementally-optional) below).
+
+**Prerequisites.** 
+
+This tutorial assumes a fitted **brms** model and familiarity
+with `brms::log_lik()`, `brms::posterior_predict()`, and
+`brms::posterior_epred()`.
+
+**What you will learn.**
+
+1. Compute all desired measures in one call to an entry point.
+2. Optionally accumulate measures incrementally with `pred_measure()`.
+3. Repeat the workflow under LOO, k-fold, and out-of-sample evaluation.
+4. Compare results across evaluation strategies.
+
+```{r load-data, include=FALSE}
+fit_sleep <- readRDS("data-for-vignettes/fit_sleep.Rds")
+fit_binary <- readRDS("data-for-vignettes/fit_binary.Rds")
+fit_roaches <- readRDS("data-for-vignettes/fit_roaches.Rds")
+fit_penguins <- readRDS("data-for-vignettes/fit_penguins.Rds")
+res_sleep_test <- readRDS("../../tests/testthat/data-for-tests/res_sleep_test.Rds")
+```
+
+## Quick start
+
+The sleep-study model from **lme4** predicts reaction time (ms) from days of
+sleep deprivation. The shortest path from a fitted model to printed measures is
+a single call to an entry point:
+
+```{r quick-start}
+sleep_measure <- insample_pred_measure(
+  ylp = brms::log_lik(fit_sleep),
+  y = fit_sleep$data$y,
+  ypred = brms::posterior_predict(fit_sleep),
+  measure = c("crps2", "scrps2")
+)
+
+print(sleep_measure)
+```
+
+Base measures (`elpd`, `ic`) are always computed; pass additional measure names
+in `measure`. The rest of this tutorial explains how inputs map to measures and
+how to switch evaluation modes.
+
+## Core concepts
+
+### Object structure
+
+Every function returns a **pred_measure** object which is a list with:
+
+| Component | Description |
+| :--- | :--- |
+| `$estimates` | Summary estimate and SE for each measure |
+| `$pointwise` | Observation-level contributions (one column per measure) |
+| `$diagnostics` | PSIS diagnostics (LOO and Kfold-CV only) |
+| `$log_weights` | Log weights used for LOO (LOO-CV only) |
+
+The `print()` method shows `$estimates` in a readable table. Use
+`str(result)` when you need the full structure.
+
+Every object also carries attributes that identify the evaluation mode and data
+dimensions. The table below summarizes what differs across approaches; all
+objects share `attr(result, "dims")` (posterior draws × observations) and
+`attr(result, "source")` (one of `"insample"`, `"loo"`, `"kfold"`, `"test"`).
+
+| | In-sample | PSIS-LOO | K-fold | Holdout (Test) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Class** | `insample_pred_measure` | `loo_pred_measure` (+ classes from `loo` object) | `kfold_pred_measure` (+ classes from `kfold` object) | `test_pred_measure` |
+| **List slots** | `$estimates`, `$pointwise` | `$estimates`, `$pointwise`, `$diagnostics`, `$log_weights`; (`$psis_object`) | `$estimates`, `$pointwise`; (`$diagnostics`) | `$estimates`, `$pointwise` |
+| **Measure suffix** | none (`elpd`, `ic`) | `_loo` (`elpd_loo`, `p_loo`, `ic_loo`, …) | `_kfold` (`elpd_kfold`, `p_kfold`, `kfoldic`, …) | `_test` (`elpd_test`, `ic_test`, …) |
+| **Inherited attrs** | -- | `yhash`, `model_name` from `loo` | `K`, `Ksub`, `folds`, `fold_type`, `joint`, `yhash`, `model_name` from `kfold` | -- |
+
+For holdout objects, `dims` reflects the test-set size (from `ylp_test`), not
+the training data. LOO and Kfold objects expose Pareto-k values in `$diagnostics$pareto_k` to assess the reliability of PSIS weights.
+
+### Input requirements by measure
+
+Supply the inputs each measure needs in a single entry-point call (see the
+[workflow overview](#workflow-overview) below). When adding measures
+incrementally, pass an existing object as `predperf` to `pred_measure()` so
+base estimates and weights are reused.
+
+| Measure | `ylp` | `y` | `ypred` | `mupred` |
+| :---: | :---: | :---: | :---: | :---: |
+| `elpd`, `mlpd`, `ic` | ✓ | | | |
+| `crps2`, `scrps2`, `rps`, `srps` | | ✓ | ✓ | |
+| `acc`, `bacc` | | ✓ | | ✓ |
+| `mae`, `mse`, `rmse`, `r2` | | ✓ | | ✓ |
+
+- **`ylp`**: pointwise log predictive density matrix (`S` draws × `n` observations),
+  typically from `brms::log_lik(fit)`.
+- **`ypred`**: posterior predictive draws from `brms::posterior_predict()`.
+- **`mupred`**: posterior expected values from `brms::posterior_epred()`.
+
+### Two ways to compute measures
+
+| Approach | When to use | Example |
+| :--- | :--- | :--- |
+| **One-shot** | You know all measures upfront | `loo_pred_measure(..., measure = c("crps2", "r2"))` |
+| **Incremental** | Explore interactively or add measures later | `pred_measure(..., predperf = existing, measure = "r2")` |
+
+### Workflow overview
+
+| Evaluation mode | Entry point | Primary inputs | 
+| :--- | :--- | :--- | :--- |
+| In-sample | `insample_pred_measure()` | `ylp`, plus `y`, `ypred`, `mupred` as needed | 
+| PSIS-LOO | `loo_pred_measure()` | `loo`, or `ylp` + `psis_object`, or `ylp` alone |
+| K-fold | `kfold_pred_measure()` | `kfold`, plus `y`, `ypred`, `mupred` as needed |
+| Holdout | `test_pred_measure()` | `ylp`, `ylp_test`, plus `y`, `ypred`, `mupred` as needed |
+
+Pass all required inputs and the full `measure` vector to the entry point for
+your evaluation mode. Use `pred_measure()` only when you want to extend an
+existing result (see below).
+
+## Continuous outcome: sleep study
+
+We use the pre-fitted Gaussian model on the sleep study throughout this section.
+
+### In-sample evaluation
+
+Pass all required inputs and the measures you want to `insample_pred_measure()`:
+
+```{r insample-all}
+ylp_sleep <- brms::log_lik(fit_sleep)
+ypred_sleep <- brms::posterior_predict(fit_sleep)
+mupred_sleep <- brms::posterior_epred(fit_sleep)
+
+sleep_measure <- insample_pred_measure(
+  ylp = ylp_sleep,
+  y = fit_sleep$data$y,
+  ypred = ypred_sleep,
+  mupred = mupred_sleep,
+  measure = c("crps2", "scrps2", "r2")
+)
+print(sleep_measure)
+```
+
+`elpd` sums the expected log pointwise predictive density across observations;
+`ic` is `-2 × elpd`. Additional rows in the table correspond to the measures
+passed in `measure`.
+
+```{r pointwise-crps2, fig.cap="Pointwise CRPS contributions across observations (in-sample)."}
+crps_pw <- sleep_measure$pointwise[, "crps2"]
+ggplot(
+  data = data.frame(obs = seq_along(crps_pw), crps = crps_pw)
+) +
+  geom_dotplot(aes(crps), dotsize = 0.5) +
+  labs(
+    x = "CRPS_i",
+    title = "Dotplot for in-sample pointwise CRPS"
+  ) +
+  theme_minimal()
+```
+
+The entire structure of the returned object with corresponding 
+attributes is shown in the following
+
+```{r}
+str(sleep_measure)
+```
+
+#### Passing a custom function for a measure
+
+It is also possible to pass a custom function for any measure. The function must accept the same arguments as the built-in version of that measure, and you can pass additional arguments through `control`:
+
+```{r insample-custom-function}
+# custom function
+crps1 <- function(y, ypred, ypred2, log_lik) {
+  crps(ypred, ypred2, y, log_lik)
+}
+
+ypred2_sleep <- brms::posterior_predict(fit_sleep)
+
+(insample_pred_measure(
+  ylp = ylp_sleep,
+  y = fit_sleep$data$y,
+  ypred = ypred_sleep,
+  mupred = mupred_sleep,
+  measure = list("crps2", crps1 = crps1),
+  control = list(
+    crps1 = list(ypred2 = ypred2_sleep, log_lik = ylp_sleep),
+    crps2 = list(revert_sign = TRUE)
+    )
+))
+```
+
+#### Adding measures incrementally
+
+If you already computed measures and want to add more without
+recomputing them, pass the existing object as `predperf` (**pred**icted 
+**perf**ormance measure) to `pred_measure()`:
+
+```{r insample-incremental}
+(pred_measure(
+  y = fit_sleep$data$y,
+  mupred = mupred_sleep,
+  predperf = sleep_measure,
+  measure = c("rmse", "mse")
+))
+```
+
+This two-step pattern is useful when exploring measures interactively.
+
+### PSIS-LOO cross-validation
+
+In-sample `elpd` uses posterior draws from $p(\theta \mid y)$. Comparing
+those predictions to the same data is **optimistically biased** for future or
+otherwise unseen observations: the model has already seen the data it is
+predicting ([Vehtari's CV-FAQ](https://users.aalto.fi/~ave/CV-FAQ.html),
+Section 4).
+
+**Cross-validation** estimates out-of-sample predictive performance by
+holding out part of the data, refitting (or reweighting) without that part,
+and scoring the held-out points. In **leave-one-out cross-validation (LOO-CV)**,
+each observation $y_i$ is predicted using a model fit to $y_{-i}$. The target
+quantity is the expected log pointwise predictive density (elppd), estimated by
+summing held-out log predictive densities across observations (see
+`vignette("overview-measures")` for the full
+definitions of within-sample, LOO, PSIS-LOO, and k-fold variants).
+
+**PSIS-LOO** approximates exact LOO-CV without refitting the model $n$ times.
+It reweights the full-data posterior draws $\theta^{(s)} \sim p(\theta \mid y)$
+with Pareto-smoothed importance sampling (PSIS) weights so that each
+observation $i$ is scored as if it had been left out. The resulting
+`elpd_loo` is an estimate of how well the model would predict new reaction
+times.
+
+Compute LOO measures in one call:
+
+```{r loo-all}
+loo_sleep <- brms::loo(fit_sleep, save_psis = TRUE)
+
+loo_measure <- loo_pred_measure(
+  loo = loo_sleep,
+  y = fit_sleep$data$y,
+  ypred = ypred_sleep,
+  mupred = mupred_sleep,
+  measure = c("crps2", "scrps2", "r2")
+)
+print(loo_measure)
+```
+
+The estimates carry a `_loo` suffix (`elpd_loo`, `ic_loo`). Additional `p_loo` (effective number of parameters) is provided which is the difference between 
+`elpd_loo` and the non-cross-validated log posterior predictive density. 
+Furthermore, we get an additional entry with PSIS diagnostics in `$diagnostics`.
+
+```{r loo-pareto-k, fig.cap="Pareto-k diagnostics for PSIS-LOO. Values above 0.7 suggest unreliable LOO estimates for those observations."}
+str(loo_measure)
+```
+
+**Alternative LOO inputs.** 
+
+`loo_pred_measure()` accepts three equivalent input patterns:
+
+| Input | Example |
+| :--- | :--- |
+| Precomputed `loo` object | `loo_pred_measure(loo = loo_sleep, measure = ...)` |
+| `ylp` + `psis_object` | `loo_pred_measure(ylp = ylp, psis_object = psis_obj, measure = ...)` |
+| `ylp` only (PSIS computed internally) | `loo_pred_measure(ylp = ylp, measure = ...)` |
+
+To add measures incrementally after a base-only LOO call, pass the existing
+object as `predperf` to `pred_measure()`. When
+accumulating after computing only `elpd`/`ic`, use `save_psis = TRUE` in
+`loo_pred_measure()` so PSIS weights are stored for subsequent measures.
+
+Compare the in-sample and LOO ELPD values directly:
+
+```{r elpd-compare-table}
+data.frame(
+  method = c("In-sample", "PSIS-LOO"),
+  elpd = c(
+    sleep_measure$estimates["elpd", "Estimate"],
+    loo_measure$estimates["elpd_loo", "Estimate"]
+  ),
+  se = c(
+    sleep_measure$estimates["elpd", "SE"],
+    loo_measure$estimates["elpd_loo", "SE"]
+  )
+)
+```
+
+### K-fold cross-validation
+
+K-fold CV holds out groups of observations rather than single points.
+The same computation pattern applies to this approach: pass all inputs and 
+measures to `kfold_pred_measure()` with a `kfold` object from `brms::kfold()`:
+
+```{r kfold-measures}
+kfold_sleep <- brms::kfold(fit_sleep, save_fits = TRUE)
+mupred_kfold <- brms::kfold_predict(kfold_sleep, method = "fitted")$yrep
+ypred_kfold <- brms::kfold_predict(kfold_sleep, method = "predict")$yrep
+
+kfold_measure <- kfold_pred_measure(
+  y = fit_sleep$data$y,
+  ypred = ypred_kfold,
+  mupred = mupred_kfold,
+  kfold = kfold_sleep,
+  measure = c("crps2", "scrps2", "r2")
+)
+print(kfold_measure)
+```
+
+Measure names carry a `_kfold` suffix (e.g. `elpd_kfold`, `crps_kfold`).
+The returned object inherits the attributes from the `brms::kfold` object:
+
+```{r}
+str(kfold_measure)
+```
+
+### Holdout evaluation
+
+For genuinely new data, use `test_pred_measure()` in the same one-shot way.
+We load precomputed predictive inputs from the package test fixtures (a random
+train/test split of the sleep study):
+
+```{r test-measures}
+test_measure <- test_pred_measure(
+  y = res_sleep_test$y_test,
+  ypred = res_sleep_test$ypred_test,
+  mupred = res_sleep_test$mupred_test,
+  ylp = res_sleep_test$ylp_train,
+  ylp_test = res_sleep_test$ylp_test,
+  measure = c("crps2", "scrps2", "r2")
+)
+print(test_measure)
+```
+
+Holdout measures use a `_test` suffix and reflect performance on the 50
+held-out observations only.
+
+## Other outcome types
+
+The same pattern applies to non-Gaussian models. Each subsection uses
+a pre-fitted **brms** model.
+
+### Binary outcomes
+
+```{r binary-example}
+binary_measure <- insample_pred_measure(
+  ylp = brms::log_lik(fit_binary),
+  y = fit_binary$data$y,
+  mupred = brms::posterior_epred(fit_binary),
+  measure = c("acc", "bacc")
+)
+print(binary_measure)
+```
+
+### Count outcomes
+
+```{r count-example}
+ypred_roaches <- brms::posterior_predict(fit_roaches)
+
+roaches_measure <- insample_pred_measure(
+  ylp = brms::log_lik(fit_roaches),
+  y = fit_roaches$data$y,
+  ypred = ypred_roaches,
+  measure = c("rps", "srps"),
+  control = list(rps = list(size = as.integer(max(ypred_roaches))),
+                 srps = list(size = as.integer(max(ypred_roaches))))
+)
+print(roaches_measure)
+```
+
+### Categorical outcomes
+
+```{r categorical-example, eval = FALSE}
+penguins_measure <- insample_pred_measure(
+  ylp = brms::log_lik(fit_penguins),
+  y = as.integer(fit_penguins$data$y),
+  mupred = brms::posterior_epred(fit_penguins),
+  measure = c("acc", "bacc")
+)
+print(penguins_measure)
+```
+
+See `vignette("overview-measures", package = "pred_measures")` for which
+measures apply to each outcome type.
+
+## Further reading
+
+- `?supported_measures_list` — character vector of all supported measure names
+- `?pred_measure` — optional helper for adding measures to an existing predperf
+  object
+- `?insample_pred_measure`, `?loo_pred_measure`, `?kfold_pred_measure`,
+  `?test_pred_measure` — entry points for each evaluation mode
+- `vignette("overview-measures", package = "pred_measures")` — measure
+  definitions, formulas, and orientation (higher vs lower is better)
