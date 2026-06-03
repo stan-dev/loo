@@ -40,7 +40,9 @@ via a user-facing argument?
 
 ### D2: Scaled `rps`: separate function vs. argument
 + **Context:** We consider to use `rps` as a unified score for continuous and
-ordered categorical inputs, subsuming `crps`, `scrps`, `srps`, and `rps`. As they can use the same underlying implementation (see implementation shared by Aki; contact Aki or Flo)
+ordered categorical inputs, subsuming `crps`, `scrps`, `srps`, and `rps`. 
+As they can use the same underlying implementation (see implementation shared 
+by Aki; contact Aki or Flo)
 + **Question:** Do we need an explicit `srps` function, or is a `scale = TRUE /
 FALSE` argument inside `rps` sufficient?
 + **Decision:** *pending*
@@ -60,7 +62,8 @@ FALSE` argument inside `rps` sufficient?
 
 - [ ] Remove the "old" `crps` implementation that requires two independent
   `ypred` inputs; retain only the new ECDF-based implementation.
-- [ ] Align the currently two existing `elpd` implementations (old and new implementation).
+- [ ] Align the currently two existing `elpd` implementations 
+(old and new implementation).
 - [ ] Move `ic` out of "base measures"; it should not be included
   automatically but must be explicitly requested by the user.
 - [ ] Provide an interface to `loo_compare` and verify consistency with it.
@@ -77,7 +80,8 @@ FALSE` argument inside `rps` sufficient?
 - [ ] Address the `kfold_pred_measure()` limitation with families that return
   3D objects (e.g., categorical models produce an `S × N × K` array from
   `brms::kfold_predict()`):
-  - [ ] Open a corresponding issue in `brms`. *Link: TODO*
+  - [x] Open a corresponding issue in `brms`: [Issue#1889](https://github.com/paul-buerkner/brms/issues/1889)
+    + Created also a corresponding [PR#1890](https://github.com/paul-buerkner/brms/pull/1890)
   - [ ] Until the `brms` issue is resolved: document which families are not
     yet supported and return a `"not implemented"` error with a pointer to
     the `brms` issue.
