@@ -10,7 +10,7 @@ r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
 
 loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 waic1 <- suppressWarnings(waic(LLarr))
-elpd1 <- suppressWarnings(elpd(LLarr))
+elpd1 <- suppressWarnings(elpd(llarray_to_matrix(LLarr)))
 
 test_that("using loo.cores is deprecated", {
   options(mc.cores = NULL)
