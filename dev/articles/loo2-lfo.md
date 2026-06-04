@@ -746,8 +746,8 @@ sessionInfo()
     [5] Rcpp_1.1.1-1.1   knitr_1.51      
 
     loaded via a namespace (and not attached):
-     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
-     [4] bslib_0.11.0          QuickJSR_1.9.2        htmlwidgets_1.6.4    
+     [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.58            
+     [4] bslib_0.11.0          QuickJSR_1.10.0       htmlwidgets_1.6.4    
      [7] processx_3.9.0        inline_0.3.21         lattice_0.22-9       
     [10] callr_3.7.6           ps_1.9.3              vctrs_0.7.3          
     [13] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
@@ -761,7 +761,7 @@ sessionInfo()
     [37] pkgdown_2.2.0         jquerylib_0.1.4       cachem_1.1.0         
     [40] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
     [43] nlme_3.1-169          posterior_1.7.0       rstan_2.32.7         
-    [46] tidyselect_1.2.1      digest_0.6.39         mvtnorm_1.3-7        
+    [46] tidyselect_1.2.1      digest_0.6.39         mvtnorm_1.4-0        
     [49] stringi_1.8.7         dplyr_1.2.1           labeling_0.4.3       
     [52] fastmap_1.2.0         grid_4.6.0            cli_3.6.6            
     [55] magrittr_2.0.5        pkgbuild_1.4.8        withr_3.0.2          
