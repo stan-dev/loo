@@ -121,6 +121,8 @@ Useful links:
 
 Authors:
 
+- Jonah Gabry <jgabry@gmail.com>
+
 - Aki Vehtari <Aki.Vehtari@aalto.fi>
 
 - Måns Magnusson
