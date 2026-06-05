@@ -45,7 +45,13 @@ As they can use the same underlying implementation (see implementation shared
 by Aki; contact Aki or Flo)
 + **Question:** Do we need an explicit `srps` function, or is a `scale = TRUE /
 FALSE` argument inside `rps` sufficient?
-+ **Decision:** *pending*
++ **Decision:** Yes. We need `srps` for easy user-input of measures in `pred_measure`. Example: 
+```
+pred_measure(
+  y = y, ypred = ypred, measure = c("rps", "srps"), ...
+)
+```
+Without having the scaled version as explicit form, we would have to create a custom measure with a different name otherwise we would have duplicate names.
 
 ### D3: Handling of `r_eff`
 + **Context:** There is an open upstream discussion on `r_eff` handling in
