@@ -1,18 +1,9 @@
 # load test data --------------------------------------
 res_roaches <- readRDS("data-for-tests/res_roaches.Rds")
+res_sleep <- readRDS("data-for-tests/res_sleep.Rds")
 res_binom <- readRDS("data-for-tests/res_binomial.Rds")
 res_binary <- readRDS("data-for-tests/res_binary.Rds")
 res_cat <- readRDS("data-for-tests/res_penguins.Rds")
-
-set.seed(123456789)
-n <- 10; S <- 100
-
-res2 <- list(
-  y = rnorm(n),
-  x1 = matrix(rnorm(n * S), nrow = S),
-  x2 = matrix(rnorm(n * S), nrow = S),
-  ll = matrix(rnorm(n * S) * 0.1 - 1, nrow = S)
-)
 
 # ptw_log_pred_density ------------------------
 testthat::test_that("ptw_log_pred_density() works as expected", {
@@ -92,38 +83,34 @@ testthat::test_that("mlpd() works as expected", {
 
 # rps() -------------------------------------
 
-testthat::test_that("rps() works as expected", {
+testthat::test_that("rps() with ordered categorial data works as expected", {
   res <- rps(
     y = res_binom$y,
-    ypred = res_binom$ypred,
-    size = 10,
-    log_weights = NULL
+    ypred = res_binom$ypred
   )
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
-  expect_equal(length(res$pointwise), length(res_binary$y))
+  expect_equal(length(res$pointwise), length(res_binom$y))
 })
 
-testthat::test_that("srps() (scaled version) works as expected", {
+testthat::test_that("rps() scaled version with categorical data works as expected", {
   res <- rps(
     y = res_binom$y,
     ypred = res_binom$ypred,
-    size = 10,
-    log_weights = NULL,
-    scale = TRUE
+    scaled = TRUE
   )
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
-  expect_equal(length(res$pointwise), length(res_binary$y))
+  expect_equal(length(res$pointwise), length(res_binom$y))
+  expect_true(all(res$pointwise < 0))
 })
 
-testthat::test_that("rps() with log-weights works as expected", {
+testthat::test_that("rps() for categorical data with log-weights works as expected", {
   res <- rps(
     y = res_binom$y,
     ypred = res_binom$ypred,
-    size = 10,
     log_weights = res_binom$log_weights
   )
 
@@ -132,6 +119,36 @@ testthat::test_that("rps() with log-weights works as expected", {
   expect_equal(length(res$pointwise), length(res_binary$y))
   expect_true(all(res$pointwise >= 0))
 })
+
+testthat::test_that("rps() with continuous data works as expected", {
+  res <- rps(res_sleep$y, res_sleep$ypred)
+
+  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(length(res$estimates), 2)
+  expect_equal(length(res$pointwise), length(res_sleep$y))
+})
+
+testthat::test_that("rps() with continuous data and log-weights works as expected", {
+  res <- rps(
+    res_sleep$y, 
+    res_sleep$ypred, 
+    log_weights = res_sleep$log_weights
+  )
+
+  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(length(res$estimates), 2)
+  expect_equal(length(res$pointwise), length(res_sleep$y))
+})
+
+testthat::test_that("rps() with continuous data and scaled version works as expected", {
+  res <- rps(res_sleep$y, res_sleep$ypred, scaled = TRUE)
+
+  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(length(res$estimates), 2)
+  expect_equal(length(res$pointwise), length(res_sleep$y))
+  expect_true(all(res$pointwise < 0))
+})
+
 
 # brier() ---------------------------------------
 
@@ -173,103 +190,6 @@ testthat::test_that("brier() errors when y not binary", {
     ),
     regexp = "The brier score expects binary data 'y'."
   )
-})
-
-# crps() ---------------------------------------
-with_seed <- function(seed, code) {
-  code <- substitute(code)
-  orig.seed <- .Random.seed
-  on.exit(.Random.seed <<- orig.seed)
-  set.seed(seed)
-  eval.parent(code)
-}
-
-test_that("crps computation is correct", {
-  expect_equal(.crps_fun(2.0, 1.0), 0.0)
-  expect_equal(.crps_fun(1.0, 2.0), -1.5)
-  expect_equal(.crps_fun(pi, pi^2), 0.5 * pi - pi^2)
-
-  expect_equal(.crps_fun(1.0, 0.0, scale = TRUE), 0.0)
-  expect_equal(.crps_fun(1.0, 2.0, scale = TRUE), -2.0)
-  expect_equal(.crps_fun(pi, pi^2, scale = TRUE), -pi^2/pi - 0.5 * log(pi))
-})
-
-test_that("crps matches snapshots", {
-  expect_snapshot_value(with_seed(1, crps(res2$x1, res2$x2, res2$y)), 
-  style = "serialize")
-  expect_snapshot_value(with_seed(1, scrps(res2$x1, res2$x2, res2$y)), 
-  style = "serialize")
-  expect_snapshot_value(
-    with_seed(1, loo_crps(res2$x1, res2$x2, res2$y, res2$ll)), 
-    style = "serialize")
-  expect_snapshot_value(
-    with_seed(1, loo_scrps(res2$x1, res2$x2, res2$y, res2$ll)), 
-    style = "serialize")
-})
-
-test_that("input validation throws correct errors", {
-  expect_error(validate_crps_input(as.character(res2$x1), res2$x2, res2$y),
-               "is.numeric(x) is not TRUE",
-               fixed = TRUE)
-  expect_error(validate_crps_input(res2$x1, as.character(res2$x2), res2$y),
-               "is.numeric(x2) is not TRUE",
-               fixed = TRUE)
-  expect_error(validate_crps_input(res2$x1, res2$x2, c('a', 'b')),
-               "is.numeric(y) is not TRUE",
-               fixed = TRUE)
-  expect_error(validate_crps_input(res2$x1, t(res2$x2), res2$y),
-               "identical(dim(x), dim(x2)) is not TRUE",
-               fixed = TRUE)
-  expect_error(validate_crps_input(res2$x1, res2$x2, c(1, 2)),
-               "ncol(x) == length(y) is not TRUE",
-               fixed = TRUE)
-  expect_error(validate_crps_input(res2$x1, res2$x2, res2$y, t(res2$ll)),
-               "ifelse(is.null(log_lik), TRUE, identical(dim(log_lik), dim(x))) is not TRUE",
-               fixed = TRUE)
-})
-
-test_that("methods for single data point don't error", {
-  expect_silent(crps(res2$x1[,1], res2$x2[,1], res2$y[1]))
-  expect_silent(scrps(res2$x1[,1], res2$x2[,1], res2$y[1]))
-})
-
-testthat::test_that("crps2() works as expected", {
-  res <- crps2(res_roaches$y, res_roaches$ypred, log_weights = NULL)
-
-  expect_equal(names(res), c("estimates", "pointwise"))
-  expect_equal(length(res$estimates), 2)
-  expect_equal(length(res$pointwise), length(res_roaches$y))
-})
-
-testthat::test_that("crps2() with log-weights works as expected", {
-  res <- crps2(
-    res_roaches$y, 
-    res_roaches$ypred, 
-    log_weights = res_roaches$predperf_loo$log_weights
-  )
-
-  expect_equal(names(res), c("estimates", "pointwise"))
-  expect_equal(length(res$estimates), 2)
-  expect_equal(length(res$pointwise), length(res_roaches$y))
-
-  # unnormalized log-weights as input
-  res2 <- crps2(
-    res_roaches$y, 
-    res_roaches$ypred, 
-    log_weights = res_roaches$predperf_loo$psis_object$log_weights
-  )
-  expect_equal(res$pointwise, res2$pointwise)
-})
-
-testthat::test_that("scrps2() (scaled version) works as expected", {
-  res <- crps2(res_roaches$y, res_roaches$ypred, log_weights = NULL, scale = TRUE)
-  res2 <- scrps2(res_roaches$y, res_roaches$ypred, log_weights = NULL)
-
-  expect_equal(names(res), c("estimates", "pointwise"))
-  expect_equal(length(res$estimates), 2)
-  expect_equal(length(res$pointwise), length(res_roaches$y))
-  expect_equal(res$estimates, res2$estimates)
-  expect_equal(res$pointwise, res2$pointwise)
 })
 
 # mae() ------------------------------------------------

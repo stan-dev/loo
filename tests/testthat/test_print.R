@@ -17,13 +17,13 @@ measure_specs <- function(temp) {
       args = list(y = temp$y, ypred = temp$ypred),
       control = rank_control
     ),
-    list(measure = "crps2", args = list(y = temp$y, ypred = temp$ypred)),
+    list(measure = "crps", args = list(y = temp$y, ypred = temp$ypred)),
     list(
       measure = "srps",
       args = list(y = temp$y, ypred = temp$ypred),
       control = rank_control
     ),
-    list(measure = "scrps2", args = list(y = temp$y, ypred = temp$ypred)),
+    list(measure = "scrps", args = list(y = temp$y, ypred = temp$ypred)),
     list(measure = "mlpd", args = list(ylp = temp$ylp))
   )
 }

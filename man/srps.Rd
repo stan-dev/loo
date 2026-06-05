@@ -2,38 +2,49 @@
 % Please edit documentation in R/measures.R
 \name{srps}
 \alias{srps}
-\title{Scaled ranked probability score (\code{srps})}
+\title{Scaled Ranked Probability Score (SRPS, SCRPS)}
 \usage{
-srps(y, ypred, size, log_weights = NULL, pointwise = NULL, revert_sign = FALSE)
+srps(y, ypred, log_weights = NULL, revert_sign = FALSE)
 }
 \arguments{
-\item{y}{An integer vector of observed outcomes.}
+\item{y}{A numeric vector of \eqn{n} observed outcomes. May be integer-valued
+(for RPS/SRPS) or continuous (for CRPS/SCRPS).}
 
 \item{ypred}{A numeric matrix of posterior predictive draws with dimensions
-draws x observations.}
+\eqn{S \times n} (draws × observations).}
 
-\item{size}{Maximum support value for \code{y}. The function assumes support
-values from 0 to \code{size}.}
+\item{log_weights}{Optional numeric matrix of log-importance-
+weights with dimensions \eqn{S \times n}. When provided, a weighted PWM
+estimator is used. Useful for LOO cross-validation via importance sampling
+(e.g., PSIS-LOO).}
 
-\item{log_weights}{Optional numeric matrix of unnormalized log-weights
-with dimensions draws x observations.}
-
-\item{pointwise}{Optional numeric vector of precomputed pointwise scores.
-If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
-
-\item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by -1 before returning.}
+\item{revert_sign}{Logical; if \code{TRUE}, multiplies scores by \eqn{-1} to
+return the loss convention (lower is better) rather than the utility
+convention. Default is \code{FALSE}.}
 }
 \value{
-A named list with elements \code{estimate}, \code{se}, and \code{pointwise}.
+A named list with:
+\describe{
+\item{\code{estimate}}{Mean score across all observations.}
+\item{\code{se}}{Standard error of the mean score.}
+\item{\code{pointwise}}{Numeric vector of length \eqn{n} with per-observation
+scores.}
+}
 }
 \description{
-Wrapper around \code{\link[=rps]{rps()}} that computes the scaled ranked probability score
-(SRPS), a positively oriented score based on normalized absolute error and
-predictive spread.
+A convenience wrapper around \code{\link[=rps]{rps()}} with \code{scaled = TRUE}. Computes the
+scaled ranked probability score (SRPS) for discrete outcomes or the scaled
+continuously ranked probability score (SCRPS) for continuous outcomes.
+Scaling makes the score invariant to the spread of the predictive
+distribution, which can be useful when comparing models across observations
+with very different predictive uncertainties.
+}
+\details{
+See \code{\link[=rps]{rps()}} for full details on arguments, estimation, and references.
 }
 \examples{
-y <- c(2, 1, 3)
+y <- c(2L, 1L, 3L)
 ypred <- matrix(c(2, 1, 2, 3, 1, 3), nrow = 2)
-srps(y, ypred, size = 3)
+srps(y, ypred)
+
 }

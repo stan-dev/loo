@@ -38,12 +38,11 @@ summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 \code{\link[=supported_measures_list]{supported_measures_list()}}.
 \item A \strong{function} with attribute \code{"measure_name"} for one custom measure.
 \item A \strong{list} mixing character scalars (built-in names) and named
-functions (custom measures), e.g. \code{list("crps", my_metric = my_fun)}.
+functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
 }
 Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} that appear in their formals, plus arguments from \code{control}.
-They must return a list with \code{estimate}, \code{se}, and \code{pointwise} (or
-\code{estimates} and \code{pointwise}, as \code{\link[=crps2]{crps2()}} does).}
+They must return a list with  \code{estimates} and \code{pointwise}.}
 
 \item{kfold}{A \code{kfold} object from \code{\link[brms:kfold.brmsfit]{brms::kfold()}}. Supplies ELPD summaries
 and fold structure for \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}; pass \code{y}, \code{ypred}, and/or
@@ -54,7 +53,7 @@ and fold structure for \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}; 
 
 \item{control}{Named list of per-measure settings. Each name must match an
 element of \code{measure}; the value is a list of arguments passed to that
-measure's summary function (e.g. \code{list(rps = list(size = 10))}).}
+measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 }
 \value{
 An object of class \code{"kfold_pred_measure"} and \code{"pred_measure"}, inheriting

@@ -24,12 +24,10 @@ knitr::opts_chunk$set(
   fig.height = 4,
   fig.align = "center"
 )
-if (requireNamespace("pred_measures", quietly = TRUE)) {
-  library(pred_measures)
-} else {
-  devtools::load_all("..")
-}
-library(brms)
+
+devtools::load_all(".")
+# library(brms)
+devtools::load_all("/u/21/wa.bocktif1/unix/GitHub/brms")
 library(dplyr)
 library(ggplot2)
 ```
@@ -52,7 +50,7 @@ For the argument `measure` you can either specify a vector with predefined measu
 are:
 
 - **Density scores:** `elpd`, `mlpd`
-- **Distributional scores:** `crps2`, `scrps2`, `rps`, `srps`
+- **Distributional scores:** `rps`, `srps`
 - **Point metrics:** `mae`, `mse`, `rmse`, `r2`, `acc`, `bacc`
 
 Base measures (`elpd`, `ic`) are always included automatically; pass any
@@ -63,7 +61,7 @@ also obtain a list of supported measures via `supported_measures_list`:
 supported_measures_list
 ```
 
-When you want to compute a measure that is not yet supported, you can pass a custom function to the `measure` argument (see [Passing a custom function for a measure](#passing-a-custom-function-for-a-measure) below). In this case, the argument `measure` should be a list, whereby you can pass both predefined measure names and custom functions (e.g., `list("crps", "my_fun" = my_fun)`). The custom function must accept the same required arguments as the built-in version of that measure (see [Input requirements by measure](#input-requirements-by-measure) below), and you can pass additional arguments through `control`.
+When you want to compute a measure that is not yet supported, you can pass a custom function to the `measure` argument (see [Passing a custom function for a measure](#passing-a-custom-function-for-a-measure) below). In this case, the argument `measure` should be a list, whereby you can pass both predefined measure names and custom functions (e.g., `list("rps", "my_fun" = my_fun)`). The custom function must accept the same required arguments as the built-in version of that measure (see [Input requirements by measure](#input-requirements-by-measure) below), and you can pass additional arguments through `control`.
 
 For measure definitions and formulas, see the companion vignette 
 "overview-measures" [TODO].
@@ -104,7 +102,7 @@ sleep_measure <- insample_pred_measure(
   ylp = brms::log_lik(fit_sleep),
   y = fit_sleep$data$y,
   ypred = brms::posterior_predict(fit_sleep),
-  measure = c("crps2", "scrps2")
+  measure = c("rps", "srps")
 )
 
 print(sleep_measure)
@@ -155,7 +153,7 @@ base estimates and weights are reused.
 | Measure | `ylp` | `y` | `ypred` | `mupred` |
 | :---: | :---: | :---: | :---: | :---: |
 | `elpd`, `mlpd`, `ic` | ✓ | | | |
-| `crps2`, `scrps2`, `rps`, `srps` | | ✓ | ✓ | |
+| `rps`, `srps` | | ✓ | ✓ | |
 | `acc`, `bacc` | | ✓ | | ✓ |
 | `mae`, `mse`, `rmse`, `r2` | | ✓ | | ✓ |
 
@@ -168,7 +166,7 @@ base estimates and weights are reused.
 
 | Approach | When to use | Example |
 | :--- | :--- | :--- |
-| **One-shot** | You know all measures upfront | `loo_pred_measure(..., measure = c("crps2", "r2"))` |
+| **One-shot** | You know all measures upfront | `loo_pred_measure(..., measure = c("rps", "r2"))` |
 | **Incremental** | Explore interactively or add measures later | `pred_measure(..., predperf = existing, measure = "r2")` |
 
 ### Workflow overview
@@ -202,7 +200,7 @@ sleep_measure <- insample_pred_measure(
   y = fit_sleep$data$y,
   ypred = ypred_sleep,
   mupred = mupred_sleep,
-  measure = c("crps2", "scrps2", "r2")
+  measure = c("rps", "srps", "r2")
 )
 print(sleep_measure)
 ```
@@ -211,8 +209,8 @@ print(sleep_measure)
 `ic` is `-2 × elpd`. Additional rows in the table correspond to the measures
 passed in `measure`.
 
-```{r pointwise-crps2, fig.cap="Pointwise CRPS contributions across observations (in-sample)."}
-crps_pw <- sleep_measure$pointwise[, "crps2"]
+```{r pointwise-crps, fig.cap="Pointwise CRPS contributions across observations (in-sample)."}
+crps_pw <- sleep_measure$pointwise[, "rps"]
 ggplot(
   data = data.frame(obs = seq_along(crps_pw), crps = crps_pw)
 ) +
@@ -235,24 +233,32 @@ str(sleep_measure)
 
 It is also possible to pass a custom function for any measure. The function must accept the same arguments as the built-in version of that measure, and you can pass additional arguments through `control`:
 
-```{r insample-custom-function}
-# custom function
-crps1 <- function(y, ypred, ypred2, log_lik) {
-  crps(ypred, ypred2, y, log_lik)
+```{r}
+# custom scoring rule
+hamming_loss <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
+  if (is.null(log_weights)) {
+    hamming_i <- colMeans(sweep(ypred, 2, y, "!="))
+  } else {
+    w <- exp(.normalize_log_weights(log_weights))
+    hamming_i <- colSums(w * sweep(ypred, 2, y, "!="))
+  }
+  
+  res <- list(
+    estimate = mean(hamming_i),
+    se = sqrt(var(hamming_i) / length(hamming_i)),
+    pointwise = hamming_i
+  )
+  
+  .measure_output(res, revert_sign)
 }
+```
 
-ypred2_sleep <- brms::posterior_predict(fit_sleep)
-
+```{r insample-custom-function}
 (insample_pred_measure(
-  ylp = ylp_sleep,
-  y = fit_sleep$data$y,
-  ypred = ypred_sleep,
-  mupred = mupred_sleep,
-  measure = list("crps2", crps1 = crps1),
-  control = list(
-    crps1 = list(ypred2 = ypred2_sleep, log_lik = ylp_sleep),
-    crps2 = list(revert_sign = TRUE)
-    )
+  ylp = brms::log_lik(fit_binary),
+  y = fit_binary$data$y,
+  ypred = res_binary$ypred,
+  measure = list("rps", hamming = hamming_loss)
 ))
 ```
 
@@ -307,7 +313,7 @@ loo_measure <- loo_pred_measure(
   y = fit_sleep$data$y,
   ypred = ypred_sleep,
   mupred = mupred_sleep,
-  measure = c("crps2", "scrps2", "r2")
+  measure = c("rps", "srps", "r2")
 )
 print(loo_measure)
 ```
@@ -367,12 +373,12 @@ kfold_measure <- kfold_pred_measure(
   ypred = ypred_kfold,
   mupred = mupred_kfold,
   kfold = kfold_sleep,
-  measure = c("crps2", "scrps2", "r2")
+  measure = c("rps", "srps", "r2")
 )
 print(kfold_measure)
 ```
 
-Measure names carry a `_kfold` suffix (e.g. `elpd_kfold`, `crps_kfold`).
+Measure names carry a `_kfold` suffix (e.g. `elpd_kfold`, `rps_kfold`).
 The returned object inherits the attributes from the `brms::kfold` object:
 
 ```{r}
@@ -392,7 +398,7 @@ test_measure <- test_pred_measure(
   mupred = res_sleep_test$mupred_test,
   ylp = res_sleep_test$ylp_train,
   ylp_test = res_sleep_test$ylp_test,
-  measure = c("crps2", "scrps2", "r2")
+  measure = c("rps", "srps", "r2")
 )
 print(test_measure)
 ```
@@ -435,7 +441,7 @@ print(roaches_measure)
 
 ### Categorical outcomes
 
-```{r categorical-example, eval = FALSE}
+```{r categorical-example}
 penguins_measure <- insample_pred_measure(
   ylp = brms::log_lik(fit_penguins),
   y = as.integer(fit_penguins$data$y),

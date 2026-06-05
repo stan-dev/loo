@@ -27,8 +27,8 @@ The table below summarizes the core metrics implemented in our framework.
 | `acc` | Accuracy | Proper Scoring Rule | Higher is Better | Nominal Categorical |
 | `bacc` | Balanced Accuracy | Adjusted Classification Metric | Higher is Better | Imbalanced Categorical |
 | `brier` | Brier Score | Proper Scoring Rule | Lower is Better | Binary |
-| `crps2` | Continuous Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous |
-| `scrps2` | Scaled Continuous Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous |
+| `crps` | Continuous Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous |
+| `scrps` | Scaled Continuous Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous |
 | `rps` | Ranked Probability Score | Proper Scoring Rule | Lower is Better | Ordered Categorical |
 | `srps` | Scaled Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Ordered Categorical |
 | `mae` | Mean Absolute Error | Point Estimation Metric | Lower is Better | Continuous |
@@ -523,16 +523,16 @@ $$
   $$
 
 ```{r}
-crps_ws <- crps2(
+crps_ws <- crps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred
 )
-crps_loo <- crps2(
+crps_loo <- crps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred, 
   log_weights = res_sleep$log_weights
 )
-crps_kfold <- crps2(
+crps_kfold <- crps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred_kfold
 )
@@ -584,16 +584,16 @@ $$
   $$
 
 ```{r}
-scrps_ws <- scrps2(
+scrps_ws <- scrps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred
 )
-scrps_loo <- scrps2(
+scrps_loo <- scrps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred, 
   log_weights = res_sleep$log_weights
 )
-scrps_kfold <- scrps2(
+scrps_kfold <- scrps(
   y = res_sleep$y, 
   ypred = res_sleep$ypred_kfold
 )

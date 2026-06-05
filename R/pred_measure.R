@@ -29,12 +29,11 @@
 #'       [supported_measures_list()].
 #'     \item A **function** with attribute `"measure_name"` for one custom measure.
 #'     \item A **list** mixing character scalars (built-in names) and named
-#'       functions (custom measures), e.g. `list("crps", my_metric = my_fun)`.
+#'       functions (custom measures), e.g. `list("rps", my_metric = my_fun)`.
 #'   }
 #'   Custom functions are called with any of `y`, `ypred`, `mupred`, `ylp`, and
 #'   `log_weights` that appear in their formals, plus arguments from `control`.
-#'   They must return a list with `estimate`, `se`, and `pointwise` (or
-#'   `estimates` and `pointwise`, as [crps2()] does).
+#'   They must return a list with  `estimates` and `pointwise`.
 #' @param measure_name For a single custom function, set
 #'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
 #'   `measure`.
@@ -54,7 +53,7 @@
 #'   recomputing PSIS weights.
 #' @param control Named list of per-measure settings. Each name must match an
 #'   element of `measure`; the value is a list of arguments passed to that
-#'   measure's summary function (e.g. `list(rps = list(size = 10))`).
+#'   measure's summary function (e.g. `list(new_measure = list(add_arg = 10))`).
 #' @param source Character string indicating the evaluation mode: `"insample"`,
 #'   `"loo"`, `"kfold"`, or `"test"`. Set automatically by the wrapper
 #'   functions; required when calling [pred_measure_engine()] directly.

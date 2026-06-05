@@ -29,13 +29,13 @@ test_that(".compute_measure() with r2 works as expected", {
   expect_equal(names(measure_res), c("estimates", "pointwise"))
 })
 
-test_that(".compute_measure() with crps2 works as expected", {
+test_that(".compute_measure() with crps works as expected", {
   measure_res <- .compute_measure(
     y = y,
     ypred = ypred,
     mupred = NULL,
     ylp = ylp,
-    measure_entry = .builtin_entry("crps2"),
+    measure_entry = .builtin_entry("crps"),
     log_weights = NULL
   )
 
