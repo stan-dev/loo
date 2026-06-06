@@ -12,7 +12,7 @@ loo_compare(x, ...)
 
 \method{loo_compare}{default}(x, ...)
 
-\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE)
+\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE)
 
 \method{print}{compare.loo_ss}(x, ..., digits = 1)
 }
@@ -30,6 +30,11 @@ printing.}
 \item{p_worse}{For the print method only, should we include the normal
 approximation based probability of each model having worse performance than
 the best model? The default is \code{TRUE}.}
+
+\item{simplify}{For the print method only, should the output be simplified
+to only include the model names and ELPD differences? The default is
+\code{TRUE}. If \code{FALSE}, the full comparison table is printed including
+pointwise ELPD, LOOIC/WAIC, and their standard errors for each model.}
 }
 \value{
 A data frame with class \code{"compare.loo"} that has its own
@@ -118,6 +123,9 @@ loo3 <- loo(LL + 2) # should be best model when compared
 
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
+
+# print full table with pointwise ELPD and LOOIC
+print(comp, simplify = FALSE)
 
 # can use a list of objects with custom names
 # the names will be used in the output

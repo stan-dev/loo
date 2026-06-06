@@ -92,6 +92,9 @@
 #' comp <- loo_compare(loo1, loo2, loo3)
 #' print(comp, digits = 2)
 #'
+#' # print full table with pointwise ELPD and LOOIC
+#' print(comp, simplify = FALSE)
+#'
 #' # can use a list of objects with custom names
 #' # the names will be used in the output
 #' loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
@@ -170,7 +173,11 @@ loo_compare.default <- function(x, ...) {
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
-print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
+#' @param simplify For the print method only, should the output be simplified
+#'   to only include the model names and ELPD differences? The default is
+#'   `TRUE`. If `FALSE`, the full comparison table is printed including
+#'   pointwise ELPD, LOOIC/WAIC, and their standard errors for each model.
+print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE) {
   if (inherits(x, "old_compare.loo")) {
     return(unclass(x))
   }
@@ -192,6 +199,16 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
       diag_diff = x[, "diag_diff"],
       diag_elpd = x[, "diag_elpd"]
     )
+  }
+  if (!simplify) {
+    est_cols <- c("elpd_loo", "se_elpd_loo", "p_loo", "se_p_loo",
+                  "looic", "se_looic",
+                  "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic",
+                  "waic", "se_waic")
+    avail <- intersect(est_cols, colnames(x))
+    if (length(avail)) {
+      x2 <- cbind(x2, .fr(x[, avail], digits))
+    }
   }
   print(x2, quote = FALSE, row.names = FALSE)
 
