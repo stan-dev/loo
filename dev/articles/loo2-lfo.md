@@ -749,7 +749,7 @@ sessionInfo()
      [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.58            
      [4] bslib_0.11.0          QuickJSR_1.10.0       htmlwidgets_1.6.4    
      [7] processx_3.9.0        inline_0.3.21         lattice_0.22-9       
-    [10] callr_3.7.6           ps_1.9.3              vctrs_0.7.3          
+    [10] callr_3.8.0           ps_1.9.3              vctrs_0.7.3          
     [13] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
     [16] parallel_4.6.0        tibble_3.3.1          pkgconfig_2.0.3      
     [19] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
