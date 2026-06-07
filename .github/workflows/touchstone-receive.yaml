@@ -41,3 +41,4 @@ jobs:
       - uses: lorenzwalthert/touchstone/actions/receive@main
         with:
           r-version: ${{ matrix.config.r }}
+          touchstone_ref: '@main'
