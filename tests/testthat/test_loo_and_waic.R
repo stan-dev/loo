@@ -223,6 +223,22 @@ test_that("loo.function runs with multiple cores", {
   expect_identical(loo_with_fn2$estimates, loo_with_fn1$estimates)
 })
 
+test_that("waic.function runs with multiple cores", {
+  waic_with_fn1 <- waic(
+    llfun,
+    data = data,
+    draws = draws,
+    cores = 1
+  )
+  waic_with_fn2 <- waic(
+    llfun,
+    data = data,
+    draws = draws,
+    cores = 2
+  )
+  expect_identical(waic_with_fn2$estimates, waic_with_fn1$estimates)
+})
+
 test_that("save_psis option to loo.function makes correct psis object", {
   loo_with_fn2 <- loo.function(
     llfun,
