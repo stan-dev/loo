@@ -513,18 +513,18 @@ in the upcoming section.</p>
 Computed from 4000 by 49 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo   -186.8 10.9
-p_loo         8.0  5.2
-looic       373.7 21.7
+elpd_loo   -186.9 10.9
+p_loo         8.1  5.2
+looic       373.8 21.8
 ------
 MCSE of elpd_loo is NA.
 MCSE and ESS estimates assume independent draws (r_eff=1).
 
 Pareto k diagnostic values:
                          Count Pct.    Min. ESS
-(-Inf, 0.7]   (good)     48    98.0%   960     
-   (0.7, 1]   (bad)       0     0.0%   &lt;NA&gt;    
-   (1, Inf)   (very bad)  1     2.0%   &lt;NA&gt;    
+(-Inf, 0.7]   (good)     48    98.0%   550     
+   (0.7, 1]   (bad)       1     2.0%   &lt;NA&gt;    
+   (1, Inf)   (very bad)  0     0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
 </div>
 <div class="section level4">
@@ -618,7 +618,7 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] -187.9</code></pre>
+<pre><code>[1] -189</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate
@@ -649,7 +649,7 @@ equivalent results for approximate and exact LOO-CV:</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">without_pt_4</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <pre><code>approx  exact 
--172.9 -173.3 </code></pre>
+-173.0 -173.1 </code></pre>
 <p>From this we can conclude that the difference we found when including
 <em>all</em> observations does not indicate a bug in our implementation
 of the approximate LOO-CV but rather a violation of its assumptions.</p>
