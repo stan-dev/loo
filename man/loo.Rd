@@ -15,7 +15,7 @@ loo(x, ...)
 \method{loo}{array}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -24,7 +24,7 @@ loo(x, ...)
 \method{loo}{matrix}(
   x,
   ...,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
@@ -35,21 +35,13 @@ loo(x, ...)
   ...,
   data = NULL,
   draws = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
   is_method = c("psis", "tis", "sis")
 )
 
-loo_i(
-  i,
-  llfun,
-  ...,
-  data = NULL,
-  draws = NULL,
-  r_eff = NULL,
-  is_method = "psis"
-)
+loo_i(i, llfun, ..., data = NULL, draws = NULL, r_eff = 1, is_method = "psis")
 
 is.loo(x)
 
@@ -63,20 +55,23 @@ each method.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
-helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+\item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally but by default discards the (potentially large) \code{"psis"} object
+internally but by default discards the (potentially large) \code{psis} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
-will add a \code{psis_object} component to the list returned by \code{loo}. Currently
-this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
-weighted expectations after running \code{loo}.}
+will add a \code{psis_object} component to the list returned by \code{loo}.
+This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}. Several functions in the
+\pkg{bayesplot} package also accept \code{psis} objects.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -117,12 +112,12 @@ The \code{loo()} methods return a named list with class
 \code{c("psis_loo", "loo")} and components:
 \describe{
 \item{\code{estimates}}{
-A matrix with two columns (\code{Estimate}, \code{SE}) and three rows
-(\code{elpd_loo}, \code{p_loo}, \code{looic}). This
-contains point estimates and standard errors of the expected log pointwise
-predictive density (\code{elpd_loo}), the effective number of parameters
-(\code{p_loo}) and the LOO information criterion \code{looic} (which is
-just \code{-2 * elpd_loo}, i.e., converted to deviance scale).
+A matrix with two columns (\code{Estimate}, \code{SE}) and three rows (\code{elpd_loo},
+\code{p_loo}, \code{looic}). This contains point estimates and standard errors of the
+expected log pointwise predictive density (\code{\link[=loo-glossary]{elpd_loo}}), the
+effective number of parameters (\code{\link[=loo-glossary]{p_loo}}) and the LOO
+information criterion \code{looic} (which is just \code{-2 * elpd_loo}, i.e.,
+converted to deviance scale).
 }
 
 \item{\code{pointwise}}{
@@ -130,12 +125,12 @@ A matrix with five columns (and number of rows equal to the number of
 observations) containing the pointwise contributions of the measures
 (\code{elpd_loo}, \code{mcse_elpd_loo}, \code{p_loo}, \code{looic}, \code{influence_pareto_k}).
 in addition to the three measures in \code{estimates}, we also report
-pointwise values of the Monte Carlo standard error of \code{elpd_loo}
-(\code{mcse_elpd_loo}), and statistics describing the influence of
+pointwise values of the Monte Carlo standard error of \code{\link[=loo-glossary]{elpd_loo}}
+(\code{\link[=loo-glossary]{mcse_elpd_loo}}), and statistics describing the influence of
 each observation on the posterior distribution (\code{influence_pareto_k}).
 These are the estimates of the shape parameter \eqn{k} of the
 generalized Pareto fit to the importance ratios for each leave-one-out
-distribution. See the \link{pareto-k-diagnostic} page for details.
+distribution (see the \link{pareto-k-diagnostic} page for details).
 }
 
 \item{\code{diagnostics}}{
@@ -168,7 +163,7 @@ The \code{loo()} methods for arrays, matrices, and functions compute PSIS-LOO
 CV, efficient approximate leave-one-out (LOO) cross-validation for Bayesian
 models using Pareto smoothed importance sampling (\link[=psis]{PSIS}). This is
 an implementation of the methods described in Vehtari, Gelman, and Gabry
-(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2019).
+(2017) and Vehtari, Simpson, Gelman, Yao, and Gabry (2024).
 
 The \code{loo_i()} function enables testing log-likelihood
 functions for use with the \code{loo.function()} method.
@@ -182,19 +177,21 @@ method is more memory efficient and may be preferable.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+\item \code{loo(array)}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+\item \code{loo(matrix)}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+\item \code{loo(`function`)}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
 vector containing the log-likelihood for a single observation \code{i} evaluated
 at each posterior draw. The function should be written such that, for each
-observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
-}
+observation \code{i} in \code{1:N}, evaluating
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}\if{html}{\out{</div>}}
 
 results in a vector of length \code{S} (size of posterior sample). The
 log-likelihood function can also have additional arguments but \code{data_i} and
@@ -217,8 +214,8 @@ the log-likelihood function.
 arguments. These arguments are used like the \code{draws} argument in that they
 are recycled for each observation.
 }
-}}
 
+}}
 \section{Defining \code{loo()} methods in a package}{
  Package developers can define
 \code{loo()} methods for fitted models objects. See the example \code{loo.stanfit()}
@@ -263,11 +260,11 @@ llfun <- function(data_i, draws) {
 
 # Use the loo_i function to check that llfun works on a single observation
 # before running on all obs. For example, using the 3rd obs in the data:
-loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior, r_eff = NA)
+loo_3 <- loo_i(i = 3, llfun = llfun, data = fake_data, draws = fake_posterior)
 print(loo_3$pointwise[, "elpd_loo"])
 
-# Use loo.function method (setting r_eff=NA since this posterior not obtained via MCMC)
-loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data, r_eff = NA)
+# Use loo.function method (default r_eff=1 is used as this posterior not obtained via MCMC)
+loo_with_fn <- loo(llfun, draws = fake_posterior, data = fake_data)
 
 # If we look at the elpd_loo contribution from the 3rd obs it should be the
 # same as what we got above with the loo_i function and i=3:
@@ -278,7 +275,7 @@ print(loo_3$pointwise[, "elpd_loo"])
 log_lik_matrix <- sapply(1:N, function(i) {
   llfun(data_i = fake_data[i,, drop=FALSE], draws = fake_posterior)
 })
-loo_with_mat <- loo(log_lik_matrix, r_eff = NA)
+loo_with_mat <- loo(log_lik_matrix)
 all.equal(loo_with_mat$estimates, loo_with_fn$estimates) # should be TRUE!
 
 
@@ -312,20 +309,23 @@ loo.stanfit <-
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
-Pareto smoothed importance sampling.
-\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research},
+25(72):1-58.
+\href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 }
 \seealso{
 \itemize{
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
 for demonstrations.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
 \item \code{\link[=psis]{psis()}} for the underlying Pareto Smoothed Importance Sampling (PSIS)
 procedure used in the LOO-CV approximation.
 \item \link{pareto-k-diagnostic} for convenience functions for looking at diagnostics.

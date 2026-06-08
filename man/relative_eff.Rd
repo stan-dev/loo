@@ -60,21 +60,23 @@ the total sample size.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: A vector of length \eqn{S} (posterior sample size).
+\item \code{relative_eff(default)}: A vector of length \eqn{S} (posterior sample size).
 
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+\item \code{relative_eff(matrix)}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+\item \code{relative_eff(array)}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{function}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
+\item \code{relative_eff(`function`)}: A function \code{f()} that takes arguments \code{data_i} and \code{draws} and returns a
 vector containing the log-likelihood for a single observation \code{i} evaluated
 at each posterior draw. The function should be written such that, for each
-observation \code{i} in \code{1:N}, evaluating\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
-}
+observation \code{i} in \code{1:N}, evaluating
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{f(data_i = data[i,, drop=FALSE], draws = draws)
+}\if{html}{\out{</div>}}
 
 results in a vector of length \code{S} (size of posterior sample). The
 log-likelihood function can also have additional arguments but \code{data_i} and
@@ -98,10 +100,10 @@ arguments. These arguments are used like the \code{draws} argument in that they
 are recycled for each observation.
 }
 
-\item \code{importance_sampling}: If \code{x} is an object of class \code{"psis"}, \code{relative_eff()} simply returns
+\item \code{relative_eff(importance_sampling)}: If \code{x} is an object of class \code{"psis"}, \code{relative_eff()} simply returns
 the \code{r_eff} attribute of \code{x}.
-}}
 
+}}
 \examples{
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()

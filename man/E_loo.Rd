@@ -12,7 +12,7 @@ E_loo(x, psis_object, ...)
   x,
   psis_object,
   ...,
-  type = c("mean", "variance", "quantile"),
+  type = c("mean", "variance", "sd", "quantile"),
   probs = NULL,
   log_ratios = NULL
 )
@@ -21,7 +21,7 @@ E_loo(x, psis_object, ...)
   x,
   psis_object,
   ...,
-  type = c("mean", "variance", "quantile"),
+  type = c("mean", "variance", "sd", "quantile"),
   probs = NULL,
   log_ratios = NULL
 )
@@ -34,14 +34,14 @@ E_loo(x, psis_object, ...)
 \item{...}{Arguments passed to individual methods.}
 
 \item{type}{The type of expectation to compute. The options are
-\code{"mean"}, \code{"variance"}, and \code{"quantile"}.}
+\code{"mean"}, \code{"variance"}, \code{"sd"}, and \code{"quantile"}.}
 
 \item{probs}{For computing quantiles, a vector of probabilities.}
 
 \item{log_ratios}{Optionally, a vector or matrix (the same dimensions as \code{x})
 of raw (not smoothed) log ratios. If working with log-likelihood values,
 the log ratios are the \strong{negative} of those values. If \code{log_ratios} is
-specified we are able to compute \link[=pareto-k-diagnostic]{Pareto k}
+specified we are able to compute more accurate \link[=pareto-k-diagnostic]{Pareto k}
 diagnostics specific to \code{E_loo()}.}
 }
 \value{
@@ -56,30 +56,39 @@ multiple values are specified in \code{probs} the \code{value} component of
 the returned object is a \code{length(probs)} by \code{ncol(x)} matrix.
 
 For the default/vector method the \code{value} component is scalar, with
-one exception: when \code{type} is \code{"quantile"} and multiple values
+one exception: when \code{type="quantile"} and multiple values
 are specified in \code{probs} the \code{value} component is a vector with
 \code{length(probs)} elements.
 }
 \item{\code{pareto_k}}{
 Function-specific diagnostic.
 
-If \code{log_ratios} is not specified when calling \code{E_loo()},
-\code{pareto_k} will be \code{NULL}. Otherwise, for the matrix method it
-will be a vector of length \code{ncol(x)} containing estimates of the shape
-parameter \eqn{k} of the generalized Pareto distribution. For the
-default/vector method, the estimate is a scalar.
+For the matrix method it will be a vector of length \code{ncol(x)}
+containing estimates of the shape parameter \eqn{k} of the
+generalized Pareto distribution. For the default/vector method,
+the estimate is a scalar. If \code{log_ratios} is not specified when
+calling \code{E_loo()}, the smoothed log-weights are used to estimate
+Pareto-k's, which may produce optimistic estimates.
+
+For \code{type="mean"}, \code{type="var"}, and \code{type="sd"}, the returned Pareto-k is
+usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
+and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+\eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and \code{type="sd"}.
+If \eqn{h} is binary, constant, or not finite, or if \code{type="quantile"}, the
+returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 }
 }
 }
 \description{
 The \code{E_loo()} function computes weighted expectations (means, variances,
-quantiles) using the importance weights obtained from the
-\link[=psis]{PSIS} smoothing procedure. The expectations estimated by the
-\code{E_loo()} function assume that the PSIS approximation is working well.
+quantiles) using the importance weights obtained from the \link[=psis]{PSIS}
+smoothing procedure. The expectations estimated by the \code{E_loo()} function
+assume that the PSIS approximation is working well.
 \strong{A small \link[=pareto-k-diagnostic]{Pareto k} estimate is necessary,
-but not sufficient, for \code{E_loo()} to give reliable estimates.} Additional
-diagnostic checks for gauging the reliability of the estimates are in
-development and will be added in a future release.
+but not sufficient, for \code{E_loo()} to give reliable estimates}. If the
+\code{log_ratios} argument is provided, \code{E_loo()} also computes a function
+specific Pareto k diagnostic, which must also be small for a reliable
+estimate. See more details below.
 }
 \examples{
 \donttest{
@@ -107,11 +116,12 @@ psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
 
 E_loo(yrep, psis_object, type = "mean")
 E_loo(yrep, psis_object, type = "var")
+E_loo(yrep, psis_object, type = "sd")
 E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 
-# To get Pareto k diagnostic with E_loo we also need to provide the negative
-# log-likelihood values using the log_ratios argument.
+# We can get more accurate Pareto k diagnostic if we also provide
+# the log_ratios argument
 E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 }
 }

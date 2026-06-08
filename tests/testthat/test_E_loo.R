@@ -1,7 +1,3 @@
-library(loo)
-
-context("E_loo")
-
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 LLvec <- LLmat[, 1]
@@ -18,17 +14,58 @@ log_rats <- -LLmat
 # matrix method
 E_test_mean <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)
 E_test_var <- E_loo(x, psis_mat, type = "var", log_ratios = log_rats)
-E_test_quant <- E_loo(x, psis_mat, type = "quantile", probs = 0.5, log_ratios = log_rats)
-E_test_quant2 <- E_loo(x, psis_mat, type = "quantile", probs = c(0.1, 0.9), log_ratios = log_rats)
+E_test_sd <- E_loo(x, psis_mat, type = "sd", log_ratios = log_rats)
+E_test_quant <- E_loo(
+  x,
+  psis_mat,
+  type = "quantile",
+  probs = 0.5,
+  log_ratios = log_rats
+)
+E_test_quant2 <- E_loo(
+  x,
+  psis_mat,
+  type = "quantile",
+  probs = c(0.1, 0.9),
+  log_ratios = log_rats
+)
 
 # vector method
-E_test_mean_vec <- E_loo(x[, 1], psis_vec, type = "mean", log_ratios = log_rats[,1])
-E_test_var_vec <- E_loo(x[, 1], psis_vec, type = "var", log_ratios = log_rats[,1])
-E_test_quant_vec <- E_loo(x[, 1], psis_vec, type = "quant", probs = 0.5, log_ratios = log_rats[,1])
-E_test_quant_vec2 <- E_loo(x[, 1], psis_vec, type = "quant", probs = c(0.1, 0.5, 0.9), log_ratios = log_rats[,1])
+E_test_mean_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "mean",
+  log_ratios = log_rats[, 1]
+)
+E_test_var_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "var",
+  log_ratios = log_rats[, 1]
+)
+E_test_sd_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "sd",
+  log_ratios = log_rats[, 1]
+)
+E_test_quant_vec <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "quant",
+  probs = 0.5,
+  log_ratios = log_rats[, 1]
+)
+E_test_quant_vec2 <- E_loo(
+  x[, 1],
+  psis_vec,
+  type = "quant",
+  probs = c(0.1, 0.5, 0.9),
+  log_ratios = log_rats[, 1]
+)
 
 # E_loo_khat
-khat <- E_loo_khat(x, psis_mat, log_rats)
+khat <- loo:::E_loo_khat.matrix(x, psis_mat, log_rats)
 
 test_that("E_loo return types correct for matrix method", {
   expect_type(E_test_mean, "list")
@@ -42,6 +79,12 @@ test_that("E_loo return types correct for matrix method", {
   expect_length(E_test_var, 2)
   expect_length(E_test_var$value, ncol(x))
   expect_length(E_test_var$pareto_k, ncol(x))
+
+  expect_type(E_test_sd, "list")
+  expect_named(E_test_sd, c("value", "pareto_k"))
+  expect_length(E_test_sd, 2)
+  expect_length(E_test_sd$value, ncol(x))
+  expect_length(E_test_sd$pareto_k, ncol(x))
 
   expect_type(E_test_quant, "list")
   expect_named(E_test_quant, c("value", "pareto_k"))
@@ -69,6 +112,12 @@ test_that("E_loo return types correct for default/vector method", {
   expect_length(E_test_var_vec$value, 1)
   expect_length(E_test_var_vec$pareto_k, 1)
 
+  expect_type(E_test_sd_vec, "list")
+  expect_named(E_test_sd_vec, c("value", "pareto_k"))
+  expect_length(E_test_sd_vec, 2)
+  expect_length(E_test_sd_vec$value, 1)
+  expect_length(E_test_sd_vec$pareto_k, 1)
+
   expect_type(E_test_quant_vec, "list")
   expect_named(E_test_quant_vec, c("value", "pareto_k"))
   expect_length(E_test_quant_vec, 2)
@@ -82,25 +131,33 @@ test_that("E_loo return types correct for default/vector method", {
   expect_length(E_test_quant_vec2$pareto_k, 1)
 })
 
-test_that("E_loo.default equal to reference", {
-  expect_equal_to_reference(E_test_mean_vec, "reference-results/E_loo_default_mean.rds")
-  expect_equal_to_reference(E_test_var_vec, "reference-results/E_loo_default_var.rds")
-  expect_equal_to_reference(E_test_quant_vec, "reference-results/E_loo_default_quantile_50.rds")
-  expect_equal_to_reference(E_test_quant_vec2, "reference-results/E_loo_default_quantile_10_50_90.rds")
+test_that("E_loo.default equal to snapshots", {
+  expect_snapshot_value(E_test_mean_vec, style = "serialize")
+  expect_snapshot_value(E_test_var_vec, style = "serialize")
+  expect_snapshot_value(E_test_sd_vec, style = "serialize")
+  expect_snapshot_value(E_test_quant_vec, style = "serialize")
+  expect_snapshot_value(E_test_quant_vec2, style = "serialize")
 })
 
-test_that("E_loo.matrix equal to reference", {
-  expect_equal_to_reference(E_test_mean, "reference-results/E_loo_matrix_mean.rds")
-  expect_equal_to_reference(E_test_var, "reference-results/E_loo_matrix_var.rds")
-  expect_equal_to_reference(E_test_quant, "reference-results/E_loo_matrix_quantile_50.rds")
-  expect_equal_to_reference(E_test_quant2, "reference-results/E_loo_matrix_quantile_10_90.rds")
+test_that("E_loo.matrix equal to snapshots", {
+  expect_snapshot_value(E_test_mean, style = "serialize")
+  expect_snapshot_value(E_test_var, style = "serialize")
+  expect_snapshot_value(E_test_sd, style = "serialize")
+  expect_snapshot_value(E_test_quant, style = "serialize")
+  expect_snapshot_value(E_test_quant2, style = "serialize")
 })
 
 test_that("E_loo throws correct errors and warnings", {
   # warnings
-  expect_warning(E_loo.matrix(x, psis_mat), "'log_ratios' not specified")
-  expect_warning(E_test <- E_loo.default(x[, 1], psis_vec), "'log_ratios' not specified")
-  expect_null(E_test$pareto_k)
+  expect_no_warning(E_loo.matrix(x, psis_mat))
+  # no warnings if x is constant, binary, NA, NaN, Inf
+  expect_no_warning(E_loo.matrix(x * 0, psis_mat))
+  expect_no_warning(E_loo.matrix(0 + (x > 0), psis_mat))
+  expect_no_warning(E_loo.matrix(x + NA, psis_mat))
+  expect_no_warning(E_loo.matrix(x * NaN, psis_mat))
+  expect_no_warning(E_loo.matrix(x * Inf, psis_mat))
+  expect_no_warning(E_test <- E_loo.default(x[, 1], psis_vec))
+  expect_length(E_test$pareto_k, 1)
 
   # errors
   expect_error(E_loo(x, 1), "is.psis")
@@ -141,7 +198,6 @@ test_that("weighted quantiles work", {
     quantile(xx, probs, names = FALSE)
   }
 
-
   set.seed(123)
   pr <- seq(0.025, 0.975, 0.025)
 
@@ -166,3 +222,12 @@ test_that("weighted quantiles work", {
   )
 })
 
+test_that("weighted variance works", {
+  x <- rnorm(100)
+  w <- rep(0.01, 100)
+  expect_equal(.wvar(x, w), var(x))
+  expect_equal(.wsd(x, w), sqrt(.wvar(x, w)))
+
+  w <- c(rep(0.1, 10), rep(0, 90))
+  expect_equal(.wvar(x, w), var(x[w > 0]))
+})

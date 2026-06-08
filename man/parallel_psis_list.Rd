@@ -37,12 +37,7 @@ parallel_importance_sampling_list(
 
 \item{.llfun}{See \code{llfun} in \code{\link[=loo.function]{loo.function()}}.}
 
-\item{data}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
-
-\item{draws}{For the \code{loo.function()} method and the \code{loo_i()}
+\item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
 below for details on how to specify these arguments.}
@@ -50,20 +45,23 @@ below for details on how to specify these arguments.}
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. See the \code{\link[=relative_eff]{relative_eff()}}
-helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
-\item{save_psis}{Should the \code{"psis"} object created internally by \code{loo()} be
+\item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally but by default discards the (potentially large) \code{"psis"} object
+internally but by default discards the (potentially large) \code{psis} object
 after using it to compute the LOO-CV summaries. Setting \code{save_psis=TRUE}
-will add a \code{psis_object} component to the list returned by \code{loo}. Currently
-this is only needed if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
-weighted expectations after running \code{loo}.}
+will add a \code{psis_object} component to the list returned by \code{loo}.
+This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to compute
+weighted expectations after running \code{loo}. Several functions in the
+\pkg{bayesplot} package also accept \code{psis} objects.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -78,11 +76,6 @@ recommend using as many (or close to as many) cores as possible.
 the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
 setting \code{mc.cores} interactively or in a script is fine).
 }}
-
-\item{...}{For the \code{loo.function()} method and the \code{loo_i()}
-function, these are the data, posterior draws, and other arguments to pass
-to the log-likelihood function. See the \strong{Methods (by class)} section
-below for details on how to specify these arguments.}
 
 \item{method}{See \code{is_method} for \code{\link[=loo]{loo()}}}
 }

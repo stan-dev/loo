@@ -4,6 +4,7 @@
 #' @param ... Currently ignored.
 #' @return A `compare.loo_ss` object.
 #' @author Mans Magnusson
+#' @export
 loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
@@ -30,7 +31,7 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
   return(comp)
 }
 
-#' Compare a reference loo object with a comaprison loo object
+#' Compare a reference loo object with a comparison loo object
 #' @noRd
 #' @param ref_loo A named list with a `psis_loo_ss` object.
 #' @param compare_loo A named list with a  `psis_loo_ss` object.
@@ -172,14 +173,9 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 
 #' @rdname loo_compare
 #' @export
-print.compare.loo_ss <- function(x, ..., digits = 1, simplify = TRUE) {
+print.compare.loo_ss <- function(x, ..., digits = 1) {
   xcopy <- x
-  if (inherits(xcopy, "old_compare.loo")) {
-    if (NCOL(xcopy) >= 2 && simplify) {
-      patts <- "^elpd_|^se_diff|^p_|^waic$|^looic$"
-      xcopy <- xcopy[, grepl(patts, colnames(xcopy))]
-    }
-  } else if (NCOL(xcopy) >= 2 && simplify) {
+  if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff", "subsampling_se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)

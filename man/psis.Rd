@@ -12,11 +12,11 @@
 \usage{
 psis(log_ratios, ...)
 
-\method{psis}{array}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
+\method{psis}{array}(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1))
 
-\method{psis}{matrix}(log_ratios, ..., r_eff = NULL, cores = getOption("mc.cores", 1))
+\method{psis}{matrix}(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1))
 
-\method{psis}{default}(log_ratios, ..., r_eff = NULL)
+\method{psis}{default}(log_ratios, ..., r_eff = 1)
 
 is.psis(x)
 
@@ -38,11 +38,11 @@ effective sample sizes of \code{1/exp(log_ratios)} (i.e., \code{1/ratios}).
 This is related to the relative efficiency of estimating the normalizing
 term in self-normalizing importance sampling. If \code{r_eff} is not
 provided then the reported PSIS effective sample sizes and Monte Carlo
-error estimates will be over-optimistic. See the \code{\link[=relative_eff]{relative_eff()}}
-helper function for computing \code{r_eff}. If using \code{psis} with
-draws of the \code{log_ratios} not obtained from MCMC then the warning
-message thrown when not specifying \code{r_eff} can be disabled by
-setting \code{r_eff} to \code{NA}.}
+error estimates can be over-optimistic. If the posterior draws are (near)
+independent then \code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same
+value is used for all observations) or a vector with length equal to the
+number of observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}}
+helper function for computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -82,7 +82,7 @@ page for details.
 }
 }
 
-Objects of class \code{"psis"} also have the following \link[=attributes]{attributes}:
+Objects of class \code{"psis"} also have the following \link{attributes}:
 \describe{
 \item{\code{norm_const_log}}{
 Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
@@ -107,22 +107,22 @@ Method used for importance sampling, here \code{psis}.
 Implementation of Pareto smoothed importance sampling (PSIS), a method for
 stabilizing importance ratios. The version of PSIS implemented here
 corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
-and Gabry (2019).
+and Gabry (2024).
 For PSIS diagnostics see the \link{pareto-k-diagnostic} page.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{array}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
+\item \code{psis(array)}: An \eqn{I} by \eqn{C} by \eqn{N} array, where \eqn{I}
 is the number of MCMC iterations per chain, \eqn{C} is the number of
 chains, and \eqn{N} is the number of data points.
 
-\item \code{matrix}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
+\item \code{psis(matrix)}: An \eqn{S} by \eqn{N} matrix, where \eqn{S} is the size
 of the posterior sample (with all chains merged) and \eqn{N} is the number
 of data points.
 
-\item \code{default}: A vector of length \eqn{S} (posterior sample size).
-}}
+\item \code{psis(default)}: A vector of length \eqn{S} (posterior sample size).
 
+}}
 \examples{
 log_ratios <- -1 * example_loglik_array()
 r_eff <- relative_eff(exp(-log_ratios))
@@ -141,19 +141,24 @@ uw <- weights(psis_result, log=FALSE, normalize = FALSE) # unnormalized weights
 
 }
 \references{
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
 \emph{Statistics and Computing}. 27(5), 1413--1432. doi:10.1007/s11222-016-9696-4
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
-Pareto smoothed importance sampling.
-\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research},
+25(72):1-58.
+\href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 }
 \seealso{
 \itemize{
 \item \code{\link[=loo]{loo()}} for approximate LOO-CV using PSIS.
 \item \link{pareto-k-diagnostic} for PSIS diagnostics.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}
+for demonstrations.
+\item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
+the \strong{loo} website for answers to frequently asked questions.
 }
 }

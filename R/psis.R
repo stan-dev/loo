@@ -3,7 +3,7 @@
 #' Implementation of Pareto smoothed importance sampling (PSIS), a method for
 #' stabilizing importance ratios. The version of PSIS implemented here
 #' corresponds to the algorithm presented in Vehtari, Simpson, Gelman, Yao,
-#' and Gabry (2019).
+#' and Gabry (2024).
 #' For PSIS diagnostics see the [pareto-k-diagnostic] page.
 #'
 #' @export
@@ -19,11 +19,11 @@
 #'   This is related to the relative efficiency of estimating the normalizing
 #'   term in self-normalizing importance sampling. If `r_eff` is not
 #'   provided then the reported PSIS effective sample sizes and Monte Carlo
-#'   error estimates will be over-optimistic. See the [relative_eff()]
-#'   helper function for computing `r_eff`. If using `psis` with
-#'   draws of the `log_ratios` not obtained from MCMC then the warning
-#'   message thrown when not specifying `r_eff` can be disabled by
-#'   setting `r_eff` to `NA`.
+#'   error estimates can be over-optimistic. If the posterior draws are (near)
+#'   independent then `r_eff=1` can be used. `r_eff` has to be a scalar (same
+#'   value is used for all observations) or a vector with length equal to the
+#'   number of observations. The default value is 1. See the [relative_eff()]
+#'   helper function for computing `r_eff`.
 #'
 #' @return The `psis()` methods return an object of class `"psis"`,
 #'   which is a named list with the following components:
@@ -68,6 +68,10 @@
 #' @seealso
 #' * [loo()] for approximate LOO-CV using PSIS.
 #' * [pareto-k-diagnostic] for PSIS diagnostics.
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html)
+#'   for demonstrations.
+#' * The [FAQ page](https://mc-stan.org/loo/articles/online-only/faq.html) on
+#'   the __loo__ website for answers to frequently asked questions.
 #'
 #' @template loo-and-psis-references
 #'
@@ -94,13 +98,14 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(log_ratios, ...,
-           r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
-  importance_sampling.array(log_ratios = log_ratios, ...,
-                            r_eff = r_eff,
-                            cores = cores,
-                            method = "psis")
+  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+    importance_sampling.array(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "psis"
+    )
   }
 
 
@@ -109,15 +114,14 @@ psis.array <-
 #' @template matrix
 #'
 psis.matrix <-
-  function(log_ratios,
-           ...,
-           r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
-    importance_sampling.matrix(log_ratios,
-                               ...,
-                               r_eff = r_eff,
-                               cores = cores,
-                               method = "psis")
+  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+    importance_sampling.matrix(
+      log_ratios,
+      ...,
+      r_eff = r_eff,
+      cores = cores,
+      method = "psis"
+    )
   }
 
 #' @export
@@ -125,10 +129,13 @@ psis.matrix <-
 #' @template vector
 #'
 psis.default <-
-  function(log_ratios, ..., r_eff = NULL) {
-    importance_sampling.default(log_ratios = log_ratios, ...,
-                                r_eff = r_eff,
-                                method = "psis")
+  function(log_ratios, ..., r_eff = 1) {
+    importance_sampling.default(
+      log_ratios = log_ratios,
+      ...,
+      r_eff = r_eff,
+      method = "psis"
+    )
   }
 
 
@@ -145,25 +152,26 @@ is.psis <- function(x) {
 #' @noRd
 #' @seealso importance_sampling_object
 psis_object <-
-  function(unnormalized_log_weights,
-           pareto_k,
-           tail_len,
-           r_eff) {
-    importance_sampling_object(unnormalized_log_weights = unnormalized_log_weights,
-                               pareto_k = pareto_k,
-                               tail_len = tail_len,
-                               r_eff = r_eff,
-                               method = "psis")
+  function(unnormalized_log_weights, pareto_k, tail_len, r_eff) {
+    importance_sampling_object(
+      unnormalized_log_weights = unnormalized_log_weights,
+      pareto_k = pareto_k,
+      tail_len = tail_len,
+      r_eff = r_eff,
+      method = "psis"
+    )
   }
 
 
 #' @noRd
 #' @seealso do_importance_sampling
-do_psis <- function(log_ratios, r_eff, cores, method){
-  do_importance_sampling(log_ratios = log_ratios,
-                         r_eff = r_eff,
-                         cores = cores,
-                         method = "psis")
+do_psis <- function(log_ratios, r_eff, cores, method) {
+  do_importance_sampling(
+    log_ratios = log_ratios,
+    r_eff = r_eff,
+    cores = cores,
+    method = "psis"
+  )
 }
 
 #' Extract named components from each list in the list of lists obtained by
@@ -177,7 +185,9 @@ do_psis <- function(log_ratios, r_eff, cores, method){
 #' @return Numeric vector or matrix.
 #'
 psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
-  if (!is.list(x)) stop("Internal error ('x' must be a list for psis_apply)")
+  if (!is.list(x)) {
+    stop("Internal error ('x' must be a list for psis_apply)")
+  }
   vapply(x, FUN = match.arg(fun), FUN.VALUE = fun_val, item)
 }
 
@@ -208,7 +218,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
     ord <- sort.int(lw_i, index.return = TRUE)
     tail_ids <- seq(S - tail_len_i + 1, S)
     lw_tail <- ord$x[tail_ids]
-    if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps/100) {
+    if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
       warning(
         "Can't fit generalized Pareto distribution ",
         "because all tail values are the same.",
@@ -244,15 +254,15 @@ psis_smooth_tail <- function(x, cutoff) {
   exp_cutoff <- exp(cutoff)
 
   # save time not sorting since x already sorted
-  fit <- gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
+  fit <- posterior::gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
   if (is.finite(k)) {
-      p <- (seq_len(len) - 0.5) / len
-      qq <- qgpd(p, k, sigma) + exp_cutoff
-      tail <- log(qq)
+    p <- (seq_len(len) - 0.5) / len
+    qq <- posterior::qgeneralized_pareto(p, 0, sigma, k) + exp_cutoff
+    tail <- log(qq)
   } else {
-      tail <- x
+    tail <- x
   }
   list(tail = tail, k = k)
 }
@@ -269,11 +279,15 @@ psis_smooth_tail <- function(x, cutoff) {
 #' 20% of the total number of weights.
 #'
 #' @noRd
-#' @param r_eff A N-vector of relative MCMC effective sample sizes of `exp(log-lik matrix)`.
+#' @param r_eff A N-vector or scalar of relative MCMC effective sample sizes of
+#'   `exp(log-lik matrix)`. The default value is 1.
 #' @param S The (integer) size of posterior sample.
 #' @return An N-vector of tail lengths.
 #'
 n_pareto <- function(r_eff, S) {
+  if (isTRUE(is.null(r_eff) || all(is.na(r_eff)))) {
+    r_eff <- 1
+  }
   ceiling(pmin(0.2 * S, 3 * sqrt(S / r_eff)))
 }
 
@@ -289,19 +303,16 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 }
 
 
-#' Throw warnings about pareto k estimates
+#' Throw warnings about Pareto k estimates
 #'
 #' @noRd
-#' @param k A vector of pareto k estimates.
-#' @param high The value at which to warn about slighly high estimates.
-#' @param too_high The value at which to warn about very high estimates.
+#' @param k A vector of Pareto k estimates.
+#' @param k_threshold The value at which to warn about high Pareto k estimates.
 #' @return Nothing, just possibly throws warnings.
 #'
-throw_pareto_warnings <- function(k, high = 0.5, too_high = 0.7) {
-  if (any(k > too_high)) {
+throw_pareto_warnings <- function(k, k_threshold) {
+  if (isTRUE(any(k > k_threshold))) {
     .warn("Some Pareto k diagnostic values are too high. ", .k_help())
-  } else if (any(k > high)) {
-    .warn("Some Pareto k diagnostic values are slightly high. ", .k_help())
   }
 }
 
@@ -317,7 +328,8 @@ throw_tail_length_warnings <- function(tail_lengths) {
     if (length(tail_lengths) == 1) {
       warning(
         "Not enough tail samples to fit the generalized Pareto distribution.",
-        call. = FALSE, immediate. = TRUE
+        call. = FALSE,
+        immediate. = TRUE
       )
     } else {
       bad <- which(tail_len_bad)
@@ -327,7 +339,11 @@ throw_tail_length_warnings <- function(tail_lengths) {
         "in some or all columns of matrix of log importance ratios. ",
         "Skipping the following columns: ",
         paste(if (Nbad <= 10) bad else bad[1:10], collapse = ", "),
-        if (Nbad > 10) paste0(", ... [", Nbad - 10, " more not printed].\n") else "\n",
+        if (Nbad > 10) {
+          paste0(", ... [", Nbad - 10, " more not printed].\n")
+        } else {
+          "\n"
+        },
         call. = FALSE,
         immediate. = TRUE
       )
@@ -343,23 +359,27 @@ throw_tail_length_warnings <- function(tail_lengths) {
 #' @param len The length `r_eff` should have if not `NULL` or `NA`.
 #' @return
 #' * If `r_eff` has length `len` then `r_eff` is returned.
-#' * If `r_eff` is `NULL` then a warning is thrown and `rep(1, len)` is returned.
-#' * If `r_eff` is `NA` then the warning is skipped and
-#'   `rep(1, len)` is returned.
-#' * If `r_eff` has length `len` but has `NA`s then an error is thrown.
+#' * If `r_eff` is `NULL` then `rep(1, len)` is returned.
+#' * If `r_eff` is `NA` then `rep(1, len)` is returned.
+#' * If `r_eff` is a scalar then `rep(r_eff, len)` is returned.
+#' * If `r_eff` is not a scalar but the length is not `len` then an error is thrown.
+#' * If `r_eff` has length `len` but has `NA`s then `NA`s are filled in with `1`s.
 #'
 prepare_psis_r_eff <- function(r_eff, len) {
   if (isTRUE(is.null(r_eff) || all(is.na(r_eff)))) {
-    if (!called_from_loo() && is.null(r_eff)) {
-      throw_psis_r_eff_warning()
-    }
     r_eff <- rep(1, len)
+  } else if (length(r_eff) == 1) {
+    r_eff <- rep(r_eff, len)
   } else if (length(r_eff) != len) {
-    stop("'r_eff' must have one value per observation.", call. = FALSE)
+    stop(
+      "'r_eff' must have one value or one value per observation.",
+      call. = FALSE
+    )
   } else if (anyNA(r_eff)) {
-    stop("Can't mix NA and not NA values in 'r_eff'.", call. = FALSE)
+    message("Replacing NAs in `r_eff` with 1s")
+    r_eff[is.na(r_eff)] <- 1
   }
-  return(r_eff)
+  r_eff
 }
 
 #' Check if `psis()` was called from one of the loo methods
@@ -381,8 +401,7 @@ called_from_loo <- function() {
 throw_psis_r_eff_warning <- function() {
   warning(
     "Relative effective sample sizes ('r_eff' argument) not specified. ",
-    "PSIS n_eff will not be adjusted based on MCMC n_eff.",
+    "PSIS ESS (n_eff) will not be adjusted based on MCMC ESS (n_eff).",
     call. = FALSE
   )
 }
-

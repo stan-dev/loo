@@ -29,12 +29,12 @@
 #' @seealso
 #' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) and
 #'   Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao,
-#'   and Gabry (2019) for more details on why we prefer `loo()` to `waic()`.
+#'   and Gabry (2024) for more details on why we prefer `loo()` to `waic()`.
 #' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
 #'
 #' @references
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-#' widely application information criterion in singular learning theory.
+#' widely applicable information criterion in singular learning theory.
 #' *Journal of Machine Learning Research* **11**, 3571-3594.
 #'
 #' @template loo-and-psis-references

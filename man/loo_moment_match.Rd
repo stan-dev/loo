@@ -16,7 +16,7 @@ loo_moment_match(x, ...)
   log_prob_upars,
   log_lik_i_upars,
   max_iters = 30L,
-  k_threshold = 0.7,
+  k_threshold = NULL,
   split = TRUE,
   cov = TRUE,
   cores = getOption("mc.cores", 1),
@@ -56,7 +56,8 @@ reached, there will be a warning, and increasing \code{max_iters} may improve
 accuracy.}
 
 \item{k_threshold}{Threshold value for Pareto k values above which the moment
-matching algorithm is used. The default value is 0.5.}
+matching algorithm is used. The default value is \code{min(1 - 1/log10(S), 0.7)},
+where \code{S} is the sample size.}
 
 \item{split}{Logical; Indicate whether to do the split transformation or not
 at the end of moment matching for each LOO fold.}
@@ -97,19 +98,19 @@ in addition to those specified for each function.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: A default method that takes as arguments a
+\item \code{loo_moment_match(default)}: A default method that takes as arguments a
 user-specified model object \code{x}, a \code{loo} object and user-specified
 functions \code{post_draws}, \code{log_lik_i}, \code{unconstrain_pars}, \code{log_prob_upars},
 and \code{log_lik_i_upars}.
-}}
 
+}}
 \examples{
 # See the vignette for loo_moment_match()
 }
 \references{
-Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2020).
-Implicitly Adaptive Importance Sampling.
-\href{https://arxiv.org/abs/1906.08850}{preprint arXiv:1906.08850}
+Paananen, T., Piironen, J., Buerkner, P.-C., Vehtari, A. (2021).
+Implicitly adaptive importance sampling. \emph{Statistics and Computing}, 31, 16.
+doi:10.1007/s11222-020-09982-2. arXiv preprint arXiv:1906.08850.
 }
 \seealso{
 \code{\link[=loo]{loo()}}, \code{\link[=loo_moment_match_split]{loo_moment_match_split()}}
