@@ -33,7 +33,7 @@ License: GPL (>=3)
 URL: https://mc-stan.org/loo/, https://discourse.mc-stan.org
 BugReports: https://github.com/stan-dev/loo/issues
 Depends:
-    R (>= 3.1.2)
+    R (>= 3.5)
 Imports:
     checkmate,
     matrixStats (>= 0.52),
@@ -60,5 +60,5 @@ Config/testthat/start-first: loo_subsampling_cases, loo_subsampling
 Encoding: UTF-8
 LazyData: TRUE
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
+Config/roxygen2/version: 8.0.0
