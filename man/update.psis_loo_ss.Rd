@@ -10,7 +10,7 @@
   data = NULL,
   draws = NULL,
   observations = NULL,
-  r_eff = NULL,
+  r_eff = 1,
   cores = getOption("mc.cores", 1),
   loo_approximation = NULL,
   loo_approximation_draws = NULL,
@@ -41,13 +41,14 @@ previous call to \code{loo_subsample()}.
 \item{r_eff}{Vector of relative effective sample size estimates for the
 likelihood (\code{exp(log_lik)}) of each observation. This is related to
 the relative efficiency of estimating the normalizing term in
-self-normalizing importance sampling when using posterior draws obtained
+self-normalized importance sampling when using posterior draws obtained
 with MCMC. If MCMC draws are used and \code{r_eff} is not provided then
 the reported PSIS effective sample sizes and Monte Carlo error estimates
-will be over-optimistic. If the posterior draws are independent then
-\code{r_eff=1} and can be omitted. The warning message thrown when \code{r_eff} is
-not specified can be disabled by setting \code{r_eff} to \code{NA}. See the
-\code{\link[=relative_eff]{relative_eff()}} helper functions for computing \code{r_eff}.}
+can be over-optimistic. If the posterior draws are (near) independent then
+\code{r_eff=1} can be used. \code{r_eff} has to be a scalar (same value is used
+for all observations) or a vector with length equal to the number of
+observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
+functions for help computing \code{r_eff}.}
 
 \item{cores}{The number of cores to use for parallelization. This defaults to
 the option \code{mc.cores} which can be set for an entire R session by
@@ -97,7 +98,7 @@ to \code{"lpd"}, \code{"waic"}, or \code{"tis"}.}
 is only used when \code{loo_approximation} is \code{"waic_grad"},
 \code{"waic_grad_marginal"}, or \code{"waic_hess"}. The default is \code{NULL}.}
 
-\item{llhess}{The hessian of the log-likelihood. This is only used
+\item{llhess}{The Hessian of the log-likelihood. This is only used
 with \code{loo_approximation = "waic_hess"}. The default is \code{NULL}.}
 }
 \value{

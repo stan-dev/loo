@@ -1,8 +1,5 @@
 #' Efficient LOO-CV and WAIC for Bayesian models
 #'
-#' @docType package
-#' @name loo-package
-#'
 #' @importFrom stats sd var quantile setNames weights rnorm qnorm
 #' @importFrom matrixStats logSumExp colLogSumExps colSums2 colVars colMaxs
 #'
@@ -13,7 +10,7 @@
 #' *Stan Development Team*
 #'
 #' This package implements the methods described in Vehtari, Gelman, and
-#' Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2019), and
+#' Gabry (2017), Vehtari, Simpson, Gelman, Yao, and Gabry (2024), and
 #' Yao et al. (2018). To get started see the **loo** package
 #' [vignettes](https://mc-stan.org/loo/articles/index.html), the
 #' [loo()] function for efficient approximate leave-one-out
@@ -33,7 +30,7 @@
 #'   fast and stable computations for approximate LOO-CV laid out in Vehtari,
 #'   Gelman, and Gabry (2017). From existing posterior simulation draws, we
 #'   compute LOO-CV using Pareto smoothed importance sampling (PSIS; Vehtari,
-#'   Simpson, Gelman, Yao, and Gabry, 2019), a new procedure for stabilizing
+#'   Simpson, Gelman, Yao, and Gabry, 2024), a new procedure for stabilizing
 #'   and diagnosing importance weights. As a byproduct of our calculations,
 #'   we also obtain approximate standard errors for estimated predictive
 #'   errors and for comparing of predictive errors between two models.
@@ -82,11 +79,11 @@
 #' <https://mc-stan.org>.
 #'
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
-#' widely application information criterion in singular learning theory.
+#' widely applicable information criterion in singular learning theory.
 #' *Journal of Machine Learning Research* **11**, 3571-3594.
 #'
 #' Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
 #' for the generalized Pareto distribution. *Technometrics* **51**,
 #' 316-325.
 #'
-NULL
+"_PACKAGE"

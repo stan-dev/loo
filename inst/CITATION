@@ -27,13 +27,96 @@ bibentry(bibtype = "Article",
 )
 
 bibentry(bibtype = "Article",
+         title = "Uncertainty in Bayesian leave-one-out cross-validation based model comparison",
+         author = c(person("Tuomas", "Sivula"),
+                    person("Måns", "Magnusson"),
+                    person("Asael Alonzo", "Matamoros"),
+    		    person("Aki", "Vehtari")),
+         journal = "Bayesian Analysis",
+         year = "2025",
+         note = "doi:10.1214/24-BA1453",
+         header = "To cite when using loo_compare():"
+)
+
+bibentry(bibtype = "Article",
          title = "Using stacking to average Bayesian predictive distributions",
          author = c(person("Yuling", "Yao"),
     		            person("Aki", "Vehtari"),
                     person("Daniel", "Simpson"),
                     person("Andrew", "Gelman")),
-         year = "2017",
          journal = "Bayesian Analysis",
+         year = "2018",
+         volume = 13,
+         issue = 3,
+         pages = "917--1007",
          doi = "10.1214/17-BA1091",
          header = "To cite the stacking paper:"
+)
+
+bibentry(
+  title = "Pareto smoothed importance sampling",
+  bibtype = "Article",
+  author = c(
+    person("Aki", "Vehtari"),
+    person("Daniel", "Simpson"),
+    person("Andrew", "Gelman"),
+    person("Yuling", "Yao"),
+    person("Jonah", "Gabry")
+  ),
+  journal = "Journal of Machine Learning Research",
+  year = 2024,
+  volume = 25,
+  number = 72,
+  pages = "1-58",
+  header = "To cite Pareto-k diagnostics:"
+)
+
+bibentry(
+  bibtype = "Article",
+  author = c(
+    person(given = "Topi", family = "Paananen"),
+    person(given = "Juho", family = "Piironen"),
+    person(given = "Paul-Christian", family = "Buerkner"),
+    person(given = "Aki", family = "Vehtari")
+  ),
+  title = "Implicitly adaptive importance sampling",
+  journal = "Statistics and Computing",
+  volume = 31,
+  pages = "16",
+  year = 2021,
+  header = "To cite moment matching:"
+)
+
+bibentry(
+  bibtype = "InProceedings",
+  author = c(
+    person(given = "Måns", family = "Magnusson"),
+    person(given = "Michael Riis", family = "Andersen"),
+    person(given = "Johan", family = "Jonasson"),
+    person(given = "Aki", family = "Vehtari")
+  ),
+  title = "Leave-One-Out Cross-Validation for Large Data",
+  booktitle = "Thirty-sixth International Conference on Machine Learning",
+  publisher = "PMLR",
+  volume = "97",
+  pages = "4244-4253",
+  year = 2019,
+  header = "To cite subsampling loo:"
+)
+
+bibentry(
+  bibtype = "InProceedings",
+  author = c(
+    person(given = "Måns", family = "Magnusson"),
+    person(given = "Michael Riis", family = "Andersen"),
+    person(given = "Johan", family = "Jonasson"),
+    person(given = "Aki", family = "Vehtari")
+  ),
+  title = "Leave-One-Out Cross-Validation for Model Comparison in Large Data",
+  booktitle = "Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS)",
+  publisher = "PMLR",
+  volume = "108",
+  pages = "341-351",
+  year = 2019,
+  header = "To cite subsampling loo:"
 )

@@ -1,13 +1,14 @@
 #' Compute weighted expectations
 #'
 #' The `E_loo()` function computes weighted expectations (means, variances,
-#' quantiles) using the importance weights obtained from the
-#' [PSIS][psis()] smoothing procedure. The expectations estimated by the
-#' `E_loo()` function assume that the PSIS approximation is working well.
+#' quantiles) using the importance weights obtained from the [PSIS][psis()]
+#' smoothing procedure. The expectations estimated by the `E_loo()` function
+#' assume that the PSIS approximation is working well.
 #' **A small [Pareto k][pareto-k-diagnostic] estimate is necessary,
-#' but not sufficient, for `E_loo()` to give reliable estimates.** Additional
-#' diagnostic checks for gauging the reliability of the estimates are in
-#' development and will be added in a future release.
+#' but not sufficient, for `E_loo()` to give reliable estimates**. If the
+#' `log_ratios` argument is provided, `E_loo()` also computes a function
+#' specific Pareto k diagnostic, which must also be small for a reliable
+#' estimate. See more details below.
 #'
 #' @export
 #' @param x A numeric vector or matrix.
@@ -15,7 +16,7 @@
 #' @param log_ratios Optionally, a vector or matrix (the same dimensions as `x`)
 #'   of raw (not smoothed) log ratios. If working with log-likelihood values,
 #'   the log ratios are the **negative** of those values. If `log_ratios` is
-#'   specified we are able to compute [Pareto k][pareto-k-diagnostic]
+#'   specified we are able to compute more accurate [Pareto k][pareto-k-diagnostic]
 #'   diagnostics specific to `E_loo()`.
 #' @param type The type of expectation to compute. The options are
 #'   `"mean"`, `"variance"`, `"sd"`, and `"quantile"`.
@@ -33,18 +34,26 @@
 #'   the returned object is a `length(probs)` by `ncol(x)` matrix.
 #'
 #'   For the default/vector method the `value` component is scalar, with
-#'   one exception: when `type` is `"quantile"` and multiple values
+#'   one exception: when `type="quantile"` and multiple values
 #'   are specified in `probs` the `value` component is a vector with
 #'   `length(probs)` elements.
 #'   }
 #'  \item{`pareto_k`}{
 #'   Function-specific diagnostic.
 #'
-#'   If `log_ratios` is not specified when calling `E_loo()`,
-#'   `pareto_k` will be `NULL`. Otherwise, for the matrix method it
-#'   will be a vector of length `ncol(x)` containing estimates of the shape
-#'   parameter \eqn{k} of the generalized Pareto distribution. For the
-#'   default/vector method, the estimate is a scalar.
+#'   For the matrix method it will be a vector of length `ncol(x)`
+#'   containing estimates of the shape parameter \eqn{k} of the
+#'   generalized Pareto distribution. For the default/vector method,
+#'   the estimate is a scalar. If `log_ratios` is not specified when
+#'   calling `E_loo()`, the smoothed log-weights are used to estimate
+#'   Pareto-k's, which may produce optimistic estimates.
+#'
+#'   For `type="mean"`, `type="var"`, and `type="sd"`, the returned Pareto-k is
+#'   usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
+#'   and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
+#'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and `type="sd"`.
+#'   If \eqn{h} is binary, constant, or not finite, or if `type="quantile"`, the
+#'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 #'  }
 #' }
 #'
@@ -79,8 +88,8 @@
 #' E_loo(yrep, psis_object, type = "quantile", probs = 0.5) # median
 #' E_loo(yrep, psis_object, type = "quantile", probs = c(0.1, 0.9))
 #'
-#' # To get Pareto k diagnostic with E_loo we also need to provide the negative
-#' # log-likelihood values using the log_ratios argument.
+#' # We can get more accurate Pareto k diagnostic if we also provide
+#' # the log_ratios argument
 #' E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 #' }
 #' }
@@ -111,12 +120,18 @@ E_loo.default <-
     out <- E_fun(x, w, probs)
 
     if (is.null(log_ratios)) {
-      warning("'log_ratios' not specified. Can't compute k-hat diagnostic.",
-              call. = FALSE)
-      khat <- NULL
-    } else {
-      khat <- E_loo_khat.default(x, psis_object, log_ratios)
+      # Use of smoothed ratios gives slightly optimistic
+      # Pareto-k's, but these are still better than nothing
+      log_ratios <- weights(psis_object, log = TRUE)
     }
+    h <- switch(
+      type,
+      "mean" = x,
+      "variance" = x^2,
+      "sd" = x^2,
+      "quantile" = NULL
+    )
+    khat <- E_loo_khat.default(h, psis_object, log_ratios)
     list(value = out, pareto_k = khat)
   }
 
@@ -153,12 +168,18 @@ E_loo.matrix <-
     }, FUN.VALUE = fun_val)
 
     if (is.null(log_ratios)) {
-      warning("'log_ratios' not specified. Can't compute k-hat diagnostic.",
-              call. = FALSE)
-      khat <- NULL
-    } else {
-      khat <- E_loo_khat.matrix(x, psis_object, log_ratios)
+      # Use of smoothed ratios gives slightly optimistic
+      # Pareto-k's, but these are still better than nothing
+      log_ratios <- weights(psis_object, log = TRUE)
     }
+    h <- switch(
+      type,
+      "mean" = x,
+      "variance" = x^2,
+      "sd" = x^2,
+      "quantile" = NULL
+    )
+    khat <- E_loo_khat.matrix(h, psis_object, log_ratios)
     list(value = out, pareto_k = khat)
   }
 
@@ -240,16 +261,22 @@ E_loo.matrix <-
 E_loo_khat <- function(x, psis_object, log_ratios, ...) {
   UseMethod("E_loo_khat")
 }
-
+#' @export
 E_loo_khat.default <- function(x, psis_object, log_ratios, ...) {
   .E_loo_khat_i(x, log_ratios, attr(psis_object, "tail_len"))
 }
-
+#' @export
 E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   tail_lengths <- attr(psis_object, "tail_len")
-  sapply(seq_len(ncol(x)), function(i) {
-    .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
-  })
+  if (is.null(x)) {
+    sapply(seq_len(ncol(log_ratios)), function(i) {
+      .E_loo_khat_i(x, log_ratios[, i], tail_lengths[i])
+    })
+  } else {
+    sapply(seq_len(ncol(log_ratios)), function(i) {
+      .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
+    })
+  }
 }
 
 #' Compute function-specific khat estimates
@@ -262,16 +289,25 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 #' @return Scalar h-specific k-hat estimate.
 #'
 .E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
-    h_theta <- x_i
-    r_theta <- exp(log_ratios_i - max(log_ratios_i))
-    a <- sqrt(1 + h_theta^2) * r_theta
-    log_a <- sort(log(a))
-
-    S <- length(log_a)
-    tail_ids <- seq(S - tail_len_i + 1, S)
-    tail_sample <- log_a[tail_ids]
-    cutoff <- log_a[min(tail_ids) - 1]
-
-    smoothed <- psis_smooth_tail(tail_sample, cutoff)
-    smoothed$k
+  h_theta <- x_i
+  r_theta <- exp(log_ratios_i - max(log_ratios_i))
+  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)
+  if (is.list(khat_r)) { # retain compatiblity with older posterior that returned a list
+    khat_r <- khat_r$khat
   }
+  if (is.null(x_i) || is_constant(x_i) || length(unique(x_i))==2 ||
+        anyNA(x_i) || any(is.infinite(x_i))) {
+    khat_r
+  } else {
+    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)
+    if (is.list(khat_hr)) { # retain compatiblity with older posterior that returned a list
+      khat_hr <- khat_hr$khat
+    }
+    if (is.na(khat_hr) && is.na(khat_r)) {
+      k <- NA
+    } else {
+      k <- max(khat_hr, khat_r, na.rm=TRUE)
+    }
+    k
+  }
+}

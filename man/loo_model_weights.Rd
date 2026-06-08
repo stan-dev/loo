@@ -28,7 +28,7 @@ pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
 \arguments{
 \item{x}{A list of \code{"psis_loo"} objects (objects returned by \code{\link[=loo]{loo()}}) or
-pointwise log-likelihood matrices or , one for each model. If the list
+pointwise log-likelihood matrices, one for each model. If the list
 elements are named the names will be used to label the models in the
 results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 where \eqn{S} is the size of the posterior sample (with all chains merged)
@@ -36,7 +36,8 @@ and \eqn{N} is the number of data points. If \code{x} is a list of
 log-likelihood matrices then \code{\link[=loo]{loo()}} is called internally on each matrix.
 Currently the \code{loo_model_weights()} function is not implemented to be used
 with results from K-fold CV, but you can still obtain weights using K-fold
-CV results by calling the \code{stacking_weights()} function directly.}
+CV results by calling the \code{stacking_weights()} or \code{pseudobma_weights()}
+function directly.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
@@ -101,7 +102,7 @@ A numeric vector containing one weight for each model.
 Model averaging via stacking of predictive distributions, pseudo-BMA
 weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
 al. (2018), Vehtari, Gelman, and Gabry (2017), and Vehtari, Simpson,
-Gelman, Yao, and Gabry (2019) for background.
+Gelman, Yao, and Gabry (2024) for background.
 }
 \details{
 \code{loo_model_weights()} is a wrapper around the \code{stacking_weights()} and
@@ -215,9 +216,10 @@ evaluation using leave-one-out cross-validation and WAIC.
 (\href{https://link.springer.com/article/10.1007/s11222-016-9696-4}{journal version},
 \href{https://arxiv.org/abs/1507.04544}{preprint arXiv:1507.04544}).
 
-Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2019).
-Pareto smoothed importance sampling.
-\href{https://arxiv.org/abs/1507.02646}{preprint arXiv:1507.02646}
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. \emph{Journal of Machine Learning Research},
+25(72):1-58.
+\href{https://jmlr.org/papers/v25/19-556.html}{PDF}
 
 Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018) Using
 stacking to average Bayesian predictive distributions.

@@ -3,11 +3,11 @@
 #' Model averaging via stacking of predictive distributions, pseudo-BMA
 #' weighting or pseudo-BMA+ weighting with the Bayesian bootstrap. See Yao et
 #' al. (2018), Vehtari, Gelman, and Gabry (2017), and Vehtari, Simpson,
-#' Gelman, Yao, and Gabry (2019) for background.
+#' Gelman, Yao, and Gabry (2024) for background.
 #'
 #' @export
 #' @param x A list of `"psis_loo"` objects (objects returned by [loo()]) or
-#'   pointwise log-likelihood matrices or , one for each model. If the list
+#'   pointwise log-likelihood matrices, one for each model. If the list
 #'   elements are named the names will be used to label the models in the
 #'   results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 #'   where \eqn{S} is the size of the posterior sample (with all chains merged)
@@ -15,7 +15,8 @@
 #'   log-likelihood matrices then [loo()] is called internally on each matrix.
 #'   Currently the `loo_model_weights()` function is not implemented to be used
 #'   with results from K-fold CV, but you can still obtain weights using K-fold
-#'   CV results by calling the `stacking_weights()` function directly.
+#'   CV results by calling the `stacking_weights()` or `pseudobma_weights()`
+#'   function directly.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
@@ -257,15 +258,12 @@ stacking_weights <-
       stop("At least two models are required for stacking weights.")
     }
 
-    exp_lpd_point <- exp(lpd_point)
     negative_log_score_loo <- function(w) {
       # objective function: log score
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
-      sum <- 0
-      for (i in 1:N) {
-        sum <- sum + log(exp(lpd_point[i, ]) %*% w_full)
-      }
+      # avoid over- and underflows using log weights and rowLogSumExps
+      sum <- sum(matrixStats::rowLogSumExps(sweep(lpd_point[1:N,], 2, log(w_full), '+')))
       return(-as.numeric(sum))
     }
 
@@ -274,11 +272,11 @@ stacking_weights <-
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       grad <- rep(0, K - 1)
+      # avoid over- and underflows using log weights, rowLogSumExps,
+      # and by subtracting the row maximum of lpd_point
+      mlpd <- matrixStats::rowMaxs(lpd_point)
       for (k in 1:(K - 1)) {
-        for (i in 1:N) {
-          grad[k] <- grad[k] +
-            (exp_lpd_point[i, k] - exp_lpd_point[i, K]) / (exp_lpd_point[i,]  %*% w_full)
-        }
+        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
       }
       return(-grad)
     }
