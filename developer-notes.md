@@ -68,8 +68,11 @@ Without having the scaled version as explicit form, we would have to create a cu
 
 - [x] Remove the "old" `crps` implementation that requires two independent
   `ypred` inputs; retain only the new ECDF-based implementation.
-- [ ] Align the currently two existing `elpd` implementations 
+- [x] Align the currently two existing `elpd` implementations 
 (old and new implementation).
+  + I used a new function and removed the old S3 elpd method.
+  + However, currently the elpd returns only elpd and not ic.
+  + do we want to provide both measures?
 - [x] Move `ic` out of "base measures"; it should not be included
   automatically but must be explicitly requested by the user.
 - [ ] Provide an interface to `loo_compare` and verify consistency with it.
