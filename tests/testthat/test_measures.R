@@ -1,5 +1,5 @@
 # load test data --------------------------------------
-res_roaches <- readRDS("data-for-tests/res_roaches.Rds")
+res_roaches <- readRDS("tests/testthat/data-for-tests/res_roaches.Rds")
 res_sleep <- readRDS("data-for-tests/res_sleep.Rds")
 res_binom <- readRDS("data-for-tests/res_binomial.Rds")
 res_binary <- readRDS("data-for-tests/res_binary.Rds")
@@ -44,6 +44,10 @@ testthat::test_that("elpd() works as expected", {
   expect_equal(length(res$estimates[1]), 1)
   expect_equal(length(res$estimates[2]), 1)
   expect_equal(length(res$pointwise), dim(res_roaches$ylp)[2])
+  
+  expect_snapshot_output(
+    elpd(ylp = res_roaches$ylp, log_weights = NULL)
+  )
 })
 
 testthat::test_that("elpd() with unnormalized log-weights works as expected", {
@@ -66,6 +70,16 @@ testthat::test_that("elpd() with normalized log-weights works as expected", {
   expect_equal(length(res$pointwise), dim(res_roaches$ylp)[2])
 })
 
+# ic() -----------------------------------
+
+testthat::test_that("ic() works as expected", {
+  res <- ic(ylp = res_roaches$ylp)
+  n_obs <- dim(res_roaches$ylp)[2]
+
+  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_snapshot_output(ic(ylp = res_roaches$ylp))
+})
+
 # mlpd() -----------------------------------
 
 testthat::test_that("mlpd() works as expected", {
@@ -79,6 +93,24 @@ testthat::test_that("mlpd() works as expected", {
   expect_equal(length(res$pointwise), n_obs)
   expect_equal(res$estimates, res_elpd$estimates / n_obs)
   expect_equal(res$pointwise, res_elpd$pointwise)
+  
+  expect_snapshot_output(mlpd(ylp = res_roaches$ylp, log_weights = NULL))
+})
+
+testthat::test_that("mlpd() with pointwise works as expected", {
+  res_elpd <- elpd(ylp = res_roaches$ylp, log_weights = NULL)
+  res <- mlpd(ylp = NULL, pointwise = res_elpd$pointwise)
+  
+  n_obs <- dim(res_roaches$ylp)[2]
+
+  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(length(res$estimates[1]), 1)
+  expect_equal(length(res$estimates[2]), 1)
+  expect_equal(length(res$pointwise), n_obs)
+  expect_equal(res$estimates, res_elpd$estimates / n_obs)
+  expect_equal(res$pointwise, res_elpd$pointwise)
+  
+  expect_snapshot_output(mlpd(ylp = NULL, pointwise = res_elpd$pointwise))
 })
 
 # rps() -------------------------------------
@@ -92,6 +124,8 @@ testthat::test_that("rps() with ordered categorial data works as expected", {
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_binom$y))
+  
+  expect_snapshot_output(rps(y = res_binom$y, ypred = res_binom$ypred))
 })
 
 testthat::test_that("rps() scaled version with categorical data works as expected", {
@@ -105,6 +139,8 @@ testthat::test_that("rps() scaled version with categorical data works as expecte
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_binom$y))
   expect_true(all(res$pointwise < 0))
+  
+  expect_snapshot_output(srps(y = res_binom$y, ypred = res_binom$ypred))
 })
 
 testthat::test_that("rps() for categorical data with log-weights works as expected", {
@@ -126,6 +162,8 @@ testthat::test_that("rps() with continuous data works as expected", {
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_sleep$y))
+  
+  expect_snapshot_output(rps(res_sleep$y, res_sleep$ypred))
 })
 
 testthat::test_that("rps() with continuous data and log-weights works as expected", {
@@ -159,6 +197,8 @@ testthat::test_that("brier() works as expected", {
   expect_equal(length(res_brier$estimates), 2)
   expect_equal(length(res_brier$pointwise), length(res_binary$y))
   expect_true(all(res_brier$pointwise >= 0 & res_brier$pointwise <= 1))
+  
+  expect_snapshot_output(brier(y = res_binary$y, ypred = res_binary$ypred))
 })
 
 testthat::test_that("brier() with log-weights works as expected", {
@@ -200,6 +240,8 @@ testthat::test_that("mae() works as expected", {
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_roaches$y))
+  
+  expect_snapshot_output(mae(y = res_roaches$y, mupred = res_roaches$mupred))
 })
 
 testthat::test_that("mae() with log_weights works as expected", {
@@ -224,7 +266,11 @@ testthat::test_that("mse() and rmse() work as expected", {
   expect_equal(length(res_mse$pointwise), length(res_roaches$y))
 
   expect_equal(sqrt(abs(res_mse$estimates[1])), res_rmse$estimates[1])
-  expect_equal(res_mse$estimates[2]/(2*sqrt(abs(res_mse$estimates[1]))), res_rmse$estimates[2])
+  expect_equal(res_mse$estimates[2]/(2*sqrt(abs(res_mse$estimates[1]))), 
+  res_rmse$estimates[2])
+  
+  expect_snapshot_output(mse(y = res_roaches$y, mupred = res_roaches$mupred))
+  expect_snapshot_output(rmse(y = res_roaches$y, mupred = res_roaches$mupred))
 })
 
 testthat::test_that("rmse() works with se=0", {
@@ -247,6 +293,8 @@ testthat::test_that("r2() works as expected", {
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_roaches$y))
   expect_true(all(res$estimates[1] >= 0 & res$estimates[1] <= 1))
+  
+  expect_snapshot_output(r2(y = res_roaches$y, mupred = res_roaches$mupred))
 })
 
 testthat::test_that("r2() with log_weights works as expected", {
@@ -269,6 +317,8 @@ testthat::test_that("acc() works as expected", {
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(all(res$pointwise >= 0 & res$pointwise <= 1))
+  
+  expect_snapshot_output(acc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
 })
 
 testthat::test_that("acc() with log-weights works as expected", {
@@ -291,6 +341,8 @@ testthat::test_that("bacc() works as expected", {
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
+  
+  expect_snapshot_output(bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
 })
 
 testthat::test_that("bacc() with log-weights works as expected", {

@@ -118,7 +118,10 @@ Without having the scaled version as explicit form, we would have to create a cu
 
 + the function name `ic` for the information criteria is very short and ambiguous;
 shall we change to `information_criteria` as a more descriptive name?
-
++ do we want to maintain a "generic elpd" measure that returns elpd and ic 
+information? 
++ What is the criteria whether something is of class loo? For example, elpd.generic
+is of class loo, why?
 
 ## References & Resources
 

@@ -249,7 +249,7 @@ hamming_loss <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
     pointwise = hamming_i
   )
   
-  .measure_output(res, revert_sign)
+  .create_measure_structure(res, revert_sign)
 }
 ```
 

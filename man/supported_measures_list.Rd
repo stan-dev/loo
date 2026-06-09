@@ -5,7 +5,7 @@
 \alias{supported_measures_list}
 \title{Supported predictive measure names}
 \format{
-An object of class \code{character} of length 10.
+An object of class \code{character} of length 11.
 }
 \usage{
 supported_measures_list

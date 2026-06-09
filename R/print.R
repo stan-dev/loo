@@ -351,3 +351,20 @@ print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
   }
   "unknown"
 }
+
+#' @export
+print.measure <- function(x, digits = 2, ...) {
+  dims <- attr(x, "dims")
+  name <- attr(x, "measure")
+
+  if (length(dims) < 2) {
+    # number of draws are NULL
+    cat("\nComputed from", dims[1], "pointwise terms.\n\n")
+  } else {
+    cat("\nComputed from", dims[1], "draws by", dims[2], "observations.\n\n")
+  }
+
+  print(.fr(x$estimates, digits), quote = FALSE)
+  
+  invisible(x)
+}

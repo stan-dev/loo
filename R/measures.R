@@ -1,4 +1,64 @@
-## Density scores -------------------------------------------------------------
+#' Shared parameters for all measures
+#'
+#' @param log_weights Optional numeric matrix of unnormalized log-importance
+#'   weights with dimensions \eqn{S \times n}. Weights are column-normalized
+#'   before computing each per-observation contribution.
+#' @param pointwise Optional numeric vector of precomputed per-observation
+#'   contributions. When supplied, `ylp` and `log_weights` are ignored.
+#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
+#'   values by \eqn{-1} before returning.
+#'
+#' @return An object of class `"measure"`: a list with:
+#'   \describe{
+#'     \item{`estimates`}{Named numeric vector with elements `Estimate`
+#'       and `SE` (standard error).}
+#'     \item{`pointwise`}{Numeric vector of length \eqn{n} with per-observation
+#'       values.}
+#'   }
+#'   Attributes `measure` (i.e., measure name) and `dims` (draws \eqn{\times} 
+#'   observations) are also set. Use [print()] for a readable summary.
+#' 
+#' @keywords internal
+#' @name measure_params
+NULL
+
+#' Shared parameters for density scores
+#'
+#' @param ylp A numeric matrix or three-dimensional array of log predictive
+#'   densities or probabilities:
+#'   \itemize{
+#'     \item **Matrix** (\eqn{S \times n}): \eqn{S} posterior draws (chains
+#'       merged) by \eqn{n} observations.
+#'     \item **Array** (\eqn{I \times C \times n}): \eqn{I} MCMC iterations per
+#'       chain, \eqn{C} chains, and \eqn{n} observations. Converted to an
+#'       \eqn{S \times n} matrix internally.
+#'   }
+#' 
+#' @keywords internal
+#' @name measure_density_params
+NULL
+
+#' Shared parameters for metrics
+#'
+#' @param y A vector of observed values.
+#' @param mupred A numeric array of posterior predictive means. For binary
+#'   outcomes use a draws x observations matrix. For multiclass outcomes use a
+#'   draws x observations x categories array.
+#' 
+#' @keywords internal
+#' @name measure_metric_params
+NULL
+
+#' Shared parameters for scores
+#'
+#' @param y A vector of observed values.
+#' @param mupred A numeric array of posterior predictive means. For binary
+#'   outcomes use a draws x observations matrix. For multiclass outcomes use a
+#'   draws x observations x categories array.
+#' 
+#' @keywords internal
+#' @name measure_score_params
+NULL
 
 #' Pointwise log predictive density (`lppd_i`)
 #'
@@ -50,24 +110,35 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 
 #' Expected log pointwise predictive density (`elpd`)
 #'
-#' Computes ELPD as the sum of pointwise log predictive density contributions
-#' (lppd_i).
+#' Computes the expected log pointwise predictive density (ELPD) as the sum of
+#' pointwise log predictive density contributions (\eqn{\mathrm{lppd}_i}), using
+#' [ptw_log_pred_density()]. ELPD is returned on the utility scale (higher is
+#' better), consistent with the sign convention used throughout this package.
+#' Manual change of sign convention is possible via the argument `revert_sign`.
 #'
-#' @param ylp A numeric matrix of log predictive densities/probabilities with
-#'   dimensions draws x observations.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
-#' @param pointwise Optional numeric vector of precomputed pointwise
-#'   contributions. If provided, `ylp` and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
+#' @inheritParams measure_density_params
+#' @inheritParams measure_params
+#' @param pointwise Optional numeric vector of precomputed \eqn{\mathrm{lppd}_i}
+#'   values. When supplied, `ylp` and `log_weights` are ignored.
 #'
-#' @returns A named list with elements `estimate` (sum over lppd_i), `se`
-#'   (standard error across lppd_i), and `pointwise` (lppd_i).
+#' @details
+#' \deqn{\mathrm{elpd} = \sum_{i=1}^{n} \mathrm{lppd}_i,}
+#' where each \eqn{\mathrm{lppd}_i} is computed by [ptw_log_pred_density()].
+#' The standard error is \eqn{\sqrt{n}\,\mathrm{sd}(\mathrm{lppd}_i)}.
+#'
+#' @seealso [ptw_log_pred_density()], [mlpd()], [ic()]
 #'
 #' @examples
 #' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
 #' elpd(ylp)
+#'
+#' # With unnormalized importance weights (e.g., PSIS-LOO)
+#' lw <- matrix(log(c(0.7, 0.3, 0.6, 0.4)), nrow = 2)
+#' elpd(ylp, log_weights = lw)
+#'
+#' # From a draws x chains x observations array
+#' LLarr <- example_loglik_array()
+#' elpd(LLarr)
 #' @export
 elpd <- function(
   ylp, log_weights = NULL, pointwise = NULL, revert_sign = FALSE
@@ -80,13 +151,16 @@ elpd <- function(
       fun_name = "elpd"
     )
     lppd_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
     .validate_numeric_matrix(ylp, arg = "ylp")
+    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
+    n_draws <- nrow(ylp)
+    n_obs <- ncol(ylp)
     if (!is.null(log_weights)) {
       log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = nrow(ylp),
-        n_obs = ncol(ylp)
+        log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
       )
     }
     lppd_i <- ptw_log_pred_density(ylp, log_weights)
@@ -102,7 +176,9 @@ elpd <- function(
     pointwise = lppd_i
   )
   
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "elpd", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Mean log pointwise predictive density (`mlpd`)
@@ -110,17 +186,10 @@ elpd <- function(
 #' Computes MLPD as the average of pointwise log predictive density (lppd_i) 
 #' values. Inputs follow the same conventions as [elpd()].
 #'
-#' @param ylp A numeric matrix of log predictive densities/probabilities with
-#'   dimensions draws x observations.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
-#' @param pointwise Optional numeric vector of precomputed pointwise
-#'   contributions. If provided, `ylp` and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
-#'
-#' @returns A named list with elements `estimate` (mean over lppd_i), `se`
-#'   (standard error), and `pointwise` (lppd_i).
+#' @inheritParams measure_density_params
+#' @inheritParams measure_params
+#' @param pointwise Optional numeric vector of precomputed \eqn{\mathrm{lppd}_i}
+#'   values. When supplied, `ylp` and `log_weights` are ignored.
 #'
 #' @examples
 #' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
@@ -137,8 +206,14 @@ mlpd <- function(
       fun_name = "mlpd"
     )
     lppd_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(ylp)
+    n_obs <- ncol(ylp)
     .validate_numeric_matrix(ylp, arg = "ylp")
+    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
+    
     if (!is.null(log_weights)) {
       log_weights <- .normalize_and_validate_log_weights(
         log_weights = log_weights,
@@ -159,7 +234,9 @@ mlpd <- function(
     se = if (n_obs == 1L) 0 else sqrt(n_obs * var(lppd_i)) / n_obs,
     pointwise = lppd_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "mlpd", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Information Criteria (`ic`)
@@ -167,17 +244,11 @@ mlpd <- function(
 #' Computes the information criteria as -2 x log predictive density (lppd_i) 
 #' values. Inputs follow the same conventions as [elpd()] and [mlpd()].
 #'
-#' @param ylp A numeric matrix of log predictive densities/probabilities with
-#'   dimensions draws x observations.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
+#' @inheritParams measure_density_params
+#' @inheritParams measure_params
 #' @param pointwise Optional numeric vector of precomputed pointwise
-#'   contributions. If provided, `ylp` and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
-#'
-#' @returns A named list with elements `estimate` (mean over ic_i), `se`
-#'   (standard error), and `pointwise` (ic_i).
+#'   contributions \eqn{\mathrm{ic}_i = -1 \cdot \mathrm{lppd}_i}. If provided, 
+#'   `ylp` and `log_weights` are ignored.
 #'
 #' @examples
 #' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
@@ -194,13 +265,18 @@ ic <- function(
       fun_name = "ic"
     )
     ic_i <- pointwise
+    n_draws = NULL
+    n_obs = length(pointwise)
   } else {
+    n_draws <- nrow(ylp)
+    n_obs <- ncol(ylp)
     .validate_numeric_matrix(ylp, arg = "ylp")
+    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
     if (!is.null(log_weights)) {
       log_weights <- .normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(ylp),
-        n_obs = ncol(ylp)
+        n_draws = n_draws,
+        n_obs = n_obs
       )
     }
     lppd_i <- ptw_log_pred_density(ylp, log_weights)
@@ -217,7 +293,9 @@ ic <- function(
     se = if (n_obs == 1L) 0 else 2 * sqrt(n_obs * var(ic_i / (-2))),
     pointwise = ic_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "ic", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Classification accuracy (`acc`)
@@ -226,20 +304,12 @@ ic <- function(
 #' multiclass outcomes from posterior predictive class assignments. For binary
 #' outcomes, each draw is thresholded at 0.5. For multiclass outcomes, each
 #' draw is mapped to the most likely category via `which.max()`.
-#'
+#' 
+#' @inheritParams measure_score_params
+#' @inheritParams measure_params
 #' @param y An integer vector of observed class labels.
-#' @param mupred A numeric array of posterior predictive means. For binary
-#'   outcomes use a draws x observations matrix. For multiclass outcomes use a
-#'   draws x observations x categories array.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
 #' @param pointwise Optional numeric vector of precomputed pointwise accuracy
 #'   contributions. If provided, `y`, `mupred`, and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
-#'
-#' @returns A named list with elements `estimate` (mean accuracy), `se`
-#'   (standard error), and `pointwise` (pointwise accuracy).
 #'
 #' @examples
 #' y <- c(1L, 0L, 1L)
@@ -256,7 +326,11 @@ acc <- function(
       fun_name = "acc"
     )
     acc_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(mupred)
+    n_obs <- dim(mupred)[2]
     .validate_numeric_vector(y, arg = "y")
     if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
       cli::cli_abort("{.arg mupred} must be a numeric matrix or 3D numeric array.")
@@ -266,8 +340,8 @@ acc <- function(
     if (!is.null(log_weights)) {
       weights <- exp(.normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(mupred),
-        n_obs = dim(mupred)[2]
+        n_draws = n_draws,
+        n_obs = n_obs
       ))
     } else {
       weights <- rep(1 / nrow(mupred), nrow(mupred))
@@ -289,7 +363,9 @@ acc <- function(
     se = sqrt(var(acc_i) / length(acc_i)),
     pointwise = acc_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "acc", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Balanced classification accuracy (`bacc`)
@@ -298,10 +374,6 @@ acc <- function(
 #' each observed class equal weight regardless of class frequency.
 #'
 #' @inheritParams acc
-#'
-#' @returns A named list with elements `estimate` (balanced accuracy), `se`
-#'   (standard error based on balanced pointwise contributions), and
-#'   `pointwise` (pointwise balanced accuracy terms).
 #'
 #' @examples
 #' y <- c(1L, 1L, 2L, 2L)
@@ -321,7 +393,11 @@ bacc <- function(
       fun_name = "bacc"
     )
     acc_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(mupred)
+    n_obs <- ncol(mupred)
     .validate_numeric_vector(y, arg = "y")
     classes <- sort(unique(y))
     K <- length(classes)
@@ -336,8 +412,8 @@ bacc <- function(
     if (!is.null(log_weights)) {
       weights <- exp(.normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(mupred),
-        n_obs = dim(mupred)[2]
+        n_draws = n_draws,
+        n_obs = n_obs
       ))
     } else {
       weights <- rep(1 / nrow(mupred), nrow(mupred))
@@ -362,7 +438,9 @@ bacc <- function(
     se = sqrt(var(bacc_i) / length(bacc_i)),
     pointwise = acc_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "bacc", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Brier score (`brier`)
@@ -373,15 +451,9 @@ bacc <- function(
 #' @param y A numeric vector of binary outcomes coded as 0 or 1.
 #' @param ypred A numeric matrix of posterior predictive probabilities with
 #'   dimensions draws x observations.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
+#' @inheritParams measure_params
 #' @param pointwise Optional numeric vector of precomputed pointwise Brier
 #'   scores. If provided, `y`, `ypred`, and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
-#'
-#' @returns A named list with elements `estimate` (mean Brier score), `se`
-#'   (standard error), and `pointwise` (pointwise brier score).
 #'
 #' @examples
 #' y <- c(1, 0, 1)
@@ -398,7 +470,11 @@ brier <- function(
       fun_name = "brier"
     )
     bs_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(ypred)
+    n_obs <- ncol(ypred)
     .validate_numeric_vector(y, arg = "y")
     if (any(y != 0 & y != 1)) {
       cli::cli_abort(c(
@@ -412,8 +488,8 @@ brier <- function(
     if (!is.null(log_weights)) {
       weights <- exp(.normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(ypred),
-        n_obs = ncol(ypred)
+        n_draws = n_draws,
+        n_obs = n_obs
       ))
       prob_i <- colSums(ypred * weights)
     } else {
@@ -427,7 +503,9 @@ brier <- function(
     se = sqrt(var(bs_i) / length(bs_i)),
     pointwise = bs_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "brier", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Mean absolute error (`mae`)
@@ -439,15 +517,9 @@ brier <- function(
 #' @param y A numeric vector of observed outcomes.
 #' @param mupred A numeric matrix of posterior expected predictions with
 #'   dimensions draws x observations. A length-`n` vector is also accepted.
-#' @param log_weights Optional numeric matrix of unnormalized log-weights
-#'   with dimensions draws x observations.
 #' @param pointwise Optional numeric vector of precomputed pointwise absolute
 #'   errors. If provided, `y`, `mupred`, and `log_weights` are ignored.
-#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
-#'   values by -1 before returning.
-#'
-#' @returns A named list with elements `estimate` (mean absolute error), `se`
-#'   (standard error), and `pointwise` (pointwise absolute errors).
+#' @inheritParams measure_params
 #'
 #' @examples
 #' y <- c(1, 2, 3)
@@ -464,7 +536,11 @@ mae <- function(
       fun_name = "mae"
     )
     mae_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(mupred)
+    n_obs <- ncol(mupred)
     .validate_numeric_vector(y, arg = "y")
     if (!is.null(mupred) && !is.matrix(mupred)){
       .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
@@ -479,8 +555,8 @@ mae <- function(
     } else {
       weights <- exp(.normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(mupred),
-        n_obs = ncol(mupred)
+        n_draws = n_draws,
+        n_obs = n_obs
       ))
       mae_i <- abs(y - colSums(weights * mupred))
     }
@@ -491,7 +567,9 @@ mae <- function(
     se = sqrt(var(mae_i) / length(mae_i)),
     pointwise = mae_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "mae", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Mean squared error (`mse`)
@@ -501,9 +579,6 @@ mae <- function(
 #' by PSIS-weighted averaging when `log_weights` is provided.
 #'
 #' @inheritParams mae
-#'
-#' @returns A named list with elements `estimate` (mean squared error), `se`
-#'   (standard error), and `pointwise` (pointwise squared errors).
 #'
 #' @examples
 #' y <- c(1, 2, 3)
@@ -520,7 +595,11 @@ mse <- function(
       fun_name = "mse"
     )
     sqe_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   } else {
+    n_draws <- nrow(mupred)
+    n_obs <- ncol(mupred)
     .validate_numeric_vector(y, arg = "y")
     if (!is.null(mupred) && !is.matrix(mupred)){
       .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
@@ -535,8 +614,8 @@ mse <- function(
     } else {
       weights <- exp(.normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(mupred),
-        n_obs = ncol(mupred)
+        n_draws = n_draws,
+        n_obs = n_obs
       ))
       sqe_i <- (y - colSums(weights * mupred))^2
     }
@@ -547,7 +626,9 @@ mse <- function(
     se = sqrt(var(sqe_i) / length(sqe_i)),
     pointwise = sqe_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "mse", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Root mean squared error (`rmse`)
@@ -556,9 +637,6 @@ mse <- function(
 #' first-order delta-method approximation.
 #'
 #' @inheritParams mae
-#'
-#' @returns A named list with elements `estimate` (root mean squared error),
-#'   `se` (standard error), and `pointwise` (pointwise squared errors).
 #'
 #' @examples
 #' y <- c(1, 2, 3)
@@ -572,6 +650,9 @@ rmse <- function(
     y = y, mupred = mupred, log_weights = log_weights, 
     pointwise = pointwise
   )
+  n_draws <- if (is.null(pointwise)) nrow(mupred) else NULL
+  n_obs <- length(mse_res$pointwise)
+  
   sqe_i <- mse_res$pointwise
   rmse_est <- sqrt(mse_res$estimates[1])
   if (rmse_est == 0) {
@@ -585,7 +666,9 @@ rmse <- function(
     se = rmse_se,
     pointwise = sqe_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "rmse", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Predictive R-squared (`r2`)
@@ -595,9 +678,6 @@ rmse <- function(
 #' first-order delta-method approximation.
 #'
 #' @inheritParams mae
-#'
-#' @returns A named list with elements `estimate` (predictive R2), `se`
-#'   (standard error), and `pointwise` (pointwise squared errors).
 #'
 #' @examples
 #' y <- c(1, 2, 3)
@@ -623,6 +703,7 @@ r2 <- function(
   mse_hat <- mse_res$estimate
   sqe_i <- mse_res$pointwise
   n_obs <- length(sqe_i)
+  n_draws <- if (is.null(pointwise)) nrow(mupred) else NULL
   
   mse_y_i <- (y - mean(y))^2
   mse_y_hat <- mean(mse_y_i)
@@ -643,7 +724,9 @@ r2 <- function(
     se = se_r2,
     pointwise = sqe_i
   )
-  .measure_output(res, revert_sign)
+  .create_measure_structure(
+    res, revert_sign, "r2", n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Ranked Probability Score (RPS, SRPS, CRPS, SCRPS)
@@ -696,23 +779,11 @@ r2 <- function(
 #'   (for RPS/SRPS) or continuous (for CRPS/SCRPS).
 #' @param ypred A numeric matrix of posterior predictive draws with dimensions
 #'   \eqn{S \times n} (draws × observations).
-#' @param log_weights Optional numeric matrix of log-importance-
-#'   weights with dimensions \eqn{S \times n}. When provided, a weighted PWM
-#'   estimator is used. Useful for LOO cross-validation via importance sampling
-#'   (e.g., PSIS-LOO).
+#' @param pointwise Optional numeric vector of precomputed pointwise rps values.
+#'   If provided, `y`, `ypred`, and `log_weights` are ignored.
 #' @param scaled Logical; if `TRUE`, computes the scaled variant (SRPS for
 #'   discrete outcomes, SCRPS for continuous outcomes). Default is `FALSE`.
-#' @param revert_sign Logical; if `TRUE`, multiplies scores by \eqn{-1} to
-#'   return the loss convention (lower is better) rather than the utility
-#'   convention. Default is `FALSE`.
-#'
-#' @return A named list with:
-#'   \describe{
-#'     \item{`estimate`}{Mean score across all observations.}
-#'     \item{`se`}{Standard error of the mean score.}
-#'     \item{`pointwise`}{Numeric vector of length \eqn{n} with per-observation
-#'       scores.}
-#'   }
+#' @inheritParams measure_params
 #'
 #' @examples
 #' # Discrete outcomes: RPS
@@ -762,46 +833,57 @@ r2 <- function(
 #' weather forecasts. *Mathematical Geosciences*, 50:209–234.
 #'
 #' @export
-rps <- function(y, ypred, log_weights = NULL, scaled = FALSE, revert_sign = FALSE) {
-  if (is.null(log_weights)) {
-    EXy <- colMeans(abs(sweep(ypred, 2, y)))
-    ypred_sorted <- apply(ypred, 2, sort)
-    S <- nrow(ypred)
-    EXX  <- colMeans(ypred_sorted * ((1:S) * (4 / (S - 1)) - 2))
-    if (scaled) {
-      # Scaled version by Bolin & Wallin (2023)
-      rps_i <- -EXy/EXX - 0.5 * log(EXX)
+rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled = FALSE, 
+  revert_sign = FALSE) {
+  if (is.null(pointwise)) {
+    n_draws <- nrow(ypred)
+    n_obs <- ncol(ypred)
+    
+    if (is.null(log_weights)) {
+      EXy <- colMeans(abs(sweep(ypred, 2, y)))
+      ypred_sorted <- apply(ypred, 2, sort)
+      EXX  <- colMeans(ypred_sorted * ((1:n_draws) * (4 / (n_draws - 1)) - 2))
+      if (scaled) {
+        # Scaled version by Bolin & Wallin (2023)
+        rps_i <- -EXy/EXX - 0.5 * log(EXX)
+      } else {
+        # Gneiting & Raftery (2007)
+        rps_i <- - 0.5 * EXX + EXy
+      }
     } else {
-      # Gneiting & Raftery (2007)
-      rps_i <- - 0.5 * EXX + EXy
+      w <- exp(.normalize_log_weights(log_weights))
+      w_csum <- sapply(1:n_obs, function(j) {
+        perm <- order(ypred[,j])
+        result <- numeric(n_draws)
+        result[perm] <- cumsum(w[perm, j])
+        result
+      })
+      
+      EXX <- 2 * colSums(ypred * w * (1 - (2*(1 - w_csum)) / (1 - w)))
+      EXy <- colSums(w * abs(sweep(ypred, 2, y)))
+      if (scaled) {
+        # Scaled version by Bolin & Wallin (2023)
+        rps_i <- -EXy/EXX - 0.5 * log(EXX)
+      } else {
+        # Gneiting & Raftery (2007)
+        rps_i <- EXy - 0.5 * EXX
+      }
     }
   } else {
-    S <- nrow(ypred)
-    n <- ncol(ypred)
-    w <- exp(.normalize_log_weights(log_weights))
-    w_csum <- sapply(1:n, function(j) {
-      perm <- order(ypred[,j])
-      result <- numeric(S)
-      result[perm] <- cumsum(w[perm, j])
-      result
-    })
-    
-    EXX <- 2 * colSums(ypred * w * (1 - (2*(1 - w_csum)) / (1 - w)))
-    EXy <- colSums(w * abs(sweep(ypred, 2, y)))
-    if (scaled) {
-      # Scaled version by Bolin & Wallin (2023)
-      rps_i <- -EXy/EXX - 0.5 * log(EXX)
-    } else {
-      # Gneiting & Raftery (2007)
-      rps_i <- EXy - 0.5 * EXX
-    }
+    rps_i <- pointwise
+    n_draws <- NULL
+    n_obs <- length(pointwise)
   }
+  
   res <- list(
     estimate = mean(rps_i),
-    se = sqrt(var(rps_i) / length(rps_i)),
+    se = sqrt(var(rps_i) / n_obs),
     pointwise = rps_i
   )
-  .measure_output(res, revert_sign)
+  name <- if(isTRUE(scaled)) "srps" else "rps"
+  .create_measure_structure(
+    res, revert_sign, name, n_draws = n_draws, n_obs = n_obs
+  )
 }
 
 #' Scaled Ranked Probability Score (SRPS, SCRPS)
@@ -817,15 +899,14 @@ rps <- function(y, ypred, log_weights = NULL, scaled = FALSE, revert_sign = FALS
 #'
 #' @inheritParams rps
 #'
-#' @inherit rps return
-#'
 #' @examples
 #' y <- c(2L, 1L, 3L)
 #' ypred <- matrix(c(2, 1, 2, 3, 1, 3), nrow = 2)
 #' srps(y, ypred)
 #'
 #' @export
-srps <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
+srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
+  revert_sign = FALSE) {
   rps(
     y = y, ypred = ypred, log_weights = log_weights, 
     scaled = TRUE, revert_sign = revert_sign
@@ -845,6 +926,7 @@ srps <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
 # @return The measure specification.
 .measure_spec <- list(
   elpd = elpd,
+  ic = ic,
   mlpd = mlpd,
   mae = mae,
   r2 = r2,
@@ -853,8 +935,7 @@ srps <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
   acc = acc,
   bacc = bacc,
   rps = rps,
-  srps = srps,
-  ic = ic
+  srps = srps
 )
 
 #' Supported predictive measure names
@@ -867,14 +948,30 @@ srps <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
 supported_measures_list <- names(.measure_spec)
 
 # internal function that produces output format for measures
-.measure_output <- function(res, revert_sign) {
+.create_measure_structure <- function(
+  res, revert_sign, measure_name, n_draws, n_obs
+) {
   if (isTRUE(revert_sign)) {
     res$estimate <- -res$estimate
     res$pointwise <- -res$pointwise
   }
   out <- list()
-  out$estimates <- c(res$estimate, res$se)
-  names(out$estimates) <- c('Estimate', 'SE')
-  out$pointwise <- res$pointwise
-  out
+  out$estimates <- matrix(
+    c(res$estimate, res$se),
+    nrow = 1,
+    dimnames = list(measure_name, c("Estimate", "SE"))
+  )
+  out$pointwise <- matrix(
+    res$pointwise,
+    ncol     = 1,
+    dimnames = list(NULL, measure_name)
+  )
+
+  
+  structure(
+    out,
+    class = c("measure", "loo"),
+    measure = measure_name,
+    dims = c(n_draws, n_obs)
+  )
 }

@@ -256,8 +256,10 @@
 #'
 #' @noRd
 .validate_numeric_matrix <- function(x, arg, nrow = NULL, ncol = NULL) {
-  if (!is.matrix(x) || !is.numeric(x)) {
-    cli::cli_abort("{.arg {arg}} must be a numeric matrix.")
+  if (!is.matrix(x) && !is.array(x)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be a numeric matrix or array, not {.obj_type_friendly {x}}."
+    )
   }
   if (!is.null(nrow) && nrow(x) != nrow) {
     cli::cli_abort(

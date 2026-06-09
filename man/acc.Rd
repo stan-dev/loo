@@ -13,18 +13,15 @@ acc(y, mupred, log_weights = NULL, pointwise = NULL, revert_sign = FALSE)
 outcomes use a draws x observations matrix. For multiclass outcomes use a
 draws x observations x categories array.}
 
-\item{log_weights}{Optional numeric matrix of unnormalized log-weights
-with dimensions draws x observations.}
+\item{log_weights}{Optional numeric matrix of unnormalized log-importance
+weights with dimensions \eqn{S \times n}. Weights are column-normalized
+before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise accuracy
 contributions. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
 
 \item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by -1 before returning.}
-}
-\value{
-A named list with elements \code{estimate} (mean accuracy), \code{se}
-(standard error), and \code{pointwise} (pointwise accuracy).
+values by \eqn{-1} before returning.}
 }
 \description{
 Computes pointwise and average classification accuracy for binary or

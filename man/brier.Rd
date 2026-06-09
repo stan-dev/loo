@@ -12,18 +12,15 @@ brier(y, ypred, log_weights = NULL, pointwise = NULL, revert_sign = FALSE)
 \item{ypred}{A numeric matrix of posterior predictive probabilities with
 dimensions draws x observations.}
 
-\item{log_weights}{Optional numeric matrix of unnormalized log-weights
-with dimensions draws x observations.}
+\item{log_weights}{Optional numeric matrix of unnormalized log-importance
+weights with dimensions \eqn{S \times n}. Weights are column-normalized
+before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise Brier
 scores. If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
 
 \item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by -1 before returning.}
-}
-\value{
-A named list with elements \code{estimate} (mean Brier score), \code{se}
-(standard error), and \code{pointwise} (pointwise brier score).
+values by \eqn{-1} before returning.}
 }
 \description{
 Computes the Brier score for binary outcomes as squared error between the

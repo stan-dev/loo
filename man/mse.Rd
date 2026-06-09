@@ -12,18 +12,15 @@ mse(y, mupred, log_weights = NULL, pointwise = NULL, revert_sign = FALSE)
 \item{mupred}{A numeric matrix of posterior expected predictions with
 dimensions draws x observations. A length-\code{n} vector is also accepted.}
 
-\item{log_weights}{Optional numeric matrix of unnormalized log-weights
-with dimensions draws x observations.}
+\item{log_weights}{Optional numeric matrix of unnormalized log-importance
+weights with dimensions \eqn{S \times n}. Weights are column-normalized
+before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise absolute
 errors. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
 
 \item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by -1 before returning.}
-}
-\value{
-A named list with elements \code{estimate} (mean squared error), \code{se}
-(standard error), and \code{pointwise} (pointwise squared errors).
+values by \eqn{-1} before returning.}
 }
 \description{
 Computes MSE between observed outcomes and posterior predictive point
