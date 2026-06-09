@@ -77,7 +77,8 @@ pred_measure_engine <- function(
   control = list()
 ) {
   # input validation ---------------------------------------------------
-  checkmate::assert_list(control, types = "list", names = "named")
+  .validate_control(control)
+  
   measures <- .prepare_measures(measure, predperf, supported_measures_list)
   
   if (source == "loo") {
@@ -142,7 +143,8 @@ pred_measure_engine <- function(
       ylp = ylp,
       measure_entry = entry,
       log_weights = log_weights,
-      control = control
+      control = control,
+      base_measure = base_measure
     )
     estimates <- .merge_matrix(
       source = source,
@@ -303,7 +305,8 @@ pred_measure_engine <- function(
     ylp,
     measure_entry,
     log_weights,
-    control = list()
+    control = list(),
+    base_measure
 ) {
   if (measure_entry$type == "builtin") {
     measure_fun <- .measure_spec[[measure_entry$key]]
@@ -312,6 +315,15 @@ pred_measure_engine <- function(
     }
   } else {
     measure_fun <- measure_entry$key
+  }
+  
+  if (identical(measure_fun, mlpd) || identical(measure_fun, ic)) {
+    elpd_i <- base_measure$pointwise[, 1]
+    # ensure elpd_i is in correct orientation (negative log predictive density)
+    if (any(elpd_i > 0)) elpd_i <- -elpd_i
+
+    if (identical(measure_fun, mlpd)) return(mlpd(ylp = NULL, pointwise = elpd_i))
+    return(ic(ylp = NULL, pointwise = -2 * elpd_i))
   }
 
   measure_control <- control[[measure_entry$name]]
@@ -341,8 +353,9 @@ pred_measure_engine <- function(
 #' Compute base density summaries for a predictive measure object
 #'
 #' @description
-#' Forms the default block of log-density summaries (`elpd`, `ic`, and for LOO
-#' `p_loo`) that underlie every [pred_measure()] result. Additional measures
+#' Forms the default block of log-density summaries (`elpd` and for loo and kfold
+#' the effective number of parameters `p_loo`\`p_kfold`) that underlie every 
+#' [pred_measure()] result. Additional measures
 #' requested via `measure` are merged into the returned matrices later.
 #'
 #' When `predperf` is provided (incremental update), returns `predperf` unchanged.
@@ -356,11 +369,9 @@ pred_measure_engine <- function(
 #'   \item `test`: `ylp_test` on holdout observations.
 #' }
 #'
-#' `ic` is always \eqn{-2 \times} ELPD on the same scale as LOOIC. For
-#' `source = "loo"`, `p_loo` (effective number of parameters) is also included,
-#' computed by \code{.compute_effective_param()} as the difference between
-#' in-sample and LOO log predictive density; see `p_loo` in [loo::loo()] and the
-#' [CV-FAQ on p_loo](https://users.aalto.fi/~ave/CV-FAQ.html#p_loo).
+#' Effective number of parameters is computed by \code{.compute_effective_param()} 
+#' as the difference between in-sample and LOO log predictive density; see 
+#' `p_loo` in [loo::loo()] and the [CV-FAQ on p_loo](https://users.aalto.fi/~ave/CV-FAQ.html#p_loo).
 #'
 #' @param ylp Matrix of pointwise log predictive densities for training data
 #'   (`S` × `n`).
@@ -378,9 +389,9 @@ pred_measure_engine <- function(
 #'
 #' @return A named list with:
 #' \describe{
-#'   \item{`estimates`}{Matrix with rows `elpd`, optionally `p_loo` (LOO only),
-#'     and `ic`, plus a source suffix when applicable (`_loo`, `_kfold`,
-#'     `_test`).}
+#'   \item{`estimates`}{Matrix with rows `elpd` and optionally `p` (number of 
+#'   effective parameters, for LOO and kfold), plus a source suffix when 
+#'   applicable (`_loo`, `_kfold`, `_test`).}
 #'   \item{`pointwise`}{Matrix of observation-level contributions.}
 #'   \item{`diagnostics`}{From `psis_object$diagnostics` when LOO weights are
 #'     used; otherwise `NULL` or taken from the input `loo`/`kfold` object.}
@@ -389,33 +400,42 @@ pred_measure_engine <- function(
 #' @noRd
 .compute_base_measure <- function(
   ylp,
-  ylp_test = ylp_test,
+  ylp_test,
   loo,
   kfold,
   predperf,
   psis_object,
   source
 ) {
-  if (!is.null(predperf)) {
-    return(predperf)
-  }
+  if (!is.null(predperf)) return(predperf)
+  
   if (source == "kfold") {
-    if ("diagnostics" %in% names(kfold)) {
-      return(kfold[c("estimates", "pointwise", "diagnostics")])
+    components <- if ("diagnostics" %in% kfold1) {
+      c("estimates", "pointwise", "diagnostics")
     } else {
-      return(kfold[c("estimates", "pointwise")])
+      c("estimates", "pointwise")
     }
-  }
-  if (source == "loo" && !is.null(loo)) {
-    return(loo[c("estimates", "pointwise", "diagnostics")])
+    return(subset_measures(
+      kfold, 
+      measures = c("elpd_kfold", "p_kfold"),
+      components = components
+    ))
   }
   
-  elpd_res <- switch(
-    source,
+  if (source == "loo" && !is.null(loo)) {
+    return(subset_measures(
+      loo, 
+      measures = c("elpd_loo", "p_loo"),
+      components = c("estimates", "pointwise", "diagnostics")
+    ))
+  }
+  
+  elpd_res <- switch(source,
     insample = elpd(ylp = ylp),
     loo = elpd(ylp = ylp, log_weights = psis_object$log_weights),
     test = elpd(ylp_test)
   )
+  
   if (!is.null(elpd_res$estimates)) {
     elpd_res <- list(
       estimate = unname(elpd_res$estimates["Estimate"]),
@@ -423,37 +443,26 @@ pred_measure_engine <- function(
       pointwise = elpd_res$pointwise
     )
   }
+  
   suffix <- if (source == "insample") "" else paste0("_", source)
   add_p_eff <- source == "loo"
-  est_mat <- rbind(
-    elpd = c(elpd_res$estimate, elpd_res$se),
-    ic = c(-2 * elpd_res$estimate, 2 * elpd_res$se)
-  )
-  pw_mat <- cbind(
-    elpd = elpd_res$pointwise,
-    ic = -2 * elpd_res$pointwise
-  )
+  
+  estimates <- rbind(elpd = c(elpd_res$estimate, elpd_res$se))
+  pointwise <- cbind(elpd = elpd_res$pointwise)
+  
   if (add_p_eff) {
-    p_eff_res <- .compute_effective_param(ylp, elpd_res$pointwise)
-    est_mat <- rbind(
-      est_mat["elpd", , drop = FALSE],
-      p_eff = c(p_eff_res$estimate, p_eff_res$se),
-      est_mat["ic", , drop = FALSE]
-    )
-    pw_mat <- cbind(
-      elpd = pw_mat[, "elpd"],
-      p_eff = p_eff_res$pointwise,
-      ic = pw_mat[, "ic"]
-    )
+    p_eff <- .compute_effective_param(ylp, elpd_res$pointwise)
+    estimates <- rbind(estimates, p_eff = c(p_eff$estimate, p_eff$se))
+    pointwise <- cbind(pointwise, p_eff = p_eff$pointwise)
   }
   
-  rownames(est_mat) <- paste0(rownames(est_mat), suffix)
-  colnames(est_mat) <- c("Estimate", "SE")
-  colnames(pw_mat) <- paste0(colnames(pw_mat), suffix)
+  rownames(estimates) <- paste0(rownames(estimates), suffix)
+  colnames(estimates) <- c("Estimate", "SE")
+  colnames(pointwise) <- paste0(colnames(pointwise), suffix)
   
   list(
-    estimates = est_mat, 
-    pointwise = pw_mat,
+    estimates = estimates, 
+    pointwise = pointwise,
     diagnostics = psis_object$diagnostics
   )
 }

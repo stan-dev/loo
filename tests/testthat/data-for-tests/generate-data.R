@@ -2,6 +2,9 @@
 # used in the testthat tests for pred_measure* files and for
 # vignettes in articles-online-only
 library(rstanarm)
+library(brms)
+library(dplyr)
+
 SEED <- 42
 
 postprocess_res <- function(model, fit, chains = 2, draws = 200) {
@@ -106,11 +109,11 @@ get_roaches_res <- function() {
 
 get_sleep_test_train_res <- function() {
   # specifically for testing test_pred_measure
-  data("sleepstudy")
-  conditions <- make_conditions(sleepstudy, "Subject", incl_vars = FALSE)
+  data("sleepstudy", package = "lme4")
+  conditions <- brms::make_conditions(sleepstudy, "Subject", incl_vars = FALSE)
   sleepstudy <- sleepstudy |>
-    filter(Days >= 2) |>
-    mutate(
+    dplyr::filter(Days >= 2) |>
+    dplyr::mutate(
       Days = Days - 2,
       y = Reaction
     )
@@ -121,9 +124,9 @@ get_sleep_test_train_res <- function() {
   test_data <- sleepstudy |>
     dplyr::filter(Subject %in% test_subjects)
 
-  prior_lin_base <- prior(normal(200, 100), class = b, coef = "Intercept") +
-    prior(normal(0, 20), class = b, coef = "Days") +
-    prior(exponential(0.02), class = sigma)
+  prior_lin_base <- brms::prior(normal(200, 100), class = b, coef = "Intercept") +
+    brms::prior(normal(0, 20), class = b, coef = "Days") +
+    brms::prior(exponential(0.02), class = sigma)
 
   fit_sleep_train <- brm(
     y ~ 0 + Intercept + Days, 
@@ -148,17 +151,17 @@ get_sleep_test_train_res <- function() {
 }
 
 get_sleep_res <- function() {
-  data("sleepstudy")
-  conditions <- make_conditions(sleepstudy, "Subject", incl_vars = FALSE)
+  data("sleepstudy", package = "lme4")
+  conditions <- brms::make_conditions(sleepstudy, "Subject", incl_vars = FALSE)
   sleepstudy <- sleepstudy |>
     dplyr::filter(Days >= 2) |>
     dplyr::mutate(Days = Days - 2, y = Reaction)
 
-  prior_lin_base <- prior(normal(200, 100), class = b, coef = "Intercept") +
-    prior(normal(0, 20), class = b, coef = "Days") +
-    prior(exponential(0.02), class = sigma)
+  prior_lin_base <- brms::prior(normal(200, 100), class = b, coef = "Intercept") +
+    brms::prior(normal(0, 20), class = b, coef = "Days") +
+    brms::prior(exponential(0.02), class = sigma)
 
-  fit_sleepstudy <- brm(
+  fit_sleepstudy <- brms::brm(
     y ~ 0 + Intercept + Days, 
     data = sleepstudy,
     family = gaussian(),

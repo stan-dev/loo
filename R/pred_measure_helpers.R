@@ -418,3 +418,91 @@
     check.margin = FALSE
   )
 }
+
+
+#' Validate control argument
+#' 
+#' @description
+#' Validates that the arguments passed to the control list are valid 
+#' arguments for the corresponding function. If not, a warning is issued that 
+#' corresponding invalid argument is ignored.
+#' 
+#' @param control Named list of per-measure settings.
+#' 
+.validate_control <- function(control) {
+  res <- checkmate::check_list(control, types = "list", names = "named")
+  if (!isTRUE(res)) {
+    cli::cli_abort(c(
+      "{.arg control} must be a named list of named lists.",
+      "i" = "Expected format: {.code list(fun_name = list(arg1 = val1, arg2 = val2))}"
+    ))
+  }
+  
+  for (func_name in names(control)) {
+    invalid_args <- names(control[[func_name]])[
+      !names(control[[func_name]]) %in% names(formals(match.fun(func_name)))
+    ]
+    if (length(invalid_args) > 0) {
+      cli::cli_warn(
+        "Ignoring {.arg {invalid_args}} as it is not a valid argument of {.fn {func_name}}."
+      )
+    }
+  }
+}
+
+#' Subset measure results
+#' 
+#' @description
+#' Subsets the measure results to the specified measures and components.
+#' 
+#' @param x Measure results object.
+#' @param measures Character vector of measures to subset.
+#' @param components Character vector of components to subset.
+#' 
+#' @return Subsetted measure results object.
+#' 
+#' @noRd
+subset_measures <- function(x, measures, components) {
+  invalid_components <- setdiff(components, names(x))
+  if (length(invalid_components) > 0) {
+    cli::cli_abort(c(
+      "{.arg components} contains invalid value{?s}: {.val {invalid_components}}.",
+      "i" = "Valid components: {.val {names(x)}}."
+    ))
+  }
+  components <- intersect(components, names(x))
+  
+  available_measures <- if ("estimates" %in% components) {
+    rownames(x$estimates)
+  } else if ("pointwise" %in% components) {
+    colnames(x$pointwise)
+  }
+
+  if (!is.null(available_measures)) {
+    invalid_measures <- setdiff(measures, available_measures)
+    if (length(invalid_measures) > 0) {
+      cli::cli_abort(c(
+        "{.arg measures} contains invalid value{?s}: {.val {invalid_measures}}.",
+        "i" = "Valid measures: {.val {available_measures}}."
+      ))
+    }
+  }
+  
+  result <- x[components]
+
+  if ("estimates" %in% components) {
+    rows <- intersect(measures, rownames(result$estimates))
+    result$estimates <- result$estimates[rows, , drop = FALSE]
+  }
+
+  if ("pointwise" %in% components) {
+    cols <- intersect(measures, colnames(result$pointwise))
+    result$pointwise <- result$pointwise[, cols, drop = FALSE]
+  }
+
+  if ("diagnostics" %in% components) {
+    result$diagnostics <- result$diagnostics
+  }
+
+  result
+}

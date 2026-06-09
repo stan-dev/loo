@@ -29,13 +29,13 @@ test_that(".compute_measure() with r2 works as expected", {
   expect_equal(names(measure_res), c("estimates", "pointwise"))
 })
 
-test_that(".compute_measure() with crps works as expected", {
+test_that(".compute_measure() with rps works as expected", {
   measure_res <- .compute_measure(
     y = y,
     ypred = ypred,
     mupred = NULL,
     ylp = ylp,
-    measure_entry = .builtin_entry("crps"),
+    measure_entry = .builtin_entry("rps"),
     log_weights = NULL
   )
 
@@ -113,9 +113,9 @@ test_that(".compute_base_measure() computes elpd as expected", {
 
   expect_equal(names(base_measure), c("estimates", "pointwise", "diagnostics"))
   expect_null(base_measure$diagnostics)
-  expect_equal(rownames(base_measure$estimates), c("elpd", "ic"))
+  expect_equal(rownames(base_measure$estimates), "elpd")
   expect_equal(colnames(base_measure$estimates), c("Estimate", "SE"))
-  expect_equal(dimnames(base_measure$pointwise)[[2]], c("elpd", "ic"))
+  expect_equal(dimnames(base_measure$pointwise)[[2]], "elpd")
 })
 
 test_that(".compute_base_measure() computes elpd_loo as expected", {
@@ -131,11 +131,11 @@ test_that(".compute_base_measure() computes elpd_loo as expected", {
 
   expect_equal(
     rownames(base_measure$estimates),
-    c("elpd_loo", "p_eff_loo", "ic_loo")
+    c("elpd_loo", "p_eff_loo")
   )
   expect_equal(
     dimnames(base_measure$pointwise)[[2]],
-    c("elpd_loo", "p_eff_loo", "ic_loo")
+    c("elpd_loo", "p_eff_loo")
   )
 })
 
@@ -152,11 +152,11 @@ test_that(".compute_base_measure() computes elpd_kfold as expected", {
 
   expect_equal(
     rownames(base_measure$estimates),
-    c("elpd_kfold", "p_kfold", "kfoldic")
+    c("elpd_kfold", "p_kfold")
   )
   expect_equal(
     dimnames(base_measure$pointwise)[[2]],
-    c("elpd_kfold", "p_kfold", "kfoldic")
+    c("elpd_kfold", "p_kfold")
   )
 })
 
@@ -260,9 +260,9 @@ test_that("pred_measure() updates loo results as expected", {
 
   expect_equal(
     rownames(updated_predperf$estimates),
-    c("elpd_loo", "p_loo", "looic", "r2_loo", "mse_loo", "mae_loo")
+    c("elpd_loo", "p_loo", "r2_loo", "mse_loo", "mae_loo")
   )
-  expect_equal(dim(updated_predperf$estimates), c(6, 2))
+  expect_equal(dim(updated_predperf$estimates), c(5, 2))
 })
 
 test_that("pred_measure() provides warning for duplicate measure", {
@@ -308,9 +308,26 @@ test_that("loo_pred_measure() computes expected measures", {
 
   expect_equal(
     rownames(predperf1$estimates),
-    c("elpd_loo", "p_loo", "looic", "r2_loo", "mse_loo")
+    c("elpd_loo", "p_loo", "r2_loo", "mse_loo")
   )
-  expect_equal(dim(predperf1$estimates), c(5, 2))
+  expect_equal(dim(predperf1$estimates), c(4, 2))
+})
+
+test_that("pred_measure_engine() warns if control args are invalid", {
+  expect_warning(
+    kfold_pred_measure(
+      y = y,
+      ypred = ypred,
+      mupred = mupred,
+      ylp = ylp,
+      measure = c("rps", "srps"),
+      kfold = kfold1,
+      control = list(
+        rps = list(size = 10)
+      )
+    ),
+    regexp = "Ignoring `size` as it is not a valid argument"
+  )
 })
 
 test_that("kfold_pred_measure() works with rps as expected", {
@@ -319,17 +336,13 @@ test_that("kfold_pred_measure() works with rps as expected", {
     ypred = ypred,
     mupred = mupred,
     ylp = ylp,
-    measure = c("rps", "srps"),
-    kfold = kfold1,
-    control = list(
-      rps = list(size = max(ypred)),
-      srps = list(size = max(ypred))
-    )
+    measure = c("mlpd", "ic" ,"rps", "srps"),
+    kfold = kfold1
   )
 
   expect_equal(
     rownames(res$estimates),
-    c("elpd_kfold", "p_kfold", "kfoldic", "rps_kfold", "srps_kfold")
+    c("elpd_kfold", "p_kfold", "mlpd_kfold", "ic_kfold", "rps_kfold", "srps_kfold")
   )
 })
 

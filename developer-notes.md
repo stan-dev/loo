@@ -66,23 +66,23 @@ Without having the scaled version as explicit form, we would have to create a cu
 
 ### Refactoring
 
-- [ ] Remove the "old" `crps` implementation that requires two independent
+- [x] Remove the "old" `crps` implementation that requires two independent
   `ypred` inputs; retain only the new ECDF-based implementation.
 - [ ] Align the currently two existing `elpd` implementations 
 (old and new implementation).
-- [ ] Move `ic` out of "base measures"; it should not be included
+- [x] Move `ic` out of "base measures"; it should not be included
   automatically but must be explicitly requested by the user.
 - [ ] Provide an interface to `loo_compare` and verify consistency with it.
 - [ ] Resolve handling of `r_eff` *(see Decision D3 above)*.
 
 ### Implementation of Scores & Metrics
 
-- [ ] Consolidate `crps`, `rps`, `scrps`, and `srps` into a unified `rps`
+- [x] Consolidate `crps`, `rps`, `scrps`, and `srps` into a unified `rps`
   function usable for continuous and ordered categorical inputs (including
   scaled variants).
-  - [ ] Use the implementation shared by Aki with Flo.
-  - [ ] Verify consistency with Seth's derivations.
-  - [ ] Resolve the `srps` question *(see Decision D2 above)*.
+  - [x] Use the implementation shared by Aki with Flo.
+  - [x] Verify consistency with Seth's derivations.
+  - [x] Resolve the `srps` question *(see Decision D2 above)*.
 - [ ] Address the `kfold_pred_measure()` limitation with families that return
   3D objects (e.g., categorical models produce an `S × N × K` array from
   `brms::kfold_predict()`):
@@ -114,6 +114,10 @@ Without having the scaled version as explicit form, we would have to create a cu
   > grouping scenarios must be fully understood before any implementation
   > begins.
 
+## General questions
+
++ the function name `ic` for the information criteria is very short and ambiguous;
+shall we change to `information_criteria` as a more descriptive name?
 
 
 ## References & Resources

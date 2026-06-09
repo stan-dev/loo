@@ -162,6 +162,64 @@ mlpd <- function(
   .measure_output(res, revert_sign)
 }
 
+#' Information Criteria (`ic`)
+#'
+#' Computes the information criteria as -2 x log predictive density (lppd_i) 
+#' values. Inputs follow the same conventions as [elpd()] and [mlpd()].
+#'
+#' @param ylp A numeric matrix of log predictive densities/probabilities with
+#'   dimensions draws x observations.
+#' @param log_weights Optional numeric matrix of unnormalized log-weights
+#'   with dimensions draws x observations.
+#' @param pointwise Optional numeric vector of precomputed pointwise
+#'   contributions. If provided, `ylp` and `log_weights` are ignored.
+#' @param revert_sign Logical; if `TRUE`, multiply the estimate and pointwise
+#'   values by -1 before returning.
+#'
+#' @returns A named list with elements `estimate` (mean over ic_i), `se`
+#'   (standard error), and `pointwise` (ic_i).
+#'
+#' @examples
+#' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
+#' ic(ylp)
+#' @export
+ic <- function(
+  ylp, log_weights = NULL, pointwise = NULL, revert_sign = FALSE
+) {
+  if (!is.null(pointwise)) {
+    .validate_numeric_vector(pointwise, arg = "pointwise")
+    .inform_ignored_inputs(
+      pointwise,
+      ignored_args = list(ylp = ylp, log_weights = log_weights),
+      fun_name = "ic"
+    )
+    ic_i <- pointwise
+  } else {
+    .validate_numeric_matrix(ylp, arg = "ylp")
+    if (!is.null(log_weights)) {
+      log_weights <- .normalize_and_validate_log_weights(
+        log_weights = log_weights,
+        n_draws = nrow(ylp),
+        n_obs = ncol(ylp)
+      )
+    }
+    lppd_i <- ptw_log_pred_density(ylp, log_weights)
+    ic_i <- -2 * lppd_i
+  }
+  
+  n_obs <- length(ic_i)
+  if (n_obs == 1L) {
+    cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
+  }
+  
+  res <- list(
+    estimate = sum(ic_i),
+    se = if (n_obs == 1L) 0 else 2 * sqrt(n_obs * var(ic_i / (-2))),
+    pointwise = ic_i
+  )
+  .measure_output(res, revert_sign)
+}
+
 #' Classification accuracy (`acc`)
 #'
 #' Computes pointwise and average classification accuracy for binary or
@@ -795,7 +853,8 @@ srps <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
   acc = acc,
   bacc = bacc,
   rps = rps,
-  srps = srps
+  srps = srps,
+  ic = ic
 )
 
 #' Supported predictive measure names
