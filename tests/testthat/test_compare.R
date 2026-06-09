@@ -109,6 +109,13 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot_value(comp2, style = "serialize")
   expect_snapshot(print(comp2))
   expect_snapshot(print(comp2, p_worse = FALSE))
+  out_full <- paste(
+    capture.output(suppressMessages(print(comp2, simplify = FALSE))),
+    collapse = "\n"
+  )
+  expect_match(out_full, "elpd_waic\\s+se_elpd_waic")
+  expect_match(out_full, "p_waic\\s+se_p_waic\\s+waic\\s+se_waic")
+  expect_message(print(comp2, simplify = FALSE), "Diagnostic flags present.", fixed = TRUE)
 
   # specifying objects via ... and via arg x gives equal results
   expect_equal(comp2, loo_compare(x = list(w1, w2)))

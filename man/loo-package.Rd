@@ -124,9 +124,9 @@ Authors:
 \itemize{
   \item Jonah Gabry \email{jgabry@gmail.com}
   \item Aki Vehtari \email{Aki.Vehtari@aalto.fi}
-  \item M<U+00E5>ns Magnusson
+  \item Måns Magnusson
   \item Yuling Yao
-  \item Paul-Christian B<U+00FC>rkner
+  \item Paul-Christian Bürkner
   \item Topi Paananen
   \item Andrew Gelman
 }

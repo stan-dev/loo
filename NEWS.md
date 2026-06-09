@@ -11,6 +11,8 @@
 * `loo_compare()` output now includes additional columns: `p_worse`,
   `diag_diff`, and `diag_elpd`, providing richer diagnostics for model
   comparison by @florence-bockting in #300
+* `print.compare.loo()` regains a `simplify = FALSE` mode for showing the full
+  comparison table, including the available estimate and standard-error columns
 
 # loo 2.9.0
 
