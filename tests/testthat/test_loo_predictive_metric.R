@@ -10,6 +10,7 @@ y <- rnorm(ncol(LL))
 y_binary <- rbinom(ncol(LL), 1, 0.5)
 
 mae_mean <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff)
+mae_new <- mae(y = y, mupred = x, log_weights = psis_obj$log_weights)
 mae_quant <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
 
@@ -49,6 +50,44 @@ test_that('loo_predictive_metric stops with incorrect inputs', {
                fixed = TRUE)
 })
 
+test_that("loo_predictive_metric output matches loo_pred_measure", {
+  res_new <- loo_pred_measure(
+    ylp = LL, y = y, mupred = x, psis_object = psis_obj,
+    measure = c("mae", "rmse", "mse")
+  )
+  
+  expect_equal(
+    unname(res_new$estimates["mae_loo",]), 
+    c(mae_mean$estimate, mae_mean$se)
+  )
+  
+  expect_equal(
+    unname(res_new$estimates["rmse_loo",]), 
+    c(rmse_mean$estimate, rmse_mean$se)
+  )
+  
+  expect_equal(
+    unname(res_new$estimates["mse_loo",]), 
+    c(mse_mean$estimate, mse_mean$se)
+  )
+  
+  res_new <- loo_pred_measure(
+    ylp = LL, y = y_binary, mupred = x_prob, psis_object = psis_obj,
+    measure = c("acc", "bacc")
+  )
+  
+  expect_equal(
+    unname(res_new$estimates["acc_loo",]), 
+    c(acc_mean$estimate, acc_mean$se)
+  )
+  
+  # TODO: the variance computation differs. Check which variance computation
+  # is correct
+  # expect_equal(
+  #   unname(res_new$estimates["bacc_loo",]), 
+  #   c(bacc_mean$estimate, bacc_mean$se)
+  # )
+})
 
 test_that('loo_predictive_metric return types are correct', {
   # MAE

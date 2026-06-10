@@ -438,8 +438,8 @@ pred_measure_engine <- function(
   
   if (!is.null(elpd_res$estimates)) {
     elpd_res <- list(
-      estimate = unname(elpd_res$estimates["Estimate"]),
-      se = unname(elpd_res$estimates["SE"]),
+      estimate = unname(elpd_res$estimates[1]),
+      se = unname(elpd_res$estimates[2]),
       pointwise = elpd_res$pointwise
     )
   }
@@ -490,7 +490,7 @@ pred_measure_engine <- function(
 #' @noRd
 .compute_effective_param <- function(ylp, elpd_cv_i) {
   lpd_i <- matrixStats::colLogSumExps(ylp) - log(nrow(ylp))
-  p_eff_i <- lpd_i - elpd_cv_i
+  p_eff_i <- lpd_i - elpd_cv_i[ ,"elpd"]
   
   list(
       estimate = sum(p_eff_i),

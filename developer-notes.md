@@ -125,6 +125,9 @@ shall we change to `information_criteria` as a more descriptive name?
 information? 
 + What is the criteria whether something is of class loo? For example, elpd.generic
 is of class loo, why?
++ Do we always want to include "elpd" as output. Might there not be the situation
+where someone wants to use `loo_pred_measure()` to compute measures without 
+interest in elpd?
 
 ## References & Resources
 

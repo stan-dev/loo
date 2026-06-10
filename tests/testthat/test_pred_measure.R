@@ -40,7 +40,7 @@ test_that(".compute_measure() with rps works as expected", {
   )
 
   expect_equal(names(measure_res), c("estimates", "pointwise"))
-  expect_equal(names(measure_res$estimates), c("Estimate", "SE"))
+  expect_equal(colnames(measure_res$estimates), c("Estimate", "SE"))
 })
 
 test_that(".compute_measure() with elpd works as expected", {

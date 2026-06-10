@@ -349,18 +349,23 @@ acc <- function(
     
     if (length(dim(mupred)) == 3) {
       # Multiclass: (draws × obs × categories) > argmax over categories
-      ypred <- apply(mupred, c(1, 2), which.max)
+      weighted_mupred <- apply(
+        sweep(mupred, 1, weights, `*`),
+        c(2, 3),
+        sum
+      )
+      mupred_hat <- apply(weighted_mupred, 1, which.max)
     } else {
-      .validate_numeric_matrix(mupred, arg = "mupred")
-      # Binary: (draws × obs) > threshold at 0.5
-      ypred <- (mupred > 0.5) * 1L
+      weighted_mupred <- colSums(mupred * weights)
+      mupred_hat <- (weighted_mupred > 0.5) * 1L
     }
-    acc_i <- colSums(sweep(ypred, 2, y, `==`) * weights)
+    
+    acc_i <- (mupred_hat == y) * 1L
   }
   
   res <- list(
     estimate = mean(acc_i),
-    se = sqrt(var(acc_i) / length(acc_i)),
+    se = sqrt(mean(acc_i) * (1 - mean(acc_i)) / n_obs),
     pointwise = acc_i
   )
   .create_measure_structure(
@@ -420,13 +425,18 @@ bacc <- function(
     }
     if (length(dim(mupred)) == 3) {
       # Multiclass: (draws × obs × categories) > argmax over categories
-      ypred <- apply(mupred, c(1, 2), which.max)
+      weighted_mupred <- apply(
+        sweep(mupred, 1, weights, `*`),
+        c(2, 3),
+        sum
+      )
+      mupred_hat <- apply(weighted_mupred, 1, which.max)
     } else {
       .validate_numeric_matrix(mupred, arg = "mupred")
-      # Binary: (draws × obs) > threshold at 0.5
-      ypred <- (mupred > 0.5) * 1L
+      weighted_mupred <- colSums(mupred * weights)
+      mupred_hat <- (weighted_mupred > 0.5) * 1L
     }
-    acc_i <- colSums(sweep(ypred, 2, y, `==`) * weights)
+    acc_i <- (mupred_hat == y) * 1L
   }
   
   acc_c <- vapply(classes, function(c) mean(acc_i[y == c]), numeric(1))
@@ -435,7 +445,7 @@ bacc <- function(
   
   res <- list(
     estimate = mean(acc_c),
-    se = sqrt(var(bacc_i) / length(bacc_i)),
+    se = sqrt(sum(acc_c * (1 - acc_c) / n_c)) / K,
     pointwise = acc_i
   )
   .create_measure_structure(
@@ -700,7 +710,7 @@ r2 <- function(
     log_weights = log_weights,
     pointwise = pointwise
   )
-  mse_hat <- mse_res$estimate
+  mse_hat <- mse_res$estimate[1]
   sqe_i <- mse_res$pointwise
   n_obs <- length(sqe_i)
   n_draws <- if (is.null(pointwise)) nrow(mupred) else NULL
@@ -708,7 +718,7 @@ r2 <- function(
   mse_y_i <- (y - mean(y))^2
   mse_y_hat <- mean(mse_y_i)
    
-  var_mse_hat <- mse_res$se^2     
+  var_mse_hat <- mse_res$estimate[2]^2     
   cov_mse_msey <- stats::cov(sqe_i, mse_y_i) / n_obs              
   var_mse_y_hat <- var(mse_y_i) / n_obs 
   

@@ -1,9 +1,10 @@
 # load test data --------------------------------------
-res_roaches <- readRDS("tests/testthat/data-for-tests/res_roaches.Rds")
-res_sleep <- readRDS("data-for-tests/res_sleep.Rds")
-res_binom <- readRDS("data-for-tests/res_binomial.Rds")
-res_binary <- readRDS("data-for-tests/res_binary.Rds")
-res_cat <- readRDS("data-for-tests/res_penguins.Rds")
+path <- ""#"tests/testthat/"
+res_roaches <- readRDS(paste0(path, "data-for-tests/res_roaches.Rds"))
+res_sleep <- readRDS(paste0(path, "data-for-tests/res_sleep.Rds"))
+res_binom <- readRDS(paste0(path, "data-for-tests/res_binomial.Rds"))
+res_binary <- readRDS(paste0(path, "data-for-tests/res_binary.Rds"))
+res_cat <- readRDS(paste0(path, "data-for-tests/res_penguins.Rds"))
 
 # ptw_log_pred_density ------------------------
 testthat::test_that("ptw_log_pred_density() works as expected", {
@@ -91,15 +92,15 @@ testthat::test_that("mlpd() works as expected", {
   expect_equal(length(res$estimates[1]), 1)
   expect_equal(length(res$estimates[2]), 1)
   expect_equal(length(res$pointwise), n_obs)
-  expect_equal(res$estimates, res_elpd$estimates / n_obs)
-  expect_equal(res$pointwise, res_elpd$pointwise)
+  expect_equal(unname(res$estimates), unname(res_elpd$estimates) / n_obs)
+  expect_equal(unname(res$pointwise), unname(res_elpd$pointwise))
   
   expect_snapshot_output(mlpd(ylp = res_roaches$ylp, log_weights = NULL))
 })
 
 testthat::test_that("mlpd() with pointwise works as expected", {
   res_elpd <- elpd(ylp = res_roaches$ylp, log_weights = NULL)
-  res <- mlpd(ylp = NULL, pointwise = res_elpd$pointwise)
+  res <- mlpd(ylp = NULL, pointwise = res_elpd$pointwise[ ,"elpd"])
   
   n_obs <- dim(res_roaches$ylp)[2]
 
@@ -107,10 +108,10 @@ testthat::test_that("mlpd() with pointwise works as expected", {
   expect_equal(length(res$estimates[1]), 1)
   expect_equal(length(res$estimates[2]), 1)
   expect_equal(length(res$pointwise), n_obs)
-  expect_equal(res$estimates, res_elpd$estimates / n_obs)
-  expect_equal(res$pointwise, res_elpd$pointwise)
+  expect_equal(unname(res$estimates), unname(res_elpd$estimates) / n_obs)
+  expect_equal(unname(res$pointwise), unname(res_elpd$pointwise))
   
-  expect_snapshot_output(mlpd(ylp = NULL, pointwise = res_elpd$pointwise))
+  expect_snapshot_output(mlpd(ylp = NULL, pointwise = res_elpd$pointwise[ ,"elpd"]))
 })
 
 # rps() -------------------------------------
