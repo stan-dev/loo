@@ -2,19 +2,23 @@
 + changed in DESCRIPTION: version and date
 + update NEWS.md
 
+## Update cran-comments
++ send to @jgabry
+
 ## Running reverse dependency checks
 + flocker 0.1.0 still fails but on GitHub is already an updated release 
 (it is just not yet in Cran)
-
++ clmstan 0.1.1 still fails as expected as we were not able to reach the 
+author
 
 ## Running `devtools::check_win_devel()`
-+ Jonah, did you got a message with the tar file?
++ @jgabry did you got a message with the tar file via e-mail?
 
 ```
 > withr::with_envvar(c("NOT_CRAN" = "true"), devtools::check_win_devel())
 Building windows version of loo (2.10.0)
 ℹ Using R-devel with win-builder.r-project.org.
-Email results to jgabry@gmail.com?
+Email results to <REMOVED>?
 
 1: I forget
 2: Nope
@@ -35,7 +39,7 @@ Selection:
    Warning: invalid gid value replaced by that for user 'nobody'
    
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-ℹ Check <jgabry@gmail.com> for the results in 15-30 mins (~06:59 ).
+ℹ Check <REMOVED> for the results in 15-30 mins (~06:59 ).
 ```
 
 ## Running `devtools::check_mac_release()`
