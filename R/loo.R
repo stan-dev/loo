@@ -487,28 +487,19 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
 #' @param n_samples Deprecated
 #' @return Vector of standard error estimates.
 #'
-mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
-  lik <- exp(ll)
-  w2 <- exp(lw)^2
-  E_epd <- exp(E_elpd)
+mcse_elpd <- function(ll, lw, E_elpd, r_eff) {
   if (length(r_eff) == 1 && !is.null(ncol(ll))) {
     r_eff <- rep(r_eff, ncol(ll))
   }
-  var_elpd <-
-    vapply(
-      seq_len(ncol(w2)),
-      FUN.VALUE = numeric(1),
-      FUN = function(i) {
-        # Variance in linear scale
-        # Equation (6) in Vehtari et al. (2024)
-        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2) / r_eff[i]
-        # Compute variance in log scale by match the variance of a
-        # log-normal approximation
-        # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
-        log(1 + var_epd_i / E_epd[i]^2)
-      }
-    )
-  sqrt(var_elpd)
+
+  # Variance in relative linear scale.
+  # Equivalent to Equation (6) in Vehtari et al. (2024) divided by E_epd[i]^2.
+  z <- expm1(sweep(ll, 2, E_elpd, "-")) * exp(lw)
+
+  # Compute variance in log scale by matching the variance of a
+  # log-normal approximation:
+  # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
+  sqrt(log1p(matrixStats::colSums2(z * z) / r_eff))
 }
 
 
