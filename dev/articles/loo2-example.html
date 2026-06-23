@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-06-07</h4>
+            <h4 data-toc-skip class="date">2026-06-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-example.Rmd" class="external-link"><code>vignettes/loo2-example.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-example.Rmd</code></div>
@@ -431,11 +431,16 @@ See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
 or https://mc-stan.org/loo/reference/loo-glossary.html.</code></pre>
 <p>The difference in ELPD is much larger than several times the
 estimated standard error of the difference again indicating that the
-negative-binomial model is xpected to have better predictive performance
-than the Poisson model. However, according to the LOO-PIT checks there
-is still some misspecification, and a reasonable guess is that a hurdle
-or zero-inflated model would be an improvement (we leave that for
-another case study).</p>
+negative-binomial model is expected to have better predictive
+performance than the Poisson model. However, according to the LOO-PIT
+checks there is still some misspecification, and a reasonable guess is
+that a hurdle or zero-inflated model would be an improvement (we leave
+that for another case study).</p>
+<p>The <code>p_worse</code>, <code>diag_diff</code>, and
+<code>diag_elpd</code> columns are new as of version 2.10. For details
+on interpreting them see ?<code>loo-glossary</code> and the case study
+<a href="https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html" class="external-link">Uncertainty
+in Bayesian LOO-CV Model Comparison</a>.</p>
 <p><br></p>
 </div>
 </div>
