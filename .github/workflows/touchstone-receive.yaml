@@ -4,7 +4,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -17,13 +17,14 @@ jobs:
       config: ${{ steps.read_touchstone_config.outputs.config }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - id: read_touchstone_config
+        shell: bash
         run: |
-          echo "config=$(jq -c . ./touchstone/config.json)" >> $GITHUB_OUTPUT
+          echo "config=$(jq -c . ./touchstone/config.json)" >> "$GITHUB_OUTPUT"
 
   build:
     needs: prepare
@@ -33,12 +34,10 @@ jobs:
       matrix:
         config:
           - ${{ fromJson(needs.prepare.outputs.config) }}
+    env:
+      RSPM: ${{ matrix.config.rspm }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - uses: lorenzwalthert/touchstone/actions/receive@main
         with:
           r-version: ${{ matrix.config.r }}
-          touchstone_ref: '@main'
+          touchstone_ref: "@main"
