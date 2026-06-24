@@ -18,6 +18,7 @@ matching*](https://mc-stan.org/loo/articles/loo2-moment-matching.html).
 Here is the Stan code for fitting a Poisson regression model:
 
 ``` r
+
 # Note: some syntax used in this Stan program requires RStan >= 2.26 (or CmdStanR)
 # To use an older version of RStan change the line declaring `y` to: int y[N];
 stancode <- "
@@ -60,6 +61,7 @@ In addition to **loo**, we load the **rstan** package for fitting the
 model. We will also need the **rstanarm** package for the data.
 
 ``` r
+
 library("rstan")
 library("loo")
 seed <- 9547
@@ -76,6 +78,7 @@ is evaluated on the held-out “test” data.
 The data is divided between train (80% of the data) and test (20%):
 
 ``` r
+
 # Prepare data
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
@@ -111,15 +114,16 @@ Next we fit the model to the “test” data in Stan using the **rstan**
 package:
 
 ``` r
+
 # Compile
 stanmodel <- stan_model(model_code = stancode)
 ```
 
     Trying to compile a simple C file
 
-    Running /opt/R/4.5.2/lib/R/bin/R CMD SHLIB foo.c
-    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.5.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    Running /opt/R/4.6.0/lib/R/bin/R CMD SHLIB foo.c
+    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+    gcc -std=gnu2x -I"/opt/R/4.6.0/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
                      from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
                      from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
@@ -128,9 +132,10 @@ stanmodel <- stan_model(model_code = stancode)
       679 | #include <cmath>
           |          ^~~~~~~
     compilation terminated.
-    make: *** [/opt/R/4.5.2/lib/R/etc/Makeconf:202: foo.o] Error 1
+    make: *** [/opt/R/4.6.0/lib/R/etc/Makeconf:190: foo.o] Error 1
 
 ``` r
+
 # Fit model
 fit <- sampling(stanmodel, data = data_train, seed = seed, refresh = 0)
 ```
@@ -142,6 +147,7 @@ using independent data, the log predictive density coincides with the
 log likelihood of the test data.
 
 ``` r
+
 gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
 log_pd <- extract_log_lik(gen_test)
 ```
@@ -152,8 +158,10 @@ Now we evaluate the predictive performance of the model on the test data
 using [`elpd()`](https://mc-stan.org/loo/reference/elpd.md).
 
 ``` r
+
 (elpd_holdout <- elpd(log_pd))
 ```
+
 
     Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
 
@@ -177,6 +185,7 @@ We use the data that is already pre-processed and we divide it in 10
 random folds using `kfold_split_random`
 
 ``` r
+
 # Prepare data
 roaches$fold <- kfold_split_random(K = 10, N = nrow(roaches))
 ```
@@ -192,6 +201,7 @@ this loop is a matrix of the log pointwise predictive densities of all
 the observations.
 
 ``` r
+
 # Prepare a matrix with the number of post-warmup iterations by number of observations:
 log_pd_kfold <- matrix(nrow = 4000, ncol = nrow(roaches))
 # Loop over the folds
@@ -226,8 +236,10 @@ Now we evaluate the predictive performance of the model on the 10 folds
 using [`elpd()`](https://mc-stan.org/loo/reference/elpd.md).
 
 ``` r
+
 (elpd_kfold <- elpd(log_pd_kfold))
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
 

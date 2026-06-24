@@ -17,6 +17,7 @@ regression model applied to the *Voice* dataset.
 ### Setup: load packages and set seed
 
 ``` r
+
 library("rstan")
 library("loo")
 library("matrixStats")
@@ -31,6 +32,7 @@ horseshoe prior. The code includes an if statement to include a code
 line needed later for the MixIS approach.
 
 ``` r
+
 # Note: some syntax used in this program requires RStan >= 2.26 (or CmdStanR)
 # To use an older version of RStan change the line declaring `y` to:
 #    int<lower=0,upper=1> y[N];
@@ -98,6 +100,7 @@ for details) has \\p=312\\ covariates and \\n=126\\ observations with
 binary response. We construct data list for Stan.
 
 ``` r
+
 data(voice)
 y <- voice$y
 X <- voice[2:length(voice)]
@@ -121,6 +124,7 @@ PSIS-LOO estimators, which require sampling from the posterior
 distribution, and inspect the associated Pareto-\\k\\ diagnostics.
 
 ``` r
+
 chains <- 4
 n_iter <- 2000
 warm_iter <- 1000
@@ -130,13 +134,16 @@ stanmodel <- stan_model(model_code = stancode_horseshoe)
     Trying to compile a simple C file
 
 ``` r
+
 fit_post <- sampling(stanmodel, data = standata, chains = chains, iter = n_iter, warmup = warm_iter, refresh = 0)
 loo_post <-loo(fit_post)
 ```
 
 ``` r
+
 print(loo_post)
 ```
+
 
     Computed from 4000 by 126 log-likelihood matrix.
 
@@ -179,6 +186,7 @@ term in the equation above.
 We sample from the mixture and collect the log-likelihoods term.
 
 ``` r
+
 standata$mixis <- 1
 fit_mix <- sampling(stanmodel, data = standata, chains = chains, iter = n_iter, warmup = warm_iter, refresh = 0, pars = "log_lik")
 log_lik_mix <- extract(fit_mix)$log_lik
@@ -190,6 +198,7 @@ implementation in Appendix A.2 of [Silva and Zanella
 the package “matrixStats”.
 
 ``` r
+
 l_common_mix <- rowLogSumExps(-log_lik_mix)
 log_weights <- -log_lik_mix - l_common_mix
 elpd_mixis <- logSumExp(-l_common_mix) - rowLogSumExps(t(log_weights))
@@ -206,6 +215,7 @@ This is computationally heavy, hence we have saved the results and we
 just load them in the current vignette.
 
 ``` r
+
 data(voice_loo)
 elpd_loo <- voice_loo$elpd_loo
 ```
@@ -214,6 +224,7 @@ We can then compute the root mean squared error (RMSE) of the PSIS and
 mixture estimators relative to such benchmark values.
 
 ``` r
+
 elpd_psis <- loo_post$pointwise[,1]
 print(paste("RMSE(PSIS) =",round( sqrt(mean((elpd_loo-elpd_psis)^2)) ,2)))
 ```
@@ -221,6 +232,7 @@ print(paste("RMSE(PSIS) =",round( sqrt(mean((elpd_loo-elpd_psis)^2)) ,2)))
     [1] "RMSE(PSIS) = 0.08"
 
 ``` r
+
 print(paste("RMSE(MixIS) =",round( sqrt(mean((elpd_loo-elpd_mixis)^2)) ,2)))
 ```
 
@@ -237,6 +249,7 @@ results).
 We then compare the overall ELPD estimates with the brute force one.
 
 ``` r
+
 elpd_psis <- loo_post$pointwise[,1]
 print(paste("ELPD (PSIS)=",round(sum(elpd_psis),2)))
 ```
@@ -244,12 +257,14 @@ print(paste("ELPD (PSIS)=",round(sum(elpd_psis),2)))
     [1] "ELPD (PSIS)= -42.95"
 
 ``` r
+
 print(paste("ELPD (MixIS)=",round(sum(elpd_mixis),2)))
 ```
 
     [1] "ELPD (MixIS)= -45.49"
 
 ``` r
+
 print(paste("ELPD (brute force)=",round(sum(elpd_loo),2)))
 ```
 

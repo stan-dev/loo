@@ -3,9 +3,6 @@
 Compare fitted models based on
 [ELPD](https://mc-stan.org/loo/reference/loo-glossary.md).
 
-By default the print method shows only the most important information.
-Use `print(..., simplify=FALSE)` to print a more detailed summary.
-
 ## Usage
 
 ``` r
@@ -15,10 +12,10 @@ loo_compare(x, ...)
 loo_compare(x, ...)
 
 # S3 method for class 'compare.loo'
-print(x, ..., digits = 1, simplify = TRUE)
+print(x, ..., digits = 1, p_worse = TRUE)
 
 # S3 method for class 'compare.loo_ss'
-print(x, ..., digits = 1, simplify = TRUE)
+print(x, ..., digits = 1)
 ```
 
 ## Arguments
@@ -38,16 +35,16 @@ print(x, ..., digits = 1, simplify = TRUE)
 
   For the print method only, the number of digits to use when printing.
 
-- simplify:
+- p_worse:
 
-  For the print method only, should only the essential columns of the
-  summary matrix be printed? The entire matrix is always returned, but
-  by default only the most important columns are printed.
+  For the print method only, should we include the normal approximation
+  based probability of each model having worse performance than the best
+  model? The default is `TRUE`.
 
 ## Value
 
-A matrix with class `"compare.loo"` that has its own print method. See
-the **Details** section.
+A data frame with class `"compare.loo"` that has its own print method.
+See the **Details** and **Examples** sections.
 
 ## Details
 
@@ -57,16 +54,16 @@ their expected predictive accuracy by the difference in
 `elpd_waic` (or multiplied by \\-2\\, if desired, to be on the deviance
 scale).
 
-When using `loo_compare()`, the returned matrix will have one row per
-model and several columns of estimates. The values in the
+### `elpd_diff` and `se_diff`
+
+When using `loo_compare()`, the returned data frame will have one row
+per model and several columns of estimates. The values of
 [`elpd_diff`](https://mc-stan.org/loo/reference/loo-glossary.md) and
-[`se_diff`](https://mc-stan.org/loo/reference/loo-glossary.md) columns
-of the returned matrix are computed by making pairwise comparisons
-between each model and the model with the largest ELPD (the model in the
-first row). For this reason the `elpd_diff` column will always have the
-value `0` in the first row (i.e., the difference between the preferred
-model and itself) and negative values in subsequent rows for the
-remaining models.
+[`se_diff`](https://mc-stan.org/loo/reference/loo-glossary.md) are
+computed by making pairwise comparisons between each model and the model
+with the largest ELPD (the model listed first). Therefore, the first
+`elpd_diff` value will always be `0` (i.e., the difference between the
+preferred model and itself) and the rest of the values will be negative.
 
 To compute the standard error of the difference in
 [ELPD](https://mc-stan.org/loo/reference/loo-glossary.md) — which should
@@ -80,8 +77,39 @@ better sense of uncertainty than what is obtained using the current
 standard approach of comparing differences of deviances to a Chi-squared
 distribution, a practice derived for Gaussian linear models or
 asymptotically, and which only applies to nested models in any case.
-Sivula et al. (2022) discuss the conditions when the normal
-approximation used for SE and `se_diff` is good.
+
+### `p_worse`, `diag_diff`, and `diag_elpd`
+
+The values in the `p_worse` column show the probability of each model
+having worse ELPD than the best model. These probabilities are computed
+with a normal approximation using the values from `elpd_diff` and
+`se_diff`. Sivula et al. (2025) present the conditions when the normal
+approximation used for SE and `se_diff` is good, and the column
+`diag_diff` contains possible diagnostic messages:
+
+- `N < 100` (small data)
+
+- `|elpd_diff| < 4` (models make similar predictions)
+
+If either of these diagnostic messages is shown, the error distribution
+is skewed or thick tailed and the normal approximation based on
+`elpd_diff` and `se_diff` is not well calibrated. In that case, the
+probabilities `p_worse` are likely to be too large. However, `elpd_diff`
+and `se_diff` will still be indicative of the differences and
+uncertainties (for example, if `|elpd_diff|` is many times larger than
+`se_diff` the difference is quite certain). In addition, if the model is
+not well specificed and there are outliers, the error distribution can
+also be skewed or thick tailed and the normal approximation is not well
+calibrated. Possible model misspecification and outliers can be
+diagnosed with usual predictive checking methods.
+
+The column `diag_elpd` shows the PSIS-LOO Pareto k diagnostic for the
+pointwise ELPD computations for each model. If `K k_psis > 0.7` is
+shown, where `K` is the number of high Pareto k values in the PSIS
+computation, then there may be significant bias in `elpd_diff` favoring
+models with a large number of high Pareto k values.
+
+### Warnings for many model comparisons
 
 If more than \\11\\ models are compared, we internally recompute the
 model differences using the median model by ELPD as the baseline model.
@@ -131,26 +159,26 @@ loo3 <- loo(LL + 2) # should be best model when compared
 
 comp <- loo_compare(loo1, loo2, loo3)
 print(comp, digits = 2)
-#>        elpd_diff se_diff
-#> model3   0.00      0.00 
-#> model2 -32.00      0.00 
-#> model1 -64.00      0.00 
-
-# show more details with simplify=FALSE
-# (will be the same for all models in this artificial example)
-print(comp, simplify = FALSE, digits = 3)
-#>        elpd_diff se_diff elpd_loo se_elpd_loo p_loo   se_p_loo looic   se_looic
-#> model3   0.000     0.000 -19.589    4.284       3.329   1.152   39.178   8.568 
-#> model2 -32.000     0.000 -51.589    4.284       3.329   1.152  103.178   8.568 
-#> model1 -64.000     0.000 -83.589    4.284       3.329   1.152  167.178   8.568 
+#>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+#>  model3      0.00    0.00      NA                    
+#>  model2    -32.00    0.00    1.00   N < 100          
+#>  model1    -64.00    0.00    1.00   N < 100          
+#> 
+#> Diagnostic flags present.
+#> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+#> or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 # can use a list of objects with custom names
-# will use apple, banana, and cherry, as the names in the output
+# the names will be used in the output
 loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
-#>        elpd_diff se_diff
-#> cherry   0.0       0.0  
-#> banana -32.0       0.0  
-#> apple  -64.0       0.0  
+#>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+#>  cherry       0.0     0.0      NA                    
+#>  banana     -32.0     0.0    1.00   N < 100          
+#>   apple     -64.0     0.0    1.00   N < 100          
+#> 
+#> Diagnostic flags present.
+#> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+#> or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 # \dontrun{
 # works for waic (and kfold) too
@@ -159,8 +187,12 @@ loo_compare(waic(LL), waic(LL - 10))
 #> 3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.
 #> Warning: 
 #> 3 (9.4%) p_waic estimates greater than 0.4. We recommend trying loo instead.
-#>        elpd_diff se_diff
-#> model1    0.0       0.0 
-#> model2 -320.0       0.0 
+#>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+#>  model1       0.0     0.0      NA                    
+#>  model2    -320.0     0.0    1.00   N < 100          
+#> 
+#> Diagnostic flags present.
+#> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+#> or https://mc-stan.org/loo/reference/loo-glossary.html.
 # }
 ```

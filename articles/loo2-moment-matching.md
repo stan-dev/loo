@@ -49,6 +49,7 @@ Here is the Stan code for fitting the Poisson regression model, which we
 will use for modeling the number of roaches.
 
 ``` r
+
 # Note: some syntax used in this Stan program requires RStan >= 2.26 (or CmdStanR)
 # To use an older version of RStan change the line declaring `y` to: int y[N];
 stancode <- "
@@ -92,6 +93,7 @@ In addition to **loo**, we load the **rstan** package for fitting the
 model, and the **rstanarm** package for the data.
 
 ``` r
+
 library("rstan")
 library("loo")
 seed <- 9547
@@ -103,6 +105,7 @@ set.seed(seed)
 Next we fit the model in Stan using the **rstan** package:
 
 ``` r
+
 # Prepare data
 data(roaches, package = "rstanarm")
 roaches$roach1 <- sqrt(roaches$roach1)
@@ -126,9 +129,9 @@ standata <- list(
 stanmodel <- stan_model(model_code = stancode)
 ```
 
-    Running /opt/R/4.5.2/lib/R/bin/R CMD SHLIB foo.c
-    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.5.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    Running /opt/R/4.6.0/lib/R/bin/R CMD SHLIB foo.c
+    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
+    gcc -std=gnu2x -I"/opt/R/4.6.0/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/"  -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
                      from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
                      from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
@@ -137,9 +140,10 @@ stanmodel <- stan_model(model_code = stancode)
       679 | #include <cmath>
           |          ^~~~~~~
     compilation terminated.
-    make: *** [/opt/R/4.5.2/lib/R/etc/Makeconf:202: foo.o] Error 1
+    make: *** [/opt/R/4.6.0/lib/R/etc/Makeconf:190: foo.o] Error 1
 
 ``` r
+
 # Fit model
 fit <- sampling(stanmodel, data = standata, seed = seed, refresh = 0)
 print(fit, pars = "beta")
@@ -154,7 +158,7 @@ print(fit, pars = "beta")
     beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
     beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
 
-    Samples were drawn using NUTS(diag_e) at Tue Dec 23 16:14:52 2025.
+    Samples were drawn using NUTS(diag_e) at Wed Jun 24 16:05:07 2026.
     For each parameter, n_eff is a crude measure of effective sample size,
     and Rhat is the potential scale reduction factor on split chains (at 
     convergence, Rhat=1).
@@ -163,6 +167,7 @@ Let us now evaluate the predictive performance of the model using
 [`loo()`](https://mc-stan.org/loo/reference/loo.md).
 
 ``` r
+
 loo1 <- loo(fit)
 ```
 
@@ -171,8 +176,10 @@ loo1 <- loo(fit)
     Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.
 
 ``` r
+
 loo1
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 
@@ -230,6 +237,7 @@ value is larger than the sample size (\\S\\) specific threshold
 \\\min(1 - 1 / \log\_{10}(S), 0.7)\\ (which is \\0.7\\ for \\S\>2200\\).
 
 ``` r
+
 # available in rstan >= 2.21
 loo2 <- loo(fit, moment_match = TRUE)
 ```
@@ -237,8 +245,10 @@ loo2 <- loo(fit, moment_match = TRUE)
     Replacing NAs in `r_eff` with 1s
 
 ``` r
+
 loo2
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 
@@ -313,6 +323,7 @@ directly. For stanfit objects from **rstan** objects, the functions look
 like this:
 
 ``` r
+
 # create a named list of draws for use with rstan methods
 .rstan_relist <- function(x, skeleton) {
   out <- utils::relist(x, skeleton)
@@ -393,6 +404,7 @@ Using these function, we can call
 to update the existing `loo` object.
 
 ``` r
+
 loo3 <- loo::loo_moment_match.default(
   x = fit,
   loo = loo1,
@@ -404,6 +416,7 @@ loo3 <- loo::loo_moment_match.default(
 )
 loo3
 ```
+
 
     Computed from 4000 by 262 log-likelihood matrix.
 

@@ -24,10 +24,7 @@ diagnostics.
   [`is.psis_loo()`](https://mc-stan.org/loo/reference/loo.md) :
   Efficient approximate leave-one-out cross-validation (LOO)
 - [`loo_subsample()`](https://mc-stan.org/loo/reference/loo_subsample.md)
-  : Efficient approximate leave-one-out cross-validation (LOO) using
-  subsampling, so that less costly and more approximate computation is
-  made for all LOO-fold, and more costly and accurate computations are
-  made only for m\<N LOO-folds.
+  : Efficient approximate LOO-CV using subsampling
 - [`loo_approximate_posterior()`](https://mc-stan.org/loo/reference/loo_approximate_posterior.md)
   : Efficient approximate leave-one-out cross-validation (LOO) for
   posterior approximations
@@ -117,6 +114,11 @@ of predictive distributions or pseudo-BMA weighting.
 - [`relative_eff()`](https://mc-stan.org/loo/reference/relative_eff.md)
   : Convenience function for computing relative efficiencies
 
+- [`find_model_names()`](https://mc-stan.org/loo/reference/find_model_names.md)
+  :
+
+  Find the model names associated with `"loo"` objects
+
 - [`gpdfit()`](https://mc-stan.org/loo/reference/gpdfit.md) : Estimate
   parameters of the Generalized Pareto distribution
 
@@ -131,6 +133,7 @@ of predictive distributions or pseudo-BMA weighting.
   [`print(`*`<psis_loo_ap>`*`)`](https://mc-stan.org/loo/reference/print.loo.md)
   [`print(`*`<psis>`*`)`](https://mc-stan.org/loo/reference/print.loo.md)
   [`print(`*`<importance_sampling>`*`)`](https://mc-stan.org/loo/reference/print.loo.md)
+  [`print(`*`<kfold>`*`)`](https://mc-stan.org/loo/reference/print.loo.md)
   : Print methods
 
 - [`nobs(`*`<psis_loo_ss>`*`)`](https://mc-stan.org/loo/reference/nobs.psis_loo_ss.md)

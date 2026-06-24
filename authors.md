@@ -26,18 +26,20 @@
 
 - **Visruth Srimath Kandali**. Contributor.
 
+- **Florence Bockting**. Contributor.
+
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/stan-dev/loo/blob/v2.9.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/stan-dev/loo/blob/master/inst/CITATION)
 
-(2025). “loo: Efficient leave-one-out cross-validation and WAIC for
-Bayesian models.” R package version 2.9.0, <https://mc-stan.org/loo/>.
+(2026). “loo: Efficient leave-one-out cross-validation and WAIC for
+Bayesian models.” R package version 2.10.0, <https://mc-stan.org/loo/>.
 
     @Misc{,
       title = {loo: Efficient leave-one-out cross-validation and WAIC for Bayesian models},
-      year = {2025},
-      note = {R package version 2.9.0},
+      year = {2026},
+      note = {R package version 2.10.0},
       url = {https://mc-stan.org/loo/},
     }
 

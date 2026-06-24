@@ -50,12 +50,14 @@ and effective sample size and Monte Carlo standard error estimates.
 - Install the latest release from CRAN:
 
 ``` r
+
 install.packages("loo")
 ```
 
 - Install the latest development version from GitHub:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("stan-dev/loo")
 ```

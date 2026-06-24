@@ -70,7 +70,7 @@ loo_moment_match_split(
 - log_lik_i_upars:
 
   A function that takes arguments `x`, `upars`, and `i` and returns a
-  vector of log-likeliood draws of the `i`th observation based on the
+  vector of log-likelihood draws of the `i`th observation based on the
   unconstrained posterior draws passed via `upars`.
 
 - r_eff_i:

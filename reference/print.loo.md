@@ -25,6 +25,9 @@ print(x, digits = 1, plot_k = FALSE, ...)
 
 # S3 method for class 'importance_sampling'
 print(x, digits = 1, plot_k = FALSE, ...)
+
+# S3 method for class 'kfold'
+print(x, digits = 1, plot_k = FALSE, ...)
 ```
 
 ## Arguments
