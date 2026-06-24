@@ -17,11 +17,12 @@ jobs:
       pull-requests: write
     if: ${{ github.event.workflow_run.event == 'pull_request' }}
     steps:
-      - name: Download Touchstone artifact
-        id: download
+      - name: Download Touchstone comment artifact
+        id: download_comment
         uses: actions/download-artifact@v8
         with:
           name: pr
+          path: ./pr
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ github.event.workflow_run.id }}
@@ -31,7 +32,7 @@ jobs:
         id: pr
         shell: bash
         run: |
-          number="$(tr -cd '0-9' < ./NR)"
+          number="$(tr -cd '0-9' < ./pr/NR)"
           test -n "$number"
           echo "number=$number" >> "$GITHUB_OUTPUT"
 
@@ -42,5 +43,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           number_force: ${{ steps.pr.outputs.number }}
           header: touchstone
-          path: ./info.txt
+          path: ./pr/info.txt
           skip_unchanged: true
