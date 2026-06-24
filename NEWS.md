@@ -1,11 +1,13 @@
 # loo 2.10.0
 
-* Fix bug in IS method error message + documentation typos by @ishaan-arora-1 in #326
-* Shortened `?loo_subsample` title and edited description by @vinniott in #339
+* Updates to `loo_compare` output by @jgabry, @avehtari, @florence-bockting in #300: 
+  - new output columns `p_worse`, `diag_diff`, `diag_elpd`
+  - returned object is now a `data.frame` instead of a `matrix`
 * Add new `kfold.print` method by @florence-bockting in #342
-* Add touchstone by @VisruthSK in #352
+* Add touchstone performance benchmarks by @VisruthSK in #352
 * Use `posterior::gpdfit` and `posterior::qgeneralized_pareto` by @avehtari in #305
-* Update `loo_compare` output by @jgabry, @avehtari, @florence-bockting in #300
+* Fix bug in IS method error message + documentation typos by @ishaan-arora-1 in #326
+* Shortened `?loo_subsample` title and improved description by @vinniott in #339
 * Add AI contribution policy by @florence-bockting in #361
 
 
