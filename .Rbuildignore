@@ -25,3 +25,5 @@ vignettes/loo2-non-factorized_cache/*
 ^_pkgdown\.yml$
 ^pkgdown$
 ^touchstone$
+^[.]?air[.]toml$
+^\.vscode$
