@@ -10,9 +10,6 @@ loo.Rproj
 .Rproj.user/
 .Rproj.user
 
-# vscode/positron/etc settings
-.vscode/*
-
 # produced vignettes
 vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*
