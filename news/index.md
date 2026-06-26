@@ -2,6 +2,8 @@
 
 ## loo 2.10.0
 
+CRAN release: 2026-06-26
+
 - Updates to `loo_compare` output by
   [@jgabry](https://github.com/jgabry),
   [@avehtari](https://github.com/avehtari),
