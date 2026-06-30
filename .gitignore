@@ -30,3 +30,4 @@ release-prep.R
 agent/*
 data/*
 scratch-files/*
+notes/*

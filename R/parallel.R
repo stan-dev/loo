@@ -1,3 +1,104 @@
+#' Package-internal state for the parallel backend
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Holds small bits of session-scoped state used by the parallel helpers:
+#'
+#' * `cleanup_registered`: guards `loo_register_daemon_cleanup()` so the
+#'   session-exit finalizer is only registered once.
+#' * `warned_bad_daemons`: guards the malformed-config warning in
+#'   `loo_persist_config()` so it is only emitted once per session.
+#'
+#' It also serves as the object the daemon-cleanup finalizer is attached to.
+.loo_internal <- new.env(parent = emptyenv())
+
+#' Resolve the persistent local daemon pool size from user configuration
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Reads the opt-in "persistent local pool" size from, in precedence order:
+#'
+#' 1. the R option `loo.daemons`,
+#' 2. the environment variable `LOO_DAEMONS`,
+#' 3. otherwise the feature is off.
+#'
+#' This knob enables a local [mirai::daemons()] pool that is created lazily on
+#' first parallel use and kept warm for the rest of the session (see
+#' `with_loo_daemons()`), which avoids paying pool spawn/teardown overhead on
+#' every top-level `loo()`/`psis()` call (useful for simulations, benchmarks
+#' and batch/HPC scripts).
+#'
+#' @return A single integer `>= 2` giving the persistent pool size, or
+#'   `NA_integer_` when the feature is off (unset, `0`/`1`, or a non-integer
+#'   value). Genuinely malformed (non-coercible) values warn once per session
+#'   and then disable the feature.
+loo_persist_config <- function() {
+  raw <- getOption("loo.daemons")
+  if (is.null(raw)) {
+    raw <- Sys.getenv("LOO_DAEMONS", unset = NA_character_)
+  }
+  if (length(raw) != 1L) {
+    return(NA_integer_)
+  }
+  if (is.na(raw) || (is.character(raw) && !nzchar(trimws(raw)))) {
+    # Unset / empty -> feature off.
+    return(NA_integer_)
+  }
+  n <- suppressWarnings(as.numeric(raw))
+  if (is.na(n) || !is.finite(n)) {
+    # Non-numeric garbage -> off, but tell the user once that it was ignored.
+    loo_warn_bad_daemons(raw)
+    return(NA_integer_)
+  }
+  if (n < 2 || n != trunc(n)) {
+    # 0/1 (serial) or a non-integer value -> feature off, silently.
+    return(NA_integer_)
+  }
+  as.integer(n)
+}
+
+#' Warn (once per session) about a malformed persistent-pool configuration
+#'
+#' @noRd
+#' @keywords internal
+loo_warn_bad_daemons <- function(value) {
+  if (isTRUE(.loo_internal$warned_bad_daemons)) {
+    return(invisible(NULL))
+  }
+  .loo_internal$warned_bad_daemons <- TRUE
+  warning(
+    "Ignoring invalid persistent-pool size ", encodeString(value, quote = "'"),
+    " from 'loo.daemons'/'LOO_DAEMONS'; expected a single integer >= 2.",
+    call. = FALSE
+  )
+  invisible(NULL)
+}
+
+#' Register a one-time session-exit cleanup for the persistent daemon pool
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Attaches a finalizer (only once per session) that resets any local daemon
+#' pool with `mirai::daemons(0)` when the R session exits. mirai already
+#' terminates local daemons when the host session ends; this is a
+#' belt-and-suspenders guard so the lazily created persistent pool never leaves
+#' orphan processes behind in batch/HPC scripts.
+loo_register_daemon_cleanup <- function() {
+  if (isTRUE(.loo_internal$cleanup_registered)) {
+    return(invisible(NULL))
+  }
+  .loo_internal$cleanup_registered <- TRUE
+  reg.finalizer(
+    .loo_internal,
+    function(e) try(mirai::daemons(0), silent = TRUE),
+    onexit = TRUE
+  )
+  invisible(NULL)
+}
+
 #' Evaluate parallel work with an appropriate mirai daemon pool
 #'
 #' @noRd
@@ -10,7 +111,14 @@
 #' * `cores <= 1`: runs `code` serially without touching daemons.
 #' * A daemon pool is already configured (e.g. the user called
 #'   [mirai::daemons()] themselves, possibly with remote/HPC daemons): `code`
-#'   runs on the existing pool, which is left untouched.
+#'   runs on the existing pool, which is left untouched. This always takes
+#'   precedence over the options below.
+#' * Otherwise, if the user opted in to a persistent session pool via the
+#'   `loo.daemons` option or `LOO_DAEMONS` environment variable (see
+#'   `loo_persist_config()`): a local pool of that size is created lazily on
+#'   this first parallel call and left warm for the rest of the session, with a
+#'   session-exit finalizer registered for cleanup. Subsequent calls reuse it
+#'   via the existing-pool branch above.
 #' * Otherwise: a pool of `cores` local daemons is created for the duration of
 #'   `code` and automatically reset afterwards (via the scoped
 #'   `with(mirai::daemons(), ...)` method), so no daemon processes are left
@@ -22,14 +130,24 @@
 #' existing pool, it is safe to nest: an inner call made while an outer call
 #' already established a pool simply reuses it instead of creating another.
 #'
-#' @param cores Integer number of cores requested by the user.
+#' @param cores Integer number of cores requested by the user. Acts as the
+#'   per-call "enable parallel" switch; the persistent pool size, when enabled,
+#'   comes from `loo_persist_config()` rather than from `cores`.
 #' @param code Expression to evaluate. Lazily evaluated in the calling
 #'   environment, after any daemon pool has been set up.
 #' @return The value of `code`.
 with_loo_daemons <- function(cores, code) {
   if (cores <= 1 || loo_has_pool()) {
     # Serial work, or reuse the daemon pool the user (or an outer loo call)
-    # already configured.
+    # already configured. This always wins over the persistent-pool option.
+    return(code)
+  }
+  persist <- loo_persist_config()
+  if (!is.na(persist)) {
+    # Opt-in persistent pool: create once, leave warm for the session, and
+    # register a finalizer to tidy up at session exit. No per-call teardown.
+    mirai::daemons(persist)
+    loo_register_daemon_cleanup()
     return(code)
   }
   # No pool configured: create one scoped to this computation and reset it on

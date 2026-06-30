@@ -64,3 +64,4 @@ LazyData: TRUE
 Roxygen: list(markdown = TRUE)
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

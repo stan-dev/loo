@@ -242,5 +242,118 @@ test_that("loo_model_weights() parallel equals serial", {
                tolerance = 1e-6)
 })
 
+# Persistent session pool (loo.daemons / LOO_DAEMONS) -----------------------
+
+test_that("loo_persist_config() resolves option/env var and rejects bad values", {
+  # Start from a known-clean configuration and restore it afterwards.
+  old_opt <- options(loo.daemons = NULL)
+  on.exit(options(old_opt), add = TRUE)
+  old_env <- Sys.getenv("LOO_DAEMONS", unset = NA)
+  Sys.unsetenv("LOO_DAEMONS")
+  on.exit(
+    if (!is.na(old_env)) {
+      Sys.setenv(LOO_DAEMONS = old_env)
+    } else {
+      Sys.unsetenv("LOO_DAEMONS")
+    },
+    add = TRUE
+  )
+
+  # Unset -> feature off.
+  expect_identical(loo:::loo_persist_config(), NA_integer_)
+
+  # Environment variable is parsed when the option is unset.
+  Sys.setenv(LOO_DAEMONS = "3")
+  expect_identical(loo:::loo_persist_config(), 3L)
+
+  # Option takes precedence over the environment variable.
+  options(loo.daemons = 4)
+  expect_identical(loo:::loo_persist_config(), 4L)
+
+  # 0/1, non-integer, and garbage values all disable the feature (no error).
+  options(loo.daemons = 1)
+  expect_identical(loo:::loo_persist_config(), NA_integer_)
+  options(loo.daemons = 0)
+  expect_identical(loo:::loo_persist_config(), NA_integer_)
+  options(loo.daemons = 2.5)
+  expect_identical(loo:::loo_persist_config(), NA_integer_)
+  options(loo.daemons = "garbage")
+  expect_identical(suppressWarnings(loo:::loo_persist_config()), NA_integer_)
+})
+
+test_that("persistent pool is created lazily and reused across calls", {
+  skip_on_cran()
+  mirai::daemons(0)
+  expect_false(loo:::loo_has_pool())
+
+  old_opt <- options(loo.daemons = 2)
+  on.exit(options(old_opt), add = TRUE)
+  on.exit(mirai::daemons(0), add = TRUE)
+
+  ps_serial <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 1))
+  # cores = 1 work must not spin up the persistent pool.
+  expect_false(loo:::loo_has_pool())
+
+  # First parallel call creates the pool and leaves it warm.
+  ps1 <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
+  expect_true(loo:::loo_has_pool())
+  expect_equal(loo:::loo_n_workers(2), 2L)
+
+  # Second call reuses the same pool (still 2 connected daemons).
+  ps2 <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
+  expect_true(loo:::loo_has_pool())
+  expect_equal(loo:::loo_n_workers(2), 2L)
+
+  # Results match the serial computation.
+  expect_equal(ps1$log_weights, ps_serial$log_weights)
+  expect_equal(ps2$log_weights, ps_serial$log_weights)
+})
+
+test_that("a user-configured pool takes precedence over loo.daemons", {
+  skip_on_cran()
+  mirai::daemons(0)
+  old_opt <- options(loo.daemons = 4)
+  on.exit(options(old_opt), add = TRUE)
+
+  # User sets up their own pool; loo must reuse it untouched and not replace
+  # it with a persistent pool of the configured size.
+  mirai::daemons(2)
+  on.exit(mirai::daemons(0), add = TRUE)
+
+  ps <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
+  expect_true(loo:::loo_has_pool())
+  expect_equal(loo:::loo_n_workers(2), 2L)
+})
+
+test_that("a persistent-pool child process exits cleanly (no orphans)", {
+  skip_on_cran()
+  skip_on_os("windows")
+  rscript <- file.path(R.home("bin"), "Rscript")
+  skip_if_not(file.exists(rscript))
+
+  script <- tempfile(fileext = ".R")
+  on.exit(unlink(script), add = TRUE)
+  writeLines(
+    c(
+      "library(loo)",
+      "LLarr <- example_loglik_array()",
+      "r_eff <- relative_eff(exp(LLarr))",
+      "invisible(suppressWarnings(loo(LLarr, r_eff = r_eff, cores = 2)))",
+      "cat('LOO_CHILD_OK\\n')"
+    ),
+    script
+  )
+  out <- suppressWarnings(system2(
+    rscript,
+    c("--vanilla", shQuote(script)),
+    stdout = TRUE,
+    stderr = TRUE,
+    env = "LOO_DAEMONS=2"
+  ))
+  status <- attr(out, "status")
+  expect_true(is.null(status) || identical(as.integer(status), 0L))
+  expect_true(any(grepl("LOO_CHILD_OK", out)))
+})
+
 # Final safety net in case any test above exited early with a live pool.
 mirai::daemons(0)

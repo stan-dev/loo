@@ -10,3 +10,21 @@
 #'     the `.Rprofile` file to set `mc.cores` (using the `cores` argument or
 #'     setting `mc.cores` interactively or in a script is fine).
 #'
+#'   Parallelism is implemented with the \pkg{mirai} package. There are three
+#'   ways to control the backend, in increasing order of precedence:
+#'   * `cores > 1` (the default behaviour): a local daemon pool is created for
+#'     the duration of the call and torn down automatically when it returns, so
+#'     no worker processes are left running. This is convenient for one-off
+#'     calls but pays a small pool start-up/teardown cost on every call.
+#'   * `options(loo.daemons = k)` or the environment variable `LOO_DAEMONS=k`
+#'     (with `k >= 2`): opt in to a *persistent* local pool of `k` daemons that
+#'     is created lazily on the first parallel call and kept warm for the rest
+#'     of the R session, then cleaned up automatically at session exit. This
+#'     avoids repeated pool start-up/teardown and is ideal for simulations,
+#'     benchmarks, and batch/HPC scripts that call `loo()`/`psis()` many times.
+#'     Local pools automatically use zero-copy shared memory (via \pkg{mori})
+#'     for the shared posterior draws.
+#'   * A pool you configure yourself with [mirai::daemons()] (including
+#'     remote/SSH/HPC daemons via `mirai::daemons(url = ...)`) always takes
+#'     precedence: loo reuses it and never tears it down.
+#'

@@ -1,0 +1,230 @@
+---
+title: "Parallel and distributed loo"
+author: "The loo developers"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Parallel and distributed loo}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+Computing PSIS-LOO, WAIC, and related quantities is *embarrassingly parallel*:
+the expensive work is done once per observation (or per fold), and these
+computations are independent of one another. The __loo__ package can therefore
+spread this work across multiple cores or even multiple machines.
+
+As of __loo__ 2.10 the parallel backend is built on the
+[__mirai__](https://mirai.r-lib.org/) package, with
+[__mori__](https://mirai.r-lib.org/) providing zero-copy sharing of large
+objects (such as the posterior draws) between local workers. You do not need to
+learn either package to benefit from parallelism, but understanding the three
+ways to control the backend lets you pick the right one for your workflow:
+
+1. **Per-call parallelism** with the `cores` argument --- the simplest option,
+   good for one-off calls.
+2. **A persistent session pool** via `options(loo.daemons = k)` or the
+   `LOO_DAEMONS` environment variable --- best when you call __loo__ functions
+   *many* times in one session (simulations, benchmarks, batch/HPC scripts).
+3. **A pool you manage yourself** with `mirai::daemons()` --- needed for
+   remote/SSH/HPC workers, and always takes precedence over the options above.
+
+Every __loo__ function that does per-observation work accepts a `cores`
+argument and respects these settings, including `loo()`, `psis()`, `waic()`,
+`relative_eff()`, `loo_subsample()`, `loo_moment_match()`, and
+`loo_model_weights()`.
+
+# Setup
+
+The examples below only need the __loo__ package and its built-in example
+log-likelihood objects, so they are fast and self-contained.
+
+```{r setup, message=FALSE}
+library("loo")
+
+# A 500 (draws) x 2 (chains) x 32 (observations) log-likelihood array.
+LLarr <- example_loglik_array()
+r_eff <- relative_eff(exp(LLarr))
+```
+
+# 1. Per-call parallelism with `cores`
+
+The `cores` argument is the simplest way to parallelize. Passing `cores > 1`
+tells __loo__ to create a local pool of worker processes *for the duration of
+that single call* and to shut it down automatically when the call returns:
+
+```{r cores-basic}
+# Serial (the default)
+loo_serial <- loo(LLarr, r_eff = r_eff, cores = 1)
+
+# Parallel across 2 local workers, then automatically cleaned up
+loo_parallel <- loo(LLarr, r_eff = r_eff, cores = 2)
+```
+
+The results are identical --- parallelism only changes *how* the work is
+scheduled, never the answer:
+
+```{r cores-equal}
+all.equal(loo_serial$estimates, loo_parallel$estimates)
+```
+
+You can set the default number of cores for a whole session with the standard
+`mc.cores` option, so you don't have to pass `cores` to every call:
+
+```{r mc-cores, eval=FALSE}
+options(mc.cores = 4)
+loo(LLarr, r_eff = r_eff) # uses 4 cores
+```
+
+Because the pool is created and destroyed on every call, this mode pays a small
+start-up/teardown cost each time. For a single analysis that cost is
+negligible, but if you call __loo__ functions repeatedly it can add up --- which
+is exactly what the next section addresses.
+
+# 2. A persistent session pool: `loo.daemons` / `LOO_DAEMONS`
+
+When you call __loo__ functions many times in one session --- for example in a
+simulation study, a benchmark, or a script that loops over many models --- you
+can avoid repeatedly spinning workers up and down by keeping a pool **warm for
+the whole session**.
+
+Opt in by setting either the `loo.daemons` R option or the `LOO_DAEMONS`
+environment variable to the desired number of workers (an integer `>= 2`):
+
+```{r persistent-option, eval=FALSE}
+# Either set the R option ...
+options(loo.daemons = 4)
+
+# ... or, equivalently, set the environment variable (useful for batch/HPC
+# scripts and `Rscript`):
+Sys.setenv(LOO_DAEMONS = 4)
+```
+
+With this enabled, __loo__:
+
+* creates a local pool **lazily**, on the first call that actually needs
+  parallelism (so nothing is started if you only do serial work),
+* **reuses** that same warm pool for every later call, and
+* **cleans it up automatically** when the R session ends (so no worker
+  processes are left behind, even in non-interactive scripts).
+
+This is ideal for loops like the following, where the pool is created once on
+the first iteration and reused thereafter:
+
+```{r persistent-loop, eval=FALSE}
+options(loo.daemons = 4)
+
+# Imagine `model_loglik` returns a log-likelihood matrix for each model.
+results <- lapply(seq_len(100), function(i) {
+  ll <- model_loglik(i)
+  loo(ll, r_eff = relative_eff(exp(ll)), cores = 4)
+})
+```
+
+A couple of details worth knowing:
+
+* `cores > 1` is still the per-call switch that *enables* parallelism; the size
+  of the persistent pool comes from `loo.daemons`/`LOO_DAEMONS`, not from
+  `cores`.
+* Invalid values disable the feature: anything below `2`, a non-integer, or
+  unset all mean "no persistent pool" (and __loo__ falls back to the per-call
+  behavior from Section 1).
+
+From a script, the most convenient pattern is to set the environment variable
+outside R so you never touch __loo__-specific code:
+
+```bash
+LOO_DAEMONS=8 Rscript my_simulation.R
+```
+
+# 3. User-managed pools, including remote/HPC workers
+
+If you configure a pool yourself with `mirai::daemons()`, __loo__ will **reuse
+it and never tear it down**. A user-managed pool always takes precedence over
+both the `cores` per-call behavior and the `loo.daemons` option, which makes it
+the right tool for advanced setups --- in particular **remote, SSH, or HPC
+cluster** workers.
+
+A local pool you manage by hand behaves just like the persistent pool from
+Section 2:
+
+```{r user-local, eval=FALSE}
+library(mirai)
+
+daemons(4)                                  # start 4 local workers
+loo1 <- loo(LLarr, r_eff = r_eff, cores = 2) # reuses your pool
+loo2 <- loo(LLarr, r_eff = r_eff, cores = 2) # reuses it again
+daemons(0)                                  # you decide when to stop them
+```
+
+For distributed computing, point __mirai__ at remote machines or a cluster
+scheduler. __loo__ does not need to know any of the details --- it simply uses
+whatever pool is connected:
+
+```{r user-remote, eval=FALSE}
+library(mirai)
+
+# Launch workers on remote hosts over SSH (see ?mirai::daemons and
+# ?mirai::ssh_config for the full set of options, including HPC launchers).
+daemons(
+  n = 8,
+  url = host_url(),
+  remote = ssh_config(c("ssh://node1", "ssh://node2"))
+)
+
+loo_big <- loo(large_loglik, r_eff = r_eff_big, cores = 8)
+
+daemons(0)
+```
+
+# Large objects and shared memory
+
+When __loo__ uses the function method (e.g. `loo(llfun, data = ..., draws =
+...)`), the posterior `draws` are reused identically by every observation. On a
+**local** pool these large objects are written once into shared memory with
+__mori__ so each worker maps the same physical pages (zero-copy), which keeps
+memory use low even with many workers.
+
+On a **remote** pool shared memory is not available, so __loo__ falls back to
+ordinary serialization and chunks the work to send each large object roughly
+once per worker rather than once per observation. You don't need to do anything
+to get this behavior --- __loo__ detects whether the active pool is local and
+chooses the appropriate transport automatically.
+
+# Choosing a strategy
+
+| Situation | Recommended approach |
+|---|---|
+| A single `loo()`/`psis()` call | `cores = k` (Section 1) |
+| Default cores for a session | `options(mc.cores = k)` |
+| Many calls in one session (simulations, benchmarks, batch jobs) | `options(loo.daemons = k)` or `LOO_DAEMONS=k` (Section 2) |
+| Remote / SSH / HPC workers | `mirai::daemons(url = ..., remote = ...)` (Section 3) |
+
+A few general notes:
+
+* All approaches give identical results; they differ only in scheduling and
+  set-up cost.
+* These mechanisms compose safely. A pool you set up yourself is always reused
+  and never removed by __loo__, and nested __loo__ calls reuse an outer pool
+  rather than creating a new one. For example, `loo_model_weights()` sets up a
+  single pool and reuses it across all of the models it evaluates.
+* On Windows, avoid setting `mc.cores` in your `.Rprofile`
+  (see [this issue](https://github.com/stan-dev/loo/issues/94)); pass `cores`
+  explicitly or set the option in your script instead.
+
+# See also
+
+* `help("loo", package = "loo")` for the `cores` argument documentation.
+* The [__mirai__](https://mirai.r-lib.org/) documentation, especially
+  `?mirai::daemons`, for configuring local, remote, and HPC pools.
