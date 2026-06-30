@@ -2,23 +2,40 @@
 
 ## loo (development version)
 
-### Breaking changes
+## loo 2.10.0
 
-- [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
-  now returns a data frame instead of a matrix and has additional
-  columns. Code that relies on matrix-specific behaviour will need to be
-  updated accordingly by [@jgabry](https://github.com/jgabry),
+CRAN release: 2026-06-26
+
+- Updates to `loo_compare` output by
+  [@jgabry](https://github.com/jgabry),
   [@avehtari](https://github.com/avehtari),
   [@florence-bockting](https://github.com/florence-bockting) in
-  [\#300](https://github.com/stan-dev/loo/issues/300)
-
-### New features
-
-- [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
-  output now includes additional columns: `p_worse`, `diag_diff`, and
-  `diag_elpd`, providing richer diagnostics for model comparison by
+  [\#300](https://github.com/stan-dev/loo/issues/300):
+  - new output columns `p_worse`, `diag_diff`, `diag_elpd`
+  - returned object is now a `data.frame` instead of a `matrix`
+- Add new `kfold.print` method by
   [@florence-bockting](https://github.com/florence-bockting) in
-  [\#300](https://github.com/stan-dev/loo/issues/300)
+  [\#342](https://github.com/stan-dev/loo/issues/342)
+- Add touchstone performance benchmarks by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#352](https://github.com/stan-dev/loo/issues/352)
+- Use
+  [`posterior::gpdfit`](https://mc-stan.org/posterior/reference/gpdfit.html)
+  and
+  [`posterior::qgeneralized_pareto`](https://mc-stan.org/posterior/reference/qgeneralized_pareto.html)
+  by [@avehtari](https://github.com/avehtari) in
+  [\#305](https://github.com/stan-dev/loo/issues/305)
+- Fix bug in IS method error message + documentation typos by
+  [@ishaan-arora-1](https://github.com/ishaan-arora-1) in
+  [\#326](https://github.com/stan-dev/loo/issues/326)
+- Shortened
+  [`?loo_subsample`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
+  title and improved description by
+  [@vinniott](https://github.com/vinniott) in
+  [\#339](https://github.com/stan-dev/loo/issues/339)
+- Add AI contribution policy by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#361](https://github.com/stan-dev/loo/issues/361)
 
 ## loo 2.9.0
 
