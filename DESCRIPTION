@@ -37,6 +37,8 @@ Depends:
 Imports:
     checkmate,
     matrixStats (>= 0.52),
+    mirai,
+    mori,
     parallel,
     posterior (>= 1.7.0),
     stats

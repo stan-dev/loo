@@ -198,20 +198,23 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     stop("Incorrect IS method.")
   }
 
-  if (cores == 1) {
-    lw_list <- lapply(seq_len(N), do_is_i, is_fun, log_ratios, tail_len)
-  } else {
-    shared_lr <- mori::share(log_ratios)
-    lw_list <- with(
-      mirai::daemons(cores),
-      mirai::mirai_map(
-        seq_len(N),
-        do_is_i,
-        .args = list(is_fun = is_fun, log_ratios = shared_lr,
-        tail_len = tail_len)
-      )[]
+  # Each observation needs a different column of `log_ratios`, but the whole
+  # matrix is reused across the map, so it is a broadcast object: `loo_map()`
+  # shares it via shared memory on a local pool (zero-copy column access) and
+  # falls back to serialization on a remote pool. Serial work runs as a plain
+  # lapply(). `with_loo_daemons()` provides a pool when this is the top-level
+  # call (e.g. psis()) and reuses an outer pool when called from loo().
+  lw_list <- with_loo_daemons(
+    cores,
+    loo_map(
+      seq_len(N),
+      do_is_i,
+      is_fun = is_fun,
+      tail_len = tail_len,
+      cores = cores,
+      broadcast = list(log_ratios = log_ratios)
     )
-  }
+  )
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")

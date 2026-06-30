@@ -62,30 +62,27 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   stopifnot(length(dim(x)) == 3)
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
-  if (cores == 1) {
-    n_eff_vec <- apply(x, 3, posterior::ess_mean)
-  } else {
-    if (!os_is_windows()) {
-      n_eff_list <-
-        parallel::mclapply(
-          mc.cores = cores,
-          X = seq_len(dim(x)[3]),
-          FUN = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
-        )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      n_eff_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(dim(x)[3]),
-          fun = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
-        )
-    }
-    n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
-  }
+  # The full draws array is reused across observations, so it is broadcast via
+  # shared memory on a local pool. Each worker reads only its slice `x[, , i]`.
+  n_eff_list <- with_loo_daemons(
+    cores,
+    loo_map(
+      seq_len(dim(x)[3]),
+      relative_eff_i_array,
+      cores = cores,
+      broadcast = list(x = x)
+    )
+  )
+  n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
 
   return(n_eff_vec / S)
+}
+
+#' Worker computing `ess_mean()` for a single slice of a draws array
+#' @noRd
+#' @keywords internal
+relative_eff_i_array <- function(i, x) {
+  posterior::ess_mean(x[, , i, drop = TRUE])
 }
 
 #' @export
@@ -104,45 +101,35 @@ relative_eff.function <-
     f_i <- validate_llfun(x) # not really an llfun, should return exp(ll) or exp(-ll)
     N <- dim(data)[1]
 
-    if (cores == 1) {
-      n_eff_list <-
-        lapply(
-          X = seq_len(N),
-          FUN = function(i) {
-            val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-          }
-        )
-    } else {
-      if (!os_is_windows()) {
-        n_eff_list <-
-          parallel::mclapply(
-            X = seq_len(N),
-            FUN = function(i) {
-              val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-            },
-            mc.cores = cores
-          )
-      } else {
-        cl <- parallel::makePSOCKcluster(cores)
-        parallel::clusterExport(cl=cl, varlist=c("draws", "chain_id", "data"), envir=environment())
-        on.exit(parallel::stopCluster(cl))
-        n_eff_list <-
-          parallel::parLapply(
-            cl = cl,
-            X = seq_len(N),
-            fun = function(i) {
-              val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-            }
-          )
-      }
-    }
+    # `data` and `draws` are reused for every observation, so they are broadcast
+    # via shared memory on a local pool and serialized on a remote pool.
+    n_eff_list <- with_loo_daemons(
+      cores,
+      loo_map(
+        seq_len(N),
+        relative_eff_i_function,
+        f_i = f_i,
+        chain_id = chain_id,
+        re_dots = list(...),
+        cores = cores,
+        broadcast = list(data = data, draws = draws)
+      )
+    )
 
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
     return(n_eff_vec)
   }
+
+#' Worker computing the relative effective sample size for observation `i`
+#' @noRd
+#' @keywords internal
+relative_eff_i_function <- function(i, f_i, data, draws, chain_id, re_dots) {
+  val_i <- do.call(
+    f_i,
+    c(list(data_i = data[i, , drop = FALSE], draws = draws), re_dots)
+  )
+  relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
+}
 
 #' @export
 #' @describeIn relative_eff
