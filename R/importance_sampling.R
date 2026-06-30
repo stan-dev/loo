@@ -199,27 +199,18 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   }
 
   if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i]))
+    lw_list <- lapply(seq_len(N), do_is_i, is_fun, log_ratios, tail_len)
   } else {
-    if (!os_is_windows()) {
-      lw_list <- parallel::mclapply(
-        X = seq_len(N),
-        mc.cores = cores,
-        FUN = function(i)
-          is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-      )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      lw_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = function(i)
-            is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-        )
-    }
+    shared_lr <- mori::share(log_ratios)
+    lw_list <- with(
+      mirai::daemons(cores),
+      mirai::mirai_map(
+        seq_len(N),
+        do_is_i,
+        .args = list(is_fun = is_fun, log_ratios = shared_lr,
+        tail_len = tail_len)
+      )[]
+    )
   }
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
@@ -233,4 +224,25 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     r_eff = r_eff,
     method = rep(method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
+}
+
+#' Apply an importance sampling method to a single observation
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Worker function mapped over observations (matrix columns) by
+#' [do_importance_sampling()], either serially via [lapply()] or in parallel
+#' via [mirai::mirai_map()]. 
+#' @param i Integer column index of the observation to process.
+#' @param is_fun The per-observation importance sampling function to apply, one
+#'   of [do_psis_i()], [do_tis_i()], or [do_sis_i()].
+#' @param log_ratios Matrix of log ratios (`-loglik`). May be a shared-memory
+#'   object created by [mori::share()] to avoid copying to each worker.
+#' @param tail_len Vector of tail lengths used to fit the GPD, one per
+#'   observation.
+#' @return The result of `is_fun` for observation `i` (a list with elements
+#'   such as `log_weights` and `pareto_k`).
+do_is_i <- function(i, is_fun, log_ratios, tail_len) {
+  is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
 }
