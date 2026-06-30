@@ -56,10 +56,11 @@ test_that("loo_map() runs serially when no pool is available", {
   expect_identical(res, as.list((1:5) * 2))
 })
 
-test_that("loo_map() runs serially when cores <= 1 even with a pool", {
+test_that("loo_map() uses a connected pool regardless of cores", {
   skip_on_cran()
   mirai::daemons(2)
   on.exit(mirai::daemons(0), add = TRUE)
+  # cores = 1 no longer forces serial: a connected pool always wins.
   res <- loo:::loo_map(1:5, function(x, m) x * m, m = 3, cores = 1)
   expect_identical(res, as.list((1:5) * 3))
 })
@@ -323,6 +324,35 @@ test_that("a user-configured pool takes precedence over loo.daemons", {
   ps <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
   expect_true(loo:::loo_has_pool())
   expect_equal(loo:::loo_n_workers(2), 2L)
+})
+
+test_that("with_loo_daemons() informs (once) that cores is ignored with a pool", {
+  skip_on_cran()
+  mirai::daemons(0)
+  # Reset the once-per-session guard so this test is order-independent.
+  loo:::.loo_internal$informed_cores_ignored <- NULL
+  on.exit(loo:::.loo_internal$informed_cores_ignored <- NULL, add = TRUE)
+
+  # No pool connected: cores = 1 runs serially without a message.
+  expect_silent(loo:::with_loo_daemons(1, 42))
+
+  mirai::daemons(2)
+  on.exit(mirai::daemons(0), add = TRUE)
+
+  # Pool connected and cores = 1: informs once that cores is ignored, and the
+  # value still comes back (work runs on the pool).
+  expect_message(
+    out <- loo:::with_loo_daemons(1, 42),
+    "'cores' is ignored"
+  )
+  expect_identical(out, 42)
+
+  # Message is emitted at most once per session.
+  expect_silent(loo:::with_loo_daemons(1, 42))
+
+  # cores > 1 with a pool never triggers the message (parallel was requested).
+  loo:::.loo_internal$informed_cores_ignored <- NULL
+  expect_silent(loo:::with_loo_daemons(2, 42))
 })
 
 test_that("a persistent-pool child process exits cleanly (no orphans)", {

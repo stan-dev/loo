@@ -9,6 +9,9 @@
 #'   session-exit finalizer is only registered once.
 #' * `warned_bad_daemons`: guards the malformed-config warning in
 #'   `loo_persist_config()` so it is only emitted once per session.
+#' * `informed_cores_ignored`: guards the "a pool is connected so `cores` is
+#'   ignored" message in `with_loo_daemons()` so it is only emitted once per
+#'   session.
 #'
 #' It also serves as the object the daemon-cleanup finalizer is attached to.
 .loo_internal <- new.env(parent = emptyenv())
@@ -76,6 +79,32 @@ loo_warn_bad_daemons <- function(value) {
   invisible(NULL)
 }
 
+#' Inform (once per session) that `cores` is ignored while a pool is connected
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Emitted by `with_loo_daemons()` when a mirai daemon pool is connected (a
+#' user-managed pool, or a persistent pool left warm by an earlier call) and
+#' the current call passed `cores <= 1`. When a pool is connected loo always
+#' uses it, so the `cores` argument is ignored and the work runs in parallel
+#' regardless of its value. This message makes that behaviour visible the
+#' first time a call looks like it asked for serial execution; the usual cause
+#' is relying on the default `cores = getOption("mc.cores", 1)` after setting
+#' up daemons.
+loo_inform_cores_ignored <- function() {
+  if (isTRUE(.loo_internal$informed_cores_ignored)) {
+    return(invisible(NULL))
+  }
+  .loo_internal$informed_cores_ignored <- TRUE
+  message(
+    "A mirai daemon pool is connected, so 'cores' is ignored and this call ",
+    "runs in parallel on the existing pool. Call mirai::daemons(0) to stop ",
+    "the pool if you want serial execution."
+  )
+  invisible(NULL)
+}
+
 #' Register a one-time session-exit cleanup for the persistent daemon pool
 #'
 #' @noRd
@@ -108,11 +137,17 @@ loo_register_daemon_cleanup <- function() {
 #' [mirai::daemons()] pool exists for the duration of a computation. It is
 #' deliberately a good citizen of the user's session:
 #'
-#' * `cores <= 1`: runs `code` serially without touching daemons.
-#' * A daemon pool is already configured (e.g. the user called
-#'   [mirai::daemons()] themselves, possibly with remote/HPC daemons): `code`
-#'   runs on the existing pool, which is left untouched. This always takes
-#'   precedence over the options below.
+#' * A daemon pool is already connected (e.g. the user called
+#'   [mirai::daemons()] themselves, possibly with remote/HPC daemons, or a
+#'   persistent pool was left warm by an earlier call): `code` runs on the
+#'   existing pool, which is left untouched. **A connected pool always wins**,
+#'   so the `cores` argument is ignored entirely in this case (loo uses the
+#'   pool regardless of `cores`). If `cores <= 1` here -- i.e. the call looked
+#'   like it requested serial execution -- a one-time-per-session message
+#'   notes that `cores` is being ignored (via `loo_inform_cores_ignored()`).
+#' * `cores <= 1` with no pool connected: runs `code` serially without
+#'   touching daemons. (A configured `loo.daemons` pool is created lazily only
+#'   when `cores > 1`, so serial-only work never starts workers.)
 #' * Otherwise, if the user opted in to a persistent session pool via the
 #'   `loo.daemons` option or `LOO_DAEMONS` environment variable (see
 #'   `loo_persist_config()`): a local pool of that size is created lazily on
@@ -130,16 +165,29 @@ loo_register_daemon_cleanup <- function() {
 #' existing pool, it is safe to nest: an inner call made while an outer call
 #' already established a pool simply reuses it instead of creating another.
 #'
-#' @param cores Integer number of cores requested by the user. Acts as the
-#'   per-call "enable parallel" switch; the persistent pool size, when enabled,
-#'   comes from `loo_persist_config()` rather than from `cores`.
+#' @param cores Integer number of cores requested by the user. When no pool is
+#'   connected this is the per-call "enable parallel" switch (and the size of
+#'   the ephemeral pool). When a pool is already connected it is ignored --
+#'   loo always uses the connected pool. The persistent pool size, when
+#'   enabled, comes from `loo_persist_config()` rather than from `cores`.
 #' @param code Expression to evaluate. Lazily evaluated in the calling
 #'   environment, after any daemon pool has been set up.
 #' @return The value of `code`.
 with_loo_daemons <- function(cores, code) {
-  if (cores <= 1 || loo_has_pool()) {
-    # Serial work, or reuse the daemon pool the user (or an outer loo call)
-    # already configured. This always wins over the persistent-pool option.
+  if (loo_has_pool()) {
+    # A pool is connected (user-managed, or a warm persistent pool): use it
+    # regardless of `cores`. This always wins over the options below. If the
+    # call looked like it asked for serial work, note once that `cores` is
+    # being ignored.
+    if (cores <= 1) {
+      loo_inform_cores_ignored()
+    }
+    return(code)
+  }
+  if (cores <= 1) {
+    # No pool connected and no parallelism requested: run serially. A
+    # configured loo.daemons pool is created lazily only when cores > 1, so
+    # serial-only work never starts workers.
     return(code)
   }
   persist <- loo_persist_config()
@@ -221,7 +269,7 @@ loo_pool_is_local <- function() {
 #' Replaces the previous platform-branching
 #' [parallel::mclapply()] / [parallel::parLapply()] code paths with a single
 #' [mirai::mirai_map()] path, while preserving the serial [lapply()] behaviour
-#' when no parallelism is requested or available.
+#' when no daemon pool is connected.
 #'
 #' Object transport is chosen automatically:
 #'
@@ -238,8 +286,10 @@ loo_pool_is_local <- function() {
 #' @param FUN Worker function. Called as `FUN(x, <broadcast>, <...>)`; the
 #'   names in `broadcast` and `...` must match `FUN`'s formals.
 #' @param ... Small constant arguments forwarded to `FUN` for every element.
-#' @param cores Integer number of cores requested by the user. Parallelism is
-#'   only used when `cores > 1` and a daemon pool is connected.
+#' @param cores Integer number of cores requested by the user. Used only as a
+#'   fallback worker count for chunking when (unexpectedly) no pool is
+#'   connected; it does not gate execution. Parallelism is used whenever a
+#'   daemon pool is connected (the connected pool always wins over `cores`).
 #' @param broadcast Named list of large objects reused by every element. See
 #'   Description for how these are transported.
 #' @param chunk Chunking strategy. `"auto"` (default) splits `X` into roughly
@@ -254,9 +304,11 @@ loo_map <- function(X, FUN, ..., cores = 1L, broadcast = list(),
   chunk <- match.arg(chunk)
   dots <- list(...)
 
-  if (!(cores > 1L && loo_has_pool())) {
+  if (!loo_has_pool()) {
     # Serial path: identical behaviour to a plain lapply() with the broadcast
-    # and constant arguments supplied by name.
+    # and constant arguments supplied by name. When a pool is connected loo
+    # uses it regardless of `cores`; the decision to create one lives upstream
+    # in with_loo_daemons().
     return(do.call(lapply, c(list(X, FUN), broadcast, dots)))
   }
 

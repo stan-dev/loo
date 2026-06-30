@@ -45,6 +45,12 @@ argument and respects these settings, including `loo()`, `psis()`, `waic()`,
 `relative_eff()`, `loo_subsample()`, `loo_moment_match()`, and
 `loo_model_weights()`.
 
+One rule ties all three together: **when a daemon pool is already connected
+(options 2 or 3), __loo__ always uses it and the `cores` argument is ignored.**
+`cores` only takes effect when no pool is connected (option 1). The section
+[How `cores` interacts with a pool](#how-cores-interacts-with-a-pool) spells
+this out.
+
 # Setup
 
 The examples below only need the __loo__ package and its built-in example
@@ -113,9 +119,10 @@ Sys.setenv(LOO_DAEMONS = 4)
 
 With this enabled, __loo__:
 
-* creates a local pool **lazily**, on the first call that actually needs
-  parallelism (so nothing is started if you only do serial work),
-* **reuses** that same warm pool for every later call, and
+* creates a local pool **lazily**, on the first call made with `cores > 1`
+  (so nothing is started if you only do serial work),
+* **reuses** that same warm pool for every later call --- which, because a
+  connected pool always wins, then run in parallel *regardless* of `cores`, and
 * **cleans it up automatically** when the R session ends (so no worker
   processes are left behind, even in non-interactive scripts).
 
@@ -126,6 +133,9 @@ the first iteration and reused thereafter:
 options(loo.daemons = 4)
 
 # Imagine `model_loglik` returns a log-likelihood matrix for each model.
+# `cores = 4` on the first iteration triggers creation of the warm pool; on
+# later iterations the pool already exists, so `cores` is ignored and the work
+# simply runs on it.
 results <- lapply(seq_len(100), function(i) {
   ll <- model_loglik(i)
   loo(ll, r_eff = relative_eff(exp(ll)), cores = 4)
@@ -134,9 +144,10 @@ results <- lapply(seq_len(100), function(i) {
 
 A couple of details worth knowing:
 
-* `cores > 1` is still the per-call switch that *enables* parallelism; the size
-  of the persistent pool comes from `loo.daemons`/`LOO_DAEMONS`, not from
-  `cores`.
+* `cores > 1` is what *triggers* the lazy creation of the pool on the first
+  call; the size of the persistent pool comes from `loo.daemons`/`LOO_DAEMONS`,
+  not from `cores`. Once the pool is warm, every later call uses it regardless
+  of `cores` (see "How `cores` interacts with a pool" below).
 * Invalid values disable the feature: anything below `2`, a non-integer, or
   unset all mean "no persistent pool" (and __loo__ falls back to the per-call
   behavior from Section 1).
@@ -157,15 +168,16 @@ the right tool for advanced setups --- in particular **remote, SSH, or HPC
 cluster** workers.
 
 A local pool you manage by hand behaves just like the persistent pool from
-Section 2:
+Section 2. Because a connected pool always wins, you do not even need to pass
+`cores` --- __loo__ uses the pool whatever `cores` is:
 
 ```{r user-local, eval=FALSE}
 library(mirai)
 
-daemons(4)                                  # start 4 local workers
-loo1 <- loo(LLarr, r_eff = r_eff, cores = 2) # reuses your pool
-loo2 <- loo(LLarr, r_eff = r_eff, cores = 2) # reuses it again
-daemons(0)                                  # you decide when to stop them
+daemons(4)                       # start 4 local workers
+loo1 <- loo(LLarr, r_eff = r_eff) # reuses your pool (cores not needed)
+loo2 <- loo(LLarr, r_eff = r_eff) # reuses it again
+daemons(0)                       # you decide when to stop them
 ```
 
 For distributed computing, point __mirai__ at remote machines or a cluster
@@ -187,6 +199,42 @@ loo_big <- loo(large_loglik, r_eff = r_eff_big, cores = 8)
 
 daemons(0)
 ```
+
+# How `cores` interacts with a pool
+
+The rule is simple: **whenever a daemon pool is connected, __loo__ uses it and
+ignores `cores`.** This applies both to a pool you set up yourself (Section 3)
+and to a `loo.daemons` pool once it has been created (Section 2). In that state
+the *value* of `cores` does not matter --- `cores = 2` and `cores = 6` behave
+identically, and even `cores = 1` (the default when `mc.cores` is unset) still
+runs in parallel on the pool. The first time a call would otherwise have looked
+like a request for serial execution (`cores <= 1`) while a pool is connected,
+__loo__ prints a one-time message noting that `cores` is being ignored.
+
+`cores` only controls things when **no** pool is connected: there `cores > 1`
+both enables parallelism and sets the size of the temporary per-call pool
+(Section 1), and it is what triggers lazy creation of a `loo.daemons` pool
+(Section 2). If you genuinely want a single call to run serially while a pool
+is up, stop the pool first with `mirai::daemons(0)`.
+
+## When is the number of worker daemons equal to `cores`?
+
+It follows directly from the rule above. The number of workers actually doing
+the computation equals `cores` **only in the per-call case**; in every other
+case the worker count comes from the pool and `cores` is irrelevant:
+
+| How parallelism is set up | Number of worker daemons | Equal to `cores`? |
+|---|---|---|
+| Per-call, no pool connected (`cores = k`, Section 1) | `k` | **Yes** --- loo spawns exactly `cores` daemons for the call |
+| Persistent pool (`options(loo.daemons = k)`, Section 2) | `k` (from `loo.daemons`) | Only if you happen to pass the same `cores` |
+| User-managed pool (`mirai::daemons(n)`, Section 3) | `n` (whatever you started) | Only if you happen to pass the same `cores` |
+
+In other words, `cores` *is* the daemon count in the per-call path, but for a
+persistent or user-managed pool the daemon count is fixed by `loo.daemons` or
+by your `mirai::daemons()` call, and passing a different `cores` (including the
+default `1`) does **not** change how many workers run. Internally __loo__ always
+splits the work according to the number of daemons that are actually connected,
+not the requested `cores`.
 
 # Large objects and shared memory
 
@@ -219,6 +267,10 @@ A few general notes:
   and never removed by __loo__, and nested __loo__ calls reuse an outer pool
   rather than creating a new one. For example, `loo_model_weights()` sets up a
   single pool and reuses it across all of the models it evaluates.
+* A connected pool always wins: when one is active, `cores` is ignored and the
+  work runs on the pool (the first time a `cores <= 1` call is overridden this
+  way, __loo__ prints a one-time message). Stop the pool with
+  `mirai::daemons(0)` if you need a call to run serially.
 * On Windows, avoid setting `mc.cores` in your `.Rprofile`
   (see [this issue](https://github.com/stan-dev/loo/issues/94)); pass `cores`
   explicitly or set the option in your script instead.
