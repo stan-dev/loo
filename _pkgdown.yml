@@ -52,6 +52,7 @@ articles:
       - loo2-non-factorized
       - loo2-lfo
       - loo2-large-data
+      - loo2-parallel
       - loo2-moment-matching
       - loo2-mixis
   - title: Frequently asked questions

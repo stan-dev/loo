@@ -39,6 +39,26 @@ recommend using as many (or close to as many) cores as possible.
 \href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
 the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
 setting \code{mc.cores} interactively or in a script is fine).
+}
+
+Parallelism is implemented with the \pkg{mirai} package. There are three
+ways to control the backend, in increasing order of precedence:
+\itemize{
+\item \code{cores > 1} (the default behaviour): a local daemon pool is created for
+the duration of the call and torn down automatically when it returns, so
+no worker processes are left running. This is convenient for one-off
+calls but pays a small pool start-up/teardown cost on every call.
+\item \code{options(loo.daemons = k)} or the environment variable \code{LOO_DAEMONS=k}
+(with \code{k >= 2}): opt in to a \emph{persistent} local pool of \code{k} daemons that
+is created lazily on the first parallel call and kept warm for the rest
+of the R session, then cleaned up automatically at session exit. This
+avoids repeated pool start-up/teardown and is ideal for simulations,
+benchmarks, and batch/HPC scripts that call \code{loo()}/\code{psis()} many times.
+Local pools automatically use zero-copy shared memory (via \pkg{mori})
+for the shared posterior draws.
+\item A pool you configure yourself with \code{\link[mirai:daemons]{mirai::daemons()}} (including
+remote/SSH/HPC daemons via \code{mirai::daemons(url = ...)}) always takes
+precedence: loo reuses it and never tears it down.
 }}
 }
 \description{

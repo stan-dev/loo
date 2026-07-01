@@ -188,15 +188,24 @@ loo_model_weights.default <-
       N <- ncol(x[[1]]) # number of data points
       validate_log_lik_list(x)
       validate_r_eff_list(r_eff_list, K, N)
-      lpd_point <- matrix(NA, N, K)
-      elpd_loo <- rep(NA, K)
-      for (k in 1:K) {
-        r_eff_k <- r_eff_list[[k]] # possibly NULL
-        log_likelihood <- x[[k]]
-        loo_object <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
-        lpd_point[, k] <- loo_object$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
-        elpd_loo[k] <- loo_object$estimates["elpd_loo", "Estimate"]
-      }
+      # Establish a single daemon pool for all K models so each inner loo()
+      # reuses it instead of spinning a pool up and down K times.
+      loo_objects <- with_loo_daemons(
+        cores,
+        lapply(seq_len(K), function(k) {
+          loo(x[[k]], r_eff = r_eff_list[[k]], cores = cores)
+        })
+      )
+      lpd_point <- vapply(
+        loo_objects,
+        function(o) o$pointwise[, "elpd_loo"], #calculate log(p_k (y_i | y_-i))
+        FUN.VALUE = numeric(N)
+      )
+      elpd_loo <- vapply(
+        loo_objects,
+        function(o) o$estimates["elpd_loo", "Estimate"],
+        FUN.VALUE = numeric(1)
+      )
     } else if (is.psis_loo(x[[1]])) {
       validate_psis_loo_list(x)
       lpd_point <- do.call(cbind, lapply(x, function(obj) obj$pointwise[, "elpd_loo"]))
