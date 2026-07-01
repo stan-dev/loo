@@ -271,14 +271,16 @@ stacking_weights <-
       # gradient of the objective function
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
-      grad <- rep(0, K - 1)
       # avoid over- and underflows using log weights, rowLogSumExps,
       # and by subtracting the row maximum of lpd_point
       mlpd <- matrixStats::rowMaxs(lpd_point)
-      for (k in 1:(K - 1)) {
-        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
-      }
-      return(-grad)
+      denom <- exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd)
+      -colSums(
+        (
+          exp(lpd_point[, 1:(K - 1), drop = FALSE] - mlpd) -
+            exp(lpd_point[, K] - mlpd)
+        ) / denom
+      )
     }
 
     ui <- rbind(rep(-1, K - 1), diag(K - 1))  # K-1 simplex constraint matrix
