@@ -121,9 +121,27 @@ tree's real footprint).
 
 Edit the top of `benchmark-parallel.R` to match your machine / problem sizes:
 
-- `cores_grid` (default `c(1, 4, 8)`) — the core counts to sweep.
-- `iters` (default `5`) — iterations per `bench::mark()` measurement.
-- `psis_sizes` and the `loo.function` `draws` dimensions — the problem sizes.
+- `cores_grid` (default `c(1, 4, 6)`) — the core counts to sweep.
+- `iters` (default `10`) — iterations per `bench::mark()` measurement for the
+  small/cheap scenarios.
+- `big_iters` (default `5`) — iterations for the large, slow scenarios that are
+  actually worth parallelizing (fewer iterations keeps total runtime sane).
+- `psis_sizes` and `loo_sizes` — the problem sizes. Each entry carries its own
+  `iters`.
+
+Which scenarios are actually worth parallelizing:
+
+- **`loo.function` (`loo_sizes`)** is the path that parallelizes well. `draws`
+  is shared zero-copy across local workers via `mori`, so only tiny
+  per-observation data/results move. The two larger configs (~9s and ~18s
+  serial) reach roughly 2.3x at 4 cores and 3x at 8 cores in local testing —
+  even with the per-call pool, so a single one-off call already benefits.
+- **Matrix `psis` (`psis_sizes`)** is *not* worth parallelizing, even when
+  large: it must ship a big log-ratio matrix out to the workers and return an
+  equally large weighted matrix, so it is communication-bound and stays near 1x
+  regardless of size. The large `S=6000 N=20000` entry (~960 MB) is included
+  deliberately to show this — make sure the machine has enough RAM before adding
+  bigger ones.
 
 For `peak-mem-run.R`, adjust `S`, `P`, and `Nf` to change the size of the
 broadcast `draws` matrix.
