@@ -9,6 +9,7 @@ x_prob <- 1 / (1 + exp(-x))
 y <- rnorm(ncol(LL))
 y_binary <- rbinom(ncol(LL), 1, 0.5)
 
+suppressWarnings({
 mae_mean <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff)
 mae_quant <- loo_predictive_metric(x, y, LL, metric = 'mae', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
@@ -28,23 +29,24 @@ acc_quant <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'acc', r_eff =
 bacc_mean <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'balanced_acc', r_eff = r_eff)
 bacc_quant <- loo_predictive_metric(x_prob, y_binary, LL, metric = 'balanced_acc', r_eff = r_eff,
                                   type = 'quantile', probs = 0.9)
+})
 
 test_that('loo_predictive_metric stops with incorrect inputs', {
-  expect_error(loo_predictive_metric(as.character(x), y, LL, r_eff = r_eff),
+  expect_error(suppressWarnings(loo_predictive_metric(as.character(x), y, LL, r_eff = r_eff)),
                'no applicable method',
                fixed = TRUE)
 
-  expect_error(loo_predictive_metric(x, as.character(y), LL, r_eff = r_eff),
+  expect_error(suppressWarnings(loo_predictive_metric(x, as.character(y), LL, r_eff = r_eff)),
                'is.numeric(y) is not TRUE',
                fixed = TRUE)
 
   x_invalid <- matrix(rnorm(9), nrow = 3)
-  expect_error(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff),
+  expect_error(suppressWarnings(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff)),
                'identical(ncol(x), length(y)) is not TRUE',
                fixed = TRUE)
 
   x_invalid <- matrix(rnorm(64), nrow = 2)
-  expect_error(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff),
+  expect_error(suppressWarnings(loo_predictive_metric(x_invalid, y, LL, r_eff = r_eff)),
                'identical(dim(x), dim(log_lik)) is not TRUE',
                fixed = TRUE)
 })

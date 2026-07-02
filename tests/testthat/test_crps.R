@@ -25,10 +25,22 @@ test_that("crps computation is correct", {
 })
 
 test_that("crps matches snapshots", {
-  expect_snapshot_value(with_seed(1, crps(x1, x2, y)), style = "serialize")
-  expect_snapshot_value(with_seed(1, scrps(x1, x2, y)), style = "serialize")
-  expect_snapshot_value(with_seed(1, loo_crps(x1, x2, y, ll)), style = "serialize")
-  expect_snapshot_value(with_seed(1, loo_scrps(x1, x2, y, ll)), style = "serialize")
+  expect_snapshot_value(
+    with_seed(1, suppressWarnings(crps(x1, x2, y))),
+    style = "serialize"
+  )
+  expect_snapshot_value(
+    with_seed(1, suppressWarnings(scrps(x1, x2, y))),
+    style = "serialize"
+  )
+  expect_snapshot_value(
+    with_seed(1, suppressWarnings(loo_crps(x1, x2, y, ll))),
+    style = "serialize"
+  )
+  expect_snapshot_value(
+    with_seed(1, suppressWarnings(loo_scrps(x1, x2, y, ll))),
+    style = "serialize"
+  )
 })
 
 test_that("input validation throws correct errors", {
@@ -53,6 +65,6 @@ test_that("input validation throws correct errors", {
 })
 
 test_that("methods for single data point don't error", {
-  expect_silent(crps(x1[,1], x2[,1], y[1]))
-  expect_silent(scrps(x1[,1], x2[,1], y[1]))
+  expect_silent(suppressWarnings(crps(x1[, 1], x2[, 1], y[1])))
+  expect_silent(suppressWarnings(scrps(x1[, 1], x2[, 1], y[1])))
 })
