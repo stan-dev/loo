@@ -19,7 +19,7 @@ kfold_split_grouped(K = 10, x = NULL)
 \item{N}{The number of observations in the data.}
 
 \item{x}{A discrete variable of length \code{N} with at least \code{K} levels (unique
-values). Will be coerced to a \link{factor}.}
+values). Will be coerced to a \link[=factor]{factor}.}
 }
 \value{
 An integer vector of length \code{N} where each element is an index in \code{1:K}.

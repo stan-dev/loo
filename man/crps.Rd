@@ -11,7 +11,7 @@
 \alias{scrps.matrix}
 \alias{scrps.numeric}
 \alias{loo_scrps.matrix}
-\title{Continuously ranked probability score}
+\title{Continuously ranked probability score (deprecated)}
 \usage{
 crps(x, ...)
 
@@ -85,6 +85,17 @@ The former reports estimator and standard error and latter the pointwise
 values. Following Bolin & Wallin (2023), a larger value is better.
 }
 \description{
+As of loo 3.0.0, \code{crps()}, \code{scrps()}, \code{loo_crps()}, and \code{loo_scrps()} are
+\strong{deprecated}. Please use \code{\link[=measure_rps]{measure_rps()}} and \code{\link[=measure_srps]{measure_srps()}} instead,
+or \code{\link[=loo_pred_measure]{loo_pred_measure()}} for leave-one-out predictive performance.
+See \code{vignette("migration-guide", package = "loo")} for a full mapping table.
+}
+\details{
+The new functions use a single matrix of posterior predictive draws
+(\code{ypred}) and a PWM estimator. The deprecated functions require two
+independent draw matrices (\code{x} and \code{x2}) and use a permutation-based
+estimator. See \code{\link[=measure_rps]{measure_rps()}} for migration details.
+
 The \code{crps()} and \code{scrps()} functions and their \verb{loo_*()} counterparts can be
 used to compute the continuously ranked probability score (CRPS) and scaled
 CRPS (SCRPS) (as defined by Bolin and Wallin, 2023). CRPS is a proper scoring rule, and
@@ -92,8 +103,7 @@ strictly proper when the first moment of the predictive distribution is
 finite. Both can be expressed in terms of samples form the predictive
 distribution. See, for example, a paper by Gneiting and Raftery (2007)
 for a comprehensive discussion on CRPS.
-}
-\details{
+
 To compute (S)CRPS, the user needs to provide two sets of draws, \code{x} and
 \code{x2}, from the predictive distribution. This is due to the fact that formulas
 used to compute CRPS involve an expectation of the absolute difference of \code{x}
@@ -102,14 +112,15 @@ as well as Gneiting and Raftery (2007) for details.
 }
 \examples{
 \dontrun{
-# An example using rstanarm
+# Deprecated:
 library(rstanarm)
 data("kidiq")
 fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 ypred1 <- posterior_predict(fit)
 ypred2 <- posterior_predict(fit)
 crps(ypred1, ypred2, y = fit$y)
-loo_crps(ypred1, ypred2, y = fit$y, log_lik = log_lik(fit))
+# ->
+measure_rps(y = fit$y, ypred = ypred1)
 }
 
 }
@@ -120,4 +131,7 @@ proper scoring rules. Statistical Science, 38(1):140-159.
 Gneiting, T., & Raftery, A. E. (2007). Strictly Proper Scoring Rules,
 Prediction, and Estimation. Journal of the American Statistical Association,
 102(477), 359–378.
+}
+\seealso{
+\code{\link[=measure_rps]{measure_rps()}}, \code{\link[=measure_srps]{measure_srps()}}, \code{\link[=loo_pred_measure]{loo_pred_measure()}}
 }

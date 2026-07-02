@@ -47,6 +47,8 @@ A named list with components \code{lw_smooth} (modified log weights) and
 \description{
 As of version \verb{2.0.0} this function is \strong{deprecated}. Please use the
 \code{\link[=psis]{psis()}} function for the new PSIS algorithm.
+\code{psislw()} and \code{R/psislw.R} are scheduled for removal in 3.0.0.
+See \code{vignette("migration-guide", package = "loo")} for details.
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
