@@ -1,0 +1,223 @@
+---
+title: "Migration guide"
+author: "loo package developers"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Migration guide}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+This vignette documents API changes for the **predictive performance measures**
+feature introduced on this branch. It lists deprecated functions, their
+replacements, and the new `*_pred_measure()` workflow.
+
+| Status | Meaning |
+|--------|---------|
+| **Deprecated** | Still works but emits a warning (via `.Deprecated()`). Use the replacement for new code. |
+| **Current** | Supported API; use for new code. |
+
+Release notes appear in `NEWS.md`. Deprecated functions are listed under
+**Deprecated functions** on the package website.
+
+## Scope of this guide (predictive performance branch)
+
+This guide covers migrations for `elpd()`, `crps()`, `scrps()`, `loo_crps()`,
+`loo_scrps()`, and `loo_predictive_metric()` to the unified `measure_*()` and
+`*_pred_measure()` API.
+
+Migrations for `compare()`, `psislw()`, loo-object extractors, and other
+changes planned for **loo 3.0.0** are documented on the `loo-v3.0.0` branch
+(see `dev/migration-guide-loo-v3.Rmd`). Those sections will be merged into a
+single guide when both branches are integrated.
+
+---
+
+# Deprecated source files
+
+| File | Status | Replacement / notes |
+|------|--------|---------------------|
+| `R/elpd.R` | Deprecated | `measure_elpd()` in `R/pred_measure-builtin.R` |
+| `R/crps.R` | Deprecated | `measure_rps()`, `measure_srps()`, `loo_pred_measure()` |
+| `R/loo_predictive_metric.R` | Deprecated | `loo_pred_measure()`, `measure_*()` |
+| `R/pred_measure.R` | **Current** | `*_pred_measure()` entry points |
+| `R/pred_measure-compute.R` | **Current** | Internal orchestration |
+| `R/pred_measure-helpers.R` | **Current** | Validation and helpers |
+| `R/pred_measure-builtin.R` | **Current** | `measure_*()` implementations |
+
+---
+
+# Function migration tables
+
+## Expected log predictive density
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `elpd()` | `measure_elpd()` | 3.0.0 | |
+
+**Return type change:** `elpd()` returns class `"elpd_generic"` with `elpd` and
+`ic` columns in `pointwise`. `measure_elpd()` returns class `"measure"`.
+
+```r
+# Deprecated
+elpd(log_lik_matrix)
+
+# Current
+measure_elpd(log_lik_matrix)
+```
+
+## Scoring rules (CRPS / SCRPS)
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `crps(x, x2, y)` | `measure_rps(y, ypred = x)` | 3.0.0 | |
+| `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | 3.0.0 | |
+| `loo_crps(...)` | `loo_pred_measure(..., measure = "rps")` | 3.0.0 | |
+| `loo_scrps(...)` | `loo_pred_measure(..., measure = "srps")` | 3.0.0 | |
+
+**API change:** deprecated functions require **two** draw matrices (`x`, `x2`)
+and use a permutation-based estimator. The replacement uses **one** draw
+matrix (`ypred`) and a PWM estimator. Results are not identical.
+
+```r
+# Deprecated
+crps(ypred1, ypred2, y = y)
+
+# Current
+measure_rps(y = y, ypred = ypred1)
+```
+
+## Leave-one-out predictive metrics
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `loo_predictive_metric()` | `loo_pred_measure()` | 3.0.0 | |
+
+**Argument mapping:**
+
+| Old (`loo_predictive_metric`) | New (`loo_pred_measure`) |
+|-------------------------------|--------------------------|
+| `x` (predictions) | `mupred` |
+| `log_lik` | via `loo(..., save_psis = TRUE)` or `ylp` + `psis_object` |
+| `metric = "mae"` | `measure = "mae"` |
+| `metric = "balanced_acc"` | `measure = "bacc"` |
+
+```r
+# Deprecated
+loo_predictive_metric(x = mupred, y = y, log_lik = ll, metric = "mae")
+
+# Current
+loo_fit <- loo(ll, save_psis = TRUE)
+loo_pred_measure(loo = loo_fit, y = y, mupred = mupred, measure = "mae")
+```
+
+---
+
+# Current predictive performance API (3.0.0)
+
+## Workflow entry points
+
+| Function | Evaluation mode | Source file |
+|----------|-----------------|-------------|
+| `insample_pred_measure()` | In-sample | `pred_measure.R` |
+| `loo_pred_measure()` | PSIS-LOO | `pred_measure.R` |
+| `kfold_pred_measure()` | K-fold CV | `pred_measure.R` |
+| `test_pred_measure()` | Holdout test set | `pred_measure.R` |
+| `pred_measure()` | Add measures incrementally | `pred_measure.R` |
+
+## Built-in measures
+
+Pass short names to the `measure` argument, or call standalone functions:
+
+| `measure =` | Function | Source file |
+|-------------|----------|-------------|
+| `"elpd"` | `measure_elpd()` | `pred_measure-builtin.R` |
+| `"mlpd"` | `measure_mlpd()` | `pred_measure-builtin.R` |
+| `"ic"` | `measure_ic()` | `pred_measure-builtin.R` |
+| `"mae"` | `measure_mae()` | `pred_measure-builtin.R` |
+| `"mse"` | `measure_mse()` | `pred_measure-builtin.R` |
+| `"rmse"` | `measure_rmse()` | `pred_measure-builtin.R` |
+| `"r2"` | `measure_r2()` | `pred_measure-builtin.R` |
+| `"acc"` | `measure_acc()` | `pred_measure-builtin.R` |
+| `"bacc"` | `measure_bacc()` | `pred_measure-builtin.R` |
+| `"rps"` | `measure_rps()` | `pred_measure-builtin.R` |
+| `"srps"` | `measure_srps()` | `pred_measure-builtin.R` |
+
+List all registered built-in names:
+
+```r
+supported_measures_list()
+```
+
+`measure_brier()` is exported but not yet registered in `supported_measures_list()`.
+
+---
+
+# Maintainer checklist
+
+When deprecating or removing a function on this branch:
+
+1. Add `.Deprecated("replacement")` in each exported method (only if the
+   replacement exists in the same branch).
+2. Document deprecation in roxygen (`**deprecated**`, links to replacement).
+3. Add a bullet to `NEWS.md`.
+4. Update this migration guide.
+5. Add or update tests in `tests/testthat/test_deprecated_measures.R`.
+6. List the topic under **Deprecated functions** in `_pkgdown.yml`.
+7. Keep the old implementation until the planned removal release.
+8. On removal: delete the source file, remove from `NAMESPACE`, update this guide.
+
+Do **not** add `compare()` / `psislw()` migration content here; that belongs on
+the `loo-v3.0.0` branch migration guide.
+
+---
+
+# `_pkgdown.yml` reference (this branch)
+
+Suggested `_pkgdown.yml` entries for this branch:
+
+```yaml
+articles:
+  - title: Migration
+    desc: |
+      Guides for updating code when APIs change.
+    contents:
+      - migration-guide
+
+reference:
+  - title: Predictive performance measures
+    desc: |
+      Unified API for predictive performance measures (density scores, scoring
+      rules, and point-prediction metrics) with in-sample, LOO, K-fold, and
+      holdout evaluation modes.
+    contents:
+      - insample_pred_measure
+      - loo_pred_measure
+      - kfold_pred_measure
+      - test_pred_measure
+      - pred_measure
+      - supported_measures_list
+      - starts_with("measure_")
+      - ptw_log_pred_density
+  - title: Deprecated functions
+    contents:
+      - elpd
+      - crps
+      - loo_predictive_metric
+```
+
+After merging into `loo-v3.0.0`, combine this with the `compare` and `psislw`
+entries from that branch's migration guide.
