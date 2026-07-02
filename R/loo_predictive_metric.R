@@ -1,5 +1,8 @@
-#' Estimate leave-one-out predictive performance..
-#'
+#' Estimate leave-one-out predictive performance.
+#' 
+#' **This function is deprecated**. Please use the new [loo_pred_measure()] 
+#' function instead.
+#' 
 #' The `loo_predictive_metric()` function computes estimates of leave-one-out
 #' predictive metrics given a set of predictions and observations. Currently
 #' supported metrics are mean absolute error, mean squared error and root mean

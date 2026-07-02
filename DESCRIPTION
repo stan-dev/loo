@@ -36,6 +36,7 @@ Depends:
     R (>= 3.5)
 Imports:
     checkmate,
+    cli,
     matrixStats (>= 0.52),
     parallel,
     posterior (>= 1.7.0),

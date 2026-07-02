@@ -3,7 +3,7 @@
 \name{loo_predictive_metric}
 \alias{loo_predictive_metric}
 \alias{loo_predictive_metric.matrix}
-\title{Estimate leave-one-out predictive performance..}
+\title{Estimate leave-one-out predictive performance.}
 \usage{
 loo_predictive_metric(x, ...)
 
@@ -68,6 +68,10 @@ Standard error of the estimate.
 }
 }
 \description{
+\strong{This function is deprecated}. Please use the new \code{\link[=loo_pred_measure]{loo_pred_measure()}}
+function instead.
+}
+\details{
 The \code{loo_predictive_metric()} function computes estimates of leave-one-out
 predictive metrics given a set of predictions and observations. Currently
 supported metrics are mean absolute error, mean squared error and root mean
