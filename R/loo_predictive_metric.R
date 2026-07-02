@@ -1,4 +1,15 @@
-#' Estimate leave-one-out predictive performance..
+#' Estimate leave-one-out predictive performance (deprecated)
+#'
+#' As of loo 3.0.0, `loo_predictive_metric()` is **deprecated**. Please use
+#' [loo_pred_measure()] instead, or the standalone [measure_mae()],
+#' [measure_rmse()], [measure_mse()], [measure_acc()], and [measure_bacc()]
+#' functions with PSIS log-weights.
+#' See `vignette("migration-guide", package = "loo")` for a full mapping table.
+#'
+#' @details
+#' The replacement API uses `mupred` (posterior expected values) rather than
+#' pre-computed LOO expectations passed as `x`. Metric names also differ:
+#' `"balanced_acc"` maps to `"bacc"` in [supported_measures_list()].
 #'
 #' The `loo_predictive_metric()` function computes estimates of leave-one-out
 #' predictive metrics given a set of predictions and observations. Currently
@@ -49,6 +60,7 @@
 #'   Standard error of the estimate.
 #'   }
 #'  }
+#' @seealso [loo_pred_measure()], [measure_mae()], [supported_measures_list()]
 #' @export
 #'
 #' @examples
@@ -93,6 +105,7 @@ loo_predictive_metric.matrix <-
            metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
+    .Deprecated("loo_pred_measure")
     stopifnot(
       is.numeric(x),
       is.numeric(y),

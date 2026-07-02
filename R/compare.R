@@ -1,7 +1,8 @@
 #' Model comparison (deprecated, old version)
 #'
 #' **This function is deprecated**. Please use the new [loo_compare()] function
-#' instead.
+#' instead. See `vignette("migration-guide", package = "loo")` for details.
+#' `compare()` and `R/compare.R` are scheduled for removal in 3.0.0.
 #'
 #' @export
 #' @param ... At least two objects returned by [loo()] (or [waic()]).

@@ -2,6 +2,8 @@
 #'
 #' As of version `2.0.0` this function is **deprecated**. Please use the
 #' [psis()] function for the new PSIS algorithm.
+#' `psislw()` and `R/psislw.R` are scheduled for removal in 3.0.0.
+#' See `vignette("migration-guide", package = "loo")` for details.
 #'
 #' @export
 #' @param lw A matrix or vector of log weights. For computing LOO, `lw =
