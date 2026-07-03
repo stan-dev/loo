@@ -19,6 +19,7 @@ vignettes/loo2-non-factorizable_cache/*
 vignettes/*.html
 vignettes/*.pdf
 inst/doc
+*.html
 
 revdep/*
 tests/testthat/Rplots.pdf

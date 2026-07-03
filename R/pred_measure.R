@@ -255,9 +255,11 @@ loo_pred_measure <- function(
 #'   )
 #'   kf <- brms::kfold(fit, K = 5, save_fits = TRUE)
 #'   ypred_kf <- brms::kfold_predict(kf, method = "predict")$yrep
+#'   mupred_kf <- brms::kfold_predict(kf, method = "fitted")$yrep
 #'   kfold_pred_measure(
 #'     y = fit$data$Reaction,
 #'     ypred = ypred_kf,
+#'     mupred = mupred_kf,
 #'     kfold = kf,
 #'     measure = "rmse"
 #'   )
@@ -427,14 +429,13 @@ test_pred_measure <- function(
 #'   result <- insample_pred_measure(
 #'     ylp = brms::log_lik(fit),
 #'     y = fit$data$Reaction,
-#'     ypred = brms::posterior_predict(fit),
-#'     measure = "rmse"
+#'     ypred = brms::posterior_predict(fit)
 #'   )
 #'   pred_measure(
 #'     y = fit$data$Reaction,
 #'     mupred = brms::posterior_epred(fit),
 #'     predperf = result,
-#'     measure = "r2"
+#'     measure = c("rmse", "r2")
 #'   )
 #' }
 #' }

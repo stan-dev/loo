@@ -87,9 +87,11 @@ if (requireNamespace("brms", quietly = TRUE)) {
   )
   kf <- brms::kfold(fit, K = 5, save_fits = TRUE)
   ypred_kf <- brms::kfold_predict(kf, method = "predict")$yrep
+  mupred_kf <- brms::kfold_predict(kf, method = "fitted")$yrep
   kfold_pred_measure(
     y = fit$data$Reaction,
     ypred = ypred_kf,
+    mupred = mupred_kf,
     kfold = kf,
     measure = "rmse"
   )
