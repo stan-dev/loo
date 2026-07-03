@@ -96,8 +96,9 @@ needs:\tabular{lcccc}{
 
 Base measures (\code{elpd}, \code{ic}) are always computed when \code{ylp} is provided.
 Pass additional built-in names via \code{measure}, or supply a custom function;
-see \link{supported_measures_list} and \code{vignette("overview-measures")} for
-definitions and orientation (higher vs lower is better).
+see \link{supported_measures_list} and the
+\href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{overview of scores and metrics}
+article for definitions and orientation (higher vs lower is better).
 
 \strong{Custom measures.} A function passed to \code{measure} must have attribute
 \code{measure_name} and return \code{estimate}, \code{se}, and \code{pointwise}. Only arguments
@@ -140,5 +141,5 @@ attr(my_abs_err, "measure_name") <- "my_abs_err"
 \code{\link[=pred_measure]{pred_measure()}} to add measures incrementally,
 \code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}, \code{\link[=test_pred_measure]{test_pred_measure()}},
 \link{supported_measures_list},
-\code{vignette("pred_measure_tutorial")}
+\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}
 }

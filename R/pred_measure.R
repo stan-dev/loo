@@ -43,8 +43,9 @@
 #'
 #' Base measures (`elpd`, `ic`) are always computed when `ylp` is provided.
 #' Pass additional built-in names via `measure`, or supply a custom function;
-#' see [supported_measures_list] and `vignette("overview-measures")` for
-#' definitions and orientation (higher vs lower is better).
+#' see [supported_measures_list] and the
+#' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
+#' article for definitions and orientation (higher vs lower is better).
 #'
 #' **Custom measures.** A function passed to `measure` must have attribute
 #' `measure_name` and return `estimate`, `se`, and `pointwise`. Only arguments
@@ -85,7 +86,7 @@
 #' @seealso [pred_measure()] to add measures incrementally,
 #'   [loo_pred_measure()], [kfold_pred_measure()], [test_pred_measure()],
 #'   [supported_measures_list],
-#'   `vignette("pred_measure_tutorial")`
+#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 insample_pred_measure <- function(
@@ -186,7 +187,7 @@ insample_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [pred_measure()], [loo::loo()],
 #'   [supported_measures_list],
-#'   `vignette("pred_measure_tutorial")`
+#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 loo_pred_measure <- function(
@@ -244,7 +245,7 @@ loo_pred_measure <- function(
 #' For distributional measures on held-out folds, obtain posterior predictions
 #' with `brms::kfold_predict()` and pass the resulting `yrep` matrices as
 #' `ypred` and/or `mupred`. See the sleep-study workflow in
-#' `vignette("pred_measure_tutorial")`.
+#' [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html).
 #'
 #' @examples
 #' \donttest{
@@ -266,7 +267,7 @@ loo_pred_measure <- function(
 #'
 #' @seealso [loo_pred_measure()], [insample_pred_measure()], [pred_measure()],
 #'   [brms::kfold()], [supported_measures_list],
-#'   `vignette("pred_measure_tutorial")`
+#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 kfold_pred_measure <- function(
@@ -347,7 +348,7 @@ kfold_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [loo_pred_measure()],
 #'   [kfold_pred_measure()], [pred_measure()], [supported_measures_list],
-#'   `vignette("pred_measure_tutorial")`
+#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 test_pred_measure <- function(
@@ -441,7 +442,7 @@ test_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [loo_pred_measure()],
 #'   [kfold_pred_measure()], [test_pred_measure()], [supported_measures_list],
-#'   `vignette("pred_measure_tutorial", package = "pred_measures")`
+#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 pred_measure <- function(
