@@ -59,6 +59,13 @@ articles:
       Guides for updating code when APIs change.
     contents:
       - migration-guide
+  - title: Predictive performance measures
+    desc: |
+      Reference and workflow articles for the `*_pred_measure()` API (website
+      only; not included in the CRAN package).
+    contents:
+      - articles-online-only/pred-measure-workflow
+      - articles-online-only/overview-measures
   - title: Frequently asked questions
     contents:
       - faq

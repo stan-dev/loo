@@ -38,7 +38,7 @@ jobs:
             local::.
             any::bayesplot
             any::BH
-            any::brms
+            paul-buerkner/brms
             any::ggplot2
             any::rmarkdown
             any::Rcpp
@@ -51,7 +51,22 @@ jobs:
             any::StanHeaders
             any::knitr
             any::withr
+            any::lme4
+            any::palmerpenguins
             stan-dev/pkgdown-config
+
+      # pred-measure-workflow needs pre-fitted brms models (~99 MB, not in git).
+      # Skipped when data-for-vignettes/ is already present (e.g. local cache).
+      - name: Generate vignette data if missing (slow — fits brms models)
+        run: |
+          VIG_DATA="vignettes/articles-online-only/data-for-vignettes"
+          N=$(find "$VIG_DATA" -name '*.Rds' 2>/dev/null | wc -l)
+          if [ "$N" -lt 5 ]; then
+            echo "::notice title=Vignette data generation::Fitting brms models for data-for-vignettes/ — expect ~10-20 minutes."
+            Rscript tests/testthat/data-for-tests/test_data_generation.R --vignettes-only
+          else
+            echo "Vignette data already present ($N RDS files) — skipping generation."
+          fi
 
       - name: Build site
         run: |
