@@ -412,7 +412,7 @@ do_pred_measure <- function(
   if (!is.null(predperf)) return(predperf)
   
   if (source == "kfold") {
-    components <- if ("diagnostics" %in% kfold1) {
+    components <- if ("diagnostics" %in% kfold) {
       c("estimates", "pointwise", "diagnostics")
     } else {
       c("estimates", "pointwise")
@@ -433,9 +433,9 @@ do_pred_measure <- function(
   }
   
   elpd_res <- switch(source,
-    insample = elpd(ylp = ylp),
-    loo = elpd(ylp = ylp, log_weights = psis_object$log_weights),
-    test = elpd(ylp_test)
+    insample = measure_elpd(ylp = ylp),
+    loo = measure_elpd(ylp = ylp, log_weights = psis_object$log_weights),
+    test = measure_elpd(ylp_test)
   )
   
   if (!is.null(elpd_res$estimates)) {
