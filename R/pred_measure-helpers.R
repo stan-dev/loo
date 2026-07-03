@@ -444,7 +444,7 @@
   
   for (func_name in names(control)) {
     invalid_args <- names(control[[func_name]])[
-      !names(control[[func_name]]) %in% names(formals(match.fun(func_name)))
+      !names(control[[func_name]]) %in% names(formals(match.fun(paste0("measure_", func_name))))
     ]
     if (length(invalid_args) > 0) {
       cli::cli_warn(
