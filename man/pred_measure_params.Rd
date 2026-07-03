@@ -43,8 +43,8 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Additional measures beyond the base summaries (\code{elpd} and
-\code{ic}, which are always included). Can be:
+\item{measure}{Additional measures beyond the base summary \code{elpd} (always
+included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \code{\link[=supported_measures_list]{supported_measures_list()}}.

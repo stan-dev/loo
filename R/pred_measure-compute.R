@@ -22,8 +22,8 @@
 #' @param predperf An existing predictive measure object (class
 #'   `"pred_measure"`) to update. When supplied, base density summaries and
 #'   (for LOO) PSIS weights are reused instead of recomputed.
-#' @param measure Additional measures beyond the base summaries (`elpd` and
-#'   `ic`, which are always included). Can be:
+#' @param measure Additional measures beyond the base summary `elpd` (always
+#'   included when `ylp` is available). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
 #'       [supported_measures_list()].
@@ -107,6 +107,12 @@ do_pred_measure <- function(
     checkmate::assert_null(psis_object)
   } else { # kfold
     checkmate::assert_null(psis_object)
+    if (is.null(predperf) && is.null(kfold)) {
+      cli::cli_abort(c(
+        "{.arg kfold} is required for {.fn kfold_pred_measure}.",
+        "i" = "Pass a {.cls kfold} object from {.fn brms::kfold}."
+      ))
+    }
   }
 
   # core logic ---------------------------------------------------
@@ -136,6 +142,14 @@ do_pred_measure <- function(
   log_weights <- if (!is.null(psis_object)) psis_object$log_weights else NULL
 
   for (entry in measures) {
+    name_updated <- .measure_result_name(source, entry$name)
+    if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
+      cli::cli_warn(c(
+        "{.field {name_updated}} already present in results. Skipping the update."
+      ))
+      next
+    }
+
     sel_measure <- .compute_measure(
       y = y,
       ypred = ypred,
@@ -453,9 +467,9 @@ do_pred_measure <- function(
   pointwise <- cbind(elpd = elpd_res$pointwise)
   
   if (add_p_eff) {
-    p_eff <- .compute_effective_param(ylp, elpd_res$pointwise)
-    estimates <- rbind(estimates, p_eff = c(p_eff$estimate, p_eff$se))
-    pointwise <- cbind(pointwise, p_eff = p_eff$pointwise)
+    p_loo <- .compute_effective_param(ylp, elpd_res$pointwise)
+    estimates <- rbind(estimates, p = c(p_loo$estimate, p_loo$se))
+    pointwise <- cbind(pointwise, p = p_loo$pointwise)
   }
   
   rownames(estimates) <- paste0(rownames(estimates), suffix)
@@ -526,18 +540,22 @@ do_pred_measure <- function(
 #' @return Updated matrix with `name` as a row or column name.
 #'
 #' @noRd
-.merge_matrix <- function(source, mat, name, values, margin) {
-  is_row <- margin == 1
-  along <- if (is_row) rownames else colnames
-  bind_fn <- if (is_row) rbind else cbind
-  name_updated <- switch(
+.measure_result_name <- function(source, name) {
+  switch(
     source,
     kfold = paste0(name, "_kfold"),
     loo = paste0(name, "_loo"),
     test = paste0(name, "_test"),
     insample = name
   )
-  
+}
+
+#' @noRd
+.merge_matrix <- function(source, mat, name, values, margin) {
+  is_row <- margin == 1
+  bind_fn <- if (is_row) rbind else cbind
+  name_updated <- .measure_result_name(source, name)
+
   new_slice <- if (is_row) {
     matrix(values, nrow = 1, dimnames = list(name_updated, c("Estimate", "SE")))
   } else {
@@ -545,16 +563,6 @@ do_pred_measure <- function(
   }
 
   if (is.null(mat)) return(new_slice)
-  # && margin == 1 condition ensures that warning is shown only once
-  if (name_updated %in% along(mat) && margin == 1) {
-    # TODO: Check whether this behavior is wanted
-    cli::cli_warn(
-      c(
-        "{.field {name_updated}} already present in results. Skipping the update."
-      )
-    )
-    return(mat)
-  }
   bind_fn(mat, new_slice)
 }
 

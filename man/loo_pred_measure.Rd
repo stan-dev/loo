@@ -33,8 +33,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik.brmsfit]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summaries (\code{elpd} and
-\code{ic}, which are always included). Can be:
+\item{measure}{Additional measures beyond the base summary \code{elpd} (always
+included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \code{\link[=supported_measures_list]{supported_measures_list()}}.
@@ -89,10 +89,9 @@ observation: each held-out point is scored by reweighting the full-data
 posterior draws.
 
 The primary summary is \code{elpd_loo}, the LOO estimate of expected log
-pointwise predictive density (ELPD). Additional rows include \code{ic_loo}
-(\eqn{-2 \times} \code{elpd_loo}) and \code{p_loo} (effective number of parameters,
-the difference between in-sample and LOO log predictive density). See
-\code{\link[=loo]{loo()}} and the
+pointwise predictive density (ELPD). The base result also includes \code{p_loo}
+(effective number of parameters, the difference between in-sample and LOO
+log predictive density). See \code{\link[=loo]{loo()}} and the
 \href{https://users.aalto.fi/~ave/CV-FAQ.html}{Cross-validation FAQ} for
 interpretation.
 }

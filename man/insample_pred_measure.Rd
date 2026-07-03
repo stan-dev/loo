@@ -31,8 +31,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik.brmsfit]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summaries (\code{elpd} and
-\code{ic}, which are always included). Can be:
+\item{measure}{Additional measures beyond the base summary \code{elpd} (always
+included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \code{\link[=supported_measures_list]{supported_measures_list()}}.
@@ -60,8 +60,8 @@ An object of class \code{"insample_pred_measure"} and \code{"pred_measure"}: a l
 with:
 \describe{
 \item{\code{estimates}}{Matrix of summary estimates and standard errors (rows
-are measures, columns are \code{Estimate} and \code{SE}). Base rows \code{elpd} and
-\code{ic} are always present; \code{ic} equals \eqn{-2 \times} \code{elpd}.}
+are measures, columns are \code{Estimate} and \code{SE}). The base row \code{elpd} is
+always present when \code{ylp} is supplied.}
 \item{\code{pointwise}}{Matrix of observation-level contributions (one column
 per measure).}
 }
@@ -72,7 +72,7 @@ draws × observations. Use \code{\link[=print]{print()}} for a readable summary 
 \description{
 Compute predictive performance measures on the same data used to fit the
 model. This is the simplest entry point when you want density scores
-(\code{elpd}, \code{ic}) and optional distributional or point-prediction metrics in
+(\code{elpd}) and optional distributional or point-prediction metrics in
 one call.
 
 In-sample \code{elpd} sums the expected log pointwise predictive density (ELPD)
@@ -94,8 +94,8 @@ needs:\tabular{lcccc}{
 }
 
 
-Base measures (\code{elpd}, \code{ic}) are always computed when \code{ylp} is provided.
-Pass additional built-in names via \code{measure}, or supply a custom function;
+Base measure \code{elpd} is always computed when \code{ylp} is provided. Request
+\code{ic}, \code{mlpd}, or other density scores via \code{measure}, or supply a custom function;
 see \link{supported_measures_list} and the
 \href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{overview of scores and metrics}
 article for definitions and orientation (higher vs lower is better).

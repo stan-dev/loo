@@ -36,8 +36,8 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Additional measures beyond the base summaries (\code{elpd} and
-\code{ic}, which are always included). Can be:
+\item{measure}{Additional measures beyond the base summary \code{elpd} (always
+included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \code{\link[=supported_measures_list]{supported_measures_list()}}.
@@ -68,16 +68,16 @@ not used to fit the model. This mirrors the cross-validation goal of
 assessing how well a model predicts unseen observations, but with an
 explicit train/test split rather than LOO or k-fold reweighting.
 
-Supply \code{ylp} from the \strong{training} fit and \code{ylp_test} from log predictive
-densities evaluated on the holdout set (e.g.
-\code{brms::log_lik(fit, newdata = test_data)}). Optional distributional and
-point-prediction measures use observed and predicted values on the test set
-only.
+Supply \code{ylp_test} from log predictive densities evaluated on the holdout set
+(e.g. \code{brms::log_lik(fit, newdata = test_data)}). This is required for the
+base summary \code{elpd_test}. Optional distributional and point-prediction
+measures use observed and predicted values on the test set only. Pass training
+\code{ylp} only when an additional measure needs log predictive densities from the
+training fit.
 }
 \details{
-When both \code{ylp} (training) and \code{ylp_test} (holdout) are provided, the
-effective number of parameters (\code{p_test}) compares in-sample and holdout log
-predictive density, analogous to \code{p_loo} for PSIS-LOO.
+The base summary \code{elpd_test} is computed from \code{ylp_test} on the holdout
+observations only.
 }
 \examples{
 \donttest{

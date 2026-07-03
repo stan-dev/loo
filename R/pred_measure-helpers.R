@@ -371,7 +371,7 @@
 #'
 #' @noRd
 .validate_probs <- function(x, arg) {
-  if (!all(x >= 0 | x <= 1)) {
+  if (!all(x >= 0 & x <= 1)) {
     cli::cli_abort("{.arg {arg}} must contain values in [0, 1].")
   }
 }

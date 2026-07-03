@@ -54,7 +54,8 @@ are:
 - **Distributional scores:** `rps`, `srps`
 - **Point metrics:** `mae`, `mse`, `rmse`, `r2`, `acc`, `bacc`
 
-Base measures (`elpd`, `ic`) are always included automatically; pass any
+Base measure `elpd` is always included automatically when `ylp` is supplied;
+request `ic`, `mlpd`, or other density scores via `measure`. Pass any
 additional names from the list above through the `measure` argument. You can 
 also obtain a list of supported measures via `supported_measures_list`:
 
@@ -112,8 +113,8 @@ sleep_measure <- insample_pred_measure(
 print(sleep_measure)
 ```
 
-Base measures (`elpd`, `ic`) are always computed; pass additional measure names
-in `measure`. The rest of this tutorial explains how inputs map to measures and
+Base measure `elpd` is always computed when `ylp` is supplied; request `ic`
+or other density scores via `measure`. The rest of this tutorial explains how inputs map to measures and
 how to switch evaluation modes.
 
 ## Core concepts
@@ -141,7 +142,7 @@ objects share `attr(result, "dims")` (posterior draws × observations) and
 | :--- | :--- | :--- | :--- | :--- |
 | **Class** | `insample_pred_measure` | `loo_pred_measure` (+ classes from `loo` object) | `kfold_pred_measure` (+ classes from `kfold` object) | `test_pred_measure` |
 | **List slots** | `$estimates`, `$pointwise` | `$estimates`, `$pointwise`, `$diagnostics`, `$log_weights`; (`$psis_object`) | `$estimates`, `$pointwise`; (`$diagnostics`) | `$estimates`, `$pointwise` |
-| **Measure suffix** | none (`elpd`, `ic`) | `_loo` (`elpd_loo`, `p_loo`, `ic_loo`, …) | `_kfold` (`elpd_kfold`, `p_kfold`, `kfoldic`, …) | `_test` (`elpd_test`, `ic_test`, …) |
+| **Measure suffix** | none (`elpd`) | `_loo` (`elpd_loo`, `p_loo`, …) | `_kfold` (`elpd_kfold`, `p_kfold`, `kfoldic`, …) | `_test` (`elpd_test`, …) |
 | **Inherited attrs** | -- | `yhash`, `model_name` from `loo` | `K`, `Ksub`, `folds`, `fold_type`, `joint`, `yhash`, `model_name` from `kfold` | -- |
 
 For holdout objects, `dims` reflects the test-set size (from `ylp_test`), not
@@ -180,7 +181,7 @@ base estimates and weights are reused.
 | In-sample | `insample_pred_measure()` | `ylp`, plus `y`, `ypred`, `mupred` as needed | 
 | PSIS-LOO | `loo_pred_measure()` | `loo`, or `ylp` + `psis_object`, or `ylp` alone |
 | K-fold | `kfold_pred_measure()` | `kfold`, plus `y`, `ypred`, `mupred` as needed |
-| Holdout | `test_pred_measure()` | `ylp`, `ylp_test`, plus `y`, `ypred`, `mupred` as needed |
+| Holdout | `test_pred_measure()` | `ylp_test` (for `elpd_test`), plus `y`, `ypred`, `mupred` as needed |
 
 Pass all required inputs and the full `measure` vector to the entry point for
 your evaluation mode. Use `pred_measure()` only when you want to extend an
@@ -209,8 +210,9 @@ sleep_measure <- insample_pred_measure(
 print(sleep_measure)
 ```
 
-`elpd` sums the expected log pointwise predictive density across observations;
-`ic` is `-2 × elpd`. Additional rows in the table correspond to the measures
+`elpd` is always computed when `ylp` is supplied; it sums the expected log
+pointwise predictive density across observations. Request `ic` via `measure`
+(`ic` equals `-2 × elpd`). Additional rows in the table correspond to the measures
 passed in `measure`.
 
 ```{r pointwise-crps, fig.cap="Pointwise CRPS contributions across observations (in-sample)."}
@@ -326,8 +328,10 @@ loo_measure <- loo_pred_measure(
 print(loo_measure)
 ```
 
-The estimates carry a `_loo` suffix (`elpd_loo`, `ic_loo`). Additional `p_loo` (effective number of parameters) is provided which is the difference between 
-`elpd_loo` and the non-cross-validated log posterior predictive density. 
+The estimates carry a `_loo` suffix (e.g. `elpd_loo`). Base LOO summaries
+include `elpd_loo` and `p_loo` (effective number of parameters: the difference between
+`elpd_loo` and the non-cross-validated log posterior predictive density).
+Request `ic_loo` via `measure = "ic"`.
 Furthermore, we get an additional entry with PSIS diagnostics in `$diagnostics`.
 
 ```{r loo-pareto-k, fig.cap="Pareto-k diagnostics for PSIS-LOO. Values above 0.7 suggest unreliable LOO estimates for those observations."}
@@ -346,7 +350,7 @@ str(loo_measure)
 
 To add measures incrementally after a base-only LOO call, pass the existing
 object as `predperf` to `pred_measure()`. When
-accumulating after computing only `elpd`/`ic`, use `save_psis = TRUE` in
+accumulating after computing only `elpd`, use `save_psis = TRUE` in
 `loo_pred_measure()` so PSIS weights are stored for subsequent measures.
 
 Compare the in-sample and LOO ELPD values directly:
@@ -412,7 +416,7 @@ print(test_measure)
 ```
 
 Holdout measures use a `_test` suffix and reflect performance on the 50
-held-out observations only.
+held-out observations only. The base summary `elpd_test` comes from `ylp_test`.
 
 ## Other outcome types
 

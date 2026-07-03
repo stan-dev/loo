@@ -3,7 +3,7 @@
 #' @description
 #' Compute predictive performance measures on the same data used to fit the
 #' model. This is the simplest entry point when you want density scores
-#' (`elpd`, `ic`) and optional distributional or point-prediction metrics in
+#' (`elpd`) and optional distributional or point-prediction metrics in
 #' one call.
 #'
 #' In-sample `elpd` sums the expected log pointwise predictive density (ELPD)
@@ -21,8 +21,8 @@
 #' with:
 #' \describe{
 #'   \item{`estimates`}{Matrix of summary estimates and standard errors (rows
-#'     are measures, columns are `Estimate` and `SE`). Base rows `elpd` and
-#'     `ic` are always present; `ic` equals \eqn{-2 \times} `elpd`.}
+#'     are measures, columns are `Estimate` and `SE`). The base row `elpd` is
+#'     always present when `ylp` is supplied.}
 #'   \item{`pointwise`}{Matrix of observation-level contributions (one column
 #'     per measure).}
 #' }
@@ -41,8 +41,8 @@
 #' | `acc`, `bacc` | | ✓ | | ✓ |
 #' | `mae`, `mse`, `rmse`, `r2` | | ✓ | | ✓ |
 #'
-#' Base measures (`elpd`, `ic`) are always computed when `ylp` is provided.
-#' Pass additional built-in names via `measure`, or supply a custom function;
+#' Base measure `elpd` is always computed when `ylp` is provided. Request
+#' `ic`, `mlpd`, or other density scores via `measure`, or supply a custom function;
 #' see [supported_measures_list] and the
 #' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
@@ -126,10 +126,9 @@ insample_pred_measure <- function(
 #' posterior draws.
 #'
 #' The primary summary is `elpd_loo`, the LOO estimate of expected log
-#' pointwise predictive density (ELPD). Additional rows include `ic_loo`
-#' (\eqn{-2 \times} `elpd_loo`) and `p_loo` (effective number of parameters,
-#' the difference between in-sample and LOO log predictive density). See
-#' [loo::loo()] and the
+#' pointwise predictive density (ELPD). The base result also includes `p_loo`
+#' (effective number of parameters, the difference between in-sample and LOO
+#' log predictive density). See [loo::loo()] and the
 #' [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html) for
 #' interpretation.
 #'
@@ -306,11 +305,12 @@ kfold_pred_measure <- function(
 #' assessing how well a model predicts unseen observations, but with an
 #' explicit train/test split rather than LOO or k-fold reweighting.
 #'
-#' Supply `ylp` from the **training** fit and `ylp_test` from log predictive
-#' densities evaluated on the holdout set (e.g.
-#' `brms::log_lik(fit, newdata = test_data)`). Optional distributional and
-#' point-prediction measures use observed and predicted values on the test set
-#' only.
+#' Supply `ylp_test` from log predictive densities evaluated on the holdout set
+#' (e.g. `brms::log_lik(fit, newdata = test_data)`). This is required for the
+#' base summary `elpd_test`. Optional distributional and point-prediction
+#' measures use observed and predicted values on the test set only. Pass training
+#' `ylp` only when an additional measure needs log predictive densities from the
+#' training fit.
 #'
 #' @inheritParams pred_measure_params
 #'
@@ -321,9 +321,8 @@ kfold_pred_measure <- function(
 #' (from `ylp_test`), not the training data.
 #'
 #' @details
-#' When both `ylp` (training) and `ylp_test` (holdout) are provided, the
-#' effective number of parameters (`p_test`) compares in-sample and holdout log
-#' predictive density, analogous to `p_loo` for PSIS-LOO.
+#' The base summary `elpd_test` is computed from `ylp_test` on the holdout
+#' observations only.
 #'
 #' @examples
 #' \donttest{
@@ -398,7 +397,7 @@ test_pred_measure <- function(
 #' @return
 #' An updated object of the same class as `predperf`, with new rows in
 #' `estimates` and columns in `pointwise` for each requested measure. Base
-#' summaries (`elpd`, `ic`, and LOO/k-fold complexity terms) are not
+#' summaries (`elpd` and LOO/k-fold complexity terms such as `p_loo`) are not
 #' recomputed.
 #'
 #' @details

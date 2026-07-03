@@ -1,5 +1,6 @@
 # load data -----------------------------
 res <- readRDS("data-for-tests/test_data_roaches.Rds")
+res_sleep_test <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
 
 # unit tests ----------------------
 ## .compute_measure() --------------------
@@ -123,11 +124,11 @@ test_that(".compute_base_measure() computes elpd_loo as expected", {
 
   expect_equal(
     rownames(base_measure$estimates),
-    c("elpd_loo", "p_eff_loo")
+    c("elpd_loo", "p_loo")
   )
   expect_equal(
     dimnames(base_measure$pointwise)[[2]],
-    c("elpd_loo", "p_eff_loo")
+    c("elpd_loo", "p_loo")
   )
 })
 
@@ -210,24 +211,20 @@ test_that(".merge_matrix() with kfold showes correct names", {
   expect_equal(dim(res), c(1, 2))
 })
 
-test_that(".merge_matrix() with duplicate naming is skipped", {
-  mat <- matrix(c(1, 2, 3, 4), ncol = 2, nrow = 2)
-  rownames(mat) <- c("elpd", "mse")
-
-  res <- .merge_matrix(
-    source = "insample", mat = mat, name = "rmse",
-    values = c(5, 6), margin = 1
+test_that("duplicate measure warns once and skips estimates and pointwise", {
+  warnings <- character()
+  withCallingHandlers(
+    res <- insample_pred_measure(ylp = res$ylp, measure = "elpd"),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
 
-  expect_equal(c("elpd", "mse", "rmse"), rownames(res))
-  
-  expect_warning(
-    .merge_matrix(
-      source = "insample", mat = mat, name = "elpd",
-      values = c(5, 6), margin = 1
-    ),
-    regexp = "already present in results. Skipping the update."
-  )
+  expect_length(warnings, 1L)
+  expect_match(warnings[[1]], "already present in results")
+  expect_equal(rownames(res$estimates), "elpd")
+  expect_equal(colnames(res$pointwise), "elpd")
 })
 
 # integration tests ------------------------------
@@ -322,6 +319,17 @@ test_that("do_pred_measure() warns if control args are invalid", {
   )
 })
 
+test_that("kfold_pred_measure() requires kfold argument", {
+  expect_error(
+    kfold_pred_measure(
+      y = res$y,
+      mupred = res$mupred,
+      measure = "rmse"
+    ),
+    regexp = "`kfold` is required"
+  )
+})
+
 test_that("kfold_pred_measure() works with rps as expected", {
   kfold_res <- kfold_pred_measure(
     y = res$y,
@@ -336,6 +344,65 @@ test_that("kfold_pred_measure() works with rps as expected", {
     rownames(kfold_res$estimates),
     c("elpd_kfold", "p_kfold", "mlpd_kfold", "ic_kfold", "rps_kfold", "srps_kfold")
   )
+})
+
+## test_pred_measure() -------------------------------------------------
+
+test_that("test_pred_measure() computes holdout measures as expected", {
+  test_res <- test_pred_measure(
+    y = res_sleep_test$y_test,
+    ypred = res_sleep_test$ypred_test,
+    mupred = res_sleep_test$mupred_test,
+    ylp_test = res_sleep_test$ylp_test,
+    measure = c("rmse", "r2")
+  )
+
+  expect_s3_class(test_res, "test_pred_measure")
+  expect_s3_class(test_res, "pred_measure")
+  expect_equal(attr(test_res, "source"), "test")
+  expect_equal(
+    rownames(test_res$estimates),
+    c("elpd_test", "rmse_test", "r2_test")
+  )
+  expect_equal(dim(test_res$estimates), c(3, 2))
+  expect_equal(attr(test_res, "dims"), c(400L, 40L))
+  expect_equal(dim(test_res$pointwise), c(40L, 3L))
+})
+
+test_that("test_pred_measure() works with ylp_test only for base summary", {
+  test_res <- test_pred_measure(
+    y = res_sleep_test$y_test,
+    mupred = res_sleep_test$mupred_test,
+    ylp_test = res_sleep_test$ylp_test,
+    measure = "mae"
+  )
+
+  expect_equal(rownames(test_res$estimates), c("elpd_test", "mae_test"))
+  expect_equal(nrow(test_res$pointwise), length(res_sleep_test$y_test))
+})
+
+test_that("pred_measure() updates test_pred_measure results as expected", {
+  test_res <- test_pred_measure(
+    y = res_sleep_test$y_test,
+    ypred = res_sleep_test$ypred_test,
+    mupred = res_sleep_test$mupred_test,
+    ylp_test = res_sleep_test$ylp_test,
+    measure = "rmse"
+  )
+
+  updated <- pred_measure(
+    y = res_sleep_test$y_test,
+    mupred = res_sleep_test$mupred_test,
+    predperf = test_res,
+    measure = "mae"
+  )
+
+  expect_equal(
+    rownames(updated$estimates),
+    c("elpd_test", "rmse_test", "mae_test")
+  )
+  expect_equal(attr(updated, "source"), "test")
+  expect_equal(dim(updated$pointwise), c(40L, 3L))
 })
 
 # pred_measure() with custom function ------------------------------

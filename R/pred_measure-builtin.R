@@ -447,7 +447,7 @@ measure_bacc <- function(
   res <- list(
     estimate = mean(acc_c),
     se = sqrt(sum(acc_c * (1 - acc_c) / n_c)) / K,
-    pointwise = acc_i
+    pointwise = bacc_i
   )
   .create_measure_structure(
     res, revert_sign, "bacc", n_draws = n_draws, n_obs = n_obs

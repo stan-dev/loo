@@ -168,6 +168,24 @@ test_that(".validate_control() errors on malformed control", {
   )
 })
 
+# .validate_probs() -----------------------------------------
+
+test_that(".validate_probs() accepts values in [0, 1]", {
+  expect_invisible(.validate_probs(c(0, 0.5, 1), "x"))
+  expect_invisible(.validate_probs(matrix(c(0.2, 0.8), nrow = 1), "x"))
+})
+
+test_that(".validate_probs() rejects out-of-range values", {
+  expect_error(
+    .validate_probs(c(-0.1, 0.5), "mupred"),
+    regexp = "`mupred` must contain values in \\[0, 1\\]"
+  )
+  expect_error(
+    .validate_probs(c(0.5, 1.1), "ypred"),
+    regexp = "`ypred` must contain values in \\[0, 1\\]"
+  )
+})
+
 # subset_measures() -----------------------------------------
 
 .make_measure_result <- function() {

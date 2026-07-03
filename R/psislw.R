@@ -2,7 +2,7 @@
 #'
 #' As of version `2.0.0` this function is **deprecated**. Please use the
 #' [psis()] function for the new PSIS algorithm.
-#' `psislw()` and `R/psislw.R` are scheduled for removal in 3.0.0.
+#' `psislw()` and `R/psislw.R` are scheduled for removal in a future release.
 #' See `vignette("migration-guide", package = "loo")` for details.
 #'
 #' @export

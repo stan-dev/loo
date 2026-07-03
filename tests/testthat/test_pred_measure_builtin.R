@@ -202,6 +202,15 @@ testthat::test_that("measure_brier() works as expected", {
   expect_snapshot_output(measure_brier(y = res_binary$y, ypred = res_binary$ypred))
 })
 
+testthat::test_that("measure_brier() rejects out-of-range ypred", {
+  bad_ypred <- res_binary$ypred
+  bad_ypred[1, 1] <- 1.5
+  expect_error(
+    measure_brier(y = res_binary$y, ypred = bad_ypred),
+    regexp = "`ypred` must contain values in \\[0, 1\\]"
+  )
+})
+
 testthat::test_that("measure_brier() with log-weights works as expected", {
   res_brier <- measure_brier(
     y = res_binary$y,
@@ -322,6 +331,15 @@ testthat::test_that("measure_acc() works as expected", {
   expect_snapshot_output(measure_acc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
 })
 
+testthat::test_that("measure_acc() rejects out-of-range mupred", {
+  bad_mupred <- res_cat$mupred
+  bad_mupred[1, 1, 1] <- -0.1
+  expect_error(
+    measure_acc(y = as.integer(res_cat$y), mupred = bad_mupred),
+    regexp = "`mupred` must contain values in \\[0, 1\\]"
+  )
+})
+
 testthat::test_that("measure_acc() with log-weights works as expected", {
   res <- measure_acc(
     y = as.integer(res_cat$y),
@@ -335,6 +353,27 @@ testthat::test_that("measure_acc() with log-weights works as expected", {
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
 })
 
+testthat::test_that("measure_bacc() pointwise contributions sum to estimate", {
+  y <- c(1L, 1L, 2L, 2L)
+  mupred <- array(
+    c(0.8, 0.2, 0.7, 0.3, 0.3, 0.7, 0.2, 0.8),
+    dim = c(1, 4, 2)
+  )
+  res <- measure_bacc(y, mupred)
+
+  classes <- sort(unique(y))
+  K <- length(classes)
+  weights <- rep(1 / nrow(mupred), nrow(mupred))
+  weighted_mupred <- apply(sweep(mupred, 1, weights, `*`), c(2, 3), sum)
+  mupred_hat <- apply(weighted_mupred, 1, which.max)
+  acc_i <- (mupred_hat == y) * 1L
+  n_c <- tabulate(match(y, classes))
+  expected_bacc_i <- acc_i / (K * n_c[match(y, classes)])
+
+  expect_equal(as.numeric(res$pointwise), expected_bacc_i)
+  expect_equal(sum(as.numeric(res$pointwise)), unname(res$estimates[1, "Estimate"]))
+})
+
 testthat::test_that("measure_bacc() works as expected", {
   res <- measure_bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred, log_weights = NULL)
 
@@ -344,6 +383,15 @@ testthat::test_that("measure_bacc() works as expected", {
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
   
   expect_snapshot_output(measure_bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
+})
+
+testthat::test_that("measure_bacc() rejects out-of-range mupred", {
+  bad_mupred <- res_cat$mupred
+  bad_mupred[1, 1, 1] <- 1.2
+  expect_error(
+    measure_bacc(y = as.integer(res_cat$y), mupred = bad_mupred),
+    regexp = "`mupred` must contain values in \\[0, 1\\]"
+  )
 })
 
 testthat::test_that("measure_bacc() with log-weights works as expected", {

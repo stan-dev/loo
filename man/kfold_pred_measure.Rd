@@ -31,8 +31,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik.brmsfit]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summaries (\code{elpd} and
-\code{ic}, which are always included). Can be:
+\item{measure}{Additional measures beyond the base summary \code{elpd} (always
+included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \code{\link[=supported_measures_list]{supported_measures_list()}}.
