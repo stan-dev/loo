@@ -692,7 +692,6 @@ do_pred_measure <- function(
   }
   
   attr(predperf_res, "class") <- c(
-    "pred_measure",
     switch(
       source,
       loo = "loo_pred_measure",
@@ -701,6 +700,7 @@ do_pred_measure <- function(
       test = "test_pred_measure",
       "pred_measure"
     ),
+    "pred_measure",
     attr(predperf_res, "class")
   )
   attr(predperf_res, "source") <- source

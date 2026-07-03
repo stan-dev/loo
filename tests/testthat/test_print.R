@@ -73,3 +73,16 @@ test_that("loo_pred_measure print snapshots", {
     loo_shuffled$estimates
   )
 })
+
+test_that("test_pred_measure print output", {
+  res <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
+  x <- test_pred_measure(
+    y = res$y_test,
+    ypred = res$ypred_test,
+    mupred = res$mupred_test,
+    ylp_test = res$ylp_test,
+    measure = c("rmse", "r2")
+  )
+  expect_s3_class(x, "test_pred_measure")
+  expect_snapshot_output(print(x))
+})

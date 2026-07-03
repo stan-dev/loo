@@ -289,6 +289,12 @@ print.kfold_pred_measure <- function(x, digits = 1, ...) {
 }
 
 #' @export
+print.test_pred_measure <- function(x, digits = 1, ...) {
+  print.pred_measure(x, digits = digits, ...)
+  invisible(x)
+}
+
+#' @export
 print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
   print.pred_measure(x, digits = digits, ...)
   cat("------\n")
