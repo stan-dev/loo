@@ -3,7 +3,7 @@
     Code
       psis <- psislw(x[, 1], wcp = 0.01)
     Condition
-      Warning:
+      Warning in `psislw()`:
       'psislw' is deprecated.
       Use 'psis' instead.
       See help("Deprecated")
