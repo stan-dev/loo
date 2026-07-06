@@ -135,8 +135,9 @@ insample_pred_measure <- function(
 #' @inheritParams pred_measure_params
 #'
 #' @return
-#' An object of class `"loo_pred_measure"`, `"pred_measure"`, and (when a
-#' `loo` object is supplied) `"loo"`. In addition to `estimates` and
+#' An object of class `"loo_pred_measure"`, `"pred_measure"`, and `"loo"`.
+#' When a `loo` object is supplied, additional classes from that object are
+#' inherited (e.g. `"psis_loo"`). In addition to `estimates` and
 #' `pointwise`, the list may contain:
 #' \describe{
 #'   \item{`diagnostics`}{PSIS diagnostics, including Pareto \eqn{\hat{k}} in

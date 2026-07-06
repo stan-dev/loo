@@ -691,7 +691,7 @@ do_pred_measure <- function(
     } 
   }
   
-  attr(predperf_res, "class") <- c(
+  classes <- c(
     switch(
       source,
       loo = "loo_pred_measure",
@@ -703,6 +703,10 @@ do_pred_measure <- function(
     "pred_measure",
     attr(predperf_res, "class")
   )
+  if (source == "loo" && !"loo" %in% classes) {
+    classes <- c(classes, "loo")
+  }
+  attr(predperf_res, "class") <- classes
   attr(predperf_res, "source") <- source
   
   return(predperf_res)

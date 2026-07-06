@@ -300,6 +300,27 @@ test_that("loo_pred_measure() computes expected measures", {
     c("elpd_loo", "p_loo", "r2_loo", "mse_loo")
   )
   expect_equal(dim(predperf1$estimates), c(4, 2))
+  expect_true(is.loo(predperf1))
+})
+
+test_that("loo_pred_measure() has class 'loo' for all input patterns", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo,
+    y = res$y,
+    ylp = res$ylp
+  )
+  predperf_ylp_psis <- suppressMessages(loo_pred_measure(
+    ylp = res$ylp,
+    psis_object = res$loo$psis_object
+  ))
+  predperf_ylp <- suppressMessages(loo_pred_measure(ylp = res$ylp))
+
+  expect_true(is.loo(predperf_loo))
+  expect_true(is.loo(predperf_ylp_psis))
+  expect_true(is.loo(predperf_ylp))
+  expect_true(is.psis_loo(predperf_loo))
+  expect_false(is.psis_loo(predperf_ylp_psis))
+  expect_false(is.psis_loo(predperf_ylp))
 })
 
 test_that("do_pred_measure() warns if control args are invalid", {
