@@ -94,3 +94,19 @@
        Estimate SE  
     r2 0.27     0.11
 
+# measure_acc() works as expected
+
+    
+    Computed from 400 draws by 333 observations.
+    
+        Estimate SE  
+    acc 0.96     0.01
+
+# measure_bacc() works as expected
+
+    
+    Computed from 400 draws by 333 observations.
+    
+         Estimate SE  
+    bacc 0.95     0.01
+
