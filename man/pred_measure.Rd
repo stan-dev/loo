@@ -22,15 +22,15 @@ pred_measure(
 point-prediction measures such as \code{crps}, \code{mae}, and \code{acc}.}
 
 \item{ypred}{Matrix of posterior predictive draws (\code{S} draws × \code{n}
-observations), typically from \code{\link[brms:posterior_predict.brmsfit]{brms::posterior_predict()}}. Required for
+observations), typically from \code{\link[brms:posterior_predict]{brms::posterior_predict()}}. Required for
 distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 
 \item{mupred}{Matrix of posterior expected values (\code{S} × \code{n}), typically from
-\code{\link[brms:posterior_epred.brmsfit]{brms::posterior_epred()}}. Required for point-prediction measures such as
+\code{\link[brms:posterior_epred]{brms::posterior_epred()}}. Required for point-prediction measures such as
 \code{mae}, \code{rmse}, \code{r2}, and \code{acc}.}
 
 \item{ylp}{Matrix of pointwise log predictive densities or probabilities
-(\code{S} × \code{n}), typically from \code{\link[brms:log_lik.brmsfit]{brms::log_lik()}}. Required for density-based
+(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
 \item{measure}{Additional measures beyond the base summary \code{elpd} (always
@@ -69,7 +69,8 @@ measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
 An updated object of the same class as \code{predperf}, with new rows in
 \code{estimates} and columns in \code{pointwise} for each requested measure. Base
 summaries (\code{elpd} and LOO/k-fold complexity terms such as \code{p_loo}) are not
-recomputed.
+recomputed. Attribute \code{measure_revert_sign} is updated for any newly added
+measures.
 }
 \description{
 Extend a \code{"pred_measure"} object with additional measures \strong{without
@@ -100,6 +101,20 @@ When extending a LOO result, ensure the initial call used \code{save_psis = TRUE
 (or that \code{predperf} already contains a \code{psis_object}) so LOO weights are
 available for additional measures.
 }
+\section{\code{measure_revert_sign} attribute}{
+
+All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
+\code{measure_revert_sign}: a named list recording whether \code{revert_sign} was
+applied to each measure when it was computed (logical per bare measure name;
+\code{elpd} is always \code{FALSE}). Built-in loss measures such as MSE are stored on
+a loss scale by default (\code{FALSE}); pass
+\code{control = list(mse = list(revert_sign = TRUE))} to store negated values.
+When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}}, the attribute
+is updated for newly computed measures. \code{\link[=loo_compare]{loo_compare()}} uses
+\code{measure_revert_sign} when converting paired differences to a common utility
+scale; see \link{loo-glossary}.
+}
+
 \examples{
 \donttest{
 if (requireNamespace("brms", quietly = TRUE)) {

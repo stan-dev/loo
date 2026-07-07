@@ -254,4 +254,55 @@
 #'
 #' See for further information on Pareto-k values the "Pareto k estimates"
 #' section.
+#'
+#' @section Multi-measure model comparisons:
+#'
+#' When comparing [`loo_pred_measure()`][loo_pred_measure] objects with
+#' `loo_compare()`, paired differences are computed for every predictive
+#' measure common to all models. Models are ranked by the `rank_by` argument
+#' (default `"elpd"`); the top-ranked model is the reference for all difference
+#' columns.
+#'
+#' ### `{measure}_diff` and `{measure}_se_diff`
+#'
+#' For each non-ELPD measure `m`, `loo_compare()` adds columns `m_diff` and
+#' `m_se_diff`. When the overall estimate is a sum or mean of pointwise
+#' contributions, these are computed from paired pointwise differences on a
+#' utility scale (higher is better; loss measures such as MSE, Brier score, and
+#' SRPS have their sign flipped from the raw loss orientation) using the same
+#' approach as `elpd_diff` and `se_diff` (Eq 24 in VGG2017 for sums; the mean
+#' analogue for means). Measures already returned on a utility scale (e.g. ELPD,
+#' CRPS/RPS) are not sign-flipped. Negative `m_diff` values then indicate worse
+#' performance than the reference model, which has `m_diff = 0` and
+#' `se_diff = 0`. Attribute `measure_revert_sign` on each `*_pred_measure()`
+#' result records whether `revert_sign` was applied when each measure was
+#' computed; when stored values are on a loss scale, `loo_compare()` emits a
+#' short message naming those measures (see [loo_compare()]).
+#'
+#' For measures where pointwise values do not define the overall estimate (e.g.
+#' `r2`, `mse`, `rmse`), `m_diff` is the difference between overall estimates
+#' (on a utility scale) and `m_se_diff` is `NA`.
+#'
+#' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
+#' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
+#' these diagnostics do not apply to other predictive measures.
+#'
+#' ### `measure_revert_sign`
+#'
+#' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
+#' list of logicals recording whether `revert_sign` was applied when each
+#' measure was computed (`elpd` is always `FALSE`). Used by [loo_compare()] to
+#' decide whether paired differences for loss measures need an additional sign
+#' flip when converting to a utility scale.
+#'
+#' ### `rank_by` and `compare_measures`
+#'
+#' The `rank_by` argument selects which measure determines model ordering and
+#' the reference model for all pairwise differences. The returned data frame has
+#' attribute `rank_by` with the measure name used, attribute `compare_measures`
+#' listing all measures that were compared, and attribute
+#' `sign_converted_measures` listing loss measures whose sign was flipped onto
+#' the utility scale. The print method shows the `rank_by` measure by default;
+#' use `print(x, measures = "all")` or `print(x, measures = c("rmse", "r2"))`
+#' to display additional measure tables.
 NULL

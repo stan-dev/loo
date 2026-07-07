@@ -270,6 +270,61 @@ section.
 }
 }
 
+\section{Multi-measure model comparisons}{
+
+
+When comparing \code{\link[=loo_pred_measure]{loo_pred_measure()}} objects with
+\code{loo_compare()}, paired differences are computed for every predictive
+measure common to all models. Models are ranked by the \code{rank_by} argument
+(default \code{"elpd"}); the top-ranked model is the reference for all difference
+columns.
+\subsection{\verb{\{measure\}_diff} and \verb{\{measure\}_se_diff}}{
+
+For each non-ELPD measure \code{m}, \code{loo_compare()} adds columns \code{m_diff} and
+\code{m_se_diff}. When the overall estimate is a sum or mean of pointwise
+contributions, these are computed from paired pointwise differences on a
+utility scale (higher is better; loss measures such as MSE, Brier score, and
+SRPS have their sign flipped from the raw loss orientation) using the same
+approach as \code{elpd_diff} and \code{se_diff} (Eq 24 in VGG2017 for sums; the mean
+analogue for means). Measures already returned on a utility scale (e.g. ELPD,
+CRPS/RPS) are not sign-flipped. Negative \code{m_diff} values then indicate worse
+performance than the reference model, which has \code{m_diff = 0} and
+\code{se_diff = 0}. Attribute \code{measure_revert_sign} on each \verb{*_pred_measure()}
+result records whether \code{revert_sign} was applied when each measure was
+computed; when stored values are on a loss scale, \code{loo_compare()} emits a
+short message naming those measures (see \code{\link[=loo_compare]{loo_compare()}}).
+
+For measures where pointwise values do not define the overall estimate (e.g.
+\code{r2}, \code{mse}, \code{rmse}), \code{m_diff} is the difference between overall estimates
+(on a utility scale) and \code{m_se_diff} is \code{NA}.
+
+ELPD-family measures use the column names \code{elpd_diff} and \code{se_diff} rather
+than a prefixed form. Only ELPD comparisons include \code{p_worse} and \code{diag_diff};
+these diagnostics do not apply to other predictive measures.
+}
+
+\subsection{\code{measure_revert_sign}}{
+
+Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results: a named
+list of logicals recording whether \code{revert_sign} was applied when each
+measure was computed (\code{elpd} is always \code{FALSE}). Used by \code{\link[=loo_compare]{loo_compare()}} to
+decide whether paired differences for loss measures need an additional sign
+flip when converting to a utility scale.
+}
+
+\subsection{\code{rank_by} and \code{compare_measures}}{
+
+The \code{rank_by} argument selects which measure determines model ordering and
+the reference model for all pairwise differences. The returned data frame has
+attribute \code{rank_by} with the measure name used, attribute \code{compare_measures}
+listing all measures that were compared, and attribute
+\code{sign_converted_measures} listing loss measures whose sign was flipped onto
+the utility scale. The print method shows the \code{rank_by} measure by default;
+use \code{print(x, measures = "all")} or \code{print(x, measures = c("rmse", "r2"))}
+to display additional measure tables.
+}
+}
+
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
