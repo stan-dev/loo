@@ -125,6 +125,52 @@ get_roaches_res <- function() {
   )
 }
 
+get_roaches_compare_res <- function() {
+  data(roaches, package = "rstanarm")
+  roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+  
+  fit_p <- brm(
+    y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
+    data = roaches,
+    family = poisson,
+    prior = prior(normal(0, 1), class = b),
+    chains = 2,
+    iter = 400,
+    refresh = 0,
+    seed = SEED
+  )
+
+  fit_p <- add_criterion(
+    fit_p,
+    criterion = "loo",
+    moment_match = TRUE,
+    overwrite = TRUE
+  )
+
+  fit_p_m1 <- update(fit_p, formula = y ~ treatment + senior) |>
+    add_criterion(criterion = "loo", moment_match = TRUE)
+  fit_p_m2 <- update(fit_p, formula = y ~ sqrt_roach1 + senior)  |>
+    add_criterion(criterion = "loo", moment_match = TRUE)
+  fit_p_m3 <- update(fit_p, formula = y ~ sqrt_roach1 + treatment) |>
+    add_criterion(criterion = "loo", moment_match = TRUE)
+
+  return(list(
+    y = fit_p$data$y,
+    loo_p = fit_p$loo,
+    mupred = brms::posterior_epred(fit_p),
+    ylp = brms::log_lik(fit_p),
+    loo_p_m1 = fit_p_m1$loo,
+    mupred_m1 = brms::posterior_epred(fit_p_m1),
+    ylp_m1 = brms::log_lik(fit_p_m1),
+    loo_p_m2 = fit_p_m2$loo,
+    mupred_m2 = brms::posterior_epred(fit_p_m2),
+    ylp_m2 = brms::log_lik(fit_p_m2),
+    loo_p_m3 = fit_p_m3$loo,
+    mupred_m3 = brms::posterior_epred(fit_p_m3),
+    ylp_m3 = brms::log_lik(fit_p_m3)
+  ))
+}
+
 get_sleep_test_train_res <- function() {
   # specifically for testing test_pred_measure
   data("sleepstudy", package = "lme4")
@@ -256,10 +302,12 @@ generate_test_data <- function(vignettes_only = FALSE) {
   full_binomial <- get_binomial_res()
   full_sleep <- get_sleep_res()
   full_sleep_test <- get_sleep_test_train_res()
+  full_roaches_compare <- get_roaches_compare_res()
 
   if (!vignettes_only) {
     test_path <- "tests/testthat/data-for-tests/"
     saveRDS(full_roaches$res, paste0(test_path, "test_data_roaches.Rds"))
+    saveRDS(full_roaches_compare, paste0(test_path, "test_data_roaches_compare.Rds"))
     saveRDS(full_binary$res, paste0(test_path, "test_data_binary.Rds"))
     saveRDS(full_penguins$res, paste0(test_path, "test_data_penguins.Rds"))
     saveRDS(full_binomial$res, paste0(test_path, "test_data_binomial.Rds"))
