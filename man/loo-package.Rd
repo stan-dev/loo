@@ -122,6 +122,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Jonah Gabry \email{jgabry@gmail.com}
   \item Aki Vehtari \email{Aki.Vehtari@aalto.fi}
   \item Måns Magnusson
   \item Yuling Yao
