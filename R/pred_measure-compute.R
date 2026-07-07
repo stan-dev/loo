@@ -165,7 +165,8 @@ do_pred_measure <- function(
       mat = estimates,
       name = entry$name,
       values = .measure_estimate_se(sel_measure),
-      margin = 1
+      margin = 1,
+      revert_sign = attr(sel_measure, "revert_sign")
     )
     pointwise <- .merge_matrix(
       source = source,
@@ -184,7 +185,7 @@ do_pred_measure <- function(
     save_psis = save_psis
   )
   
-  .add_attributes(
+  predperf_res <- .add_attributes(
     save_psis,
     predperf_res, 
     y, 
@@ -197,6 +198,7 @@ do_pred_measure <- function(
     predperf, 
     source
   )
+  predperf_res
   }
 
 # internal helper functions ---------------------------------------------------
@@ -536,6 +538,8 @@ do_pred_measure <- function(
 #'   `(estimate, se)`; for `margin = 2`, length-`n` pointwise vector.
 #' @param margin `1` to merge along rows (estimates table), `2` along columns
 #'   (pointwise table).
+#' @param revert_sign Optional logical; when merging an estimates row
+#'   (`margin = 1`), records whether the sign was reverted for `name`.
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
@@ -551,7 +555,7 @@ do_pred_measure <- function(
 }
 
 #' @noRd
-.merge_matrix <- function(source, mat, name, values, margin) {
+.merge_matrix <- function(source, mat, name, values, margin, revert_sign = NULL) {
   is_row <- margin == 1
   bind_fn <- if (is_row) rbind else cbind
   name_updated <- .measure_result_name(source, name)
@@ -562,8 +566,18 @@ do_pred_measure <- function(
     matrix(values, ncol = 1, dimnames = list(NULL, name_updated))
   }
 
-  if (is.null(mat)) return(new_slice)
-  bind_fn(mat, new_slice)
+  mat <- if (is.null(mat)) new_slice else bind_fn(mat, new_slice)
+
+  if (is_row && !is.null(revert_sign)) {
+    measure_revert_sign <- attr(mat, "measure_revert_sign")
+    if (is.null(measure_revert_sign)) {
+      measure_revert_sign <- list()
+    }
+    measure_revert_sign[[name]] <- isTRUE(revert_sign)
+    attr(mat, "measure_revert_sign") <- measure_revert_sign
+  }
+
+  mat
 }
 
 #' Construct the S3 predictive measure result object
@@ -586,8 +600,9 @@ do_pred_measure <- function(
 #' @param save_psis Logical; if `TRUE`, include `psis_object` in the result.
 #'
 #' @return A list with elements `estimates`, `pointwise`, and optionally
-#'   `diagnostics`, `psis_object`, and `log_weights`. Class attributes are added
-#'   by \code{.add_attributes()}.
+#'   `diagnostics`, `psis_object`, and `log_weights`. Attribute
+#'   `measure_revert_sign` records `revert_sign` for measures added in the
+#'   current call. Class attributes are added by \code{.add_attributes()}.
 #'
 #' @noRd
 .build_pred_measure <- function(
@@ -597,6 +612,12 @@ do_pred_measure <- function(
   psis_object,
   save_psis
 ) {
+  measure_revert_sign <- attr(estimates, "measure_revert_sign")
+  if (is.null(measure_revert_sign)) {
+    measure_revert_sign <- list()
+  }
+  attr(estimates, "measure_revert_sign") <- NULL
+
   output_list <- list(
     estimates = estimates,
     pointwise = pointwise
@@ -610,23 +631,27 @@ do_pred_measure <- function(
   if (!is.null(psis_object)) {
     output_list$log_weights <- psis_object$log_weights
   }
-  
-  structure(output_list)
+
+  structure(output_list, measure_revert_sign = measure_revert_sign)
 }
 
 #' Attach S3 classes and metadata attributes to a result
 #'
 #' @description
-#' Sets `class`, `source`, and `dims` attributes on a predictive measure object.
+#' Sets `class`, `source`, `dims`, and `measure_revert_sign` attributes on a
+#' predictive measure object.
 #'
 #' When updating an existing result (`predperf` is not `NULL`), copies attributes
 #' from `predperf` and refreshes `dims` from newly supplied input matrices.
+#' Merges `measure_revert_sign` from the prior result with any new entries
+#' supplied on `predperf_res` (from \code{.build_pred_measure()}).
 #' When `save_psis = FALSE`, clears any stored `psis_object` from the prior
 #' result.
 #'
 #' For new objects, copies relevant attributes from `loo` or `kfold` inputs
 #' (e.g. `yhash`, `model_name`, fold structure) and assigns a source-specific
-#' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.).
+#' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.). Sets
+#' `measure_revert_sign` to `list(elpd = FALSE)` merged with new entries.
 #'
 #' @param save_psis Logical; when `FALSE` and accumulating, clears stored
 #'   `psis_object` from the prior result.
@@ -646,7 +671,24 @@ do_pred_measure <- function(
 #' @return The updated `predperf_res` with class and attributes set.
 #'
 #' @noRd
-.add_attributes <- function(save_psis, predperf_res, y, ypred, mupred, ylp, ylp_test, kfold, loo, predperf, source) {
+.add_attributes <- function(
+  save_psis,
+  predperf_res,
+  y,
+  ypred,
+  mupred,
+  ylp,
+  ylp_test,
+  kfold,
+  loo,
+  predperf,
+  source
+) {
+  new_revert_sign <- attr(predperf_res, "measure_revert_sign")
+  if (is.null(new_revert_sign)) {
+    new_revert_sign <- list()
+  }
+
   if (!is.null(predperf)) {
     if (isFALSE(save_psis)) {
       predperf$psis_object <- NULL
@@ -661,6 +703,14 @@ do_pred_measure <- function(
       dim(ylp)
     }
     attr(predperf_res, "dims") <- dims
+    revert_sign <- attr(predperf, "measure_revert_sign")
+    if (is.null(revert_sign)) {
+      revert_sign <- list()
+    }
+    if (length(new_revert_sign)) {
+      revert_sign[names(new_revert_sign)] <- new_revert_sign
+    }
+    attr(predperf_res, "measure_revert_sign") <- revert_sign
     
     return(predperf_res)
   }
@@ -708,6 +758,11 @@ do_pred_measure <- function(
   }
   attr(predperf_res, "class") <- classes
   attr(predperf_res, "source") <- source
+  revert_sign <- list(elpd = FALSE)
+  if (length(new_revert_sign)) {
+    revert_sign[names(new_revert_sign)] <- new_revert_sign
+  }
+  attr(predperf_res, "measure_revert_sign") <- revert_sign
   
   return(predperf_res)
 }

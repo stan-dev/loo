@@ -983,6 +983,7 @@ supported_measures_list <- names(.measure_spec)
     out,
     class = c("measure", "loo"),
     measure = measure_name,
-    dims = c(n_draws, n_obs)
+    dims = c(n_draws, n_obs),
+    revert_sign = isTRUE(revert_sign)
   )
 }

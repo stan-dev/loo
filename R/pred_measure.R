@@ -28,7 +28,11 @@
 #' }
 #'
 #' The attribute `source` is `"insample"`. Attribute `dims` gives posterior
-#' draws × observations. Use [print()] for a readable summary table.
+#' draws × observations. Attribute `measure_revert_sign` records whether
+#' `revert_sign` was applied for each measure; see section below. Use [print()]
+#' for a readable summary table.
+#'
+#' @template measure-revert-sign-attribute
 #'
 #' @details
 #' **Input requirements by measure.** Supply only the inputs each measure
@@ -151,6 +155,8 @@ insample_pred_measure <- function(
 #'
 #' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `crps_loo`).
 #'
+#' @template measure-revert-sign-attribute
+#'
 #' @details
 #' **Three equivalent input patterns:**
 #'
@@ -241,6 +247,8 @@ loo_pred_measure <- function(
 #' list contains `estimates` and `pointwise`; measure names carry a `_kfold`
 #' suffix (e.g. `elpd_kfold`, `crps_kfold`).
 #'
+#' @template measure-revert-sign-attribute
+#'
 #' @details
 #' For distributional measures on held-out folds, obtain posterior predictions
 #' with `brms::kfold_predict()` and pass the resulting `yrep` matrices as
@@ -323,6 +331,8 @@ kfold_pred_measure <- function(
 #' `elpd_test`, `crps_test`). Attribute `dims` reflects the test-set size
 #' (from `ylp_test`), not the training data.
 #'
+#' @template measure-revert-sign-attribute
+#'
 #' @details
 #' The base summary `elpd_test` is computed from `ylp_test` on the holdout
 #' observations only.
@@ -401,7 +411,10 @@ test_pred_measure <- function(
 #' An updated object of the same class as `predperf`, with new rows in
 #' `estimates` and columns in `pointwise` for each requested measure. Base
 #' summaries (`elpd` and LOO/k-fold complexity terms such as `p_loo`) are not
-#' recomputed.
+#' recomputed. Attribute `measure_revert_sign` is updated for any newly added
+#' measures.
+#'
+#' @template measure-revert-sign-attribute
 #'
 #' @details
 #' **Typical workflow:**
