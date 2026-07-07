@@ -1,16 +1,36 @@
 #' Model comparison
 #'
-#' @description Compare fitted models based on [ELPD][loo-glossary].
+#' @description Compare fitted models based on [ELPD][loo-glossary] or, for
+#'   [`loo_pred_measure()`][loo_pred_measure] results, multiple predictive
+#'   performance measures at once.
 #'
 #' @export
-#' @param x An object of class `"loo"` or a list of such objects. If a list is
-#'   used then the list names will be used as the model names in the output. See
-#'   **Examples**.
-#' @param ... Additional objects of class `"loo"`, if not passed in as a single
-#'   list.
+#' @param x An object of class `"loo"` or `"loo_pred_measure"`, or a list of
+#'   such objects. If a list is used then the list names will be used as the
+#'   model names in the output. See **Examples**.
+#' @param ... Additional objects of class `"loo"` or `"loo_pred_measure"`, if not
+#'   passed in as a single list.
+#' @param rank_by For [`loo_pred_measure()`][loo_pred_measure] comparisons only,
+#'   the bare measure name used to rank models and define the reference model
+#'   for all pairwise differences (default `"elpd"`). For example,
+#'   `rank_by = "mse"` ranks models by MSE and computes all measure differences
+#'   relative to the model with the lowest MSE.
 #'
 #' @return A data frame with class `"compare.loo"` that has its own
 #'   print method. See the **Details** and **Examples** sections.
+#'
+#'   For classic `"loo"` / `"waic"` / `"kfold"` comparisons, the returned
+#'   columns are unchanged from previous versions.
+#'
+#'   For [`loo_pred_measure()`][loo_pred_measure] comparisons, the data frame
+#'   additionally contains `{measure}_diff` and `{measure}_se_diff` columns for
+#'   every predictive measure common to all models (e.g. `rmse_diff`,
+#'   `rmse_se_diff`). ELPD-family measures use `elpd_diff` and `se_diff`.
+#'   `p_worse` and `diag_diff` are computed for ELPD only. Per-model PSIS
+#'   diagnostics appear in `diag_elpd`. Attributes `rank_by`,
+#'   `compare_measures`, and `sign_converted_measures` record which measure was
+#'   used for ranking, which measures were compared, and which loss measures had
+#'   their sign flipped for comparison.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -67,9 +87,41 @@
 #'   computation, then there may be significant bias in `elpd_diff` favoring
 #'   models with a large number of high Pareto k values.
 #'
+#' ## Comparing `loo_pred_measure` objects
+#'   When all inputs are [`loo_pred_measure()`][loo_pred_measure] objects,
+#'   `loo_compare()` computes paired differences for every predictive measure
+#'   present in all models. Models are ranked by `rank_by` (default `"elpd"`);
+#'   the top-ranked model is the reference for all `{measure}_diff` columns.
+#'   Measures may use different orientations in their raw form (e.g. ELPD and
+#'   CRPS/RPS are returned on a utility scale where higher is better, while MSE
+#'   and Brier score are loss measures where lower is better). For comparison,
+#'   all `{measure}_diff` values are reported on a common utility scale (higher
+#'   is better). Loss measures have their sign flipped from the raw loss
+#'   orientation so that negative `{measure}_diff` values indicate worse
+#'   performance than the reference model. Each `*_pred_measure()` result stores
+#'   attribute `measure_revert_sign`, a named list recording whether `revert_sign`
+#'   was applied when each measure was computed. When loss measures are compared
+#'   on a utility scale, `loo_compare()` emits a short message naming the affected
+#'   measures, for example:
+#'   "For model comparison, differences for mse are reported on a utility scale
+#'   (higher is better)."
+#'
+#'   `p_worse` and `diag_diff` are computed for ELPD-family measures only. Other
+#'   measures receive `{measure}_diff` and `{measure}_se_diff` from paired
+#'   pointwise contributions when the overall estimate is a sum or mean of those
+#'   contributions (using the same standard error formula as `se_diff`). For
+#'   measures where pointwise values do not define the overall estimate (e.g.
+#'   `r2`, `mse`, `rmse`), `{measure}_diff` is the difference between overall
+#'   estimates and `{measure}_se_diff` is `NA`. When models were fit with
+#'   different `measure` sets, only measures common to all models are compared; a
+#'   warning lists omitted measures. Use `print(x, measures = "all")` to display
+#'   diff tables for every compared measure; see [loo-glossary] for column
+#'   definitions.
+#'
 #' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
-#'   differences using the median model by ELPD as the baseline model. We then
+#'   differences using the median model (by ELPD, or by `rank_by` for
+#'   `loo_pred_measure` comparisons) as the baseline model. We then
 #'   estimate whether the differences in predictive performance are potentially
 #'   due to chance as described by McLatchie and Vehtari (2023). This will flag
 #'   a warning if it is deemed that there is a risk of over-fitting due to the
@@ -99,31 +151,69 @@
 #' \dontrun{
 #' # works for waic (and kfold) too
 #' loo_compare(waic(LL), waic(LL - 10))
+#'
+#' # compare multiple predictive measures from loo_pred_measure()
+#' if (requireNamespace("brms", quietly = TRUE)) {
+#'   fit1 <- brms::brm(
+#'     Reaction ~ Days, data = lme4::sleepstudy,
+#'     refresh = 0, chains = 2, iter = 1000
+#'   )
+#'   fit2 <- brms::brm(
+#'     Reaction ~ poly(Days, 2), data = lme4::sleepstudy,
+#'     refresh = 0, chains = 2, iter = 1000
+#'   )
+#'   pm1 <- loo_pred_measure(
+#'     loo = loo(fit1, save_psis = TRUE),
+#'     y = fit1$data$Reaction,
+#'     mupred = brms::posterior_epred(fit1),
+#'     measure = c("rmse", "r2")
+#'   )
+#'   pm2 <- loo_pred_measure(
+#'     loo = loo(fit2, save_psis = TRUE),
+#'     y = fit2$data$Reaction,
+#'     mupred = brms::posterior_epred(fit2),
+#'     measure = c("rmse", "r2")
+#'   )
+#'   comp <- loo_compare(pm1, pm2)
+#'   print(comp)                      # ranked by elpd (default)
+#'   print(comp, measures = "all")    # all measure diff tables
+#'   loo_compare(pm1, pm2, rank_by = "rmse")
+#' }
 #' }
 #'
-loo_compare <- function(x, ...) {
+loo_compare <- function(x, ..., rank_by = NULL) {
   UseMethod("loo_compare")
 }
 
 #' @rdname loo_compare
 #' @export
-loo_compare.default <- function(x, ...) {
-  if (is.loo(x)) {
-    dots <- list(...)
-    loos <- c(list(x), dots)
-  } else {
-    if (!is.list(x) || !length(x)) {
-      stop("'x' must be a list if not a 'loo' object.")
-    }
-    if (length(list(...))) {
-      stop("If 'x' is a list then '...' should not be specified.")
-    }
-    loos <- x
-  }
+loo_compare.default <- function(x, ..., rank_by = NULL) {
+  loos <- .loo_compare_inputs(x, ...)
 
   # if subsampling is used
   if (any(sapply(loos, inherits, "psis_loo_ss"))) {
     return(loo_compare.psis_loo_ss_list(loos))
+  }
+
+  if (all(vapply(loos, is.loo_pred_measure, logical(1)))) {
+    return(compare_loo_pred_measure(loos, rank_by = rank_by))
+  }
+
+  if (any(vapply(loos, is.loo_pred_measure, logical(1)))) {
+    stop(
+      "Cannot mix 'loo_pred_measure' objects with other 'loo' objects. ",
+      "Compare models using 'loo_pred_measure()' for each model.",
+      call. = FALSE
+    )
+  }
+
+  if (any(vapply(loos, inherits, what = "pred_measure", logical(1)))) {
+    stop(
+      "'loo_compare' for predictive measures requires 'loo_pred_measure' objects. ",
+      "Use loo_pred_measure() instead of insample_pred_measure(), ",
+      "kfold_pred_measure(), or test_pred_measure().",
+      call. = FALSE
+    )
   }
 
   # run pre-comparison checks
@@ -170,13 +260,28 @@ loo_compare.default <- function(x, ...) {
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
-print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
+#' @param measures For `loo_pred_measure` comparisons only, which measures to
+#'   print diff tables for. `NULL` (default) prints only the `rank_by` measure;
+#'   `"all"` prints all compared measures; or a character vector of measure
+#'   names (e.g. `c("elpd", "mse")`).
+print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NULL) {
   if (inherits(x, "old_compare.loo")) {
     return(unclass(x))
   }
   if (!inherits(x, "data.frame")) {
     class(x) <- c(class(x), "data.frame")
   }
+
+  compare_measures <- attr(x, "compare_measures")
+  if (!is.null(compare_measures)) {
+    return(.print_compare_loo_pred_measure(
+      x,
+      digits = digits,
+      p_worse = p_worse,
+      measures = measures
+    ))
+  }
+
   if (!all(c("model", "elpd_diff", "se_diff") %in% colnames(x))) {
     print(as.data.frame(x))
     return(x)
@@ -195,9 +300,157 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
   }
   print(x2, quote = FALSE, row.names = FALSE)
 
-  # show glossary for diagnostic flags
-  has_diag <- any(nzchar(x[["diag_diff"]], keepNA = FALSE), na.rm = TRUE) ||
-              any(nzchar(x[["diag_elpd"]], keepNA = FALSE), na.rm = TRUE)
+  .print_compare_diag_message(x, p_worse = p_worse)
+  invisible(x)
+}
+
+
+# internal ----------------------------------------------------------------
+
+#' Print `compare.loo` results from `loo_pred_measure` comparisons
+#' @noRd
+.print_compare_loo_pred_measure <- function(x, digits, p_worse, measures) {
+  rank_by <- attr(x, "rank_by")
+  compare_measures <- attr(x, "compare_measures")
+  ref_model <- x$model[[1L]]
+  primary_measure <- if (is.null(rank_by)) "elpd" else rank_by
+
+  measures_to_print <- if (is.null(measures)) {
+    primary_measure
+  } else if (identical(measures, "all")) {
+    compare_measures
+  } else {
+    measures
+  }
+
+  unknown <- setdiff(measures_to_print, compare_measures)
+  if (length(unknown)) {
+    stop(
+      paste0(
+        "Unknown measure(s) in `measures`: ",
+        paste(unknown, collapse = ", "),
+        ". Available measures: ",
+        paste(compare_measures, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  if (identical(measures, "all") && length(compare_measures) > 4L) {
+    message(
+      "Printing ", length(compare_measures), " measure comparisons; ",
+      "consider `measures = c(...)`."
+    )
+  }
+
+  if (is.null(measures) && !is.null(rank_by)) {
+    message(
+      "Models ranked by ", rank_by, " (reference: ", ref_model, ")."
+    )
+  }
+
+  show_diag_elpd_primary <- is.null(measures) || identical(measures, "all")
+  for (i in seq_along(measures_to_print)) {
+    measure <- measures_to_print[[i]]
+    if (!is.null(measures)) {
+      cat("\n-- ", measure, " (vs ", ref_model, ") --\n", sep = "")
+    }
+    .print_compare_measure_table(
+      x,
+      measure = measure,
+      digits = digits,
+      p_worse = p_worse,
+      show_diag_elpd = show_diag_elpd_primary &&
+        identical(measure, primary_measure) &&
+        i == match(primary_measure, measures_to_print)
+    )
+  }
+
+  has_diag_msg <- .print_compare_diag_message(
+    x,
+    p_worse = p_worse,
+    measures = measures_to_print
+  )
+
+  if (is.null(measures)) {
+    other <- setdiff(compare_measures, primary_measure)
+    if (length(other)) {
+      message(
+        if (has_diag_msg) "\n",
+        "Other measures compared: ",
+        paste(other, collapse = ", "),
+        ". Use print(x, measures = \"all\")."
+      )
+    }
+  }
+
+  .warn_measures_no_pointwise_se(attr(x, "measures_no_pointwise_se"))
+
+  invisible(x)
+}
+
+#' Print one measure's comparison table
+#' @noRd
+.print_compare_measure_table <- function(x, measure, digits, p_worse, show_diag_elpd) {
+  if (.is_elpd_measure(measure)) {
+    diff_col <- "elpd_diff"
+    se_col <- "se_diff"
+    diff_name <- "elpd_diff"
+    se_name <- "se_diff"
+  } else {
+    diff_col <- paste0(measure, "_diff")
+    se_col <- paste0(measure, "_se_diff")
+    diff_name <- diff_col
+    se_name <- "se_diff"
+  }
+
+  if (!all(c(diff_col, se_col) %in% colnames(x))) {
+    stop(
+      "Comparison columns for measure '", measure, "' are missing.",
+      call. = FALSE
+    )
+  }
+
+  x2 <- data.frame(
+    model = x$model,
+    diff = unname(.fr(x[[diff_col]], digits)),
+    se_diff = unname(.fr(x[[se_col]], digits)),
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  names(x2)[2:3] <- c(diff_name, se_name)
+
+  if (.is_elpd_measure(measure) && p_worse && "p_worse" %in% colnames(x)) {
+    x2$p_worse <- unname(.fr(x[["p_worse"]], digits = 2))
+    x2$diag_diff <- x[["diag_diff"]]
+  }
+  if (show_diag_elpd && "diag_elpd" %in% colnames(x)) {
+    x2$diag_elpd <- x[["diag_elpd"]]
+  }
+
+  print(x2, quote = FALSE, row.names = FALSE)
+}
+
+#' Print diagnostic glossary message for compare output
+#' @noRd
+.print_compare_diag_message <- function(x, p_worse, measures = NULL) {
+  diag_cols <- c("diag_elpd")
+  if (is.null(measures) || "elpd" %in% measures) {
+    diag_cols <- c("diag_diff", diag_cols)
+  } else if (!is.null(measures)) {
+    elpd_measures <- measures[vapply(measures, .is_elpd_measure, logical(1))]
+    if (length(elpd_measures)) {
+      diag_cols <- c("diag_diff", diag_cols)
+    }
+  }
+
+  has_diag <- any(
+    vapply(
+      intersect(diag_cols, colnames(x)),
+      function(col) any(nzchar(x[[col]], keepNA = FALSE), na.rm = TRUE),
+      logical(1)
+    )
+  )
   if (has_diag && p_worse) {
     message(
       "\nDiagnostic flags present.\n",
@@ -205,11 +458,484 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE) {
       "or https://mc-stan.org/loo/reference/loo-glossary.html."
     )
   }
-  invisible(x)
+  invisible(has_diag && p_worse)
 }
 
+#' Is an object a PSIS-LOO predictive measure result?
+#' @noRd
+is.loo_pred_measure <- function(x) {
+  inherits(x, "loo_pred_measure")
+}
 
-# internal ----------------------------------------------------------------
+#' Normalize `loo_compare()` inputs to a list of model results
+#' @noRd
+.loo_compare_inputs <- function(x, ...) {
+  if (is.loo(x) || inherits(x, "pred_measure")) {
+    dots <- list(...)
+    return(c(list(x), dots))
+  }
+  if (!is.list(x) || !length(x)) {
+    stop("'x' must be a list if not a 'loo' object.", call. = FALSE)
+  }
+  if (length(list(...))) {
+    stop("If 'x' is a list then '...' should not be specified.", call. = FALSE)
+  }
+  x
+}
+
+#' Compare `loo_pred_measure` objects (multi-measure path)
+#' @noRd
+#' @param loos List of `loo_pred_measure` objects.
+#' @param rank_by Bare measure name used to order models.
+compare_loo_pred_measure <- function(loos, rank_by = NULL) {
+  loo_compare_checks.loo_pred_measure(loos)
+  .warn_omitted_compare_measures(loos)
+
+  rank_measure <- .resolve_rank_measure(loos, rank_by)
+  compare_cols <- .compare_pointwise_cols(loos)
+  .inform_compare_sign_conversion(compare_cols, loos)
+  ord <- loo_compare_order_pred_measure(loos, rank_measure$internal)
+  loos_ord <- loos[ord]
+  ref_loo <- loos_ord[[1L]]
+
+  comp <- loo_compare_matrix_pred_measure(loos_ord)
+  rnms <- rownames(comp)
+  n_obs <- nrow(loos_ord[[1L]]$pointwise)
+
+  diff_cols <- list()
+  measures_no_pointwise_se <- character()
+  for (col in compare_cols) {
+    bare <- .display_name(col)
+    method <- .measure_pointwise_diff_method(loos_ord, col)
+    if (method == "estimates_only") {
+      measures_no_pointwise_se <- c(measures_no_pointwise_se, bare)
+    }
+    pair_stats <- vapply(
+      loos_ord,
+      .pair_measure_stats,
+      FUN.VALUE = c(diff = 0, se = 0),
+      ref = ref_loo,
+      col = col,
+      method = method
+    )
+    measure_diff <- pair_stats["diff", ]
+    measure_se <- pair_stats["se", ]
+
+    if (.is_elpd_measure(col)) {
+      diff_cols$elpd_diff <- measure_diff
+      diff_cols$se_diff <- measure_se
+      p_worse <- stats::pnorm(0, measure_diff, measure_se)
+      p_worse[measure_diff == 0] <- NA_real_
+      diff_cols$p_worse <- p_worse
+      diff_cols$diag_diff <- diag_diff(n_obs, measure_diff)
+    } else {
+      diff_cols[[paste0(bare, "_diff")]] <- measure_diff
+      diff_cols[[paste0(bare, "_se_diff")]] <- measure_se
+    }
+  }
+
+  comp <- cbind(
+    data.frame(
+      model = rnms,
+      diff_cols,
+      diag_elpd = diag_elpd(loos_ord),
+      stringsAsFactors = FALSE
+    ),
+    as.data.frame(comp)
+  )
+  rownames(comp) <- NULL
+
+  loo_order_stat_check_pred_measure(
+    loos_ord,
+    seq_along(loos_ord),
+    rank_measure$internal
+  )
+
+  attr(comp, "measures_no_pointwise_se") <- unique(measures_no_pointwise_se)
+  if (!is.null(rank_by)) {
+    attr(comp, "rank_by") <- rank_measure$bare
+  }
+  attr(comp, "compare_measures") <- .compare_measures(loos)
+  attr(comp, "sign_converted_measures") <- .compare_sign_converted_measures(
+    compare_cols,
+    loos
+  )
+  class(comp) <- c("compare.loo", class(comp))
+  comp
+}
+
+#' Order `loo_pred_measure` objects by a comparison measure
+#' @noRd
+loo_compare_order_pred_measure <- function(loos, rank_col) {
+  est_row <- vapply(loos, function(x) {
+    val <- x$estimates[rank_col, "Estimate"]
+    if (.measure_lower_is_better(rank_col, loos)) -val else val
+  }, numeric(1))
+  order(est_row, decreasing = TRUE)
+}
+
+#' Compute comparison matrix for `loo_pred_measure` objects
+#' @noRd
+loo_compare_matrix_pred_measure <- function(loos) {
+  tmp <- sapply(loos, function(x) {
+    est <- x$estimates
+    bare_rows <- .display_name(rownames(est))
+    setNames(
+      c(est),
+      nm = c(bare_rows, paste0("se_", bare_rows))
+    )
+  })
+  colnames(tmp) <- find_model_names(loos)
+  rnms <- rownames(tmp)
+  comp <- t(tmp)
+  patts <- c("^elpd$", "^p$", "^se_elpd$", "^se_p$")
+  col_ord <- unique(unlist(
+    lapply(patts, function(p) grep(p, colnames(comp))),
+    use.names = FALSE
+  ))
+  other <- setdiff(seq_len(ncol(comp)), col_ord)
+  comp <- comp[, c(col_ord, other), drop = FALSE]
+  comp
+}
+
+#' Many-model check for `loo_pred_measure` comparisons
+#' @noRd
+loo_order_stat_check_pred_measure <- function(loos, ord, rank_col) {
+  if (length(loos) <= 11L) {
+    return(NULL)
+  }
+
+  baseline_idx <- middle_idx(ord)
+  ref_loo <- loos[[ord[baseline_idx]]]
+  method <- .measure_pointwise_diff_method(loos, rank_col)
+  measure_diff <- vapply(
+    loos,
+    .pair_measure_stats,
+    FUN.VALUE = c(diff = 0, se = 0),
+    ref = ref_loo,
+    col = rank_col,
+    method = method
+  )["diff", ]
+
+  diff_median <- stats::median(measure_diff)
+  measure_diff_trunc <- measure_diff[measure_diff >= diff_median]
+  n_models <- sum(!is.na(measure_diff_trunc))
+  candidate_sd <- sqrt(1 / n_models * sum(measure_diff_trunc^2, na.rm = TRUE))
+
+  K <- length(loos) - 1L
+  order_stat <- order_stat_heuristic(K, candidate_sd)
+
+  if (max(measure_diff) <= order_stat) {
+    warning(
+      "Difference in performance potentially due to chance. ",
+      "See McLatchie and Vehtari (2023) for details.",
+      call. = FALSE
+    )
+  }
+}
+
+#' Perform checks on `loo_pred_measure` objects before comparison
+#' @noRd
+#' @param loos List of `loo_pred_measure` objects.
+#' @return Nothing, just possibly throws errors/warnings.
+loo_compare_checks.loo_pred_measure <- function(loos) {
+  if (length(loos) <= 1L) {
+    stop("'loo_compare' requires at least two models.", call. = FALSE)
+  }
+  if (!all(vapply(loos, is.loo_pred_measure, logical(1)))) {
+    stop(
+      "All inputs must have class 'loo_pred_measure'.",
+      call. = FALSE
+    )
+  }
+
+  Ns <- vapply(loos, function(x) nrow(x$pointwise), integer(1))
+  if (any(Ns != Ns[1L])) {
+    stop(
+      paste0(
+        "All models must have the same number of observations, but models have inconsistent observation counts: ",
+        paste(paste0("'", find_model_names(loos), "' (", Ns, ")"), collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  yhash <- lapply(loos, attr, which = "yhash")
+  yhash_ok <- vapply(yhash, function(x) {
+    isTRUE(all.equal(x, yhash[[1]]))
+  }, logical(1))
+  if (!all(yhash_ok)) {
+    warning(
+      "Not all models have the same y variable. ('yhash' attributes do not match)",
+      call. = FALSE
+    )
+  }
+}
+
+#' Strip `_loo` suffix for `loo_compare` display names
+#' @noRd
+.display_name <- function(col) {
+  sub("_loo$", "", col)
+}
+
+#' Map bare measure name to `pointwise` column name
+#' @noRd
+.pointwise_col <- function(name, cols) {
+  if (name %in% cols) {
+    return(name)
+  }
+  internal <- paste0(name, "_loo")
+  if (internal %in% cols) {
+    return(internal)
+  }
+  stop(
+    paste0(
+      "Measure '", name, "' not found in all models. ",
+      "Available measures: ",
+      paste(vapply(cols, .display_name, character(1)), collapse = ", ")
+    ),
+    call. = FALSE
+  )
+}
+
+#' Common `pointwise` columns across models, excluding complexity terms
+#' @noRd
+.compare_pointwise_cols <- function(loos) {
+  cols <- Reduce(
+    intersect,
+    lapply(loos, function(x) colnames(x$pointwise))
+  )
+  cols[!grepl("^p_", cols)]
+}
+
+#' Bare measure names per model from `pointwise` columns
+#' @noRd
+.compare_measures_by_model <- function(loos) {
+  model_names <- find_model_names(loos)
+  if (anyDuplicated(model_names)) {
+    model_names <- make.unique(model_names, sep = "_")
+  }
+  stats::setNames(
+    lapply(loos, function(x) {
+      cols <- colnames(x$pointwise)
+      cols <- cols[!grepl("^p_", cols)]
+      unname(vapply(cols, .display_name, character(1)))
+    }),
+    model_names
+  )
+}
+
+#' Warn when `se_diff` is unavailable for compared measures
+#' @noRd
+.warn_measures_no_pointwise_se <- function(measures) {
+  if (!length(measures)) {
+    return(invisible(NULL))
+  }
+  warning(
+    paste0(
+      "se_diff unavailable for: ",
+      paste(measures, collapse = ", "),
+      "."
+    ),
+    call. = FALSE
+  )
+  invisible(NULL)
+}
+
+#' Warn when models do not share the same predictive measures
+#' @noRd
+.warn_omitted_compare_measures <- function(loos) {
+  by_model <- .compare_measures_by_model(loos)
+  common <- Reduce(intersect, by_model)
+  omitted <- setdiff(unique(unlist(by_model)), common)
+  if (!length(omitted)) {
+    return(invisible(NULL))
+  }
+  omitted <- sort(omitted)
+
+  omitted_detail <- vapply(
+    omitted,
+    function(measure) {
+      present <- names(by_model)[vapply(
+        by_model,
+        function(measures) measure %in% measures,
+        logical(1)
+      )]
+      paste0(measure, " (", paste(present, collapse = ", "), ")")
+    },
+    character(1)
+  )
+
+  warning(
+    paste0(
+      "Omitted measures: ",
+      paste(omitted_detail, collapse = ", "),
+      ". Compared: ",
+      paste(common, collapse = ", "),
+      "."
+    ),
+    call. = FALSE
+  )
+}
+
+#' Bare measure names available for comparison across models
+#' @noRd
+.compare_measures <- function(loos) {
+  cols <- .compare_pointwise_cols(loos)
+  unname(vapply(cols, .display_name, character(1)))
+}
+
+#' Resolve `rank_by` to bare and internal `pointwise` column names
+#' @noRd
+.resolve_rank_measure <- function(loos, rank_by = NULL) {
+  cols <- .compare_pointwise_cols(loos)
+  bare <- if (is.null(rank_by)) "elpd" else rank_by
+  internal <- .pointwise_col(bare, cols)
+  list(
+    bare = .display_name(internal),
+    internal = internal
+  )
+}
+
+#' Is a measure an ELPD-family measure (for `p_worse` / `diag_diff`)?
+#' @noRd
+.is_elpd_measure <- function(name) {
+  grepl("^elpd", .display_name(name))
+}
+
+#' Loss-scale measures where a sign flip is needed for utility-scale comparison
+#' @noRd
+.measure_lower_is_better <- function(name, loos = NULL) {
+  bare <- .display_name(name)
+  loss <- bare %in% c("ic", "mae", "mse", "rmse", "brier", "srps")
+  if (is.null(loos)) {
+    return(loss)
+  }
+  rev <- attr(loos[[1L]], "measure_revert_sign")[[bare]]
+  xor(loss, isTRUE(rev))
+}
+
+#' Bare names of measures whose sign is flipped for `loo_compare()`
+#' @noRd
+.compare_sign_converted_measures <- function(cols, loos) {
+  bare <- vapply(cols, .display_name, character(1))
+  unique(bare[vapply(
+    cols,
+    function(col) .measure_lower_is_better(col, loos),
+    logical(1)
+  )])
+}
+
+#' Inform when measure signs are flipped for comparison
+#' @noRd
+.inform_compare_sign_conversion <- function(cols, loos) {
+  converted <- .compare_sign_converted_measures(cols, loos)
+  if (!length(converted)) {
+    return(invisible(NULL))
+  }
+  message(
+    "For model comparison, differences for ",
+    paste(converted, collapse = ", "),
+    " ",
+    if (length(converted) == 1L) "is" else "are",
+    " reported on a utility scale (higher is better)."
+  )
+  invisible(NULL)
+}
+
+#' Built-in measures without pointwise-based comparison SEs
+#' @noRd
+.measures_without_pointwise_diffs <- function() {
+  c("mse", "rmse", "r2")
+}
+
+#' How to aggregate paired pointwise differences for a measure
+#'
+#' Returns `"sum"` when the overall estimate equals the sum of pointwise
+#' contributions, `"mean"` when it equals the mean, and `"estimates_only"`
+#' when pointwise values do not define the overall estimate.
+#' @noRd
+.measure_pointwise_diff_method <- function(loos, col) {
+  bare <- .display_name(col)
+  if (bare %in% .measures_without_pointwise_diffs()) {
+    return("estimates_only")
+  }
+  if (.is_elpd_measure(col) || bare == "ic") {
+    return("sum")
+  }
+
+  ref <- loos[[1L]]
+  est <- ref$estimates[col, "Estimate"]
+  pw <- ref$pointwise[, col, drop = TRUE]
+  if (!length(pw) || !is.finite(est)) {
+    return("estimates_only")
+  }
+
+  tol <- sqrt(.Machine$double.eps) * max(abs(c(est, pw)), na.rm = TRUE)
+  if (isTRUE(all.equal(est, sum(pw), tolerance = tol, check.attributes = FALSE))) {
+    return("sum")
+  }
+  if (isTRUE(all.equal(est, mean(pw), tolerance = tol, check.attributes = FALSE))) {
+    return("mean")
+  }
+  "estimates_only"
+}
+
+#' Pointwise values on utility scale (higher is better)
+#' @noRd
+.pointwise_utility <- function(pointwise, col, loos) {
+  x <- pointwise[, col, drop = TRUE]
+  if (.measure_lower_is_better(col, loos)) -x else x
+}
+
+#' Compute pointwise measure differences on utility scale
+#' @noRd
+#' @param ref,cmp Two `loo_pred_measure` objects.
+#' @param col Internal `pointwise` column name.
+.measure_diffs <- function(ref, cmp, col) {
+  loos <- list(ref)
+  u_ref <- .pointwise_utility(ref$pointwise, col, loos)
+  u_cmp <- .pointwise_utility(cmp$pointwise, col, loos)
+  u_cmp - u_ref
+}
+
+#' Overall estimate on utility scale (higher is better)
+#' @noRd
+.measure_estimate_utility <- function(estimates, col, loos) {
+  val <- estimates[col, "Estimate"]
+  if (.measure_lower_is_better(col, loos)) -val else val
+}
+
+#' Paired measure difference from overall estimates
+#' @noRd
+.measure_diff_from_estimates <- function(cmp, ref, col) {
+  loos <- list(ref)
+  .measure_estimate_utility(cmp$estimates, col, loos) -
+    .measure_estimate_utility(ref$estimates, col, loos)
+}
+
+#' Paired measure difference and SE for one model vs a reference
+#' @noRd
+.pair_measure_stats <- function(cmp, ref, col, method = NULL) {
+  if (is.null(method)) {
+    method <- .measure_pointwise_diff_method(list(ref, cmp), col)
+  }
+  if (method == "estimates_only") {
+    return(c(
+      diff = .measure_diff_from_estimates(cmp, ref, col),
+      se = NA_real_
+    ))
+  }
+  diffs <- .measure_diffs(ref, cmp, col)
+  diff <- if (method == "sum") sum(diffs) else mean(diffs)
+  se <- if (method == "sum") {
+    se_elpd_diff(diffs)
+  } else {
+    N <- length(diffs)
+    if (N <= 1L) 0 else stats::sd(diffs) / sqrt(N)
+  }
+  c(diff = diff, se = se)
+}
 
 #' Compute pointwise elpd differences
 #' @noRd
