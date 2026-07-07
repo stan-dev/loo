@@ -20,10 +20,10 @@ knitr::opts_chunk$set(
 
 > **Status:** In Progress  
 > **Base branch:** `loo-v3.0.0`  
-> **Compare branch:** `pred_measure`  
+> **Compare branch:** `pred_measure` (+ `integrate-loo_compare`)  
 > **Related PR:** [#363](https://github.com/stan-dev/loo/pull/363)  
 > **Contributors:** @florence-bockting, @avehtari, @VisruthSK, @jgabry  
-> **Last updated:** 2026-07-03
+> **Last updated:** 2026-07-07
 
 These notes document internal design decisions and ongoing work for the
 `pred_measure` feature. This PR **adds** the new API.
@@ -37,7 +37,7 @@ These notes document internal design decisions and ongoing work for the
 | Scoring rules (`measure_rps`) | Done |
 | Documentation | In progress |
 | `group_ids` grouping | Not started |
-| `loo_compare` integration | Not started |
+| `loo_compare` integration | Done (`integrate-loo_compare`) |
 
 ## Scope of this PR (`pred_measure` vs `loo-v3.0.0`)
 
@@ -52,6 +52,7 @@ These notes document internal design decisions and ongoing work for the
 - `vignettes/migration-guide.Rmd`
 - Website-only articles: `overview-measures.Rmd`, `pred-measure-workflow.Rmd`
 - Test suite + pre-fitted fixtures + `test_data_generation.R`
+- `loo_compare()` multi-measure path for `loo_pred_measure` objects
 
 ### Changed on existing code (implementations retained)
 
@@ -61,6 +62,9 @@ These notes document internal design decisions and ongoing work for the
 - `elpd()` — refactored to `.elpd_matrix_impl()` to avoid double deprecation
   warnings
 - Minor doc cross-references in `compare.R`, `psislw.R`
+- `loo_compare()` — extended for `loo_pred_measure` objects: `rank_by`, multi-measure
+  paired diffs, updated `print.compare.loo(measures = ...)`; classic `loo` path unchanged
+- `R/loo-glossary.R` — multi-measure comparison columns (`{measure}_diff`, `rank_by`, etc.)
 - `NEWS.md`, `NAMESPACE`, `_pkgdown.yml`, pkgdown CI workflow
 
 ## Design decisions (resolved)
@@ -111,6 +115,29 @@ Design choices **internal to `pred_measure`**:
 - [ ] Verify `kfold_pred_measure()` with categorical/multinomial examples
   end-to-end (penguins fixture exists; confirm test/doc coverage)
 
+### D4: `loo_compare()` for `loo_pred_measure` objects
+
+**Decision:** Extend existing `loo_compare()`, not a separate function.
+
+- When all inputs are `loo_pred_measure` objects, compute paired differences for
+  every measure common to all models
+- Rank models by `rank_by` (default `"elpd"`); top-ranked model is the reference
+  for all `{measure}_diff` columns
+- ELPD-family measures keep `elpd_diff` / `se_diff`; other measures use
+  `{measure}_diff` / `{measure}_se_diff`
+- `p_worse` and `diag_diff` apply to ELPD only; `diag_elpd` per model as before
+- Loss measures (MSE, RMSE, MAE, IC) compared on a utility scale (negated) so
+  worse models have negative diffs, consistent with ELPD
+- Pointwise SEs use the same paired formula as ELPD when the overall estimate is
+  a sum or mean of pointwise contributions; otherwise `{measure}_se_diff` is `NA`
+  (e.g. `r2`, `mse`, `rmse`)
+- Reuse `elpd_diffs`, `se_elpd_diff`, `diag_diff`, `diag_elpd`, and many-model
+  order-statistic check (with `rank_by` when applicable)
+- `print.compare.loo(measures = ...)` shows one or all measure diff tables
+
+Implemented on branch `integrate-loo_compare`; tests in `test_compare.R` with
+fixture `test_data_roaches_compare.Rds`.
+
 ## Open decisions
 
 ### D1: Sign convention for pointwise estimates
@@ -138,7 +165,7 @@ Design choices **internal to `pred_measure`**:
 - [x] In `*_pred_measure()`, compute `elpd` as base when `ylp` supplied;
   require explicit `measure = "ic"` for information criterion
 - [x] Document and test deprecated vs new API comparisons *(see appendix)*
-- [ ] Provide an interface to `loo_compare` and verify consistency
+- [x] Provide an interface to `loo_compare` and verify consistency
 - [ ] Resolve `r_eff` handling *(see D3)*
 
 ### Implementation
@@ -156,7 +183,8 @@ Design choices **internal to `pred_measure`**:
 - [x] Online-only articles published via `_pkgdown.yml`
 - [ ] Formula derivations article (`pred_measure-formulas.Rmd`)
 - [ ] Detailed per-measure descriptions (derivations where appropriate)
-- [ ] Extend glossary (`R/loo-glossary.R`) — measure, metric, score, utility, loss
+- [x] Extend glossary (`R/loo-glossary.R`) — multi-measure `loo_compare` columns
+- [ ] Extend glossary further — measure, metric, score, utility, loss (general terms)
 
 ### Grouping via `group_ids`
 
@@ -170,8 +198,8 @@ Design choices **internal to `pred_measure`**:
 
 - Rename `ic` → `information_criteria` for clarity?
 - Should `measure_elpd()` also return `ic`, or keep them separate?
-- What defines class `"loo"` on measure objects? (e.g. deprecated `elpd_generic`
-  inherits `"loo"`)
+- What defines class `"loo"` on measure objects? `loo_pred_measure` inherits `"loo"`
+  (see `integrate-loo_compare`); deprecated `elpd_generic` also inherits `"loo"`.
 - Should `elpd` always be computed when `ylp` is supplied, or allow
   `loo_pred_measure()` for non-ELPD measures only?
 
