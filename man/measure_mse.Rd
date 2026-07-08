@@ -9,7 +9,7 @@ measure_mse(
   mupred,
   log_weights = NULL,
   pointwise = NULL,
-  revert_sign = FALSE
+  higher_is_better = NULL
 )
 }
 \arguments{
@@ -25,8 +25,11 @@ before computing each per-observation contribution.}
 \item{pointwise}{Optional numeric vector of precomputed pointwise absolute
 errors. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
 
-\item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by \eqn{-1} before returning.}
+\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
+better predictive performance. \code{NULL} (default) keeps each measure's
+natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
+Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
+scale (lower is better).}
 }
 \description{
 Computes MSE between observed outcomes and posterior predictive point

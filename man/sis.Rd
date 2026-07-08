@@ -67,7 +67,7 @@ A named list containing one vector:
 }
 }
 
-Objects of class \code{"sis"} also have the following \link[=attributes]{attributes}:
+Objects of class \code{"sis"} also have the following \link{attributes}:
 \describe{
 \item{\code{norm_const_log}}{
 Vector of precomputed values of \code{colLogSumExps(log_weights)} that are
