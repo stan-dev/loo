@@ -10,7 +10,7 @@
 * `loo_compare()` now supports `loo_pred_measure` objects: paired differences
   for all measures common to the compared models, optional `rank_by` ranking,
   utility-scale sign conversion for loss measures, and
-  `print(compare, measures = ...)` for multi-measure tables by @florence-bockting in #220.
+  `print(compare, measures = ...)` for multi-measure tables by @florence-bockting in #380.
 
 # loo 2.10.0
 
