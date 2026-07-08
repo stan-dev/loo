@@ -241,7 +241,7 @@ It is also possible to pass a custom function for any measure. The function must
 
 ```{r}
 # custom scoring rule
-hamming_loss <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
+hamming_loss <- function(y, ypred, log_weights = NULL, higher_is_better = NULL) {
   if (is.null(log_weights)) {
     hamming_i <- colMeans(sweep(ypred, 2, y, "!="))
   } else {
@@ -255,7 +255,8 @@ hamming_loss <- function(y, ypred, log_weights = NULL, revert_sign = FALSE) {
     pointwise = hamming_i
   )
   
-  if (isTRUE(revert_sign)) {
+  # Hamming loss is naturally on a loss scale (lower is better).
+  if (isTRUE(higher_is_better)) {
     res$estimate <- -res$estimate
     res$pointwise <- -res$pointwise
   }

@@ -120,7 +120,7 @@ test_that(".validate_control() accepts valid control silently", {
   expect_invisible(.validate_control(list(rps = list(scaled = TRUE))))
   expect_invisible(.validate_control(list(
     rps = list(scaled = TRUE),
-    srps = list(revert_sign = TRUE)
+    srps = list(higher_is_better = TRUE)
   )))
 })
 

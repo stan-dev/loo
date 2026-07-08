@@ -10,7 +10,7 @@ measure_rps(
   log_weights = NULL,
   pointwise = NULL,
   scaled = FALSE,
-  revert_sign = FALSE
+  higher_is_better = NULL
 )
 }
 \arguments{
@@ -30,8 +30,11 @@ If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
 \item{scaled}{Logical; if \code{TRUE}, computes the scaled variant (SRPS for
 discrete outcomes, SCRPS for continuous outcomes). Default is \code{FALSE}.}
 
-\item{revert_sign}{Logical; if \code{TRUE}, multiply the estimate and pointwise
-values by \eqn{-1} before returning.}
+\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
+better predictive performance. \code{NULL} (default) keeps each measure's
+natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
+Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
+scale (lower is better).}
 }
 \description{
 Computes proper scoring rules based on the ranked probability score family,
@@ -79,8 +82,9 @@ accounts for the importance weights when estimating expectations.
 
 Unscaled scores are returned as utilities (higher is better), consistent
 with the sign convention of log score / ELPD. Scaled scores are negatively
-oriented (lower is better). Use \code{revert_sign = TRUE} to obtain the
-loss convention (lower is better) used in some references.
+oriented (lower is better). Use \code{higher_is_better = NULL} to obtain the
+loss convention (lower is better) used in some references for unscaled scores,
+or \code{higher_is_better = TRUE} for a utility scale when using scaled scores.
 }
 \examples{
 # Discrete outcomes: RPS

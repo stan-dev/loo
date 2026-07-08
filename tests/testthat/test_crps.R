@@ -92,10 +92,10 @@ test_that("methods for single data point don't error", {
   list(y = y, x1 = x1, x2 = x2)
 }
 
-test_that("measure_rps(revert_sign = TRUE) matches deprecated crps() sign convention", {
+test_that("measure_rps(higher_is_better = FALSE) matches deprecated crps() sign convention", {
   d <- .crps_draws()
   old <- suppressWarnings(crps(d$x1, d$x2, d$y))
-  new_rev <- measure_rps(d$y, d$x1, revert_sign = TRUE)
+  new_rev <- measure_rps(d$y, d$x1, higher_is_better = FALSE)
 
   expect_equal(
     as.vector(new_rev$pointwise),
