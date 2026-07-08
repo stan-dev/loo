@@ -283,6 +283,21 @@ testthat::test_that("measure_mse() and measure_rmse() work as expected", {
   expect_snapshot_output(measure_rmse(y = res_roaches$y, mupred = res_roaches$mupred))
 })
 
+testthat::test_that("higher_is_better reorients loss measures to utility scale", {
+  res_mse <- measure_mse(y = res_roaches$y, mupred = res_roaches$mupred)
+  res_mse_utility <- measure_mse(
+    y = res_roaches$y,
+    mupred = res_roaches$mupred,
+    higher_is_better = TRUE
+  )
+
+  expect_equal(
+    unname(res_mse_utility$estimates["Estimate"]),
+    -unname(res_mse$estimates["Estimate"])
+  )
+  expect_equal(res_mse_utility$pointwise, -res_mse$pointwise)
+})
+
 testthat::test_that("measure_rmse() works with se=0", {
   mupred0 <- t(replicate(4000, res_roaches$y))
 
