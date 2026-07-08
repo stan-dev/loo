@@ -118,7 +118,7 @@ Design choices **internal to `pred_measure`**:
 - **Context:** Measures differ in orientation (`rps`: lower is better;
   `srps`: higher is better). Aligning orientations may help comparisons.
 - **Options:** `lower_is_better`, `orientation = "utility" / "loss"`,
-  `revert_sign` (currently internal on some `measure_*()` functions)
+  `higher_is_better` (per-measure orientation control on `measure_*()` functions)
 - **Decision:** *pending*
 
 ### D3: Handling of `r_eff`
@@ -203,7 +203,7 @@ the same scoring rules but use different estimators.
 
 | Deprecated | New workflow | Notes |
 |------------|--------------|-------|
-| `crps(x, x2, y)` | `measure_rps(y, ypred = x, revert_sign = TRUE)` | Sign flip on unscaled score |
+| `crps(x, x2, y)` | `measure_rps(y, ypred = x, higher_is_better = FALSE)` | Loss-scale unscaled score |
 | `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | Same sign convention |
 | `loo_crps(...)` | `loo_pred_measure(..., measure = "rps")` | Additional LOO weighting difference |
 | `loo_scrps(...)` | `loo_pred_measure(..., measure = "srps")` | Additional LOO weighting difference |
@@ -212,7 +212,7 @@ the same scoring rules but use different estimators.
 
 1. **Sign convention (unscaled only).** `crps()` returns `0.5·EXX − EXy` (utility:
    higher is better). Default `measure_rps()` negates this; use
-   `revert_sign = TRUE` to match `crps()`. Scaled scores (`scrps` / `measure_srps`)
+   `higher_is_better = FALSE` to match `crps()`. Scaled scores (`scrps` / `measure_srps`)
    already share the formula `−EXy/EXX − 0.5·log(EXX)`.
 
 2. **EXX estimator (in-sample).** Both estimate `E|X − X'|`, but:
@@ -273,7 +273,7 @@ EXX_perm <- colMeans(abs(x1 - x2[sample(S), , drop = FALSE]))
 EXX_pwm <- .exx_pwm(x1)
 
 old_crps <- suppressWarnings(crps(x1, x2, y))
-new_rps <- measure_rps(y, x1, revert_sign = TRUE)
+new_rps <- measure_rps(y, x1, higher_is_better = FALSE)
 old_scrps <- suppressWarnings(scrps(x1, x2, y))
 new_srps <- measure_srps(y, x1)
 
@@ -355,7 +355,7 @@ invisible(dev.off())
 ![CRPS/RPS outcome comparison across replications](figures/crps-rps-outcomes.png)
 
 *Figure: 200 simulations (S = 100, n = 30). Left — `crps()` vs
-`measure_rps(revert_sign = TRUE)`; right — `scrps()` vs `measure_srps()`.*
+`measure_rps(higher_is_better = FALSE)`; right — `scrps()` vs `measure_srps()`.*
 
 ```{r crps-rps-outcomes-figure, fig.show = "hide"}
 n_repl <- 200L
@@ -369,7 +369,7 @@ for (i in seq_len(n_repl)) {
   x1 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
   x2 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
   old <- suppressWarnings(crps(x1, x2, y))
-  new <- measure_rps(y, x1, revert_sign = TRUE)
+  new <- measure_rps(y, x1, higher_is_better = FALSE)
   old_s <- suppressWarnings(scrps(x1, x2, y))
   new_s <- measure_srps(y, x1)
   crps_old[i] <- old$estimates["Estimate"]
@@ -383,7 +383,7 @@ par(mfrow = c(1, 2), mar = c(4, 4, 2.5, 1))
 .outcome_panel(
   crps_old, rps_new,
   xlab = "crps() estimate",
-  ylab = "measure_rps(revert_sign = TRUE)",
+  ylab = "measure_rps(higher_is_better = FALSE)",
   main = "Unscaled (CRPS / RPS)"
 )
 .outcome_panel(
