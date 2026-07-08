@@ -106,6 +106,11 @@ article for definitions and orientation (higher vs lower is better).
 \code{measure_name} and return \code{estimate}, \code{se}, and \code{pointwise}. Only arguments
 declared in the function signature among \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} are supplied automatically.
+
+Custom measures are assumed to be on a utility scale (higher is better) in
+\code{\link[=loo_compare]{loo_compare()}}. For a custom loss measure, pass
+\code{control = list(my_measure = list(higher_is_better = TRUE))} or negate values
+in the custom function so that \code{\link[=loo_compare]{loo_compare()}} ranks models correctly.
 }
 \section{\code{measure_higher_is_better} attribute}{
 
@@ -156,11 +161,6 @@ my_abs_err <- function(y, mupred, log_weights = NULL) {
 attr(my_abs_err, "measure_name") <- "my_abs_err"
 # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
 }
-
-Custom measures are assumed to be on a utility scale (higher is better) in
-[loo_compare()]. For a custom loss measure, pass
-`control = list(my_measure = list(higher_is_better = TRUE))` or negate values in
-the custom function so that [loo_compare()] ranks models correctly.
 
 }
 \seealso{

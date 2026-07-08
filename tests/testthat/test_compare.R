@@ -340,6 +340,32 @@ test_that("loo_compare errors on inconsistent measure metadata", {
   )
 })
 
+test_that("loo_compare errors when compare metadata is missing on some models", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  pm1 <- loo_pred_measure(
+    loo = res$loo_p_m1,
+    y = res$y,
+    mupred = res$mupred_m1,
+    ylp = res$ylp_m1,
+    measure = "mse"
+  )
+  pm2 <- loo_pred_measure(
+    loo = res$loo_p_m2,
+    y = res$y,
+    mupred = res$mupred_m2,
+    ylp = res$ylp_m2,
+    measure = "mse"
+  )
+  compare_meta <- attr(pm2, "measure_compare_meta")
+  compare_meta$mse <- NULL
+  attr(pm2, "measure_compare_meta") <- compare_meta
+
+  expect_error(
+    suppressMessages(loo_compare(pm1, pm2)),
+    "Not all models provide comparison metadata for measure 'mse'"
+  )
+})
+
 test_that("loo_compare warns when rank_by is ignored for classic loo objects", {
   expect_warning(
     loo_compare(w1, w2, rank_by = "mse"),

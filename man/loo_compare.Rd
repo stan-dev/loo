@@ -27,8 +27,9 @@ passed in as a single list.}
 \item{rank_by}{For \code{\link[=loo_pred_measure]{loo_pred_measure()}} comparisons only,
 the bare measure name used to rank models and define the reference model
 for all pairwise differences (default \code{"elpd"}). For example,
-\code{rank_by = "mse"} ranks models by MSE and computes all measure differences
-relative to the model with the lowest MSE.}
+\code{rank_by = "mse"} ranks models by predictive MSE (best/lowest MSE first) and
+computes all measure differences relative to that model on a utility scale
+(higher is better; loss measures such as MSE have their sign flipped).}
 
 \item{digits}{For the print method only, the number of digits to use when
 printing.}
@@ -38,9 +39,12 @@ approximation based probability of each model having worse performance than
 the best model? The default is \code{TRUE}.}
 
 \item{measures}{For \code{loo_pred_measure} comparisons only, which measures to
-print diff tables for. \code{NULL} (default) prints only the \code{rank_by} measure;
+print diff tables for. \code{NULL} (default) prints only the ranking measure
+(\code{"elpd"} when \code{rank_by} was not set, otherwise \code{rank_by});
 \code{"all"} prints all compared measures; or a character vector of measure
-names (e.g. \code{c("elpd", "mse")}).}
+names (e.g. \code{c("elpd", "mse")}). Printed tables use the column name
+\code{se_diff} for the standard error of the difference even when the data
+frame column is \verb{\{measure\}_se_diff}.}
 }
 \value{
 A data frame with class \code{"compare.loo"} that has its own
@@ -54,10 +58,12 @@ additionally contains \verb{\{measure\}_diff} and \verb{\{measure\}_se_diff} col
 every predictive measure common to all models (e.g. \code{rmse_diff},
 \code{rmse_se_diff}). ELPD-family measures use \code{elpd_diff} and \code{se_diff}.
 \code{p_worse} and \code{diag_diff} are computed for ELPD only. Per-model PSIS
-diagnostics appear in \code{diag_elpd}. Attributes \code{rank_by},
-\code{compare_measures}, and \code{sign_converted_measures} record which measure was
-used for ranking, which measures were compared, and which loss measures had
-their sign flipped for comparison.
+diagnostics appear in \code{diag_elpd}. Attributes \code{compare_measures} and
+\code{sign_converted_measures} record which measures were compared and which
+loss measures had their sign flipped for comparison. Attribute \code{rank_by} is
+set when \code{rank_by} was passed explicitly (default ranking is by \code{"elpd"}).
+Attribute \code{measures_no_pointwise_se} lists measures without pointwise-based
+\verb{\{measure\}_se_diff} values.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD} or, for

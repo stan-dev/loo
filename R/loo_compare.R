@@ -13,8 +13,9 @@
 #' @param rank_by For [`loo_pred_measure()`][loo_pred_measure] comparisons only,
 #'   the bare measure name used to rank models and define the reference model
 #'   for all pairwise differences (default `"elpd"`). For example,
-#'   `rank_by = "mse"` ranks models by MSE and computes all measure differences
-#'   relative to the model with the lowest MSE.
+#'   `rank_by = "mse"` ranks models by predictive MSE (best/lowest MSE first) and
+#'   computes all measure differences relative to that model on a utility scale
+#'   (higher is better; loss measures such as MSE have their sign flipped).
 #'
 #' @return A data frame with class `"compare.loo"` that has its own
 #'   print method. See the **Details** and **Examples** sections.
@@ -27,10 +28,12 @@
 #'   every predictive measure common to all models (e.g. `rmse_diff`,
 #'   `rmse_se_diff`). ELPD-family measures use `elpd_diff` and `se_diff`.
 #'   `p_worse` and `diag_diff` are computed for ELPD only. Per-model PSIS
-#'   diagnostics appear in `diag_elpd`. Attributes `rank_by`,
-#'   `compare_measures`, and `sign_converted_measures` record which measure was
-#'   used for ranking, which measures were compared, and which loss measures had
-#'   their sign flipped for comparison.
+#'   diagnostics appear in `diag_elpd`. Attributes `compare_measures` and
+#'   `sign_converted_measures` record which measures were compared and which
+#'   loss measures had their sign flipped for comparison. Attribute `rank_by` is
+#'   set when `rank_by` was passed explicitly (default ranking is by `"elpd"`).
+#'   Attribute `measures_no_pointwise_se` lists measures without pointwise-based
+#'   `{measure}_se_diff` values.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -268,9 +271,12 @@ loo_compare.default <- function(x, ..., rank_by = NULL) {
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
 #' @param measures For `loo_pred_measure` comparisons only, which measures to
-#'   print diff tables for. `NULL` (default) prints only the `rank_by` measure;
+#'   print diff tables for. `NULL` (default) prints only the ranking measure
+#'   (`"elpd"` when `rank_by` was not set, otherwise `rank_by`);
 #'   `"all"` prints all compared measures; or a character vector of measure
-#'   names (e.g. `c("elpd", "mse")`).
+#'   names (e.g. `c("elpd", "mse")`). Printed tables use the column name
+#'   `se_diff` for the standard error of the difference even when the data
+#'   frame column is `{measure}_se_diff`.
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NULL) {
   if (inherits(x, "old_compare.loo")) {
     return(unclass(x))
@@ -637,7 +643,16 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
       }
       compare_meta[[bare]]
     })
-    non_null <- metas[!vapply(metas, is.null, logical(1))]
+    has_meta <- !vapply(metas, is.null, logical(1))
+    if (any(has_meta) && !all(has_meta)) {
+      stop(
+        "Not all models provide comparison metadata for measure '",
+        bare,
+        "'. Recompute all inputs with the current version of `loo_pred_measure()`.",
+        call. = FALSE
+      )
+    }
+    non_null <- metas[has_meta]
     if (length(non_null) > 1L) {
       ref <- non_null[[1L]]
       inconsistent <- vapply(
@@ -835,7 +850,8 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
     return(meta$diff_method)
   }
 
-  if (bare %in% c("mse", "rmse", "r2")) {
+  spec <- .measure_spec[[bare]]
+  if (!is.null(spec) && identical(spec$diff_method, "estimates_only")) {
     return("estimates_only")
   }
   if (.is_elpd_measure(col) || bare == "ic") {

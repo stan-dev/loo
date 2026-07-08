@@ -288,8 +288,10 @@ SRPS have their sign flipped from the raw loss orientation) using the same
 approach as \code{elpd_diff} and \code{se_diff} (Eq 24 in VGG2017 for sums; the mean
 analogue for means). Measures already returned on a utility scale (e.g. ELPD,
 CRPS/RPS) are not sign-flipped. Negative \code{m_diff} values then indicate worse
-performance than the reference model, which has \code{m_diff = 0} and
-\code{se_diff = 0}. Attribute \code{measure_higher_is_better} on each \verb{*_pred_measure()}
+performance than the reference model, which has \code{m_diff = 0}. For sum- and
+mean-based measures, the reference model also has \code{m_se_diff = 0}; for
+\code{estimates_only} measures (e.g. \code{r2}, \code{mse}, \code{rmse}), \code{m_se_diff} is \code{NA}.
+Attribute \code{measure_higher_is_better} on each \verb{*_pred_measure()}
 result records the \code{higher_is_better} setting used when each measure was
 computed; when stored values are on a loss scale, \code{loo_compare()} emits a
 short message naming those measures (see \code{\link[=loo_compare]{loo_compare()}}).
@@ -312,16 +314,41 @@ list recording the \code{higher_is_better} setting used for each measure (\code{
 when converting to a utility scale.
 }
 
-\subsection{\code{rank_by} and \code{compare_measures}}{
+\subsection{\code{measure_compare_meta}}{
+
+Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results: a named
+list of per-measure comparison metadata used by \code{\link[=loo_compare]{loo_compare()}}. Each entry
+is a list with:
+\itemize{
+\item \code{higher_is_better} — the orientation setting used when the measure was
+computed (\code{NULL}, \code{TRUE}, or \code{FALSE})
+\item \code{loss} — whether stored values are on a loss scale (lower is better)
+\item \code{diff_method} — how paired differences are aggregated: \code{"sum"},
+\code{"mean"}, \code{"estimates_only"}, or \code{"auto"} (inferred at compare time for
+custom measures)
+}
+
+Built-in measures take \code{loss} and \code{diff_method} from the package measure
+registry; custom measures default to \code{loss = FALSE} and \code{diff_method = "auto"}.
+\code{\link[=loo_compare]{loo_compare()}} requires all models to provide matching metadata for each
+shared measure; mismatched \code{higher_is_better} settings or missing metadata on
+some models produce an error.
+}
+
+\subsection{\code{rank_by}, \code{compare_measures}, and related attributes`}{
 
 The \code{rank_by} argument selects which measure determines model ordering and
-the reference model for all pairwise differences. The returned data frame has
-attribute \code{rank_by} with the measure name used, attribute \code{compare_measures}
-listing all measures that were compared, and attribute
-\code{sign_converted_measures} listing loss measures whose sign was flipped onto
-the utility scale. The print method shows the \code{rank_by} measure by default;
-use \code{print(x, measures = "all")} or \code{print(x, measures = c("rmse", "r2"))}
-to display additional measure tables.
+the reference model for all pairwise differences. When \code{rank_by} is omitted,
+models are ranked by \code{"elpd"}; attribute \code{rank_by} is set only when \code{rank_by}
+is passed explicitly. Attribute \code{compare_measures} lists all measures that
+were compared, \code{sign_converted_measures} lists loss measures whose sign was
+flipped onto the utility scale, and \code{measures_no_pointwise_se} lists measures
+for which \verb{\{measure\}_se_diff} is unavailable (overall estimate not defined
+from pointwise values). The print method shows the ranking measure by default
+(\code{"elpd"} when \code{rank_by} was not set); use \code{print(x, measures = "all")} or
+\code{print(x, measures = c("rmse", "r2"))} to display additional measure tables.
+Printed tables label the standard-error column \code{se_diff} even for non-ELPD
+measures; the data frame columns remain \verb{\{measure\}_se_diff}.
 }
 }
 
