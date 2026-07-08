@@ -323,7 +323,7 @@ do_pred_measure <- function(
     base_measure
 ) {
   if (measure_entry$type == "builtin") {
-    measure_fun <- .measure_spec[[measure_entry$key]]
+    measure_fun <- .measure_spec[[measure_entry$key]]$fun
     if (is.null(measure_fun)) {
       cli::cli_abort("Unknown built-in measure {.val {measure_entry$key}}.")
     }
