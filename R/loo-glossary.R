@@ -274,8 +274,8 @@
 #' analogue for means). Measures already returned on a utility scale (e.g. ELPD,
 #' CRPS/RPS) are not sign-flipped. Negative `m_diff` values then indicate worse
 #' performance than the reference model, which has `m_diff = 0` and
-#' `se_diff = 0`. Attribute `measure_revert_sign` on each `*_pred_measure()`
-#' result records whether `revert_sign` was applied when each measure was
+#' `se_diff = 0`. Attribute `measure_higher_is_better` on each `*_pred_measure()`
+#' result records the `higher_is_better` setting used when each measure was
 #' computed; when stored values are on a loss scale, `loo_compare()` emits a
 #' short message naming those measures (see [loo_compare()]).
 #'
@@ -287,13 +287,13 @@
 #' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
 #' these diagnostics do not apply to other predictive measures.
 #'
-#' ### `measure_revert_sign`
+#' ### `measure_higher_is_better`
 #'
 #' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
-#' list of logicals recording whether `revert_sign` was applied when each
-#' measure was computed (`elpd` is always `FALSE`). Used by [loo_compare()] to
-#' decide whether paired differences for loss measures need an additional sign
-#' flip when converting to a utility scale.
+#' list recording the `higher_is_better` setting used for each measure (`NULL`,
+#' `TRUE`, or `FALSE`; `elpd` is always `NULL`). Used by [loo_compare()] with
+#' `measure_compare_meta` to decide whether paired differences need a sign flip
+#' when converting to a utility scale.
 #'
 #' ### `rank_by` and `compare_measures`
 #'

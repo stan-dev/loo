@@ -289,8 +289,8 @@ approach as \code{elpd_diff} and \code{se_diff} (Eq 24 in VGG2017 for sums; the 
 analogue for means). Measures already returned on a utility scale (e.g. ELPD,
 CRPS/RPS) are not sign-flipped. Negative \code{m_diff} values then indicate worse
 performance than the reference model, which has \code{m_diff = 0} and
-\code{se_diff = 0}. Attribute \code{measure_revert_sign} on each \verb{*_pred_measure()}
-result records whether \code{revert_sign} was applied when each measure was
+\code{se_diff = 0}. Attribute \code{measure_higher_is_better} on each \verb{*_pred_measure()}
+result records the \code{higher_is_better} setting used when each measure was
 computed; when stored values are on a loss scale, \code{loo_compare()} emits a
 short message naming those measures (see \code{\link[=loo_compare]{loo_compare()}}).
 
@@ -303,13 +303,13 @@ than a prefixed form. Only ELPD comparisons include \code{p_worse} and \code{dia
 these diagnostics do not apply to other predictive measures.
 }
 
-\subsection{\code{measure_revert_sign}}{
+\subsection{\code{measure_higher_is_better}}{
 
 Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results: a named
-list of logicals recording whether \code{revert_sign} was applied when each
-measure was computed (\code{elpd} is always \code{FALSE}). Used by \code{\link[=loo_compare]{loo_compare()}} to
-decide whether paired differences for loss measures need an additional sign
-flip when converting to a utility scale.
+list recording the \code{higher_is_better} setting used for each measure (\code{NULL},
+\code{TRUE}, or \code{FALSE}; \code{elpd} is always \code{NULL}). Used by \code{\link[=loo_compare]{loo_compare()}} with
+\code{measure_compare_meta} to decide whether paired differences need a sign flip
+when converting to a utility scale.
 }
 
 \subsection{\code{rank_by} and \code{compare_measures}}{

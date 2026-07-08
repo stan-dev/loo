@@ -166,7 +166,8 @@ do_pred_measure <- function(
       name = entry$name,
       values = .measure_estimate_se(sel_measure),
       margin = 1,
-      revert_sign = attr(sel_measure, "revert_sign")
+      measure_entry = entry,
+      higher_is_better = attr(sel_measure, "higher_is_better")
     )
     pointwise <- .merge_matrix(
       source = source,
@@ -325,10 +326,11 @@ do_pred_measure <- function(
     base_measure
 ) {
   if (measure_entry$type == "builtin") {
-    measure_fun <- .measure_spec[[measure_entry$key]]$fun
-    if (is.null(measure_fun)) {
+    spec <- .measure_spec[[measure_entry$key]]
+    if (is.null(spec)) {
       cli::cli_abort("Unknown built-in measure {.val {measure_entry$key}}.")
     }
+    measure_fun <- spec$fun
   } else {
     measure_fun <- measure_entry$key
   }
@@ -538,8 +540,11 @@ do_pred_measure <- function(
 #'   `(estimate, se)`; for `margin = 2`, length-`n` pointwise vector.
 #' @param margin `1` to merge along rows (estimates table), `2` along columns
 #'   (pointwise table).
-#' @param revert_sign Optional logical; when merging an estimates row
-#'   (`margin = 1`), records whether the sign was reverted for `name`.
+#' @param measure_entry Optional normalized measure entry; when merging an
+#'   estimates row (`margin = 1`), comparison metadata for [loo_compare()] is
+#'   recorded from this entry and `higher_is_better`.
+#' @param higher_is_better Optional logical or `NULL`; records the orientation
+#'   used for `name` when merging an estimates row (`margin = 1`).
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
@@ -555,7 +560,15 @@ do_pred_measure <- function(
 }
 
 #' @noRd
-.merge_matrix <- function(source, mat, name, values, margin, revert_sign = NULL) {
+.merge_matrix <- function(
+  source,
+  mat,
+  name,
+  values,
+  margin,
+  measure_entry = NULL,
+  higher_is_better = NULL
+) {
   is_row <- margin == 1
   bind_fn <- if (is_row) rbind else cbind
   name_updated <- .measure_result_name(source, name)
@@ -566,15 +579,40 @@ do_pred_measure <- function(
     matrix(values, ncol = 1, dimnames = list(NULL, name_updated))
   }
 
+  compare_meta <- if (is_row && !is.null(measure_entry)) {
+    .measure_compare_meta(measure_entry, higher_is_better)
+  }
+
+  old_higher_is_better <- if (is_row && !is.null(mat)) {
+    attr(mat, "measure_higher_is_better")
+  }
+  old_compare_meta <- if (is_row && !is.null(mat)) {
+    attr(mat, "measure_compare_meta")
+  }
+
   mat <- if (is.null(mat)) new_slice else bind_fn(mat, new_slice)
 
-  if (is_row && !is.null(revert_sign)) {
-    measure_revert_sign <- attr(mat, "measure_revert_sign")
-    if (is.null(measure_revert_sign)) {
-      measure_revert_sign <- list()
+  if (is_row) {
+    if (!is.null(measure_entry) || !is.null(old_higher_is_better)) {
+      measure_higher_is_better <- old_higher_is_better
+      if (is.null(measure_higher_is_better)) {
+        measure_higher_is_better <- list()
+      }
+      if (!is.null(measure_entry)) {
+        measure_higher_is_better[[name]] <- higher_is_better
+      }
+      attr(mat, "measure_higher_is_better") <- measure_higher_is_better
     }
-    measure_revert_sign[[name]] <- isTRUE(revert_sign)
-    attr(mat, "measure_revert_sign") <- measure_revert_sign
+    if (!is.null(compare_meta) || !is.null(old_compare_meta)) {
+      measure_compare_meta <- old_compare_meta
+      if (is.null(measure_compare_meta)) {
+        measure_compare_meta <- list()
+      }
+      if (!is.null(compare_meta)) {
+        measure_compare_meta[[name]] <- compare_meta
+      }
+      attr(mat, "measure_compare_meta") <- measure_compare_meta
+    }
   }
 
   mat
@@ -600,9 +638,10 @@ do_pred_measure <- function(
 #' @param save_psis Logical; if `TRUE`, include `psis_object` in the result.
 #'
 #' @return A list with elements `estimates`, `pointwise`, and optionally
-#'   `diagnostics`, `psis_object`, and `log_weights`. Attribute
-#'   `measure_revert_sign` records `revert_sign` for measures added in the
-#'   current call. Class attributes are added by \code{.add_attributes()}.
+#'   `diagnostics`, `psis_object`, and `log_weights`. Attributes
+#'   `measure_higher_is_better` and `measure_compare_meta` record per-measure
+#'   metadata for measures added in the current call. Class attributes are added
+#'   by \code{.add_attributes()}.
 #'
 #' @noRd
 .build_pred_measure <- function(
@@ -612,11 +651,17 @@ do_pred_measure <- function(
   psis_object,
   save_psis
 ) {
-  measure_revert_sign <- attr(estimates, "measure_revert_sign")
-  if (is.null(measure_revert_sign)) {
-    measure_revert_sign <- list()
+  measure_higher_is_better <- attr(estimates, "measure_higher_is_better")
+  if (is.null(measure_higher_is_better)) {
+    measure_higher_is_better <- list()
   }
-  attr(estimates, "measure_revert_sign") <- NULL
+  attr(estimates, "measure_higher_is_better") <- NULL
+
+  measure_compare_meta <- attr(estimates, "measure_compare_meta")
+  if (is.null(measure_compare_meta)) {
+    measure_compare_meta <- list()
+  }
+  attr(estimates, "measure_compare_meta") <- NULL
 
   output_list <- list(
     estimates = estimates,
@@ -632,26 +677,31 @@ do_pred_measure <- function(
     output_list$log_weights <- psis_object$log_weights
   }
 
-  structure(output_list, measure_revert_sign = measure_revert_sign)
+  structure(
+    output_list,
+    measure_higher_is_better = measure_higher_is_better,
+    measure_compare_meta = measure_compare_meta
+  )
 }
 
 #' Attach S3 classes and metadata attributes to a result
 #'
 #' @description
-#' Sets `class`, `source`, `dims`, and `measure_revert_sign` attributes on a
-#' predictive measure object.
+#' Sets `class`, `source`, `dims`, `measure_higher_is_better`, and
+#' `measure_compare_meta` attributes on a predictive measure object.
 #'
 #' When updating an existing result (`predperf` is not `NULL`), copies attributes
 #' from `predperf` and refreshes `dims` from newly supplied input matrices.
-#' Merges `measure_revert_sign` from the prior result with any new entries
-#' supplied on `predperf_res` (from \code{.build_pred_measure()}).
+#' Merges `measure_higher_is_better` and `measure_compare_meta` from the prior result
+#' with any new entries supplied on `predperf_res` (from
+#' \code{.build_pred_measure()}).
 #' When `save_psis = FALSE`, clears any stored `psis_object` from the prior
 #' result.
 #'
 #' For new objects, copies relevant attributes from `loo` or `kfold` inputs
 #' (e.g. `yhash`, `model_name`, fold structure) and assigns a source-specific
 #' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.). Sets
-#' `measure_revert_sign` to `list(elpd = FALSE)` merged with new entries.
+#' `measure_higher_is_better` and `measure_compare_meta`, seeding `elpd` defaults.
 #'
 #' @param save_psis Logical; when `FALSE` and accumulating, clears stored
 #'   `psis_object` from the prior result.
@@ -684,9 +734,13 @@ do_pred_measure <- function(
   predperf,
   source
 ) {
-  new_revert_sign <- attr(predperf_res, "measure_revert_sign")
-  if (is.null(new_revert_sign)) {
-    new_revert_sign <- list()
+  new_higher_is_better <- attr(predperf_res, "measure_higher_is_better")
+  if (is.null(new_higher_is_better)) {
+    new_higher_is_better <- list()
+  }
+  new_compare_meta <- attr(predperf_res, "measure_compare_meta")
+  if (is.null(new_compare_meta)) {
+    new_compare_meta <- list()
   }
 
   if (!is.null(predperf)) {
@@ -703,14 +757,25 @@ do_pred_measure <- function(
       dim(ylp)
     }
     attr(predperf_res, "dims") <- dims
-    revert_sign <- attr(predperf, "measure_revert_sign")
-    if (is.null(revert_sign)) {
-      revert_sign <- list()
+    measure_higher_is_better <- attr(predperf, "measure_higher_is_better")
+    if (is.null(measure_higher_is_better)) {
+      measure_higher_is_better <- list()
     }
-    if (length(new_revert_sign)) {
-      revert_sign[names(new_revert_sign)] <- new_revert_sign
+    if (length(new_higher_is_better)) {
+      measure_higher_is_better[names(new_higher_is_better)] <- new_higher_is_better
     }
-    attr(predperf_res, "measure_revert_sign") <- revert_sign
+    attr(predperf_res, "measure_higher_is_better") <- measure_higher_is_better
+    compare_meta <- attr(predperf, "measure_compare_meta")
+    if (is.null(compare_meta)) {
+      compare_meta <- list()
+    }
+    if (is.null(compare_meta$elpd)) {
+      compare_meta$elpd <- .measure_compare_meta("elpd")
+    }
+    if (length(new_compare_meta)) {
+      compare_meta[names(new_compare_meta)] <- new_compare_meta
+    }
+    attr(predperf_res, "measure_compare_meta") <- compare_meta
     
     return(predperf_res)
   }
@@ -758,11 +823,19 @@ do_pred_measure <- function(
   }
   attr(predperf_res, "class") <- classes
   attr(predperf_res, "source") <- source
-  revert_sign <- list(elpd = FALSE)
-  if (length(new_revert_sign)) {
-    revert_sign[names(new_revert_sign)] <- new_revert_sign
+  measure_higher_is_better <- list(elpd = NULL)
+  if (length(new_higher_is_better)) {
+    measure_higher_is_better[names(new_higher_is_better)] <- new_higher_is_better
   }
-  attr(predperf_res, "measure_revert_sign") <- revert_sign
+  attr(predperf_res, "measure_higher_is_better") <- measure_higher_is_better
+  compare_meta <- list(
+    elpd = .measure_compare_meta("elpd")
+  )
+  if (length(new_compare_meta)) {
+    compare_meta[names(new_compare_meta)] <- new_compare_meta
+  }
+  attr(predperf_res, "measure_compare_meta") <- compare_meta
   
   return(predperf_res)
 }
+

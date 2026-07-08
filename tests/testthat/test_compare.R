@@ -10,7 +10,7 @@ test_that("loo_compare throws appropriate errors", {
   w3 <- suppressWarnings(waic(LLarr[,, -1]))
   w4 <- suppressWarnings(waic(LLarr[,, -(1:2)]))
 
-  expect_error(loo_compare(2, 3), "must be a list if not a 'loo' object")
+  expect_error(loo_compare(2, 3), "must be a list if not a 'loo' or 'pred_measure' object")
   expect_error(
     loo_compare(w1, w2, x = list(w1, w2)),
     "If 'x' is a list then '...' should not be specified"
@@ -268,8 +268,13 @@ test_that("loo_compare measure helpers work as expected", {
   expect_equal(loo:::.resolve_rank_measure(loos, "mse")$internal, "mse_loo")
   expect_true(loo:::.is_elpd_measure("elpd_loo"))
   expect_false(loo:::.is_elpd_measure("mse_loo"))
-  expect_equal(attr(pm1, "measure_revert_sign")$mse, FALSE)
-  expect_equal(attr(pm1, "measure_revert_sign")$elpd, FALSE)
+  expect_equal(attr(pm1, "measure_higher_is_better")$mse, NULL)
+  expect_equal(attr(pm1, "measure_higher_is_better")$r2, NULL)
+  expect_equal(attr(pm1, "measure_higher_is_better")$elpd, NULL)
+  expect_equal(attr(pm1, "measure_compare_meta")$elpd$diff_method, "sum")
+  expect_equal(attr(pm1, "measure_compare_meta")$mse$loss, TRUE)
+  expect_equal(attr(pm1, "measure_compare_meta")$mse$diff_method, "estimates_only")
+  expect_equal(attr(pm1, "measure_compare_meta")$r2$diff_method, "estimates_only")
   expect_true(loo:::.measure_lower_is_better("mse_loo", loos))
   expect_false(loo:::.measure_lower_is_better("r2_loo", loos))
   expect_true(loo:::.measure_lower_is_better("mse_loo"))
@@ -279,25 +284,181 @@ test_that("loo_compare measure helpers work as expected", {
     c("mse")
   )
 
-  diffs <- loo:::.measure_diffs(pm1, pm2, "elpd_loo")
-  expect_length(diffs, nrow(pm1$pointwise))
-  expect_equal(loo:::.measure_diffs(pm1, pm1, "elpd_loo"), rep(0, length(diffs)))
-  pair_stats <- loo:::.pair_measure_stats(pm2, pm1, "elpd_loo", "sum")
-  expect_equal(unname(pair_stats["se"]), loo:::se_elpd_diff(diffs))
-
+  pair_stats_elpd <- loo:::.pair_measure_stats(
+    pm2, pm1, "elpd_loo", "sum", loos = loos
+  )
+  expect_equal(unname(pair_stats_elpd["se"]), loo:::se_elpd_diff(
+    pm2$pointwise[, "elpd_loo"] - pm1$pointwise[, "elpd_loo"]
+  ))
   expect_equal(
-    loo:::.measure_diff_from_estimates(pm2, pm1, "mse_loo"),
-    pm1$estimates["mse_loo", "Estimate"] - pm2$estimates["mse_loo", "Estimate"]
+    unname(loo:::.pair_measure_stats(pm1, pm1, "elpd_loo", "sum", loos = loos)["diff"]),
+    0
+  )
+
+  pair_mse <- loo:::.pair_measure_stats(
+    pm2, pm1, "mse_loo", "estimates_only", loos = loos
   )
   expect_equal(
-    loo:::.measure_diff_from_estimates(pm2, pm1, "r2_loo"),
+    unname(pair_mse["diff"]),
+    pm1$estimates["mse_loo", "Estimate"] - pm2$estimates["mse_loo", "Estimate"]
+  )
+  pair_r2 <- loo:::.pair_measure_stats(
+    pm2, pm1, "r2_loo", "estimates_only", loos = loos
+  )
+  expect_equal(
+    unname(pair_r2["diff"]),
     pm2$estimates["r2_loo", "Estimate"] - pm1$estimates["r2_loo", "Estimate"]
   )
   expect_equal(loo:::.measure_pointwise_diff_method(loos, "mse_loo"), "estimates_only")
   expect_equal(loo:::.measure_pointwise_diff_method(loos, "r2_loo"), "estimates_only")
   expect_equal(loo:::.measure_pointwise_diff_method(loos, "elpd_loo"), "sum")
-  pair_mse <- loo:::.pair_measure_stats(pm2, pm1, "mse_loo", "estimates_only")
   expect_true(is.na(pair_mse["se"]))
+})
+
+test_that("loo_compare errors on inconsistent measure metadata", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  pm1 <- loo_pred_measure(
+    loo = res$loo_p_m1,
+    y = res$y,
+    mupred = res$mupred_m1,
+    ylp = res$ylp_m1,
+    measure = "mse",
+    control = list(mse = list(higher_is_better = NULL))
+  )
+  pm2 <- loo_pred_measure(
+    loo = res$loo_p_m2,
+    y = res$y,
+    mupred = res$mupred_m2,
+    ylp = res$ylp_m2,
+    measure = "mse",
+    control = list(mse = list(higher_is_better = TRUE))
+  )
+
+  expect_error(
+    suppressMessages(loo_compare(pm1, pm2)),
+    "disagree on comparison metadata for measure 'mse'"
+  )
+})
+
+test_that("loo_compare warns when rank_by is ignored for classic loo objects", {
+  expect_warning(
+    loo_compare(w1, w2, rank_by = "mse"),
+    "`rank_by` is only used for `loo_pred_measure` comparisons"
+  )
+})
+
+.make_compare_pm <- function(res, model = 1L, measure, extra_args = list()) {
+  suffix <- model
+  args <- c(
+    list(
+      loo = res[[paste0("loo_p_m", suffix)]],
+      y = res$y,
+      mupred = res[[paste0("mupred_m", suffix)]],
+      ylp = res[[paste0("ylp_m", suffix)]],
+      measure = measure
+    ),
+    extra_args
+  )
+  do.call(loo_pred_measure, args)
+}
+
+.make_compare_pm_synthetic <- function(measure) {
+  if (measure == "brier") {
+    res_binary <- readRDS("data-for-tests/test_data_binary.Rds")
+    ylp <- matrix(
+      rnorm(nrow(res_binary$ypred) * ncol(res_binary$ypred)),
+      nrow = nrow(res_binary$ypred)
+    )
+    return(loo_pred_measure(
+      ylp = ylp,
+      y = res_binary$y,
+      ypred = res_binary$ypred,
+      measure = measure
+    ))
+  }
+  if (measure %in% c("acc", "bacc")) {
+    res_cat <- readRDS("data-for-tests/test_data_penguins.Rds")
+    ylp <- matrix(
+      rnorm(nrow(res_cat$mupred) * ncol(res_cat$mupred)),
+      nrow = nrow(res_cat$mupred)
+    )
+    return(loo_pred_measure(
+      ylp = ylp,
+      y = as.integer(res_cat$y),
+      mupred = res_cat$mupred,
+      measure = measure
+    ))
+  }
+  stop("Unsupported synthetic measure: ", measure)
+}
+
+test_that("loo_compare works for all built-in measures", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  res_roaches <- readRDS("data-for-tests/test_data_roaches.Rds")
+  roaches_measures <- c(
+    "ic", "mlpd", "mae", "r2", "rmse", "mse"
+  )
+  for (measure in roaches_measures) {
+    pm1 <- .make_compare_pm(res, 1L, measure)
+    pm2 <- .make_compare_pm(res, 2L, measure)
+    comp <- suppressMessages(loo_compare(pm1, pm2))
+    expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
+    expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
+  }
+
+  for (measure in c("rps", "srps")) {
+    pm1 <- loo_pred_measure(
+      loo = res$loo_p_m1,
+      y = res$y,
+      ypred = res_roaches$ypred,
+      ylp = res$ylp_m1,
+      measure = measure
+    )
+    pm2 <- loo_pred_measure(
+      loo = res$loo_p_m2,
+      y = res$y,
+      ypred = res_roaches$ypred,
+      ylp = res$ylp_m2,
+      measure = measure
+    )
+    comp <- suppressMessages(loo_compare(pm1, pm2))
+    expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
+    expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
+  }
+
+  for (measure in c("brier", "acc", "bacc")) {
+    pm1 <- .make_compare_pm_synthetic(measure)
+    pm2 <- .make_compare_pm_synthetic(measure)
+    comp <- suppressMessages(loo_compare(pm1, pm2))
+    expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
+    expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
+  }
+})
+
+.make_many_compare_pms <- function(res, n, noise_scale = 0.01) {
+  lapply(seq_len(n), function(i) {
+    loo_pred_measure(
+      loo = res$loo_p_m1,
+      y = res$y,
+      mupred = res$mupred_m1 + rnorm(length(res$y), 0, noise_scale * i),
+      ylp = res$ylp_m1,
+      measure = "mae"
+    )
+  })
+}
+
+test_that("loo_compare warns for many loo_pred_measure models", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  set.seed(123)
+  pm_list <- .make_many_compare_pms(res, 25L)
+  expect_warning(
+    suppressMessages(loo_compare(pm_list)),
+    "Difference in performance potentially due to chance. See McLatchie and Vehtari (2023) for details.",
+    fixed = TRUE
+  )
+
+  pm_list_short <- .make_many_compare_pms(res, 4L)
+  expect_no_warning(suppressMessages(loo_compare(pm_list_short)))
 })
 
 test_that("loo_compare throws appropriate warnings", {

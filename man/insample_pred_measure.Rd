@@ -67,8 +67,8 @@ per measure).}
 }
 
 The attribute \code{source} is \code{"insample"}. Attribute \code{dims} gives posterior
-draws × observations. Attribute \code{measure_revert_sign} records whether
-\code{revert_sign} was applied for each measure; see section below. Use \code{\link[=print]{print()}}
+draws × observations. Attribute \code{measure_higher_is_better} records the
+\code{higher_is_better} setting used for each measure; see section below. Use \code{\link[=print]{print()}}
 for a readable summary table.
 }
 \description{
@@ -107,18 +107,23 @@ article for definitions and orientation (higher vs lower is better).
 declared in the function signature among \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} are supplied automatically.
 }
-\section{\code{measure_revert_sign} attribute}{
+\section{\code{measure_higher_is_better} attribute}{
 
 All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
-\code{measure_revert_sign}: a named list recording whether \code{revert_sign} was
-applied to each measure when it was computed (logical per bare measure name;
-\code{elpd} is always \code{FALSE}). Built-in loss measures such as MSE are stored on
-a loss scale by default (\code{FALSE}); pass
-\code{control = list(mse = list(revert_sign = TRUE))} to store negated values.
-When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}}, the attribute
-is updated for newly computed measures. \code{\link[=loo_compare]{loo_compare()}} uses
-\code{measure_revert_sign} when converting paired differences to a common utility
-scale; see \link{loo-glossary}.
+\code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
+setting used for each measure (\code{NULL}, \code{TRUE}, or \code{FALSE} per bare measure
+name; \code{elpd} is always \code{NULL}). Built-in loss measures such as MSE are stored
+on a loss scale by default (\code{NULL}); pass
+\code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
+utility scale. When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}},
+the attribute is updated for newly computed measures.
+
+Attribute \code{measure_compare_meta} records per-measure comparison metadata
+(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=loo_compare]{loo_compare()}}.
+Built-in measures take \code{loss} and \code{diff_method} from the package measure
+registry; custom measures default to \code{diff_method = "auto"} and \code{loss = FALSE}
+(utility scale). For custom loss measures, use \code{higher_is_better = TRUE} in
+\code{control} so \code{\link[=loo_compare]{loo_compare()}} interprets the sign correctly. See \link{loo-glossary}.
 }
 
 \examples{
@@ -151,6 +156,11 @@ my_abs_err <- function(y, mupred, log_weights = NULL) {
 attr(my_abs_err, "measure_name") <- "my_abs_err"
 # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
 }
+
+Custom measures are assumed to be on a utility scale (higher is better) in
+[loo_compare()]. For a custom loss measure, pass
+`control = list(my_measure = list(higher_is_better = TRUE))` or negate values in
+the custom function so that [loo_compare()] ranks models correctly.
 
 }
 \seealso{

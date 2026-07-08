@@ -940,19 +940,51 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 # @param measure The measure used.
 # @return The measure specification.
 .measure_spec <- list(
-  elpd = list(fun = measure_elpd, loss = FALSE),
-  ic = list(fun = measure_ic, loss = TRUE),
-  mlpd = list(fun = measure_mlpd, loss = FALSE),
-  mae = list(fun = measure_mae, loss = TRUE),
-  r2 = list(fun = measure_r2, loss = FALSE),
-  rmse = list(fun = measure_rmse, loss = TRUE),
-  mse = list(fun = measure_mse, loss = TRUE),
-  acc = list(fun = measure_acc, loss = FALSE),
-  bacc = list(fun = measure_bacc, loss = FALSE),
-  rps = list(fun = measure_rps, loss = FALSE),
-  srps = list(fun = measure_srps, loss = TRUE),
-  brier = list(fun = measure_brier, loss = TRUE)
+  elpd = list(fun = measure_elpd, loss = FALSE, diff_method = "sum"),
+  ic = list(fun = measure_ic, loss = TRUE, diff_method = "sum"),
+  mlpd = list(fun = measure_mlpd, loss = FALSE, diff_method = "sum"),
+  mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
+  r2 = list(fun = measure_r2, loss = FALSE, diff_method = "estimates_only"),
+  rmse = list(fun = measure_rmse, loss = TRUE, diff_method = "estimates_only"),
+  mse = list(fun = measure_mse, loss = TRUE, diff_method = "estimates_only"),
+  acc = list(fun = measure_acc, loss = FALSE, diff_method = "mean"),
+  bacc = list(fun = measure_bacc, loss = FALSE, diff_method = "estimates_only"),
+  rps = list(fun = measure_rps, loss = FALSE, diff_method = "mean"),
+  srps = list(fun = measure_srps, loss = TRUE, diff_method = "mean"),
+  brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
 )
+
+#' Return comparison metadata for a measure
+#' @noRd
+#' @param measure_entry Normalized measure entry, or a built-in measure name.
+#' @param higher_is_better Value of `higher_is_better` used for this measure.
+.measure_compare_meta <- function(measure_entry, higher_is_better = NULL) {
+  if (is.character(measure_entry)) {
+    measure_entry <- list(
+      name = measure_entry,
+      type = "builtin",
+      key = measure_entry
+    )
+  }
+
+  if (measure_entry$type == "builtin") {
+    entry <- .measure_spec[[measure_entry$key]]
+    if (is.null(entry)) {
+      return(NULL)
+    }
+    return(list(
+      higher_is_better = higher_is_better,
+      loss = isTRUE(entry$loss),
+      diff_method = entry$diff_method
+    ))
+  }
+
+  list(
+    higher_is_better = higher_is_better,
+    loss = FALSE,
+    diff_method = "auto"
+  )
+}
 
 #' Supported predictive measure names
 #'
@@ -992,6 +1024,6 @@ supported_measures_list <- names(.measure_spec)
     class = c("measure", "loo"),
     measure = measure_name,
     dims = c(n_draws, n_obs),
-    revert_sign = isTRUE(revert_sign)
+    higher_is_better = higher_is_better
   )
 }

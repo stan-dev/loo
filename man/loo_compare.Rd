@@ -136,8 +136,8 @@ all \verb{\{measure\}_diff} values are reported on a common utility scale (highe
 is better). Loss measures have their sign flipped from the raw loss
 orientation so that negative \verb{\{measure\}_diff} values indicate worse
 performance than the reference model. Each \verb{*_pred_measure()} result stores
-attribute \code{measure_revert_sign}, a named list recording whether \code{revert_sign}
-was applied when each measure was computed. When loss measures are compared
+attribute \code{measure_higher_is_better}, a named list recording the
+\code{higher_is_better} setting used when each measure was computed. When loss measures are compared
 on a utility scale, \code{loo_compare()} emits a short message naming the affected
 measures, for example:
 "For model comparison, differences for mse are reported on a utility scale

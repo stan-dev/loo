@@ -28,11 +28,11 @@
 #' }
 #'
 #' The attribute `source` is `"insample"`. Attribute `dims` gives posterior
-#' draws × observations. Attribute `measure_revert_sign` records whether
-#' `revert_sign` was applied for each measure; see section below. Use [print()]
+#' draws × observations. Attribute `measure_higher_is_better` records the
+#' `higher_is_better` setting used for each measure; see section below. Use [print()]
 #' for a readable summary table.
 #'
-#' @template measure-revert-sign-attribute
+#' @template measure-higher-is-better-attribute
 #'
 #' @details
 #' **Input requirements by measure.** Supply only the inputs each measure
@@ -86,6 +86,11 @@
 #' attr(my_abs_err, "measure_name") <- "my_abs_err"
 #' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
 #' }
+#'
+#' Custom measures are assumed to be on a utility scale (higher is better) in
+#' [loo_compare()]. For a custom loss measure, pass
+#' `control = list(my_measure = list(higher_is_better = TRUE))` or negate values in
+#' the custom function so that [loo_compare()] ranks models correctly.
 #'
 #' @seealso [pred_measure()] to add measures incrementally,
 #'   [loo_pred_measure()], [kfold_pred_measure()], [test_pred_measure()],
@@ -155,7 +160,7 @@ insample_pred_measure <- function(
 #'
 #' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `crps_loo`).
 #'
-#' @template measure-revert-sign-attribute
+#' @template measure-higher-is-better-attribute
 #'
 #' @details
 #' **Three equivalent input patterns:**
@@ -247,7 +252,7 @@ loo_pred_measure <- function(
 #' list contains `estimates` and `pointwise`; measure names carry a `_kfold`
 #' suffix (e.g. `elpd_kfold`, `crps_kfold`).
 #'
-#' @template measure-revert-sign-attribute
+#' @template measure-higher-is-better-attribute
 #'
 #' @details
 #' For distributional measures on held-out folds, obtain posterior predictions
@@ -331,7 +336,7 @@ kfold_pred_measure <- function(
 #' `elpd_test`, `crps_test`). Attribute `dims` reflects the test-set size
 #' (from `ylp_test`), not the training data.
 #'
-#' @template measure-revert-sign-attribute
+#' @template measure-higher-is-better-attribute
 #'
 #' @details
 #' The base summary `elpd_test` is computed from `ylp_test` on the holdout
@@ -411,10 +416,10 @@ test_pred_measure <- function(
 #' An updated object of the same class as `predperf`, with new rows in
 #' `estimates` and columns in `pointwise` for each requested measure. Base
 #' summaries (`elpd` and LOO/k-fold complexity terms such as `p_loo`) are not
-#' recomputed. Attribute `measure_revert_sign` is updated for any newly added
+#' recomputed. Attribute `measure_higher_is_better` is updated for any newly added
 #' measures.
 #'
-#' @template measure-revert-sign-attribute
+#' @template measure-higher-is-better-attribute
 #'
 #' @details
 #' **Typical workflow:**
