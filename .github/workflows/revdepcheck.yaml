@@ -38,7 +38,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::revdepcheck
+          extra-packages: r-lib/revdepcheck
           needs: check
 
       - name: Reset revdep state
