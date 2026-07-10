@@ -52,12 +52,13 @@ jobs:
         run: |
           options(repos = c(CRAN = "https://cloud.r-project.org"))
           revdepcheck::revdep_check(
-            num_workers = 2,
+            num_workers = 4,
             timeout = as.difftime(
               as.integer("${{ inputs.timeout_minutes }}"),
               units = "mins"
             ),
-            env = c(revdepcheck::revdep_env_vars(), NOT_CRAN = TRUE)
+            env = c(revdepcheck::revdep_env_vars(), NOT_CRAN = TRUE),
+            quiet = FALSE
           )
 
       - name: Show summary
