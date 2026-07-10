@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   loo2-elpd: loo2-elpd.html
@@ -11,7 +11,7 @@ articles:
   loo2-non-factorized: loo2-non-factorized.html
   loo2-weights: loo2-weights.html
   loo2-with-rstan: loo2-with-rstan.html
-last_built: 2026-06-30T15:49Z
+last_built: 2026-07-10T21:41Z
 urls:
   reference: https://mc-stan.org/loo/reference
   article: https://mc-stan.org/loo/articles
