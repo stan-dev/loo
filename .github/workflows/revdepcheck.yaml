@@ -3,18 +3,18 @@ name: revdepcheck
 on:
   workflow_dispatch:
     inputs:
-      reset_revdeps:
-        description: "Delete revdep/ before running"
-        required: true
-        type: boolean
       timeout_minutes:
         description: "Timeout per reverse dependency"
         required: false
-        default: 30
-        type: numeric 
+        default: "30"
+      previous_run_id:
+        description: "Previous run ID"
+        required: false
+        default: ""
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: revdepcheck-${{ github.ref }}
@@ -28,9 +28,19 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: "true"
+      TIMEOUT_MINUTES: ${{ inputs.timeout_minutes }}
+      PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
 
     steps:
       - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        if: ${{ inputs.previous_run_id != '' }}
+        with:
+          name: revdep-state
+          path: revdep
+          run-id: ${{ inputs.previous_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -38,49 +48,36 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: r-lib/revdepcheck
+          extra-packages: any::revdepcheck
           needs: check
 
-      - name: Reset revdep state
-        if: ${{ inputs.reset_revdeps }}
-        shell: Rscript {0}
-        run: |
-          revdepcheck::revdep_reset()
-
       - name: Run revdepcheck
-        shell: Rscript {0}
-        run: |
-          options(repos = c(CRAN = "https://cloud.r-project.org"))
-          revdepcheck::revdep_check(
-            num_workers = 4,
-            timeout = as.difftime(
-              as.integer("${{ inputs.timeout_minutes }}"),
-              units = "mins"
-            ),
-            env = c(revdepcheck::revdep_env_vars(), NOT_CRAN = TRUE),
-            quiet = FALSE
-          )
+        id: revdep
+        run: bash .github/revdepcheck/run.sh
 
-      - name: Show summary
-        shell: Rscript {0}
-        run: |
-          print(revdepcheck::revdep_summary())
-
-      - name: Upload revdep results
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
+        if: always()
         with:
-          name: revdepcheck-results
+          name: revdep-state
           path: revdep/
           retention-days: 14
-          if-no-files-found: 'error'
+          if-no-files-found: ignore
 
-      - name: Fail if revdeps broke
+      - name: Continue
+        if: ${{ steps.revdep.outputs.again == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run revdepcheck.yaml \
+            --ref "${{ github.ref_name }}" \
+            -f timeout_minutes="${{ inputs.timeout_minutes }}" \
+            -f previous_run_id="${{ github.run_id }}"
+
+      - name: Fail on broken revdeps
+        if: ${{ steps.revdep.outputs.again == 'false' }}
         shell: Rscript {0}
         run: |
           status <- revdepcheck:::report_status(".")
-          message("Reverse dependencies OK: ", status$ok)
-          message("Reverse dependencies BROKEN: ", status$broken)
-
           if (status$broken > 0) {
-            stop(status$broken, " reverse dependency check(s) failed.")
+            stop(status$broken, " reverse dependencies have new failures.")
           }
