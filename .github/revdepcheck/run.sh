@@ -2,14 +2,21 @@
 set -euo pipefail
 
 set +e
-timeout -s INT -k 5m 350m Rscript .github/revdepcheck/run.R
+timeout -s TERM -k 5m 350m Rscript .github/revdepcheck/run.R
 code=$?
 set -e
 
-if [ "$code" = "124" ] || [ "$code" = "130" ] || [ "$code" = "137" ]; then
-  echo "again=true" >> "$GITHUB_OUTPUT"
-  exit 0
-fi
-
-echo "again=false" >> "$GITHUB_OUTPUT"
-exit "$code"
+case "$code" in
+  124|130|137|143)
+    echo "again=true" >> "$GITHUB_OUTPUT"
+    exit 0
+    ;;
+  0)
+    echo "again=false" >> "$GITHUB_OUTPUT"
+    exit 0
+    ;;
+  *)
+    echo "again=false" >> "$GITHUB_OUTPUT"
+    exit "$code"
+    ;;
+esac
