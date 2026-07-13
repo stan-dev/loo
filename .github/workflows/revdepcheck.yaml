@@ -6,7 +6,7 @@ on:
       timeout_minutes:
         description: "Timeout per reverse dependency"
         required: false
-        default: "30"
+        default: "60"
       previous_run_id:
         description: "Previous run ID"
         required: false
@@ -48,7 +48,24 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: r-lib/revdepcheck
+          extra-packages: |
+            r-lib/revdepcheck
+            any::callr
+            any::rstantools
+            any::systemfonts
+            any::textshaping
+            any::ragg
+            any::Cairo
+            any::rjags
+            any::runjags
+            any::R2jags
+            any::gsl
+            any::Rmpfr
+            any::rJava
+            any::xlsx
+            any::xlsxjars
+            any::OpenCL
+            any::Rmpi
           needs: check
 
       - name: Run revdepcheck
@@ -81,3 +98,25 @@ jobs:
           if (status$broken > 0) {
             stop(status$broken, " reverse dependencies have new failures.")
           }
+
+      - name: Write final revdep report
+        if: ${{ always() && steps.revdep.outputs.again != 'true' }}
+        shell: Rscript {0}
+        run: |
+          try(
+            revdepcheck::revdep_report(pkg = ".", all = TRUE),
+            silent = TRUE
+          )
+
+      - name: Upload final revdep report
+        if: ${{ always() && steps.revdep.outputs.again != 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: revdep-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            revdep/README.md
+            revdep/problems.md
+            revdep/failures.md
+            revdep/cran.md
+          retention-days: 30
+          if-no-files-found: warn
