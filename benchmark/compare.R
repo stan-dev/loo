@@ -143,7 +143,7 @@ md <- c(
   "",
   sprintf("_Generated %s._", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
   "",
-  "**Columns / modes.** `base` is the baseline version. `new/call` is the new version's default per-call pool (created and torn down each call). `new/persist` is the new version's persistent session pool (`options(loo.daemons = k)`), reused across calls. `cores = 1` rows are fully serial (the parallel backend is never used).",
+  "**Columns / modes.** `base` is the baseline version. `new/call` is the new version's default per-call pool (created and torn down each call). `new/persist` is the new version with a user-managed `mirai::daemons()` session pool, reused across calls. `cores = 1` rows are fully serial (the parallel backend is never used).",
   "",
   "## Median wall-clock time (s) and speedup vs baseline",
   "",

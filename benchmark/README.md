@@ -6,13 +6,13 @@ two installed versions of the package side by side:
 - **`baseline`** — a pre-`mirai` version (the old `mclapply`/`parLapply`
   backend), e.g. the released version from CRAN.
 - **`new`** — the current working tree (the `mirai` + `mori` backend, including
-  the persistent session pool controlled by `options(loo.daemons = k)` /
-  `LOO_DAEMONS`).
+  user-managed `mirai::daemons()` session pools).
 
 The same user-facing calls (`psis()`, `loo()`) are timed for every version; only
 the internal parallel backend differs. For the `new` version we additionally
-time a **persist** mode that opts in to the persistent session pool, so we can
-separate per-call daemon spawn/teardown overhead from the steady-state cost.
+time a **persist** mode that starts `mirai::daemons()` once and reuses the
+pool across timed iterations, so we can separate per-call daemon
+spawn/teardown overhead from the steady-state cost.
 
 ## Files
 
@@ -58,8 +58,8 @@ LOO_LIB=/tmp/loo-base-lib BENCH_LABEL=baseline Rscript benchmark/benchmark-paral
 LOO_LIB=/tmp/loo-new-lib  BENCH_LABEL=new      Rscript benchmark/benchmark-parallel.R
 ```
 
-The `persist` mode is only measured for `BENCH_LABEL=new`, because
-`options(loo.daemons)` is a no-op in the baseline version.
+The `persist` mode is only measured for `BENCH_LABEL=new`, because the
+baseline version does not use mirai.
 
 ## Step 3 — Aggregate and compare
 
@@ -73,7 +73,7 @@ memory) with these columns:
 - `base` — baseline version.
 - `new/call` — new version, default per-call pool (created and torn down each
   call).
-- `new/per` — new version, persistent session pool (`options(loo.daemons = k)`),
+- `new/per` — new version, user-managed session pool (`mirai::daemons(k)`),
   reused across calls.
 
 A speedup `> 1` means the new version is faster than the baseline. The report

@@ -8,12 +8,10 @@
 #
 # The same user-facing calls (psis(), loo()) are timed for every version; the
 # parallel backend (mclapply/parLapply vs mirai+mori) differs internally. For
-# the new version we additionally time a "persist" mode that opts in to loo's
-# persistent session pool via `options(loo.daemons = k)` (equivalently the
-# `LOO_DAEMONS` environment variable). loo then creates the local mirai pool
-# lazily on the first (warm-up) call and reuses it for every later call, so the
-# timed iterations measure steady-state cost with no per-call daemon
-# spawn/teardown overhead.
+# the new version we additionally time a "persist" mode where mirai::daemons()
+# is started once before the timed iterations and reused (user-managed session
+# pool), so the timed iterations measure steady-state cost with no per-call
+# daemon spawn/teardown overhead.
 
 lib <- Sys.getenv("LOO_LIB")
 label <- Sys.getenv("BENCH_LABEL", unset = "unknown")
@@ -91,12 +89,9 @@ for (sz in psis_sizes) {
     mode <- if (k == 1L) "serial" else "per-call"
     record(scen, mode, k, suppressWarnings(psis(-LL, r_eff = re, cores = k)), n_iter = n_iter)
     if (is_new && k > 1L) {
-      # Opt in to loo's persistent session pool; the warm-up call inside
-      # record() creates it and the timed iterations reuse it.
-      old_opt <- options(loo.daemons = k)
+      mirai::daemons(k)
       record(scen, "persist", k, suppressWarnings(psis(-LL, r_eff = re, cores = k)), n_iter = n_iter)
       mirai::daemons(0)
-      options(old_opt)
     }
   }
   rm(LL)
@@ -138,14 +133,11 @@ for (sz in loo_sizes) {
       loo(llfun_b, data = data_f, draws = draws_big, cores = k)
     ), n_iter = n_iter)
     if (is_new && k > 1L) {
-      # Opt in to loo's persistent session pool; the warm-up call inside
-      # record() creates it and the timed iterations reuse it.
-      old_opt <- options(loo.daemons = k)
+      mirai::daemons(k)
       record(scen, "persist", k, suppressWarnings(
         loo(llfun_b, data = data_f, draws = draws_big, cores = k)
       ), n_iter = n_iter)
       mirai::daemons(0)
-      options(old_opt)
     }
   }
   rm(draws_big)

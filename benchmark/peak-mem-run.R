@@ -2,9 +2,8 @@
 # Driven by peak-mem.sh, which samples the total RSS of this process tree.
 #   LOO_LIB=... BENCH_LABEL=baseline|new MODE=per-call|persist CORES=8 Rscript peak-mem-run.R
 #
-# In "persist" mode (new version only) we opt in to loo's persistent session
-# pool via `options(loo.daemons = cores)`; loo creates the local mirai pool
-# lazily during the loo() call and would keep it warm for the session.
+# In "persist" mode (new version only) mirai::daemons() is started before the
+# loo() call so the pool is reused for the duration of the run.
 
 lib <- Sys.getenv("LOO_LIB")
 label <- Sys.getenv("BENCH_LABEL", unset = "unknown")
@@ -35,13 +34,12 @@ if (label == "new") {
 }
 
 if (label == "new" && mode == "persist") {
-  options(loo.daemons = cores)
+  mirai::daemons(cores)
 }
 
 invisible(suppressWarnings(loo(llfun_b, data = data_f, draws = draws_big, cores = cores)))
 
 if (label == "new" && mode == "persist") {
   mirai::daemons(0)
-  options(loo.daemons = NULL)
 }
 cat("RUN COMPLETE\n")

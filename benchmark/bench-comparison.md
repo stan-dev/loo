@@ -2,7 +2,7 @@
 
 _Generated 2026-07-01 11:23:20._
 
-**Columns / modes.** `base` is the baseline version. `new/call` is the new version's default per-call pool (created and torn down each call). `new/persist` is the new version's persistent session pool (`options(loo.daemons = k)`), reused across calls. `cores = 1` rows are fully serial (the parallel backend is never used).
+**Columns / modes.** `base` is the baseline version. `new/call` is the new version's default per-call pool (created and torn down each call). `new/persist` is the new version with a user-managed `mirai::daemons()` session pool, reused across calls. `cores = 1` rows are fully serial (the parallel backend is never used).
 
 ## Median wall-clock time (s) and speedup vs baseline
 
