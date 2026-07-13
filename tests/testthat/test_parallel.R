@@ -1,8 +1,13 @@
-options(mc.cores = 1)
+options(mc.cores = NULL)
 set.seed(123)
 
 # Make sure no daemon pool leaks in from another test file.
 mirai::daemons(0)
+
+# Most tests here intentionally exercise the deprecated `cores` path; quiet the
+# once-per-session deprecation warning so parallel correctness remains testable.
+internal <- get(".loo_internal", envir = asNamespace("loo"))
+internal$warned_cores_deprecated <- TRUE
 
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
@@ -243,95 +248,148 @@ test_that("loo_model_weights() parallel equals serial", {
                tolerance = 1e-6)
 })
 
-# Persistent session pool (loo.daemons / LOO_DAEMONS) -----------------------
+# loo_mirai() ---------------------------------------------------------------
 
-test_that("loo_persist_config() resolves option/env var and rejects bad values", {
-  # Start from a known-clean configuration and restore it afterwards.
-  old_opt <- options(loo.daemons = NULL)
-  on.exit(options(old_opt), add = TRUE)
-  old_env <- Sys.getenv("LOO_DAEMONS", unset = NA)
-  Sys.unsetenv("LOO_DAEMONS")
-  on.exit(
-    if (!is.na(old_env)) {
-      Sys.setenv(LOO_DAEMONS = old_env)
-    } else {
-      Sys.unsetenv("LOO_DAEMONS")
-    },
-    add = TRUE
+psis_args_list <- function(n = 2L) {
+  arg <- list(log_ratios = -LLmat, r_eff = r_eff)
+  replicate(n, arg, simplify = FALSE)
+}
+
+test_that("loo_mirai() runs psis serially when no pool is connected", {
+  mirai::daemons(0)
+  args_list <- psis_args_list()
+  expected <- suppressWarnings(lapply(args_list, function(a) do.call(psis, a)))
+  res <- suppressWarnings(loo_mirai(psis, args_list))
+  expect_equal(
+    lapply(res, `[[`, "log_weights"),
+    lapply(expected, `[[`, "log_weights")
   )
-
-  # Unset -> feature off.
-  expect_identical(loo:::loo_persist_config(), NA_integer_)
-
-  # Environment variable is parsed when the option is unset.
-  Sys.setenv(LOO_DAEMONS = "3")
-  expect_identical(loo:::loo_persist_config(), 3L)
-
-  # Option takes precedence over the environment variable.
-  options(loo.daemons = 4)
-  expect_identical(loo:::loo_persist_config(), 4L)
-
-  # 0/1, non-integer, and garbage values all disable the feature (no error).
-  options(loo.daemons = 1)
-  expect_identical(loo:::loo_persist_config(), NA_integer_)
-  options(loo.daemons = 0)
-  expect_identical(loo:::loo_persist_config(), NA_integer_)
-  options(loo.daemons = 2.5)
-  expect_identical(loo:::loo_persist_config(), NA_integer_)
-  options(loo.daemons = "garbage")
-  expect_identical(suppressWarnings(loo:::loo_persist_config()), NA_integer_)
 })
 
-test_that("persistent pool is created lazily and reused across calls", {
+test_that("loo_mirai() with n_daemons runs psis in parallel", {
   skip_on_cran()
   mirai::daemons(0)
-  expect_false(loo:::loo_has_pool())
+  on.exit(mirai::daemons(0), add = TRUE)
+  args_list <- psis_args_list()
+  serial <- suppressWarnings(lapply(args_list, function(a) do.call(psis, a)))
+  parallel <- suppressWarnings(loo_mirai(psis, args_list, n_daemons = 2))
+  expect_equal(
+    lapply(parallel, `[[`, "log_weights"),
+    lapply(serial, `[[`, "log_weights")
+  )
+})
 
-  old_opt <- options(loo.daemons = 2)
-  on.exit(options(old_opt), add = TRUE)
+test_that("loo_mirai() reuses an existing pool for psis", {
+  skip_on_cran()
+  mirai::daemons(0)
+  mirai::daemons(2)
+  on.exit(mirai::daemons(0), add = TRUE)
+  args_list <- psis_args_list()
+  serial <- suppressWarnings(lapply(args_list, function(a) do.call(psis, a)))
+  res <- suppressWarnings(loo_mirai(psis, args_list))
+  expect_equal(
+    lapply(res, `[[`, "log_weights"),
+    lapply(serial, `[[`, "log_weights")
+  )
+  expect_true(loo:::loo_has_pool())
+})
+
+test_that("loo_mirai() warns when cores is passed in args_list", {
+  mirai::daemons(0)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_in_mirai <- NULL
+  on.exit({ internal$warned_cores_in_mirai <- NULL }, add = TRUE)
+
+  args_list <- list(list(log_ratios = -LLmat, r_eff = r_eff, cores = 8L))
+  expect_warning(
+    loo_mirai(psis, args_list),
+    "args_list"
+  )
+})
+
+test_that("options(mc.cores) triggers a deprecation warning", {
+  mirai::daemons(0)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_deprecated <- NULL
+  on.exit({ internal$warned_cores_deprecated <- NULL }, add = TRUE)
+
+  old_mc <- options(mc.cores = 1)
+  on.exit(options(old_mc), add = TRUE)
+
+  expect_warning(
+    psis(-LLmat, r_eff = r_eff),
+    "options\\('mc.cores'\\)"
+  )
+})
+
+test_that("options(mc.cores) > 1 still parallelizes (deprecated bridge)", {
+  skip_on_cran()
+  mirai::daemons(0)
   on.exit(mirai::daemons(0), add = TRUE)
 
   ps_serial <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 1))
-  # cores = 1 work must not spin up the persistent pool.
-  expect_false(loo:::loo_has_pool())
 
-  # First parallel call creates the pool and leaves it warm.
-  ps1 <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
-  expect_true(loo:::loo_has_pool())
-  expect_equal(loo:::loo_n_workers(2), 2L)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_deprecated <- NULL
+  on.exit({ internal$warned_cores_deprecated <- NULL }, add = TRUE)
 
-  # Second call reuses the same pool (still 2 connected daemons).
-  ps2 <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
-  expect_true(loo:::loo_has_pool())
-  expect_equal(loo:::loo_n_workers(2), 2L)
+  old_mc <- options(mc.cores = 2)
+  on.exit(options(old_mc), add = TRUE)
 
-  # Results match the serial computation.
-  expect_equal(ps1$log_weights, ps_serial$log_weights)
-  expect_equal(ps2$log_weights, ps_serial$log_weights)
+  expect_warning(
+    ps_parallel <- psis(-LLmat, r_eff = r_eff),
+    "will be removed in a future release"
+  )
+  expect_equal(ps_serial$log_weights, ps_parallel$log_weights)
 })
 
-test_that("a user-configured pool takes precedence over loo.daemons", {
-  skip_on_cran()
+test_that("explicit cores = 1 triggers a deprecation warning", {
   mirai::daemons(0)
-  old_opt <- options(loo.daemons = 4)
-  on.exit(options(old_opt), add = TRUE)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_deprecated <- NULL
+  on.exit({ internal$warned_cores_deprecated <- NULL }, add = TRUE)
 
-  # User sets up their own pool; loo must reuse it untouched and not replace
-  # it with a persistent pool of the configured size.
-  mirai::daemons(2)
-  on.exit(mirai::daemons(0), add = TRUE)
-
-  ps <- suppressWarnings(psis(-LLmat, r_eff = r_eff, cores = 2))
-  expect_true(loo:::loo_has_pool())
-  expect_equal(loo:::loo_n_workers(2), 2L)
+  expect_warning(
+    psis(-LLmat, r_eff = r_eff, cores = 1),
+    "options\\('mc.cores'\\)|'cores' argument"
+  )
 })
+
+test_that("cores > 1 triggers a deprecation warning", {
+  mirai::daemons(0)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_deprecated <- NULL
+  on.exit({ internal$warned_cores_deprecated <- NULL }, add = TRUE)
+
+  expect_warning(
+    psis(-LLmat, r_eff = r_eff, cores = 2),
+    "options\\('mc.cores'\\)|'cores' argument"
+  )
+})
+
+test_that("loo_mirai() validates inputs", {
+  expect_error(loo_mirai("not a function", list()), "'fun' must be a function")
+  expect_error(
+    loo_mirai(`+`, list(list(x = 1))),
+    "'fun' must be a loo function"
+  )
+  expect_error(loo_mirai(psis, "not a list"), "'args_list' must be a list")
+  expect_error(
+    loo_mirai(psis, list(list(log_ratios = -LLmat)), n_daemons = 0),
+    "'n_daemons' must be a single positive integer or NULL"
+  )
+})
+
+
+# with_loo_daemons() messaging -----------------------------------------------
 
 test_that("with_loo_daemons() informs (once) that cores is ignored with a pool", {
   skip_on_cran()
   mirai::daemons(0)
   # Reset the once-per-session guard so this test is order-independent.
-  loo:::.loo_internal$informed_cores_ignored <- NULL
-  on.exit(loo:::.loo_internal$informed_cores_ignored <- NULL, add = TRUE)
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$informed_cores_ignored <- NULL
+  on.exit({ internal$informed_cores_ignored <- NULL }, add = TRUE)
 
   # No pool connected: cores = 1 runs serially without a message.
   expect_silent(loo:::with_loo_daemons(1, 42))
@@ -351,38 +409,8 @@ test_that("with_loo_daemons() informs (once) that cores is ignored with a pool",
   expect_silent(loo:::with_loo_daemons(1, 42))
 
   # cores > 1 with a pool never triggers the message (parallel was requested).
-  loo:::.loo_internal$informed_cores_ignored <- NULL
+  internal$informed_cores_ignored <- NULL
   expect_silent(loo:::with_loo_daemons(2, 42))
-})
-
-test_that("a persistent-pool child process exits cleanly (no orphans)", {
-  skip_on_cran()
-  skip_on_os("windows")
-  rscript <- file.path(R.home("bin"), "Rscript")
-  skip_if_not(file.exists(rscript))
-
-  script <- tempfile(fileext = ".R")
-  on.exit(unlink(script), add = TRUE)
-  writeLines(
-    c(
-      "library(loo)",
-      "LLarr <- example_loglik_array()",
-      "r_eff <- relative_eff(exp(LLarr))",
-      "invisible(suppressWarnings(loo(LLarr, r_eff = r_eff, cores = 2)))",
-      "cat('LOO_CHILD_OK\\n')"
-    ),
-    script
-  )
-  out <- suppressWarnings(system2(
-    rscript,
-    c("--vanilla", shQuote(script)),
-    stdout = TRUE,
-    stderr = TRUE,
-    env = "LOO_DAEMONS=2"
-  ))
-  status <- attr(out, "status")
-  expect_true(is.null(status) || identical(as.integer(status), 0L))
-  expect_true(any(grepl("LOO_CHILD_OK", out)))
 })
 
 # Final safety net in case any test above exited early with a live pool.

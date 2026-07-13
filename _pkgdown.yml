@@ -105,6 +105,7 @@ reference:
       - elpd
   - title: Other functions
     contents:
+      - loo_mirai
       - loo_predictive_metric
       - crps
       - elpd
