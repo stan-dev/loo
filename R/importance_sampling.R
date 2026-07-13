@@ -21,7 +21,7 @@ importance_sampling.array <-
            ...,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
@@ -38,7 +38,7 @@ importance_sampling.matrix <-
            ...,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
@@ -235,11 +235,11 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
 #' @keywords internal
 #' @description
 #' Worker function mapped over observations (matrix columns) by
-#' [do_importance_sampling()], either serially via [lapply()] or in parallel
+#' `do_importance_sampling()`, either serially via [lapply()] or in parallel
 #' via [mirai::mirai_map()]. 
 #' @param i Integer column index of the observation to process.
 #' @param is_fun The per-observation importance sampling function to apply, one
-#'   of [do_psis_i()], [do_tis_i()], or [do_sis_i()].
+#'   of `do_psis_i()`, `do_tis_i()`, or `do_sis_i()`.
 #' @param log_ratios Matrix of log ratios (`-loglik`). May be a shared-memory
 #'   object created by [mori::share()] to avoid copying to each worker.
 #' @param tail_len Vector of tail lengths used to fit the GPD, one per

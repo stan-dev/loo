@@ -1,4 +1,4 @@
-options(mc.cores = 1)
+options(mc.cores = NULL)
 
 generate_test_elpd_dataset <- function() {
   N <- 10

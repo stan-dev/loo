@@ -5,10 +5,9 @@
     "- Online documentation and vignettes at mc-stan.org/loo"
   )
   packageStartupMessage(
-    "- As of v2.0.0 loo defaults to 1 core ",
-    "but we recommend using as many as possible. ",
-    "Use the 'cores' argument or set options(mc.cores = NUM_CORES) ",
-    "for an entire session. "
+    "- Parallelization uses mirai. The 'cores' argument and options('mc.cores') ",
+    "are deprecated; see vignette('loo2-parallel') for mirai::daemons() and ",
+    "loo_mirai()."
   )
   if (os_is_windows()) {
     packageStartupMessage(

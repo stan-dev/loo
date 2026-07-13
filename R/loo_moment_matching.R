@@ -81,6 +81,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   checkmate::assertNumber(k_threshold, null.ok=TRUE)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
+  cores <- loo_cores(cores, call = match.call())
   checkmate::assertNumber(cores)
 
 
@@ -225,13 +226,13 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @param ... Further arguments passed to the custom functions documented above.
 #' @return List with the updated elpd values and diagnostics
 #'
-#' Worker wrapper around [loo_moment_match_i()] for parallel mapping
+#' Worker wrapper around `loo_moment_match_i()`` for parallel mapping
 #'
 #' @noRd
 #' @keywords internal
 #' @description
 #' A namespace-level (non-closure) adapter mapped over high-Pareto-k
-#' observation indices by [loo_map()]. Keeping it at namespace scope means it
+#' observation indices by `loo_map()`. Keeping it at namespace scope means it
 #' does not capture the calling frame, so large objects shared via
 #' [mori::share()] (`upars`, `orig_log_prob`) are not duplicated inside a
 #' serialized closure environment. The per-observation Pareto k is selected
@@ -240,8 +241,8 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @param i Integer observation index.
 #' @param ks Full vector of Pareto k estimates; `ks[i]` is used for this fold.
 #' @param mm_dots A list of additional arguments forwarded to
-#'   [loo_moment_match_i()] (the `...` from [loo_moment_match()]).
-#' @return The result of [loo_moment_match_i()] for observation `i`.
+#'   `loo_moment_match_i()` (the `...` from [loo_moment_match()]).
+#' @return The result of `loo_moment_match_i()` for observation `i`.
 loo_moment_match_i_worker <- function(i, x, ks, log_lik_i, unconstrain_pars,
                                       log_prob_upars, log_lik_i_upars,
                                       max_iters, k_threshold, split, cov,

@@ -257,7 +257,7 @@ loo.function <-
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)

@@ -171,14 +171,17 @@ nlist <- function(...) {
 }
 
 
-# Check how many cores to use and throw deprecation warning if loo.cores is used
-loo_cores <- function(cores) {
-  loo_cores_op <- getOption("loo.cores", NA)
-  if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
-    cores <- loo_cores_op
-    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
-            call. = FALSE)
-  }
+# Check how many cores to use and throw deprecation warnings for legacy options
+loo_cores <- function(cores, call = NULL) {
+  explicit <- !is.null(call) && "cores" %in% names(call)
+  mc_cores_op <- getOption("mc.cores")
+  mc_cores_set <- !explicit && !is.null(mc_cores_op)
+
+  loo_deprecate_cores(
+    cores = cores,
+    explicit = explicit,
+    mc_cores_set = mc_cores_set
+  )
   return(cores)
 }
 

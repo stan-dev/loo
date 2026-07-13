@@ -1,4 +1,4 @@
-options(mc.cores = 1)
+options(mc.cores = NULL)
 set.seed(123)
 
 LLarr <- example_loglik_array()
@@ -11,14 +11,6 @@ r_eff_mat <- relative_eff(exp(LLmat), chain_id = chain_id)
 loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 waic1 <- suppressWarnings(waic(LLarr))
 elpd1 <- suppressWarnings(elpd(LLarr))
-
-test_that("using loo.cores is deprecated", {
-  options(mc.cores = NULL)
-  options(loo.cores = 1)
-  expect_warning(loo(LLarr, r_eff = r_eff_arr, cores = 2), "loo.cores")
-  options(loo.cores = NULL)
-  options(mc.cores = 1)
-})
 
 test_that("loo, waic and elpd results haven't changed", {
   expect_snapshot_value(loo1, style = "serialize")
@@ -163,21 +155,6 @@ loo_with_mat <- loo(
   r_eff = rep(1, ncol(llmat_from_fn)),
   save_psis = TRUE
 )
-
-test_that("loo.cores deprecation warning works with function method", {
-  options(loo.cores = 1)
-  expect_warning(
-    loo(
-      llfun,
-      cores = 2,
-      data = data,
-      draws = draws,
-      r_eff = rep(1, nrow(data))
-    ),
-    "loo.cores"
-  )
-  options(loo.cores = NULL)
-})
 
 test_that("loo_i results match loo results for ith data point", {
   expect_no_warning(

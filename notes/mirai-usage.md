@@ -18,7 +18,7 @@ Most wrapper-style packages call `mirai::daemons(n)` before parallel work and
 `mirai::daemons(0)` (or `on.exit`) afterward. Several also expose convenience 
 helpers so users never touch mirai directly.
 
-For **loo**, two complementary options are worth considering:
+For **loo**, two complementary options are implemented:
 
 1. **Use mirai directly and document workflow** in a vignette
 
@@ -36,9 +36,8 @@ map-style execution without managing daemons:
 loo_mirai(fun, args_list, n_daemons = NULL)
 ```
 
-Third path (currently implemented): 
-+ lazy session-scoped pools via `options(loo.daemons)` / `LOO_DAEMONS`, without 
-a per-call `workers` argument or a `loo_daemons()` wrapper.
+The earlier third path (lazy session-scoped pools via `options(loo.daemons)` /
+`LOO_DAEMONS`) was removed in favor of direct mirai usage.
 
 
 ## bakerrr

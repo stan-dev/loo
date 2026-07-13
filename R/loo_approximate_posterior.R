@@ -47,6 +47,7 @@ loo_approximate_posterior.array <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores, call = match.call())
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
@@ -75,6 +76,7 @@ loo_approximate_posterior.matrix <-
            ...,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores, call = match.call())
     checkmate::assert_flag(save_psis)
     checkmate::assert_int(cores)
     checkmate::assert_numeric(log_p, len = nrow(x))
@@ -117,7 +119,7 @@ loo_approximate_posterior.function <-
 
     checkmate::assert_numeric(log_p, len = length(log_g))
     checkmate::assert_numeric(log_g, len = length(log_p))
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]

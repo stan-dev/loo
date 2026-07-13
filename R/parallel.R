@@ -5,90 +5,27 @@
 #' @description
 #' Holds small bits of session-scoped state used by the parallel helpers:
 #'
-#' * `cleanup_registered`: guards `loo_register_daemon_cleanup()` so the
-#'   session-exit finalizer is only registered once.
-#' * `warned_bad_daemons`: guards the malformed-config warning in
-#'   `loo_persist_config()` so it is only emitted once per session.
 #' * `informed_cores_ignored`: guards the "a pool is connected so `cores` is
 #'   ignored" message in `with_loo_daemons()` so it is only emitted once per
 #'   session.
+#' * `warned_cores_deprecated`: guards the `cores` argument deprecation warning
+#'   in `loo_deprecate_cores()` so it is only emitted once per session.
+#' * `warned_cores_in_mirai`: guards the `cores`-in-`args_list` warning in
+#'   `loo_mirai()` so it is only emitted once per session.
 #'
-#' It also serves as the object the daemon-cleanup finalizer is attached to.
+#' It also serves as the object attached to session-scoped parallel state.
 .loo_internal <- new.env(parent = emptyenv())
-
-#' Resolve the persistent local daemon pool size from user configuration
-#'
-#' @noRd
-#' @keywords internal
-#' @description
-#' Reads the opt-in "persistent local pool" size from, in precedence order:
-#'
-#' 1. the R option `loo.daemons`,
-#' 2. the environment variable `LOO_DAEMONS`,
-#' 3. otherwise the feature is off.
-#'
-#' This knob enables a local [mirai::daemons()] pool that is created lazily on
-#' first parallel use and kept warm for the rest of the session (see
-#' `with_loo_daemons()`), which avoids paying pool spawn/teardown overhead on
-#' every top-level `loo()`/`psis()` call (useful for simulations, benchmarks
-#' and batch/HPC scripts).
-#'
-#' @return A single integer `>= 2` giving the persistent pool size, or
-#'   `NA_integer_` when the feature is off (unset, `0`/`1`, or a non-integer
-#'   value). Genuinely malformed (non-coercible) values warn once per session
-#'   and then disable the feature.
-loo_persist_config <- function() {
-  raw <- getOption("loo.daemons")
-  if (is.null(raw)) {
-    raw <- Sys.getenv("LOO_DAEMONS", unset = NA_character_)
-  }
-  if (length(raw) != 1L) {
-    return(NA_integer_)
-  }
-  if (is.na(raw) || (is.character(raw) && !nzchar(trimws(raw)))) {
-    # Unset / empty -> feature off.
-    return(NA_integer_)
-  }
-  n <- suppressWarnings(as.numeric(raw))
-  if (is.na(n) || !is.finite(n)) {
-    # Non-numeric garbage -> off, but tell the user once that it was ignored.
-    loo_warn_bad_daemons(raw)
-    return(NA_integer_)
-  }
-  if (n < 2 || n != trunc(n)) {
-    # 0/1 (serial) or a non-integer value -> feature off, silently.
-    return(NA_integer_)
-  }
-  as.integer(n)
-}
-
-#' Warn (once per session) about a malformed persistent-pool configuration
-#'
-#' @noRd
-#' @keywords internal
-loo_warn_bad_daemons <- function(value) {
-  if (isTRUE(.loo_internal$warned_bad_daemons)) {
-    return(invisible(NULL))
-  }
-  .loo_internal$warned_bad_daemons <- TRUE
-  warning(
-    "Ignoring invalid persistent-pool size ", encodeString(value, quote = "'"),
-    " from 'loo.daemons'/'LOO_DAEMONS'; expected a single integer >= 2.",
-    call. = FALSE
-  )
-  invisible(NULL)
-}
 
 #' Inform (once per session) that `cores` is ignored while a pool is connected
 #'
 #' @noRd
 #' @keywords internal
 #' @description
-#' Emitted by `with_loo_daemons()` when a mirai daemon pool is connected (a
-#' user-managed pool, or a persistent pool left warm by an earlier call) and
-#' the current call passed `cores <= 1`. When a pool is connected loo always
-#' uses it, so the `cores` argument is ignored and the work runs in parallel
-#' regardless of its value. This message makes that behaviour visible the
+#' Emitted by `with_loo_daemons()` when a mirai daemon pool is connected (e.g.
+#' the user called [mirai::daemons()] themselves) and the current call passed
+#' `cores <= 1`. When a pool is connected loo always uses it, so the `cores`
+#' argument is ignored and the work runs in parallel regardless of its value.
+#' This message makes that behaviour visible the
 #' first time a call looks like it asked for serial execution; the usual cause
 #' is relying on the default `cores = getOption("mc.cores", 1)` after setting
 #' up daemons.
@@ -105,27 +42,72 @@ loo_inform_cores_ignored <- function() {
   invisible(NULL)
 }
 
-#' Register a one-time session-exit cleanup for the persistent daemon pool
+#' Warn (once per session) that the `cores` argument is deprecated
 #'
 #' @noRd
 #' @keywords internal
 #' @description
-#' Attaches a finalizer (only once per session) that resets any local daemon
-#' pool with `mirai::daemons(0)` when the R session exits. mirai already
-#' terminates local daemons when the host session ends; this is a
-#' belt-and-suspenders guard so the lazily created persistent pool never leaves
-#' orphan processes behind in batch/HPC scripts.
-loo_register_daemon_cleanup <- function() {
-  if (isTRUE(.loo_internal$cleanup_registered)) {
+#' Emitted from `loo_cores()` when the user passes `cores` explicitly (even
+#' `cores = 1`), when `options(mc.cores)` is set, or when the resolved value
+#' is `cores > 1`. The argument/option still works for now by starting a scoped
+#' local [mirai::daemons()] pool when `cores > 1`, but users should migrate to
+#' [mirai::daemons()] or [loo_mirai()].
+#' @param cores Integer number of cores requested by the user.
+#' @param explicit Whether `cores` was passed explicitly by the user.
+#' @param mc_cores_set Whether `options(mc.cores)` is set and `cores` was not
+#'   passed explicitly.
+loo_deprecate_cores <- function(cores, explicit = FALSE, mc_cores_set = FALSE) {
+  if (!explicit && !mc_cores_set && cores <= 1L) {
     return(invisible(NULL))
   }
-  .loo_internal$cleanup_registered <- TRUE
-  reg.finalizer(
-    .loo_internal,
-    function(e) try(mirai::daemons(0), silent = TRUE),
-    onexit = TRUE
+  if (isTRUE(.loo_internal$warned_cores_deprecated)) {
+    return(invisible(NULL))
+  }
+  .loo_internal$warned_cores_deprecated <- TRUE
+  warning(
+    "The 'cores' argument and options('mc.cores') are deprecated and will be ",
+    "removed in a future release. For one-off parallel calls, 'cores' / ",
+    "'mc.cores' currently start a per-call local daemon pool when > 1; use ",
+    "mirai::daemons() before calling loo functions, or loo_mirai(..., ",
+    "n_daemons = k) for map-style workflows over many models.",
+    call. = FALSE
   )
   invisible(NULL)
+}
+
+#' Warn (once per session) about `cores` in `loo_mirai()` `args_list`
+#'
+#' @noRd
+#' @keywords internal
+loo_deprecate_cores_in_mirai <- function() {
+  if (isTRUE(.loo_internal$warned_cores_in_mirai)) {
+    return(invisible(NULL))
+  }
+  .loo_internal$warned_cores_in_mirai <- TRUE
+  warning(
+    "Passing 'cores' in args_list to loo_mirai() is deprecated and ignored. ",
+    "Parallelism is controlled by loo_mirai() via n_daemons or an existing ",
+    "mirai::daemons() pool.",
+    call. = FALSE
+  )
+  invisible(NULL)
+}
+
+#' Prepare argument lists for [loo_mirai()] map jobs
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Strips any user-supplied `cores` element (with a deprecation warning) and
+#' forces `cores = 1` so each mapped job runs serially on its worker. Outer
+#' parallelism comes only from `loo_mirai()` itself.
+loo_mirai_prepare_args <- function(args) {
+  if ("cores" %in% names(args)) {
+    loo_deprecate_cores_in_mirai()
+    args$cores <- NULL
+  }
+  args$cores <- 1L
+  args
 }
 
 #' Evaluate parallel work with an appropriate mirai daemon pool
@@ -138,22 +120,14 @@ loo_register_daemon_cleanup <- function() {
 #' deliberately a good citizen of the user's session:
 #'
 #' * A daemon pool is already connected (e.g. the user called
-#'   [mirai::daemons()] themselves, possibly with remote/HPC daemons, or a
-#'   persistent pool was left warm by an earlier call): `code` runs on the
-#'   existing pool, which is left untouched. **A connected pool always wins**,
-#'   so the `cores` argument is ignored entirely in this case (loo uses the
-#'   pool regardless of `cores`). If `cores <= 1` here -- i.e. the call looked
-#'   like it requested serial execution -- a one-time-per-session message
-#'   notes that `cores` is being ignored (via `loo_inform_cores_ignored()`).
-#' * `cores <= 1` with no pool connected: runs `code` serially without
-#'   touching daemons. (A configured `loo.daemons` pool is created lazily only
-#'   when `cores > 1`, so serial-only work never starts workers.)
-#' * Otherwise, if the user opted in to a persistent session pool via the
-#'   `loo.daemons` option or `LOO_DAEMONS` environment variable (see
-#'   `loo_persist_config()`): a local pool of that size is created lazily on
-#'   this first parallel call and left warm for the rest of the session, with a
-#'   session-exit finalizer registered for cleanup. Subsequent calls reuse it
-#'   via the existing-pool branch above.
+#'   [mirai::daemons()] themselves, possibly with remote/HPC daemons): `code`
+#'   runs on the existing pool, which is left untouched. **A connected pool
+#'   always wins**, so the `cores` argument is ignored entirely in this case.
+#'   If `cores <= 1` here -- i.e. the call looked like it requested serial
+#'   execution -- a one-time-per-session message notes that `cores` is being
+#'   ignored (via `loo_inform_cores_ignored()`).
+#' * `cores <= 1` with no pool connected: runs `code` serially without touching
+#'   daemons.
 #' * Otherwise: a pool of `cores` local daemons is created for the duration of
 #'   `code` and automatically reset afterwards (via the scoped
 #'   `with(mirai::daemons(), ...)` method), so no daemon processes are left
@@ -168,40 +142,106 @@ loo_register_daemon_cleanup <- function() {
 #' @param cores Integer number of cores requested by the user. When no pool is
 #'   connected this is the per-call "enable parallel" switch (and the size of
 #'   the ephemeral pool). When a pool is already connected it is ignored --
-#'   loo always uses the connected pool. The persistent pool size, when
-#'   enabled, comes from `loo_persist_config()` rather than from `cores`.
+#'   loo always uses the connected pool.
 #' @param code Expression to evaluate. Lazily evaluated in the calling
 #'   environment, after any daemon pool has been set up.
 #' @return The value of `code`.
 with_loo_daemons <- function(cores, code) {
   if (loo_has_pool()) {
-    # A pool is connected (user-managed, or a warm persistent pool): use it
-    # regardless of `cores`. This always wins over the options below. If the
-    # call looked like it asked for serial work, note once that `cores` is
-    # being ignored.
     if (cores <= 1) {
       loo_inform_cores_ignored()
     }
     return(code)
   }
   if (cores <= 1) {
-    # No pool connected and no parallelism requested: run serially. A
-    # configured loo.daemons pool is created lazily only when cores > 1, so
-    # serial-only work never starts workers.
     return(code)
   }
-  persist <- loo_persist_config()
-  if (!is.na(persist)) {
-    # Opt-in persistent pool: create once, leave warm for the session, and
-    # register a finalizer to tidy up at session exit. No per-call teardown.
-    mirai::daemons(persist)
-    loo_register_daemon_cleanup()
-    return(code)
-  }
-  # No pool configured: create one scoped to this computation and reset it on
-  # exit. `code` (including result collection via `[]`) is forced before the
-  # daemons are torn down.
   with(mirai::daemons(cores), code)
+}
+
+#' Run a \pkg{loo} function over argument lists in parallel with mirai
+#'
+#' Intended for map-style workflows such as computing [loo()], [psis()], or
+#' other \pkg{loo} functions for many models in one session.
+#'
+#' @param fun A \pkg{loo} function (e.g. [loo()], [psis()]) to apply to each
+#'   element of `args_list`.
+#' @param args_list A list of lists. Each element is passed to `fun` via
+#'   `do.call(fun, element)`.
+#' @param n_daemons Number of local daemons to start for this call. When
+#'   `NULL` (the default), an existing [mirai::daemons()] pool is reused if
+#'   connected; otherwise the work runs serially. When an integer `>= 2`, a
+#'   local pool of that size is created for the duration of the call and
+#'   torn down automatically when it returns (unless a pool was already
+#'   connected, in which case it is reused and left untouched).
+#' @return A list of results in the same order as `args_list`.
+#' @details Parallelism is controlled by `loo_mirai()` (via `n_daemons` or an
+#'   existing daemon pool), not by a `cores` argument on the mapped calls.
+#'   Any `cores` element in `args_list` is deprecated, ignored, and replaced
+#'   with `cores = 1` so each job runs serially on its worker.
+#' @export
+#' @examples
+#' r_eff <- relative_eff(exp(example_loglik_array()))
+#' ll_list <- list(example_loglik_matrix(), example_loglik_matrix())
+#' args_list <- lapply(ll_list, function(LL) {
+#'   list(log_ratios = -LL, r_eff = r_eff)
+#' })
+#'
+#' # Serial when no pool is connected and n_daemons is NULL
+#' loo_mirai(psis, args_list)
+#'
+#' \dontrun{
+#' # Convenience wrapper: start workers, map, tear down
+#' loo_mirai(psis, args_list, n_daemons = 2)
+#'
+#' # Or manage the pool yourself and call loo functions directly
+#' mirai::daemons(4)
+#' loo_mirai(loo, lapply(ll_list, function(LL) {
+#'   list(x = LL, r_eff = r_eff)
+#' }))
+#' mirai::daemons(0)
+#' }
+loo_mirai <- function(fun, args_list, n_daemons = NULL) {
+  if (!is.function(fun)) {
+    stop("'fun' must be a function.", call. = FALSE)
+  }
+  if (!identical(environment(fun), asNamespace("loo"))) {
+    stop(
+      "'fun' must be a loo function (e.g. loo(), psis()).",
+      call. = FALSE
+    )
+  }
+  if (!is.list(args_list)) {
+    stop("'args_list' must be a list.", call. = FALSE)
+  }
+
+  run_map <- function() {
+    prepared <- lapply(args_list, loo_mirai_prepare_args)
+    if (!loo_has_pool()) {
+      return(lapply(prepared, function(a) do.call(fun, a)))
+    }
+    mirai::mirai_map(
+      prepared,
+      function(.args, .fun) do.call(.fun, .args),
+      .args = list(.fun = fun)
+    )[mirai::.stop]
+  }
+
+  if (!is.null(n_daemons)) {
+    n_daemons <- as.integer(n_daemons)
+    if (length(n_daemons) != 1L || is.na(n_daemons) || n_daemons < 1L) {
+      stop(
+        "'n_daemons' must be a single positive integer or NULL.",
+        call. = FALSE
+      )
+    }
+    if (n_daemons == 1L || loo_has_pool()) {
+      return(run_map())
+    }
+    return(with(mirai::daemons(n_daemons), run_map()))
+  }
+
+  run_map()
 }
 
 #' Is a mirai daemon pool currently connected?
@@ -305,21 +345,14 @@ loo_map <- function(X, FUN, ..., cores = 1L, broadcast = list(),
   dots <- list(...)
 
   if (!loo_has_pool()) {
-    # Serial path: identical behaviour to a plain lapply() with the broadcast
-    # and constant arguments supplied by name. When a pool is connected loo
-    # uses it regardless of `cores`; the decision to create one lives upstream
-    # in with_loo_daemons().
     return(do.call(lapply, c(list(X, FUN), broadcast, dots)))
   }
 
   local_pool <- loo_pool_is_local()
   if (length(broadcast) > 0L) {
     if (local_pool) {
-      # Zero-copy: write once to shared memory, ship tiny references.
       broadcast <- lapply(broadcast, mori::share)
     } else if (chunk == "never") {
-      # Remote pool: avoid re-serializing large broadcast objects once per
-      # task by collapsing to one chunk per worker instead.
       chunk <- "auto"
     }
   }
@@ -345,7 +378,5 @@ loo_map <- function(X, FUN, ..., cores = 1L, broadcast = list(),
     },
     .args = list(.FUN = FUN, .const = const_args)
   )[mirai::.stop]
-  # splitIndices() returns contiguous ascending groups, so concatenating the
-  # per-chunk lists restores the original order of X.
   do.call(c, chunk_results)
 }

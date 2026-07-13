@@ -23,6 +23,8 @@ params:
 This vignette demonstrates how to use the __loo__ package to carry out 
 Pareto smoothed importance-sampling leave-one-out cross-validation (PSIS-LOO) 
 for purposes of model checking and model comparison. 
+For parallel computation see `vignette("loo2-parallel")` (`mirai::daemons()` or
+`loo_mirai()`; the `cores` argument is deprecated but still works).
 
 In this vignette we can't provide all necessary background information on
 PSIS-LOO and its diagnostics (Pareto $k$ and effective sample size), so we

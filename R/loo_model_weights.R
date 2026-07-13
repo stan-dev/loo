@@ -180,7 +180,7 @@ loo_model_weights.default <-
            r_eff_list = NULL,
            cores = getOption("mc.cores", 1)) {
 
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     method <- match.arg(method)
     K <- length(x) # number of models
 

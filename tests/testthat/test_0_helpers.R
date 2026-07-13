@@ -73,12 +73,12 @@ test_that("nlist works", {
 })
 
 test_that("loo_cores works", {
+  internal <- get(".loo_internal", envir = asNamespace("loo"))
+  internal$warned_cores_deprecated <- TRUE
+  on.exit({ internal$warned_cores_deprecated <- NULL }, add = TRUE)
+
   expect_equal(loo_cores(10), 10)
   options(mc.cores = 2)
+  on.exit(options(mc.cores = NULL), add = TRUE)
   expect_equal(loo_cores(getOption("mc.cores", 1)), 2)
-  options(mc.cores = 1)
-
-  options(loo.cores = 2)
-  expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
-  options(loo.cores = NULL)
 })

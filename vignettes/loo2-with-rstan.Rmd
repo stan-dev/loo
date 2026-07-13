@@ -133,8 +133,8 @@ log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
 # sample sizes and Monte Carlo error
 r_eff <- relative_eff(exp(log_lik_1), cores = 2) 
 
-# preferably use more than 2 cores (as many cores as possible)
-# will use value of 'mc.cores' option if cores is not specified
+# For parallel PSIS-LOO, see vignette("loo2-parallel"): prefer mirai::daemons()
+# for session pools. The cores argument still works as a deprecated bridge.
 loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
 print(loo_1)
 ```

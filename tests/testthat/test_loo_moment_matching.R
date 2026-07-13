@@ -1,4 +1,4 @@
-options(mc.cores = 1)
+options(mc.cores = NULL)
 
 set.seed(123)
 S <- 4000

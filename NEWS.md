@@ -1,5 +1,17 @@
 # loo (development version)
 
+* Parallelization with **mirai**: user-managed `mirai::daemons()` pools,
+  new `loo_mirai()` convenience wrapper for map-style workflows, and deprecated
+  per-call `cores` / `options(mc.cores)` bridges.
+* The `cores` argument and `options(mc.cores)` on loo functions are deprecated
+  and will be removed in a future release; they still start a per-call local
+  daemon pool when the resolved value is `> 1` and no pool is connected. A
+  once-per-session warning is emitted when `cores` is passed explicitly (even
+  `cores = 1`), when `options(mc.cores)` is set, or when the resolved value is
+  `> 1`.
+* Removed support for `options(loo.cores)`, which had been deprecated since
+  loo 2.x in favor of `options(mc.cores)`.
+
 # loo 2.10.0
 
 * Updates to `loo_compare` output by @jgabry, @avehtari, @florence-bockting in #300: 

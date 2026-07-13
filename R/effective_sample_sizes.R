@@ -50,6 +50,7 @@ relative_eff.default <- function(x, chain_id, ...) {
 #' @template matrix
 #'
 relative_eff.matrix <- function(x, chain_id, ..., cores = getOption("mc.cores", 1)) {
+  cores <- loo_cores(cores, call = match.call())
   x <- llmatrix_to_array(x, chain_id)
   relative_eff.array(x, cores = cores)
 }
@@ -59,6 +60,7 @@ relative_eff.matrix <- function(x, chain_id, ..., cores = getOption("mc.cores", 
 #' @template array
 #'
 relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
+  cores <- loo_cores(cores, call = match.call())
   stopifnot(length(dim(x)) == 3)
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
@@ -97,6 +99,7 @@ relative_eff.function <-
            cores = getOption("mc.cores", 1),
            data = NULL,
            draws = NULL) {
+    cores <- loo_cores(cores, call = match.call())
 
     f_i <- validate_llfun(x) # not really an llfun, should return exp(ll) or exp(-ll)
     N <- dim(data)[1]
