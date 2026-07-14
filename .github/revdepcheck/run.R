@@ -5,7 +5,7 @@ if (Sys.getenv("PREVIOUS_RUN_ID") == "") {
 }
 
 revdepcheck::revdep_check(
-  num_workers = 3,
+  num_workers = 2,
   timeout = as.difftime(
     as.integer(Sys.getenv("TIMEOUT_MINUTES")),
     units = "mins"
