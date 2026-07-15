@@ -45,6 +45,13 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          extra-repositories: |
+            https://stan-dev.r-universe.dev
+
+      - name: Install system libraries for hard revdeps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagick++-dev libopenmpi-dev openmpi-bin
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -52,6 +59,7 @@ jobs:
             r-lib/revdepcheck
             any::callr
             any::rstantools
+            any::cmdstanr
             any::systemfonts
             any::textshaping
             any::ragg
@@ -67,6 +75,17 @@ jobs:
             any::OpenCL
             any::Rmpi
           needs: check
+
+      - name: cmdstan env vars
+        run: |
+          echo "CMDSTAN_PATH=${HOME}/.cmdstan" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Install cmdstan
+        run: |
+          cmdstanr::check_cmdstan_toolchain()
+          cmdstanr::install_cmdstan(cores = 2)
+        shell: Rscript {0}
 
       - name: Run revdepcheck
         id: revdep
