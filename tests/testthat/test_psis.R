@@ -152,11 +152,9 @@ test_that("do_psis_i throws warning if all tail values the same", {
 })
 
 test_that("psis_smooth_tail returns original tail values if k is infinite", {
-  # skip on M1 Mac until we figure out why this test fails only on M1 Mac
-  skip_if(Sys.info()[["sysname"]] == "Darwin" && R.version$arch == "aarch64")
-
-  xx <- c(1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4)
-  val <- suppressWarnings(psis_smooth_tail(xx, 3))
+  xx <- log(c(2, 2, 2, 2, 3, 4, 5, 6))
+  val <- suppressWarnings(psis_smooth_tail(xx, 0))
   expect_equal(val$tail, xx)
   expect_equal(val$k, Inf)
 })
+
