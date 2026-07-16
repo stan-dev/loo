@@ -78,6 +78,25 @@ with \code{brms::kfold_predict()} and pass the resulting \code{yrep} matrices as
 \code{ypred} and/or \code{mupred}. See the sleep-study workflow in
 \href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}.
 }
+\section{\code{measure_higher_is_better} attribute}{
+
+All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
+\code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
+setting used for each measure (\code{NULL}, \code{TRUE}, or \code{FALSE} per bare measure
+name; \code{elpd} is always \code{NULL}). Built-in loss measures such as MSE are stored
+on a loss scale by default (\code{NULL}); pass
+\code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
+utility scale. When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}},
+the attribute is updated for newly computed measures.
+
+Attribute \code{measure_compare_meta} records per-measure comparison metadata
+(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=loo_compare]{loo_compare()}}.
+Built-in measures take \code{loss} and \code{diff_method} from the package measure
+registry; custom measures default to \code{diff_method = "auto"} and \code{loss = FALSE}
+(utility scale). For custom loss measures, use \code{higher_is_better = TRUE} in
+\code{control} so \code{\link[=loo_compare]{loo_compare()}} interprets the sign correctly. See \link{loo-glossary}.
+}
+
 \examples{
 \donttest{
 if (requireNamespace("brms", quietly = TRUE)) {

@@ -1,3 +1,131 @@
+# loo_compare works with three loo_pred_measure models
+
+    Code
+      print(comp)
+    Message
+      Models ranked by mae (reference: C).
+    Output
+       model mae_diff se_diff        diag_elpd
+           C      0.0     0.0 13 k_psis > 0.62
+           B     -0.1     0.7  9 k_psis > 0.62
+           A     -7.6     1.7 25 k_psis > 0.62
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Other measures compared: elpd, r2. Use print(x, measures = "all").
+    Condition
+      Warning:
+      se_diff unavailable for: r2.
+
+# loo_compare informs when measure signs are converted
+
+    Code
+      comp <- loo_compare(pm1, pm2)
+    Message
+      For model comparison, differences for mse is reported on a utility scale (higher is better).
+
+# print.compare.loo works for loo_pred_measure comparisons
+
+    Code
+      print(comp)
+    Output
+       model elpd_diff se_diff p_worse diag_diff        diag_elpd
+          m3       0.0     0.0      NA           13 k_psis > 0.62
+          m2    -219.0   221.6    0.84            9 k_psis > 0.62
+          m1   -2764.4   634.3    1.00           25 k_psis > 0.62
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Other measures compared: r2, mae. Use print(x, measures = "all").
+    Condition
+      Warning:
+      se_diff unavailable for: r2.
+
+---
+
+    Code
+      print(comp, measures = "all", digits = 2)
+    Output
+      
+      -- elpd (vs m3) --
+       model elpd_diff se_diff p_worse diag_diff        diag_elpd
+          m3      0.00    0.00      NA           13 k_psis > 0.62
+          m2   -218.98  221.65    0.84            9 k_psis > 0.62
+          m1  -2764.42  634.26    1.00           25 k_psis > 0.62
+      
+      -- r2 (vs m3) --
+       model r2_diff se_diff
+          m3    0.00      NA
+          m2    0.01      NA
+          m1   -0.20      NA
+      
+      -- mae (vs m3) --
+       model mae_diff se_diff
+          m3     0.00    0.00
+          m2    -0.08    0.71
+          m1    -7.64    1.68
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+    Condition
+      Warning:
+      se_diff unavailable for: r2.
+
+---
+
+    Code
+      print(comp, measures = c("r2", "mae"))
+    Output
+      
+      -- r2 (vs m3) --
+       model r2_diff se_diff
+          m3     0.0      NA
+          m2     0.0      NA
+          m1    -0.2      NA
+      
+      -- mae (vs m3) --
+       model mae_diff se_diff
+          m3      0.0     0.0
+          m2     -0.1     0.7
+          m1     -7.6     1.7
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+    Condition
+      Warning:
+      se_diff unavailable for: r2.
+
+---
+
+    Code
+      print(comp_mae)
+    Message
+      Models ranked by mae (reference: m2).
+    Output
+       model mae_diff se_diff        diag_elpd
+          m2      0.0     0.0  9 k_psis > 0.62
+          m1     -7.6     1.5 25 k_psis > 0.62
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Other measures compared: elpd, r2. Use print(x, measures = "all").
+    Condition
+      Warning:
+      se_diff unavailable for: r2.
+
 # loo_compare returns expected results (2 models)
 
     WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v

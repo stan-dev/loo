@@ -69,7 +69,8 @@ measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
 An updated object of the same class as \code{predperf}, with new rows in
 \code{estimates} and columns in \code{pointwise} for each requested measure. Base
 summaries (\code{elpd} and LOO/k-fold complexity terms such as \code{p_loo}) are not
-recomputed.
+recomputed. Attribute \code{measure_higher_is_better} is updated for any newly added
+measures.
 }
 \description{
 Extend a \code{"pred_measure"} object with additional measures \strong{without
@@ -100,6 +101,25 @@ When extending a LOO result, ensure the initial call used \code{save_psis = TRUE
 (or that \code{predperf} already contains a \code{psis_object}) so LOO weights are
 available for additional measures.
 }
+\section{\code{measure_higher_is_better} attribute}{
+
+All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
+\code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
+setting used for each measure (\code{NULL}, \code{TRUE}, or \code{FALSE} per bare measure
+name; \code{elpd} is always \code{NULL}). Built-in loss measures such as MSE are stored
+on a loss scale by default (\code{NULL}); pass
+\code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
+utility scale. When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}},
+the attribute is updated for newly computed measures.
+
+Attribute \code{measure_compare_meta} records per-measure comparison metadata
+(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=loo_compare]{loo_compare()}}.
+Built-in measures take \code{loss} and \code{diff_method} from the package measure
+registry; custom measures default to \code{diff_method = "auto"} and \code{loss = FALSE}
+(utility scale). For custom loss measures, use \code{higher_is_better = TRUE} in
+\code{control} so \code{\link[=loo_compare]{loo_compare()}} interprets the sign correctly. See \link{loo-glossary}.
+}
+
 \examples{
 \donttest{
 if (requireNamespace("brms", quietly = TRUE)) {

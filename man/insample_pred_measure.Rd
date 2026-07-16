@@ -67,7 +67,9 @@ per measure).}
 }
 
 The attribute \code{source} is \code{"insample"}. Attribute \code{dims} gives posterior
-draws × observations. Use \code{\link[=print]{print()}} for a readable summary table.
+draws × observations. Attribute \code{measure_higher_is_better} records the
+\code{higher_is_better} setting used for each measure; see section below. Use \code{\link[=print]{print()}}
+for a readable summary table.
 }
 \description{
 Compute predictive performance measures on the same data used to fit the
@@ -104,7 +106,31 @@ article for definitions and orientation (higher vs lower is better).
 \code{measure_name} and return \code{estimate}, \code{se}, and \code{pointwise}. Only arguments
 declared in the function signature among \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} are supplied automatically.
+
+Custom measures are assumed to be on a utility scale (higher is better) in
+\code{\link[=loo_compare]{loo_compare()}}. For a custom loss measure, pass
+\code{control = list(my_measure = list(higher_is_better = TRUE))} or negate values
+in the custom function so that \code{\link[=loo_compare]{loo_compare()}} ranks models correctly.
 }
+\section{\code{measure_higher_is_better} attribute}{
+
+All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
+\code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
+setting used for each measure (\code{NULL}, \code{TRUE}, or \code{FALSE} per bare measure
+name; \code{elpd} is always \code{NULL}). Built-in loss measures such as MSE are stored
+on a loss scale by default (\code{NULL}); pass
+\code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
+utility scale. When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}},
+the attribute is updated for newly computed measures.
+
+Attribute \code{measure_compare_meta} records per-measure comparison metadata
+(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=loo_compare]{loo_compare()}}.
+Built-in measures take \code{loss} and \code{diff_method} from the package measure
+registry; custom measures default to \code{diff_method = "auto"} and \code{loss = FALSE}
+(utility scale). For custom loss measures, use \code{higher_is_better = TRUE} in
+\code{control} so \code{\link[=loo_compare]{loo_compare()}} interprets the sign correctly. See \link{loo-glossary}.
+}
+
 \examples{
 \donttest{
 if (requireNamespace("brms", quietly = TRUE)) {

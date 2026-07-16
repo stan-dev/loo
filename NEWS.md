@@ -7,6 +7,10 @@
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].
+* `loo_compare()` now supports `loo_pred_measure` objects: paired differences
+  for all measures common to the compared models, optional `rank_by` ranking,
+  utility-scale sign conversion for loss measures, and
+  `print(compare, measures = ...)` for multi-measure tables by @florence-bockting in #380.
 
 # loo 2.10.0
 

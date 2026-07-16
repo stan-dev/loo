@@ -254,4 +254,80 @@
 #'
 #' See for further information on Pareto-k values the "Pareto k estimates"
 #' section.
+#'
+#' @section Multi-measure model comparisons:
+#'
+#' When comparing [`loo_pred_measure()`][loo_pred_measure] objects with
+#' `loo_compare()`, paired differences are computed for every predictive
+#' measure common to all models. Models are ranked by the `rank_by` argument
+#' (default `"elpd"`); the top-ranked model is the reference for all difference
+#' columns.
+#'
+#' ### `{measure}_diff` and `{measure}_se_diff`
+#'
+#' For each non-ELPD measure `m`, `loo_compare()` adds columns `m_diff` and
+#' `m_se_diff`. When the overall estimate is a sum or mean of pointwise
+#' contributions, these are computed from paired pointwise differences on a
+#' utility scale (higher is better; loss measures such as MSE, Brier score, and
+#' SRPS have their sign flipped from the raw loss orientation) using the same
+#' approach as `elpd_diff` and `se_diff` (Eq 24 in VGG2017 for sums; the mean
+#' analogue for means). Measures already returned on a utility scale (e.g. ELPD,
+#' CRPS/RPS) are not sign-flipped. Negative `m_diff` values then indicate worse
+#' performance than the reference model, which has `m_diff = 0`. For sum- and
+#' mean-based measures, the reference model also has `m_se_diff = 0`; for
+#' `estimates_only` measures (e.g. `r2`, `mse`, `rmse`), `m_se_diff` is `NA`.
+#' Attribute `measure_higher_is_better` on each `*_pred_measure()`
+#' result records the `higher_is_better` setting used when each measure was
+#' computed; when stored values are on a loss scale, `loo_compare()` emits a
+#' short message naming those measures (see [loo_compare()]).
+#'
+#' For measures where pointwise values do not define the overall estimate (e.g.
+#' `r2`, `mse`, `rmse`), `m_diff` is the difference between overall estimates
+#' (on a utility scale) and `m_se_diff` is `NA`.
+#'
+#' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
+#' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
+#' these diagnostics do not apply to other predictive measures.
+#'
+#' ### `measure_higher_is_better`
+#'
+#' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
+#' list recording the `higher_is_better` setting used for each measure (`NULL`,
+#' `TRUE`, or `FALSE`; `elpd` is always `NULL`). Used by [loo_compare()] with
+#' `measure_compare_meta` to decide whether paired differences need a sign flip
+#' when converting to a utility scale.
+#'
+#' ### `measure_compare_meta`
+#'
+#' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
+#' list of per-measure comparison metadata used by [loo_compare()]. Each entry
+#' is a list with:
+#'
+#' * `higher_is_better` — the orientation setting used when the measure was
+#'   computed (`NULL`, `TRUE`, or `FALSE`)
+#' * `loss` — whether stored values are on a loss scale (lower is better)
+#' * `diff_method` — how paired differences are aggregated: `"sum"`,
+#'   `"mean"`, `"estimates_only"`, or `"auto"` (inferred at compare time for
+#'   custom measures)
+#'
+#' Built-in measures take `loss` and `diff_method` from the package measure
+#' registry; custom measures default to `loss = FALSE` and `diff_method = "auto"`.
+#' [loo_compare()] requires all models to provide matching metadata for each
+#' shared measure; mismatched `higher_is_better` settings or missing metadata on
+#' some models produce an error.
+#'
+#' ### `rank_by`, `compare_measures`, and related attributes`
+#'
+#' The `rank_by` argument selects which measure determines model ordering and
+#' the reference model for all pairwise differences. When `rank_by` is omitted,
+#' models are ranked by `"elpd"`; attribute `rank_by` is set only when `rank_by`
+#' is passed explicitly. Attribute `compare_measures` lists all measures that
+#' were compared, `sign_converted_measures` lists loss measures whose sign was
+#' flipped onto the utility scale, and `measures_no_pointwise_se` lists measures
+#' for which `{measure}_se_diff` is unavailable (overall estimate not defined
+#' from pointwise values). The print method shows the ranking measure by default
+#' (`"elpd"` when `rank_by` was not set); use `print(x, measures = "all")` or
+#' `print(x, measures = c("rmse", "r2"))` to display additional measure tables.
+#' Printed tables label the standard-error column `se_diff` even for non-ELPD
+#' measures; the data frame columns remain `{measure}_se_diff`.
 NULL

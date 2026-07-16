@@ -14,10 +14,10 @@ Developer Notes: `pred_measure` Feature
 
 > **Status:** In Progress  
 > **Base branch:** `loo-v3.0.0`  
-> **Compare branch:** `add-pred-measure`  
+> **Compare branch:** `pred_measure` (+ `integrate-loo_compare`)  
 > **Related PR:** [\#363](https://github.com/stan-dev/loo/pull/363)  
 > **Contributors:** @florence-bockting, @avehtari, @VisruthSK, @jgabry  
-> **Last updated:** 2026-07-03
+> **Last updated:** 2026-07-07
 
 These notes document internal design decisions and ongoing work for the
 `pred_measure` feature. This PR **adds** the new API on top of
@@ -39,7 +39,7 @@ For the merge summary, see the PR description
 | Scoring rules (`measure_rps`) | Done                   |
 | Documentation                 | In progress            |
 | `group_ids` grouping          | Not started            |
-| `loo_compare` integration     | Not started            |
+| `loo_compare` integration     | Done (`integrate-loo_compare`) |
 
 ------------------------------------------------------------------------
 
@@ -59,6 +59,8 @@ For the merge summary, see the PR description
 - Website-only articles: `overview-measures.Rmd`,
   `pred-measure-workflow.Rmd`
 - Test suite + pre-fitted fixtures + `test_data_generation.R`
+- `loo_compare()` multi-measure path for `loo_pred_measure` objects
+  (`integrate-loo_compare`)
 
 ### Changed on existing code (implementations retained)
 
@@ -69,6 +71,11 @@ For the merge summary, see the PR description
 - `elpd()` — refactored to `.elpd_matrix_impl()` to avoid double
   deprecation warnings
 - Minor doc cross-references in `compare.R`, `psislw.R`
+- `loo_compare()` — extended for `loo_pred_measure` objects: `rank_by`,
+  multi-measure paired diffs, updated `print.compare.loo(measures = ...)`;
+  classic `loo` path unchanged
+- `R/loo-glossary.R` — multi-measure comparison columns (`{measure}_diff`,
+  `rank_by`, etc.)
 - `NEWS.md`, `NAMESPACE`, `_pkgdown.yml`, pkgdown CI workflow
 
 ------------------------------------------------------------------------
@@ -127,17 +134,53 @@ Design choices **internal to `pred_measure`** (not a migration from
   examples end-to-end (penguins fixture exists; confirm test/doc
   coverage)
 
+### D4: `loo_compare()` for `loo_pred_measure` objects
+
+**Decision:** Extend existing `loo_compare()`
+
+- When all inputs are `loo_pred_measure` objects, compute paired
+  differences for every measure common to all models
+- Rank models by `rank_by` (default `"elpd"`); top-ranked model is the
+  reference for all `{measure}_diff` columns
+- ELPD-family measures keep `elpd_diff` / `se_diff`; other measures use
+  `{measure}_diff` / `{measure}_se_diff`
+- `p_worse` and `diag_diff` apply to ELPD only; `diag_elpd` per model as
+  before
+- Loss measures (MSE, RMSE, MAE, IC, Brier score, SRPS) compared on a common
+  utility scale (higher is better): sign flipped from the raw loss orientation
+  so worse models have negative diffs, consistent with ELPD. Orientation is
+  read from `measure_compare_meta` and `measure_higher_is_better` on each
+  `*_pred_measure()` result; attribute `sign_converted_measures` records
+  affected measures. A short message is emitted at compare time; full
+  interpretation is in `?loo_compare` / `?loo-glossary`.
+- Pointwise SEs use the same paired formula as ELPD when the overall
+  estimate is a sum or mean of pointwise contributions; otherwise
+  `{measure}_se_diff` is `NA` (e.g. `r2`, `mse`, `rmse`)
+- Reuse `elpd_diffs`, `se_elpd_diff`, `diag_diff`, `diag_elpd`, and
+  many-model order-statistic check (with `rank_by` when applicable)
+- `print.compare.loo(measures = ...)` shows one or all measure diff tables
+
+Implemented on branch `integrate-loo_compare`; tests in `test_compare.R`
+with fixture `test_data_roaches_compare.Rds`.
+
 ------------------------------------------------------------------------
 
 ## Open decisions
 
 ### D1: Sign convention for pointwise estimates
 
-- **Context:** Measures differ in orientation (`rps`: lower is better;
-  `srps`: higher is better). Aligning orientations may help comparisons.
-- **Options:** `lower_is_better`, `orientation = "utility" / "loss"`,
-  `revert_sign` (currently internal on some `measure_*()` functions)
-- **Decision:** *pending*
+- **Context:** Measures differ in orientation (e.g. ELPD/CRPS on a utility
+  scale; MSE and Brier score as losses). `loo_compare()` aligns them for
+  paired differences.
+- **Decision (for `loo_compare`):** Each `*_pred_measure()` result stores
+  `higher_is_better` per measure in `measure_higher_is_better` and comparison
+  metadata in `measure_compare_meta` (`higher_is_better`, `loss`,
+  `diff_method`). Built-in loss measures are sign-flipped for utility-scale
+  `{measure}_diff` when stored on a loss scale (`higher_is_better = NULL` with
+  `loss = TRUE`).
+- **Still open:** Whether to expose orientation metadata on `*_pred_measure()`
+  results themselves beyond the attributes above (e.g. when
+  `higher_is_better = TRUE` in `control`).
 
 ### D3: Handling of `r_eff`
 
@@ -163,7 +206,7 @@ Design choices **internal to `pred_measure`** (not a migration from
   require explicit `measure = "ic"` for information criterion
 - [x] Document and test deprecated vs new API comparisons *(see
   appendix)*
-- [ ] Provide an interface to `loo_compare` and verify consistency
+- [x] Provide an interface to `loo_compare` and verify consistency
 - [ ] Resolve `r_eff` handling *(see D3)*
 
 ### Implementation
@@ -181,8 +224,9 @@ Design choices **internal to `pred_measure`** (not a migration from
 - [x] Online-only articles published via `_pkgdown.yml`
 - [ ] Formula derivations article (`pred_measure-formulas.Rmd`)
 - [ ] Detailed per-measure descriptions (derivations where appropriate)
-- [ ] Extend glossary (`R/loo-glossary.R`) — measure, metric, score,
-  utility, loss
+- [x] Extend glossary (`R/loo-glossary.R`) — multi-measure `loo_compare` columns
+- [ ] Extend glossary further — measure, metric, score, utility, loss
+  (general terms)
 
 ### Grouping via `group_ids`
 
@@ -200,8 +244,9 @@ Design choices **internal to `pred_measure`** (not a migration from
 
 - Rename `ic` → `information_criteria` for clarity?
 - Should `measure_elpd()` also return `ic`, or keep them separate?
-- What defines class `"loo"` on measure objects? (e.g. deprecated
-  `elpd_generic` inherits `"loo"`)
+- What defines class `"loo"` on measure objects? `loo_pred_measure` inherits
+  `"loo"` (see `integrate-loo_compare`); deprecated `elpd_generic` also
+  inherits `"loo"`.
 - Should `elpd` always be computed when `ylp` is supplied, or allow
   `loo_pred_measure()` for non-ELPD measures only?
 
@@ -236,7 +281,7 @@ estimators.
 
 | Deprecated        | New workflow                                    | Notes                               |
 |-------------------|-------------------------------------------------|-------------------------------------|
-| `crps(x, x2, y)`  | `measure_rps(y, ypred = x, revert_sign = TRUE)` | Sign flip on unscaled score         |
+| `crps(x, x2, y)`  | `measure_rps(y, ypred = x, higher_is_better = FALSE)` | Sign flip on unscaled score         |
 | `scrps(x, x2, y)` | `measure_srps(y, ypred = x)`                    | Same sign convention                |
 | `loo_crps(...)`   | `loo_pred_measure(..., measure = "rps")`        | Additional LOO weighting difference |
 | `loo_scrps(...)`  | `loo_pred_measure(..., measure = "srps")`       | Additional LOO weighting difference |
@@ -245,7 +290,7 @@ estimators.
 
 1.  **Sign convention (unscaled only).** `crps()` returns
     `0.5·EXX − EXy` (utility: higher is better). Default `measure_rps()`
-    negates this; use `revert_sign = TRUE` to match `crps()`. Scaled
+    negates this; use `higher_is_better = FALSE` to match `crps()`. Scaled
     scores (`scrps` / `measure_srps`) already share the formula
     `−EXy/EXX − 0.5·log(EXX)`.
 
@@ -295,7 +340,7 @@ replications</figcaption>
 </figure>
 
 *Figure: 200 simulations (S = 100, n = 30). Left — `crps()` vs
-`measure_rps(revert_sign = TRUE)`; right — `scrps()` vs
+`measure_rps(higher_is_better = FALSE)`; right — `scrps()` vs
 `measure_srps()`.*
 
 #### LOO outcome comparison
