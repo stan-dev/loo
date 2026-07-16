@@ -257,6 +257,9 @@ psis_smooth_tail <- function(x, cutoff) {
   fit <- posterior::gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
+  if (is.na(k)) {
+    k <- Inf
+  }
   if (is.finite(k)) {
     p <- (seq_len(len) - 0.5) / len
     qq <- posterior::qgeneralized_pareto(p, 0, sigma, k) + exp_cutoff
