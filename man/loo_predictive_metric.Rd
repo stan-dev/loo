@@ -3,7 +3,7 @@
 \name{loo_predictive_metric}
 \alias{loo_predictive_metric}
 \alias{loo_predictive_metric.matrix}
-\title{Estimate leave-one-out predictive performance..}
+\title{Estimate leave-one-out predictive performance (deprecated)}
 \usage{
 loo_predictive_metric(x, ...)
 
@@ -68,6 +68,17 @@ Standard error of the estimate.
 }
 }
 \description{
+As of loo 3.0.0, \code{loo_predictive_metric()} is \strong{deprecated}. Please use
+\code{\link[=loo_pred_measure]{loo_pred_measure()}} instead, or the standalone \code{\link[=measure_mae]{measure_mae()}},
+\code{\link[=measure_rmse]{measure_rmse()}}, \code{\link[=measure_mse]{measure_mse()}}, \code{\link[=measure_acc]{measure_acc()}}, and \code{\link[=measure_bacc]{measure_bacc()}}
+functions with PSIS log-weights.
+See \code{vignette("migration-guide", package = "loo")} for a full mapping table.
+}
+\details{
+The replacement API uses \code{mupred} (posterior expected values) rather than
+pre-computed LOO expectations passed as \code{x}. Metric names also differ:
+\code{"balanced_acc"} maps to \code{"bacc"} in \code{\link[=supported_measures_list]{supported_measures_list()}}.
+
 The \code{loo_predictive_metric()} function computes estimates of leave-one-out
 predictive metrics given a set of predictions and observations. Currently
 supported metrics are mean absolute error, mean squared error and root mean
@@ -104,4 +115,7 @@ mae_90q <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
                                 type = 'quantile', probs = 0.9)
 }
 }
+}
+\seealso{
+\code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=measure_mae]{measure_mae()}}, \code{\link[=supported_measures_list]{supported_measures_list()}}
 }

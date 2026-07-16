@@ -1,0 +1,510 @@
+---
+title: "Developer Notes: `pred_measure` Feature"
+output:
+  github_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.path = "figures/",
+  fig.width = 8,
+  fig.height = 4.5,
+  dpi = 150
+)
+```
+
+> **Status:** In Progress  
+> **Base branch:** `loo-v3.0.0`  
+> **Compare branch:** `pred_measure`  
+> **Related PR:** [#363](https://github.com/stan-dev/loo/pull/363)  
+> **Contributors:** @florence-bockting, @avehtari, @VisruthSK, @jgabry  
+> **Last updated:** 2026-07-03
+
+These notes document internal design decisions and ongoing work for the
+`pred_measure` feature. This PR **adds** the new API.
+
+## Status at a Glance
+
+| Area | Status |
+|------|--------|
+| `pred_measure` API | Done |
+| `measure_*()` built-ins | Done |
+| Scoring rules (`measure_rps`) | Done |
+| Documentation | In progress |
+| `group_ids` grouping | Not started |
+| `loo_compare` integration | Not started |
+
+## Scope of this PR (`pred_measure` vs `loo-v3.0.0`)
+
+### Added (did not exist on `loo-v3.0.0`)
+
+- `R/pred_measure.R` — `insample_pred_measure()`, `loo_pred_measure()`,
+  `kfold_pred_measure()`, `test_pred_measure()`, `pred_measure()`
+- `R/pred_measure-compute.R`, `R/pred_measure-helpers.R`,
+  `R/pred_measure-builtin.R` — orchestration and `measure_*()` implementations
+- `supported_measures_list()`, `ptw_log_pred_density()`
+- S3 print methods for `pred_measure`, `loo_pred_measure`, `kfold_pred_measure`, `test_pred_measure`
+- `vignettes/migration-guide.Rmd`
+- Website-only articles: `overview-measures.Rmd`, `pred-measure-workflow.Rmd`
+- Test suite + pre-fitted fixtures + `test_data_generation.R`
+
+### Changed on existing code (implementations retained)
+
+- `elpd()`, `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()`,
+  `loo_predictive_metric()` — deprecated with migration docs; **same APIs and
+  implementations** (e.g. `crps(x, x2, y)` permutation estimator unchanged)
+- `elpd()` — refactored to `.elpd_matrix_impl()` to avoid double deprecation
+  warnings
+- Minor doc cross-references in `compare.R`, `psislw.R`
+- `NEWS.md`, `NAMESPACE`, `_pkgdown.yml`, pkgdown CI workflow
+
+## Design decisions (resolved)
+
+### D2: Scaled RPS — separate function vs. argument
+
+**Decision:** Both. `measure_rps(..., scaled = TRUE)` is the implementation;
+`measure_srps()` is a convenience wrapper. An explicit `srps` built-in name is
+required so users can request both in one call:
+
+```r
+pred_measure(y = y, ypred = ypred, measure = c("rps", "srps"), ...)
+```
+
+Without a separate `srps` name, duplicate measure names would require custom
+functions.
+
+### Unified scoring rule in the new API
+
+`measure_rps()` subsumes CRPS, RPS, SCRPS, and SRPS for the **new** workflow:
+
+- Single `ypred` matrix (not two independent draw matrices)
+- PWM/ECDF estimator (Aki's implementation; verified against Seth's derivations)
+- Works for continuous and ordered categorical outcomes
+- `measure_srps()` = scaled variant
+
+Deprecated `crps()` / `scrps()` remain for backward compatibility with the
+`x`, `x2` permutation-based API.
+
+### ELPD and `ic` in the new API
+
+Design choices **internal to `pred_measure`**:
+
+- When `ylp` is supplied, `elpd` is computed as the base summary
+- `ic` is **not** included automatically; request via `measure = "ic"`
+- `measure_elpd()` is separate from deprecated `elpd()` (different return type: `"measure"` vs `"elpd_generic"`)
+
+### K-fold + categorical / multinomial models (brms)
+
+- [x] Upstream fix for 3D `brms::kfold_predict()` output
+  ([brms#1889](https://github.com/paul-buerkner/brms/issues/1889),
+  fixed in [brms#1890](https://github.com/paul-buerkner/brms/pull/1890),
+  merged to `main`)
+- [x] Vignettes and pkgdown CI install brms from GitHub `master`
+  (`vignettes/children/LOAD-BRMS-GITHUB.txt`, `.github/workflows/pkgdown.yaml`,
+  `tests/testthat/data-for-tests/test_data_generation.R`)
+- [ ] Drop GitHub brms pin once a CRAN release includes the #1890 fix
+- [ ] Verify `kfold_pred_measure()` with categorical/multinomial examples
+  end-to-end (penguins fixture exists; confirm test/doc coverage)
+
+## Open decisions
+
+### D1: Sign convention for pointwise estimates
+
+- **Context:** Measures differ in orientation (`rps`: lower is better;
+  `srps`: higher is better). Aligning orientations may help comparisons.
+- **Options:** `lower_is_better`, `orientation = "utility" / "loss"`,
+  `higher_is_better` (per-measure orientation control on `measure_*()` functions)
+- **Decision:** *pending*
+
+### D3: Handling of `r_eff`
+
+- **Context:** [stan-dev/posterior#446](https://github.com/stan-dev/posterior/issues/446)
+- **Question:** How should `r_eff` be handled in `pred_measure` workflows?
+- **Decision:** *pending*
+
+## Tasks
+
+### Refactoring (within new API)
+
+- [x] Add `measure_elpd()` for the new API
+- [x] Refactor deprecated `elpd()` to `.elpd_matrix_impl()` (no double warnings)
+- [x] Add `measure_rps()` as unified scoring-rule implementation (single `ypred`)
+- [x] Keep deprecated `crps()` / `scrps()` with `x`, `x2` API unchanged
+- [x] In `*_pred_measure()`, compute `elpd` as base when `ylp` supplied;
+  require explicit `measure = "ic"` for information criterion
+- [x] Document and test deprecated vs new API comparisons *(see appendix)*
+- [ ] Provide an interface to `loo_compare` and verify consistency
+- [ ] Resolve `r_eff` handling *(see D3)*
+
+### Implementation
+
+- [x] Consolidate CRPS/RPS/SCRPS/SRPS in `measure_rps()` for new API
+- [x] Resolve `srps` naming *(see D2)*
+- [x] brms k-fold categorical support unblocked upstream *(see above)*
+- [ ] Drop GitHub brms pin after CRAN release
+
+### Documentation
+
+- [x] Migration guide (`vignettes/migration-guide.Rmd`)
+- [x] Overview of measures (`overview-measures.Rmd`)
+- [x] Workflow article (`pred-measure-workflow.Rmd`)
+- [x] Online-only articles published via `_pkgdown.yml`
+- [ ] Formula derivations article (`pred_measure-formulas.Rmd`)
+- [ ] Detailed per-measure descriptions (derivations where appropriate)
+- [ ] Extend glossary (`R/loo-glossary.R`) — measure, metric, score, utility, loss
+
+### Grouping via `group_ids`
+
+- [ ] Work out grouping scenarios for LOO and k-fold
+- [ ] Implement in `kfold_pred_measure()`, `loo_pred_measure()`, `pred_measure()`
+
+  > **Blocker:** Implementation approach uncertain; grouping scenarios must be
+  > understood before coding begins.
+
+## General questions
+
+- Rename `ic` → `information_criteria` for clarity?
+- Should `measure_elpd()` also return `ic`, or keep them separate?
+- What defines class `"loo"` on measure objects? (e.g. deprecated `elpd_generic`
+  inherits `"loo"`)
+- Should `elpd` always be computed when `ylp` is supplied, or allow
+  `loo_pred_measure()` for non-ELPD measures only?
+
+## References & resources
+
+| Resource | Link / contact |
+|----------|----------------|
+| Cross-validation FAQ | <https://users.aalto.fi/~ave/CV-FAQ.html> |
+| `r_eff` in posterior (Aki) | <https://github.com/stan-dev/posterior/issues/446> |
+| brms k-fold 3D fix | [brms#1889](https://github.com/paul-buerkner/brms/issues/1889), [brms#1890](https://github.com/paul-buerkner/brms/pull/1890) |
+| `rps` derivation (Seth) | @florence-bockting, @avehtari |
+| `rps` implementation (Aki) | @florence-bockting, @avehtari |
+| K-fold vignette | <https://mc-stan.org/loo/articles/loo2-elpd.html> |
+| Broader loo 3.0.0 migration | `loo-v3.0.0` branch, `dev/migration-guide-loo-v3.Rmd` |
+
+---
+
+## Appendix: Numerical comparisons (deprecated vs new API)
+
+Simulations and tests that validate design choices in this PR. Automated
+comparisons live in `tests/testthat/test_crps.R` (CRPS/RPS section).
+
+### CRPS / RPS
+
+Deprecated `crps()` / `scrps()` and new `measure_rps()` / `measure_srps()` target
+the same scoring rules but use different estimators.
+
+#### API mapping
+
+| Deprecated | New workflow | Notes |
+|------------|--------------|-------|
+| `crps(x, x2, y)` | `measure_rps(y, ypred = x, higher_is_better = FALSE)` | Loss-scale unscaled score |
+| `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | Same sign convention |
+| `loo_crps(...)` | `loo_pred_measure(..., measure = "rps")` | Additional LOO weighting difference |
+| `loo_scrps(...)` | `loo_pred_measure(..., measure = "srps")` | Additional LOO weighting difference |
+
+#### Sources of numerical difference
+
+1. **Sign convention (unscaled only).** `crps()` returns `0.5·EXX − EXy` (utility:
+   higher is better). Default `measure_rps()` negates this; use
+   `higher_is_better = FALSE` to match `crps()`. Scaled scores (`scrps` / `measure_srps`)
+   already share the formula `−EXy/EXX − 0.5·log(EXX)`.
+
+2. **EXX estimator (in-sample).** Both estimate `E|X − X'|`, but:
+   - **Deprecated:** two draw matrices `x`, `x2`; one random shuffle per
+     permutation (`EXX_compute()` in `R/crps.R`).
+   - **New:** single `ypred` matrix; PWM on sorted draws (Zamo & Naveau, 2018).
+
+   `EXy = E|X − y|` is **identical** between APIs. After sign alignment, all
+   pointwise differences come from EXX.
+
+3. **LOO weighting.** `loo_crps()` shuffles a second draw matrix and applies
+   joint PSIS weights to `|x − x2|`. `loo_pred_measure(..., measure = "rps")`
+   uses weighted PWM on a single `ypred` with PSIS weights from `ylp` only — so
+   LOO differences combine EXX method and importance-weighting approach.
+
+#### Key results (reference simulation)
+
+![CRPS/RPS comparison: PWM vs permutation EXX estimators](figures/crps-rps-comparison.png)
+
+*Figure: left — per-observation EXX estimates at the brms default draw count
+(S = 4000 post-warmup draws: 4 chains × 1000); right — mean relative EXX error
+decreases with more posterior draws.*
+
+```{r crps-rps-comparison}
+devtools::load_all(quiet = TRUE)
+
+.exx_pwm <- function(ypred) {
+  n_draws <- nrow(ypred)
+  ypred_sorted <- apply(ypred, 2, sort)
+  colMeans(ypred_sorted * ((seq_len(n_draws) * (4 / (n_draws - 1))) - 2))
+}
+
+.outcome_panel <- function(old_est, new_est, xlab, ylab, main, pad_frac = 0.2) {
+  lim <- range(c(old_est, new_est))
+  pad <- diff(lim) * pad_frac
+  if (pad == 0) pad <- abs(lim[1]) * pad_frac
+  lim <- lim + c(-pad, pad)
+  plot(
+    old_est, new_est,
+    xlab = xlab, ylab = ylab, main = main,
+    xlim = lim, ylim = lim,
+    pch = 16, col = adjustcolor("steelblue", 0.55)
+  )
+  abline(0, 1, lty = 2, col = "gray40")
+  r <- cor(old_est, new_est)
+  mtext(sprintf("r = %.3f", r), side = 3, line = 0.2, cex = 0.85, adj = 0)
+}
+
+set.seed(123456789)
+n <- 30
+S <- 100
+y <- rnorm(n)
+x1 <- matrix(rnorm(n * S), nrow = S)
+x2 <- matrix(rnorm(n * S), nrow = S)
+
+EXy <- colMeans(abs(sweep(x1, 2, y)))
+EXX_perm <- colMeans(abs(x1 - x2[sample(S), , drop = FALSE]))
+EXX_pwm <- .exx_pwm(x1)
+
+old_crps <- suppressWarnings(crps(x1, x2, y))
+new_rps <- measure_rps(y, x1, higher_is_better = FALSE)
+old_scrps <- suppressWarnings(scrps(x1, x2, y))
+new_srps <- measure_srps(y, x1)
+
+comparison <- data.frame(
+  metric = c(
+    "Mean rel. |EXX_perm - EXX_pwm| / EXX_pwm",
+    "cor(pointwise CRPS, sign-aligned)",
+    "Mean |pointwise CRPS diff|",
+    "cor(pointwise SCRPS, SRPS)"
+  ),
+  value = c(
+    mean(abs(EXX_perm - EXX_pwm) / EXX_pwm),
+    cor(old_crps$pointwise, as.vector(new_rps$pointwise)),
+    mean(abs(old_crps$pointwise - as.vector(new_rps$pointwise))),
+    cor(old_scrps$pointwise, as.vector(new_srps$pointwise))
+  )
+)
+knitr::kable(
+  comparison,
+  col.names = c("Metric (S = 100, n = 30)", "Value"),
+  digits = 4
+)
+```
+
+```{r crps-rps-figure, fig.show = "hide"}
+S_brms <- 4L * (getOption("brms.iter", 2000L) %/% 2L)
+
+set.seed(123456789)
+n_obs_exx <- 30L
+y_exx <- rnorm(n_obs_exx)
+x1_exx <- matrix(rnorm(n_obs_exx * S_brms), nrow = S_brms)
+x2_exx <- matrix(rnorm(n_obs_exx * S_brms), nrow = S_brms)
+EXX_perm_brms <- colMeans(abs(x1_exx - x2_exx[sample(S_brms), , drop = FALSE]))
+EXX_pwm_brms <- .exx_pwm(x1_exx)
+
+.exx_axis_lim <- function(x, y, pad_frac = 0.2) {
+  lim <- range(c(x, y))
+  pad <- diff(lim) * pad_frac
+  if (pad == 0) pad <- abs(lim[1]) * pad_frac
+  c(max(0, lim[1] - pad), lim[2] + pad)
+}
+exx_lim <- .exx_axis_lim(EXX_perm_brms, EXX_pwm_brms)
+
+png("figures/crps-rps-comparison.png", width = 8, height = 4.5, units = "in", res = 150)
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
+
+plot(
+  EXX_perm_brms, EXX_pwm_brms,
+  xlab = "EXX (permutation, 1 shuffle)",
+  ylab = "EXX (PWM)",
+  xlim = exx_lim, ylim = exx_lim,
+  pch = 16, col = adjustcolor("steelblue", 0.7),
+  main = sprintf("EXX per observation (S = %d)", S_brms)
+)
+abline(0, 1, lty = 2, col = "gray40")
+
+draw_sizes <- c(50, 100, 250, 500, 1000, 2500, 5000)
+rel_err <- vapply(draw_sizes, function(S) {
+  set.seed(99)
+  x1s <- matrix(rnorm(20 * S), nrow = S)
+  x2s <- matrix(rnorm(20 * S), nrow = S)
+  EXX_p <- colMeans(abs(x1s - x2s[sample(S), , drop = FALSE]))
+  EXX_w <- .exx_pwm(x1s)
+  mean(abs(EXX_p - EXX_w) / EXX_w)
+}, numeric(1))
+
+plot(
+  draw_sizes, rel_err, type = "b", pch = 16,
+  log = "x",
+  xlab = "Number of posterior draws (S)",
+  ylab = "Mean relative |EXX_perm - EXX_pwm| / EXX_pwm",
+  main = "EXX convergence with more draws"
+)
+invisible(dev.off())
+```
+
+#### In-sample outcome comparison
+
+![CRPS/RPS outcome comparison across replications](figures/crps-rps-outcomes.png)
+
+*Figure: 200 simulations (S = 100, n = 30). Left — `crps()` vs
+`measure_rps(higher_is_better = FALSE)`; right — `scrps()` vs `measure_srps()`.*
+
+```{r crps-rps-outcomes-figure, fig.show = "hide"}
+n_repl <- 200L
+n_obs <- 30L
+n_draws <- 100L
+crps_old <- rps_new <- scrps_old <- srps_new <- numeric(n_repl)
+
+for (i in seq_len(n_repl)) {
+  set.seed(i)
+  y <- rnorm(n_obs)
+  x1 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
+  x2 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
+  old <- suppressWarnings(crps(x1, x2, y))
+  new <- measure_rps(y, x1, higher_is_better = FALSE)
+  old_s <- suppressWarnings(scrps(x1, x2, y))
+  new_s <- measure_srps(y, x1)
+  crps_old[i] <- old$estimates["Estimate"]
+  rps_new[i] <- new$estimates[1, "Estimate"]
+  scrps_old[i] <- old_s$estimates["Estimate"]
+  srps_new[i] <- new_s$estimates[1, "Estimate"]
+}
+
+png("figures/crps-rps-outcomes.png", width = 8, height = 4.5, units = "in", res = 150)
+par(mfrow = c(1, 2), mar = c(4, 4, 2.5, 1))
+.outcome_panel(
+  crps_old, rps_new,
+  xlab = "crps() estimate",
+  ylab = "measure_rps(higher_is_better = FALSE)",
+  main = "Unscaled (CRPS / RPS)"
+)
+.outcome_panel(
+  scrps_old, srps_new,
+  xlab = "scrps() estimate",
+  ylab = "measure_srps()",
+  main = "Scaled (SCRPS / SRPS)"
+)
+invisible(dev.off())
+```
+
+#### LOO outcome comparison
+
+![LOO CRPS/RPS outcome comparison across replications](figures/loo-crps-rps-outcomes.png)
+
+*Figure: 200 LOO simulations (S = 100, n = 30). Left — `loo_crps()` vs
+sign-aligned `loo_pred_measure(..., measure = "rps")`; right — `loo_scrps()`
+vs `loo_pred_measure(..., measure = "srps")`.*
+
+```{r loo-crps-outcomes-figure, fig.show = "hide"}
+n_repl <- 200L
+n_obs <- 30L
+n_draws <- 100L
+loo_crps_old <- loo_rps_new <- loo_scrps_old <- loo_srps_new <- numeric(n_repl)
+
+for (i in seq_len(n_repl)) {
+  set.seed(i)
+  y <- rnorm(n_obs)
+  x1 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
+  x2 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
+  ll <- matrix(rnorm(n_obs * n_draws) * 0.1 - 1, nrow = n_draws)
+  old <- suppressWarnings(loo_crps(x1, x2, y, ll))
+  old_s <- suppressWarnings(loo_scrps(x1, x2, y, ll))
+  psis_obj <- psis(-ll, r_eff = 1)
+  new <- loo_pred_measure(
+    y = y, ypred = x1, ylp = ll, measure = "rps", psis_object = psis_obj
+  )
+  new_s <- loo_pred_measure(
+    y = y, ypred = x1, ylp = ll, measure = "srps", psis_object = psis_obj
+  )
+  loo_crps_old[i] <- old$estimates["Estimate"]
+  loo_rps_new[i] <- -new$estimates["rps_loo", "Estimate"]
+  loo_scrps_old[i] <- old_s$estimates["Estimate"]
+  loo_srps_new[i] <- new_s$estimates["srps_loo", "Estimate"]
+}
+
+png("figures/loo-crps-rps-outcomes.png", width = 8, height = 4.5, units = "in", res = 150)
+par(mfrow = c(1, 2), mar = c(4, 4, 2.5, 1))
+.outcome_panel(
+  loo_crps_old, loo_rps_new,
+  xlab = "loo_crps() estimate",
+  ylab = "-loo_pred_measure(..., measure = 'rps')",
+  main = "LOO unscaled (CRPS / RPS)"
+)
+.outcome_panel(
+  loo_scrps_old, loo_srps_new,
+  xlab = "loo_scrps() estimate",
+  ylab = "loo_pred_measure(..., measure = 'srps')",
+  main = "LOO scaled (SCRPS / SRPS)"
+)
+invisible(dev.off())
+```
+
+**CRPS/RPS takeaway:** Results are highly correlated but not interchangeable. The
+PWM estimator is lower-variance and requires only one draw matrix. For migration,
+compare trends and rankings rather than expecting pointwise equality.
+
+### ELPD / IC
+
+Deprecated `elpd()` and new `measure_elpd()` / `measure_ic()` compute the same
+in-sample pointwise log predictive density and information criterion from a
+log-likelihood matrix. The difference is return structure (`elpd_generic` with
+both columns vs separate `"measure"` objects), not the underlying formula.
+
+| Deprecated | New workflow | Notes |
+|------------|--------------|-------|
+| `elpd(ylp)$estimates["elpd", ]` | `measure_elpd(ylp)` | Same `lppd_i` computation |
+| `elpd(ylp)$estimates["ic", ]` | `measure_ic(ylp)` | `ic_i = -2 * lppd_i` in both APIs |
+
+#### Outcome comparison
+
+![ELPD / IC outcome comparison across replications](figures/elpd-ic-outcomes.png)
+
+*Figure: 200 simulations (S = 100, n = 30). Left — `elpd()` vs `measure_elpd()`;
+right — `ic` from `elpd()` vs `measure_ic()`.*
+
+```{r elpd-ic-outcomes-figure, fig.show = "hide"}
+n_repl <- 200L
+n_obs <- 30L
+n_draws <- 100L
+elpd_old <- elpd_new <- ic_old <- ic_new <- numeric(n_repl)
+
+for (i in seq_len(n_repl)) {
+  set.seed(i)
+  ll <- matrix(rnorm(n_obs * n_draws) - 2, nrow = n_draws)
+  old <- suppressWarnings(elpd(ll))
+  new_e <- measure_elpd(ll)
+  new_i <- measure_ic(ll)
+  elpd_old[i] <- old$estimates["elpd", "Estimate"]
+  elpd_new[i] <- new_e$estimates[1, "Estimate"]
+  ic_old[i] <- old$estimates["ic", "Estimate"]
+  ic_new[i] <- new_i$estimates[1, "Estimate"]
+}
+
+png("figures/elpd-ic-outcomes.png", width = 8, height = 4.5, units = "in", res = 150)
+par(mfrow = c(1, 2), mar = c(4, 4, 2.5, 1))
+.outcome_panel(
+  elpd_old, elpd_new,
+  xlab = "elpd() estimate",
+  ylab = "measure_elpd()",
+  main = "ELPD"
+)
+.outcome_panel(
+  ic_old, ic_new,
+  xlab = "elpd() ic estimate",
+  ylab = "measure_ic()",
+  main = "IC"
+)
+invisible(dev.off())
+```
+
+**ELPD/IC takeaway:** In-sample estimates match between deprecated and new APIs.
+Migration is about return type and `*_pred_measure()` workflow integration, not
+numerical differences.

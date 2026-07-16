@@ -4,7 +4,7 @@
 \alias{elpd}
 \alias{elpd.array}
 \alias{elpd.matrix}
-\title{Generic (expected) log-predictive density}
+\title{Generic (expected) log-predictive density (deprecated)}
 \usage{
 elpd(x, ...)
 
@@ -20,11 +20,18 @@ each method.}
 \item{...}{Currently ignored.}
 }
 \description{
+As of loo 3.0.0, \code{elpd()} is \strong{deprecated}. Please use \code{\link[=measure_elpd]{measure_elpd()}}
+instead. For full predictive performance workflows, see
+\code{\link[=insample_pred_measure]{insample_pred_measure()}} and \code{\link[=loo_pred_measure]{loo_pred_measure()}}.
+See \code{vignette("migration-guide", package = "loo")} for a full mapping table.
+}
+\details{
+The return type differs: \code{elpd()} returns class \code{"elpd_generic"} with
+\code{elpd} and \code{ic} in \code{pointwise}; \code{measure_elpd()} returns class \code{"measure"}.
+
 The \code{elpd()} methods for arrays and matrices can compute the expected log
 pointwise predictive density for a new dataset or the log pointwise
 predictive density of the observed data (an overestimate of the elpd).
-}
-\details{
 The \code{elpd()} function is an S3 generic and methods are provided for
 3-D pointwise log-likelihood arrays and matrices.
 }
@@ -40,13 +47,17 @@ of data points.
 
 }}
 \examples{
-# Calculate the lpd of the observed data
+\dontrun{
+# Deprecated:
 LLarr <- example_loglik_array()
 elpd(LLarr)
+# ->
+measure_elpd(LLarr)
+}
 
 }
 \seealso{
-The vignette \emph{Holdout validation and K-fold cross-validation of Stan
-programs with the loo package} for demonstrations of using the \code{elpd()}
-methods.
+\code{\link[=measure_elpd]{measure_elpd()}}, \code{\link[=insample_pred_measure]{insample_pred_measure()}}, \code{\link[=loo_pred_measure]{loo_pred_measure()}},
+and the vignette \emph{Holdout validation and K-fold cross-validation of Stan
+programs with the loo package}.
 }

@@ -18,7 +18,7 @@ vignettes/loo2-non-factorized_cache/*
 .github/*
 .vscode/*
 ^\.github$
-^vignettes/online-only$
+^vignettes/articles-online-only$
 
 ^CRAN-SUBMISSION$
 ^release-prep\.R$
@@ -27,3 +27,4 @@ vignettes/loo2-non-factorized_cache/*
 ^touchstone$
 ^.git-blame-ignore-revs
 ^notes-release.md
+^notes$

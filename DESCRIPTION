@@ -36,6 +36,7 @@ Depends:
     R (>= 3.5)
 Imports:
     checkmate,
+    cli (>= 3.4.0),
     matrixStats (>= 0.52),
     parallel,
     posterior (>= 1.7.0),
@@ -46,6 +47,7 @@ Suggests:
     ggplot2,
     graphics,
     knitr,
+    lme4,
     rmarkdown,
     rstan,
     rstanarm (>= 2.19.0),
@@ -62,3 +64,4 @@ LazyData: TRUE
 Roxygen: list(markdown = TRUE)
 SystemRequirements: pandoc (>= 1.12.3), pandoc-citeproc
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3
