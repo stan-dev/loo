@@ -23,7 +23,9 @@ params:
 
 This vignette demonstrates how to do leave-one-out cross-validation for large
 data using the __loo__ package and Stan. There are two approaches covered:
-LOO with subsampling and LOO using approximations to posterior distributions. 
+LOO with subsampling and LOO using approximations to posterior distributions.
+For parallel computation see `vignette("loo2-parallel")` (`mirai::daemons()` or
+`loo_mirai()`; the `cores` argument in examples below is a deprecated bridge).
 Some sections from this vignette are excerpted from the papers
 
 * Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020). Leave-One-Out Cross-Validation for Model Comparison in Large Data.

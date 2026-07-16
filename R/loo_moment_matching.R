@@ -81,6 +81,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   checkmate::assertNumber(k_threshold, null.ok=TRUE)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
+  cores <- loo_cores(cores, call = match.call())
   checkmate::assertNumber(cores)
 
 
@@ -111,32 +112,27 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   kfs <- rep(0,N)
   I <- which(ks > k_threshold)
 
-  loo_moment_match_i_fun <- function(i) {
-    loo_moment_match_i(i = i, x = x, log_lik_i = log_lik_i,
-                       unconstrain_pars = unconstrain_pars,
-                       log_prob_upars = log_prob_upars,
-                       log_lik_i_upars = log_lik_i_upars,
-                       max_iters = max_iters, k_threshold = k_threshold,
-                       split = split, cov = cov, N = N, S = S, upars = upars,
-                       orig_log_prob = orig_log_prob, k = ks[i],
-                       is_method = is_method, npars = npars, ...)
-  }
-
-  if (cores == 1) {
-    mm_list <- lapply(X = I, FUN = function(i) loo_moment_match_i_fun(i))
-  }
-  else {
-    if (!os_is_windows()) {
-      mm_list <- parallel::mclapply(X = I, mc.cores = cores,
-                                    FUN = function(i) loo_moment_match_i_fun(i))
-    }
-    else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      mm_list <- parallel::parLapply(cl = cl, X = I,
-                                    fun = function(i) loo_moment_match_i_fun(i))
-    }
-  }
+  # The large unconstrained-draws matrix `upars` and the `orig_log_prob` vector
+  # are reused for every high-Pareto-k observation, so they are broadcast via
+  # shared memory on a local pool. The worker is the namespace-level
+  # `loo_moment_match_i_worker()` (rather than a closure over this frame) so the
+  # broadcast objects are not also dragged along inside a captured environment.
+  mm_list <- with_loo_daemons(
+    cores,
+    loo_map(
+      I,
+      loo_moment_match_i_worker,
+      x = x, ks = ks, log_lik_i = log_lik_i,
+      unconstrain_pars = unconstrain_pars,
+      log_prob_upars = log_prob_upars,
+      log_lik_i_upars = log_lik_i_upars,
+      max_iters = max_iters, k_threshold = k_threshold,
+      split = split, cov = cov, N = N, S = S,
+      is_method = is_method, npars = npars, mm_dots = list(...),
+      cores = cores,
+      broadcast = list(upars = upars, orig_log_prob = orig_log_prob)
+    )
+  )
 
   # update results
   for (ii in seq_along(I)) {
@@ -230,6 +226,46 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #' @param ... Further arguments passed to the custom functions documented above.
 #' @return List with the updated elpd values and diagnostics
 #'
+#' Worker wrapper around `loo_moment_match_i()`` for parallel mapping
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' A namespace-level (non-closure) adapter mapped over high-Pareto-k
+#' observation indices by `loo_map()`. Keeping it at namespace scope means it
+#' does not capture the calling frame, so large objects shared via
+#' [mori::share()] (`upars`, `orig_log_prob`) are not duplicated inside a
+#' serialized closure environment. The per-observation Pareto k is selected
+#' here from the full `ks` vector, and any extra arguments are forwarded
+#' through `mm_dots`.
+#' @param i Integer observation index.
+#' @param ks Full vector of Pareto k estimates; `ks[i]` is used for this fold.
+#' @param mm_dots A list of additional arguments forwarded to
+#'   `loo_moment_match_i()` (the `...` from [loo_moment_match()]).
+#' @return The result of `loo_moment_match_i()` for observation `i`.
+loo_moment_match_i_worker <- function(i, x, ks, log_lik_i, unconstrain_pars,
+                                      log_prob_upars, log_lik_i_upars,
+                                      max_iters, k_threshold, split, cov,
+                                      N, S, upars, orig_log_prob, is_method,
+                                      npars, mm_dots) {
+  do.call(
+    loo_moment_match_i,
+    c(
+      list(
+        i = i, x = x, log_lik_i = log_lik_i,
+        unconstrain_pars = unconstrain_pars,
+        log_prob_upars = log_prob_upars,
+        log_lik_i_upars = log_lik_i_upars,
+        max_iters = max_iters, k_threshold = k_threshold,
+        split = split, cov = cov, N = N, S = S, upars = upars,
+        orig_log_prob = orig_log_prob, k = ks[i],
+        is_method = is_method, npars = npars
+      ),
+      mm_dots
+    )
+  )
+}
+
 loo_moment_match_i <- function(i,
                                x,
                                log_lik_i,

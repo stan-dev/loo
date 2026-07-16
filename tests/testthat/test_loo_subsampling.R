@@ -1,4 +1,9 @@
-options(mc.cores = 1)
+options(mc.cores = NULL)
+
+# Most tests here intentionally exercise the deprecated `cores` path; quiet the
+# once-per-session deprecation warning so parallel correctness remains testable.
+internal <- get(".loo_internal", envir = asNamespace("loo"))
+internal$warned_cores_deprecated <- TRUE
 
 test_that("overall loo_subampling works as expected (compared with loo) for diff_est", {
   set.seed(123)

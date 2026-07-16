@@ -1,0 +1,261 @@
+---
+title: "Parallel and distributed loo"
+author: "The loo developers"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Parallel and distributed loo}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+Computing PSIS-LOO, WAIC, and related quantities is *embarrassingly parallel*:
+the expensive work is done once per observation (or per fold), and these
+computations are independent of one another. The __loo__ package can therefore
+spread this work across multiple cores or even multiple machines.
+
+As of __loo__ 2.10 the parallel backend is built on the
+[__mirai__](https://mirai.r-lib.org/) package, with
+[__mori__](https://mirai.r-lib.org/) providing zero-copy sharing of large
+objects (such as the posterior draws) between local workers. You do not need to
+learn mirai to benefit from parallelism, but understanding the recommended
+workflows (and the deprecated bridges) helps you pick the right approach:
+
+1. **A pool you manage yourself** with `mirai::daemons()` --- recommended for
+   repeated calls in one session and for remote/SSH/HPC workers. A connected
+   pool always takes precedence over deprecated parallel controls.
+2. **[loo_mirai()]** --- a convenience wrapper for map-style workflows over
+   many models (optional `n_daemons` argument).
+
+**Deprecated (still works, with a once-per-session warning):**
+
+* The `cores` argument on __loo__ functions (`cores > 1` starts a per-call
+  local pool when no mirai pool is connected).
+* `options(mc.cores)` as a session default for loo parallelism.
+
+Every __loo__ function that does per-observation work accepts a deprecated
+`cores` argument, including `loo()`, `psis()`, `waic()`, `relative_eff()`,
+`loo_subsample()`, `loo_moment_match()`, and `loo_model_weights()`.
+
+See `vignette("migration-guide")` for migration examples. The section
+[How deprecated `cores` / `mc.cores` interact with a pool](#how-deprecated-cores--mc.cores-interact-with-a-pool) spells
+out how deprecated controls interact with user-managed pools.
+
+# Setup
+
+The examples below only need the __loo__ package and its built-in example
+log-likelihood objects, so they are fast and self-contained.
+
+```{r setup, message=FALSE}
+library("loo")
+
+# A 500 (draws) x 2 (chains) x 32 (observations) log-likelihood array.
+LLarr <- example_loglik_array()
+r_eff <- relative_eff(exp(LLarr))
+```
+
+# 1. Deprecated per-call parallelism (`cores` and `mc.cores`)
+
+The `cores` argument and `options(mc.cores)` are **deprecated** and will be
+removed in a future release. They **still work** as a bridge:
+when the resolved core count is `> 1` and no mirai pool is connected, __loo__
+starts a local per-call daemon pool. A once-per-session deprecation warning is
+emitted if you pass `cores` explicitly (even `cores = 1`), if `options(mc.cores)`
+is set, or if the resolved value is `> 1`. Prefer `mirai::daemons()` or
+[loo_mirai()] for new code (Sections 2--3).
+
+```{r cores-basic}
+# Deprecated: explicit cores (warns once per session)
+loo_serial <- loo(LLarr, r_eff = r_eff, cores = 1)
+loo_parallel <- loo(LLarr, r_eff = r_eff, cores = 2)
+
+# Deprecated: session default via mc.cores (also warns once per session)
+# options(mc.cores = 2)
+# loo_via_mc <- loo(LLarr, r_eff = r_eff)
+```
+
+The results are identical --- parallelism only changes *how* the work is
+scheduled, never the answer:
+
+```{r cores-equal}
+all.equal(loo_serial$estimates, loo_parallel$estimates)
+```
+
+You can still set a session default with `options(mc.cores = k)` --- it remains currently
+functional but is deprecated for loo parallelism (use
+`mirai::daemons(k)` instead; see Section 2).
+
+Because the pool is created and destroyed on every call, this mode pays a small
+start-up/teardown cost each time. For a single analysis that cost is
+negligible, but if you call __loo__ functions repeatedly it can add up ---
+which is exactly what the next sections address.
+
+# 2. User-managed pools, including remote/HPC workers (recommended)
+
+If you configure a pool yourself with `mirai::daemons()`, __loo__ will **reuse
+it and never tear it down**. A user-managed pool always takes precedence over
+the `cores` per-call behavior, which makes it the right tool for repeated
+calls in one session and for **remote, SSH, or HPC cluster** workers.
+
+A local pool you manage by hand behaves like a persistent session pool. Because
+a connected pool always wins, you do not even need to pass `cores` --- __loo__
+uses the pool whatever `cores` is:
+
+```{r user-local, eval=FALSE}
+library(mirai)
+
+daemons(4)                       # start 4 local workers
+loo1 <- loo(LLarr, r_eff = r_eff) # reuses your pool (cores not needed)
+loo2 <- loo(LLarr, r_eff = r_eff) # reuses it again
+daemons(0)                       # you decide when to stop them
+```
+
+For distributed computing, point __mirai__ at remote machines or a cluster
+scheduler. __loo__ does not need to know any of the details --- it simply uses
+whatever pool is connected:
+
+```{r user-remote, eval=FALSE}
+library(mirai)
+
+# Launch workers on remote hosts over SSH (see ?mirai::daemons and
+# ?mirai::ssh_config for the full set of options, including HPC launchers).
+daemons(
+  n = 8,
+  url = host_url(),
+  remote = ssh_config(c("ssh://node1", "ssh://node2"))
+)
+
+loo_big <- loo(large_loglik, r_eff = r_eff_big)
+
+daemons(0)
+```
+
+# 3. Map-style workflows with `loo_mirai()`
+
+When you have many independent jobs --- for example, one `psis()` or `loo()`
+call per model in a simulation study --- [loo_mirai()] provides a thin
+convenience wrapper around `mirai::mirai_map()`. Each element of `args_list`
+is a named list of arguments passed to a \pkg{loo} function via `do.call()`:
+
+```{r loo-mirai, eval=FALSE}
+r_eff <- relative_eff(exp(example_loglik_array()))
+ll_list <- list(model_a_loglik, model_b_loglik)
+
+args_list <- lapply(ll_list, function(ll) {
+  list(log_ratios = -ll, r_eff = r_eff)
+})
+
+# Start workers, map, tear down automatically.
+results <- loo_mirai(psis, args_list, n_daemons = 4)
+```
+
+Alternatively, manage the pool yourself and call `loo_mirai()` without
+`n_daemons` (or call `psis()`/`loo()` directly --- both reuse a connected
+pool):
+
+```{r loo-mirai-pool, eval=FALSE}
+library(mirai)
+
+daemons(4)
+results <- loo_mirai(psis, args_list)
+daemons(0)
+```
+
+When no pool is connected and `n_daemons` is `NULL`, `loo_mirai()` runs
+serially. Do not pass `cores` in `args_list` --- parallelism is controlled by
+`n_daemons` or an existing `mirai::daemons()` pool.
+
+# How deprecated `cores` / `mc.cores` interact with a pool
+
+The rule for user-managed pools is unchanged: **whenever a daemon pool is
+connected, __loo__ always uses it and ignores deprecated parallel controls.**
+In that state the *value* of `cores` does not matter --- `cores = 2` and
+`cores = 6` behave identically, and even the default (`cores = 1` when
+`mc.cores` is unset) still runs in parallel on the pool. The first time a call
+would otherwise have looked like a request for serial execution (`cores <= 1`)
+while a pool is connected, __loo__ prints a one-time message noting that
+`cores` is being ignored.
+
+Deprecated controls only start per-call pools when **no** mirai pool is
+connected: `cores > 1` or `options(mc.cores = k)` with `k > 1` both resolve to
+a temporary pool for that call (Section 1). If you genuinely want a single call
+to run serially while a pool is up, stop the pool first with `mirai::daemons(0)`.
+
+## When is the number of worker daemons equal to `cores`?
+
+It follows directly from the rule above. The number of workers actually doing
+the computation equals `cores` **only in the per-call case**; when a
+user-managed pool is connected the worker count comes from your
+`mirai::daemons()` call and `cores` is irrelevant:
+
+| How parallelism is set up | Number of worker daemons | Equal to `cores`? |
+|---|---|---|
+| Per-call, no pool connected (`cores = k`, Section 1) | `k` | **Yes** --- loo spawns exactly `cores` daemons for the call |
+| User-managed pool (`mirai::daemons(n)`, Section 2) | `n` (whatever you started) | Only if you happen to pass the same `cores` |
+
+In other words, `cores` *is* the daemon count in the per-call path, but for a
+user-managed pool the daemon count is fixed by your `mirai::daemons()` call,
+and passing a different `cores` (including the default `1`) does **not** change
+how many workers run. Internally __loo__ always splits the work according to
+the number of daemons that are actually connected, not the requested `cores`.
+
+# Large objects and shared memory
+
+When __loo__ uses the function method (e.g. `loo(llfun, data = ..., draws =
+...)`), the posterior `draws` are reused identically by every observation. On a
+**local** pool these large objects are written once into shared memory with
+__mori__ so each worker maps the same physical pages (zero-copy), which keeps
+memory use low even with many workers.
+
+On a **remote** pool shared memory is not available, so __loo__ falls back to
+ordinary serialization and chunks the work to send each large object roughly
+once per worker rather than once per observation. You don't need to do anything
+to get this behavior --- __loo__ detects whether the active pool is local and
+chooses the appropriate transport automatically.
+
+# Choosing a strategy
+
+| Situation | Recommended approach |
+|---|---|
+| A single `loo()`/`psis()` call | `mirai::daemons(k)` … `loo()` … `mirai::daemons(0)` (Section 2) |
+| Default parallelism for a session | `mirai::daemons(k)` (Section 2) |
+| Many calls in one session (simulations, benchmarks, batch jobs) | `mirai::daemons(k)` (Section 2) or `loo_mirai(..., n_daemons = k)` (Section 3) |
+| Remote / SSH / HPC workers | `mirai::daemons(url = ..., remote = ...)` (Section 2) |
+| Legacy code (deprecated bridge) | `cores = k` or `options(mc.cores = k)` (Section 1; warns once per session) |
+
+A few general notes:
+
+* All approaches give identical results; they differ only in scheduling and
+  set-up cost.
+* These mechanisms compose safely. A pool you set up yourself is always reused
+  and never removed by __loo__, and nested __loo__ calls reuse an outer pool
+  rather than creating a new one. For example, `loo_model_weights()` sets up a
+  single pool and reuses it across all of the models it evaluates.
+* Deprecated `cores` / `mc.cores` controls still work on this branch but emit
+  a once-per-session warning; they start per-call pools only when no mirai
+  pool is connected and the resolved core count is `> 1`.
+* A connected pool always wins: when one is active, deprecated parallel
+  controls are ignored and the work runs on the pool (the first time a
+  `cores <= 1` call is overridden this way, __loo__ prints a one-time message).
+  Stop the pool with `mirai::daemons(0)` if you need a call to run serially.
+* On Windows, avoid setting deprecated parallel options in your `.Rprofile`
+  (see [this issue](https://github.com/stan-dev/loo/issues/94)); use
+  `mirai::daemons()` in your script instead.
+
+# See also
+
+* `help("loo", package = "loo")` for the `cores` argument documentation.
+* `?loo_mirai` for the map-style convenience wrapper.
+* The [__mirai__](https://mirai.r-lib.org/) documentation, especially
+  `?mirai::daemons`, for configuring local, remote, and HPC pools.

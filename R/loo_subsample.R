@@ -117,7 +117,7 @@ loo_subsample.function <-
            estimator = "diff_srs",
            llgrad = NULL,
            llhess = NULL) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     # Asserting inputs
     .llfun <- validate_llfun(x)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -133,7 +133,6 @@ loo_subsample.function <-
         r_eff <- prepare_psis_r_eff(r_eff, len = dim(data)[1])
     }
     checkmate::assert_flag(save_psis)
-    cores <- loo_cores(cores)
 
     checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
     checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
@@ -276,7 +275,7 @@ update.psis_loo_ss <- function(object, ...,
   if (!is.null(draws)) {
     # No current checks
   }
-  cores <- loo_cores(cores)
+  cores <- loo_cores(cores, call = match.call())
 
   # Update elpd approximations
   if (!is.null(loo_approximation) | !is.null(loo_approximation_draws)) {
@@ -494,17 +493,18 @@ lpd_i <- function(i, llfun, data, draws) {
 #' @noRd
 #' @return a vector of computed log probability densities
 compute_lpds <- function(N, data, draws, llfun, cores) {
-  if (cores == 1) {
-    lpds <- lapply(X = seq_len(N), FUN = lpd_i, llfun, data, draws)
-  } else {
-    if (.Platform$OS.type != "windows") {
-      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, llfun, data, draws)
-    } else {
-      cl <- makePSOCKcluster(cores)
-      on.exit(stopCluster(cl))
-      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, llfun, data, draws)
-    }
-  }
+  # `draws` (and `data`) are reused for every observation, so they are shared
+  # once via shared memory on a local pool and serialized on a remote pool.
+  lpds <- with_loo_daemons(
+    cores,
+    loo_map(
+      seq_len(N),
+      lpd_i,
+      llfun = llfun,
+      cores = cores,
+      broadcast = list(data = data, draws = draws)
+    )
+  )
 
   unlist(lpds)
 }

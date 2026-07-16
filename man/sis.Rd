@@ -33,19 +33,26 @@ draws of the \code{log_ratios} not obtained from MCMC then the warning
 message thrown when not specifying \code{r_eff} can be disabled by
 setting \code{r_eff} to \code{NA}.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
+\item{cores}{\strong{Deprecated.} The number of cores to use for parallelization.
+This argument will be removed in a future release. A deprecation warning is
+emitted when \code{cores} is passed explicitly (even \code{cores = 1}), when
+\code{options(mc.cores)} is set, or when the resolved value is \code{cores > 1}.
+When \code{cores > 1} and no \code{\link[mirai:daemons]{mirai::daemons()}} pool is connected, a per-call
+local daemon pool of that size is started for the duration of the call.
+Prefer \code{\link[mirai:daemons]{mirai::daemons()}} for session-level pools or \code{\link[=loo_mirai]{loo_mirai()}} for
+map-style workflows over many models.
+
+This defaults to \code{getOption("mc.cores", 1)}, but \strong{\code{options(mc.cores)} is
+also deprecated} and will be removed in a future release (it still works
+on this branch as a bridge to per-call daemon pools). \strong{As of version 2.0.0
+the default is 1 core when \code{mc.cores} is not set}.
 \itemize{
 \item Note for Windows 10 users: it is \strong{strongly}
 \href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
+the \code{.Rprofile} file to set \code{mc.cores}.
+}
+
+See \code{vignette("loo2-parallel")} for the mirai-based replacement workflow.}
 }
 \value{
 The \code{sis()} methods return an object of class \code{"sis"},

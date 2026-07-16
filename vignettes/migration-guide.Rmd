@@ -79,7 +79,6 @@ loo_compare(loo1, loo2)
 | Deprecated | Replacement | Since | Planned removal |
 |------------|-------------|-------|-----------------|
 | `psislw()` | `psis()` | 2.0.0 | 3.0.0 |
-| `options(loo.cores = ...)` | `options(mc.cores = ...)` or `cores` argument | 2.0.0 | |
 
 ```r
 # Deprecated
@@ -88,6 +87,9 @@ psislw(-log_lik_matrix)
 # Current
 psis(-log_lik_matrix)
 ```
+
+See [Parallelization](#parallelization-cores-argument-and-mc.cores-option) below
+for deprecated `cores` / `mc.cores` controls and their mirai replacements.
 
 ## Accessing estimates from loo and waic objects
 
@@ -107,6 +109,35 @@ The same pattern applies to `waic` objects (`elpd_waic`, `waic`, etc.).
 |----------|------------|-------------|-------|
 | `psis_approximate_posterior()` | `log_q` | `log_g` | 2.x |
 
+## Parallelization (`cores` argument and `mc.cores` option) {#parallelization-cores-argument-and-mc.cores-option}
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `cores` argument on `loo()`, `psis()`, etc. | `mirai::daemons()` before calling loo functions | 3.0.0 | future release |
+| | `loo_mirai(..., n_daemons = k)` for many models | 3.0.0 | |
+| `options(mc.cores = ...)` (when used for loo parallelism) | `mirai::daemons()` / `loo_mirai()` | 3.0.0 | future release |
+
+When the resolved core count is `> 1` and no daemon pool is connected, loo still
+starts a scoped per-call local pool (as on this branch). A deprecation warning
+is emitted once per session when `cores` is passed explicitly (even `cores = 1`),
+when `options(mc.cores)` is set, or when the resolved value is `cores > 1`.
+
+```r
+# Deprecated (still works for now)
+loo(LLarr, r_eff = r_eff, cores = 4)
+
+# Current: one-off parallel call with a user-managed pool
+mirai::daemons(4)
+loo(LLarr, r_eff = r_eff)
+mirai::daemons(0)
+
+# Current: many models in one session
+loo_mirai(loo, args_list, n_daemons = 4)
+```
+
+Do not pass `cores` in `args_list` to `loo_mirai()`; parallelism is controlled
+by `n_daemons` or an existing `mirai::daemons()` pool.
+
 ---
 
 # Planned removals in 3.0.0
@@ -115,9 +146,12 @@ The following are targeted for **removal** in loo 3.0.0:
 
 - `compare()` and `R/compare.R`
 - `psislw()` and `R/psislw.R`
+- `options(loo.cores)` (deprecated since loo 2.x in favor of `options(mc.cores)`)
 
-The deprecated option `options(loo.cores = ...)` remains for backward
-compatibility until a separate removal decision is made.
+Deprecated parallel controls (`cores` and `options(mc.cores)`) remain
+functional on this branch with deprecation warnings but are planned for removal
+in a future release after mirai-based workflows are documented in
+`vignette("loo2-parallel")`.
 
 ---
 

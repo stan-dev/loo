@@ -257,7 +257,7 @@ loo.function <-
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
@@ -665,52 +665,23 @@ parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
                                               data, draws, r_eff,
                                               save_psis, cores,
                                               method, ...){
-  if (cores == 1) {
-    psis_list <-
-      lapply(
-        X = seq_len(N),
-        FUN = .loo_i,
-        llfun = .llfun,
-        data = data,
-        draws = draws,
-        r_eff = r_eff,
-        save_psis = save_psis,
-        is_method = method,
-        ...
-      )
-  } else {
-    if (!os_is_windows()) {
-      # On Mac or Linux use mclapply() for multiple cores
-      psis_list <-
-        parallel::mclapply(
-          mc.cores = cores,
-          X = seq_len(N),
-          FUN = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          is_method = method,
-          ...
-        )
-    } else {
-      # On Windows use makePSOCKcluster() and parLapply() for multiple cores
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      psis_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          is_method = method,
-          ...
-        )
-    }
-  }
+  # `draws` (and `data`) are reused identically for every observation, so they
+  # are broadcast objects: shared once via shared memory on a local pool
+  # (recovering the copy-on-write benefit fork gave the old mclapply() path)
+  # and serialized on a remote pool. A single cross-platform code path replaces
+  # the previous mclapply()/parLapply() branching.
+  with_loo_daemons(
+    cores,
+    loo_map(
+      seq_len(N),
+      .loo_i,
+      llfun = .llfun,
+      r_eff = r_eff,
+      save_psis = save_psis,
+      is_method = method,
+      ...,
+      cores = cores,
+      broadcast = list(data = data, draws = draws)
+    )
+  )
 }

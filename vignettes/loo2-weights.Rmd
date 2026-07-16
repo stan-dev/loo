@@ -121,8 +121,8 @@ packages for fitting Stan models, e.g. __brms__, also provide similar methods
 for interfacing with the __loo__ package.)
 
 ```{r loo}
-# note: the loo function accepts a 'cores' argument that we recommend specifying
-# when working with bigger datasets
+# For parallel loo on large datasets, see vignette("loo2-parallel")
+# (mirai::daemons() or loo_mirai(); cores is deprecated but still works)
 
 loo1 <- loo(fit1)
 loo2 <- loo(fit2)

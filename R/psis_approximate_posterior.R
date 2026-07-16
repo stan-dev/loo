@@ -92,7 +92,7 @@ ap_psis <- function(log_ratios, log_p, log_g, ...) {
 ap_psis.array <-
   function(log_ratios, log_p, log_g, ...,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(length(dim(log_ratios)) == 3)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
@@ -113,7 +113,7 @@ ap_psis.matrix <- function(log_ratios, log_p, log_g,
            cores = getOption("mc.cores", 1)) {
     checkmate::assert_numeric(log_p, len = nrow(log_ratios))
     checkmate::assert_numeric(log_g, len = nrow(log_ratios))
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     log_ratios <- validate_ll(log_ratios)
 
     log_ratios <- correct_log_ratios(log_ratios, log_p = log_p, log_g = log_g)

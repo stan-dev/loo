@@ -16,6 +16,7 @@ loo.Rproj
 # produced vignettes
 vignettes/loo2-lfo_cache/*
 vignettes/loo2-non-factorizable_cache/*
+vignettes/articles-online-only/*.html
 vignettes/*.html
 vignettes/*.pdf
 inst/doc
@@ -26,3 +27,7 @@ tests/testthat/Rplots.pdf
 cran-comments.md
 CRAN-RELEASE
 release-prep.R
+
+agent/*
+data/*
+scratch-files/*

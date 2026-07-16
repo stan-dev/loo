@@ -21,7 +21,7 @@ importance_sampling.array <-
            ...,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
@@ -38,7 +38,7 @@ importance_sampling.matrix <-
            ...,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+    cores <- loo_cores(cores, call = match.call())
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_ll(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
@@ -198,29 +198,23 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     stop("Incorrect IS method.")
   }
 
-  if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i]))
-  } else {
-    if (!os_is_windows()) {
-      lw_list <- parallel::mclapply(
-        X = seq_len(N),
-        mc.cores = cores,
-        FUN = function(i)
-          is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-      )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      lw_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = function(i)
-            is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-        )
-    }
-  }
+  # Each observation needs a different column of `log_ratios`, but the whole
+  # matrix is reused across the map, so it is a broadcast object: `loo_map()`
+  # shares it via shared memory on a local pool (zero-copy column access) and
+  # falls back to serialization on a remote pool. Serial work runs as a plain
+  # lapply(). `with_loo_daemons()` provides a pool when this is the top-level
+  # call (e.g. psis()) and reuses an outer pool when called from loo().
+  lw_list <- with_loo_daemons(
+    cores,
+    loo_map(
+      seq_len(N),
+      do_is_i,
+      is_fun = is_fun,
+      tail_len = tail_len,
+      cores = cores,
+      broadcast = list(log_ratios = log_ratios)
+    )
+  )
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")
@@ -233,4 +227,25 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     r_eff = r_eff,
     method = rep(method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
+}
+
+#' Apply an importance sampling method to a single observation
+#'
+#' @noRd
+#' @keywords internal
+#' @description
+#' Worker function mapped over observations (matrix columns) by
+#' `do_importance_sampling()`, either serially via [lapply()] or in parallel
+#' via [mirai::mirai_map()]. 
+#' @param i Integer column index of the observation to process.
+#' @param is_fun The per-observation importance sampling function to apply, one
+#'   of `do_psis_i()`, `do_tis_i()`, or `do_sis_i()`.
+#' @param log_ratios Matrix of log ratios (`-loglik`). May be a shared-memory
+#'   object created by [mori::share()] to avoid copying to each worker.
+#' @param tail_len Vector of tail lengths used to fit the GPD, one per
+#'   observation.
+#' @return The result of `is_fun` for observation `i` (a list with elements
+#'   such as `log_weights` and `pareto_k`).
+do_is_i <- function(i, is_fun, log_ratios, tail_len) {
+  is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
 }
