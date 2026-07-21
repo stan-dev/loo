@@ -79,6 +79,15 @@
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
 
+---
+
+    Code
+      print(comp2, simplify = FALSE, p_worse = FALSE)
+    Output
+        model elpd_diff se_diff elpd_waic se_elpd_waic p_waic se_p_waic  waic se_waic
+       model1       0.0     0.0     -83.5          4.3    3.3       1.1 167.1     8.5
+       model2      -4.1     0.1     -87.6          4.3   11.2       1.1 175.2     8.6
+
 # loo_compare returns expected result (3 models)
 
     WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v

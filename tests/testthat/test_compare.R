@@ -110,10 +110,7 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot(print(comp2))
   expect_snapshot(print(comp2, p_worse = FALSE))
   expect_snapshot(print(comp2, simplify = FALSE))
-  out_full <- paste(
-    capture.output(suppressMessages(print(comp2, simplify = FALSE))),
-    collapse = "\n"
-  )
+  expect_snapshot(print(comp2, simplify = FALSE, p_worse = FALSE))
 
   # specifying objects via ... and via arg x gives equal results
   expect_equal(comp2, loo_compare(x = list(w1, w2)))
