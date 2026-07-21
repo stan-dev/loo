@@ -109,6 +109,11 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot_value(comp2, style = "serialize")
   expect_snapshot(print(comp2))
   expect_snapshot(print(comp2, p_worse = FALSE))
+  expect_snapshot(print(comp2, simplify = FALSE))
+  out_full <- paste(
+    capture.output(suppressMessages(print(comp2, simplify = FALSE))),
+    collapse = "\n"
+  )
 
   # specifying objects via ... and via arg x gives equal results
   expect_equal(comp2, loo_compare(x = list(w1, w2)))
@@ -116,6 +121,18 @@ test_that("loo_compare returns expected results (2 models)", {
   # custom naming works
   comp3 <- loo_compare(x = list("A" = w2, "B" = w1))
   expect_equal(comp3$model, c("B", "A"))
+})
+
+test_that("print.compare.loo simplify=FALSE shows loo estimate columns", {
+  loo1 <- suppressWarnings(loo(LLarr))
+  loo2 <- suppressWarnings(loo(LLarr2))
+  comp <- loo_compare(loo1, loo2)
+  out_full <- paste(
+    capture.output(suppressMessages(print(comp, simplify = FALSE))),
+    collapse = "\n"
+  )
+  expect_match(out_full, "elpd_loo\\s+se_elpd_loo")
+  expect_match(out_full, "p_loo\\s+se_p_loo\\s+looic\\s+se_looic")
 })
 
 
