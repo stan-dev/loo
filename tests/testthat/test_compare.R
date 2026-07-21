@@ -151,6 +151,15 @@ test_that("loo_compare returns expected result (3 models)", {
   expect_equal(comp1, loo_compare(x = list(w1, w2, w3)), ignore_attr = TRUE)
 })
 
+test_that("loo_compare with simplify=FALSE returns expected result", {
+  LL <- example_loglik_array()
+  loo1 <- loo(LL)
+  loo2 <- loo(LL + 1)
+  loo3 <- loo(LL + 2)
+  comp <- loo_compare(loo1, loo2, loo3)
+  expect_snapshot(print(comp, simplify = FALSE))
+})
+
 # Tests for deprecated compare() ------------------------------------------
 
 test_that("compare throws deprecation warnings", {

@@ -121,6 +121,25 @@
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
 
+# loo_compare with simplify=FALSE returns expected result
+
+    Code
+      print(comp, simplify = FALSE)
+    Output
+        model elpd_diff se_diff p_worse diag_diff diag_elpd elpd_loo se_elpd_loo
+       model3       0.0     0.0      NA                        -19.6         4.3
+       model2     -32.0     0.0    1.00   N < 100              -51.6         4.3
+       model1     -64.0     0.0    1.00   N < 100              -83.6         4.3
+       p_loo se_p_loo looic se_looic
+         3.3      1.2  39.2      8.6
+         3.3      1.2 103.2      8.6
+         3.3      1.2 167.2      8.6
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
 # compare returns expected result (3 models)
 
     WAoAAAACAAQFAAACAwAAAAMOAAAAGAAAAAAAAAAAwBA6U1+cRe7AMA3KkbYEGAAAAAAAAAAA
