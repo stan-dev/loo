@@ -1,7 +1,7 @@
 # loo (development version)
 
 * `print.compare.loo()` regains a `simplify` argument for showing the full
-  comparison table with `simplify = FALSE` by florence-bockting in #383.
+  comparison table with `simplify = FALSE` by @florence-bockting in #383.
 
 # loo 2.10.0
 
