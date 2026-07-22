@@ -109,6 +109,8 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot_value(comp2, style = "serialize")
   expect_snapshot(print(comp2))
   expect_snapshot(print(comp2, p_worse = FALSE))
+  expect_snapshot(print(comp2, simplify = FALSE))
+  expect_snapshot(print(comp2, simplify = FALSE, p_worse = FALSE))
 
   # specifying objects via ... and via arg x gives equal results
   expect_equal(comp2, loo_compare(x = list(w1, w2)))
@@ -117,7 +119,6 @@ test_that("loo_compare returns expected results (2 models)", {
   comp3 <- loo_compare(x = list("A" = w2, "B" = w1))
   expect_equal(comp3$model, c("B", "A"))
 })
-
 
 test_that("loo_compare returns expected result (3 models)", {
   w3 <- suppressWarnings(waic(LLarr3))
@@ -135,6 +136,15 @@ test_that("loo_compare returns expected result (3 models)", {
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
   expect_equal(comp1, loo_compare(x = list(w1, w2, w3)), ignore_attr = TRUE)
+})
+
+test_that("loo_compare with simplify=FALSE returns expected result", {
+  LL <- example_loglik_array()
+  loo1 <- loo(LL)
+  loo2 <- loo(LL + 1)
+  loo3 <- loo(LL + 2)
+  comp <- loo_compare(loo1, loo2, loo3)
+  expect_snapshot(print(comp, simplify = FALSE))
 })
 
 # Tests for deprecated compare() ------------------------------------------
