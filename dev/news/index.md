@@ -2,6 +2,12 @@
 
 ## loo (development version)
 
+- [`print.compare.loo()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
+  regains a `simplify` argument for showing the full comparison table
+  with `simplify = FALSE` by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#383](https://github.com/stan-dev/loo/issues/383).
+
 ## loo 2.10.0
 
 CRAN release: 2026-06-26

@@ -12,7 +12,7 @@ loo_compare(x, ...)
 loo_compare(x, ...)
 
 # S3 method for class 'compare.loo'
-print(x, ..., digits = 1, p_worse = TRUE)
+print(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE)
 
 # S3 method for class 'compare.loo_ss'
 print(x, ..., digits = 1)
@@ -40,6 +40,14 @@ print(x, ..., digits = 1)
   For the print method only, should we include the normal approximation
   based probability of each model having worse performance than the best
   model? The default is `TRUE`.
+
+- simplify:
+
+  For the print method only, should the output be simplified to only
+  include the model names, ELPD differences, and (when `p_worse = TRUE`)
+  diagnostic columns? The default is `TRUE`. Set to `FALSE` to also
+  print the available estimate columns (pointwise ELPD, LOOIC/WAIC, and
+  their standard errors).
 
 ## Value
 
@@ -163,6 +171,19 @@ print(comp, digits = 2)
 #>  model3      0.00    0.00      NA                    
 #>  model2    -32.00    0.00    1.00   N < 100          
 #>  model1    -64.00    0.00    1.00   N < 100          
+#> 
+#> Diagnostic flags present.
+#> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+#> or https://mc-stan.org/loo/reference/loo-glossary.html.
+print(comp, simplify = FALSE) # full table
+#>   model elpd_diff se_diff p_worse diag_diff diag_elpd elpd_loo se_elpd_loo
+#>  model3       0.0     0.0      NA                        -19.6         4.3
+#>  model2     -32.0     0.0    1.00   N < 100              -51.6         4.3
+#>  model1     -64.0     0.0    1.00   N < 100              -83.6         4.3
+#>  p_loo se_p_loo looic se_looic
+#>    3.3      1.2  39.2      8.6
+#>    3.3      1.2 103.2      8.6
+#>    3.3      1.2 167.2      8.6
 #> 
 #> Diagnostic flags present.
 #> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
