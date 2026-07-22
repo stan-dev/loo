@@ -171,11 +171,11 @@ loo_compare.default <- function(x, ...) {
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
-#' @param simplify For the print method only, should the output be simplified
-#'   to only include the model names, ELPD differences, and (when `p_worse =
-#'   TRUE`) diagnostic columns? The default is `TRUE`, matching the printed
-#'   output in loo 2.10. Set to `FALSE` to also print the available estimate
-#'   columns (pointwise ELPD, LOOIC/WAIC, and their standard errors).
+#' @param simplify For the print method only, should the output be simplified to
+#'   only include the model names, ELPD differences, and (when `p_worse = TRUE`)
+#'   diagnostic columns? The default is `TRUE`. Set to `FALSE` to also print the
+#'   available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
+#'   errors).
 print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
                               simplify = TRUE) {
   if (inherits(x, "old_compare.loo")) {
