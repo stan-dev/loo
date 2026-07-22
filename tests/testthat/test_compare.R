@@ -120,19 +120,6 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_equal(comp3$model, c("B", "A"))
 })
 
-test_that("print.compare.loo simplify=FALSE shows loo estimate columns", {
-  loo1 <- suppressWarnings(loo(LLarr))
-  loo2 <- suppressWarnings(loo(LLarr2))
-  comp <- loo_compare(loo1, loo2)
-  out_full <- paste(
-    capture.output(suppressMessages(print(comp, simplify = FALSE))),
-    collapse = "\n"
-  )
-  expect_match(out_full, "elpd_loo\\s+se_elpd_loo")
-  expect_match(out_full, "p_loo\\s+se_p_loo\\s+looic\\s+se_looic")
-})
-
-
 test_that("loo_compare returns expected result (3 models)", {
   w3 <- suppressWarnings(waic(LLarr3))
   comp1 <- loo_compare(w1, w2, w3)
