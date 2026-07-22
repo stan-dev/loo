@@ -214,6 +214,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       x2[fmt_cols] <- .fr(x2[fmt_cols], digits)
     }
   }
+  # Use `as.data.frame(x2)` here to drop "compare.loo"
+  # so print() uses print.data.frame.
   print(as.data.frame(x2), quote = FALSE, row.names = FALSE)
 
   # show glossary for diagnostic flags
