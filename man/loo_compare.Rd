@@ -31,10 +31,11 @@ printing.}
 approximation based probability of each model having worse performance than
 the best model? The default is \code{TRUE}.}
 
-\item{simplify}{For the print method only, should the output be simplified
-to only include the model names, ELPD differences, and (when \code{p_worse = TRUE}) diagnostic columns? The default is \code{TRUE}, matching the printed
-output in loo 2.10. Set to \code{FALSE} to also print the available estimate
-columns (pointwise ELPD, LOOIC/WAIC, and their standard errors).}
+\item{simplify}{For the print method only, should the output be simplified to
+only include the model names, ELPD differences, and (when \code{p_worse = TRUE})
+diagnostic columns? The default is \code{TRUE}. Set to \code{FALSE} to also print the
+available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
+errors).}
 }
 \value{
 A data frame with class \code{"compare.loo"} that has its own
