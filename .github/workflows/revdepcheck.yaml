@@ -1,0 +1,141 @@
+name: revdepcheck
+
+on:
+  workflow_dispatch:
+    inputs:
+      timeout_minutes:
+        description: "Timeout per reverse dependency"
+        required: false
+        default: "60"
+      previous_run_id:
+        description: "Previous run ID"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: revdepcheck-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  revdepcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: "true"
+      TIMEOUT_MINUTES: ${{ inputs.timeout_minutes }}
+      PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        if: ${{ inputs.previous_run_id != '' }}
+        with:
+          name: revdep-state
+          path: revdep
+          run-id: ${{ inputs.previous_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          extra-repositories: |
+            https://stan-dev.r-universe.dev
+
+      - name: Install system libraries for hard revdeps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagick++-dev libopenmpi-dev openmpi-bin
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            r-lib/revdepcheck
+            any::callr
+            any::rstantools
+            any::cmdstanr
+            any::systemfonts
+            any::textshaping
+            any::ragg
+            any::Cairo
+            any::rjags
+            any::runjags
+            any::R2jags
+            any::gsl
+            any::Rmpfr
+            any::rJava
+            any::xlsx
+            any::xlsxjars
+            any::OpenCL
+            any::Rmpi
+          needs: check
+
+      - name: cmdstan env vars
+        run: |
+          echo "CMDSTAN_PATH=${HOME}/.cmdstan" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Install cmdstan
+        run: |
+          cmdstanr::check_cmdstan_toolchain()
+          cmdstanr::install_cmdstan(cores = 2)
+        shell: Rscript {0}
+
+      - name: Run revdepcheck
+        id: revdep
+        run: bash .github/revdepcheck/run.sh
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: revdep-state
+          path: revdep/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Continue
+        if: ${{ steps.revdep.outputs.again == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run revdepcheck.yaml \
+            --ref "${{ github.ref_name }}" \
+            -f timeout_minutes="${{ inputs.timeout_minutes }}" \
+            -f previous_run_id="${{ github.run_id }}"
+
+      - name: Fail on broken revdeps
+        if: ${{ steps.revdep.outputs.again == 'false' }}
+        shell: Rscript {0}
+        run: |
+          status <- revdepcheck:::report_status(".")
+          if (status$broken > 0) {
+            stop(status$broken, " reverse dependencies have new failures.")
+          }
+
+      - name: Write final revdep report
+        if: ${{ always() && steps.revdep.outputs.again != 'true' }}
+        shell: Rscript {0}
+        run: |
+          try(
+            revdepcheck::revdep_report(pkg = ".", all = TRUE),
+            silent = TRUE
+          )
+
+      - name: Upload final revdep report
+        if: ${{ always() && steps.revdep.outputs.again != 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: revdep-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            revdep/README.md
+            revdep/problems.md
+            revdep/failures.md
+            revdep/cran.md
+          retention-days: 30
+          if-no-files-found: warn
