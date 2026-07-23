@@ -1,7 +1,10 @@
-# loo (development version)
+# loo 2.10.1
 
+* Revert behavior of internal `psis_smooth_tail()` function that led to several
+failing tests not caught by CRAN reverse dependency checks. This change should
+not directly affect individual users. by @VisruthSK in #381
 * `print.compare.loo()` regains a `simplify` argument for showing the full
-  comparison table with `simplify = FALSE` by @florence-bockting in #383.
+comparison table with `simplify = FALSE` by @florence-bockting in #383.
 
 # loo 2.10.0
 
