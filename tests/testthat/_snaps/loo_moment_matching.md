@@ -13,7 +13,7 @@
       Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.
     Output
       
-      Computed from 4000 by 30 log-likelihood matrix.
+      Computed from 4000 posterior draws and 30 log-likelihood terms.
       
                Estimate   SE
       elpd_loo    -74.0 18.8
