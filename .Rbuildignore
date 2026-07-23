@@ -24,3 +24,6 @@ vignettes/loo2-non-factorized_cache/*
 ^release-prep\.R$
 ^_pkgdown\.yml$
 ^pkgdown$
+^touchstone$
+^.git-blame-ignore-revs
+^notes-release.md

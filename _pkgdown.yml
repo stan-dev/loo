@@ -111,6 +111,7 @@ reference:
       - extract_log_lik
       - pointwise
       - relative_eff
+      - find_model_names
       - gpdfit
       - starts_with("example_loglik")
       - print.loo

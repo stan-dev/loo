@@ -11,3 +11,31 @@
       All Pareto k estimates are good (k < 0.67).
       See help('pareto-k-diagnostic') for details.
 
+# tis_loo and sis_loo are returned
+
+    Code
+      print(loo_tis)
+    Output
+      
+      Computed from 1000 by 32 log-likelihood matrix using tis_loo .
+      
+               Estimate  SE
+      elpd_loo    -83.6 4.3
+      p_loo         3.3 1.2
+      looic       167.2 8.6
+      ------
+
+---
+
+    Code
+      print(loo_sis)
+    Output
+      
+      Computed from 1000 by 32 log-likelihood matrix using sis_loo .
+      
+               Estimate  SE
+      elpd_loo    -83.6 4.3
+      p_loo         3.3 1.2
+      looic       167.2 8.6
+      ------
+

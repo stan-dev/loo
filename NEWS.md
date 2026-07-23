@@ -1,6 +1,20 @@
 # loo (development version)
 
-* Clarify print output to say "posterior draws" and "log-likelihood terms" instead of the ambiguous "X by Y matrix" format (#198)
+* `print.compare.loo()` regains a `simplify` argument for showing the full
+  comparison table with `simplify = FALSE` by @florence-bockting in #383.
+
+# loo 2.10.0
+
+* Updates to `loo_compare` output by @jgabry, @avehtari, @florence-bockting in #300: 
+  - new output columns `p_worse`, `diag_diff`, `diag_elpd`
+  - returned object is now a `data.frame` instead of a `matrix`
+* Add new `kfold.print` method by @florence-bockting in #342
+* Add touchstone performance benchmarks by @VisruthSK in #352
+* Use `posterior::gpdfit` and `posterior::qgeneralized_pareto` by @avehtari in #305
+* Fix bug in IS method error message + documentation typos by @ishaan-arora-1 in #326
+* Shortened `?loo_subsample` title and improved description by @vinniott in #339
+* Add AI contribution policy by @florence-bockting in #361
+
 
 # loo 2.9.0
 

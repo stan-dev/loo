@@ -221,6 +221,6 @@ test_that("tis_loo and sis_loo are returned", {
   expect_s3_class(loo_tis, "importance_sampling_loo")
   expect_s3_class(loo_sis, "importance_sampling_loo")
 
-  expect_output(print(loo_tis), regexp = "tis_loo")
-  expect_output(print(loo_sis), regexp = "sis_loo")
+  expect_snapshot(print(loo_tis))
+  expect_snapshot(print(loo_sis))
 })

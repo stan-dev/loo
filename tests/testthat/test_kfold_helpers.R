@@ -138,7 +138,7 @@ test_that("kfold helpers throw correct errors", {
 
 test_that("print_dims.kfold works", {
   xx <- structure(list(), K = 17, class = c("kfold", "loo"))
-  expect_output(print_dims(xx), "Based on 17-fold cross-validation")
+  expect_snapshot(print_dims(xx))
 
   attr(xx, "K") <- NULL
   expect_silent(print_dims(xx))
