@@ -42,3 +42,8 @@
       model2 1.000 
       model3 0.000 
 
+# stacking_weights gives expected result
+
+    c(3.60852095316096e-07, 3.2286826572722e-07, 0.999999316279639
+    )
+

@@ -111,6 +111,28 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_identical(w3, w3_b)
 })
 
+test_that("stacking_weights gives expected result", {
+  lpd_point <- matrix(
+    c(
+      -0.2, -0.8, -1.1,
+      -1.4, -0.3, -0.5,
+      -0.6, -0.7, -0.1,
+      -1.0, -1.2, -0.4,
+      -0.9, -0.5, -0.8
+    ),
+    ncol = 3,
+    byrow = TRUE
+  )
+
+  set.seed(0)
+  actual <- stacking_weights(lpd_point)
+
+  expect_s3_class(actual, "stacking_weights")
+  expect_named(actual, paste0("model", 1:3))
+  expect_equal(sum(actual), 1)
+  expect_snapshot_value(as.numeric(actual), style = "deparse")
+})
+
 test_that("stacking_weights and pseudobma_weights throw correct errors", {
   xx <- cbind(rnorm(10))
   expect_error(stacking_weights(xx), "two models are required")
