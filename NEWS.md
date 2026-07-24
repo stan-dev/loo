@@ -1,3 +1,5 @@
+# loo (development version)
+
 # loo 2.10.1
 
 * Revert behavior of internal `psis_smooth_tail()` function that led to several
