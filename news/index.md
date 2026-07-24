@@ -2,6 +2,8 @@
 
 ## loo 2.10.1
 
+CRAN release: 2026-07-24
+
 - Revert behavior of internal `psis_smooth_tail()` function that led to
   several failing tests not caught by CRAN reverse dependency checks.
   This change should not directly affect individual users. by
