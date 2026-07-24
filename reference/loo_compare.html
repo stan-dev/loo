@@ -15,7 +15,7 @@
       loo
     </a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.10.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.10.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,7 +74,7 @@
 <span><span class="fu">loo_compare</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'compare.loo'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, digits <span class="op">=</span> <span class="fl">1</span>, p_worse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, digits <span class="op">=</span> <span class="fl">1</span>, p_worse <span class="op">=</span> <span class="cn">TRUE</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'compare.loo_ss'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -104,6 +104,14 @@ printing.</p></dd>
 <dd><p>For the print method only, should we include the normal
 approximation based probability of each model having worse performance than
 the best model? The default is <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-simplify">simplify<a class="anchor" aria-label="anchor" href="#arg-simplify"></a></dt>
+<dd><p>For the print method only, should the output be simplified to
+only include the model names, ELPD differences, and (when <code>p_worse = TRUE</code>)
+diagnostic columns? The default is <code>TRUE</code>. Set to <code>FALSE</code> to also print the
+available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
+errors).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -227,6 +235,19 @@ the <strong>loo</strong> website for answers to frequently asked questions.</p><
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Diagnostic flags present.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> or https://mc-stan.org/loo/reference/loo-glossary.html.</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comp</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># full table</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   model elpd_diff se_diff p_worse diag_diff diag_elpd elpd_loo se_elpd_loo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  model3       0.0     0.0      NA                        -19.6         4.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  model2     -32.0     0.0    1.00   N &lt; 100              -51.6         4.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  model1     -64.0     0.0    1.00   N &lt; 100              -83.6         4.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  p_loo se_p_loo looic se_looic</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3.3      1.2  39.2      8.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3.3      1.2 103.2      8.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3.3      1.2 167.2      8.6</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Diagnostic flags present.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> or https://mc-stan.org/loo/reference/loo-glossary.html.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># can use a list of objects with custom names</span></span></span>
 <span class="r-in"><span><span class="co"># the names will be used in the output</span></span></span>
@@ -267,7 +288,7 @@ the <strong>loo</strong> website for answers to frequently asked questions.</p><
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -1,5 +1,18 @@
 # Changelog
 
+## loo 2.10.1
+
+- Revert behavior of internal `psis_smooth_tail()` function that led to
+  several failing tests not caught by CRAN reverse dependency checks.
+  This change should not directly affect individual users. by
+  [@VisruthSK](https://github.com/VisruthSK) in
+  [\#381](https://github.com/stan-dev/loo/issues/381)
+- [`print.compare.loo()`](https://mc-stan.org/loo/reference/loo_compare.md)
+  regains a `simplify` argument for showing the full comparison table
+  with `simplify = FALSE` by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#383](https://github.com/stan-dev/loo/issues/383).
+
 ## loo 2.10.0
 
 CRAN release: 2026-06-26
