@@ -1,5 +1,8 @@
 # loo (development version)
 
+* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
+#328.
+
 # loo 2.10.1
 
 * Revert behavior of internal `psis_smooth_tail()` function that led to several
