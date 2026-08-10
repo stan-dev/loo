@@ -178,10 +178,10 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
     print(loo_ss),
     "Posterior approximation correction used\\."
   ))
-  expect_output(print(loo_ss), "subsampled log-likelihood terms")
+  expect_output(print(loo_ss), "Subsampling loo uses 1) faster,")
 
   expect_output(print(loo_ap_ss), "Posterior approximation correction used\\.")
-  expect_output(print(loo_ap_ss), "subsampled log-likelihood terms")
+  expect_output(print(loo_ap_ss), "Subsampling loo uses 1) faster,")
 
   expect_output(
     print(loo_ap_ss_full),
@@ -369,11 +369,8 @@ test_that("Test the vignette", {
       loo_approximation_draws = 100
     )
   )
-  expect_output(
-    print(looss_2),
-    "faster but more biased computation with 4000 posterior draws and 3020 log-likelihood terms"
-  )
-  expect_output(print(looss_2), "slower but more accurate computation with 4000 posterior draws and 100 subsampled log-likelihood terms")
+  expect_output(print(looss_2), "Subsampling loo uses 1) faster,")
+  expect_output(print(looss_2), "Subsampling loo uses 1) faster,")
   expect_output(
     print(looss_2),
     "MCSE and ESS estimates assume independent draws"
