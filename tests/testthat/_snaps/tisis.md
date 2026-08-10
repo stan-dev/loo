@@ -17,7 +17,7 @@
       print(loo_tis)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix using tis_loo .
+      Computed from 1000 posterior draws and 32 log-likelihood terms using tis_loo .
       
                Estimate  SE
       elpd_loo    -83.6 4.3
@@ -31,7 +31,7 @@
       print(loo_sis)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix using sis_loo .
+      Computed from 1000 posterior draws and 32 log-likelihood terms using sis_loo .
       
                Estimate  SE
       elpd_loo    -83.6 4.3
