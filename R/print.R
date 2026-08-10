@@ -191,12 +191,13 @@ print_dims.kfold <- function(x, ...) {
 #' @export
 print_dims.psis_loo_ss <- function(x, ...) {
   cat(
-    "Subsampling loo uses 1) faster but more biased computation with",
-    dim(x)[1], "posterior draws and",
-    length(x$loo_subsampling$elpd_loo_approx), "log-likelihood terms,",
-    "and 2) slower but more accurate computation with",
-    dim(x)[1], "posterior draws and",
-    nobs(x), "subsampled log-likelihood terms.\n"
+    "Subsampling loo uses 1) faster, more biased computation with ",
+    length(x$loo_subsampling$elpd_loo_approx),
+    " log-lik.\n",
+    "terms, and 2) slower, more accurate computation with ",
+    nobs(x),
+    " subsampled terms.\n",
+    sep = ""
   )
 }
 
