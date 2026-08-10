@@ -145,7 +145,7 @@ print(loo_post)
 ```
 
 
-    Computed from 4000 by 126 log-likelihood matrix.
+    Computed from 4000 posterior draws and 126 log-likelihood terms.
 
              Estimate   SE
     elpd_loo    -43.0  6.9

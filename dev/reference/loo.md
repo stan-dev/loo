@@ -294,7 +294,7 @@ LLarr <- example_loglik_array()
 rel_n_eff <- relative_eff(exp(LLarr))
 loo(LLarr, r_eff = rel_n_eff, cores = 2)
 #> 
-#> Computed from 1000 by 32 log-likelihood matrix.
+#> Computed from 1000 posterior draws and 32 log-likelihood terms.
 #> 
 #>          Estimate  SE
 #> elpd_loo    -83.6 4.3
@@ -312,7 +312,7 @@ LLmat <- example_loglik_matrix()
 rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
 loo(LLmat, r_eff = rel_n_eff, cores = 2)
 #> 
-#> Computed from 1000 by 32 log-likelihood matrix.
+#> Computed from 1000 posterior draws and 32 log-likelihood terms.
 #> 
 #>          Estimate  SE
 #> elpd_loo    -83.6 4.3

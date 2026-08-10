@@ -2,6 +2,11 @@
 
 ## loo (development version)
 
+- Update user messages in [`print()`](https://rdrr.io/r/base/print.html)
+  by [@ishaan-arora-1](https://github.com/ishaan-arora-1),
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#328](https://github.com/stan-dev/loo/issues/328).
+
 ## loo 2.10.1
 
 CRAN release: 2026-07-24

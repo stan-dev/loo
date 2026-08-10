@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Topi Paananen,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-07-24</h4>
+            <h4 data-toc-skip class="date">2026-08-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-moment-matching.Rmd" class="external-link"><code>vignettes/loo2-moment-matching.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-moment-matching.Rmd</code></div>
@@ -255,7 +255,7 @@ beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2318    1
 beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
 beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
 
-Samples were drawn using NUTS(diag_e) at Fri Jul 24 17:10:27 2026.
+Samples were drawn using NUTS(diag_e) at Mon Aug 10 10:43:05 2026.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -268,7 +268,7 @@ convergence, Rhat=1).</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo1</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix.
+Computed from 4000 posterior draws and 262 log-likelihood terms.
 
          Estimate     SE
 elpd_loo  -5462.4  695.2
@@ -326,7 +326,7 @@ is used. By default, it operates on all observations whose Pareto <span class="m
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo2</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix.
+Computed from 4000 posterior draws and 262 log-likelihood terms.
 
          Estimate     SE
 elpd_loo  -5479.1  700.2
@@ -504,7 +504,7 @@ update the existing <code>loo</code> object.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">loo3</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix.
+Computed from 4000 posterior draws and 262 log-likelihood terms.
 
          Estimate     SE
 elpd_loo  -5479.1  700.2

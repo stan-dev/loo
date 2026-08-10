@@ -23,7 +23,7 @@ functions for use with the loo.function() method."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -333,7 +333,7 @@ procedure used in the LOO-CV approximation.</p></li>
 <span class="r-in"><span><span class="va">rel_n_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LLarr</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">loo</span><span class="op">(</span><span class="va">LLarr</span>, r_eff <span class="op">=</span> <span class="va">rel_n_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Computed from 1000 by 32 log-likelihood matrix.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Computed from 1000 posterior draws and 32 log-likelihood terms.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Estimate  SE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> elpd_loo    -83.6 4.3</span>
@@ -351,7 +351,7 @@ procedure used in the LOO-CV approximation.</p></li>
 <span class="r-in"><span><span class="va">rel_n_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LLmat</span><span class="op">)</span>, chain_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, each <span class="op">=</span> <span class="fl">500</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">loo</span><span class="op">(</span><span class="va">LLmat</span>, r_eff <span class="op">=</span> <span class="va">rel_n_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Computed from 1000 by 32 log-likelihood matrix.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Computed from 1000 posterior draws and 32 log-likelihood terms.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Estimate  SE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> elpd_loo    -83.6 4.3</span>

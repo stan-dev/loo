@@ -56,7 +56,7 @@ methods.
 LLarr <- example_loglik_array()
 elpd(LLarr)
 #> 
-#> Computed from 1000 by 32 log-likelihood matrix using the generic elpd function
+#> Computed from 1000 posterior draws and 32 log-likelihood terms using the generic elpd function.
 #> 
 #>      Estimate  SE
 #> elpd    -80.3 3.2

@@ -163,7 +163,7 @@ using [`elpd()`](https://mc-stan.org/loo/dev/reference/elpd.md).
 ```
 
 
-    Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
+    Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
 
          Estimate    SE
     elpd  -1741.0 290.7
@@ -241,7 +241,7 @@ using [`elpd()`](https://mc-stan.org/loo/dev/reference/elpd.md).
 ```
 
 
-    Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
+    Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.
 
          Estimate     SE
     elpd  -5560.1  730.0

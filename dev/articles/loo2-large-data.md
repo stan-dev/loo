@@ -186,8 +186,8 @@ loo_ss_1 <-
 print(loo_ss_1)
 ```
 
-    Computed from 4000 by 100 subsampled log-likelihood
-    values from 3020 total observations.
+    Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+    terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
              Estimate   SE subsampling SE
     elpd_loo  -1968.5 15.6            0.3
@@ -239,12 +239,12 @@ loo_ss_1b <-
     r_eff = r_eff,
     draws = parameter_draws_1,
     data = stan_df_1
-  ) 
+  )
 print(loo_ss_1b)
 ```
 
-    Computed from 4000 by 200 subsampled log-likelihood
-    values from 3020 total observations.
+    Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+    terms, and 2) slower, more accurate computation with 200 subsampled terms.
 
              Estimate   SE subsampling SE
     elpd_loo  -1968.3 15.6            0.2
@@ -287,8 +287,8 @@ loo_ss_1c <-
 print(loo_ss_1c)
 ```
 
-    Computed from 4000 by 100 subsampled log-likelihood
-    values from 3020 total observations.
+    Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+    terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
              Estimate   SE subsampling SE
     elpd_loo  -1968.9 15.4            0.5
@@ -344,7 +344,7 @@ print(loo_ap_1)
 The function creates a class, `psis_loo_ap` that inherits from
 `psis_loo, loo`.
 
-    Computed from 2000 by 3020 log-likelihood matrix
+    Computed from 2000 posterior draws and 3020 log-likelihood terms
 
              Estimate   SE
     elpd_loo  -1968.4 15.6
@@ -379,8 +379,8 @@ loo_ap_ss_1 <-
 print(loo_ap_ss_1)
 ```
 
-    Computed from 2000 by 100 subsampled log-likelihood
-    values from 3020 total observations.
+    Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+    terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
              Estimate   SE subsampling SE
     elpd_loo  -1968.2 15.6            0.4
@@ -462,8 +462,8 @@ loo_ss_2 <- loo_subsample(
 print(loo_ss_2)
 ```
 
-    Computed from 4000 by 100 subsampled log-likelihood
-    values from 3020 total observations.
+    Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+    terms, and 2) slower, more accurate computation with 200 subsampled terms.
 
              Estimate   SE subsampling SE
     elpd_loo  -1952.0 16.2            0.2

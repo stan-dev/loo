@@ -11,7 +11,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -63,7 +63,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="loo-development-version">loo (development version)<a class="anchor" aria-label="anchor" href="#loo-development-version"></a></h2>
-</div>
+<ul><li>Update user messages in <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> by <a href="https://github.com/ishaan-arora-1" class="external-link">@ishaan-arora-1</a>, <a href="https://github.com/florence-bockting" class="external-link">@florence-bockting</a> in <a href="https://github.com/stan-dev/loo/issues/328" class="external-link">#328</a>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.10.1" id="loo-2101">loo 2.10.1<a class="anchor" aria-label="anchor" href="#loo-2101"></a></h2><p class="text-muted">CRAN release: 2026-07-24</p>
 <ul><li>Revert behavior of internal <code>psis_smooth_tail()</code> function that led to several failing tests not caught by CRAN reverse dependency checks. This change should not directly affect individual users. by <a href="https://github.com/VisruthSK" class="external-link">@VisruthSK</a> in <a href="https://github.com/stan-dev/loo/issues/381" class="external-link">#381</a></li>

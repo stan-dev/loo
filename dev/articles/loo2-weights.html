@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-07-24</h4>
+            <h4 data-toc-skip class="date">2026-08-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-weights.Rmd" class="external-link"><code>vignettes/loo2-weights.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-weights.Rmd</code></div>
@@ -266,7 +266,7 @@ for these models anyway.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo3</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 17 log-likelihood matrix.
+Computed from 4000 posterior draws and 17 log-likelihood terms.
 
          Estimate  SE
 elpd_loo      4.5 2.3
@@ -281,7 +281,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo4</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 17 log-likelihood matrix.
+Computed from 4000 posterior draws and 17 log-likelihood terms.
 
          Estimate  SE
 elpd_loo      8.4 2.8
@@ -418,7 +418,7 @@ as the conditional observation model.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 10 log-likelihood matrix.
+Computed from 4000 posterior draws and 10 log-likelihood terms.
 
          Estimate   SE
 elpd_loo    -40.9  6.1
@@ -454,7 +454,7 @@ Fitting model 2 out of 2 (leaving out observation 10)</code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 10 log-likelihood matrix.
+Computed from 4000 posterior draws and 10 log-likelihood terms.
 
          Estimate   SE
 elpd_loo    -41.1  6.0
@@ -476,7 +476,7 @@ relatively safe to continue.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">waic10</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 10 log-likelihood matrix.
+Computed from 4000 posterior draws and 10 log-likelihood terms.
 
           Estimate   SE
 elpd_waic    -40.2  6.0
@@ -495,7 +495,7 @@ we can make a comparison to models without these terms.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">loo11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit11</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 10 log-likelihood matrix.
+Computed from 4000 posterior draws and 10 log-likelihood terms.
 
          Estimate   SE
 elpd_loo    -39.7  5.8
@@ -511,7 +511,7 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">loo12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">fit12</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: Found 1 observation(s) with a pareto_k &gt; 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.</code></pre>
 <pre><code>
-Computed from 4000 by 10 log-likelihood matrix.
+Computed from 4000 posterior draws and 10 log-likelihood terms.
 
          Estimate  SE
 elpd_loo    -42.5 4.7

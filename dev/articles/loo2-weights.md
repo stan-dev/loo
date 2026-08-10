@@ -182,7 +182,7 @@ print(loo3)
 ```
 
 
-    Computed from 4000 by 17 log-likelihood matrix.
+    Computed from 4000 posterior draws and 17 log-likelihood terms.
 
              Estimate  SE
     elpd_loo      4.5 2.3
@@ -201,7 +201,7 @@ print(loo4)
 ```
 
 
-    Computed from 4000 by 17 log-likelihood matrix.
+    Computed from 4000 posterior draws and 17 log-likelihood terms.
 
              Estimate  SE
     elpd_loo      8.4 2.8
@@ -371,7 +371,7 @@ print(loo10)
 ```
 
 
-    Computed from 4000 by 10 log-likelihood matrix.
+    Computed from 4000 posterior draws and 10 log-likelihood terms.
 
              Estimate   SE
     elpd_loo    -40.9  6.1
@@ -418,7 +418,7 @@ print(loo10)
 ```
 
 
-    Computed from 4000 by 10 log-likelihood matrix.
+    Computed from 4000 posterior draws and 10 log-likelihood terms.
 
              Estimate   SE
     elpd_loo    -41.1  6.0
@@ -450,7 +450,7 @@ print(waic10)
 ```
 
 
-    Computed from 4000 by 10 log-likelihood matrix.
+    Computed from 4000 posterior draws and 10 log-likelihood terms.
 
               Estimate   SE
     elpd_waic    -40.2  6.0
@@ -478,7 +478,7 @@ fit12 <- update(fit10, formula = total_tools ~ log_pop)
 ```
 
 
-    Computed from 4000 by 10 log-likelihood matrix.
+    Computed from 4000 posterior draws and 10 log-likelihood terms.
 
              Estimate   SE
     elpd_loo    -39.7  5.8
@@ -499,7 +499,7 @@ fit12 <- update(fit10, formula = total_tools ~ log_pop)
     Warning: Found 1 observation(s) with a pareto_k > 0.7. We recommend calling 'loo' again with argument 'k_threshold = 0.7' in order to calculate the ELPD without the assumption that these observations are negligible. This will refit the model 1 times to compute the ELPDs for the problematic observations directly.
 
 
-    Computed from 4000 by 10 log-likelihood matrix.
+    Computed from 4000 posterior draws and 10 log-likelihood terms.
 
              Estimate  SE
     elpd_loo    -42.5 4.7

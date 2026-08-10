@@ -295,7 +295,7 @@ print(loo_cv)
 ```
 
 
-    Computed from 4000 by 78 log-likelihood matrix.
+    Computed from 4000 posterior draws and 78 log-likelihood terms.
 
              Estimate   SE
     elpd_loo    -88.7  6.4
@@ -747,14 +747,14 @@ sessionInfo()
 
     loaded via a namespace (and not attached):
      [1] gtable_0.3.6         tensorA_0.36.2.1     xfun_0.60           
-     [4] bslib_0.11.0         QuickJSR_1.10.0      htmlwidgets_1.6.4   
+     [4] bslib_0.12.0         QuickJSR_1.10.0      htmlwidgets_1.6.4   
      [7] processx_3.9.0       inline_0.3.21        lattice_0.22-9      
     [10] callr_3.8.0          ps_1.9.3             vctrs_0.7.3         
     [13] tools_4.6.1          generics_0.1.4       stats4_4.6.1        
     [16] parallel_4.6.1       tibble_3.3.1         pkgconfig_2.0.3     
     [19] Matrix_1.7-5         checkmate_2.3.4      RColorBrewer_1.1-3  
     [22] S7_0.2.2             desc_1.4.3           distributional_0.8.1
-    [25] RcppParallel_6.0.0   lifecycle_1.0.5      compiler_4.6.1      
+    [25] RcppParallel_6.2.0   lifecycle_1.0.5      compiler_4.6.1      
     [28] farver_2.1.2         stringr_1.6.0        textshaping_1.0.5   
     [31] Brobdingnag_1.2-9    codetools_0.2-20     htmltools_0.5.9     
     [34] sass_0.4.10          yaml_2.3.12          pillar_1.11.1       
@@ -762,13 +762,13 @@ sessionInfo()
     [40] StanHeaders_2.32.10  bridgesampling_1.2-1 abind_1.4-8         
     [43] nlme_3.1-169         posterior_1.7.0      rstan_2.32.7        
     [46] tidyselect_1.2.1     digest_0.6.39        mvtnorm_1.4-2       
-    [49] stringi_1.8.7        dplyr_1.2.1          labeling_0.4.3      
+    [49] stringi_1.8.9        dplyr_1.2.1          labeling_0.4.3      
     [52] fastmap_1.2.0        grid_4.6.1           cli_3.6.6           
     [55] magrittr_2.0.5       pkgbuild_1.4.8       withr_3.0.3         
     [58] scales_1.4.0         backports_1.5.1      rmarkdown_2.31      
     [61] matrixStats_1.5.0    otel_0.2.0           gridExtra_2.3.1     
     [64] ragg_1.5.2           coda_0.19-4.1        evaluate_1.0.5      
-    [67] rstantools_2.6.0     rlang_1.3.0          glue_1.8.1          
+    [67] rstantools_2.7.0     rlang_1.3.0          glue_1.8.1          
     [70] jsonlite_2.0.0       R6_2.6.1             systemfonts_1.3.2   
     [73] fs_2.1.0            
 

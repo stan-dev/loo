@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-07-24</h4>
+            <h4 data-toc-skip class="date">2026-08-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
@@ -253,7 +253,7 @@ data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 52 log-likelihood matrix using the generic elpd function
+Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
 
      Estimate    SE
 elpd  -1741.0 290.7
@@ -325,7 +325,7 @@ folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-Computed from 4000 by 262 log-likelihood matrix using the generic elpd function
+Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.
 
      Estimate     SE
 elpd  -5560.1  730.0

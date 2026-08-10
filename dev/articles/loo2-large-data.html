@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Mans Magnusson,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-07-24</h4>
+            <h4 data-toc-skip class="date">2026-08-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-large-data.Rmd" class="external-link"><code>vignettes/loo2-large-data.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-large-data.Rmd</code></div>
@@ -272,8 +272,8 @@ subsampling:</p>
 <span>    data <span class="op">=</span> <span class="va">stan_df_1</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ss_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+<pre><code>Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.5 15.6            0.3
@@ -318,10 +318,10 @@ we can simply add more samples until we are satisfied using the
 <span>    r_eff <span class="op">=</span> <span class="va">r_eff</span>,</span>
 <span>    draws <span class="op">=</span> <span class="va">parameter_draws_1</span>,</span>
 <span>    data <span class="op">=</span> <span class="va">stan_df_1</span></span>
-<span>  <span class="op">)</span> </span>
+<span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ss_1b</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 200 subsampled log-likelihood
-values from 3020 total observations.
+<pre><code>Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+terms, and 2) slower, more accurate computation with 200 subsampled terms.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.3 15.6            0.2
@@ -361,8 +361,8 @@ elpd approximations, for example:</p>
 <span>    cores <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ss_1c</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+<pre><code>Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.9 15.4            0.5
@@ -407,7 +407,7 @@ use the <code><a href="../reference/loo_approximate_posterior.html">loo_approxim
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ap_1</span><span class="op">)</span></span></code></pre></div>
 <p>The function creates a class, <code>psis_loo_ap</code> that inherits
 from <code>psis_loo, loo</code>.</p>
-<pre><code>Computed from 2000 by 3020 log-likelihood matrix
+<pre><code>Computed from 2000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1968.4 15.6
@@ -438,8 +438,8 @@ subsampling:</p>
 <span>    cores <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ap_ss_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 2000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+<pre><code>Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+terms, and 2) slower, more accurate computation with 100 subsampled terms.
 
          Estimate   SE subsampling SE
 elpd_loo  -1968.2 15.6            0.4
@@ -514,8 +514,8 @@ to the well-switching data, using <code>log(arsenic)</code> instead of
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_ss_2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 100 subsampled log-likelihood
-values from 3020 total observations.
+<pre><code>Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+terms, and 2) slower, more accurate computation with 200 subsampled terms.
 
          Estimate   SE subsampling SE
 elpd_loo  -1952.0 16.2            0.2

@@ -126,7 +126,7 @@ loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
 print(loo_1)
 ```
 
-    Computed from 4000 by 3020 log-likelihood matrix
+    Computed from 4000 posterior draws and 3020 log-likelihood terms
 
              Estimate   SE
     elpd_loo  -1968.5 15.6
@@ -171,7 +171,7 @@ loo_2 <- loo(log_lik_2, r_eff = r_eff_2, cores = 2)
 print(loo_2)
 ```
 
-    Computed from 4000 by 3020 log-likelihood matrix
+    Computed from 4000 posterior draws and 3020 log-likelihood terms
 
              Estimate   SE
     elpd_loo  -1952.3 16.2

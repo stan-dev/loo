@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <picture><source type="image/svg+xml" srcset="../logo.svg"><img src="../logo.png" class="stan-logo" alt="Stan blue hex logo"></source></picture>
+      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari and
 Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-07-24</h4>
+            <h4 data-toc-skip class="date">2026-08-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-with-rstan.Rmd" class="external-link"><code>vignettes/loo2-with-rstan.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-with-rstan.Rmd</code></div>
@@ -229,7 +229,7 @@ efficient PSIS-LOO approximation to exact LOO-CV:</p>
 <span><span class="co"># will use value of 'mc.cores' option if cores is not specified</span></span>
 <span><span class="va">loo_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">log_lik_1</span>, r_eff <span class="op">=</span> <span class="va">r_eff</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 3020 log-likelihood matrix
+<pre><code>Computed from 4000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1968.5 15.6
@@ -270,7 +270,7 @@ well-switching data, using <code>log(arsenic)</code> instead of
 <span><span class="va">r_eff_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_eff.html">relative_eff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">log_lik_2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">loo_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo.html">loo</a></span><span class="op">(</span><span class="va">log_lik_2</span>, r_eff <span class="op">=</span> <span class="va">r_eff_2</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">loo_2</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Computed from 4000 by 3020 log-likelihood matrix
+<pre><code>Computed from 4000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1952.3 16.2
