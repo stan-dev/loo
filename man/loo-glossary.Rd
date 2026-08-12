@@ -281,24 +281,37 @@ columns.
 \subsection{\verb{\{measure\}_diff} and \verb{\{measure\}_se_diff}}{
 
 For each non-ELPD measure \code{m}, \code{loo_compare()} adds columns \code{m_diff} and
-\code{m_se_diff}. When the overall estimate is a sum or mean of pointwise
-contributions, these are computed from paired pointwise differences on a
-utility scale (higher is better; loss measures such as MSE, Brier score, and
-SRPS have their sign flipped from the raw loss orientation) using the same
-approach as \code{elpd_diff} and \code{se_diff} (Eq 24 in VGG2017 for sums; the mean
-analogue for means). Measures already returned on a utility scale (e.g. ELPD,
-CRPS/RPS) are not sign-flipped. Negative \code{m_diff} values then indicate worse
-performance than the reference model, which has \code{m_diff = 0}. For sum- and
-mean-based measures, the reference model also has \code{m_se_diff = 0}; for
-\code{estimates_only} measures (e.g. \code{r2}, \code{mse}, \code{rmse}), \code{m_se_diff} is \code{NA}.
+\code{m_se_diff}. In all cases \code{m_diff} is the difference between the two overall
+estimates on a utility scale (higher is better; loss measures such as MSE,
+Brier score, and SRPS have their sign flipped from the raw loss orientation).
+Measures already returned on a utility scale (e.g. ELPD, CRPS/RPS) are not
+sign-flipped. Negative \code{m_diff} values then indicate worse performance than
+the reference model, which has \code{m_diff = 0}.
+
+How \code{m_se_diff} is obtained depends on the measure:
+\itemize{
+\item When the overall estimate is a sum or mean of pointwise contributions, it
+is computed from paired pointwise differences using the same approach as
+\code{elpd_diff} and \code{se_diff} (Eq 24 in VGG2017 for sums; the mean analogue for
+means). This covers ELPD, \code{mlpd}, \code{ic}, \code{mae}, \code{mse}, \code{acc}, \code{brier}, and
+the ranked probability scores.
+\item When it is a transformation of such quantities, the measure supplies its
+own delta-method standard error (\code{se_diff_fun}). For \code{rmse} this is the
+first-order bivariate Taylor approximation propagated from the MSE scale,
+which requires the covariance between the two models' pointwise squared
+errors and is therefore not a paired pointwise standard deviation. For
+\code{r2} it is the trivariate analogue, which additionally propagates the
+uncertainty in the baseline \code{MSE(y)} shared by both models.
+\item Otherwise \code{m_se_diff} is \code{NA}. This applies only to custom measures whose
+estimate is neither a sum nor a mean of their pointwise values and which do
+not attach an \code{se_diff_fun}.
+}
+
+The reference model has \code{m_se_diff = 0} whenever an \code{m_se_diff} is available.
 Attribute \code{measure_higher_is_better} on each \verb{*_pred_measure()}
 result records the \code{higher_is_better} setting used when each measure was
 computed; when stored values are on a loss scale, \code{loo_compare()} emits a
 short message naming those measures (see \code{\link[=loo_compare]{loo_compare()}}).
-
-For measures where pointwise values do not define the overall estimate (e.g.
-\code{r2}, \code{mse}, \code{rmse}), \code{m_diff} is the difference between overall estimates
-(on a utility scale) and \code{m_se_diff} is \code{NA}.
 
 ELPD-family measures use the column names \code{elpd_diff} and \code{se_diff} rather
 than a prefixed form. Only ELPD comparisons include \code{p_worse} and \code{diag_diff};
@@ -323,13 +336,30 @@ is a list with:
 \item \code{higher_is_better} — the orientation setting used when the measure was
 computed (\code{NULL}, \code{TRUE}, or \code{FALSE})
 \item \code{loss} — whether stored values are on a loss scale (lower is better)
-\item \code{diff_method} — how paired differences are aggregated: \code{"sum"},
-\code{"mean"}, \code{"estimates_only"}, or \code{"auto"} (inferred at compare time for
-custom measures)
+\item \code{diff_method} — how the standard error of the difference is obtained:
+\code{"sum"} or \code{"mean"} (paired pointwise differences), \code{"pairwise"} (the
+measure's own \code{se_diff_fun}), \code{"estimates_only"} (unavailable, \code{NA}), or
+\code{"auto"} (inferred at compare time for custom measures). No built-in
+measure declares \code{"estimates_only"}; it is reached only when
+autodetection under \code{"auto"} cannot establish that the estimate is a sum
+or mean of its pointwise values. It is not an error state — the
+difference itself is still reported, and only its standard error is
+marked unavailable.
+\item \code{se_diff_fun} — for \code{diff_method = "pairwise"}, either the name of a
+built-in implementation or, for custom measures, the function itself
+\item \code{extra} — optional list of auxiliary data the measure stored for its
+\code{se_diff_fun}, present only for measures that need it (\code{r2} stores the
+pointwise baseline \code{(y_i - mean(y))^2}, which \code{y} no longer supplies by
+the time \code{\link[=loo_compare]{loo_compare()}} runs; \code{bacc} stores the class index of each
+observation, which its pointwise values do not determine). It is excluded
+from the metadata consistency check below, since it varies with the data
+rather than with how the measure was configured.
 }
 
-Built-in measures take \code{loss} and \code{diff_method} from the package measure
-registry; custom measures default to \code{loss = FALSE} and \code{diff_method = "auto"}.
+Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} from the
+package measure registry; custom measures default to \code{loss = FALSE} and
+\code{diff_method = "auto"} unless they attach an \code{se_diff_fun} (see
+\code{\link[=insample_pred_measure]{insample_pred_measure()}}).
 \code{\link[=loo_compare]{loo_compare()}} requires all models to provide matching metadata for each
 shared measure; mismatched \code{higher_is_better} settings or missing metadata on
 some models produce an error.
@@ -341,10 +371,9 @@ The \code{rank_by} argument selects which measure determines model ordering and
 the reference model for all pairwise differences. When \code{rank_by} is omitted,
 models are ranked by \code{"elpd"}; attribute \code{rank_by} is set only when \code{rank_by}
 is passed explicitly. Attribute \code{compare_measures} lists all measures that
-were compared, \code{sign_converted_measures} lists loss measures whose sign was
-flipped onto the utility scale, and \code{measures_no_pointwise_se} lists measures
-for which \verb{\{measure\}_se_diff} is unavailable (overall estimate not defined
-from pointwise values). The print method shows the ranking measure by default
+were compared, and \code{sign_converted_measures} lists loss measures whose sign
+was flipped onto the utility scale. The print method shows the ranking
+measure by default
 (\code{"elpd"} when \code{rank_by} was not set); use \code{print(x, measures = "all")} or
 \code{print(x, measures = c("rmse", "r2"))} to display additional measure tables.
 Printed tables label the standard-error column \code{se_diff} even for non-ELPD

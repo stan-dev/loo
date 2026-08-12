@@ -443,14 +443,25 @@ measure_bacc <- function(
     acc_i <- (mupred_hat == y) * 1L
   }
   
+  # recomputed rather than reused from the branch above, which the
+  # precomputed-`pointwise` branch never enters
+  classes <- sort(unique(y))
+  K <- length(classes)
+  class_id <- match(y, classes)
+  n_c <- tabulate(class_id, nbins = K)
+
   acc_c <- vapply(classes, function(c) mean(acc_i[y == c]), numeric(1))
-  n_c <- tabulate(match(y, classes))
-  bacc_i <- acc_i / (K * n_c[match(y, classes)])
-  
+  bacc_i <- acc_i / (K * n_c[class_id])
+
   res <- list(
     estimate = mean(acc_c),
     se = sqrt(sum(acc_c * (1 - acc_c) / n_c)) / K,
-    pointwise = bacc_i
+    pointwise = bacc_i,
+    # the class strata are what makes a difference of balanced accuracies more
+    # than a mean of pointwise differences, and `.se_diff_bacc()` cannot
+    # recover them from `bacc_i`: every misclassified observation stores a
+    # zero whatever its class
+    extra = list(class_id = class_id)
   )
   .create_measure_structure(
     res, higher_is_better, "bacc", n_draws = n_draws, n_obs = n_obs
@@ -685,6 +696,33 @@ measure_rmse <- function(
   )
 }
 
+#' Delta-method standard error of an R-squared quantity
+#'
+#' The R-squared of one model and the difference in R-squared between two
+#' models have the same form: a mean of squared-error contributions divided by
+#' the model-independent baseline `MSE(y)`. Their standard errors are therefore
+#' the same first-order Taylor approximation, evaluated either at one model's
+#' pointwise squared errors or at the pointwise differences between two models.
+#'
+#' Writing `c = mean(sqe) / MSE(y)`, the three-term expansion
+#' `Var[MSE] - 2 * c * Cov[MSE, MSE(y)] + c^2 * Var[MSE(y)]`, scaled by
+#' `MSE(y)^-1`, is exactly the standard error of the mean of
+#' `sqe_i - c * mse_y_i`. That is the form used here: it needs one variance
+#' rather than three moments, it cannot go negative under the square root, and
+#' it is exactly `0` when `sqe` is identically zero, as it is when a model is
+#' compared against itself.
+#'
+#' @noRd
+#' @param sqe Pointwise squared errors of one model, or pointwise differences
+#'   in squared error between two models.
+#' @param mse_y_i Pointwise baseline `(y_i - mean(y))^2`.
+#' @return Numeric scalar standard error.
+.se_r2_delta <- function(sqe, mse_y_i) {
+  mse_y_hat <- mean(mse_y_i)
+  scaled <- sqe - (mean(sqe) / mse_y_hat) * mse_y_i
+  sqrt(var(scaled) / length(sqe)) / mse_y_hat
+}
+
 #' Predictive R-squared (`r2`)
 #'
 #' Computes predictive R-squared as one minus the ratio of prediction MSE to
@@ -721,22 +759,18 @@ measure_r2 <- function(
   
   mse_y_i <- (y - mean(y))^2
   mse_y_hat <- mean(mse_y_i)
-   
-  var_mse_hat <- mse_res$estimate[2]^2     
-  cov_mse_msey <- stats::cov(sqe_i, mse_y_i) / n_obs              
-  var_mse_y_hat <- var(mse_y_i) / n_obs 
-  
-  t1 <- var_mse_hat
-  t2 <- -2 * (mse_hat / mse_y_hat) * cov_mse_msey
-  t3 <- (mse_hat^2 / mse_y_hat^2) * var_mse_y_hat
-  se_r2 <- sqrt(t1 + t2 + t3) * (1 / mse_y_hat)
-  
+
   est_r2 <- 1 - mse_hat / mse_y_hat
-  
+  se_r2 <- .se_r2_delta(sqe_i, mse_y_i)
+
   res <- list(
     estimate = est_r2,
     se = se_r2,
-    pointwise = sqe_i
+    pointwise = sqe_i,
+    # `loo_compare()` needs the baseline to propagate uncertainty into the
+    # standard error of an r2 difference; `y` is gone by then. See
+    # `.se_diff_r2()`.
+    extra = list(mse_y_i = mse_y_i)
   )
   .create_measure_structure(
     res, higher_is_better, "r2", n_draws = n_draws, n_obs = n_obs
@@ -944,14 +978,202 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   ic = list(fun = measure_ic, loss = TRUE, diff_method = "sum"),
   mlpd = list(fun = measure_mlpd, loss = FALSE, diff_method = "sum"),
   mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
-  r2 = list(fun = measure_r2, loss = FALSE, diff_method = "estimates_only"),
-  rmse = list(fun = measure_rmse, loss = TRUE, diff_method = "estimates_only"),
-  mse = list(fun = measure_mse, loss = TRUE, diff_method = "estimates_only"),
+  r2 = list(
+    fun = measure_r2,
+    loss = FALSE,
+    diff_method = "pairwise",
+    se_diff_fun = "r2"
+  ),
+  rmse = list(
+    fun = measure_rmse,
+    loss = TRUE,
+    diff_method = "pairwise",
+    se_diff_fun = "rmse"
+  ),
+  mse = list(fun = measure_mse, loss = TRUE, diff_method = "mean"),
   acc = list(fun = measure_acc, loss = FALSE, diff_method = "mean"),
-  bacc = list(fun = measure_bacc, loss = FALSE, diff_method = "estimates_only"),
+  bacc = list(
+    fun = measure_bacc,
+    loss = FALSE,
+    diff_method = "pairwise",
+    se_diff_fun = "bacc"
+  ),
   rps = list(fun = measure_rps, loss = FALSE, diff_method = "mean"),
   srps = list(fun = measure_srps, loss = TRUE, diff_method = "mean"),
   brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
+)
+
+# pairwise standard errors -----------------------------
+#
+# Measures whose overall estimate is not a sum or mean of pointwise
+# contributions cannot use the paired pointwise standard error. They register a
+# `se_diff_fun` in `.measure_spec`, naming an entry of `.se_diff_funs` below.
+# Custom measures may instead attach a function directly via
+# `attr(my_fun, "se_diff_fun")`.
+#
+# Such a function receives `ref` and `cmp`, each a list with the elements
+# `estimate`, `se`, `pointwise`, and `extra` for one model, always on the
+# measure's natural scale (`higher_is_better` sign flips are undone before the
+# call and reapplied to the difference afterwards), and returns the standard
+# error of the difference as a numeric scalar. The difference itself is always
+# `estimate_cmp - estimate_ref` and is computed by `loo_compare()`.
+
+#' Standard error of an RMSE difference
+#'
+#' First-order bivariate Taylor (delta method) approximation of the standard
+#' error of \eqn{RMSE(M_cmp) - RMSE(M_ref)}, propagated from the MSE scale on
+#' which the pointwise squared errors live.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds squared errors.
+#' @return Numeric scalar standard error.
+.se_diff_rmse <- function(ref, cmp) {
+  sqe_ref <- ref$pointwise
+  sqe_cmp <- cmp$pointwise
+  n <- length(sqe_ref)
+  mse_ref <- mean(sqe_ref)
+  mse_cmp <- mean(sqe_cmp)
+
+  # a perfect predictor leaves the ratios below undefined; `measure_rmse()`
+  # reports a zero standard error in that case, so do the same here
+  if (n <= 1L || mse_ref <= 0 || mse_cmp <= 0) {
+    return(0)
+  }
+
+  se_mse_ref <- sqrt(stats::var(sqe_ref) / n)
+  se_mse_cmp <- sqrt(stats::var(sqe_cmp) / n)
+  cov_mse <- sum((sqe_cmp - mse_cmp) * (sqe_ref - mse_ref)) / (n * (n - 1))
+
+  # standard errors of the two MSEs relative to their own scale, and their
+  # correlation
+  rel_ref <- se_mse_ref / sqrt(mse_ref)
+  rel_cmp <- se_mse_cmp / sqrt(mse_cmp)
+  rho <- if (se_mse_ref <= 0 || se_mse_cmp <= 0) {
+    0
+  } else {
+    cov_mse / (se_mse_cmp * se_mse_ref)
+  }
+
+  # algebraically `rel_cmp^2 + rel_ref^2 - 2 * rho * rel_cmp * rel_ref`, but
+  # written so that two models with the same squared errors cancel exactly
+  # rather than leaving rounding noise behind. Both terms are non-negative,
+  # because the correlation cannot exceed one.
+  v <- (rel_cmp - rel_ref)^2 + 2 * rel_cmp * rel_ref * max(1 - rho, 0)
+
+  0.5 * sqrt(v)
+}
+
+#' Standard error of an R-squared difference
+#'
+#' First-order trivariate Taylor (delta method) approximation of the standard
+#' error of \eqn{R^2(M_cmp) - R^2(M_ref)}. The difference equals
+#' \eqn{-MSE(M_cmp, M_ref) / MSE(y)}, so it is the same expansion as the
+#' single-model standard error in `measure_r2()` with the pointwise squared
+#' errors replaced by their pointwise differences; both go through
+#' `.se_r2_delta()`.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds squared errors and
+#'   `extra$mse_y_i` the baseline `(y_i - mean(y))^2` stored by `measure_r2()`.
+#' @return Numeric scalar standard error, or `NA_real_` when the baseline is
+#'   unavailable.
+.se_diff_r2 <- function(ref, cmp) {
+  # the baseline is a property of `y`, so either model's copy will do; models
+  # fitted to different `y` are already reported by the `yhash` warning
+  mse_y_i <- ref$extra$mse_y_i
+  if (is.null(mse_y_i)) {
+    mse_y_i <- cmp$extra$mse_y_i
+  }
+
+  # objects computed before the baseline was stored cannot support the
+  # covariance terms; report the difference without a standard error rather
+  # than refusing the whole comparison
+  if (!is.numeric(mse_y_i) || length(mse_y_i) != length(ref$pointwise)) {
+    return(NA_real_)
+  }
+
+  .se_r2_delta(cmp$pointwise - ref$pointwise, mse_y_i)
+}
+
+#' Standard error of a balanced-accuracy difference
+#'
+#' Balanced accuracy averages class-wise accuracies, so a difference of two
+#' balanced accuracies is a difference of two stratified means, not a mean of
+#' pointwise differences. The two sources of dependence separate: the class
+#' strata are disjoint sets of observations and so contribute independent
+#' variances, while within a stratum both models score the *same* `n_c`
+#' observations and are therefore paired. Writing
+#' \eqn{d_i = acc_i(M_cmp) - acc_i(M_ref)},
+#'
+#' \deqn{SE = \frac{1}{K} \sqrt{\sum_c Var(d_i : i \in c) / n_c}}
+#'
+#' which is the difference-analogue of the single-model
+#' \eqn{\sqrt{\sum_c acc_c (1 - acc_c) / n_c} / K} in `measure_bacc()`: the
+#' per-stratum binomial variance replaced by the paired-difference variance.
+#' Within a stratum this is the McNemar variance of a paired difference of
+#' proportions, \eqn{(b + c)/n_c^2 - (b - c)^2/n_c^3} in discordant-pair form,
+#' up to the \eqn{n_c/(n_c - 1)} of the sample variance.
+#'
+#' For binary outcomes balanced accuracy is \eqn{(sens + spec)/2}, so this is
+#' the estimand of Newcombe (2001) at a mixing parameter of one half, and half
+#' the difference of two Youden indices in a paired design (Chen et al., 2015).
+#'
+#' @references
+#' Newcombe, R. G. (2001). Simultaneous comparison of sensitivity and
+#' specificity of two tests in the paired design: a straightforward graphical
+#' approach. *Statistics in Medicine*, 20(6):907--915.
+#'
+#' Chen, F., Xue, Y., Tan, M. T., and Chen, P. (2015). Efficient statistical
+#' tests to compare Youden index: accounting for contingency correlation.
+#' *Statistics in Medicine*, 34(9):1560--1576.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds `acc_i / (K * n_c)` and
+#'   `extra$class_id` the class index stored by `measure_bacc()`.
+#' @return Numeric scalar standard error, or `NA_real_` when the class strata
+#'   are unavailable.
+.se_diff_bacc <- function(ref, cmp) {
+  # the strata are a property of `y`, so either model's copy will do; models
+  # fitted to different `y` are already reported by the `yhash` warning
+  class_id <- ref$extra$class_id
+  if (is.null(class_id)) {
+    class_id <- cmp$extra$class_id
+  }
+
+  n <- length(ref$pointwise)
+  # objects computed before the strata were stored cannot be stratified;
+  # report the difference without a standard error rather than refusing the
+  # whole comparison
+  if (!is.numeric(class_id) || length(class_id) != n) {
+    return(NA_real_)
+  }
+
+  n_c <- tabulate(class_id)
+  K <- length(n_c)
+  # undo the `acc_i / (K * n_c)` scaling to recover the 0/1 accuracies, so the
+  # variances below are on the natural per-observation scale
+  d <- (cmp$pointwise - ref$pointwise) * (K * n_c[class_id])
+
+  # a stratum holding a single observation supports no variance estimate and
+  # contributes nothing, matching `measure_bacc()`, where `acc_c` is then 0 or
+  # 1 and its binomial variance vanishes
+  var_c <- vapply(
+    seq_len(K),
+    function(k) {
+      if (n_c[k] < 2L) 0 else stats::var(d[class_id == k]) / n_c[k]
+    },
+    numeric(1)
+  )
+
+  sqrt(sum(var_c)) / K
+}
+
+# registry of built-in `se_diff_fun` implementations, referenced by name from
+# `.measure_spec` so that stored objects carry a string rather than a closure
+.se_diff_funs <- list(
+  rmse = .se_diff_rmse,
+  r2 = .se_diff_r2,
+  bacc = .se_diff_bacc
 )
 
 #' Return comparison metadata for a measure
@@ -975,14 +1197,26 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     return(list(
       higher_is_better = higher_is_better,
       loss = isTRUE(entry$loss),
-      diff_method = entry$diff_method
+      diff_method = entry$diff_method,
+      se_diff_fun = entry$se_diff_fun
+    ))
+  }
+
+  se_diff_fun <- attr(measure_entry$key, "se_diff_fun", exact = TRUE)
+  if (!is.null(se_diff_fun) && !is.function(se_diff_fun)) {
+    cli::cli_abort(c(
+      "Attribute {.code se_diff_fun} of custom measure",
+      "{.val {measure_entry$name}} must be a function.",
+      "i" = "It is called as {.code se_diff_fun(ref, cmp)} and must return a",
+      " " = "numeric scalar."
     ))
   }
 
   list(
     higher_is_better = higher_is_better,
     loss = FALSE,
-    diff_method = "auto"
+    diff_method = if (is.null(se_diff_fun)) "auto" else "pairwise",
+    se_diff_fun = se_diff_fun
   )
 }
 
@@ -1024,6 +1258,25 @@ supported_measures_list <- names(.measure_spec)
     class = c("measure", "loo"),
     measure = measure_name,
     dims = c(n_draws, n_obs),
-    higher_is_better = higher_is_better
+    higher_is_better = higher_is_better,
+    # not affected by the sign flip above: `extra` carries auxiliary data for
+    # `se_diff_fun()`, which always works on the measure's natural scale
+    compare_extra = res$extra
   )
+}
+
+#' Auxiliary data a measure stores for its `se_diff_fun`
+#'
+#' Built-in measures carry it as the `compare_extra` attribute added by
+#' `.create_measure_structure()`; custom measures return it as an `extra`
+#' element of their result list.
+#' @noRd
+#' @param res A measure result.
+#' @return A list, or `NULL` when the measure stores nothing.
+.measure_compare_extra <- function(res) {
+  extra <- attr(res, "compare_extra", exact = TRUE)
+  if (is.null(extra)) {
+    extra <- res$extra
+  }
+  extra
 }

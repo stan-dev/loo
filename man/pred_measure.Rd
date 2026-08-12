@@ -44,7 +44,25 @@ functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
 }
 Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} that appear in their formals, plus arguments from \code{control}.
-They must return a list with  \code{estimates} and \code{pointwise}.}
+They must return a list with  \code{estimates} and \code{pointwise}.
+
+For \code{\link[=loo_compare]{loo_compare()}}, the standard error of a difference is derived from
+paired pointwise differences when the overall estimate is the sum or the
+mean of \code{pointwise}; otherwise it is \code{NA}. A custom measure that is a
+transformation of pointwise quantities (as \code{rmse} is of squared errors) can
+supply its own by setting
+\code{attr(my_fun, "se_diff_fun") <- function(ref, cmp) ...}. That function
+receives one list per model with elements \code{estimate}, \code{se}, \code{pointwise},
+and \code{extra}, always on the measure's natural scale, and must return the
+standard error of the difference as a numeric scalar. Note that the
+function is stored on the result object, so it carries its enclosing
+environment into any saved copy of that object.
+
+\code{extra} is for anything the standard error needs that the pointwise values
+do not carry. Return it as an additional list element \code{extra} from the
+measure function and it is stored alongside the estimates; the built-in
+\code{r2} uses it for the baseline \code{(y_i - mean(y))^2}, which cannot be
+recovered once \code{y} is out of scope.}
 
 \item{predperf}{An existing predictive measure object (class
 \code{"pred_measure"}) to update. When supplied, base density summaries and

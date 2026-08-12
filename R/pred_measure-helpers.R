@@ -236,6 +236,13 @@
       "length {.val {n_obs}}, not {.val {length(res$pointwise)}}."
     ))
   }
+  if (!is.null(res$extra) && !is.list(res$extra)) {
+    cli::cli_abort(c(
+      "{.field extra} from custom measure {.val {measure_name}} must be a list.",
+      "i" = "It is handed to {.code se_diff_fun(ref, cmp)} as
+             {.code ref$extra} and {.code cmp$extra}."
+    ))
+  }
 
   invisible(res)
 }

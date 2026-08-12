@@ -266,24 +266,36 @@
 #' ### `{measure}_diff` and `{measure}_se_diff`
 #'
 #' For each non-ELPD measure `m`, `loo_compare()` adds columns `m_diff` and
-#' `m_se_diff`. When the overall estimate is a sum or mean of pointwise
-#' contributions, these are computed from paired pointwise differences on a
-#' utility scale (higher is better; loss measures such as MSE, Brier score, and
-#' SRPS have their sign flipped from the raw loss orientation) using the same
-#' approach as `elpd_diff` and `se_diff` (Eq 24 in VGG2017 for sums; the mean
-#' analogue for means). Measures already returned on a utility scale (e.g. ELPD,
-#' CRPS/RPS) are not sign-flipped. Negative `m_diff` values then indicate worse
-#' performance than the reference model, which has `m_diff = 0`. For sum- and
-#' mean-based measures, the reference model also has `m_se_diff = 0`; for
-#' `estimates_only` measures (e.g. `r2`, `mse`, `rmse`), `m_se_diff` is `NA`.
+#' `m_se_diff`. In all cases `m_diff` is the difference between the two overall
+#' estimates on a utility scale (higher is better; loss measures such as MSE,
+#' Brier score, and SRPS have their sign flipped from the raw loss orientation).
+#' Measures already returned on a utility scale (e.g. ELPD, CRPS/RPS) are not
+#' sign-flipped. Negative `m_diff` values then indicate worse performance than
+#' the reference model, which has `m_diff = 0`.
+#'
+#' How `m_se_diff` is obtained depends on the measure:
+#'
+#' * When the overall estimate is a sum or mean of pointwise contributions, it
+#'   is computed from paired pointwise differences using the same approach as
+#'   `elpd_diff` and `se_diff` (Eq 24 in VGG2017 for sums; the mean analogue for
+#'   means). This covers ELPD, `mlpd`, `ic`, `mae`, `mse`, `acc`, `brier`, and
+#'   the ranked probability scores.
+#' * When it is a transformation of such quantities, the measure supplies its
+#'   own delta-method standard error (`se_diff_fun`). For `rmse` this is the
+#'   first-order bivariate Taylor approximation propagated from the MSE scale,
+#'   which requires the covariance between the two models' pointwise squared
+#'   errors and is therefore not a paired pointwise standard deviation. For
+#'   `r2` it is the trivariate analogue, which additionally propagates the
+#'   uncertainty in the baseline `MSE(y)` shared by both models.
+#' * Otherwise `m_se_diff` is `NA`. This applies only to custom measures whose
+#'   estimate is neither a sum nor a mean of their pointwise values and which do
+#'   not attach an `se_diff_fun`.
+#'
+#' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
 #' Attribute `measure_higher_is_better` on each `*_pred_measure()`
 #' result records the `higher_is_better` setting used when each measure was
 #' computed; when stored values are on a loss scale, `loo_compare()` emits a
 #' short message naming those measures (see [loo_compare()]).
-#'
-#' For measures where pointwise values do not define the overall estimate (e.g.
-#' `r2`, `mse`, `rmse`), `m_diff` is the difference between overall estimates
-#' (on a utility scale) and `m_se_diff` is `NA`.
 #'
 #' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
 #' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
@@ -306,12 +318,29 @@
 #' * `higher_is_better` — the orientation setting used when the measure was
 #'   computed (`NULL`, `TRUE`, or `FALSE`)
 #' * `loss` — whether stored values are on a loss scale (lower is better)
-#' * `diff_method` — how paired differences are aggregated: `"sum"`,
-#'   `"mean"`, `"estimates_only"`, or `"auto"` (inferred at compare time for
-#'   custom measures)
+#' * `diff_method` — how the standard error of the difference is obtained:
+#'   `"sum"` or `"mean"` (paired pointwise differences), `"pairwise"` (the
+#'   measure's own `se_diff_fun`), `"estimates_only"` (unavailable, `NA`), or
+#'   `"auto"` (inferred at compare time for custom measures). No built-in
+#'   measure declares `"estimates_only"`; it is reached only when
+#'   autodetection under `"auto"` cannot establish that the estimate is a sum
+#'   or mean of its pointwise values. It is not an error state — the
+#'   difference itself is still reported, and only its standard error is
+#'   marked unavailable.
+#' * `se_diff_fun` — for `diff_method = "pairwise"`, either the name of a
+#'   built-in implementation or, for custom measures, the function itself
+#' * `extra` — optional list of auxiliary data the measure stored for its
+#'   `se_diff_fun`, present only for measures that need it (`r2` stores the
+#'   pointwise baseline `(y_i - mean(y))^2`, which `y` no longer supplies by
+#'   the time [loo_compare()] runs; `bacc` stores the class index of each
+#'   observation, which its pointwise values do not determine). It is excluded
+#'   from the metadata consistency check below, since it varies with the data
+#'   rather than with how the measure was configured.
 #'
-#' Built-in measures take `loss` and `diff_method` from the package measure
-#' registry; custom measures default to `loss = FALSE` and `diff_method = "auto"`.
+#' Built-in measures take `loss`, `diff_method`, and `se_diff_fun` from the
+#' package measure registry; custom measures default to `loss = FALSE` and
+#' `diff_method = "auto"` unless they attach an `se_diff_fun` (see
+#' [insample_pred_measure()]).
 #' [loo_compare()] requires all models to provide matching metadata for each
 #' shared measure; mismatched `higher_is_better` settings or missing metadata on
 #' some models produce an error.
@@ -322,10 +351,9 @@
 #' the reference model for all pairwise differences. When `rank_by` is omitted,
 #' models are ranked by `"elpd"`; attribute `rank_by` is set only when `rank_by`
 #' is passed explicitly. Attribute `compare_measures` lists all measures that
-#' were compared, `sign_converted_measures` lists loss measures whose sign was
-#' flipped onto the utility scale, and `measures_no_pointwise_se` lists measures
-#' for which `{measure}_se_diff` is unavailable (overall estimate not defined
-#' from pointwise values). The print method shows the ranking measure by default
+#' were compared, and `sign_converted_measures` lists loss measures whose sign
+#' was flipped onto the utility scale. The print method shows the ranking
+#' measure by default
 #' (`"elpd"` when `rank_by` was not set); use `print(x, measures = "all")` or
 #' `print(x, measures = c("rmse", "r2"))` to display additional measure tables.
 #' Printed tables label the standard-error column `se_diff` even for non-ELPD

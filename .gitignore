@@ -30,3 +30,5 @@ release-prep.R
 
 # personal maintainer scratch (not shared)
 internal-notes/
+notes/loo_se.pdf
+notes/loo-compare-se-diff.md

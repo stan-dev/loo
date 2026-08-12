@@ -66,6 +66,7 @@ articles:
     contents:
       - articles-online-only/pred-measure-workflow
       - articles-online-only/overview-measures
+      - articles-online-only/comparison-standard-errors
   - title: Frequently asked questions
     contents:
       - faq

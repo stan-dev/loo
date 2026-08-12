@@ -62,8 +62,6 @@ diagnostics appear in \code{diag_elpd}. Attributes \code{compare_measures} and
 \code{sign_converted_measures} record which measures were compared and which
 loss measures had their sign flipped for comparison. Attribute \code{rank_by} is
 set when \code{rank_by} was passed explicitly (default ranking is by \code{"elpd"}).
-Attribute \code{measures_no_pointwise_se} lists measures without pointwise-based
-\verb{\{measure\}_se_diff} values.
 }
 \description{
 Compare fitted models based on \link[=loo-glossary]{ELPD} or, for

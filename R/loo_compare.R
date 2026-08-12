@@ -32,8 +32,6 @@
 #'   `sign_converted_measures` record which measures were compared and which
 #'   loss measures had their sign flipped for comparison. Attribute `rank_by` is
 #'   set when `rank_by` was passed explicitly (default ranking is by `"elpd"`).
-#'   Attribute `measures_no_pointwise_se` lists measures without pointwise-based
-#'   `{measure}_se_diff` values.
 #'
 #' @details
 #'   When comparing two fitted models, we can estimate the difference in their
@@ -397,8 +395,6 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
     }
   }
 
-  .warn_measures_no_pointwise_se(attr(x, "measures_no_pointwise_se"))
-
   invisible(x)
 }
 
@@ -529,13 +525,9 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
   n_obs <- nrow(loos_ord[[1L]]$pointwise)
 
   diff_cols <- list()
-  measures_no_pointwise_se <- list()
   for (col in compare_cols) {
     bare <- .display_name(col)
     method <- .measure_pointwise_diff_method(loos_ord, col)
-    if (method == "estimates_only") {
-      measures_no_pointwise_se[[bare]] <- bare
-    }
     pair_stats <- vapply(
       loos_ord,
       .pair_measure_stats,
@@ -578,7 +570,6 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
     rank_col = rank_measure$internal
   )
 
-  attr(comp, "measures_no_pointwise_se") <- unique(unlist(measures_no_pointwise_se))
   if (!is.null(rank_by)) {
     attr(comp, "rank_by") <- rank_measure$bare
   }
@@ -652,7 +643,15 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
         call. = FALSE
       )
     }
-    non_null <- metas[has_meta]
+    # `extra` holds per-measure auxiliary data (for `r2`, the pointwise
+    # baseline derived from `y`), which legitimately differs when models are
+    # fitted to different data. That case is already reported by the `yhash`
+    # warning, so comparing `extra` here would only mislabel it as a
+    # `higher_is_better` disagreement.
+    non_null <- lapply(metas[has_meta], function(meta) {
+      meta$extra <- NULL
+      meta
+    })
     if (length(non_null) > 1L) {
       ref <- non_null[[1L]]
       inconsistent <- vapply(
@@ -721,23 +720,6 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
   )
 }
 
-#' Warn when `se_diff` is unavailable for compared measures
-#' @noRd
-.warn_measures_no_pointwise_se <- function(measures) {
-  if (!length(measures)) {
-    return(invisible(NULL))
-  }
-  warning(
-    paste0(
-      "se_diff unavailable for: ",
-      paste(measures, collapse = ", "),
-      "."
-    ),
-    call. = FALSE
-  )
-  invisible(NULL)
-}
-
 #' Bare measure names available for comparison across models
 #' @noRd
 .compare_measures <- function(loos) {
@@ -773,18 +755,38 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
   compare_meta[[bare]]
 }
 
+#' Whether a measure is intrinsically a loss (natural scale: lower is better)
+#'
+#' Unlike `.measure_lower_is_better()` this ignores `higher_is_better`, so it
+#' describes the measure itself rather than the scale its values are stored on.
+#' @noRd
+.measure_is_loss <- function(name, loos = NULL) {
+  bare <- .display_name(name)
+
+  if (!is.null(loos)) {
+    meta <- .get_measure_compare_meta(loos, bare)
+    if (!is.null(meta) && !is.null(meta$loss)) {
+      return(isTRUE(meta$loss))
+    }
+  }
+
+  spec <- .measure_spec[[bare]]
+  if (!is.null(spec)) {
+    return(isTRUE(spec$loss))
+  }
+  bare %in% c("ic", "mae", "mse", "rmse", "brier", "srps")
+}
+
 #' Whether stored values are on a loss scale (lower is better)
 #' @noRd
 .measure_lower_is_better <- function(name, loos = NULL) {
   bare <- .display_name(name)
   higher_is_better <- NULL
-  loss <- NULL
 
   if (!is.null(loos)) {
     meta <- .get_measure_compare_meta(loos, bare)
     if (!is.null(meta)) {
       higher_is_better <- meta$higher_is_better
-      loss <- meta$loss
     } else {
       hib_attr <- attr(loos[[1L]], "measure_higher_is_better")
       if (!is.null(hib_attr) && bare %in% names(hib_attr)) {
@@ -797,16 +799,18 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
     return(!isTRUE(higher_is_better))
   }
 
-  if (is.null(loss)) {
-    spec <- .measure_spec[[bare]]
-    loss <- if (!is.null(spec)) {
-      isTRUE(spec$loss)
-    } else {
-      bare %in% c("ic", "mae", "mse", "rmse", "brier", "srps")
-    }
-  }
+  .measure_is_loss(name, loos)
+}
 
-  isTRUE(loss)
+#' Sign converting stored measure values to the measure's natural scale
+#'
+#' `higher_is_better` may have negated the stored values (see
+#' `.create_measure_structure()`). Delta-method standard errors are derived on
+#' the natural scale (e.g. RMSE positive), so they must be undone first.
+#' @noRd
+.measure_natural_sign <- function(name, loos = NULL) {
+  stored_lower_is_better <- .measure_lower_is_better(name, loos)
+  if (identical(stored_lower_is_better, .measure_is_loss(name, loos))) 1 else -1
 }
 
 #' Bare names of measures whose sign is flipped for `loo_compare()`
@@ -832,7 +836,7 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
     paste(converted, collapse = ", "),
     " ",
     if (length(converted) == 1L) "is" else "are",
-    " reported on a utility scale (higher is better)."
+    "\nreported on a utility scale (higher is better)."
   )
   invisible(NULL)
 }
@@ -840,8 +844,9 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
 #' How to aggregate paired pointwise differences for a measure
 #'
 #' Returns `"sum"` when the overall estimate equals the sum of pointwise
-#' contributions, `"mean"` when it equals the mean, and `"estimates_only"`
-#' when pointwise values do not define the overall estimate.
+#' contributions, `"mean"` when it equals the mean, `"pairwise"` when the
+#' measure supplies its own `se_diff_fun`, and `"estimates_only"` when pointwise
+#' values do not define the overall estimate and no `se_diff_fun` is available.
 #' @noRd
 .measure_pointwise_diff_method <- function(loos, col) {
   bare <- .display_name(col)
@@ -850,10 +855,6 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
     return(meta$diff_method)
   }
 
-  spec <- .measure_spec[[bare]]
-  if (!is.null(spec) && identical(spec$diff_method, "estimates_only")) {
-    return("estimates_only")
-  }
   if (.is_elpd_measure(col) || bare == "ic") {
     return("sum")
   }
@@ -875,6 +876,65 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
   "estimates_only"
 }
 
+#' Resolve a measure's `se_diff_fun`
+#'
+#' Built-in measures name an entry of `.se_diff_funs`; custom measures store the
+#' function itself (see `.measure_compare_meta()`).
+#' @noRd
+.measure_se_diff_fun <- function(loos, col) {
+  bare <- .display_name(col)
+  meta <- .get_measure_compare_meta(loos, bare)
+
+  fun <- meta$se_diff_fun
+  if (is.null(fun)) {
+    fun <- .measure_spec[[bare]]$se_diff_fun
+  }
+  if (is.character(fun)) {
+    fun <- .se_diff_funs[[fun]]
+  }
+  if (!is.function(fun)) {
+    stop(
+      paste0(
+        "No 'se_diff_fun' available for measure '", bare, "'."
+      ),
+      call. = FALSE
+    )
+  }
+  fun
+}
+
+#' Assemble one model's inputs for an `se_diff_fun`
+#'
+#' Every element describes the single model `x`, including `extra`, which is
+#' read from that model's own comparison metadata rather than the reference
+#' model's.
+#' @noRd
+#' @param sgn Sign restoring the measure's natural scale, see
+#'   `.measure_natural_sign()`.
+.se_diff_input <- function(x, col, sgn) {
+  list(
+    estimate = sgn * x$estimates[col, "Estimate"],
+    se = x$estimates[col, "SE"],
+    pointwise = sgn * x$pointwise[, col, drop = TRUE],
+    extra = .get_measure_compare_meta(list(x), .display_name(col))$extra
+  )
+}
+
+#' Validate the value returned by an `se_diff_fun`
+#' @noRd
+.validate_se_diff <- function(se, col) {
+  if (!is.numeric(se) || length(se) != 1L) {
+    stop(
+      paste0(
+        "The 'se_diff_fun' for measure '", .display_name(col),
+        "' must return a numeric scalar."
+      ),
+      call. = FALSE
+    )
+  }
+  unname(se)
+}
+
 #' Paired measure difference and SE for one model vs a reference
 #' @noRd
 .pair_measure_stats <- function(cmp, ref, col, method = NULL, loos = list(ref)) {
@@ -883,15 +943,28 @@ compare_loo_pred_measure <- function(loos, rank_by = NULL) {
   }
 
   flip <- .measure_lower_is_better(col, loos)
+  est_utility <- function(estimates) {
+    val <- estimates[col, "Estimate"]
+    if (flip) -val else val
+  }
 
   if (method == "estimates_only") {
-    est_utility <- function(estimates) {
-      val <- estimates[col, "Estimate"]
-      if (flip) -val else val
-    }
     return(c(
       diff = est_utility(cmp$estimates) - est_utility(ref$estimates),
       se = NA_real_
+    ))
+  }
+
+  if (method == "pairwise") {
+    se_diff_fun <- .measure_se_diff_fun(loos, col)
+    sgn <- .measure_natural_sign(col, loos)
+    se <- se_diff_fun(
+      ref = .se_diff_input(ref, col, sgn),
+      cmp = .se_diff_input(cmp, col, sgn)
+    )
+    return(c(
+      diff = est_utility(cmp$estimates) - est_utility(ref$estimates),
+      se = .validate_se_diff(se, col)
     ))
   }
 

@@ -16,9 +16,6 @@
       or https://mc-stan.org/loo/reference/loo-glossary.html.
       
       Other measures compared: elpd, r2. Use print(x, measures = "all").
-    Condition
-      Warning:
-      se_diff unavailable for: r2.
 
 # loo_compare informs when measure signs are converted
 
@@ -43,9 +40,6 @@
       or https://mc-stan.org/loo/reference/loo-glossary.html.
       
       Other measures compared: r2, mae. Use print(x, measures = "all").
-    Condition
-      Warning:
-      se_diff unavailable for: r2.
 
 ---
 
@@ -61,9 +55,9 @@
       
       -- r2 (vs m3) --
        model r2_diff se_diff
-          m3    0.00      NA
-          m2    0.01      NA
-          m1   -0.20      NA
+          m3    0.00    0.00
+          m2    0.01    0.07
+          m1   -0.20    0.13
       
       -- mae (vs m3) --
        model mae_diff se_diff
@@ -75,9 +69,6 @@
       Diagnostic flags present.
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
-    Condition
-      Warning:
-      se_diff unavailable for: r2.
 
 ---
 
@@ -87,9 +78,9 @@
       
       -- r2 (vs m3) --
        model r2_diff se_diff
-          m3     0.0      NA
-          m2     0.0      NA
-          m1    -0.2      NA
+          m3     0.0     0.0
+          m2     0.0     0.1
+          m1    -0.2     0.1
       
       -- mae (vs m3) --
        model mae_diff se_diff
@@ -101,9 +92,6 @@
       Diagnostic flags present.
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
-    Condition
-      Warning:
-      se_diff unavailable for: r2.
 
 ---
 
@@ -122,9 +110,6 @@
       or https://mc-stan.org/loo/reference/loo-glossary.html.
       
       Other measures compared: elpd, r2. Use print(x, measures = "all").
-    Condition
-      Warning:
-      se_diff unavailable for: r2.
 
 # loo_compare returns expected results (2 models)
 

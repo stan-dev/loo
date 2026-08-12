@@ -34,6 +34,24 @@
 #'   Custom functions are called with any of `y`, `ypred`, `mupred`, `ylp`, and
 #'   `log_weights` that appear in their formals, plus arguments from `control`.
 #'   They must return a list with  `estimates` and `pointwise`.
+#'
+#'   For [loo_compare()], the standard error of a difference is derived from
+#'   paired pointwise differences when the overall estimate is the sum or the
+#'   mean of `pointwise`; otherwise it is `NA`. A custom measure that is a
+#'   transformation of pointwise quantities (as `rmse` is of squared errors) can
+#'   supply its own by setting
+#'   `attr(my_fun, "se_diff_fun") <- function(ref, cmp) ...`. That function
+#'   receives one list per model with elements `estimate`, `se`, `pointwise`,
+#'   and `extra`, always on the measure's natural scale, and must return the
+#'   standard error of the difference as a numeric scalar. Note that the
+#'   function is stored on the result object, so it carries its enclosing
+#'   environment into any saved copy of that object.
+#'
+#'   `extra` is for anything the standard error needs that the pointwise values
+#'   do not carry. Return it as an additional list element `extra` from the
+#'   measure function and it is stored alongside the estimates; the built-in
+#'   `r2` uses it for the baseline `(y_i - mean(y))^2`, which cannot be
+#'   recovered once `y` is out of scope.
 #' @param measure_name For a single custom function, set
 #'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
 #'   `measure`.
@@ -167,7 +185,8 @@ do_pred_measure <- function(
       values = .measure_estimate_se(sel_measure),
       margin = 1,
       measure_entry = entry,
-      higher_is_better = attr(sel_measure, "higher_is_better")
+      higher_is_better = attr(sel_measure, "higher_is_better"),
+      extra = .measure_compare_extra(sel_measure)
     )
     pointwise <- .merge_matrix(
       source = source,
@@ -545,6 +564,9 @@ do_pred_measure <- function(
 #'   recorded from this entry and `higher_is_better`.
 #' @param higher_is_better Optional logical or `NULL`; records the orientation
 #'   used for `name` when merging an estimates row (`margin = 1`).
+#' @param extra Optional list of auxiliary data the measure stores for its
+#'   `se_diff_fun` (see `.measure_compare_extra()`); recorded in the comparison
+#'   metadata when merging an estimates row (`margin = 1`).
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
@@ -567,7 +589,8 @@ do_pred_measure <- function(
   values,
   margin,
   measure_entry = NULL,
-  higher_is_better = NULL
+  higher_is_better = NULL,
+  extra = NULL
 ) {
   is_row <- margin == 1
   bind_fn <- if (is_row) rbind else cbind
@@ -581,6 +604,9 @@ do_pred_measure <- function(
 
   compare_meta <- if (is_row && !is.null(measure_entry)) {
     .measure_compare_meta(measure_entry, higher_is_better)
+  }
+  if (!is.null(compare_meta) && !is.null(extra)) {
+    compare_meta$extra <- extra
   }
 
   old_higher_is_better <- if (is_row && !is.null(mat)) {
