@@ -325,3 +325,18 @@ test_that("Deprecation of log_q argument", {
   expect_s3_class(psis_lap, "psis")
   expect_lt(pareto_k_values(psis_lap), 0.7)
 })
+
+test_that("ap_psis.array works as ap_psis.matrix", {
+  log_p <- test_data_psis_approximate_posterior$laplace_independent$log_p
+  log_g <- test_data_psis_approximate_posterior$laplace_independent$log_q
+  ll <- test_data_psis_approximate_posterior$laplace_independent$log_liks
+  ll_array <- array(ll, dim = c(nrow(ll) / 2, 2, ncol(ll)))
+  ll_matrix <- loo:::llarray_to_matrix(ll_array)
+
+  expect_silent(
+    psis_array <- ap_psis(log_ratios = -ll_array, log_p = log_p, log_g = log_g)
+  )
+  psis_matrix <- ap_psis(log_ratios = -ll_matrix, log_p = log_p, log_g = log_g)
+
+  expect_equal(psis_array, psis_matrix)
+})
