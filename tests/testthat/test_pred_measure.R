@@ -473,3 +473,97 @@ test_that("insample_pred_measure() accepts mixed built-in and custom measures", 
 
   expect_true(all(c("r2", "custom_rmse") %in% rownames(res$estimates)))
 })
+
+test_that("a custom measure can declare itself a loss", {
+  set.seed(11)
+  S <- 20L
+  n <- 12L
+  y <- rnorm(n)
+  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
+  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
+
+  custom_mse <- function(y, mupred) {
+    sqe <- (y - colMeans(mupred))^2
+    list(
+      estimate = mean(sqe),
+      se = sqrt(var(sqe) / length(sqe)),
+      pointwise = sqe
+    )
+  }
+  attr(custom_mse, "measure_name") <- "custom_mse"
+
+  utility <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  expect_false(attr(utility, "measure_compare_meta")$custom_mse$loss)
+
+  attr(custom_mse, "measure_loss") <- TRUE
+  loss <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  meta <- attr(loss, "measure_compare_meta")$custom_mse
+  expect_true(meta$loss)
+  expect_null(meta$higher_is_better)
+  # the declaration says what the measure is, not how it is stored
+  expect_equal(loss$estimates, utility$estimates)
+  expect_true(all(loss$pointwise[, "custom_mse"] >= 0))
+})
+
+test_that("`higher_is_better` in `control` reorients a custom measure", {
+  set.seed(12)
+  S <- 20L
+  n <- 12L
+  y <- rnorm(n)
+  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
+  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
+
+  custom_mse <- function(y, mupred) {
+    sqe <- (y - colMeans(mupred))^2
+    list(
+      estimate = mean(sqe),
+      se = sqrt(var(sqe) / length(sqe)),
+      pointwise = sqe
+    )
+  }
+  attr(custom_mse, "measure_name") <- "custom_mse"
+  attr(custom_mse, "measure_loss") <- TRUE
+
+  natural <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  flipped <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse,
+    control = list(custom_mse = list(higher_is_better = TRUE))
+  )
+
+  expect_equal(
+    flipped$estimates["custom_mse", "Estimate"],
+    -natural$estimates["custom_mse", "Estimate"]
+  )
+  # the standard error is invariant to the sign
+  expect_equal(
+    flipped$estimates["custom_mse", "SE"],
+    natural$estimates["custom_mse", "SE"]
+  )
+  expect_equal(
+    flipped$pointwise[, "custom_mse"],
+    -natural$pointwise[, "custom_mse"]
+  )
+
+  expect_true(attr(flipped, "measure_higher_is_better")$custom_mse)
+  meta <- attr(flipped, "measure_compare_meta")$custom_mse
+  # `higher_is_better` records the stored scale, `loss` what the measure is
+  expect_true(meta$higher_is_better)
+  expect_true(meta$loss)
+
+  # a custom utility is flipped by `higher_is_better = FALSE` instead
+  attr(custom_mse, "measure_loss") <- FALSE
+  as_utility <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse,
+    control = list(custom_mse = list(higher_is_better = FALSE))
+  )
+  expect_equal(
+    as_utility$estimates["custom_mse", "Estimate"],
+    -natural$estimates["custom_mse", "Estimate"]
+  )
+})

@@ -57,9 +57,13 @@
 #' `log_weights` are supplied automatically.
 #'
 #' Custom measures are assumed to be on a utility scale (higher is better) in
-#' [loo_compare()]. For a custom loss measure, pass
+#' [model_compare()]. For a custom loss measure, pass
 #' `control = list(my_measure = list(higher_is_better = TRUE))` or negate values
-#' in the custom function so that [loo_compare()] ranks models correctly.
+#' in the custom function so that [model_compare()] ranks models correctly.
+#'
+#' A custom measure declares nothing about the standard error of a difference
+#' between two models. Supply it when comparing, through the `custom_se_fn`
+#' argument of [model_compare()].
 #'
 #' @examples
 #' \donttest{

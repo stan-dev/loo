@@ -168,18 +168,38 @@ supported_measures_list()
 
 | Deprecated | Replacement | Since | Planned removal |
 |------------|-------------|-------|-----------------|
-| `compare()` | `loo_compare()` | 2.0.0 | 3.0.0 |
+| `compare()` | `model_compare()` | 2.0.0 | 3.0.0 |
 
 `compare()` returns a vector or matrix with class `"compare.loo"`.
-`loo_compare()` returns a `data.frame` with additional diagnostic columns.
-See `?loo_compare` for the current output format.
+`model_compare()` returns a `data.frame` with additional diagnostic columns.
+See `?model_compare` for the current output format.
 
 ```r
 # Deprecated
 compare(loo1, loo2)
 
 # Current
+model_compare(loo1, loo2)
+```
+
+### `loo_compare()` is now `model_compare()`
+
+`loo_compare()` has been renamed to `model_compare()`, which better reflects
+that it compares models evaluated by leave-one-out CV, k-fold CV, a held-out
+test set, or in-sample scores.
+
+`loo_compare()` is **not deprecated**: it remains an exported generic that
+forwards to `model_compare()`, so existing code and `loo_compare` methods
+registered by other packages continue to work unchanged.
+
+```r
+# Both are equivalent
 loo_compare(loo1, loo2)
+model_compare(loo1, loo2)
+
+# Only model_compare() is documented for the newer sources
+model_compare(kfold_pm1, kfold_pm2)
+model_compare(test_pm1, test_pm2)
 ```
 
 ## PSIS importance sampling

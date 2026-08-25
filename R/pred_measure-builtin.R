@@ -767,7 +767,7 @@ measure_r2 <- function(
     estimate = est_r2,
     se = se_r2,
     pointwise = sqe_i,
-    # `loo_compare()` needs the baseline to propagate uncertainty into the
+    # `model_compare()` needs the baseline to propagate uncertainty into the
     # standard error of an r2 difference; `y` is gone by then. See
     # `.se_diff_r2()`.
     extra = list(mse_y_i = mse_y_i)
@@ -976,18 +976,18 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 .measure_spec <- list(
   elpd = list(fun = measure_elpd, loss = FALSE, diff_method = "sum"),
   ic = list(fun = measure_ic, loss = TRUE, diff_method = "sum"),
-  mlpd = list(fun = measure_mlpd, loss = FALSE, diff_method = "sum"),
+  mlpd = list(fun = measure_mlpd, loss = FALSE, diff_method = "mean"),
   mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
   r2 = list(
     fun = measure_r2,
     loss = FALSE,
-    diff_method = "pairwise",
+    diff_method = "measure_specific",
     se_diff_fun = "r2"
   ),
   rmse = list(
     fun = measure_rmse,
     loss = TRUE,
-    diff_method = "pairwise",
+    diff_method = "measure_specific",
     se_diff_fun = "rmse"
   ),
   mse = list(fun = measure_mse, loss = TRUE, diff_method = "mean"),
@@ -995,7 +995,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   bacc = list(
     fun = measure_bacc,
     loss = FALSE,
-    diff_method = "pairwise",
+    diff_method = "measure_specific",
     se_diff_fun = "bacc"
   ),
   rps = list(fun = measure_rps, loss = FALSE, diff_method = "mean"),
@@ -1003,20 +1003,20 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
 )
 
-# pairwise standard errors -----------------------------
+# measure-specific standard errors -----------------------------
 #
 # Measures whose overall estimate is not a sum or mean of pointwise
 # contributions cannot use the paired pointwise standard error. They register a
 # `se_diff_fun` in `.measure_spec`, naming an entry of `.se_diff_funs` below.
-# Custom measures may instead attach a function directly via
-# `attr(my_fun, "se_diff_fun")`.
+# Custom measures take theirs from `model_compare(custom_se_fn = )` instead,
+# under the same calling contract.
 #
 # Such a function receives `ref` and `cmp`, each a list with the elements
 # `estimate`, `se`, `pointwise`, and `extra` for one model, always on the
 # measure's natural scale (`higher_is_better` sign flips are undone before the
 # call and reapplied to the difference afterwards), and returns the standard
 # error of the difference as a numeric scalar. The difference itself is always
-# `estimate_cmp - estimate_ref` and is computed by `loo_compare()`.
+# `estimate_cmp - estimate_ref` and is computed by `model_compare()`.
 
 #' Standard error of an RMSE difference
 #'
@@ -1202,21 +1202,15 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     ))
   }
 
-  se_diff_fun <- attr(measure_entry$key, "se_diff_fun", exact = TRUE)
-  if (!is.null(se_diff_fun) && !is.function(se_diff_fun)) {
-    cli::cli_abort(c(
-      "Attribute {.code se_diff_fun} of custom measure",
-      "{.val {measure_entry$name}} must be a function.",
-      "i" = "It is called as {.code se_diff_fun(ref, cmp)} and must return a",
-      " " = "numeric scalar."
-    ))
-  }
-
+  # Custom measures never declare how their standard error of the difference is
+  # computed. That is supplied at comparison time via
+  # `model_compare(custom_se_fn = )`, so nothing here is inferred and no closure
+  # is stored on the result object. Whether the measure is a loss is declared by
+  # the measure itself, through `attr(fun, "measure_loss")`.
   list(
     higher_is_better = higher_is_better,
-    loss = FALSE,
-    diff_method = if (is.null(se_diff_fun)) "auto" else "pairwise",
-    se_diff_fun = se_diff_fun
+    loss = isTRUE(measure_entry$loss),
+    diff_method = "custom"
   )
 }
 
@@ -1229,18 +1223,43 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 #' @export
 supported_measures_list <- names(.measure_spec)
 
+#' Store a measure result on the requested scale
+#'
+#' `higher_is_better` selects the scale values are stored on; `natural_higher`
+#' says which scale the measure produced them on. When the two disagree, the
+#' estimate and the pointwise values are negated. The standard error is not (it
+#' is invariant to the sign), and neither is `extra`, which carries auxiliary
+#' data for `se_diff_fun()` on the measure's natural scale.
+#'
+#' @param res A measure result, with either `estimate`/`se` or a length-2
+#'   `estimates` vector (estimate and SE).
+#' @param natural_higher `TRUE` when the measure is naturally a utility.
+#' @param higher_is_better The requested scale, or `NULL` to keep the natural
+#'   one.
+#' @noRd
+.apply_measure_scale <- function(res, natural_higher, higher_is_better) {
+  if (is.null(higher_is_better) || !xor(natural_higher, isTRUE(higher_is_better))) {
+    return(res)
+  }
+  if (!is.null(res$estimates)) {
+    res$estimates[1L] <- -res$estimates[1L]
+  } else {
+    res$estimate <- -res$estimate
+  }
+  res$pointwise <- -res$pointwise
+  res
+}
+
 # internal function that produces output format for measures
 .create_measure_structure <- function(
   res, higher_is_better, measure_name, n_draws, n_obs
 ) {
-  if (!is.null(higher_is_better)) {
-    spec <- .measure_spec[[measure_name]]
-    natural_higher <- is.null(spec) || !isTRUE(spec$loss)
-    if (xor(natural_higher, isTRUE(higher_is_better))) {
-      res$estimate <- -res$estimate
-      res$pointwise <- -res$pointwise
-    }
-  }
+  spec <- .measure_spec[[measure_name]]
+  res <- .apply_measure_scale(
+    res,
+    natural_higher = is.null(spec) || !isTRUE(spec$loss),
+    higher_is_better = higher_is_better
+  )
   out <- list()
   out$estimates <- matrix(
     c(res$estimate, res$se),

@@ -2,27 +2,36 @@
 #' @noRd
 #' @param x A list with `psis_loo` objects.
 #' @param ... Currently ignored.
+#' @param custom_se_fn Not supported here; subsampled objects are compared on
+#'   elpd only.
 #' @return A `compare.loo_ss` object.
 #' @author Mans Magnusson
 #' @export
-loo_compare.psis_loo_ss_list <- function(x, ...) {
+model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
+  if (!missing(custom_se_fn)) {
+    stop(
+      "`custom_se_fn` is not supported for subsampled loo objects, which are ",
+      "compared on elpd only.",
+      call. = FALSE
+    )
+  }
 
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
   for(i in seq_along(x)){
     if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
   }
 
-  loo_compare_checks.psis_loo_ss_list(x)
+  model_compare_checks.psis_loo_ss_list(x)
 
-  comp <- loo_compare_matrix.psis_loo_ss_list(x)
-  ord <- loo_compare_order(x)
+  comp <- model_compare_matrix.psis_loo_ss_list(x)
+  ord <- model_compare_order(x)
   names(x) <- rownames(comp)[ord]
 
   rnms <- rownames(comp)
   elpd_diff_mat <- matrix(0, nrow = nrow(comp), ncol = 3,
                           dimnames = list(rnms, c("elpd_diff", "se_diff", "subsampling_se_diff")))
   for(i in 2:length(ord)){
-    elpd_diff_mat[i,] <- loo_compare_ss(ref_loo = x[ord[1]], compare_loo = x[ord[i]])
+    elpd_diff_mat[i,] <- model_compare_ss(ref_loo = x[ord[1]], compare_loo = x[ord[i]])
   }
   comp <- cbind(elpd_diff_mat, comp)
   rownames(comp) <- rnms
@@ -36,7 +45,7 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
 #' @param ref_loo A named list with a `psis_loo_ss` object.
 #' @param compare_loo A named list with a  `psis_loo_ss` object.
 #' @return A 1 by 3 elpd_diff estimation.
-loo_compare_ss <- function(ref_loo, compare_loo){
+model_compare_ss <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
@@ -52,12 +61,12 @@ loo_compare_ss <- function(ref_loo, compare_loo){
   # Using HH estimation
   if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
     warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
-    return(loo_compare_ss_naive(ref_loo, compare_loo))
+    return(model_compare_ss_naive(ref_loo, compare_loo))
   }
 
   # Same observations in both
   if (compare_subset_of_ref & ref_subset_of_compare){
-    return(loo_compare_ss_diff(ref_loo, compare_loo))
+    return(model_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # Use subset
@@ -65,22 +74,22 @@ loo_compare_ss <- function(ref_loo, compare_loo){
     if (compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
     if (ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
     message("Estimated elpd_diff using observations included in loo calculations for all models.")
-    return(loo_compare_ss_diff(ref_loo, compare_loo))
+    return(model_compare_ss_diff(ref_loo, compare_loo))
   }
 
   # If different samples
   if (!compare_subset_of_ref & !ref_subset_of_compare){
     warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
             "'. Naive diff SE is used.", call. = FALSE)
-    return(loo_compare_ss_naive(ref_loo, compare_loo))
+    return(model_compare_ss_naive(ref_loo, compare_loo))
   }
 }
 
 #' Compute a naive diff SE
 #' @noRd
-#' @inheritParams loo_compare_ss
+#' @inheritParams model_compare_ss
 #' @return a 1 by 3 elpd_diff estimation
-loo_compare_ss_naive <- function(ref_loo, compare_loo){
+model_compare_ss_naive <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
@@ -99,9 +108,9 @@ loo_compare_ss_naive <- function(ref_loo, compare_loo){
 
 #' Compare a effective diff SE
 #' @noRd
-#' @inheritParams loo_compare_ss
+#' @inheritParams model_compare_ss
 #' @return a 1 by 3 elpd_diff estimation
-loo_compare_ss_diff <- function(ref_loo, compare_loo){
+model_compare_ss_diff <- function(ref_loo, compare_loo){
   checkmate::assert_list(ref_loo, names = "named")
   checkmate::assert_list(compare_loo, names = "named")
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
@@ -125,16 +134,16 @@ loo_compare_ss_diff <- function(ref_loo, compare_loo){
 
 
 #' Check list of `psis_loo` objects
-#' @details Similar to `loo_compare_checks()` but checks dim size rather than
+#' @details Similar to `model_compare_checks()` but checks dim size rather than
 #' pointwise dim since different pointwise sizes of `psis_loo_ss` will work.
-#' Can probably be removed by refactoring `loo_compare_checks()`.
+#' Can probably be removed by refactoring `model_compare_checks()`.
 #' @noRd
-#' @inheritParams loo_compare_ss
+#' @inheritParams model_compare_ss
 #' @return A 1 by 3 elpd_diff estimation.
-loo_compare_checks.psis_loo_ss_list <- function(loos) {
+model_compare_checks.psis_loo_ss_list <- function(loos) {
   ## errors
   if (length(loos) <= 1L) {
-    stop("'loo_compare' requires at least two models.", call.=FALSE)
+    stop("At least two models are required for comparison.", call. = FALSE)
   }
   if (!all(sapply(loos, is.loo))) {
     stop("All inputs should have class 'loo'.", call.=FALSE)
@@ -171,7 +180,7 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
   }
 }
 
-#' @rdname loo_compare
+#' @rdname model_compare
 #' @export
 print.compare.loo_ss <- function(x, ..., digits = 1) {
   xcopy <- x
@@ -188,7 +197,7 @@ print.compare.loo_ss <- function(x, ..., digits = 1) {
 #' @keywords internal
 #' @param loos List of `psis_loo_ss` objects.
 #' @return A `compare.loo_ss` matrix.
-loo_compare_matrix.psis_loo_ss_list <- function(loos){
+model_compare_matrix.psis_loo_ss_list <- function(loos){
   tmp <- sapply(loos, function(x) {
     est <- x$estimates
     setNames(c(est), nm = c(rownames(est),
@@ -198,7 +207,7 @@ loo_compare_matrix.psis_loo_ss_list <- function(loos){
   colnames(tmp) <- find_model_names(loos)
   rnms <- rownames(tmp)
   comp <- tmp
-  ord <- loo_compare_order(loos)
+  ord <- model_compare_order(loos)
   comp <- t(comp)[ord, ]
   patts <- c("elpd", "p_", "^waic$|^looic$", "se_waic$|se_looic$")
   col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),

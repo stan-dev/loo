@@ -338,6 +338,24 @@ print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
   invisible(x)
 }
 
+#' Human-readable description of an evaluation source
+#'
+#' Used by `print.compare.loo()` to name the cross-validation scheme a
+#' comparison was computed on. Unlike `.pred_measure_source_label()`, which
+#' returns a short tag for one object, this spells the scheme out for a
+#' full sentence.
+#' @noRd
+.compare_source_label <- function(source) {
+  switch(
+    source,
+    loo = "PSIS-LOO cross-validation",
+    kfold = "K-fold cross-validation",
+    test = "held-out test data",
+    insample = "in-sample (training) data",
+    source
+  )
+}
+
 .pred_measure_source_label <- function(x) {
   cls <- class(x)
   if ("loo_pred_measure" %in% cls) {

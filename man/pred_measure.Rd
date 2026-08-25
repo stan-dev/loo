@@ -22,15 +22,15 @@ pred_measure(
 point-prediction measures such as \code{crps}, \code{mae}, and \code{acc}.}
 
 \item{ypred}{Matrix of posterior predictive draws (\code{S} draws × \code{n}
-observations), typically from \code{\link[brms:posterior_predict]{brms::posterior_predict()}}. Required for
+observations), typically from \code{\link[brms:posterior_predict.brmsfit]{brms::posterior_predict()}}. Required for
 distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 
 \item{mupred}{Matrix of posterior expected values (\code{S} × \code{n}), typically from
-\code{\link[brms:posterior_epred]{brms::posterior_epred()}}. Required for point-prediction measures such as
+\code{\link[brms:posterior_epred.brmsfit]{brms::posterior_epred()}}. Required for point-prediction measures such as
 \code{mae}, \code{rmse}, \code{r2}, and \code{acc}.}
 
 \item{ylp}{Matrix of pointwise log predictive densities or probabilities
-(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
+(\code{S} × \code{n}), typically from \code{\link[brms:log_lik.brmsfit]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
 \item{measure}{Additional measures beyond the base summary \code{elpd} (always
@@ -46,23 +46,28 @@ Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \
 \code{log_weights} that appear in their formals, plus arguments from \code{control}.
 They must return a list with  \code{estimates} and \code{pointwise}.
 
-For \code{\link[=loo_compare]{loo_compare()}}, the standard error of a difference is derived from
-paired pointwise differences when the overall estimate is the sum or the
-mean of \code{pointwise}; otherwise it is \code{NA}. A custom measure that is a
-transformation of pointwise quantities (as \code{rmse} is of squared errors) can
-supply its own by setting
-\code{attr(my_fun, "se_diff_fun") <- function(ref, cmp) ...}. That function
-receives one list per model with elements \code{estimate}, \code{se}, \code{pointwise},
-and \code{extra}, always on the measure's natural scale, and must return the
-standard error of the difference as a numeric scalar. Note that the
-function is stored on the result object, so it carries its enclosing
-environment into any saved copy of that object.
+A custom measure declares whether it is a loss (lower is better) or a
+utility (higher is better) with attribute \code{"measure_loss"}:
+\code{attr(my_fun, "measure_loss") <- TRUE} for a loss. Without it a custom
+measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} uses the declaration to
+put all measures on a common utility scale and to rank models, so an
+undeclared loss is compared and ranked in the wrong direction.
+
+A custom measure declares nothing about the standard error of a difference
+between two models. That is supplied at comparison time through the
+\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which accepts a function
+\code{function(ref, cmp) ...}, the shorthands \code{"sum"} and \code{"mean"} for the
+paired pointwise formulas, or \code{NULL} to report the difference with an \code{NA}
+standard error. A function receives one list per model with elements
+\code{estimate}, \code{se}, \code{pointwise}, and \code{extra}, always on the measure's natural
+scale, and must return the standard error of the difference as a numeric
+scalar.
 
 \code{extra} is for anything the standard error needs that the pointwise values
 do not carry. Return it as an additional list element \code{extra} from the
-measure function and it is stored alongside the estimates; the built-in
-\code{r2} uses it for the baseline \code{(y_i - mean(y))^2}, which cannot be
-recovered once \code{y} is out of scope.}
+measure function and it is stored alongside the estimates and passed on to
+\code{custom_se_fn}; the built-in \code{r2} uses it for the baseline
+\code{(y_i - mean(y))^2}, which cannot be recovered once \code{y} is out of scope.}
 
 \item{predperf}{An existing predictive measure object (class
 \code{"pred_measure"}) to update. When supplied, base density summaries and
@@ -81,7 +86,10 @@ recomputing PSIS weights.}
 
 \item{control}{Named list of per-measure settings. Each name must match an
 element of \code{measure}; the value is a list of arguments passed to that
-measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
+measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
+\code{higher_is_better} selects the scale a measure's values are stored on and
+works for built-in and custom measures alike; for a custom measure it is
+applied to the returned result rather than passed to the function.}
 }
 \value{
 An updated object of the same class as \code{predperf}, with new rows in
@@ -123,19 +131,25 @@ available for additional measures.
 
 All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
 \code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
-setting used for each measure (\code{NULL}, \code{TRUE}, or \code{FALSE} per bare measure
-name; \code{elpd} is always \code{NULL}). Built-in loss measures such as MSE are stored
-on a loss scale by default (\code{NULL}); pass
+setting used for each measure (\code{TRUE} or \code{FALSE} per bare measure name).
+Measures left at their natural orientation have no entry, which reads as
+\code{NULL}; \code{elpd} is always \code{NULL}. Built-in loss measures such as MSE are
+stored on a loss scale by default; pass
 \code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
-utility scale. When measures are added incrementally with \code{\link[=pred_measure]{pred_measure()}},
-the attribute is updated for newly computed measures.
+utility scale. The same works for a custom measure, using the name it was
+given in \code{measure}. When measures are added incrementally with
+\code{\link[=pred_measure]{pred_measure()}}, the attribute is updated for newly computed measures.
 
 Attribute \code{measure_compare_meta} records per-measure comparison metadata
-(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=loo_compare]{loo_compare()}}.
+(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=model_compare]{model_compare()}}.
 Built-in measures take \code{loss} and \code{diff_method} from the package measure
-registry; custom measures default to \code{diff_method = "auto"} and \code{loss = FALSE}
-(utility scale). For custom loss measures, use \code{higher_is_better = TRUE} in
-\code{control} so \code{\link[=loo_compare]{loo_compare()}} interprets the sign correctly. See \link{loo-glossary}.
+registry. Custom measures always get \code{diff_method = "custom"} and take the
+standard error of their difference from the \code{custom_se_fn} argument of
+\code{\link[=model_compare]{model_compare()}}; their \code{loss} comes from
+\code{attr(my_fun, "measure_loss") <- TRUE}, which declares that lower values are
+better. Without that declaration a custom measure is treated as a utility, so
+an undeclared loss is compared and ranked in the wrong direction. See
+\link{loo-glossary}.
 }
 
 \examples{

@@ -35,26 +35,33 @@
 #'   `log_weights` that appear in their formals, plus arguments from `control`.
 #'   They must return a list with  `estimates` and `pointwise`.
 #'
-#'   For [loo_compare()], the standard error of a difference is derived from
-#'   paired pointwise differences when the overall estimate is the sum or the
-#'   mean of `pointwise`; otherwise it is `NA`. A custom measure that is a
-#'   transformation of pointwise quantities (as `rmse` is of squared errors) can
-#'   supply its own by setting
-#'   `attr(my_fun, "se_diff_fun") <- function(ref, cmp) ...`. That function
-#'   receives one list per model with elements `estimate`, `se`, `pointwise`,
-#'   and `extra`, always on the measure's natural scale, and must return the
-#'   standard error of the difference as a numeric scalar. Note that the
-#'   function is stored on the result object, so it carries its enclosing
-#'   environment into any saved copy of that object.
+#'   A custom measure declares whether it is a loss (lower is better) or a
+#'   utility (higher is better) with attribute `"measure_loss"`:
+#'   `attr(my_fun, "measure_loss") <- TRUE` for a loss. Without it a custom
+#'   measure is taken to be a utility. [model_compare()] uses the declaration to
+#'   put all measures on a common utility scale and to rank models, so an
+#'   undeclared loss is compared and ranked in the wrong direction.
+#'
+#'   A custom measure declares nothing about the standard error of a difference
+#'   between two models. That is supplied at comparison time through the
+#'   `custom_se_fn` argument of [model_compare()], which accepts a function
+#'   `function(ref, cmp) ...`, the shorthands `"sum"` and `"mean"` for the
+#'   paired pointwise formulas, or `NULL` to report the difference with an `NA`
+#'   standard error. A function receives one list per model with elements
+#'   `estimate`, `se`, `pointwise`, and `extra`, always on the measure's natural
+#'   scale, and must return the standard error of the difference as a numeric
+#'   scalar.
 #'
 #'   `extra` is for anything the standard error needs that the pointwise values
 #'   do not carry. Return it as an additional list element `extra` from the
-#'   measure function and it is stored alongside the estimates; the built-in
-#'   `r2` uses it for the baseline `(y_i - mean(y))^2`, which cannot be
-#'   recovered once `y` is out of scope.
+#'   measure function and it is stored alongside the estimates and passed on to
+#'   `custom_se_fn`; the built-in `r2` uses it for the baseline
+#'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
 #' @param measure_name For a single custom function, set
 #'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
-#'   `measure`.
+#'   `measure`. A custom measure passed inside a list takes its name from the
+#'   list element instead, but `attr(my_fun, "measure_loss")` is read in both
+#'   forms.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with
@@ -72,6 +79,9 @@
 #' @param control Named list of per-measure settings. Each name must match an
 #'   element of `measure`; the value is a list of arguments passed to that
 #'   measure's summary function (e.g. `list(new_measure = list(add_arg = 10))`).
+#'   `higher_is_better` selects the scale a measure's values are stored on and
+#'   works for built-in and custom measures alike; for a custom measure it is
+#'   applied to the returned result rather than passed to the function.
 #' @param source Character string indicating the evaluation mode: `"insample"`,
 #'   `"loo"`, `"kfold"`, or `"test"`. Set automatically by the wrapper
 #'   functions; required when calling [do_pred_measure()] directly.
@@ -95,9 +105,11 @@ do_pred_measure <- function(
   control = list()
 ) {
   # input validation ---------------------------------------------------
-  .validate_control(control)
-  
   measures <- .prepare_measures(measure, predperf, supported_measures_list)
+  # validated against every requested measure, including the ones
+  # `.prepare_measures()` dropped as already present: those are reported by their
+  # own warning, and a control entry for them is not a mistake
+  .validate_control(control, .normalize_measure(measure))
   
   if (source == "loo") {
     if (is.null(predperf)) {
@@ -370,6 +382,16 @@ do_pred_measure <- function(
     measure_control <- list()
   }
 
+  # Built-in measures take `higher_is_better` as an argument and flip their own
+  # sign. Custom measures know nothing about it, so it is held back here and
+  # applied to the result below; forwarding it as well could flip twice.
+  is_custom <- measure_entry$type == "custom"
+  custom_higher_is_better <- NULL
+  if (is_custom) {
+    custom_higher_is_better <- measure_control$higher_is_better
+    measure_control$higher_is_better <- NULL
+  }
+
   pool <- c(
     list(
       y = y,
@@ -382,9 +404,17 @@ do_pred_measure <- function(
   )
   args <- pool[intersect(names(formals(measure_fun)), names(pool))]
   res <- do.call(measure_fun, args)
-  if (measure_entry$type == "custom") {
+  if (is_custom) {
     n_obs <- .measure_n_obs(y, ypred, mupred, ylp)
     res <- .validate_measure_result(res, measure_entry$name, n_obs = n_obs)
+    res <- .apply_measure_scale(
+      res,
+      natural_higher = !isTRUE(measure_entry$loss),
+      higher_is_better = custom_higher_is_better
+    )
+    if (!is.null(custom_higher_is_better)) {
+      attr(res, "higher_is_better") <- custom_higher_is_better
+    }
   }
   res
 }
@@ -560,7 +590,7 @@ do_pred_measure <- function(
 #' @param margin `1` to merge along rows (estimates table), `2` along columns
 #'   (pointwise table).
 #' @param measure_entry Optional normalized measure entry; when merging an
-#'   estimates row (`margin = 1`), comparison metadata for [loo_compare()] is
+#'   estimates row (`margin = 1`), comparison metadata for [model_compare()] is
 #'   recorded from this entry and `higher_is_better`.
 #' @param higher_is_better Optional logical or `NULL`; records the orientation
 #'   used for `name` when merging an estimates row (`margin = 1`).

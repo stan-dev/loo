@@ -241,27 +241,25 @@ It is also possible to pass a custom function for any measure. The function must
 
 ```{r}
 # custom scoring rule
-hamming_loss <- function(y, ypred, log_weights = NULL, higher_is_better = NULL) {
+hamming_loss <- function(y, ypred, log_weights = NULL) {
   if (is.null(log_weights)) {
     hamming_i <- colMeans(sweep(ypred, 2, y, "!="))
   } else {
     w <- exp(.normalize_log_weights(log_weights))
     hamming_i <- colSums(w * sweep(ypred, 2, y, "!="))
   }
-  
-  res <- list(
+
+  list(
     estimate = mean(hamming_i),
     se = sqrt(var(hamming_i) / length(hamming_i)),
     pointwise = hamming_i
   )
-  
-  # Hamming loss is naturally on a loss scale (lower is better).
-  if (isTRUE(higher_is_better)) {
-    res$estimate <- -res$estimate
-    res$pointwise <- -res$pointwise
-  }
-  res
 }
+# Hamming loss is naturally on a loss scale (lower is better). Declaring that
+# lets `model_compare()` report its differences on the utility scale, as it
+# does for built-in loss measures, and lets `control` reorient the stored
+# values with `list(hamming = list(higher_is_better = TRUE))`.
+attr(hamming_loss, "measure_loss") <- TRUE
 ```
 
 ```{r insample-custom-function}

@@ -95,7 +95,7 @@
 #'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
 #'    procedure used in the LOO-CV approximation.
 #'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.
-#'  * [loo_compare()] for model comparison.
+#'  * [model_compare()] for model comparison.
 #'
 #' @template loo-and-psis-references
 #'

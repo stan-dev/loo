@@ -7,10 +7,74 @@
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].
-* `loo_compare()` now supports `loo_pred_measure` objects: paired differences
-  for all measures common to the compared models, optional `rank_by` ranking,
-  utility-scale sign conversion for loss measures, and
-  `print(compare, measures = ...)` for multi-measure tables by @florence-bockting in #380.
+* `loo_compare()` is now called `model_compare()`. `loo_compare()` remains a
+  working alias and is still a generic, so existing code and methods registered
+  by other packages keep working.
+* `model_compare()` supports every `pred_measure` result --- from
+  `loo_pred_measure()`, `kfold_pred_measure()`, `test_pred_measure()`, and
+  `insample_pred_measure()` --- with paired differences for all measures common
+  to the compared models, optional `rank_by` ranking, utility-scale sign
+  conversion for loss measures, and `print(compare, measures = ...)` for
+  multi-measure tables by @florence-bockting in #380.
+  Measures are matched on bare names, so the source suffix (`_loo`, `_kfold`,
+  `_test`, or none for in-sample) is handled transparently. All models in one
+  call must share an evaluation source; mixing them is an error. `diag_elpd` is
+  reported only for `loo_pred_measure()` comparisons, k-fold comparisons warn on
+  differing `K`, and in-sample comparisons warn that they are optimistically
+  biased.
+* In `model_compare()`, when `rank_by` is not supplied each measure is now
+  compared against *its own* best model, so e.g. `mse_diff` can be relative to a
+  different model than `elpd_diff`. Rows are still ordered by `"elpd"`, and each
+  `{measure}_diff` column has exactly one `0` entry, at that measure's best
+  model. Supplying `rank_by` keeps the previous behaviour of pinning the
+  top-ranked model as the single reference for every measure. The reference used
+  per measure is recorded in the `compare_reference` attribute and shown by
+  `print(x, measures = "all")`. Each printed measure table is now sorted by its
+  own difference, so the best model on that measure is always the first row and
+  the differences run in decreasing order.
+* In `model_compare()`, `rank_by` now also accepts a **model name** (as shown in
+  the `model` column). The named model then becomes the single reference model
+  for every measure, whether or not it is the best one, while rows stay ordered
+  by `"elpd"`. This form also works for plain `"loo"` comparisons, where
+  `elpd_diff` is then relative to the named model. The pinned model is recorded
+  in the new `compare_ref_model` attribute; a name matching both a measure and a
+  model is treated as the measure, with a warning.
+* The `diff_method` value `"pairwise"` is now called `"measure_specific"`. Every
+  model comparison is pairwise, and the `"sum"`/`"mean"` methods are the ones
+  built from paired pointwise differences, so the old name described the one
+  category that is *not* a paired pointwise standard deviation. `diff_method` is
+  read-only metadata in `measure_compare_meta`, so no user code that passes
+  arguments is affected; `custom_se_fn` still accepts only `"sum"` and `"mean"`.
+* Bug fix: in `model_compare()`, `mlpd` was registered with
+  `diff_method = "sum"` although its estimate is the *mean* of the pointwise log
+  predictive densities. `mlpd_diff` was therefore reported as the sum of the
+  pointwise differences (a factor of `N` too large, and inconsistent with the
+  difference of the reported `mlpd` estimates), with a matching `mlpd_se_diff`.
+  `mlpd` now uses `diff_method = "mean"`.
+* `model_compare()` gains a `custom_se_fn` argument controlling how the standard
+  error of a difference is computed for a **custom** measure. It accepts a
+  function called as `custom_se_fn(ref, cmp)`, the shorthands `"sum"` and
+  `"mean"` for the paired pointwise formulas, or `NULL` to report the difference
+  with an `NA` standard error; with two or more custom measures, pass a list
+  named by measure. It is required whenever a custom measure is compared ---
+  nothing is inferred from a measure's values any more, and custom measures now
+  carry `diff_method = "custom"` instead of `"auto"`. The previous
+  `attr(my_fun, "se_diff_fun")` route has been removed.
+* A custom measure can declare that it is a loss with
+  `attr(my_fun, "measure_loss") <- TRUE`, alongside `attr(my_fun,
+  "measure_name")`. `model_compare()` then flips its differences onto the
+  utility scale and orders `rank_by` by the lowest loss, as it does for built-in
+  loss measures; without the declaration a custom measure is still treated as a
+  utility. The declaration is recorded as `loss` in the `measure_compare_meta`
+  attribute, and models that disagree on it cannot be compared.
+* `control` entries now work for custom measures instead of failing with
+  `object 'measure_<name>' of mode 'function' was not found`. `higher_is_better`
+  is accepted for any measure, built-in or custom, and selects the scale its
+  values are stored on. A `control` entry naming no measure being computed now
+  warns instead of aborting.
+* `print()` on a multi-measure comparison now labels each measure's standard
+  error column `{measure}_se_diff`, matching the column name on the returned
+  data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.
 
 # loo 2.10.0
 

@@ -24,7 +24,7 @@
 #'   same length containing the posterior density and the approximation density
 #'   for the individual draws.
 #'
-#' @seealso [loo()], [psis()], [loo_compare()]
+#' @seealso [loo()], [psis()], [model_compare()]
 #' @template loo-large-data-references
 #'
 #' @export loo_subsample loo_subsample.function
