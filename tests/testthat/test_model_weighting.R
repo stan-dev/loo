@@ -111,6 +111,43 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_identical(w3, w3_b)
 })
 
+test_that("Bayesian bootstrap gives expected result", {
+  lpd_point <- matrix(
+    c(
+      -0.2,
+      -0.8,
+      -1.1,
+      -1.4,
+      -0.3,
+      -0.5,
+      -0.6,
+      -0.7,
+      -0.1,
+      -1.0,
+      -1.2,
+      -0.4,
+      -0.9,
+      -0.5,
+      -0.8
+    ),
+    ncol = 3,
+    byrow = TRUE
+  )
+  BB_n <- 25
+  alpha <- 0.7
+
+  set.seed(0)
+  weights <- pseudobma_weights(lpd_point, BB = TRUE, BB_n = BB_n, alpha = alpha)
+
+  expect_s3_class(weights, "pseudobma_bb_weights")
+  expect_named(weights, paste0("model", 1:3))
+  expect_equal(sum(weights), 1)
+  expect_snapshot_value(
+    unname(as.numeric(weights)),
+    style = "deparse"
+  )
+})
+
 test_that("stacking_weights and pseudobma_weights throw correct errors", {
   xx <- cbind(rnorm(10))
   expect_error(stacking_weights(xx), "two models are required")

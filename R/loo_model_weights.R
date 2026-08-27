@@ -329,21 +329,15 @@ pseudobma_weights <-
       return(wts)
     }
 
-    temp <- matrix(NA, BB_n, K)
     BB_weighting <- dirichlet_rng(BB_n, rep(alpha, N))
-    for (bb in 1:BB_n) {
-      z_bb <- BB_weighting[bb, ] %*% lpd_point * N
-      uwts <- exp(z_bb - max(z_bb))
-      temp[bb, ] <- uwts / sum(uwts)
-    }
-    wts <- structure(
-      colMeans(temp),
+    z <- BB_weighting %*% lpd_point * N
+    uwts <- exp(z - matrixStats::rowMaxs(z))
+    structure(
+      colMeans(uwts / rowSums(uwts)),
       names = paste0("model", 1:K),
       class = "pseudobma_bb_weights"
     )
-    return(wts)
   }
-
 
 #' Generate dirichlet simulations, rewritten version
 #' @importFrom stats rgamma
