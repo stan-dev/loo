@@ -32,6 +32,21 @@
   `print(x, measures = "all")`. Each printed measure table is now sorted by its
   own difference, so the best model on that measure is always the first row and
   the differences run in decreasing order.
+* `print()` on a `pred_measure` comparison now always names the reference model
+  each set of differences was computed against, including the default case where
+  every measure keeps its own best model. The line is written to standard output
+  rather than emitted as a message, so it survives `suppressMessages()` and
+  knitr chunks with `message = FALSE`. For `loo_pred_measure()` comparisons the
+  PSIS-LOO Pareto k diagnostic moved out of the per-measure difference tables
+  into a block above them: it describes a model's LOO approximation, not any one
+  measure or pair of models, so it is now reported once per model. The
+  `diag_elpd` column on the returned object is unchanged, and `print()` for
+  plain `"loo"` comparisons is unchanged. Printed sentences are wrapped so that
+  no line of output exceeds 80 characters.
+* Bug fix: the `diag_diff` column tested `elpd_diff > -4` rather than
+  `|elpd_diff| < 4`, so every positive difference was flagged as a small one.
+  This was only reachable with `rank_by` set to a model that is not the best
+  model, where differences against the reference can be positive.
 * In `model_compare()`, `rank_by` now also accepts a **model name** (as shown in
   the `model` column). The named model then becomes the single reference model
   for every measure, whether or not it is the best one, while rows stay ordered
@@ -43,7 +58,7 @@
   model comparison is pairwise, and the `"sum"`/`"mean"` methods are the ones
   built from paired pointwise differences, so the old name described the one
   category that is *not* a paired pointwise standard deviation. `diff_method` is
-  read-only metadata in `measure_compare_meta`, so no user code that passes
+  read-only metadata in `measure_info`, so no user code that passes
   arguments is affected; `custom_se_fn` still accepts only `"sum"` and `"mean"`.
 * Bug fix: in `model_compare()`, `mlpd` was registered with
   `diff_method = "sum"` although its estimate is the *mean* of the pointwise log
@@ -65,13 +80,26 @@
   "measure_name")`. `model_compare()` then flips its differences onto the
   utility scale and orders `rank_by` by the lowest loss, as it does for built-in
   loss measures; without the declaration a custom measure is still treated as a
-  utility. The declaration is recorded as `loss` in the `measure_compare_meta`
+  utility. The declaration is recorded as `loss` in the `measure_info`
   attribute, and models that disagree on it cannot be compared.
+* Measure values are always stored on the measure's own scale; `loss` is the
+  single setting describing a measure's orientation. Measures no longer take a
+  `higher_is_better` argument, `control` no longer accepts one, and results no
+  longer carry a `measure_higher_is_better` attribute. Comparisons were already
+  invariant to the setting --- `model_compare()` reports every measure on the
+  utility scale regardless --- so no comparison output changes. Negate the
+  values yourself if you want a loss stored as a utility.
+* Bug fix: `rps` was registered as a utility and `srps` as a loss, but
+  `measure_rps()` returns the Gneiting & Raftery (2007) unscaled score, where
+  lower is better, and `measure_srps()` the Bolin & Wallin (2023) scaled score,
+  where higher is better. `model_compare()` therefore flipped `srps_diff` and
+  left `rps_diff` unflipped, and `rank_by = "rps"` ordered models backwards.
+  The registry now records `rps` as a loss and `srps` as a utility.
+* The per-measure metadata attribute `measure_compare_meta` is now called
+  `measure_info`.
 * `control` entries now work for custom measures instead of failing with
-  `object 'measure_<name>' of mode 'function' was not found`. `higher_is_better`
-  is accepted for any measure, built-in or custom, and selects the scale its
-  values are stored on. A `control` entry naming no measure being computed now
-  warns instead of aborting.
+  `object 'measure_<name>' of mode 'function' was not found`. A `control` entry
+  naming no measure being computed now warns instead of aborting.
 * `print()` on a multi-measure comparison now labels each measure's standard
   error column `{measure}_se_diff`, matching the column name on the returned
   data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.

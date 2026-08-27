@@ -79,9 +79,6 @@
 #' @param control Named list of per-measure settings. Each name must match an
 #'   element of `measure`; the value is a list of arguments passed to that
 #'   measure's summary function (e.g. `list(new_measure = list(add_arg = 10))`).
-#'   `higher_is_better` selects the scale a measure's values are stored on and
-#'   works for built-in and custom measures alike; for a custom measure it is
-#'   applied to the returned result rather than passed to the function.
 #' @param source Character string indicating the evaluation mode: `"insample"`,
 #'   `"loo"`, `"kfold"`, or `"test"`. Set automatically by the wrapper
 #'   functions; required when calling [do_pred_measure()] directly.
@@ -197,7 +194,6 @@ do_pred_measure <- function(
       values = .measure_estimate_se(sel_measure),
       margin = 1,
       measure_entry = entry,
-      higher_is_better = attr(sel_measure, "higher_is_better"),
       extra = .measure_compare_extra(sel_measure)
     )
     pointwise <- .merge_matrix(
@@ -382,15 +378,7 @@ do_pred_measure <- function(
     measure_control <- list()
   }
 
-  # Built-in measures take `higher_is_better` as an argument and flip their own
-  # sign. Custom measures know nothing about it, so it is held back here and
-  # applied to the result below; forwarding it as well could flip twice.
   is_custom <- measure_entry$type == "custom"
-  custom_higher_is_better <- NULL
-  if (is_custom) {
-    custom_higher_is_better <- measure_control$higher_is_better
-    measure_control$higher_is_better <- NULL
-  }
 
   pool <- c(
     list(
@@ -407,14 +395,6 @@ do_pred_measure <- function(
   if (is_custom) {
     n_obs <- .measure_n_obs(y, ypred, mupred, ylp)
     res <- .validate_measure_result(res, measure_entry$name, n_obs = n_obs)
-    res <- .apply_measure_scale(
-      res,
-      natural_higher = !isTRUE(measure_entry$loss),
-      higher_is_better = custom_higher_is_better
-    )
-    if (!is.null(custom_higher_is_better)) {
-      attr(res, "higher_is_better") <- custom_higher_is_better
-    }
   }
   res
 }
@@ -590,13 +570,11 @@ do_pred_measure <- function(
 #' @param margin `1` to merge along rows (estimates table), `2` along columns
 #'   (pointwise table).
 #' @param measure_entry Optional normalized measure entry; when merging an
-#'   estimates row (`margin = 1`), comparison metadata for [model_compare()] is
-#'   recorded from this entry and `higher_is_better`.
-#' @param higher_is_better Optional logical or `NULL`; records the orientation
-#'   used for `name` when merging an estimates row (`margin = 1`).
+#'   estimates row (`margin = 1`), the `measure_info` used by [model_compare()]
+#'   is recorded from this entry.
 #' @param extra Optional list of auxiliary data the measure stores for its
-#'   `se_diff_fun` (see `.measure_compare_extra()`); recorded in the comparison
-#'   metadata when merging an estimates row (`margin = 1`).
+#'   `se_diff_fun` (see `.measure_compare_extra()`); recorded in `measure_info`
+#'   when merging an estimates row (`margin = 1`).
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
@@ -619,7 +597,6 @@ do_pred_measure <- function(
   values,
   margin,
   measure_entry = NULL,
-  higher_is_better = NULL,
   extra = NULL
 ) {
   is_row <- margin == 1
@@ -632,43 +609,28 @@ do_pred_measure <- function(
     matrix(values, ncol = 1, dimnames = list(NULL, name_updated))
   }
 
-  compare_meta <- if (is_row && !is.null(measure_entry)) {
-    .measure_compare_meta(measure_entry, higher_is_better)
+  info <- if (is_row && !is.null(measure_entry)) {
+    .measure_info(measure_entry)
   }
-  if (!is.null(compare_meta) && !is.null(extra)) {
-    compare_meta$extra <- extra
+  if (!is.null(info) && !is.null(extra)) {
+    info$extra <- extra
   }
 
-  old_higher_is_better <- if (is_row && !is.null(mat)) {
-    attr(mat, "measure_higher_is_better")
-  }
-  old_compare_meta <- if (is_row && !is.null(mat)) {
-    attr(mat, "measure_compare_meta")
+  old_info <- if (is_row && !is.null(mat)) {
+    attr(mat, "measure_info")
   }
 
   mat <- if (is.null(mat)) new_slice else bind_fn(mat, new_slice)
 
-  if (is_row) {
-    if (!is.null(measure_entry) || !is.null(old_higher_is_better)) {
-      measure_higher_is_better <- old_higher_is_better
-      if (is.null(measure_higher_is_better)) {
-        measure_higher_is_better <- list()
-      }
-      if (!is.null(measure_entry)) {
-        measure_higher_is_better[[name]] <- higher_is_better
-      }
-      attr(mat, "measure_higher_is_better") <- measure_higher_is_better
+  if (is_row && (!is.null(info) || !is.null(old_info))) {
+    measure_info <- old_info
+    if (is.null(measure_info)) {
+      measure_info <- list()
     }
-    if (!is.null(compare_meta) || !is.null(old_compare_meta)) {
-      measure_compare_meta <- old_compare_meta
-      if (is.null(measure_compare_meta)) {
-        measure_compare_meta <- list()
-      }
-      if (!is.null(compare_meta)) {
-        measure_compare_meta[[name]] <- compare_meta
-      }
-      attr(mat, "measure_compare_meta") <- measure_compare_meta
+    if (!is.null(info)) {
+      measure_info[[name]] <- info
     }
+    attr(mat, "measure_info") <- measure_info
   }
 
   mat
@@ -694,10 +656,9 @@ do_pred_measure <- function(
 #' @param save_psis Logical; if `TRUE`, include `psis_object` in the result.
 #'
 #' @return A list with elements `estimates`, `pointwise`, and optionally
-#'   `diagnostics`, `psis_object`, and `log_weights`. Attributes
-#'   `measure_higher_is_better` and `measure_compare_meta` record per-measure
-#'   metadata for measures added in the current call. Class attributes are added
-#'   by \code{.add_attributes()}.
+#'   `diagnostics`, `psis_object`, and `log_weights`. Attribute `measure_info`
+#'   records per-measure metadata for measures added in the current call. Class
+#'   attributes are added by \code{.add_attributes()}.
 #'
 #' @noRd
 .build_pred_measure <- function(
@@ -707,17 +668,11 @@ do_pred_measure <- function(
   psis_object,
   save_psis
 ) {
-  measure_higher_is_better <- attr(estimates, "measure_higher_is_better")
-  if (is.null(measure_higher_is_better)) {
-    measure_higher_is_better <- list()
+  measure_info <- attr(estimates, "measure_info")
+  if (is.null(measure_info)) {
+    measure_info <- list()
   }
-  attr(estimates, "measure_higher_is_better") <- NULL
-
-  measure_compare_meta <- attr(estimates, "measure_compare_meta")
-  if (is.null(measure_compare_meta)) {
-    measure_compare_meta <- list()
-  }
-  attr(estimates, "measure_compare_meta") <- NULL
+  attr(estimates, "measure_info") <- NULL
 
   output_list <- list(
     estimates = estimates,
@@ -735,29 +690,27 @@ do_pred_measure <- function(
 
   structure(
     output_list,
-    measure_higher_is_better = measure_higher_is_better,
-    measure_compare_meta = measure_compare_meta
+    measure_info = measure_info
   )
 }
 
 #' Attach S3 classes and metadata attributes to a result
 #'
 #' @description
-#' Sets `class`, `source`, `dims`, `measure_higher_is_better`, and
-#' `measure_compare_meta` attributes on a predictive measure object.
+#' Sets `class`, `source`, `dims`, and `measure_info` attributes on a predictive
+#' measure object.
 #'
 #' When updating an existing result (`predperf` is not `NULL`), copies attributes
 #' from `predperf` and refreshes `dims` from newly supplied input matrices.
-#' Merges `measure_higher_is_better` and `measure_compare_meta` from the prior result
-#' with any new entries supplied on `predperf_res` (from
-#' \code{.build_pred_measure()}).
+#' Merges `measure_info` from the prior result with any new entries supplied on
+#' `predperf_res` (from \code{.build_pred_measure()}).
 #' When `save_psis = FALSE`, clears any stored `psis_object` from the prior
 #' result.
 #'
 #' For new objects, copies relevant attributes from `loo` or `kfold` inputs
 #' (e.g. `yhash`, `model_name`, fold structure) and assigns a source-specific
 #' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.). Sets
-#' `measure_higher_is_better` and `measure_compare_meta`, seeding `elpd` defaults.
+#' `measure_info`, seeding the `elpd` entry.
 #'
 #' @param save_psis Logical; when `FALSE` and accumulating, clears stored
 #'   `psis_object` from the prior result.
@@ -790,13 +743,9 @@ do_pred_measure <- function(
   predperf,
   source
 ) {
-  new_higher_is_better <- attr(predperf_res, "measure_higher_is_better")
-  if (is.null(new_higher_is_better)) {
-    new_higher_is_better <- list()
-  }
-  new_compare_meta <- attr(predperf_res, "measure_compare_meta")
-  if (is.null(new_compare_meta)) {
-    new_compare_meta <- list()
+  new_info <- attr(predperf_res, "measure_info")
+  if (is.null(new_info)) {
+    new_info <- list()
   }
 
   if (!is.null(predperf)) {
@@ -813,26 +762,18 @@ do_pred_measure <- function(
       dim(ylp)
     }
     attr(predperf_res, "dims") <- dims
-    measure_higher_is_better <- attr(predperf, "measure_higher_is_better")
-    if (is.null(measure_higher_is_better)) {
-      measure_higher_is_better <- list()
+    measure_info <- attr(predperf, "measure_info")
+    if (is.null(measure_info)) {
+      measure_info <- list()
     }
-    if (length(new_higher_is_better)) {
-      measure_higher_is_better[names(new_higher_is_better)] <- new_higher_is_better
+    if (is.null(measure_info$elpd)) {
+      measure_info$elpd <- .measure_info("elpd")
     }
-    attr(predperf_res, "measure_higher_is_better") <- measure_higher_is_better
-    compare_meta <- attr(predperf, "measure_compare_meta")
-    if (is.null(compare_meta)) {
-      compare_meta <- list()
+    if (length(new_info)) {
+      measure_info[names(new_info)] <- new_info
     }
-    if (is.null(compare_meta$elpd)) {
-      compare_meta$elpd <- .measure_compare_meta("elpd")
-    }
-    if (length(new_compare_meta)) {
-      compare_meta[names(new_compare_meta)] <- new_compare_meta
-    }
-    attr(predperf_res, "measure_compare_meta") <- compare_meta
-    
+    attr(predperf_res, "measure_info") <- measure_info
+
     return(predperf_res)
   }
   
@@ -879,19 +820,14 @@ do_pred_measure <- function(
   }
   attr(predperf_res, "class") <- classes
   attr(predperf_res, "source") <- source
-  measure_higher_is_better <- list(elpd = NULL)
-  if (length(new_higher_is_better)) {
-    measure_higher_is_better[names(new_higher_is_better)] <- new_higher_is_better
-  }
-  attr(predperf_res, "measure_higher_is_better") <- measure_higher_is_better
-  compare_meta <- list(
-    elpd = .measure_compare_meta("elpd")
+  measure_info <- list(
+    elpd = .measure_info("elpd")
   )
-  if (length(new_compare_meta)) {
-    compare_meta[names(new_compare_meta)] <- new_compare_meta
+  if (length(new_info)) {
+    measure_info[names(new_info)] <- new_info
   }
-  attr(predperf_res, "measure_compare_meta") <- compare_meta
-  
+  attr(predperf_res, "measure_info") <- measure_info
+
   return(predperf_res)
 }
 

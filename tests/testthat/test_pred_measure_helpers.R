@@ -140,7 +140,7 @@ test_that(".validate_control() accepts valid control silently", {
   expect_invisible(.validate_control(list(rps = list(scaled = TRUE))))
   expect_invisible(.validate_control(list(
     rps = list(scaled = TRUE),
-    srps = list(higher_is_better = TRUE)
+    srps = list(pointwise = NULL)
   )))
 })
 
@@ -192,7 +192,7 @@ test_that(".validate_control() warns on a control entry naming no measure", {
   # the same when the requested measures are known
   expect_warning(
     .validate_control(
-      list(mse = list(higher_is_better = TRUE)),
+      list(mse = list(pointwise = NULL)),
       measures = .normalize_measure("rps")
     ),
     regexp = "mse.*matches no"
@@ -206,15 +206,16 @@ test_that(".validate_control() validates custom measures against their formals",
   attr(f, "measure_name") <- "custom_huber"
   entries <- .normalize_measure(f)
 
-  # a formal of the custom function, and the reserved `higher_is_better`
+  # only the custom function's own formals are accepted
   expect_silent(
     .validate_control(list(custom_huber = list(delta = 2)), entries)
   )
-  expect_silent(
+  expect_warning(
     .validate_control(
       list(custom_huber = list(higher_is_better = TRUE)),
       entries
-    )
+    ),
+    regexp = "Ignoring `higher_is_better` as it is not a valid argument"
   )
   expect_warning(
     .validate_control(list(custom_huber = list(nope = 1)), entries),

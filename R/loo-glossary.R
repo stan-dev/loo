@@ -252,6 +252,14 @@
 #' This is qualitatively different from the calibration issues flagged by
 #' `diag_diff`: here the estimate itself may be wrong, not just uncertain.
 #'
+#' The same importance weights produce every other PSIS-LOO measure, so the flag
+#' is not specific to ELPD: `mae_loo`, `mse_loo`, `r2_loo` and the rest are
+#' biased by unreliable importance sampling for the same reason. It is a
+#' property of one model's approximation, and does not depend on which model is
+#' used as the comparison reference. `print()` therefore reports it once per
+#' model above the per-measure difference tables rather than inside any one of
+#' them.
+#'
 #' See for further information on Pareto-k values the "Pareto k estimates"
 #' section.
 #'
@@ -294,35 +302,24 @@
 #'   compared. It is `NA` when `custom_se_fn` is `NULL` for that measure.
 #'
 #' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
-#' Attribute `measure_higher_is_better` on each `*_pred_measure()`
-#' result records the `higher_is_better` setting used when each measure was
-#' computed; when stored values are on a loss scale, `model_compare()` emits a
-#' short message naming those measures (see [model_compare()]).
+#' Which measures are losses is recorded in the `loss` element of the
+#' `measure_info` attribute on each `*_pred_measure()` result; when a loss is
+#' compared on a utility scale, `model_compare()` emits a short message naming
+#' those measures (see [model_compare()]).
 #'
 #' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
 #' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
 #' these diagnostics do not apply to other predictive measures.
 #'
-#' ### `measure_higher_is_better`
+#' ### `measure_info`
 #'
 #' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
-#' list recording the `higher_is_better` setting used for each measure (`TRUE`
-#' or `FALSE`). Measures left at their natural orientation have no entry, which
-#' reads as `NULL`; `elpd` is always `NULL`. Used by [model_compare()] with
-#' `measure_compare_meta` to decide whether paired differences need a sign flip
-#' when converting to a utility scale.
-#'
-#' ### `measure_compare_meta`
-#'
-#' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
-#' list of per-measure comparison metadata used by [model_compare()]. Each entry
+#' list of per-measure information used by [model_compare()]. Each entry
 #' is a list with:
 #'
-#' * `higher_is_better` — the orientation setting used when the measure was
-#'   computed (`NULL`, `TRUE`, or `FALSE`), that is, which scale the values were
-#'   stored on
-#' * `loss` — whether the measure itself is a loss (lower is better), regardless
-#'   of the scale its values are stored on
+#' * `loss` — whether lower values of the measure are better. Measure values are
+#'   always stored on the measure's own scale, so this describes both the
+#'   measure and the values recorded for it
 #' * `diff_method` — how the standard error of the difference is obtained:
 #'   `"sum"` or `"mean"` (paired pointwise differences),
 #'   `"measure_specific"` (the built-in measure's own `se_diff_fun`), or
@@ -332,7 +329,7 @@
 #'   or `NULL` for an `NA` standard error. A missing standard error is not an
 #'   error state — the difference itself is still reported.
 #'   `"estimates_only"` appears only for legacy objects that carry no
-#'   comparison metadata at all.
+#'   `measure_info` at all.
 #' * `se_diff_fun` — for built-in measures with
 #'   `diff_method = "measure_specific"`, the name of the built-in implementation
 #'   used. Custom measures never store a function here.
@@ -342,18 +339,17 @@
 #'   longer supplies by the time [model_compare()] runs; `bacc` stores the class
 #'   index of each observation, which its pointwise values do not determine).
 #'   Custom measures return it as an `extra` element, and it is passed on to
-#'   `custom_se_fn`. It is excluded from the metadata consistency check below,
-#'   since it varies with the data rather than with how the measure was
-#'   configured.
+#'   `custom_se_fn`. It is excluded from the consistency check below, since it
+#'   varies with the data rather than with the measure itself.
 #'
 #' Built-in measures take `loss`, `diff_method`, and `se_diff_fun` from the
 #' package measure registry. Custom measures always get `diff_method = "custom"`
 #' and take `loss` from `attr(my_fun, "measure_loss") <- TRUE`, which declares
 #' that lower values are better; without it they are treated as utilities (see
 #' [insample_pred_measure()]).
-#' [model_compare()] requires all models to provide matching metadata for each
-#' shared measure; mismatched `higher_is_better` or `measure_loss` settings, or
-#' missing metadata on some models, produce an error.
+#' [model_compare()] requires all models to provide matching `measure_info` for
+#' each shared measure; a mismatched `measure_loss` declaration, or missing
+#' `measure_info` on some models, produces an error.
 #'
 #' ### `rank_by`, `compare_measures`, and related attributes`
 #'

@@ -265,6 +265,14 @@ either model's estimate propagates directly into \code{elpd_diff} and \code{p_wo
 This is qualitatively different from the calibration issues flagged by
 \code{diag_diff}: here the estimate itself may be wrong, not just uncertain.
 
+The same importance weights produce every other PSIS-LOO measure, so the flag
+is not specific to ELPD: \code{mae_loo}, \code{mse_loo}, \code{r2_loo} and the rest are
+biased by unreliable importance sampling for the same reason. It is a
+property of one model's approximation, and does not depend on which model is
+used as the comparison reference. \code{print()} therefore reports it once per
+model above the per-measure difference tables rather than inside any one of
+them.
+
 See for further information on Pareto-k values the "Pareto k estimates"
 section.
 }
@@ -310,37 +318,25 @@ compared. It is \code{NA} when \code{custom_se_fn} is \code{NULL} for that measu
 }
 
 The reference model has \code{m_se_diff = 0} whenever an \code{m_se_diff} is available.
-Attribute \code{measure_higher_is_better} on each \verb{*_pred_measure()}
-result records the \code{higher_is_better} setting used when each measure was
-computed; when stored values are on a loss scale, \code{model_compare()} emits a
-short message naming those measures (see \code{\link[=model_compare]{model_compare()}}).
+Which measures are losses is recorded in the \code{loss} element of the
+\code{measure_info} attribute on each \verb{*_pred_measure()} result; when a loss is
+compared on a utility scale, \code{model_compare()} emits a short message naming
+those measures (see \code{\link[=model_compare]{model_compare()}}).
 
 ELPD-family measures use the column names \code{elpd_diff} and \code{se_diff} rather
 than a prefixed form. Only ELPD comparisons include \code{p_worse} and \code{diag_diff};
 these diagnostics do not apply to other predictive measures.
 }
 
-\subsection{\code{measure_higher_is_better}}{
+\subsection{\code{measure_info}}{
 
 Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results: a named
-list recording the \code{higher_is_better} setting used for each measure (\code{TRUE}
-or \code{FALSE}). Measures left at their natural orientation have no entry, which
-reads as \code{NULL}; \code{elpd} is always \code{NULL}. Used by \code{\link[=model_compare]{model_compare()}} with
-\code{measure_compare_meta} to decide whether paired differences need a sign flip
-when converting to a utility scale.
-}
-
-\subsection{\code{measure_compare_meta}}{
-
-Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results: a named
-list of per-measure comparison metadata used by \code{\link[=model_compare]{model_compare()}}. Each entry
+list of per-measure information used by \code{\link[=model_compare]{model_compare()}}. Each entry
 is a list with:
 \itemize{
-\item \code{higher_is_better} — the orientation setting used when the measure was
-computed (\code{NULL}, \code{TRUE}, or \code{FALSE}), that is, which scale the values were
-stored on
-\item \code{loss} — whether the measure itself is a loss (lower is better), regardless
-of the scale its values are stored on
+\item \code{loss} — whether lower values of the measure are better. Measure values are
+always stored on the measure's own scale, so this describes both the
+measure and the values recorded for it
 \item \code{diff_method} — how the standard error of the difference is obtained:
 \code{"sum"} or \code{"mean"} (paired pointwise differences),
 \code{"measure_specific"} (the built-in measure's own \code{se_diff_fun}), or
@@ -350,7 +346,7 @@ which supplies either a function, the \code{"sum"}/\code{"mean"} pointwise formu
 or \code{NULL} for an \code{NA} standard error. A missing standard error is not an
 error state — the difference itself is still reported.
 \code{"estimates_only"} appears only for legacy objects that carry no
-comparison metadata at all.
+\code{measure_info} at all.
 \item \code{se_diff_fun} — for built-in measures with
 \code{diff_method = "measure_specific"}, the name of the built-in implementation
 used. Custom measures never store a function here.
@@ -360,9 +356,8 @@ standard error of its difference, present only for measures that need it
 longer supplies by the time \code{\link[=model_compare]{model_compare()}} runs; \code{bacc} stores the class
 index of each observation, which its pointwise values do not determine).
 Custom measures return it as an \code{extra} element, and it is passed on to
-\code{custom_se_fn}. It is excluded from the metadata consistency check below,
-since it varies with the data rather than with how the measure was
-configured.
+\code{custom_se_fn}. It is excluded from the consistency check below, since it
+varies with the data rather than with the measure itself.
 }
 
 Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} from the
@@ -370,9 +365,9 @@ package measure registry. Custom measures always get \code{diff_method = "custom
 and take \code{loss} from \code{attr(my_fun, "measure_loss") <- TRUE}, which declares
 that lower values are better; without it they are treated as utilities (see
 \code{\link[=insample_pred_measure]{insample_pred_measure()}}).
-\code{\link[=model_compare]{model_compare()}} requires all models to provide matching metadata for each
-shared measure; mismatched \code{higher_is_better} or \code{measure_loss} settings, or
-missing metadata on some models, produce an error.
+\code{\link[=model_compare]{model_compare()}} requires all models to provide matching \code{measure_info} for
+each shared measure; a mismatched \code{measure_loss} declaration, or missing
+\code{measure_info} on some models, produces an error.
 }
 
 \subsection{\code{rank_by}, \code{compare_measures}, and related attributes`}{

@@ -255,10 +255,9 @@ hamming_loss <- function(y, ypred, log_weights = NULL) {
     pointwise = hamming_i
   )
 }
-# Hamming loss is naturally on a loss scale (lower is better). Declaring that
-# lets `model_compare()` report its differences on the utility scale, as it
-# does for built-in loss measures, and lets `control` reorient the stored
-# values with `list(hamming = list(higher_is_better = TRUE))`.
+# Hamming loss is on a loss scale (lower is better). Declaring that lets
+# `model_compare()` report its differences on the utility scale, as it does for
+# built-in loss measures, and rank models in the right direction.
 attr(hamming_loss, "measure_loss") <- TRUE
 ```
 

@@ -73,8 +73,9 @@
 #'   (that model's own standard error), `pointwise` (a plain numeric vector, not
 #'   a matrix), and `extra` (whatever the measure returned as `extra`, or
 #'   `NULL`). All values are on the measure's natural scale, so the function
-#'   does not need to account for `higher_is_better`. It must return the
-#'   standard error of the difference as a numeric scalar. For example:
+#'   does not need to account for the utility-scale conversion applied to the
+#'   reported differences. It must return the standard error of the difference
+#'   as a numeric scalar. For example:
 #'
 #'   ```
 #'   my_se_fn <- function(ref, cmp) {
@@ -162,6 +163,13 @@
 #'   computation, then there may be significant bias in `elpd_diff` favoring
 #'   models with a large number of high Pareto k values.
 #'
+#'   Pareto \eqn{\hat{k}} describes a model's PSIS-LOO approximation rather than
+#'   any one measure or any one pair of models, and every LOO measure is computed
+#'   from the same importance weights. For `pred_measure` comparisons `print()`
+#'   therefore reports it once per model, in a block above the difference tables,
+#'   instead of as a column inside one of them. The `diag_elpd` column is still
+#'   returned on the object.
+#'
 #' ## Comparing `pred_measure` objects
 #'   When all inputs are predictive measure results sharing one evaluation
 #'   source,
@@ -179,16 +187,16 @@
 #'   own difference, so the best model on that measure is always the first row
 #'   and the differences run in decreasing order.
 #'   Measures may use different orientations in their raw form (e.g. ELPD and
-#'   CRPS/RPS are returned on a utility scale where higher is better, while MSE
-#'   and Brier score are loss measures where lower is better). For comparison,
-#'   all `{measure}_diff` values are reported on a common utility scale (higher
-#'   is better). Loss measures have their sign flipped from the raw loss
-#'   orientation so that negative `{measure}_diff` values indicate worse
-#'   performance than the reference model. Each `*_pred_measure()` result stores
-#'   attribute `measure_higher_is_better`, a named list recording the
-#'   `higher_is_better` setting used when each measure was computed. When loss measures are compared
-#'   on a utility scale, `model_compare()` emits a short message naming the affected
-#'   measures, for example:
+#'   SRPS/SCRPS are returned on a utility scale where higher is better, while
+#'   MSE, RPS/CRPS and the Brier score are loss measures where lower is better).
+#'   For comparison, all `{measure}_diff` values are reported on a common
+#'   utility scale (higher is better). Loss measures have their sign flipped
+#'   from the raw loss orientation so that negative `{measure}_diff` values
+#'   indicate worse performance than the reference model. Which measures are
+#'   losses is recorded in the `loss` element of each measure's entry in the
+#'   `measure_info` attribute of an `*_pred_measure()` result. When loss
+#'   measures are compared on a utility scale, `model_compare()` emits a short
+#'   message naming the affected measures, for example:
 #'   "For model comparison, differences for mse are reported on a utility scale
 #'   (higher is better)."
 #'
@@ -198,12 +206,24 @@
 #'   the wrong direction; see [insample_pred_measure()].
 #'
 #'   `p_worse` and `diag_diff` are computed for ELPD-family measures only. Other
-#'   measures receive `{measure}_diff` and `{measure}_se_diff` from paired
-#'   pointwise contributions when the overall estimate is a sum or mean of those
-#'   contributions (using the same standard error formula as `se_diff`). For
-#'   measures where pointwise values do not define the overall estimate (e.g.
-#'   `r2`, `mse`, `rmse`), `{measure}_diff` is the difference between overall
-#'   estimates and `{measure}_se_diff` is `NA`. When models were fit with
+#'   measures receive `{measure}_diff` and `{measure}_se_diff`. How
+#'   `{measure}_se_diff` is obtained is recorded in the `diff_method` element of
+#'   the measure's entry in `measure_info`:
+#'
+#'   * `"sum"` or `"mean"`: the overall estimate is the sum (`elpd`, `ic`) or the
+#'     mean (`mlpd`, `mae`, `mse`, `acc`, `rps`, `srps`, `brier`) of its
+#'     pointwise contributions, so the standard error is computed from paired
+#'     pointwise differences (the same formula as `se_diff`).
+#'   * `"measure_specific"`: the overall estimate is not a sum or mean of
+#'     pointwise contributions (`r2`, `rmse`, `bacc`), so the measure supplies
+#'     its own standard error of the difference.
+#'   * `"custom"`: a custom measure declares nothing, so `custom_se_fn` must be
+#'     supplied. `{measure}_se_diff` is `NA` only when `custom_se_fn` is an
+#'     explicit `NULL` for that measure.
+#'
+#'   Objects carrying no `measure_info` at all fall back to the difference
+#'   between overall estimates with `{measure}_se_diff` set to `NA`.
+#'   When models were fit with
 #'   different `measure` sets, only measures common to all models are compared; a
 #'   warning lists omitted measures. Use `print(x, measures = "all")` to display
 #'   diff tables for every compared measure; see [loo-glossary] for column
@@ -492,7 +512,6 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
   compare_measures <- attr(x, "compare_measures")
   compare_source <- attr(x, "compare_source")
   primary_measure <- if (is.null(rank_by)) "elpd" else rank_by
-  ref_model <- .compare_ref_model(x, primary_measure)
 
   measures_to_print <- if (is.null(measures)) {
     primary_measure
@@ -522,29 +541,35 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
     )
   }
 
-  if (is.null(measures) && !is.null(rank_by)) {
-    message(
-      "Models ranked by ", rank_by, " (reference: ", ref_model, ")."
-    )
-  } else if (is.null(measures) && !is.null(ref_model_attr)) {
-    message(
-      "All measures compared against model ", ref_model_attr, "."
-    )
-  }
+  # The reference is always named, whichever way it was chosen: without
+  # `rank_by` each measure keeps its own best model, which is the case most in
+  # need of saying so and the only one that used to say nothing.
+  # Printed rather than messaged: it labels the tables below, and `message()`
+  # output is suppressed wholesale by knitr chunks and `suppressMessages()`.
+  .cat_wrapped(
+    .compare_reference_line(x, rank_by, ref_model_attr, compare_measures)
+  )
 
   # LOO is the familiar default, so only name the source when it is not LOO.
   if (!is.null(compare_source) && !identical(compare_source, "loo")) {
-    cat(
+    .cat_wrapped(
       "Predictive measures evaluated on ",
       .compare_source_label(compare_source),
-      ".\n",
-      sep = ""
+      "."
     )
   }
 
-  show_diag_elpd_primary <- is.null(measures) || identical(measures, "all")
-  for (i in seq_along(measures_to_print)) {
-    measure <- measures_to_print[[i]]
+  # Pareto k is a property of a model's PSIS-LOO approximation, not of any one
+  # measure or of the comparison, so it is reported once for all models rather
+  # than as a column inside a per-measure difference table.
+  psis_shown <- .print_psis_diag_block(x)
+  # A per-measure header already opens with a blank line; only the single-table
+  # form needs one inserted here.
+  if (psis_shown && is.null(measures)) {
+    cat("\n")
+  }
+
+  for (measure in measures_to_print) {
     if (!is.null(measures)) {
       cat(
         "\n-- ", measure, " (vs ", .compare_ref_model(x, measure), ") --\n",
@@ -555,10 +580,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
       x,
       measure = measure,
       digits = digits,
-      p_worse = p_worse,
-      show_diag_elpd = show_diag_elpd_primary &&
-        identical(measure, primary_measure) &&
-        i == match(primary_measure, measures_to_print)
+      p_worse = p_worse
     )
   }
 
@@ -571,28 +593,15 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
   if (is.null(measures)) {
     other <- setdiff(compare_measures, primary_measure)
     if (length(other)) {
-      # Worth naming only when a measure actually prefers a different model:
-      # otherwise the per-measure reference is invisible to the user.
-      other_refs <- vapply(other, .compare_ref_model, character(1), x = x)
-      differing <- is.null(rank_by) && is.null(ref_model_attr) &&
-        any(other_refs != ref_model)
+      # The per-measure references are named in the header line, so this only
+      # has to say which measures exist and how to see them.
       message(
         if (has_diag_msg) "\n",
-        "Other measures compared: ",
-        paste(other, collapse = ", "),
-        ".",
-        if (differing) {
-          paste0(
-            " Each is compared against its own best model (",
-            paste0(
-              other[other_refs != ref_model], ": ",
-              other_refs[other_refs != ref_model],
-              collapse = ", "
-            ),
-            ")."
-          )
-        },
-        " Use print(x, measures = \"all\")."
+        .wrap(
+          "Other measures compared: ",
+          paste(other, collapse = ", "),
+          ". Use print(x, measures = \"all\")."
+        )
       )
     }
   }
@@ -614,9 +623,174 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
   x$model[[1L]]
 }
 
+#' Header line naming the reference each difference is computed against
+#'
+#' Always printed, so the reference is never left implicit. `rank_by` pins one
+#' reference for every measure; without it each measure keeps its own best
+#' model, which is the case most in need of being spelled out.
+#' @noRd
+#' @param x A `"compare.loo"` data frame.
+#' @param rank_by Attribute `rank_by`, or `NULL`.
+#' @param ref_model_attr Attribute `compare_ref_model`, or `NULL`.
+#' @param compare_measures Bare names of all compared measures.
+#' @return A single string.
+.compare_reference_line <- function(x, rank_by, ref_model_attr,
+                                    compare_measures) {
+  if (!is.null(rank_by)) {
+    return(paste0(
+      "Models ranked by ", rank_by,
+      " (reference: ", .compare_ref_model(x, rank_by), ")."
+    ))
+  }
+  if (!is.null(ref_model_attr)) {
+    return(paste0("All measures compared against model ", ref_model_attr, "."))
+  }
+
+  refs <- vapply(compare_measures, .compare_ref_model, character(1), x = x)
+  if (length(compare_measures) == 1L) {
+    return(paste0(
+      "Models ranked by ", compare_measures, " (reference: ", refs, ")."
+    ))
+  }
+  # Naming every reference stops being readable once there are many measures.
+  if (length(compare_measures) > 4L) {
+    return("Each measure compared against its own best model.")
+  }
+  paste0(
+    "Each measure compared against its own best model (",
+    paste0(compare_measures, ": ", refs, collapse = ", "),
+    ")."
+  )
+}
+
+#' Split `diag_elpd` entries into their count and threshold
+#' @noRd
+#' @param flags Character vector of `diag_elpd` values, such as
+#'   `"25 k_psis > 0.62"`.
+#' @return Data frame with numeric `bad_k` and `threshold`, both `NA` for an
+#'   entry that does not match, so an unrecognised value is passed through
+#'   rather than silently dropped.
+.parse_diag_psis <- function(flags) {
+  parts <- regmatches(flags, regexec("^([0-9]+) k_psis > ([0-9.]+)$", flags))
+  field <- function(i) {
+    vapply(
+      parts,
+      function(p) if (length(p) == 3L) as.numeric(p[[i]]) else NA_real_,
+      numeric(1)
+    )
+  }
+  data.frame(bad_k = field(2L), threshold = field(3L))
+}
+
+#' Wrap printed prose to the conventional 80-column terminal width
+#'
+#' Tables are wrapped by `print.data.frame()` at `getOption("width")`; this does
+#' the same for the sentences around them, capped at 80 so the output stays
+#' within a standard terminal however wide the option is set.
+#' @noRd
+#' @param ... Pieces of a single line, pasted together.
+#' @return A single string with embedded newlines.
+.wrap <- function(...) {
+  width <- min(getOption("width", 80L), 80L)
+  paste(strwrap(paste0(...), width = width), collapse = "\n")
+}
+
+#' Print prose wrapped to 80 columns
+#' @noRd
+#' @param ... Pieces of a single line, pasted together.
+.cat_wrapped <- function(...) {
+  cat(.wrap(...), "\n", sep = "")
+}
+
+#' Describe how many of the compared models a flag applies to
+#' @noRd
+#' @param n Number of flagged models.
+#' @param total Number of compared models.
+#' @return A string such as `"2 of 3 models"`, `"all 3 models"`, or
+#'   `"both models"`.
+.n_of_models <- function(n, total) {
+  if (n < total) {
+    return(paste0(n, " of ", total, " models"))
+  }
+  if (total == 2L) "both models" else paste0("all ", total, " models")
+}
+
+#' Print the PSIS-LOO diagnostics block
+#'
+#' Pareto \eqn{\hat{k}} describes a model's PSIS-LOO approximation, not any one
+#' measure and not the comparison, so it is reported once per model above the
+#' per-measure difference tables. Nothing is printed when no model is flagged,
+#' or for sources other than LOO, which carry no `diag_elpd` column.
+#' @noRd
+#' @param x A `"compare.loo"` data frame.
+#' @return `TRUE` invisibly when a block was printed.
+.print_psis_diag_block <- function(x) {
+  col <- x[["diag_elpd"]]
+  if (is.null(col)) {
+    return(invisible(FALSE))
+  }
+  flagged <- !is.na(col) & nzchar(col, keepNA = FALSE)
+  if (!any(flagged)) {
+    return(invisible(FALSE))
+  }
+
+  n_models <- length(col)
+  models <- x$model[flagged]
+  parsed <- .parse_diag_psis(col[flagged])
+
+  # An unparsed entry has no count to sort or tabulate by, so fall back to the
+  # stored strings rather than inventing numbers for them.
+  if (anyNA(parsed$bad_k)) {
+    .cat_wrapped(
+      "PSIS-LOO unreliable for ", .n_of_models(length(models), n_models),
+      "; measures may be biased."
+    )
+    print(
+      data.frame(
+        model = models,
+        diag_elpd = col[flagged],
+        stringsAsFactors = FALSE
+      ),
+      quote = FALSE,
+      row.names = FALSE
+    )
+    return(invisible(TRUE))
+  }
+
+  ord <- order(parsed$bad_k, decreasing = TRUE)
+  models <- models[ord]
+  parsed <- parsed[ord, , drop = FALSE]
+  # Thresholds depend on the number of draws, so models need not share one.
+  common <- length(unique(parsed$threshold)) == 1L
+
+  if (length(models) == 1L) {
+    .cat_wrapped(
+      "PSIS-LOO unreliable for ", models, " (", parsed$bad_k,
+      " obs, k_psis > ", parsed$threshold, "); measures may be biased."
+    )
+    return(invisible(TRUE))
+  }
+
+  .cat_wrapped(
+    "PSIS-LOO unreliable for ", .n_of_models(length(models), n_models),
+    if (common) paste0(" (k_psis > ", parsed$threshold[[1L]], ")") else "",
+    "; measures may be biased."
+  )
+  block <- data.frame(
+    model = models,
+    bad_k = parsed$bad_k,
+    stringsAsFactors = FALSE
+  )
+  if (!common) {
+    block$k_psis_threshold <- parsed$threshold
+  }
+  print(block, quote = FALSE, row.names = FALSE)
+  invisible(TRUE)
+}
+
 #' Print one measure's comparison table
 #' @noRd
-.print_compare_measure_table <- function(x, measure, digits, p_worse, show_diag_elpd) {
+.print_compare_measure_table <- function(x, measure, digits, p_worse) {
   if (.is_elpd_measure(measure)) {
     diff_col <- "elpd_diff"
     se_col <- "se_diff"
@@ -657,10 +831,6 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
     x2$p_worse <- unname(.fr(x[["p_worse"]][ord], digits = 2))
     x2$diag_diff <- x[["diag_diff"]][ord]
   }
-  if (show_diag_elpd && "diag_elpd" %in% colnames(x)) {
-    x2$diag_elpd <- x[["diag_elpd"]][ord]
-  }
-
   print(x2, quote = FALSE, row.names = FALSE)
 }
 
@@ -994,7 +1164,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   cols[!grepl("^p_", cols)]
 }
 
-#' Check that comparison metadata is consistent across models
+#' Check that `measure_info` is consistent across models
 #' @noRd
 .compare_metadata_check <- function(loos) {
   bare_measures <- .compare_measures(loos)
@@ -1003,17 +1173,17 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   }
 
   for (bare in bare_measures) {
-    metas <- lapply(loos, function(x) {
-      compare_meta <- attr(x, "measure_compare_meta")
-      if (is.null(compare_meta)) {
+    infos <- lapply(loos, function(x) {
+      measure_info <- attr(x, "measure_info")
+      if (is.null(measure_info)) {
         return(NULL)
       }
-      compare_meta[[bare]]
+      measure_info[[bare]]
     })
-    has_meta <- !vapply(metas, is.null, logical(1))
-    if (any(has_meta) && !all(has_meta)) {
+    has_info <- !vapply(infos, is.null, logical(1))
+    if (any(has_info) && !all(has_info)) {
       stop(
-        "Not all models provide comparison metadata for measure '",
+        "Not all models provide `measure_info` for measure '",
         bare,
         "'. Recompute all inputs with the current version of `loo_pred_measure()`.",
         call. = FALSE
@@ -1023,25 +1193,24 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
     # baseline derived from `y`), which legitimately differs when models are
     # fitted to different data. That case is already reported by the `yhash`
     # warning, so comparing `extra` here would only mislabel it as a
-    # `higher_is_better` disagreement.
-    non_null <- lapply(metas[has_meta], function(meta) {
-      meta$extra <- NULL
-      meta
+    # disagreement about the measure itself.
+    non_null <- lapply(infos[has_info], function(info) {
+      info$extra <- NULL
+      info
     })
     if (length(non_null) > 1L) {
       ref <- non_null[[1L]]
       inconsistent <- vapply(
         non_null[-1L],
-        function(meta) !identical(meta, ref),
+        function(info) !identical(info, ref),
         logical(1)
       )
       if (any(inconsistent)) {
         stop(
-          "Models disagree on comparison metadata for measure '",
+          "Models disagree on `measure_info` for measure '",
           bare,
-          "'. Ensure all models use the same `higher_is_better` settings for ",
-          "each measure, and for a custom measure the same `measure_loss` ",
-          "declaration.",
+          "'. For a custom measure, ensure all models use the same ",
+          "`measure_loss` declaration.",
           call. = FALSE
         )
       }
@@ -1212,28 +1381,34 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   grepl("^elpd", name)
 }
 
-#' Look up per-measure comparison metadata on a result object
+#' Look up the per-measure information recorded on a result object
 #' @noRd
-.get_measure_compare_meta <- function(loos, bare) {
-  compare_meta <- attr(loos[[1L]], "measure_compare_meta")
-  if (is.null(compare_meta)) {
+.get_measure_info <- function(loos, bare) {
+  measure_info <- attr(loos[[1L]], "measure_info")
+  if (is.null(measure_info)) {
     return(NULL)
   }
-  compare_meta[[bare]]
+  measure_info[[bare]]
 }
 
-#' Whether a measure is intrinsically a loss (natural scale: lower is better)
+#' Names of the built-in measures that are losses (lower is better)
+#' @noRd
+.builtin_loss_measures <- function() {
+  names(Filter(function(spec) isTRUE(spec$loss), .measure_spec))
+}
+
+#' Whether a measure is a loss (lower is better)
 #'
-#' Unlike `.measure_lower_is_better()` this ignores `higher_is_better`, so it
-#' describes the measure itself rather than the scale its values are stored on.
+#' Measure values are always stored on the measure's own scale, so this equally
+#' describes the measure and the values recorded for it.
 #' @noRd
 .measure_is_loss <- function(name, loos = NULL) {
   bare <- .display_name(name, loos)
 
   if (!is.null(loos)) {
-    meta <- .get_measure_compare_meta(loos, bare)
-    if (!is.null(meta) && !is.null(meta$loss)) {
-      return(isTRUE(meta$loss))
+    info <- .get_measure_info(loos, bare)
+    if (!is.null(info) && !is.null(info$loss)) {
+      return(isTRUE(info$loss))
     }
   }
 
@@ -1241,43 +1416,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   if (!is.null(spec)) {
     return(isTRUE(spec$loss))
   }
-  bare %in% c("ic", "mae", "mse", "rmse", "brier", "srps")
-}
-
-#' Whether stored values are on a loss scale (lower is better)
-#' @noRd
-.measure_lower_is_better <- function(name, loos = NULL) {
-  bare <- .display_name(name, loos)
-  higher_is_better <- NULL
-
-  if (!is.null(loos)) {
-    meta <- .get_measure_compare_meta(loos, bare)
-    if (!is.null(meta)) {
-      higher_is_better <- meta$higher_is_better
-    } else {
-      hib_attr <- attr(loos[[1L]], "measure_higher_is_better")
-      if (!is.null(hib_attr) && bare %in% names(hib_attr)) {
-        higher_is_better <- hib_attr[[bare]]
-      }
-    }
-  }
-
-  if (!is.null(higher_is_better)) {
-    return(!isTRUE(higher_is_better))
-  }
-
-  .measure_is_loss(name, loos)
-}
-
-#' Sign converting stored measure values to the measure's natural scale
-#'
-#' `higher_is_better` may have negated the stored values (see
-#' `.create_measure_structure()`). Delta-method standard errors are derived on
-#' the natural scale (e.g. RMSE positive), so they must be undone first.
-#' @noRd
-.measure_natural_sign <- function(name, loos = NULL) {
-  stored_lower_is_better <- .measure_lower_is_better(name, loos)
-  if (identical(stored_lower_is_better, .measure_is_loss(name, loos))) 1 else -1
+  bare %in% .builtin_loss_measures()
 }
 
 #' Bare names of measures whose sign is flipped for `model_compare()`
@@ -1286,7 +1425,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   bare <- vapply(cols, .display_name, character(1), loos = loos)
   unique(bare[vapply(
     cols,
-    function(col) .measure_lower_is_better(col, loos),
+    function(col) .measure_is_loss(col, loos),
     logical(1)
   )])
 }
@@ -1310,19 +1449,19 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
 
 #' How to aggregate paired pointwise differences for a measure
 #'
-#' Taken from the measure's stored comparison metadata: `"sum"` or `"mean"` when
+#' Taken from the measure's stored `measure_info`: `"sum"` or `"mean"` when
 #' the overall estimate is the sum or the mean of its pointwise contributions,
 #' `"measure_specific"` when the built-in measure supplies its own
 #' `se_diff_fun`, and `"custom"` for custom measures, whose standard error is
 #' supplied at comparison time through `model_compare(custom_se_fn = )`.
 #' Nothing is inferred. `"estimates_only"` is only reached by legacy objects
-#' carrying no comparison metadata at all.
+#' carrying no `measure_info` at all.
 #' @noRd
 .measure_pointwise_diff_method <- function(loos, col) {
   bare <- .display_name(col, loos)
-  meta <- .get_measure_compare_meta(loos, bare)
-  if (!is.null(meta) && !is.null(meta$diff_method)) {
-    return(meta$diff_method)
+  info <- .get_measure_info(loos, bare)
+  if (!is.null(info) && !is.null(info$diff_method)) {
+    return(info$diff_method)
   }
 
   if (.is_elpd_measure(col) || bare == "ic") {
@@ -1370,9 +1509,9 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
 #' @noRd
 .measure_se_diff_fun <- function(loos, col) {
   bare <- .display_name(col, loos)
-  meta <- .get_measure_compare_meta(loos, bare)
+  info <- .get_measure_info(loos, bare)
 
-  fun <- meta$se_diff_fun
+  fun <- info$se_diff_fun
   if (is.null(fun)) {
     fun <- .measure_spec[[bare]]$se_diff_fun
   }
@@ -1540,18 +1679,16 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
 
 #' Assemble one model's inputs for an `se_diff_fun`
 #'
-#' Every element describes the single model `x`, including `extra`, which is
-#' read from that model's own comparison metadata rather than the reference
-#' model's.
+#' Every element describes the single model `x`, on the measure's natural scale,
+#' including `extra`, which is read from that model's own `measure_info` rather
+#' than the reference model's.
 #' @noRd
-#' @param sgn Sign restoring the measure's natural scale, see
-#'   `.measure_natural_sign()`.
-.se_diff_input <- function(x, col, sgn) {
+.se_diff_input <- function(x, col) {
   list(
-    estimate = sgn * x$estimates[col, "Estimate"],
+    estimate = x$estimates[col, "Estimate"],
     se = x$estimates[col, "SE"],
-    pointwise = sgn * x$pointwise[, col, drop = TRUE],
-    extra = .get_measure_compare_meta(list(x), .display_name(col, list(x)))$extra
+    pointwise = x$pointwise[, col, drop = TRUE],
+    extra = .get_measure_info(list(x), .display_name(col, list(x)))$extra
   )
 }
 
@@ -1583,7 +1720,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
     method <- .measure_pointwise_diff_method(c(list(ref, cmp)), col)
   }
 
-  flip <- .measure_lower_is_better(col, loos)
+  flip <- .measure_is_loss(col, loos)
   est_utility <- function(estimates) {
     val <- estimates[col, "Estimate"]
     if (flip) -val else val
@@ -1599,10 +1736,9 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
       if (is.null(se_fn)) {
         return(c(diff = diff, se = NA_real_))
       }
-      sgn <- .measure_natural_sign(col, loos)
       se <- se_fn(
-        ref = .se_diff_input(ref, col, sgn),
-        cmp = .se_diff_input(cmp, col, sgn)
+        ref = .se_diff_input(ref, col),
+        cmp = .se_diff_input(cmp, col)
       )
       return(c(
         diff = diff,
@@ -1620,10 +1756,9 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
 
   if (method == "measure_specific") {
     se_diff_fun <- .measure_se_diff_fun(loos, col)
-    sgn <- .measure_natural_sign(col, loos)
     se <- se_diff_fun(
-      ref = .se_diff_input(ref, col, sgn),
-      cmp = .se_diff_input(cmp, col, sgn)
+      ref = .se_diff_input(ref, col),
+      cmp = .se_diff_input(cmp, col)
     )
     return(c(
       diff = est_utility(cmp$estimates) - est_utility(ref$estimates),
@@ -1825,7 +1960,7 @@ model_compare_order <- function(loos, rank_col = NULL) {
 
   est_row <- vapply(loos, function(x) {
     val <- x$estimates[rank_col, "Estimate"]
-    if (.measure_lower_is_better(rank_col, loos)) -val else val
+    if (.measure_is_loss(rank_col, loos)) -val else val
   }, numeric(1))
   order(est_row, decreasing = TRUE)
 }
@@ -1939,7 +2074,9 @@ diag_diff <- function(N, elpd_diff) {
     diag_diff[elpd_diff == 0] <- ""
   } else {
     diag_diff <- rep("", length(elpd_diff))
-    diag_diff[elpd_diff > -4 & elpd_diff != 0] <- "|elpd_diff| < 4"
+    # The reference model need not be the best one, so a difference can be
+    # positive: the flag is about the magnitude, not the sign.
+    diag_diff[abs(elpd_diff) < 4 & elpd_diff != 0] <- "|elpd_diff| < 4"
   }
   diag_diff
 }

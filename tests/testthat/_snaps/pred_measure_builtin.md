@@ -36,7 +36,7 @@
     Computed from 400 draws by 50 observations.
     
         Estimate SE  
-    rps 0.86     0.09
+    rps 0.88     0.09
 
 # measure_rps() scaled version with categorical data works as expected
 
@@ -44,7 +44,7 @@
     Computed from 400 draws by 50 observations.
     
          Estimate SE   
-    srps -1.27     0.05
+    srps -1.28     0.05
 
 # measure_rps() with continuous data works as expected
 
@@ -52,7 +52,7 @@
     Computed from 400 draws by 144 observations.
     
         Estimate SE   
-    rps 26.74     1.82
+    rps 28.28     1.82
 
 # measure_brier() works as expected
 

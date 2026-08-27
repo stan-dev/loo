@@ -131,12 +131,17 @@ test_that("loo_compare works with three loo_pred_measure models", {
   )
   expect_snapshot(print(comp))
   expect_equal(nrow(comp), 3L)
-  expect_equal(comp$model, c("C", "B", "A"))
+  expect_equal(comp$model, c("B", "C", "A"))
   expect_equal(attr(comp, "rank_by"), "mae")
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2", "mae"))
   expect_equal(comp$mae_diff[1L], 0)
   expect_true(all(comp$mae_diff[-1L] < 0))
-  expect_true(all(comp$elpd_diff[-1L] <= 0))
+  # `rank_by` pins the mae-best model as the reference for *every* measure, so
+  # only the reference row is zero; here B and C are all but tied on mae while
+  # C has the clearly higher elpd, which leaves `elpd_diff` positive for C
+  expect_equal(comp$elpd_diff[1L], 0)
+  expect_gt(comp$elpd_diff[comp$model == "C"], 0)
+  expect_lt(comp$elpd_diff[comp$model == "A"], 0)
   expect_equal(attr(comp, "sign_converted_measures"), c("mae"))
 })
 
@@ -250,6 +255,10 @@ test_that("each printed measure table is sorted best model first", {
     out <- utils::capture.output(
       suppressMessages(print(comp, measures = measure))
     )
+    # Drop everything above the measure's own table: the PSIS-LOO diagnostics
+    # block lists model names too, but says nothing about measure ordering.
+    header <- grep(paste0("^-- ", measure, " "), out)
+    out <- out[seq.int(header[[1L]] + 1L, length(out))]
     rows <- out[grepl("^\\s+m[0-9]", out)]
     sub("^\\s*(\\S+).*$", "\\1", rows)
   }
@@ -335,24 +344,23 @@ test_that("loo_compare measure helpers work as expected", {
   expect_equal(loo:::.resolve_rank_measure(loos, "mse")$internal, "mse_loo")
   expect_true(loo:::.is_elpd_measure("elpd_loo"))
   expect_false(loo:::.is_elpd_measure("mse_loo"))
-  expect_equal(attr(pm1, "measure_higher_is_better")$mse, NULL)
-  expect_equal(attr(pm1, "measure_higher_is_better")$r2, NULL)
-  expect_equal(attr(pm1, "measure_higher_is_better")$elpd, NULL)
-  expect_equal(attr(pm1, "measure_compare_meta")$elpd$diff_method, "sum")
-  expect_equal(attr(pm1, "measure_compare_meta")$mse$loss, TRUE)
-  expect_equal(attr(pm1, "measure_compare_meta")$mse$diff_method, "mean")
-  expect_equal(attr(pm1, "measure_compare_meta")$r2$diff_method, "measure_specific")
-  expect_equal(attr(pm1, "measure_compare_meta")$r2$se_diff_fun, "r2")
+  expect_equal(attr(pm1, "measure_info")$elpd$diff_method, "sum")
+  expect_false(attr(pm1, "measure_info")$elpd$loss)
+  expect_false(attr(pm1, "measure_info")$r2$loss)
+  expect_equal(attr(pm1, "measure_info")$mse$loss, TRUE)
+  expect_equal(attr(pm1, "measure_info")$mse$diff_method, "mean")
+  expect_equal(attr(pm1, "measure_info")$r2$diff_method, "measure_specific")
+  expect_equal(attr(pm1, "measure_info")$r2$se_diff_fun, "r2")
   expect_equal(
-    attr(pm1, "measure_compare_meta")$r2$extra$mse_y_i,
+    attr(pm1, "measure_info")$r2$extra$mse_y_i,
     (res$y - mean(res$y))^2
   )
   # only measures that need it carry `extra`
-  expect_null(attr(pm1, "measure_compare_meta")$mse$extra)
-  expect_true(loo:::.measure_lower_is_better("mse_loo", loos))
-  expect_false(loo:::.measure_lower_is_better("r2_loo", loos))
-  expect_true(loo:::.measure_lower_is_better("mse_loo"))
-  expect_false(loo:::.measure_lower_is_better("r2_loo"))
+  expect_null(attr(pm1, "measure_info")$mse$extra)
+  expect_true(loo:::.measure_is_loss("mse_loo", loos))
+  expect_false(loo:::.measure_is_loss("r2_loo", loos))
+  expect_true(loo:::.measure_is_loss("mse_loo"))
+  expect_false(loo:::.measure_is_loss("r2_loo"))
   expect_equal(
     loo:::.compare_sign_converted_measures(c("elpd_loo", "mse_loo", "r2_loo"), loos),
     c("mse")
@@ -521,48 +529,6 @@ test_that("r2 differences use the delta-method standard error", {
   )
 })
 
-test_that("r2 se_diff is invariant to `higher_is_better`", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  make <- function(loo, mupred, ylp, higher_is_better) {
-    loo_pred_measure(
-      loo = loo,
-      y = res$y,
-      mupred = mupred,
-      ylp = ylp,
-      measure = "r2",
-      control = list(r2 = list(higher_is_better = higher_is_better))
-    )
-  }
-
-  utility <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, TRUE),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, TRUE)
-  )
-  loss <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, FALSE),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, FALSE)
-  )
-
-  # r2 is naturally a utility, so `higher_is_better = FALSE` is the flipped one
-  expect_equal(loo:::.measure_natural_sign("r2_loo", utility), 1)
-  expect_equal(loo:::.measure_natural_sign("r2_loo", loss), -1)
-
-  # the baseline is a property of `y`, so it is never sign-flipped
-  expect_equal(
-    attr(loss[[1L]], "measure_compare_meta")$r2$extra$mse_y_i,
-    attr(utility[[1L]], "measure_compare_meta")$r2$extra$mse_y_i
-  )
-
-  pair_utility <- loo:::.pair_measure_stats(
-    utility[[2L]], utility[[1L]], "r2_loo", loos = utility
-  )
-  pair_loss <- loo:::.pair_measure_stats(
-    loss[[2L]], loss[[1L]], "r2_loo", loos = loss
-  )
-  expect_equal(unname(pair_loss["se"]), unname(pair_utility["se"]))
-  expect_equal(unname(pair_loss["diff"]), unname(pair_utility["diff"]))
-})
-
 test_that("r2 reports the difference without an se when the baseline is gone", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   make <- function(loo, mupred, ylp) {
@@ -575,9 +541,9 @@ test_that("r2 reports the difference without an se when the baseline is gone", {
 
   # objects computed before the baseline was stored
   drop_baseline <- function(x) {
-    meta <- attr(x, "measure_compare_meta")
+    meta <- attr(x, "measure_info")
     meta$r2$extra <- NULL
-    attr(x, "measure_compare_meta") <- meta
+    attr(x, "measure_info") <- meta
     x
   }
   stale1 <- drop_baseline(pm1)
@@ -603,48 +569,11 @@ test_that("r2 reports the difference without an se when the baseline is gone", {
   expect_false(anyNA(mixed$r2_se_diff))
 })
 
-test_that("rmse se_diff is invariant to `higher_is_better`", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  make <- function(loo, mupred, ylp, higher_is_better) {
-    loo_pred_measure(
-      loo = loo,
-      y = res$y,
-      mupred = mupred,
-      ylp = ylp,
-      measure = "rmse",
-      control = list(rmse = list(higher_is_better = higher_is_better))
-    )
-  }
-
-  loss <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, FALSE),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, FALSE)
-  )
-  utility <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, TRUE),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, TRUE)
-  )
-
-  # stored on opposite scales, so the natural scale must be restored before the
-  # square roots and ratios of the delta method are applied
-  expect_equal(loo:::.measure_natural_sign("rmse_loo", loss), 1)
-  expect_equal(loo:::.measure_natural_sign("rmse_loo", utility), -1)
-
-  pair_loss <- loo:::.pair_measure_stats(
-    loss[[2L]], loss[[1L]], "rmse_loo", loos = loss
-  )
-  pair_utility <- loo:::.pair_measure_stats(
-    utility[[2L]], utility[[1L]], "rmse_loo", loos = utility
-  )
-  expect_equal(unname(pair_loss["se"]), unname(pair_utility["se"]))
-  expect_equal(unname(pair_loss["diff"]), unname(pair_utility["diff"]))
-})
-
 # two balanced-accuracy measures over the same three-class outcome: the second
 # model has probability mass shifted towards the first (and largest) class, so
 # the two disagree on a subset of observations and the class strata are
 # unbalanced, which is where balanced accuracy differs from plain accuracy
-.make_bacc_pms <- function(bias = 0.6, higher_is_better = NULL) {
+.make_bacc_pms <- function(bias = 0.6) {
   res <- readRDS("data-for-tests/test_data_penguins.Rds")
   y <- as.integer(res$y)
   set.seed(4321)
@@ -661,8 +590,7 @@ test_that("rmse se_diff is invariant to `higher_is_better`", {
       ylp = ylp,
       y = y,
       mupred = mupred,
-      measure = "bacc",
-      control = list(bacc = list(higher_is_better = higher_is_better))
+      measure = "bacc"
     ))
   }
   list(pm1 = make(res$mupred), pm2 = make(biased), y = y)
@@ -676,7 +604,7 @@ test_that("bacc differences use the stratified paired standard error", {
 
   expect_equal(loo:::.measure_pointwise_diff_method(loos, "bacc_loo"), "measure_specific")
   expect_equal(
-    attr(pm1, "measure_compare_meta")$bacc$se_diff_fun,
+    attr(pm1, "measure_info")$bacc$se_diff_fun,
     "bacc"
   )
 
@@ -692,7 +620,7 @@ test_that("bacc differences use the stratified paired standard error", {
   # McNemar discordant-count form of the paired difference of proportions,
   # written out per stratum rather than in the pointwise-variance form the
   # implementation uses
-  class_id <- attr(pm1, "measure_compare_meta")$bacc$extra$class_id
+  class_id <- attr(pm1, "measure_info")$bacc$extra$class_id
   n_c <- tabulate(class_id)
   K <- length(n_c)
   acc1 <- round(pm1$pointwise[, "bacc_loo"] * K * n_c[class_id])
@@ -735,42 +663,14 @@ test_that("bacc differences use the stratified paired standard error", {
   expect_equal(comp$bacc_se_diff[1], 0)
 })
 
-test_that("bacc se_diff is invariant to `higher_is_better`", {
-  utility <- .make_bacc_pms(higher_is_better = TRUE)
-  loss <- .make_bacc_pms(higher_is_better = FALSE)
-
-  # bacc is naturally a utility, so `higher_is_better = FALSE` is the flipped one
-  expect_equal(
-    loo:::.measure_natural_sign("bacc_loo", list(utility$pm1, utility$pm2)), 1
-  )
-  expect_equal(
-    loo:::.measure_natural_sign("bacc_loo", list(loss$pm1, loss$pm2)), -1
-  )
-
-  # the strata are a property of `y`, so they are never sign-flipped
-  expect_equal(
-    attr(loss$pm1, "measure_compare_meta")$bacc$extra$class_id,
-    attr(utility$pm1, "measure_compare_meta")$bacc$extra$class_id
-  )
-
-  pair_utility <- loo:::.pair_measure_stats(
-    utility$pm2, utility$pm1, "bacc_loo", loos = list(utility$pm1, utility$pm2)
-  )
-  pair_loss <- loo:::.pair_measure_stats(
-    loss$pm2, loss$pm1, "bacc_loo", loos = list(loss$pm1, loss$pm2)
-  )
-  expect_equal(unname(pair_loss["se"]), unname(pair_utility["se"]))
-  expect_equal(unname(pair_loss["diff"]), unname(pair_utility["diff"]))
-})
-
 test_that("bacc reports the difference without an se when the strata are gone", {
   fx <- .make_bacc_pms()
 
   # objects computed before the class strata were stored
   drop_strata <- function(x) {
-    meta <- attr(x, "measure_compare_meta")
+    meta <- attr(x, "measure_info")
     meta$bacc$extra <- NULL
-    attr(x, "measure_compare_meta") <- meta
+    attr(x, "measure_info") <- meta
     x
   }
   stale1 <- drop_strata(fx$pm1)
@@ -826,10 +726,10 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
 
   # custom measures declare nothing about their standard error
   expect_equal(
-    attr(pms[[1L]], "measure_compare_meta")$my_rmse$diff_method,
+    attr(pms[[1L]], "measure_info")$my_rmse$diff_method,
     "custom"
   )
-  expect_null(attr(pms[[1L]], "measure_compare_meta")$my_rmse$se_diff_fun)
+  expect_null(attr(pms[[1L]], "measure_info")$my_rmse$se_diff_fun)
   expect_equal(
     loo:::.measure_pointwise_diff_method(pms, "my_rmse_loo"),
     "custom"
@@ -900,7 +800,7 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
     make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, my_scaled)
   )
   expect_equal(
-    attr(scaled[[1L]], "measure_compare_meta")$my_scaled$extra,
+    attr(scaled[[1L]], "measure_info")$my_scaled$extra,
     list(scale = stats::sd(res$y), n_used = length(res$y))
   )
   pair_scaled <- loo:::.pair_measure_stats(
@@ -968,10 +868,9 @@ test_that("a declared custom loss is compared and ranked as a loss", {
   declared <- list(m1 = make(1, make_fun(TRUE)), m2 = make(2, make_fun(TRUE)))
   plain <- list(m1 = make(1, make_fun(FALSE)), m2 = make(2, make_fun(FALSE)))
 
-  expect_true(attr(declared$m1, "measure_compare_meta")$my_mse$loss)
+  expect_true(attr(declared$m1, "measure_info")$my_mse$loss)
   expect_true(loo:::.measure_is_loss("my_mse_loo", declared))
-  expect_true(loo:::.measure_lower_is_better("my_mse_loo", declared))
-  expect_false(loo:::.measure_lower_is_better("my_mse_loo", plain))
+  expect_false(loo:::.measure_is_loss("my_mse_loo", plain))
 
   # the sign conversion is announced, as it is for built-in loss measures
   expect_message(
@@ -1026,7 +925,7 @@ test_that("a declared custom loss is compared and ranked as a loss", {
     suppressMessages(
       model_compare(list(declared$m1, plain$m2), custom_se_fn = "mean")
     ),
-    "disagree on comparison metadata"
+    "disagree on `measure_info`"
   )
 })
 
@@ -1224,26 +1123,30 @@ test_that("`custom_se_fn` validates its per-measure form", {
 
 test_that("loo_compare errors on inconsistent measure metadata", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  pm1 <- loo_pred_measure(
-    loo = res$loo_p_m1,
-    y = res$y,
-    mupred = res$mupred_m1,
-    ylp = res$ylp_m1,
-    measure = "mse",
-    control = list(mse = list(higher_is_better = NULL))
-  )
-  pm2 <- loo_pred_measure(
-    loo = res$loo_p_m2,
-    y = res$y,
-    mupred = res$mupred_m2,
-    ylp = res$ylp_m2,
-    measure = "mse",
-    control = list(mse = list(higher_is_better = TRUE))
-  )
+  # the same custom measure, but only one model declares it a loss
+  make_fun <- function(loss) {
+    fun <- function(y, mupred) {
+      e <- (y - colMeans(mupred))^2
+      list(estimate = mean(e), se = sd(e) / sqrt(length(e)), pointwise = e)
+    }
+    attr(fun, "measure_loss") <- loss
+    fun
+  }
+  make <- function(loo, mupred, ylp, fun) {
+    loo_pred_measure(
+      loo = loo,
+      y = res$y,
+      mupred = mupred,
+      ylp = ylp,
+      measure = list(my_mse = fun)
+    )
+  }
+  pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, make_fun(TRUE))
+  pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, make_fun(FALSE))
 
   expect_error(
-    suppressMessages(loo_compare(pm1, pm2)),
-    "disagree on comparison metadata for measure 'mse'"
+    suppressMessages(loo_compare(pm1, pm2, custom_se_fn = list(my_mse = "mean"))),
+    "disagree on `measure_info` for measure 'my_mse'"
   )
 })
 
@@ -1263,13 +1166,13 @@ test_that("loo_compare errors when compare metadata is missing on some models", 
     ylp = res$ylp_m2,
     measure = "mse"
   )
-  compare_meta <- attr(pm2, "measure_compare_meta")
-  compare_meta$mse <- NULL
-  attr(pm2, "measure_compare_meta") <- compare_meta
+  measure_info <- attr(pm2, "measure_info")
+  measure_info$mse <- NULL
+  attr(pm2, "measure_info") <- measure_info
 
   expect_error(
     suppressMessages(loo_compare(pm1, pm2)),
-    "Not all models provide comparison metadata for measure 'mse'"
+    "Not all models provide `measure_info` for measure 'mse'"
   )
 })
 
@@ -1745,7 +1648,48 @@ test_that("model_compare rank_by accepts a model name as the reference model", {
     default$elpd_diff
   )
 
-  expect_message(print(pinned), "All measures compared against model m1")
+  expect_output(print(pinned), "All measures compared against model m1")
+
+  # `diag_diff` flags a *small* difference, so a large positive one --- which
+  # only arises when the reference is not the best model --- stays unflagged
+  large_positive <- pinned$elpd_diff[pinned$elpd_diff > 4]
+  expect_true(length(large_positive) > 0)
+  expect_equal(pinned$diag_diff[pinned$elpd_diff > 4], rep("", length(large_positive)))
+})
+
+test_that("diag_diff flags the magnitude of elpd_diff, not its sign", {
+  expect_equal(diag_diff(500, c(0, -2, 2, -10, 10)),
+               c("", "|elpd_diff| < 4", "|elpd_diff| < 4", "", ""))
+  # small N takes priority over the difference itself, for every non-reference
+  expect_equal(diag_diff(50, c(0, -2, 10)), c("", "N < 100", "N < 100"))
+})
+
+test_that("printed comparison output stays within 80 columns", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  mk <- function(m) {
+    loo_pred_measure(
+      loo = res[[paste0("loo_p_m", m)]],
+      y = res$y,
+      mupred = res[[paste0("mupred_m", m)]],
+      ylp = res[[paste0("ylp_m", m)]],
+      measure = c("r2", "mse", "mae")
+    )
+  }
+  # long names stress both the wrapped sentences and the table layout
+  nms <- c(
+    "poisson_baseline_model",
+    "negbin_pretreatment_model",
+    "poisson_full_interaction_model"
+  )
+  pms <- stats::setNames(lapply(1:3, mk), nms)
+  comp <- suppressMessages(model_compare(pms))
+
+  for (measures in list(NULL, "all", c("r2", "mae"))) {
+    out <- utils::capture.output(
+      suppressMessages(print(comp, measures = measures))
+    )
+    expect_true(all(nchar(out) <= 80))
+  }
 })
 
 test_that("model_compare rank_by model name works for plain loo objects", {
@@ -1833,5 +1777,53 @@ test_that("print.compare.loo names the source for non-loo comparisons", {
     paste(capture.output(print(comp_loo)), collapse = "\n"),
     "evaluated on",
     fixed = TRUE
+  )
+})
+
+test_that("rps is sign-converted for comparison but srps is not", {
+  set.seed(20250826)
+  S <- 400L
+  n <- 60L
+  y <- rnorm(n)
+  # the second model is the misspecified one under both scores
+  good <- matrix(rnorm(S * n), nrow = S)
+  bad <- matrix(rnorm(S * n, mean = 2, sd = 3), nrow = S)
+  make <- function(ypred) {
+    insample_pred_measure(
+      y = y,
+      ypred = ypred,
+      ylp = matrix(dnorm(rep(y, each = S), log = TRUE), nrow = S),
+      measure = c("rps", "srps")
+    )
+  }
+  pm1 <- make(good)
+  pm2 <- make(bad)
+  expect_false(anyNA(pm1$estimates))
+  expect_false(anyNA(pm2$estimates))
+
+  comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2)))
+
+  # the unscaled score is a loss, so it is flipped onto the utility scale; the
+  # scaled score already is a utility
+  expect_equal(attr(comp, "sign_converted_measures"), "rps")
+
+  # both differences are then on a utility scale: the best model has 0 and the
+  # other a non-positive difference
+  expect_true(all(comp$rps_diff <= 0))
+  expect_true(all(comp$srps_diff <= 0))
+
+  # `rank_by` follows the same orientation: the well-specified model must rank
+  # first under both scores
+  expect_equal(
+    suppressMessages(
+      model_compare(list(m1 = pm1, m2 = pm2), rank_by = "rps")
+    )$model[1L],
+    "m1"
+  )
+  expect_equal(
+    suppressMessages(
+      model_compare(list(m1 = pm1, m2 = pm2), rank_by = "srps")
+    )$model[1L],
+    "m1"
   )
 })

@@ -2,13 +2,18 @@
 
     Code
       print(comp)
-    Message
-      Models ranked by mae (reference: C).
     Output
-       model mae_diff mae_se_diff        diag_elpd
-           C      0.0         0.0 13 k_psis > 0.62
-           B     -0.1         0.7  9 k_psis > 0.62
-           A     -7.6         1.7 25 k_psis > 0.62
+      Models ranked by mae (reference: B).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+           A    23
+           C    19
+           B     9
+      
+       model mae_diff mae_se_diff
+           B      0.0         0.0
+           C      0.0         0.7
+           A     -7.6         1.5
     Message
       
       Diagnostic flags present.
@@ -30,41 +35,54 @@
     Code
       print(comp)
     Output
-       model elpd_diff se_diff p_worse diag_diff        diag_elpd
-          m3       0.0     0.0      NA           13 k_psis > 0.62
-          m2    -219.0   221.6    0.84            9 k_psis > 0.62
-          m1   -2764.4   634.3    1.00           25 k_psis > 0.62
+      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m2).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m1    23
+          m3    19
+          m2     9
+      
+       model elpd_diff se_diff p_worse diag_diff
+          m3       0.0     0.0      NA          
+          m2    -205.5   221.8    0.82          
+          m1   -2739.1   630.4    1.00          
     Message
       
       Diagnostic flags present.
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
       
-      Other measures compared: r2, mae. Each is compared against its own best model (r2: m2). Use print(x, measures = "all").
+      Other measures compared: r2, mae. Use print(x, measures = "all").
 
 ---
 
     Code
       print(comp, measures = "all", digits = 2)
     Output
+      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m2).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m1    23
+          m3    19
+          m2     9
       
       -- elpd (vs m3) --
-       model elpd_diff se_diff p_worse diag_diff        diag_elpd
-          m3      0.00    0.00      NA           13 k_psis > 0.62
-          m2   -218.98  221.65    0.84            9 k_psis > 0.62
-          m1  -2764.42  634.26    1.00           25 k_psis > 0.62
+       model elpd_diff se_diff p_worse diag_diff
+          m3      0.00    0.00      NA          
+          m2   -205.45  221.82    0.82          
+          m1  -2739.08  630.38    1.00          
       
       -- r2 (vs m2) --
        model r2_diff r2_se_diff
           m2    0.00       0.00
-          m3   -0.01       0.07
+          m3   -0.03       0.08
           m1   -0.22       0.09
       
-      -- mae (vs m3) --
+      -- mae (vs m2) --
        model mae_diff mae_se_diff
-          m3     0.00        0.00
-          m2    -0.08        0.71
-          m1    -7.64        1.68
+          m2     0.00        0.00
+          m3    -0.02        0.72
+          m1    -7.60        1.54
     Message
       
       Diagnostic flags present.
@@ -76,6 +94,12 @@
     Code
       print(comp, measures = c("r2", "mae"))
     Output
+      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m2).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m1    23
+          m3    19
+          m2     9
       
       -- r2 (vs m2) --
        model r2_diff r2_se_diff
@@ -83,11 +107,11 @@
           m3     0.0        0.1
           m1    -0.2        0.1
       
-      -- mae (vs m3) --
+      -- mae (vs m2) --
        model mae_diff mae_se_diff
-          m3      0.0         0.0
-          m2     -0.1         0.7
-          m1     -7.6         1.7
+          m2      0.0         0.0
+          m3      0.0         0.7
+          m1     -7.6         1.5
     Message
       
       Diagnostic flags present.
@@ -98,12 +122,16 @@
 
     Code
       print(comp_mae)
-    Message
-      Models ranked by mae (reference: m2).
     Output
-       model mae_diff mae_se_diff        diag_elpd
-          m2      0.0         0.0  9 k_psis > 0.62
-          m1     -7.6         1.5 25 k_psis > 0.62
+      Models ranked by mae (reference: m2).
+      PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m1    23
+          m2     9
+      
+       model mae_diff mae_se_diff
+          m2      0.0         0.0
+          m1     -7.6         1.5
     Message
       
       Diagnostic flags present.

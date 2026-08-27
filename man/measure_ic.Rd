@@ -4,7 +4,7 @@
 \alias{measure_ic}
 \title{Information Criteria (\code{ic})}
 \usage{
-measure_ic(ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL)
+measure_ic(ylp, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{ylp}{A numeric matrix or three-dimensional array of log predictive
@@ -24,12 +24,6 @@ before computing each per-observation contribution.}
 \item{pointwise}{Optional numeric vector of precomputed pointwise
 contributions \eqn{\mathrm{ic}_i = -1 \cdot \mathrm{lppd}_i}. If provided,
 \code{ylp} and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes the information criteria as -2 x log predictive density (lppd_i)

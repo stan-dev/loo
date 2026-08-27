@@ -76,10 +76,7 @@ and fold structure for \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}; 
 
 \item{control}{Named list of per-measure settings. Each name must match an
 element of \code{measure}; the value is a list of arguments passed to that
-measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
-\code{higher_is_better} selects the scale a measure's values are stored on and
-works for built-in and custom measures alike; for a custom measure it is
-applied to the returned result rather than passed to the function.}
+measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 }
 \value{
 An object of class \code{"kfold_pred_measure"} and \code{"pred_measure"}, inheriting
@@ -104,25 +101,20 @@ with \code{brms::kfold_predict()} and pass the resulting \code{yrep} matrices as
 \code{ypred} and/or \code{mupred}. See the sleep-study workflow in
 \href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}.
 }
-\section{\code{measure_higher_is_better} attribute}{
+\section{\code{measure_info} attribute}{
 
 All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
-\code{measure_higher_is_better}: a named list recording the \code{higher_is_better}
-setting used for each measure (\code{TRUE} or \code{FALSE} per bare measure name).
-Measures left at their natural orientation have no entry, which reads as
-\code{NULL}; \code{elpd} is always \code{NULL}. Built-in loss measures such as MSE are
-stored on a loss scale by default; pass
-\code{control = list(mse = list(higher_is_better = TRUE))} to store values on a
-utility scale. The same works for a custom measure, using the name it was
-given in \code{measure}. When measures are added incrementally with
-\code{\link[=pred_measure]{pred_measure()}}, the attribute is updated for newly computed measures.
+\code{measure_info}: a named list, keyed by bare measure name, recording what
+\code{\link[=model_compare]{model_compare()}} needs to know about each measure — \code{loss} (whether lower
+values are better), \code{diff_method} (how the standard error of a difference is
+obtained), and, where applicable, \code{se_diff_fun} and \code{extra}. When measures
+are added incrementally with \code{\link[=pred_measure]{pred_measure()}}, the attribute is extended for
+the newly computed measures.
 
-Attribute \code{measure_compare_meta} records per-measure comparison metadata
-(\code{higher_is_better}, \code{loss}, and \code{diff_method}) used by \code{\link[=model_compare]{model_compare()}}.
-Built-in measures take \code{loss} and \code{diff_method} from the package measure
-registry. Custom measures always get \code{diff_method = "custom"} and take the
-standard error of their difference from the \code{custom_se_fn} argument of
-\code{\link[=model_compare]{model_compare()}}; their \code{loss} comes from
+Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} from the
+package measure registry. Custom measures always get \code{diff_method = "custom"}
+and take the standard error of their difference from the \code{custom_se_fn}
+argument of \code{\link[=model_compare]{model_compare()}}; their \code{loss} comes from
 \code{attr(my_fun, "measure_loss") <- TRUE}, which declares that lower values are
 better. Without that declaration a custom measure is treated as a utility, so
 an undeclared loss is compared and ranked in the wrong direction. See

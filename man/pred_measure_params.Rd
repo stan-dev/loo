@@ -108,10 +108,7 @@ functions; required when calling \code{\link[=do_pred_measure]{do_pred_measure()
 
 \item{control}{Named list of per-measure settings. Each name must match an
 element of \code{measure}; the value is a list of arguments passed to that
-measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
-\code{higher_is_better} selects the scale a measure's values are stored on and
-works for built-in and custom measures alike; for a custom measure it is
-applied to the returned result rather than passed to the function.}
+measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 
 \item{measure_name}{For a single custom function, set
 \code{attr(my_fun, "measure_name") <- "my_metric"} before passing \code{my_fun} to

@@ -144,9 +144,12 @@ fixture `test_data_roaches_compare.Rds`.
 
 - **Context:** Measures differ in orientation (`rps`: lower is better;
   `srps`: higher is better). Aligning orientations may help comparisons.
-- **Options:** `lower_is_better`, `orientation = "utility" / "loss"`,
-  `higher_is_better` (per-measure orientation control on `measure_*()` functions)
-- **Decision:** *pending*
+- **Decision:** *resolved.* Values are always stored on the measure's own
+  scale. A single `loss` flag (`.measure_spec` for built-ins,
+  `attr(fun, "measure_loss")` for custom measures) records the orientation, and
+  `model_compare()` converts to a common utility scale when reporting
+  differences. The per-call `higher_is_better` control has been removed: it only
+  changed the sign of stored values, and comparisons were invariant to it.
 
 ### D3: Handling of `r_eff`
 
@@ -231,17 +234,18 @@ the same scoring rules but use different estimators.
 
 | Deprecated | New workflow | Notes |
 |------------|--------------|-------|
-| `crps(x, x2, y)` | `measure_rps(y, ypred = x, higher_is_better = FALSE)` | Loss-scale unscaled score |
+| `crps(x, x2, y)` | `-measure_rps(y, ypred = x)$pointwise` | `crps()` returns the negated unscaled score |
 | `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | Same sign convention |
 | `loo_crps(...)` | `loo_pred_measure(..., measure = "rps")` | Additional LOO weighting difference |
 | `loo_scrps(...)` | `loo_pred_measure(..., measure = "srps")` | Additional LOO weighting difference |
 
 #### Sources of numerical difference
 
-1. **Sign convention (unscaled only).** `crps()` returns `0.5·EXX − EXy` (utility:
-   higher is better). Default `measure_rps()` negates this; use
-   `higher_is_better = FALSE` to match `crps()`. Scaled scores (`scrps` / `measure_srps`)
-   already share the formula `−EXy/EXX − 0.5·log(EXX)`.
+1. **Sign convention (unscaled only).** `measure_rps()` returns `EXy − 0.5·EXX`,
+   the Gneiting & Raftery (2007) loss (lower is better); `crps()` returns its
+   negation `0.5·EXX − EXy`. Negate `measure_rps()` to match `crps()`. Scaled
+   scores (`scrps` / `measure_srps`) already share the formula
+   `−EXy/EXX − 0.5·log(EXX)` and are utilities.
 
 2. **EXX estimator (in-sample).** Both estimate `E|X − X'|`, but:
    - **Deprecated:** two draw matrices `x`, `x2`; one random shuffle per
@@ -301,7 +305,9 @@ EXX_perm <- colMeans(abs(x1 - x2[sample(S), , drop = FALSE]))
 EXX_pwm <- .exx_pwm(x1)
 
 old_crps <- suppressWarnings(crps(x1, x2, y))
-new_rps <- measure_rps(y, x1, higher_is_better = FALSE)
+# `crps()` is the negated unscaled score, so align signs here
+new_rps <- measure_rps(y, x1)
+new_rps$pointwise <- -new_rps$pointwise
 old_scrps <- suppressWarnings(scrps(x1, x2, y))
 new_srps <- measure_srps(y, x1)
 
@@ -383,7 +389,7 @@ invisible(dev.off())
 ![CRPS/RPS outcome comparison across replications](figures/crps-rps-outcomes.png)
 
 *Figure: 200 simulations (S = 100, n = 30). Left — `crps()` vs
-`measure_rps(higher_is_better = FALSE)`; right — `scrps()` vs `measure_srps()`.*
+`-measure_rps()`; right — `scrps()` vs `measure_srps()`.*
 
 ```{r crps-rps-outcomes-figure, fig.show = "hide"}
 n_repl <- 200L
@@ -397,11 +403,12 @@ for (i in seq_len(n_repl)) {
   x1 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
   x2 <- matrix(rnorm(n_obs * n_draws), nrow = n_draws)
   old <- suppressWarnings(crps(x1, x2, y))
-  new <- measure_rps(y, x1, higher_is_better = FALSE)
+  new <- measure_rps(y, x1)
   old_s <- suppressWarnings(scrps(x1, x2, y))
   new_s <- measure_srps(y, x1)
   crps_old[i] <- old$estimates["Estimate"]
-  rps_new[i] <- new$estimates[1, "Estimate"]
+  # `crps()` is the negated unscaled score, so align signs here
+  rps_new[i] <- -new$estimates[1, "Estimate"]
   scrps_old[i] <- old_s$estimates["Estimate"]
   srps_new[i] <- new_s$estimates[1, "Estimate"]
 }
@@ -411,7 +418,7 @@ par(mfrow = c(1, 2), mar = c(4, 4, 2.5, 1))
 .outcome_panel(
   crps_old, rps_new,
   xlab = "crps() estimate",
-  ylab = "measure_rps(higher_is_better = FALSE)",
+  ylab = "-measure_rps()",
   main = "Unscaled (CRPS / RPS)"
 )
 .outcome_panel(

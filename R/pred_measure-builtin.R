@@ -5,11 +5,6 @@
 #'   before computing each per-observation contribution.
 #' @param pointwise Optional numeric vector of precomputed per-observation
 #'   contributions. When supplied, `ylp` and `log_weights` are ignored.
-#' @param higher_is_better Logical or `NULL`; whether larger values indicate
-#'   better predictive performance. `NULL` (default) keeps each measure's
-#'   natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-#'   Set `TRUE` for a utility scale (higher is better) or `FALSE` for a loss
-#'   scale (lower is better).
 #'
 #' @return An object of class `"measure"`: a list with:
 #'   \describe{
@@ -117,7 +112,6 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 #' pointwise log predictive density contributions (\eqn{\mathrm{lppd}_i}), using
 #' [ptw_log_pred_density()]. ELPD is returned on the utility scale (higher is
 #' better), consistent with the sign convention used throughout this package.
-#' Manual change of sign convention is possible via `higher_is_better`.
 #'
 #' @inheritParams measure_density_params
 #' @inheritParams measure_params
@@ -144,7 +138,7 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 #' measure_elpd(LLarr)
 #' @export
 measure_elpd <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {  
   if (!is.null(pointwise)) {
     .validate_numeric_vector(pointwise, arg = "pointwise")
@@ -180,7 +174,7 @@ measure_elpd <- function(
   )
   
   .create_measure_structure(
-    res, higher_is_better, "elpd", n_draws = n_draws, n_obs = n_obs
+    res, "elpd", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -199,7 +193,7 @@ measure_elpd <- function(
 #' measure_mlpd(ylp)
 #' @export
 measure_mlpd <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .validate_numeric_vector(pointwise, arg = "pointwise")
@@ -238,7 +232,7 @@ measure_mlpd <- function(
     pointwise = lppd_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mlpd", n_draws = n_draws, n_obs = n_obs
+    res, "mlpd", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -259,7 +253,7 @@ measure_mlpd <- function(
 #' measure_ic(ylp)
 #' @export
 measure_ic <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .validate_numeric_vector(pointwise, arg = "pointwise")
@@ -298,7 +292,7 @@ measure_ic <- function(
     pointwise = ic_i
   )
   .create_measure_structure(
-    res, higher_is_better, "ic", n_draws = n_draws, n_obs = n_obs
+    res, "ic", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -321,7 +315,7 @@ measure_ic <- function(
 #' measure_acc(y, mupred)
 #' @export
 measure_acc <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -373,7 +367,7 @@ measure_acc <- function(
     pointwise = acc_i
   )
   .create_measure_structure(
-    res, higher_is_better, "acc", n_draws = n_draws, n_obs = n_obs
+    res, "acc", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -393,7 +387,7 @@ measure_acc <- function(
 #' measure_bacc(y, mupred)
 #' @export
 measure_bacc <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -464,7 +458,7 @@ measure_bacc <- function(
     extra = list(class_id = class_id)
   )
   .create_measure_structure(
-    res, higher_is_better, "bacc", n_draws = n_draws, n_obs = n_obs
+    res, "bacc", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -486,7 +480,7 @@ measure_bacc <- function(
 #' measure_brier(y, ypred)
 #' @export
 measure_brier <- function(
-  y, ypred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, ypred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -529,7 +523,7 @@ measure_brier <- function(
     pointwise = bs_i
   )
   .create_measure_structure(
-    res, higher_is_better, "brier", n_draws = n_draws, n_obs = n_obs
+    res, "brier", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -552,7 +546,7 @@ measure_brier <- function(
 #' measure_mae(y, mupred)
 #' @export
 measure_mae <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -593,7 +587,7 @@ measure_mae <- function(
     pointwise = mae_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mae", n_draws = n_draws, n_obs = n_obs
+    res, "mae", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -611,7 +605,7 @@ measure_mae <- function(
 #' measure_mse(y, mupred)
 #' @export
 measure_mse <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {  
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -652,7 +646,7 @@ measure_mse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mse", n_draws = n_draws, n_obs = n_obs
+    res, "mse", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -669,7 +663,7 @@ measure_mse <- function(
 #' measure_rmse(y, mupred)
 #' @export
 measure_rmse <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   mse_res <- measure_mse(
     y = y, mupred = mupred, log_weights = log_weights, 
@@ -692,7 +686,7 @@ measure_rmse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, higher_is_better, "rmse", n_draws = n_draws, n_obs = n_obs
+    res, "rmse", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -737,7 +731,7 @@ measure_rmse <- function(
 #' measure_r2(y, mupred)
 #' @export
 measure_r2 <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   .validate_numeric_vector(y, arg = "y")
   if (var(y) == 0) {
@@ -773,7 +767,7 @@ measure_r2 <- function(
     extra = list(mse_y_i = mse_y_i)
   )
   .create_measure_structure(
-    res, higher_is_better, "r2", n_draws = n_draws, n_obs = n_obs
+    res, "r2", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -812,24 +806,39 @@ measure_r2 <- function(
 #' both discrete and continuous outcomes; see Hosking (1990, 1996) for
 #' theoretical justification in the discrete case.
 #'
-#' If log-weights (`log_weights`) are provided (e.g., PSIS weights
-#' for LOO cross-validation), a weighted PWM estimator is used instead, which
-#' accounts for the importance weights when estimating expectations.
+#' The term \eqn{E[|X - X'|]} is computed as a weighted average over all pairs
+#' of draws,
+#' \deqn{E[|X - X'|] = \frac{\sum_i \sum_{j \neq i} w_i w_j |x_i - x_j|}{1 -
+#'   \sum_i w_i^2},}
+#' which is evaluated in \eqn{O(S \log S)} using the sorted draws and the
+#' cumulative sums of their weights. If log-weights (`log_weights`) are provided
+#' (e.g., PSIS weights for LOO cross-validation), the \eqn{w_i} are the
+#' normalized importance weights and \eqn{E[|X - y|]} is likewise a weighted
+#' mean. Otherwise the weights are equal, \eqn{w_i = 1/S}, and the expression
+#' reduces to the usual unbiased PWM estimator with the \eqn{1 / (S (S - 1))}
+#' normalization. Because the estimate is a convex combination of
+#' \eqn{|x_i - x_j|}, it is always non-negative and invariant to shifts of
+#' `ypred`.
 #'
 #' **Sign convention:**
 #'
-#' Unscaled scores are returned as utilities (higher is better), consistent 
-#' with the sign convention of log score / ELPD. Scaled scores are negatively
-#' oriented (lower is better). Use `higher_is_better = NULL` to obtain the
-#' loss convention (lower is better) used in some references for unscaled scores,
-#' or `higher_is_better = TRUE` for a utility scale when using scaled scores.
+#' Unscaled scores (RPS, CRPS) are returned on the loss scale of Gneiting &
+#' Raftery (2007): lower is better. Scaled scores (SRPS, SCRPS) follow Bolin &
+#' Wallin (2023) and are returned on the utility scale: higher is better.
+#' [model_compare()] reports differences for both on the utility scale, so no
+#' manual conversion is needed there. The deprecated [crps()] returned the
+#' negated unscaled score; `-measure_rps(...)$pointwise` reproduces it.
 #'
 #' @param y A numeric vector of \eqn{n} observed outcomes. May be integer-valued
 #'   (for RPS/SRPS) or continuous (for CRPS/SCRPS).
 #' @param ypred A numeric matrix of posterior predictive draws with dimensions
 #'   \eqn{S \times n} (draws × observations).
-#' @param pointwise Optional numeric vector of precomputed pointwise rps values.
-#'   If provided, `y`, `ypred`, and `log_weights` are ignored.
+#' @param pointwise Optional numeric vector of precomputed pointwise values, on
+#'   the scale of the measure that is returned: RPS/CRPS when `scaled = FALSE`
+#'   and SRPS/SCRPS when `scaled = TRUE`. The values are used as they are, with
+#'   no further transformation; in particular, unscaled values are not converted
+#'   to the scaled variant. If provided, `y`, `ypred`, and `log_weights` are
+#'   ignored.
 #' @param scaled Logical; if `TRUE`, computes the scaled variant (SRPS for
 #'   discrete outcomes, SCRPS for continuous outcomes). Default is `FALSE`.
 #' @inheritParams measure_params
@@ -882,41 +891,33 @@ measure_r2 <- function(
 #' weather forecasts. *Mathematical Geosciences*, 50:209–234.
 #'
 #' @export
-measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled = FALSE, 
-  higher_is_better = NULL) {
+measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
+  scaled = FALSE) {
   if (is.null(pointwise)) {
+    .validate_numeric_vector(y, arg = "y")
+    .validate_numeric_matrix(ypred, arg = "ypred", ncol = length(y))
     n_draws <- nrow(ypred)
     n_obs <- ncol(ypred)
-    
-    if (is.null(log_weights)) {
-      EXy <- colMeans(abs(sweep(ypred, 2, y)))
-      ypred_sorted <- apply(ypred, 2, sort)
-      EXX  <- colMeans(ypred_sorted * ((1:n_draws) * (4 / (n_draws - 1)) - 2))
-      if (scaled) {
-        # Scaled version by Bolin & Wallin (2023)
-        rps_i <- -EXy/EXX - 0.5 * log(EXX)
-      } else {
-        # Gneiting & Raftery (2007)
-        rps_i <- - 0.5 * EXX + EXy
-      }
+
+    w <- if (is.null(log_weights)) {
+      NULL
     } else {
-      w <- exp(.normalize_log_weights(log_weights))
-      w_csum <- sapply(1:n_obs, function(j) {
-        perm <- order(ypred[,j])
-        result <- numeric(n_draws)
-        result[perm] <- cumsum(w[perm, j])
-        result
-      })
-      
-      EXX <- 2 * colSums(ypred * w * (1 - (2*(1 - w_csum)) / (1 - w)))
-      EXy <- colSums(w * abs(sweep(ypred, 2, y)))
-      if (scaled) {
-        # Scaled version by Bolin & Wallin (2023)
-        rps_i <- -EXy/EXX - 0.5 * log(EXX)
-      } else {
-        # Gneiting & Raftery (2007)
-        rps_i <- EXy - 0.5 * EXX
-      }
+      exp(.normalize_log_weights(log_weights))
+    }
+
+    EXX <- .exx_pwm(ypred, w)
+    EXy <- if (is.null(w)) {
+      colMeans(abs(sweep(ypred, 2, y)))
+    } else {
+      colSums(w * abs(sweep(ypred, 2, y)))
+    }
+
+    rps_i <- if (scaled) {
+      # Scaled version by Bolin & Wallin (2023)
+      -EXy / EXX - 0.5 * log(EXX)
+    } else {
+      # Gneiting & Raftery (2007)
+      EXy - 0.5 * EXX
     }
   } else {
     rps_i <- pointwise
@@ -931,7 +932,7 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
   )
   name <- if(isTRUE(scaled)) "srps" else "rps"
   .create_measure_structure(
-    res, higher_is_better, name, n_draws = n_draws, n_obs = n_obs
+    res, name, n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -954,11 +955,10 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
 #' measure_srps(y, ypred)
 #'
 #' @export
-measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
-  higher_is_better = NULL) {
+measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   measure_rps(
-    y = y, ypred = ypred, log_weights = log_weights, 
-    scaled = TRUE, higher_is_better = higher_is_better
+    y = y, ypred = ypred, log_weights = log_weights, pointwise = pointwise,
+    scaled = TRUE
   )
 }
 
@@ -998,8 +998,10 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     diff_method = "measure_specific",
     se_diff_fun = "bacc"
   ),
-  rps = list(fun = measure_rps, loss = FALSE, diff_method = "mean"),
-  srps = list(fun = measure_srps, loss = TRUE, diff_method = "mean"),
+  # unscaled RPS/CRPS is the Gneiting & Raftery (2007) loss; the scaled variant
+  # follows Bolin & Wallin (2023), where larger is better
+  rps = list(fun = measure_rps, loss = TRUE, diff_method = "mean"),
+  srps = list(fun = measure_srps, loss = FALSE, diff_method = "mean"),
   brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
 )
 
@@ -1013,8 +1015,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 #
 # Such a function receives `ref` and `cmp`, each a list with the elements
 # `estimate`, `se`, `pointwise`, and `extra` for one model, always on the
-# measure's natural scale (`higher_is_better` sign flips are undone before the
-# call and reapplied to the difference afterwards), and returns the standard
+# measure's natural scale, and returns the standard
 # error of the difference as a numeric scalar. The difference itself is always
 # `estimate_cmp - estimate_ref` and is computed by `model_compare()`.
 
@@ -1040,27 +1041,17 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     return(0)
   }
 
-  se_mse_ref <- sqrt(stats::var(sqe_ref) / n)
-  se_mse_cmp <- sqrt(stats::var(sqe_cmp) / n)
-  cov_mse <- sum((sqe_cmp - mse_cmp) * (sqe_ref - mse_ref)) / (n * (n - 1))
+  # `Var(mse_cmp) / mse_cmp + Var(mse_ref) / mse_ref -
+  # 2 * Cov(mse_cmp, mse_ref) / sqrt(mse_cmp * mse_ref)` is exactly the variance
+  # of the mean of the paired contrast below, so forming the contrast pointwise
+  # and taking one variance keeps the three terms from being computed and
+  # subtracted separately. That makes the estimator structurally non-negative
+  # (no correlation above one to clamp) and makes two models with the same
+  # squared errors cancel bit-for-bit rather than leave rounding noise that
+  # `sqrt()` then amplifies to ~1e-7.
+  z <- sqe_cmp / sqrt(mse_cmp) - sqe_ref / sqrt(mse_ref)
 
-  # standard errors of the two MSEs relative to their own scale, and their
-  # correlation
-  rel_ref <- se_mse_ref / sqrt(mse_ref)
-  rel_cmp <- se_mse_cmp / sqrt(mse_cmp)
-  rho <- if (se_mse_ref <= 0 || se_mse_cmp <= 0) {
-    0
-  } else {
-    cov_mse / (se_mse_cmp * se_mse_ref)
-  }
-
-  # algebraically `rel_cmp^2 + rel_ref^2 - 2 * rho * rel_cmp * rel_ref`, but
-  # written so that two models with the same squared errors cancel exactly
-  # rather than leaving rounding noise behind. Both terms are non-negative,
-  # because the correlation cannot exceed one.
-  v <- (rel_cmp - rel_ref)^2 + 2 * rel_cmp * rel_ref * max(1 - rho, 0)
-
-  0.5 * sqrt(v)
+  0.5 * sqrt(stats::var(z) / n)
 }
 
 #' Standard error of an R-squared difference
@@ -1176,11 +1167,10 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   bacc = .se_diff_bacc
 )
 
-#' Return comparison metadata for a measure
+#' Return the per-measure information recorded on a result object
 #' @noRd
 #' @param measure_entry Normalized measure entry, or a built-in measure name.
-#' @param higher_is_better Value of `higher_is_better` used for this measure.
-.measure_compare_meta <- function(measure_entry, higher_is_better = NULL) {
+.measure_info <- function(measure_entry) {
   if (is.character(measure_entry)) {
     measure_entry <- list(
       name = measure_entry,
@@ -1195,7 +1185,6 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
       return(NULL)
     }
     return(list(
-      higher_is_better = higher_is_better,
       loss = isTRUE(entry$loss),
       diff_method = entry$diff_method,
       se_diff_fun = entry$se_diff_fun
@@ -1208,7 +1197,6 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   # is stored on the result object. Whether the measure is a loss is declared by
   # the measure itself, through `attr(fun, "measure_loss")`.
   list(
-    higher_is_better = higher_is_better,
     loss = isTRUE(measure_entry$loss),
     diff_method = "custom"
   )
@@ -1223,43 +1211,8 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 #' @export
 supported_measures_list <- names(.measure_spec)
 
-#' Store a measure result on the requested scale
-#'
-#' `higher_is_better` selects the scale values are stored on; `natural_higher`
-#' says which scale the measure produced them on. When the two disagree, the
-#' estimate and the pointwise values are negated. The standard error is not (it
-#' is invariant to the sign), and neither is `extra`, which carries auxiliary
-#' data for `se_diff_fun()` on the measure's natural scale.
-#'
-#' @param res A measure result, with either `estimate`/`se` or a length-2
-#'   `estimates` vector (estimate and SE).
-#' @param natural_higher `TRUE` when the measure is naturally a utility.
-#' @param higher_is_better The requested scale, or `NULL` to keep the natural
-#'   one.
-#' @noRd
-.apply_measure_scale <- function(res, natural_higher, higher_is_better) {
-  if (is.null(higher_is_better) || !xor(natural_higher, isTRUE(higher_is_better))) {
-    return(res)
-  }
-  if (!is.null(res$estimates)) {
-    res$estimates[1L] <- -res$estimates[1L]
-  } else {
-    res$estimate <- -res$estimate
-  }
-  res$pointwise <- -res$pointwise
-  res
-}
-
 # internal function that produces output format for measures
-.create_measure_structure <- function(
-  res, higher_is_better, measure_name, n_draws, n_obs
-) {
-  spec <- .measure_spec[[measure_name]]
-  res <- .apply_measure_scale(
-    res,
-    natural_higher = is.null(spec) || !isTRUE(spec$loss),
-    higher_is_better = higher_is_better
-  )
+.create_measure_structure <- function(res, measure_name, n_draws, n_obs) {
   out <- list()
   out$estimates <- matrix(
     c(res$estimate, res$se),
@@ -1277,9 +1230,8 @@ supported_measures_list <- names(.measure_spec)
     class = c("measure", "loo"),
     measure = measure_name,
     dims = c(n_draws, n_obs),
-    higher_is_better = higher_is_better,
-    # not affected by the sign flip above: `extra` carries auxiliary data for
-    # `se_diff_fun()`, which always works on the measure's natural scale
+    # `extra` carries auxiliary data for `se_diff_fun()`, on the measure's
+    # natural scale
     compare_extra = res$extra
   )
 }

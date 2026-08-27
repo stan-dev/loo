@@ -183,6 +183,13 @@ pointwise ELPD computations for each model. If \verb{K k_psis > 0.7} is shown,
 where \code{K} is the number of high Pareto k values in the PSIS
 computation, then there may be significant bias in \code{elpd_diff} favoring
 models with a large number of high Pareto k values.
+
+Pareto \eqn{\hat{k}} describes a model's PSIS-LOO approximation rather than
+any one measure or any one pair of models, and every LOO measure is computed
+from the same importance weights. For \code{pred_measure} comparisons \code{print()}
+therefore reports it once per model, in a block above the difference tables,
+instead of as a column inside one of them. The \code{diag_elpd} column is still
+returned on the object.
 }
 
 \subsection{Comparing \code{pred_measure} objects}{
@@ -203,16 +210,16 @@ order for all measures, but each \emph{printed} measure table is sorted by its
 own difference, so the best model on that measure is always the first row
 and the differences run in decreasing order.
 Measures may use different orientations in their raw form (e.g. ELPD and
-CRPS/RPS are returned on a utility scale where higher is better, while MSE
-and Brier score are loss measures where lower is better). For comparison,
-all \verb{\{measure\}_diff} values are reported on a common utility scale (higher
-is better). Loss measures have their sign flipped from the raw loss
-orientation so that negative \verb{\{measure\}_diff} values indicate worse
-performance than the reference model. Each \verb{*_pred_measure()} result stores
-attribute \code{measure_higher_is_better}, a named list recording the
-\code{higher_is_better} setting used when each measure was computed. When loss measures are compared
-on a utility scale, \code{model_compare()} emits a short message naming the affected
-measures, for example:
+SRPS/SCRPS are returned on a utility scale where higher is better, while
+MSE, RPS/CRPS and the Brier score are loss measures where lower is better).
+For comparison, all \verb{\{measure\}_diff} values are reported on a common
+utility scale (higher is better). Loss measures have their sign flipped
+from the raw loss orientation so that negative \verb{\{measure\}_diff} values
+indicate worse performance than the reference model. Which measures are
+losses is recorded in the \code{loss} element of each measure's entry in the
+\code{measure_info} attribute of an \verb{*_pred_measure()} result. When loss
+measures are compared on a utility scale, \code{model_compare()} emits a short
+message naming the affected measures, for example:
 "For model comparison, differences for mse are reported on a utility scale
 (higher is better)."
 
@@ -222,12 +229,25 @@ direction of \code{rank_by}, so an undeclared loss is both flipped and ranked in
 the wrong direction; see \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
 
 \code{p_worse} and \code{diag_diff} are computed for ELPD-family measures only. Other
-measures receive \verb{\{measure\}_diff} and \verb{\{measure\}_se_diff} from paired
-pointwise contributions when the overall estimate is a sum or mean of those
-contributions (using the same standard error formula as \code{se_diff}). For
-measures where pointwise values do not define the overall estimate (e.g.
-\code{r2}, \code{mse}, \code{rmse}), \verb{\{measure\}_diff} is the difference between overall
-estimates and \verb{\{measure\}_se_diff} is \code{NA}. When models were fit with
+measures receive \verb{\{measure\}_diff} and \verb{\{measure\}_se_diff}. How
+\verb{\{measure\}_se_diff} is obtained is recorded in the \code{diff_method} element of
+the measure's entry in \code{measure_info}:
+\itemize{
+\item \code{"sum"} or \code{"mean"}: the overall estimate is the sum (\code{elpd}, \code{ic}) or the
+mean (\code{mlpd}, \code{mae}, \code{mse}, \code{acc}, \code{rps}, \code{srps}, \code{brier}) of its
+pointwise contributions, so the standard error is computed from paired
+pointwise differences (the same formula as \code{se_diff}).
+\item \code{"measure_specific"}: the overall estimate is not a sum or mean of
+pointwise contributions (\code{r2}, \code{rmse}, \code{bacc}), so the measure supplies
+its own standard error of the difference.
+\item \code{"custom"}: a custom measure declares nothing, so \code{custom_se_fn} must be
+supplied. \verb{\{measure\}_se_diff} is \code{NA} only when \code{custom_se_fn} is an
+explicit \code{NULL} for that measure.
+}
+
+Objects carrying no \code{measure_info} at all fall back to the difference
+between overall estimates with \verb{\{measure\}_se_diff} set to \code{NA}.
+When models were fit with
 different \code{measure} sets, only measures common to all models are compared; a
 warning lists omitted measures. Use \code{print(x, measures = "all")} to display
 diff tables for every compared measure; see \link{loo-glossary} for column
@@ -271,8 +291,9 @@ argument describes one model and has elements \code{estimate} (scalar), \code{se
 (that model's own standard error), \code{pointwise} (a plain numeric vector, not
 a matrix), and \code{extra} (whatever the measure returned as \code{extra}, or
 \code{NULL}). All values are on the measure's natural scale, so the function
-does not need to account for \code{higher_is_better}. It must return the
-standard error of the difference as a numeric scalar. For example:
+does not need to account for the utility-scale conversion applied to the
+reported differences. It must return the standard error of the difference
+as a numeric scalar. For example:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{my_se_fn <- function(ref, cmp) \{
   d <- cmp$pointwise - ref$pointwise

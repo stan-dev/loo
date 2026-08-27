@@ -33,3 +33,9 @@
   font-weight: bold;
   margin-top: 0;
 }
+
+/* Make output scrollable
+.scroll-output {
+  max-height: 300px;
+  overflow-y: auto;
+}

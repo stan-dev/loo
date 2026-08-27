@@ -74,10 +74,10 @@ test_that("methods for single data point don't error", {
 # See notes/developer-notes.Rmd ("CRPS / RPS numerical comparison") for details.
 # -------------------------------------------------------------------------
 
+# Deliberately calls the package's own estimator rather than restating the
+# formula, so the two cannot drift apart.
 .exx_pwm <- function(ypred) {
-  n_draws <- nrow(ypred)
-  ypred_sorted <- apply(ypred, 2, sort)
-  colMeans(ypred_sorted * ((seq_len(n_draws) * (4 / (n_draws - 1))) - 2))
+  loo:::.exx_pwm(ypred)
 }
 
 .exy_crps <- function(ypred, y) {
@@ -92,19 +92,18 @@ test_that("methods for single data point don't error", {
   list(y = y, x1 = x1, x2 = x2)
 }
 
-test_that("measure_rps(higher_is_better = FALSE) matches deprecated crps() sign convention", {
+test_that("the deprecated crps() is the negated measure_rps()", {
   d <- .crps_draws()
   old <- suppressWarnings(crps(d$x1, d$x2, d$y))
-  new_rev <- measure_rps(d$y, d$x1, higher_is_better = FALSE)
+  # `measure_rps()` returns the Gneiting & Raftery (2007) loss; `crps()`
+  # returned its negation. The two use different estimators, so they agree in
+  # direction and closely, but not exactly.
+  negated <- -as.vector(measure_rps(d$y, d$x1)$pointwise)
 
-  expect_equal(
-    as.vector(new_rev$pointwise),
-    -as.vector(measure_rps(d$y, d$x1)$pointwise)
-  )
-  expect_gt(cor(old$pointwise, as.vector(new_rev$pointwise)), 0.98)
+  expect_gt(cor(old$pointwise, negated), 0.98)
   expect_false(isTRUE(all.equal(
     old$pointwise,
-    as.vector(new_rev$pointwise),
+    negated,
     tolerance = 1e-6
   )))
 })

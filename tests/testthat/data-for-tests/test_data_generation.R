@@ -188,18 +188,25 @@ get_roaches_compare_res <- function() {
   fit_p_m3 <- update(fit_p, formula = y ~ sqrt_roach1 + treatment) |>
     add_criterion(criterion = "loo", moment_match = TRUE)
 
+  # `ypred` (posterior predictive draws) is needed by the sampling-based scores
+  # such as `rps`/`srps`; `mupred` (posterior_epred) is not enough for those.
+  set.seed(SEED)
   return(list(
     y = fit_p$data$y,
     loo_p = fit_p$loo,
+    ypred = brms::posterior_predict(fit_p),
     mupred = brms::posterior_epred(fit_p),
     ylp = brms::log_lik(fit_p),
     loo_p_m1 = fit_p_m1$loo,
+    ypred_m1 = brms::posterior_predict(fit_p_m1),
     mupred_m1 = brms::posterior_epred(fit_p_m1),
     ylp_m1 = brms::log_lik(fit_p_m1),
     loo_p_m2 = fit_p_m2$loo,
+    ypred_m2 = brms::posterior_predict(fit_p_m2),
     mupred_m2 = brms::posterior_epred(fit_p_m2),
     ylp_m2 = brms::log_lik(fit_p_m2),
     loo_p_m3 = fit_p_m3$loo,
+    ypred_m3 = brms::posterior_predict(fit_p_m3),
     mupred_m3 = brms::posterior_epred(fit_p_m3),
     ylp_m3 = brms::log_lik(fit_p_m3)
   ))

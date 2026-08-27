@@ -4,13 +4,7 @@
 \alias{measure_r2}
 \title{Predictive R-squared (\code{r2})}
 \usage{
-measure_r2(
-  y,
-  mupred,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_r2(y, mupred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{y}{A numeric vector of observed outcomes.}
@@ -24,12 +18,6 @@ before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise absolute
 errors. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes predictive R-squared as one minus the ratio of prediction MSE to

@@ -146,10 +146,10 @@ Design choices **internal to `pred_measure`** (not a migration from
   `{measure}_diff` / `{measure}_se_diff`
 - `p_worse` and `diag_diff` apply to ELPD only; `diag_elpd` per model as
   before
-- Loss measures (MSE, RMSE, MAE, IC, Brier score, SRPS) compared on a common
+- Loss measures (MSE, RMSE, MAE, IC, Brier score, RPS) compared on a common
   utility scale (higher is better): sign flipped from the raw loss orientation
   so worse models have negative diffs, consistent with ELPD. Orientation is
-  read from `measure_compare_meta` and `measure_higher_is_better` on each
+  read from the `loss` element of `measure_info` on each
   `*_pred_measure()` result; attribute `sign_converted_measures` records
   affected measures. A short message is emitted at compare time; full
   interpretation is in `?loo_compare` / `?loo-glossary`.
@@ -172,15 +172,14 @@ with fixture `test_data_roaches_compare.Rds`.
 - **Context:** Measures differ in orientation (e.g. ELPD/CRPS on a utility
   scale; MSE and Brier score as losses). `loo_compare()` aligns them for
   paired differences.
-- **Decision (for `loo_compare`):** Each `*_pred_measure()` result stores
-  `higher_is_better` per measure in `measure_higher_is_better` and comparison
-  metadata in `measure_compare_meta` (`higher_is_better`, `loss`,
-  `diff_method`). Built-in loss measures are sign-flipped for utility-scale
-  `{measure}_diff` when stored on a loss scale (`higher_is_better = NULL` with
-  `loss = TRUE`).
-- **Still open:** Whether to expose orientation metadata on `*_pred_measure()`
-  results themselves beyond the attributes above (e.g. when
-  `higher_is_better = TRUE` in `control`).
+- **Decision:** Values are always stored on the measure's own scale. A single
+  `loss` flag records the orientation --- `.measure_spec` for built-ins,
+  `attr(fun, "measure_loss")` for custom measures --- and is recorded per
+  measure in the `measure_info` attribute of each `*_pred_measure()` result.
+  `model_compare()` sign-flips measures with `loss = TRUE` for utility-scale
+  `{measure}_diff`. The per-call `higher_is_better` control has been removed:
+  it only changed the sign of stored values, and comparisons were invariant
+  to it.
 
 ### D3: Handling of `r_eff`
 
@@ -281,18 +280,18 @@ estimators.
 
 | Deprecated        | New workflow                                    | Notes                               |
 |-------------------|-------------------------------------------------|-------------------------------------|
-| `crps(x, x2, y)`  | `measure_rps(y, ypred = x, higher_is_better = FALSE)` | Sign flip on unscaled score         |
+| `crps(x, x2, y)`  | `-measure_rps(y, ypred = x)$pointwise` | `crps()` returns the negated unscaled score |
 | `scrps(x, x2, y)` | `measure_srps(y, ypred = x)`                    | Same sign convention                |
 | `loo_crps(...)`   | `loo_pred_measure(..., measure = "rps")`        | Additional LOO weighting difference |
 | `loo_scrps(...)`  | `loo_pred_measure(..., measure = "srps")`       | Additional LOO weighting difference |
 
 #### Sources of numerical difference
 
-1.  **Sign convention (unscaled only).** `crps()` returns
-    `0.5·EXX − EXy` (utility: higher is better). Default `measure_rps()`
-    negates this; use `higher_is_better = FALSE` to match `crps()`. Scaled
-    scores (`scrps` / `measure_srps`) already share the formula
-    `−EXy/EXX − 0.5·log(EXX)`.
+1.  **Sign convention (unscaled only).** `measure_rps()` returns
+    `EXy − 0.5·EXX`, the Gneiting & Raftery (2007) loss (lower is better);
+    `crps()` returns its negation `0.5·EXX − EXy`. Negate `measure_rps()`
+    to match `crps()`. Scaled scores (`scrps` / `measure_srps`) already
+    share the formula `−EXy/EXX − 0.5·log(EXX)` and are utilities.
 
 2.  **EXX estimator (in-sample).** Both estimate `E|X − X'|`, but:
 
@@ -340,7 +339,7 @@ replications</figcaption>
 </figure>
 
 *Figure: 200 simulations (S = 100, n = 30). Left — `crps()` vs
-`measure_rps(higher_is_better = FALSE)`; right — `scrps()` vs
+`-measure_rps()`; right — `scrps()` vs
 `measure_srps()`.*
 
 #### LOO outcome comparison
