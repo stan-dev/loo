@@ -7,6 +7,13 @@
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].
+# loo 2.10.1
+
+* Revert behavior of internal `psis_smooth_tail()` function that led to several
+failing tests not caught by CRAN reverse dependency checks. This change should
+not directly affect individual users. by @VisruthSK in #381
+* `print.compare.loo()` regains a `simplify` argument for showing the full
+comparison table with `simplify = FALSE` by @florence-bockting in #383.
 
 # loo 2.10.0
 

@@ -62,6 +62,32 @@
        model1       0.0     0.0
        model2      -4.1     0.1
 
+---
+
+    Code
+      print(comp2, simplify = FALSE)
+    Output
+        model elpd_diff se_diff p_worse diag_diff diag_elpd elpd_waic se_elpd_waic
+       model1       0.0     0.0      NA                         -83.5          4.3
+       model2      -4.1     0.1    1.00   N < 100               -87.6          4.3
+       p_waic se_p_waic  waic se_waic
+          3.3       1.1 167.1     8.5
+         11.2       1.1 175.2     8.6
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
+      print(comp2, simplify = FALSE, p_worse = FALSE)
+    Output
+        model elpd_diff se_diff elpd_waic se_elpd_waic p_waic se_p_waic  waic se_waic
+       model1       0.0     0.0     -83.5          4.3    3.3       1.1 167.1     8.5
+       model2      -4.1     0.1     -87.6          4.3   11.2       1.1 175.2     8.6
+
 # loo_compare returns expected result (3 models)
 
     WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
@@ -89,6 +115,25 @@
        model1       0.0     0.0      NA                    
        model2      -4.1     0.1    1.00   N < 100          
        model3     -16.1     0.2    1.00   N < 100          
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+# loo_compare with simplify=FALSE returns expected result
+
+    Code
+      print(comp, simplify = FALSE)
+    Output
+        model elpd_diff se_diff p_worse diag_diff diag_elpd elpd_loo se_elpd_loo
+       model3       0.0     0.0      NA                        -19.6         4.3
+       model2     -32.0     0.0    1.00   N < 100              -51.6         4.3
+       model1     -64.0     0.0    1.00   N < 100              -83.6         4.3
+       p_loo se_p_loo looic se_looic
+         3.3      1.2  39.2      8.6
+         3.3      1.2 103.2      8.6
+         3.3      1.2 167.2      8.6
     Message
       
       Diagnostic flags present.
