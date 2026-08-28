@@ -206,6 +206,12 @@ with fixture `test_data_roaches_compare.Rds`.
 - [x] Document and test deprecated vs new API comparisons *(see
   appendix)*
 - [x] Provide an interface to `loo_compare` and verify consistency
+- [ ] Decide whether the `loo_compare` S3 tree stays. `loo_compare.default`
+  (`R/loo_compare.R:34`) and `loo_compare.psis_loo_ss_list`
+  (`R/loo_compare.R:46`) are now two-line pass-throughs to their
+  `model_compare` counterparts, so the whole tree may be a thin back-compat
+  shim. Either keep it deliberately, as with `old_nms` / `convert_old_object()`,
+  or drop it as a set — not one method at a time.
 - [ ] Resolve `r_eff` handling *(see D3)*
 
 ### Implementation

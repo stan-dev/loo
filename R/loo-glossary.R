@@ -358,12 +358,13 @@
 #' top-ranked model as the single reference model for all pairwise differences.
 #' A model name keeps the `"elpd"` ordering but pins that model as the single
 #' reference model, whether or not it is the best one. When `rank_by` is
-#' omitted, models are ordered by `"elpd"` and
-#' each measure is compared against its own best model; attribute `rank_by` is
-#' set only when `rank_by` names a measure, and attribute `compare_ref_model`
-#' only when it names a model. Attribute `compare_reference`
-#' is a named character vector recording the reference model used for each
-#' measure. Attribute `compare_measures` lists all measures that
+#' omitted, models are ordered by `"elpd"` and each measure is compared against
+#' its own best model. Attribute `rank_by` records which of these three cases
+#' applied, as a list with elements `kind` (`"default"`, `"measure"`, or
+#' `"model"`), `measure` (the measure the rows are ordered by, always set) and
+#' `model` (the pinned reference model, or `NULL`). Attribute
+#' `compare_reference` is a named character vector recording the reference model
+#' used for each measure. Attribute `compare_measures` lists all measures that
 #' were compared, and `sign_converted_measures` lists loss measures whose sign
 #' was flipped onto the utility scale. The print method shows the ranking
 #' measure by default

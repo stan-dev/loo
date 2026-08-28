@@ -202,11 +202,15 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
     rank_col = rank_measure$internal
   )
 
-  if (identical(rank_spec$kind, "measure")) {
-    attr(comp, "rank_by") <- rank_measure$bare
-  } else if (identical(rank_spec$kind, "model")) {
-    attr(comp, "compare_ref_model") <- rank_spec$model
-  }
+  # `rank_by` records how the reference was chosen, as a tagged record: `kind`
+  # is the branch taken, `measure` is the measure rows are ordered by (always
+  # set), and `model` is the pinned reference model, or `NULL`. `kind` is kept
+  # because a name can match both a measure and a model.
+  attr(comp, "rank_by") <- list(
+    kind = rank_spec$kind,
+    measure = rank_measure$bare,
+    model = rank_spec$model
+  )
   attr(comp, "compare_reference") <- ref_models
   attr(comp, "compare_source") <- source
   attr(comp, "compare_measures") <- .compare_measures(loos)

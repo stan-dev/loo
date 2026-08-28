@@ -4,7 +4,7 @@
 #'   printing.
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
-#'   the best model? The default is `TRUE`.
+#'   the reference model? The default is `TRUE`.
 #' @param simplify For the print method only, should the output be simplified to
 #'   only include the model names, ELPD differences, and (when `p_worse = TRUE`)
 #'   diagnostic columns? The default is `TRUE`. Set to `FALSE` to also print the
@@ -69,9 +69,9 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   # so print() uses print.data.frame.
   print(as.data.frame(x2), quote = FALSE, row.names = FALSE)
 
-  ref_model_attr <- attr(x, "compare_ref_model")
-  if (!is.null(ref_model_attr)) {
-    message("Differences computed against model ", ref_model_attr, ".")
+  rank_spec <- attr(x, "rank_by")
+  if (identical(rank_spec$kind, "model")) {
+    message("Differences computed against model ", rank_spec$model, ".")
   }
   .print_compare_diag_message(x, p_worse = p_worse)
   invisible(x)
@@ -80,11 +80,10 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 #' Print `compare.loo` results from `pred_measure` comparisons
 #' @noRd
 .print_compare_pred_measure <- function(x, digits, p_worse, measures) {
-  rank_by <- attr(x, "rank_by")
-  ref_model_attr <- attr(x, "compare_ref_model")
+  rank_spec <- attr(x, "rank_by")
   compare_measures <- attr(x, "compare_measures")
   compare_source <- attr(x, "compare_source")
-  primary_measure <- if (is.null(rank_by)) "elpd" else rank_by
+  primary_measure <- if (is.null(rank_spec)) "elpd" else rank_spec$measure
 
   measures_to_print <- if (is.null(measures)) {
     primary_measure
@@ -120,7 +119,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   # Printed rather than messaged: it labels the tables below, and `message()`
   # output is suppressed wholesale by knitr chunks and `suppressMessages()`.
   .cat_wrapped(
-    .compare_reference_line(x, rank_by, ref_model_attr, compare_measures)
+    .compare_reference_line(x, rank_spec, compare_measures)
   )
 
   # LOO is the familiar default, so only name the source when it is not LOO.
@@ -145,7 +144,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   for (measure in measures_to_print) {
     if (!is.null(measures)) {
       cat(
-        "\n-- ", measure, " (vs ", .compare_ref_model(x, measure), ") --\n",
+        "\n-- ", measure, " (vs ", .measure_ref_model(x, measure), ") --\n",
         sep = ""
       )
     }
@@ -189,23 +188,22 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 #' model, which is the case most in need of being spelled out.
 #' @noRd
 #' @param x A `"compare.loo"` data frame.
-#' @param rank_by Attribute `rank_by`, or `NULL`.
-#' @param ref_model_attr Attribute `compare_ref_model`, or `NULL`.
+#' @param rank_spec Attribute `rank_by`, or `NULL` for an object created before
+#'   it was set.
 #' @param compare_measures Bare names of all compared measures.
 #' @return A single string.
-.compare_reference_line <- function(x, rank_by, ref_model_attr,
-                                    compare_measures) {
-  if (!is.null(rank_by)) {
+.compare_reference_line <- function(x, rank_spec, compare_measures) {
+  if (identical(rank_spec$kind, "measure")) {
     return(paste0(
-      "Models ranked by ", rank_by,
-      " (reference: ", .compare_ref_model(x, rank_by), ")."
+      "Models ranked by ", rank_spec$measure,
+      " (reference: ", .measure_ref_model(x, rank_spec$measure), ")."
     ))
   }
-  if (!is.null(ref_model_attr)) {
-    return(paste0("All measures compared against model ", ref_model_attr, "."))
+  if (identical(rank_spec$kind, "model")) {
+    return(paste0("All measures compared against model ", rank_spec$model, "."))
   }
 
-  refs <- vapply(compare_measures, .compare_ref_model, character(1), x = x)
+  refs <- vapply(compare_measures, .measure_ref_model, character(1), x = x)
   if (length(compare_measures) == 1L) {
     return(paste0(
       "Models ranked by ", compare_measures, " (reference: ", refs, ")."

@@ -52,8 +52,8 @@
   for every measure, whether or not it is the best one, while rows stay ordered
   by `"elpd"`. This form also works for plain `"loo"` comparisons, where
   `elpd_diff` is then relative to the named model. The pinned model is recorded
-  in the new `compare_ref_model` attribute; a name matching both a measure and a
-  model is treated as the measure, with a warning.
+  in the `rank_by` attribute; a name matching both a measure and a model is
+  treated as the measure, with a warning.
 * The `diff_method` value `"pairwise"` is now called `"measure_specific"`. Every
   model comparison is pairwise, and the `"sum"`/`"mean"` methods are the ones
   built from paired pointwise differences, so the old name described the one

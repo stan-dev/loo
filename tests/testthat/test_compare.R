@@ -54,7 +54,10 @@ test_that("loo_compare dispatches loo_pred_measure inputs", {
 
   comp <- suppressMessages(loo_compare(pm1, pm2))
   expect_s3_class(comp, "compare.loo")
-  expect_null(attr(comp, "rank_by"))
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "default", measure = "elpd", model = NULL)
+  )
   expect_true(all(c("elpd_diff", "se_diff", "p_worse", "diag_diff") %in% colnames(comp)))
   expect_true(all(c("r2_diff", "r2_se_diff", "mse_diff", "mse_se_diff") %in% colnames(comp)))
   expect_false(anyNA(comp$r2_se_diff))
@@ -72,7 +75,10 @@ test_that("loo_compare dispatches loo_pred_measure inputs", {
     "At least two models are required for comparison",
     fixed = TRUE
   )
-  expect_null(attr(loo_compare(w1, w2), "rank_by"))
+  expect_equal(
+    attr(loo_compare(w1, w2), "rank_by"),
+    list(kind = "default", measure = "elpd", model = NULL)
+  )
 })
 
 test_that("loo_compare warns when predictive measures differ across models", {
@@ -132,7 +138,10 @@ test_that("loo_compare works with three loo_pred_measure models", {
   expect_snapshot(print(comp))
   expect_equal(nrow(comp), 3L)
   expect_equal(comp$model, c("B", "C", "A"))
-  expect_equal(attr(comp, "rank_by"), "mae")
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "measure", measure = "mae", model = NULL)
+  )
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2", "mae"))
   expect_equal(comp$mae_diff[1L], 0)
   expect_true(all(comp$mae_diff[-1L] < 0))
@@ -193,8 +202,14 @@ test_that("loo_compare rank_by changes order for loo_pred_measure", {
 
   comp_elpd <- loo_compare(pm1, pm2, rank_by = "elpd")
   comp_mse <- loo_compare(pm1, pm2, rank_by = "mae")
-  expect_equal(attr(comp_elpd, "rank_by"), "elpd")
-  expect_equal(attr(comp_mse, "rank_by"), "mae")
+  expect_equal(
+    attr(comp_elpd, "rank_by"),
+    list(kind = "measure", measure = "elpd", model = NULL)
+  )
+  expect_equal(
+    attr(comp_mse, "rank_by"),
+    list(kind = "measure", measure = "mae", model = NULL)
+  )
   expect_equal(comp_elpd$elpd_diff[1L], 0)
   expect_equal(comp_mse$mae_diff[1L], 0)
 })
@@ -1613,7 +1628,10 @@ test_that("model_compare rank_by resolves bare names for suffixed measures", {
                            kfold = res$kfold, measure = c("rmse", "mae"))
 
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2), rank_by = "mae"))
-  expect_equal(attr(comp, "rank_by"), "mae")
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "measure", measure = "mae", model = NULL)
+  )
   expect_equal(comp$mae_diff[1L], 0)
   expect_true(all(comp$mae_diff[-1L] <= 0))
 
@@ -1642,8 +1660,10 @@ test_that("model_compare rank_by accepts a model name as the reference model", {
 
   # the named model is the reference for every measure, whether or not it is
   # the best model
-  expect_null(attr(pinned, "rank_by"))
-  expect_equal(attr(pinned, "compare_ref_model"), "m1")
+  expect_equal(
+    attr(pinned, "rank_by"),
+    list(kind = "model", measure = "elpd", model = "m1")
+  )
   expect_true(all(attr(pinned, "compare_reference") == "m1"))
   for (col in c("elpd_diff", "r2_diff", "mse_diff", "mae_diff")) {
     expect_equal(pinned[[col]][pinned$model == "m1"], 0)
@@ -1704,7 +1724,11 @@ test_that("printed comparison output stays within 80 columns", {
 
 test_that("model_compare rank_by model name works for plain loo objects", {
   comp <- model_compare(list(a = w1, b = w2), rank_by = "b")
-  expect_equal(attr(comp, "compare_ref_model"), "b")
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "model", measure = "elpd", model = "b")
+  )
+  expect_equal(attr(comp, "compare_reference"), c(elpd = "b"))
   expect_equal(comp$elpd_diff[comp$model == "b"], 0)
   expect_true(is.na(comp$p_worse[comp$model == "b"]))
 
@@ -1734,8 +1758,10 @@ test_that("model_compare rank_by prefers the measure when a model shares its nam
     comp <- suppressMessages(model_compare(pms, rank_by = "mse")),
     "matches both a measure and a model name"
   )
-  expect_equal(attr(comp, "rank_by"), "mse")
-  expect_null(attr(comp, "compare_ref_model"))
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "measure", measure = "mse", model = NULL)
+  )
 
   expect_error(
     suppressMessages(model_compare(pms, rank_by = 1)),
