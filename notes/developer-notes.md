@@ -189,6 +189,103 @@ with fixture `test_data_roaches_compare.Rds`.
   workflows?
 - **Decision:** *pending*
 
+### D5: Weighted `E|X − X'|` — why the derivation in `crps_pwm.pdf` is not used
+
+- **Decision:** *resolved.* `.exx_pwm()` (`R/pred_measure-helpers.R`) estimates
+  `E|X − X'|` with the bias-corrected weighted Gini mean difference
+
+  ``` r
+  EXX = sum_{i != j} w_i w_j |x_i - x_j| / (1 - sum_i w_i^2)
+  ```
+
+  computed on sorted draws as `2 * sum(w_s * x_s * (2 * C_s - w_s - 1)) / (1 - sum(w^2))`,
+  with `C_s = sum_{k <= s} w_k`. At equal weights this is exactly the unbiased
+  PWM estimator of Taillardat et al. (2016) with the `1 / (S (S - 1))`
+  normalization, so the weighted and unweighted paths agree.
+
+- **Why not `notes/crps_pwm.pdf` (section 0.3).** The note derives a weighted
+  estimator from `E|X − X'| = 2 (E[X] − E[X_{1,1:2}])`, taking the probability
+  that the `s`-th order statistic is the smaller of a random pair to be
+  `2 * w_s * (1 - C_s) / (1 - w_s)`, where the factor 2 is said to handle order
+  invariance. Under weighted sampling *without replacement* the two orderings do
+  not have the same probability:
+
+  ```
+  P(x_s is the pair minimum) = w_s (1 - C_s) / (1 - w_s)        # x_s drawn first
+                             + sum_{k > s} w_k w_s / (1 - w_k)  # x_s drawn second
+  ```
+
+  The two lines coincide only when all weights are equal — which is why the
+  note's section 0.2 (unweighted) is exact and section 0.3 is not. Doubling the
+  first line overweights draws that are both heavy and small, and the implied
+  coefficients no longer sum to zero. `EXX` is then neither shift invariant nor
+  guaranteed non-negative, and `measure_srps()` takes `log()` of a negative
+  number. (Deriving the exact pair probabilities is not a small fix: they are
+  the second-order inclusion probabilities of PPS sampling without replacement,
+  which do not factorize in general.)
+
+  Measured on a toy sample of `S = 10` standard normal draws with weights
+  `(0.02, ..., 0.02, 0.82)`, and on the roaches fixture
+  (`tests/testthat/data-for-tests/test_data_roaches.Rds`, 262 obs × 400 draws):
+
+  | case | note (0.3) | implemented |
+  |---|---|---|
+  | toy `EXX` | 2.647 | 1.547 |
+  | toy `EXX`, draws shifted by +100 | 136.525 | 1.547 |
+  | roaches obs 230 (max weight 0.833) | −44.67 → `NaN` in `srps` | 6.53 |
+  | roaches obs 16 (max weight 0.778) | 392.25 | 22.97 |
+
+  The note's coefficients sum to 1.339 rather than 0 in the toy case. The
+  unweighted path is unaffected — there the note is exact and agrees with the
+  implementation to machine precision.
+
+- **Independent backing (ArviZ).** `arviz-stats` implements the same weighted
+  PWM score in the same PSIS-LOO setting, in
+  [`_loo_score()`](https://github.com/arviz-devs/arviz-stats/blob/main/src/arviz_stats/base/diagnostics.py):
+
+  ``` python
+  f_minus = cumulative_weights - weights_sorted
+  bracket = 2.0 * f_minus + weights_sorted - 1.0
+  gini_mean_difference = 2.0 * np.sum(weights_sorted * values_sorted * bracket)
+  ```
+
+  This is our numerator exactly (`2 * C_s - w_s - 1 = 2 * f_minus + w_s - 1`),
+  and it carries no `1 / (1 - w_s)` factor — i.e. ArviZ independently arrived at
+  the weighted Gini mean difference rather than at the note's estimator. The
+  same double-sum form is the standard survey-weighted Gini estimator,
+  `sum_k sum_l w_k w_l |y_k - y_l| / (2 N̂ Ŷ)`.
+
+- **Why we keep the `1 / (1 - sum w^2)` correction that ArviZ omits.** ArviZ
+  computes the plug-in version; ours divides by `1 - sum_i w_i^2 = 1 - 1/S_eff`,
+  the standard reliability-weights bias correction (the weighted-variance
+  analogue), which at equal weights is the `(S - 1) / S` "fair score" correction
+  of Ferro (2014) discussed by Zamo & Naveau (2018). Two reasons:
+
+  1. **The bias is per observation, not a constant.** With equal weights the
+     plug-in is low by a fixed `(S - 1) / S`, which cancels everywhere. With PSIS
+     weights the factor is `1 - 1/S_eff`, and on the roaches fixture `S_eff`
+     ranges from 400 (median 368, factor 0.9973) down to 1.4 (factor 0.2973).
+     27 of 262 observations differ by more than 1%, and in `srps` the omitted
+     correction lands as an additive per-observation shift in `-0.5 * log(EXX)`
+     of up to 0.61 — largest exactly where the importance weights are already
+     concentrated.
+  2. **Consistency with the unweighted path.** `measure_rps()` uses the unbiased
+     PWM estimator when `log_weights` is `NULL`. Without the correction, uniform
+     `log_weights` would no longer reproduce that result (off by `(S - 1) / S`);
+     the test *"uniform log-weights reproduce the unweighted measure_rps()"*
+     asserts that they do.
+
+  Adopting ArviZ's plug-in form would therefore mean changing the unweighted
+  path as well, which changes published `measure_rps()` output and drops the
+  fair-score correction that `crps()`'s own references argue for.
+
+- **Follow-up:** report the section 0.3 issue to the author of
+  `notes/crps_pwm.pdf`; the note's unweighted result stands, only the weighted
+  generalization needs revising. Note also that the printed code for
+  `EXX_compute_pwm()` in section 0.4 has a typo (`- 2` should be
+  `- 2 * (S + 1) / (S - 1)`); it disagrees with the note's own formula and is
+  not shift invariant. `.exx_pwm()` follows the formula, not that snippet.
+
 ------------------------------------------------------------------------
 
 ## Tasks
@@ -314,6 +411,9 @@ estimators.
     `loo_pred_measure(..., measure = "rps")` uses weighted PWM on a
     single `ypred` with PSIS weights from `ylp` only — so LOO
     differences combine EXX method and importance-weighting approach.
+
+    For why the weighted PWM estimator does not follow section 0.3 of
+    `notes/crps_pwm.pdf`, see D5 in *Open decisions*.
 
 #### Key results (reference simulation)
 

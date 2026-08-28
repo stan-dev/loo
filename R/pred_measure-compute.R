@@ -194,7 +194,7 @@ do_pred_measure <- function(
       values = .measure_estimate_se(sel_measure),
       margin = 1,
       measure_entry = entry,
-      extra = .measure_compare_extra(sel_measure)
+      extra = sel_measure$extra
     )
     pointwise <- .merge_matrix(
       source = source,
@@ -573,7 +573,7 @@ do_pred_measure <- function(
 #'   estimates row (`margin = 1`), the `measure_info` used by [model_compare()]
 #'   is recorded from this entry.
 #' @param extra Optional list of auxiliary data the measure stores for its
-#'   `se_diff_fun` (see `.measure_compare_extra()`); recorded in `measure_info`
+#'   `se_diff_fun` (the measure result's `extra` element); recorded in `measure_info`
 #'   when merging an estimates row (`margin = 1`).
 #'
 #' @return Updated matrix with `name` as a row or column name.

@@ -69,6 +69,11 @@
 
 #' Build a custom measure entry from a function
 #'
+#' The name and the orientation of a measure are properties of its definition,
+#' so both are declared once on the function via `attr(fun, "measure_name")`
+#' and `attr(fun, "measure_loss")` rather than at every call. A custom measure
+#' is a utility (higher is better) unless it declares itself a loss.
+#'
 #' @param fun Function implementing a custom measure.
 #' @param name Measure name, when it comes from the name of a `measure` list
 #'   element rather than from `attr(fun, "measure_name")`.
@@ -77,37 +82,27 @@
   if (is.null(name)) {
     name <- attr(fun, "measure_name", exact = TRUE)
     if (is.null(name) || length(name) != 1L || !nzchar(name)) {
-      cli::cli_abort(c(
-        "A custom function passed to {.arg measure} must have attribute",
-        "{.code measure_name}.",
-        "i" = "Set {.code attr(my_fun, \"measure_name\") <- \"my_metric\"}."
-      ))
+      stop(
+        "A custom function passed to 'measure' must have attribute ",
+        "'measure_name', e.g. attr(my_fun, \"measure_name\") <- \"my_metric\".",
+        call. = FALSE
+      )
     }
   }
-  list(name = name, type = "custom", key = fun, loss = .measure_entry_loss(fun))
-}
 
-#' Whether a custom measure declares itself a loss
-#'
-#' A measure's orientation is a property of its definition, so it is declared
-#' once on the function rather than at every call.
-#' @noRd
-#' @param fun Function implementing a custom measure.
-#' @return `TRUE` for a loss (lower is better), `FALSE` otherwise.
-.measure_entry_loss <- function(fun) {
   loss <- attr(fun, "measure_loss", exact = TRUE)
   if (is.null(loss)) {
-    return(FALSE)
+    loss <- FALSE
+  } else if (!is.logical(loss) || length(loss) != 1L || is.na(loss)) {
+    stop(
+      "Attribute 'measure_loss' of a custom measure must be TRUE or FALSE, ",
+      "e.g. attr(my_fun, \"measure_loss\") <- TRUE for a measure where lower ",
+      "values are better.",
+      call. = FALSE
+    )
   }
-  if (!is.logical(loss) || length(loss) != 1L || is.na(loss)) {
-    cli::cli_abort(c(
-      "Attribute {.code measure_loss} of a custom measure must be",
-      "{.code TRUE} or {.code FALSE}.",
-      "i" = "Set {.code attr(my_fun, \"measure_loss\") <- TRUE} for a measure
-             where lower values are better."
-    ))
-  }
-  loss
+
+  list(name = name, type = "custom", key = fun, loss = loss)
 }
 
 #' Check duplicate and reserved measure names
@@ -479,6 +474,10 @@
 #' non-negative, so `log()` of it in the scaled scores is always defined, and
 #' the coefficients sum to zero, so it is invariant to shifts of `ypred`.
 #'
+#' This is the bias-corrected weighted Gini mean difference, not the estimator
+#' derived in `notes/crps_pwm.pdf`; see decision D5 in `notes/developer-notes.md`
+#' for why that derivation is not used here.
+#'
 #' @param ypred Numeric matrix of posterior predictive draws (`n_draws`
 #'   \eqn{\times} `n_obs`), where rows are draws and columns are observations.
 #' @param w Optional numeric matrix of column-normalized weights on the
@@ -563,10 +562,15 @@
 
   for (func_name in names(control)) {
     entry <- if (func_name %in% names(entries)) entries[[func_name]] else NULL
-    valid_args <- if (is.null(entry) && known_measures) {
+    # custom measures are validated against their own formals, built-ins
+    # against the registry; a name matching neither accepts nothing
+    valid_args <- if (!is.null(entry) && identical(entry$type, "custom")) {
+      names(formals(entry$key))
+    } else if (is.null(entry) && known_measures) {
       NULL
     } else {
-      .control_valid_args(func_name, entry)
+      spec <- .measure_spec[[if (is.null(entry)) func_name else entry$key]]
+      if (is.null(spec)) NULL else names(formals(spec$fun))
     }
     if (is.null(valid_args)) {
       cli::cli_warn(c(
@@ -583,26 +587,6 @@
     }
   }
   invisible(NULL)
-}
-
-#' Argument names a `control` entry may set for one measure
-#'
-#' @param name Name of the `control` entry.
-#' @param entry Normalized measure entry of that name, or `NULL` when the
-#'   requested measures are unknown (see `.validate_control()`).
-#' @return Character vector of accepted argument names, or `NULL` when the name
-#'   matches no built-in measure either.
-#' @noRd
-.control_valid_args <- function(name, entry = NULL) {
-  if (!is.null(entry) && identical(entry$type, "custom")) {
-    return(names(formals(entry$key)))
-  }
-  key <- if (is.null(entry)) name else entry$key
-  spec <- .measure_spec[[key]]
-  if (is.null(spec)) {
-    return(NULL)
-  }
-  names(formals(spec$fun))
 }
 
 #' Subset measure results

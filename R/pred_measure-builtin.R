@@ -1071,9 +1071,10 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
 .se_diff_r2 <- function(ref, cmp) {
   # the baseline is a property of `y`, so either model's copy will do; models
   # fitted to different `y` are already reported by the `yhash` warning
-  mse_y_i <- ref$extra$mse_y_i
-  if (is.null(mse_y_i)) {
-    mse_y_i <- cmp$extra$mse_y_i
+  mse_y_i <- if (!is.null(ref$extra$mse_y_i)) {
+    ref$extra$mse_y_i
+  } else {
+    cmp$extra$mse_y_i
   }
 
   # objects computed before the baseline was stored cannot support the
@@ -1224,30 +1225,14 @@ supported_measures_list <- names(.measure_spec)
     ncol     = 1,
     dimnames = list(NULL, measure_name)
   )
+  # `extra` carries auxiliary data for `se_diff_fun()`, on the measure's
+  # natural scale; absent when the measure stores nothing
+  out$extra <- res$extra
 
   structure(
     out,
     class = c("measure", "loo"),
     measure = measure_name,
-    dims = c(n_draws, n_obs),
-    # `extra` carries auxiliary data for `se_diff_fun()`, on the measure's
-    # natural scale
-    compare_extra = res$extra
+    dims = c(n_draws, n_obs)
   )
-}
-
-#' Auxiliary data a measure stores for its `se_diff_fun`
-#'
-#' Built-in measures carry it as the `compare_extra` attribute added by
-#' `.create_measure_structure()`; custom measures return it as an `extra`
-#' element of their result list.
-#' @noRd
-#' @param res A measure result.
-#' @return A list, or `NULL` when the measure stores nothing.
-.measure_compare_extra <- function(res) {
-  extra <- attr(res, "compare_extra", exact = TRUE)
-  if (is.null(extra)) {
-    extra <- res$extra
-  }
-  extra
 }

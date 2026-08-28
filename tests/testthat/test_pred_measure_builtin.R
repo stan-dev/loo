@@ -447,7 +447,7 @@ testthat::test_that("measure_rmse() works with se=0", {
 testthat::test_that("measure_r2() works as expected", {
   res <- measure_r2(y = res_roaches$y, mupred = res_roaches$mupred, log_weights = NULL)
 
-  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_roaches$y))
   expect_true(all(res$estimates[1] >= 0 & res$estimates[1] <= 1))
@@ -459,7 +459,7 @@ testthat::test_that("measure_r2() with log_weights works as expected", {
   res <- measure_r2(y = res_roaches$y, mupred = res_roaches$mupred,
     log_weights = res_roaches$loo1$psis_object$log_weights)
 
-  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_roaches$y))
   expect_true(all(res$estimates[1] >= 0 & res$estimates[1] <= 1))
@@ -525,7 +525,7 @@ testthat::test_that("measure_bacc() pointwise contributions sum to estimate", {
 testthat::test_that("measure_bacc() works as expected", {
   res <- measure_bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred, log_weights = NULL)
 
-  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
@@ -549,7 +549,7 @@ testthat::test_that("measure_bacc() with log-weights works as expected", {
     log_weights = res_cat$loo$psis_object$log_weights
   )
 
-  expect_equal(names(res), c("estimates", "pointwise"))
+  expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))

@@ -123,10 +123,18 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   )
 
   # LOO is the familiar default, so only name the source when it is not LOO.
+  # Spelled out for a full sentence, unlike the short per-object tag from
+  # `.pred_measure_source_label()`.
   if (!is.null(compare_source) && !identical(compare_source, "loo")) {
     .cat_wrapped(
       "Predictive measures evaluated on ",
-      .compare_source_label(compare_source),
+      switch(
+        compare_source,
+        kfold = "K-fold cross-validation",
+        test = "held-out test data",
+        insample = "in-sample (training) data",
+        compare_source
+      ),
       "."
     )
   }
