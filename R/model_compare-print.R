@@ -5,13 +5,19 @@
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the best model? The default is `TRUE`.
+#' @param simplify For the print method only, should the output be simplified to
+#'   only include the model names, ELPD differences, and (when `p_worse = TRUE`)
+#'   diagnostic columns? The default is `TRUE`. Set to `FALSE` to also print the
+#'   available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
+#'   errors).
 #' @param measures For `loo_pred_measure` comparisons only, which measures to
 #'   print diff tables for. `NULL` (default) prints only the ranking measure
 #'   (`"elpd"` when `rank_by` was not set, otherwise `rank_by`);
 #'   `"all"` prints all compared measures; or a character vector of measure
 #'   names (e.g. `c("elpd", "mse")`). Each table is sorted by its own measure,
 #'   best model first, so the same model need not lead every table.
-print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NULL) {
+print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
+                              simplify = TRUE, measures = NULL) {
   if (inherits(x, "old_compare.loo")) {
     return(unclass(x))
   }
@@ -33,19 +39,35 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE, measures = NUL
     print(as.data.frame(x))
     return(x)
   }
-  x2 <- cbind(
-    model = x$model,
-    .fr(x[, c("elpd_diff", "se_diff")], digits)
+  base_cols <- c("model", "elpd_diff", "se_diff")
+  diag_cols <- c("p_worse", "diag_diff", "diag_elpd")
+  show_diag <- p_worse && "p_worse" %in% colnames(x)
+
+  estimate_cols <- setdiff(colnames(x), c(base_cols, diag_cols))
+  estimate_cols <- estimate_cols[vapply(x[estimate_cols], is.numeric, logical(1))]
+
+  cols <- c(
+    base_cols,
+    if (show_diag) diag_cols,
+    if (!simplify) estimate_cols
   )
-  if (p_worse && "p_worse" %in% colnames(x)) {
-    x2 <- cbind(
-      x2,
-      p_worse = .fr(x[, "p_worse"], digits = 2),
-      diag_diff = x[, "diag_diff"],
-      diag_elpd = x[, "diag_elpd"]
-    )
+  cols <- intersect(cols, colnames(x))
+
+  x2 <- x[, cols, drop = FALSE]
+
+  fmt_cols <- setdiff(cols, c("model", "diag_diff", "diag_elpd"))
+  if (length(fmt_cols)) {
+    if ("p_worse" %in% fmt_cols) {
+      x2$p_worse <- .fr(x2$p_worse, digits = 2)
+      fmt_cols <- setdiff(fmt_cols, "p_worse")
+    }
+    if (length(fmt_cols)) {
+      x2[fmt_cols] <- .fr(x2[fmt_cols], digits)
+    }
   }
-  print(x2, quote = FALSE, row.names = FALSE)
+  # Use `as.data.frame(x2)` here to drop "compare.loo"
+  # so print() uses print.data.frame.
+  print(as.data.frame(x2), quote = FALSE, row.names = FALSE)
 
   ref_model_attr <- attr(x, "compare_ref_model")
   if (!is.null(ref_model_attr)) {
