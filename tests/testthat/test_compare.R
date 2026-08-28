@@ -6,36 +6,36 @@ LLarr3 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 1), dim = dim(LLarr))
 w1 <- suppressWarnings(waic(LLarr))
 w2 <- suppressWarnings(waic(LLarr2))
 
-test_that("loo_compare throws appropriate errors", {
+test_that("model_compare throws appropriate errors", {
   w3 <- suppressWarnings(waic(LLarr[,, -1]))
   w4 <- suppressWarnings(waic(LLarr[,, -(1:2)]))
 
-  expect_error(loo_compare(2, 3), "must be a list if not a 'loo' or 'pred_measure' object")
+  expect_error(model_compare(2, 3), "must be a list if not a 'loo' or 'pred_measure' object")
   expect_error(
-    loo_compare(w1, w2, x = list(w1, w2)),
+    model_compare(w1, w2, x = list(w1, w2)),
     "If 'x' is a list then '...' should not be specified"
   )
-  expect_error(loo_compare(w1, list(1, 2, 3)), "class 'loo'")
-  expect_error(loo_compare(w1), "At least two models are required for comparison")
-  expect_error(loo_compare(x = list(w1)), "At least two models are required for comparison")
+  expect_error(model_compare(w1, list(1, 2, 3)), "class 'loo'")
+  expect_error(model_compare(w1), "At least two models are required for comparison")
+  expect_error(model_compare(x = list(w1)), "At least two models are required for comparison")
   expect_error(
-    loo_compare(w1, w3),
+    model_compare(w1, w3),
     "All models must have the same number of observations, but models have inconsistent observation counts: 'model1' (32), 'model2' (31)",
     fixed = TRUE
   )
   expect_error(
-    loo_compare(w1, w2, w3),
+    model_compare(w1, w2, w3),
     "All models must have the same number of observations, but models have inconsistent observation counts: 'model1' (32), 'model2' (32), 'model3' (31)",
     fixed = TRUE
   )
   expect_error(
-    loo_compare(x = list("Model A" = w1, "Model B" = w2, "Model C" = w3)),
+    model_compare(x = list("Model A" = w1, "Model B" = w2, "Model C" = w3)),
     "All models must have the same number of observations, but models have inconsistent observation counts: 'Model A' (32), 'Model B' (32), 'Model C' (31)",
     fixed = TRUE
   )
 })
 
-test_that("loo_compare dispatches loo_pred_measure inputs", {
+test_that("model_compare dispatches loo_pred_measure inputs", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -52,7 +52,7 @@ test_that("loo_compare dispatches loo_pred_measure inputs", {
     measure = c("r2", "mse")
   )
 
-  comp <- suppressMessages(loo_compare(pm1, pm2))
+  comp <- suppressMessages(model_compare(pm1, pm2))
   expect_s3_class(comp, "compare.loo")
   expect_equal(
     attr(comp, "rank_by"),
@@ -66,22 +66,22 @@ test_that("loo_compare dispatches loo_pred_measure inputs", {
   expect_false("mse_p_worse" %in% colnames(comp))
 
   expect_error(
-    loo_compare(w1, pm1),
+    model_compare(w1, pm1),
     "Cannot mix 'pred_measure' objects with plain 'loo' objects",
     fixed = TRUE
   )
   expect_error(
-    loo_compare(pm1),
+    model_compare(pm1),
     "At least two models are required for comparison",
     fixed = TRUE
   )
   expect_equal(
-    attr(loo_compare(w1, w2), "rank_by"),
+    attr(model_compare(w1, w2), "rank_by"),
     list(kind = "default", measure = "elpd", model = NULL)
   )
 })
 
-test_that("loo_compare warns when predictive measures differ across models", {
+test_that("model_compare warns when predictive measures differ across models", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -99,7 +99,7 @@ test_that("loo_compare warns when predictive measures differ across models", {
   )
 
   expect_warning(
-    comp <- suppressMessages(loo_compare(list(m1 = pm1, m2 = pm2))),
+    comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2))),
     "Omitted measures: mae \\(m2\\), mse \\(m1\\)"
   )
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2"))
@@ -107,7 +107,7 @@ test_that("loo_compare warns when predictive measures differ across models", {
   expect_false("mae_diff" %in% colnames(comp))
 })
 
-test_that("loo_compare works with three loo_pred_measure models", {
+test_that("model_compare works with three loo_pred_measure models", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -131,7 +131,7 @@ test_that("loo_compare works with three loo_pred_measure models", {
     measure = c("r2", "mae")
   )
 
-  comp <- loo_compare(
+  comp <- model_compare(
     list("A" = pm1, "B" = pm2, "C" = pm3),
     rank_by = "mae"
   )
@@ -154,7 +154,7 @@ test_that("loo_compare works with three loo_pred_measure models", {
   expect_equal(attr(comp, "sign_converted_measures"), c("mae"))
 })
 
-test_that("loo_compare informs when measure signs are converted", {
+test_that("model_compare informs when measure signs are converted", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -171,7 +171,7 @@ test_that("loo_compare informs when measure signs are converted", {
     measure = c("r2", "mse")
   )
 
-  expect_snapshot(comp <- loo_compare(pm1, pm2))
+  expect_snapshot(comp <- model_compare(pm1, pm2))
   expect_equal(attr(comp, "sign_converted_measures"), "mse")
 
   pm_elpd <- loo_pred_measure(
@@ -180,10 +180,10 @@ test_that("loo_compare informs when measure signs are converted", {
     mupred = res$mupred_m1,
     ylp = res$ylp_m1
   )
-  expect_no_message(loo_compare(pm_elpd, pm_elpd))
+  expect_no_message(model_compare(pm_elpd, pm_elpd))
 })
 
-test_that("loo_compare rank_by changes order for loo_pred_measure", {
+test_that("model_compare rank_by changes order for loo_pred_measure", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -200,8 +200,8 @@ test_that("loo_compare rank_by changes order for loo_pred_measure", {
     measure = c("r2", "mae")
   )
 
-  comp_elpd <- loo_compare(pm1, pm2, rank_by = "elpd")
-  comp_mse <- loo_compare(pm1, pm2, rank_by = "mae")
+  comp_elpd <- model_compare(pm1, pm2, rank_by = "elpd")
+  comp_mse <- model_compare(pm1, pm2, rank_by = "mae")
   expect_equal(
     attr(comp_elpd, "rank_by"),
     list(kind = "measure", measure = "elpd", model = NULL)
@@ -317,12 +317,12 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
     measure = c("r2", "mae")
   )
 
-  comp <- suppressMessages(loo_compare(list(m1 = pm1, m2 = pm2, m3 = pm3)))
+  comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2, m3 = pm3)))
   expect_snapshot(print(comp))
   expect_snapshot(print(comp, measures = "all", digits = 2))
   expect_snapshot(print(comp, measures = c("r2", "mae")))
 
-  comp_mae <- suppressMessages(loo_compare(list(m1 = pm1, m2 = pm2), rank_by = "mae"))
+  comp_mae <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2), rank_by = "mae"))
   expect_snapshot(print(comp_mae))
 
   expect_error(
@@ -331,7 +331,7 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   )
 })
 
-test_that("loo_compare measure helpers work as expected", {
+test_that("model_compare measure helpers work as expected", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -472,7 +472,7 @@ test_that("rmse differences use the delta-method standard error", {
   expect_equal(unname(self["diff"]), 0)
   expect_equal(unname(self["se"]), 0)
 
-  comp <- suppressMessages(loo_compare(pm1, pm2))
+  comp <- suppressMessages(model_compare(pm1, pm2))
   expect_false(anyNA(comp$rmse_se_diff))
   expect_equal(comp$rmse_se_diff[1], 0)
 })
@@ -528,7 +528,7 @@ test_that("r2 differences use the delta-method standard error", {
   expect_equal(unname(self["diff"]), 0)
   expect_equal(unname(self["se"]), 0)
 
-  comp <- suppressMessages(loo_compare(pm1, pm2))
+  comp <- suppressMessages(model_compare(pm1, pm2))
   expect_false(anyNA(comp$r2_se_diff))
   expect_equal(comp$r2_se_diff[1], 0)
 
@@ -573,14 +573,14 @@ test_that("r2 reports the difference without an se when the baseline is gone", {
   )
   expect_true(is.na(pair["se"]))
 
-  comp <- suppressMessages(loo_compare(stale1, stale2))
+  comp <- suppressMessages(model_compare(stale1, stale2))
   expect_false(anyNA(comp$r2_diff))
   expect_true(all(is.na(comp$r2_se_diff)))
 
   # one stale model does not cost the others their standard error: the
   # baseline is shared, so the other model's copy is used, and the metadata
   # check ignores `extra` rather than reporting it as a disagreement
-  mixed <- suppressMessages(loo_compare(stale1, pm2))
+  mixed <- suppressMessages(model_compare(stale1, pm2))
   expect_false(anyNA(mixed$r2_se_diff))
 })
 
@@ -673,7 +673,7 @@ test_that("bacc differences use the stratified paired standard error", {
   expect_equal(unname(self["diff"]), 0)
   expect_equal(unname(self["se"]), 0)
 
-  comp <- suppressMessages(loo_compare(pm1, pm2))
+  comp <- suppressMessages(model_compare(pm1, pm2))
   expect_false(anyNA(comp$bacc_se_diff))
   expect_equal(comp$bacc_se_diff[1], 0)
 })
@@ -704,12 +704,12 @@ test_that("bacc reports the difference without an se when the strata are gone", 
   # the strata are shared, so a stale model paired with a current one still
   # gets a standard error, from whichever copy survives. `pm1` is the better
   # model and so heads the table; staleness in `pm2` costs nothing at all
-  mixed <- suppressMessages(loo_compare(fx$pm1, stale2))
+  mixed <- suppressMessages(model_compare(fx$pm1, stale2))
   expect_false(anyNA(mixed$bacc_se_diff))
 
   # but a stale model at the head of the table has no second copy to fall back
   # on for its own row, which is a comparison against itself
-  mixed_stale_first <- suppressMessages(loo_compare(stale1, fx$pm2))
+  mixed_stale_first <- suppressMessages(model_compare(stale1, fx$pm2))
   expect_true(is.na(mixed_stale_first$bacc_se_diff[1L]))
   expect_false(is.na(mixed_stale_first$bacc_se_diff[2L]))
 })
@@ -1121,22 +1121,22 @@ test_that("`custom_se_fn` validates its per-measure form", {
     suppressMessages(model_compare(builtin))$mae_se_diff
   )
 
-  # the loo_compare() alias forwards the argument
+  # the model_compare() alias forwards the argument
   one <- list(
     make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, a),
     make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, a)
   )
   expect_equal(
-    suppressMessages(loo_compare(one, custom_se_fn = "mean"))$m_a_se_diff,
+    suppressMessages(model_compare(one, custom_se_fn = "mean"))$m_a_se_diff,
     suppressMessages(model_compare(one, custom_se_fn = "mean"))$m_a_se_diff
   )
   expect_error(
-    suppressMessages(loo_compare(one)),
+    suppressMessages(model_compare(one)),
     "must be supplied"
   )
 })
 
-test_that("loo_compare errors on inconsistent measure metadata", {
+test_that("model_compare errors on inconsistent measure metadata", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   # the same custom measure, but only one model declares it a loss
   make_fun <- function(loss) {
@@ -1160,12 +1160,12 @@ test_that("loo_compare errors on inconsistent measure metadata", {
   pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, make_fun(FALSE))
 
   expect_error(
-    suppressMessages(loo_compare(pm1, pm2, custom_se_fn = list(my_mse = "mean"))),
+    suppressMessages(model_compare(pm1, pm2, custom_se_fn = list(my_mse = "mean"))),
     "disagree on `measure_info` for measure 'my_mse'"
   )
 })
 
-test_that("loo_compare errors when compare metadata is missing on some models", {
+test_that("model_compare errors when compare metadata is missing on some models", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -1186,14 +1186,14 @@ test_that("loo_compare errors when compare metadata is missing on some models", 
   attr(pm2, "measure_info") <- measure_info
 
   expect_error(
-    suppressMessages(loo_compare(pm1, pm2)),
+    suppressMessages(model_compare(pm1, pm2)),
     "Not all models provide `measure_info` for measure 'mse'"
   )
 })
 
-test_that("loo_compare warns when rank_by is ignored for classic loo objects", {
+test_that("model_compare warns when rank_by is ignored for classic loo objects", {
   expect_warning(
-    loo_compare(w1, w2, rank_by = "mse"),
+    model_compare(w1, w2, rank_by = "mse"),
     "`rank_by` is only used for `pred_measure` comparisons"
   )
 })
@@ -1243,7 +1243,7 @@ test_that("loo_compare warns when rank_by is ignored for classic loo objects", {
   stop("Unsupported synthetic measure: ", measure)
 }
 
-test_that("loo_compare works for all built-in measures", {
+test_that("model_compare works for all built-in measures", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   res_roaches <- readRDS("data-for-tests/test_data_roaches.Rds")
   roaches_measures <- c(
@@ -1252,7 +1252,7 @@ test_that("loo_compare works for all built-in measures", {
   for (measure in roaches_measures) {
     pm1 <- .make_compare_pm(res, 1L, measure)
     pm2 <- .make_compare_pm(res, 2L, measure)
-    comp <- suppressMessages(loo_compare(pm1, pm2))
+    comp <- suppressMessages(model_compare(pm1, pm2))
     expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
     expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
   }
@@ -1272,7 +1272,7 @@ test_that("loo_compare works for all built-in measures", {
       ylp = res$ylp_m2,
       measure = measure
     )
-    comp <- suppressMessages(loo_compare(pm1, pm2))
+    comp <- suppressMessages(model_compare(pm1, pm2))
     expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
     expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
   }
@@ -1280,7 +1280,7 @@ test_that("loo_compare works for all built-in measures", {
   for (measure in c("brier", "acc", "bacc")) {
     pm1 <- .make_compare_pm_synthetic(measure)
     pm2 <- .make_compare_pm_synthetic(measure)
-    comp <- suppressMessages(loo_compare(pm1, pm2))
+    comp <- suppressMessages(model_compare(pm1, pm2))
     expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
     expect_equal(attr(comp, "compare_measures"), c("elpd", measure), info = measure)
   }
@@ -1298,47 +1298,47 @@ test_that("loo_compare works for all built-in measures", {
   })
 }
 
-test_that("loo_compare warns for many loo_pred_measure models", {
+test_that("model_compare warns for many loo_pred_measure models", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   set.seed(123)
   pm_list <- .make_many_compare_pms(res, 25L)
   expect_warning(
-    suppressMessages(loo_compare(pm_list)),
+    suppressMessages(model_compare(pm_list)),
     "Difference in performance potentially due to chance. See McLatchie and Vehtari (2023) for details.",
     fixed = TRUE
   )
 
   pm_list_short <- .make_many_compare_pms(res, 4L)
-  expect_no_warning(suppressMessages(loo_compare(pm_list_short)))
+  expect_no_warning(suppressMessages(model_compare(pm_list_short)))
 })
 
-test_that("loo_compare throws appropriate warnings", {
+test_that("model_compare throws appropriate warnings", {
   w3 <- w1
   w4 <- w2
   class(w3) <- class(w4) <- c("kfold", "loo")
   attr(w3, "K") <- 2
   attr(w4, "K") <- 3
   expect_warning(
-    loo_compare(w3, w4),
+    model_compare(w3, w4),
     "Not all kfold objects have the same K value"
   )
 
   class(w4) <- c("psis_loo", "loo")
   attr(w4, "K") <- NULL
-  expect_warning(loo_compare(w3, w4), "Comparing LOO-CV to K-fold-CV")
+  expect_warning(model_compare(w3, w4), "Comparing LOO-CV to K-fold-CV")
 
   w3 <- w1
   w4 <- w2
   attr(w3, "yhash") <- "a"
   attr(w4, "yhash") <- "b"
-  expect_warning(loo_compare(w3, w4), "Not all models have the same y variable")
+  expect_warning(model_compare(w3, w4), "Not all models have the same y variable")
 
   set.seed(123)
   w_list <- lapply(1:25, function(x) {
     suppressWarnings(waic(LLarr + rnorm(1, 0, 0.1)))
   })
   expect_warning(
-    loo_compare(w_list),
+    model_compare(w_list),
     "Difference in performance potentially due to chance. See McLatchie and Vehtari (2023) for details.",
     fixed = TRUE
   )
@@ -1346,7 +1346,7 @@ test_that("loo_compare throws appropriate warnings", {
   w_list_short <- lapply(1:4, function(x) {
     suppressWarnings(waic(LLarr + rnorm(1, 0, 0.1)))
   })
-  expect_no_warning(loo_compare(w_list_short))
+  expect_no_warning(model_compare(w_list_short))
 })
 
 
@@ -1365,8 +1365,8 @@ comp_colnames <- c(
   "se_waic"
 )
 
-test_that("loo_compare returns expected results (2 models)", {
-  comp1 <- loo_compare(w1, w1)
+test_that("model_compare returns expected results (2 models)", {
+  comp1 <- model_compare(w1, w1)
   expect_s3_class(comp1, "compare.loo")
   expect_s3_class(comp1, "data.frame")
   expect_equal(colnames(comp1), comp_colnames)
@@ -1377,7 +1377,7 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot_value(comp1, style = "serialize")
   expect_snapshot(print(comp1))
 
-  comp2 <- loo_compare(w1, w2)
+  comp2 <- model_compare(w1, w2)
   expect_s3_class(comp2, "compare.loo")
   expect_equal(colnames(comp2), comp_colnames)
   expect_equal(comp2$p_worse, c(NA, 1))
@@ -1390,16 +1390,16 @@ test_that("loo_compare returns expected results (2 models)", {
   expect_snapshot(print(comp2, simplify = FALSE, p_worse = FALSE))
 
   # specifying objects via ... and via arg x gives equal results
-  expect_equal(comp2, loo_compare(x = list(w1, w2)))
+  expect_equal(comp2, model_compare(x = list(w1, w2)))
 
   # custom naming works
-  comp3 <- loo_compare(x = list("A" = w2, "B" = w1))
+  comp3 <- model_compare(x = list("A" = w2, "B" = w1))
   expect_equal(comp3$model, c("B", "A"))
 })
 
-test_that("loo_compare returns expected result (3 models)", {
+test_that("model_compare returns expected result (3 models)", {
   w3 <- suppressWarnings(waic(LLarr3))
-  comp1 <- loo_compare(w1, w2, w3)
+  comp1 <- model_compare(w1, w2, w3)
 
   expect_equal(colnames(comp1), comp_colnames)
   expect_equal(comp1$model, c("model1", "model2", "model3"))
@@ -1412,15 +1412,15 @@ test_that("loo_compare returns expected result (3 models)", {
 
   # specifying objects via '...' gives equivalent results (equal
   # except rownames) to using 'x' argument
-  expect_equal(comp1, loo_compare(x = list(w1, w2, w3)), ignore_attr = TRUE)
+  expect_equal(comp1, model_compare(x = list(w1, w2, w3)), ignore_attr = TRUE)
 })
 
-test_that("loo_compare with simplify=FALSE returns expected result", {
+test_that("model_compare with simplify=FALSE returns expected result", {
   LL <- example_loglik_array()
   loo1 <- loo(LL)
   loo2 <- loo(LL + 1)
   loo3 <- loo(LL + 2)
-  comp <- loo_compare(loo1, loo2, loo3)
+  comp <- model_compare(loo1, loo2, loo3)
   expect_snapshot(print(comp, simplify = FALSE))
 })
 
@@ -1770,7 +1770,22 @@ test_that("model_compare rank_by prefers the measure when a model shares its nam
   )
 })
 
-test_that("loo_compare remains a working alias for model_compare", {
+# Tests for deprecated loo_compare() --------------------------------------
+
+test_that("loo_compare throws deprecation warnings", {
+  expect_warning(loo_compare(w1, w2), "Deprecated")
+  expect_warning(loo_compare(x = list(w1, w2)), "Deprecated")
+})
+
+test_that("loo_compare still returns what model_compare returns", {
+  expect_identical(suppressWarnings(loo_compare(w1, w2)), model_compare(w1, w2))
+  expect_identical(
+    suppressWarnings(loo_compare(x = list("A" = w1, "B" = w2))),
+    model_compare(x = list("A" = w1, "B" = w2))
+  )
+})
+
+test_that("loo_compare is frozen to classic elpd comparison", {
   res <- .compare_src_res()
   set.seed(4321)
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
@@ -1778,14 +1793,25 @@ test_that("loo_compare remains a working alias for model_compare", {
   k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
                            kfold = res$kfold, measure = "rmse")
 
-  expect_identical(
-    suppressMessages(loo_compare(list(m1 = k1, m2 = k2))),
-    suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
+  expect_error(
+    suppressWarnings(loo_compare(k1, k2)),
+    "Use `model_compare()` to compare 'pred_measure' results",
+    fixed = TRUE
   )
-  expect_identical(loo_compare(w1, w2), model_compare(w1, w2))
+  expect_error(
+    suppressWarnings(loo_compare(w1, w2, rank_by = "model1")),
+    "`rank_by` is not supported by the deprecated `loo_compare()`",
+    fixed = TRUE
+  )
+  expect_error(
+    suppressWarnings(loo_compare(w1, w2, custom_se_fn = "mean")),
+    "`custom_se_fn` is not supported by the deprecated `loo_compare()`",
+    fixed = TRUE
+  )
+})
 
-  # `loo_compare` is still a generic, so methods registered elsewhere
-  # (e.g. brms, rstanarm) keep dispatching
+test_that("loo_compare is still a generic", {
+  # methods registered elsewhere (e.g. brms, rstanarm) keep dispatching
   assign("loo_compare.fake_fit", function(x, ...) "dispatched", envir = globalenv())
   on.exit(rm("loo_compare.fake_fit", envir = globalenv()), add = TRUE)
   expect_identical(loo_compare(structure(list(), class = "fake_fit")), "dispatched")

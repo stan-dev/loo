@@ -54,9 +54,10 @@ branch and will extend this guide when merged into `loo-v3.0.0`.
 | `R/pred_measure-compute.R` | **Current** | Internal orchestration |
 | `R/pred_measure-helpers.R` | **Current** | Validation and helpers |
 | `R/pred_measure-builtin.R` | **Current** | `measure_*()` implementations |
-| `R/compare.R` | Deprecated (removal in 3.0.0) | `loo_compare()` in `R/loo_compare.R` |
+| `R/compare.R` | Deprecated (removal in 3.0.0) | `model_compare()` in `R/model_compare.R` |
 | `R/psislw.R` | Deprecated (removal in 3.0.0) | `psis()` in `R/psis.R` (since 2.0.0) |
-| `R/loo_compare.R` | **Current** | Model comparison |
+| `R/loo_compare.R` | Deprecated | `model_compare()` in `R/model_compare.R` |
+| `R/model_compare.R` | **Current** | Model comparison |
 | `R/loo.R`, `R/psis.R`, `R/waic.R` | **Current** | Core LOO / PSIS / WAIC |
 
 ---
@@ -169,6 +170,7 @@ supported_measures_list()
 | Deprecated | Replacement | Since | Planned removal |
 |------------|-------------|-------|-----------------|
 | `compare()` | `model_compare()` | 2.0.0 | 3.0.0 |
+| `loo_compare()` | `model_compare()` | 3.0.0 | TBD |
 
 `compare()` returns a vector or matrix with class `"compare.loo"`.
 `model_compare()` returns a `data.frame` with additional diagnostic columns.
@@ -188,18 +190,26 @@ model_compare(loo1, loo2)
 that it compares models evaluated by leave-one-out CV, k-fold CV, a held-out
 test set, or in-sample scores.
 
-`loo_compare()` is **not deprecated**: it remains an exported generic that
-forwards to `model_compare()`, so existing code and `loo_compare` methods
-registered by other packages continue to work unchanged.
+`loo_compare()` is **deprecated** but still works, and is still an exported
+generic, so `loo_compare` methods registered by other packages (for example
+`loo_compare.brmsfit` in **brms** and `loo_compare.stanreg` in **rstanarm**)
+keep dispatching. It is frozen at its previous behavior: it compares `"loo"`,
+`"waic"`, and `"kfold"` objects on ELPD only, and returns exactly what
+`model_compare()` returns for those inputs. Everything added in 3.0.0 --- the
+`pred_measure` sources, `rank_by`, and `custom_se_fn` --- is available only
+through `model_compare()`.
 
 ```r
-# Both are equivalent
+# Deprecated, but still returns the same table
 loo_compare(loo1, loo2)
+
+# Current
 model_compare(loo1, loo2)
 
-# Only model_compare() is documented for the newer sources
+# Only available via model_compare()
 model_compare(kfold_pm1, kfold_pm2)
 model_compare(test_pm1, test_pm2)
+model_compare(loo_pm1, loo_pm2, rank_by = "rmse")
 ```
 
 ## PSIS importance sampling

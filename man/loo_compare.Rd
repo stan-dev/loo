@@ -4,123 +4,46 @@
 \alias{loo_compare}
 \alias{loo_compare.default}
 \alias{loo_compare.psis_loo_ss_list}
-\title{Model comparison (previous name)}
+\title{Model comparison (deprecated)}
 \usage{
-loo_compare(x, ..., rank_by = NULL, custom_se_fn)
+loo_compare(x, ...)
 
-\method{loo_compare}{default}(x, ..., rank_by = NULL, custom_se_fn)
+\method{loo_compare}{default}(x, ...)
 
-\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE)
-
-\method{print}{compare.loo_ss}(x, ..., digits = 1)
+\method{loo_compare}{psis_loo_ss_list}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"loo"} or a list of such objects. If a list is
-used then the list names will be used as the model names in the output. See
-\strong{Examples}.}
+used then the list names will be used as the model names in the output.}
 
 \item{...}{Additional objects of class \code{"loo"}, if not passed in as a single
 list.}
-
-\item{digits}{For the print method only, the number of digits to use when
-printing.}
-
-\item{p_worse}{For the print method only, should we include the normal
-approximation based probability of each model having worse performance than
-the best model? The default is \code{TRUE}.}
-
-\item{simplify}{For the print method only, should the output be simplified to
-only include the model names, ELPD differences, and (when \code{p_worse = TRUE})
-diagnostic columns? The default is \code{TRUE}. Set to \code{FALSE} to also print the
-available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
-errors).}
 }
 \value{
-A data frame with class \code{"compare.loo"} that has its own
-print method. See the \strong{Details} and \strong{Examples} sections.
+See \code{\link[=model_compare]{model_compare()}}. For the inputs \code{loo_compare()} still accepts,
+the result is identical to what \code{\link[=model_compare]{model_compare()}} returns.
 }
 \description{
-Compare fitted models based on \link[=loo-glossary]{ELPD}.
-}
-\details{
-When comparing two fitted models, we can estimate the difference in their
-expected predictive accuracy by the difference in
-\code{\link[=loo-glossary]{elpd_loo}} or \code{elpd_waic} (or multiplied by \eqn{-2}, if
-desired, to be on the deviance scale).
-\subsection{\code{elpd_diff} and \code{se_diff}}{
+\strong{This function is deprecated}. Please use the new \code{\link[=model_compare]{model_compare()}} function
+instead. See \code{vignette("migration-guide", package = "loo")} for details.
 
-When using \code{loo_compare()}, the returned data frame will have one row per
-model and several columns of estimates. The values of
-\code{\link[=loo-glossary]{elpd_diff}} and \code{\link[=loo-glossary]{se_diff}} are computed by
-making pairwise comparisons between each model and the model with the
-largest ELPD (the model listed first). Therefore, the first \code{elpd_diff}
-value will always be \code{0} (i.e., the difference between the preferred model
-and itself) and the rest of the values will be negative.
-
-To compute the standard error of the difference in \link[=loo-glossary]{ELPD} ---
-which should not be expected to equal the difference of the standard errors
---- we use a paired estimate to take advantage of the fact that the same
-set of \eqn{N} data points was used to fit both models. These calculations
-should be most useful when \eqn{N} is large, because then non-normality of
-the distribution is not such an issue when estimating the uncertainty in
-these sums. These standard errors, for all their flaws, should give a
-better sense of uncertainty than what is obtained using the current
-standard approach of comparing differences of deviances to a Chi-squared
-distribution, a practice derived for Gaussian linear models or
-asymptotically, and which only applies to nested models in any case.
-}
-
-\subsection{\code{p_worse}, \code{diag_diff}, and \code{diag_elpd}}{
-
-The values in the \code{p_worse} column show the probability of each model
-having worse ELPD than the best model. These probabilities are computed
-with a normal approximation using the values from \code{elpd_diff} and
-\code{se_diff}. Sivula et al. (2025) present the conditions when the normal
-approximation used for SE and \code{se_diff} is good, and the column
-\code{diag_diff} contains possible diagnostic messages:
-\itemize{
-\item a \strong{function} called as \code{custom_se_fn(ref, cmp)} (see
-\strong{Custom measure standard errors} below);
-\item \code{"sum"}, for a measure whose estimate is the sum of its pointwise
-values, giving \code{sqrt(N) * sd(d_i)} as for \code{elpd};
-\item \code{"mean"}, for a measure whose estimate is the mean of its pointwise
-values, giving \code{sd(d_i) / sqrt(N)} as for \code{mae};
-\item \code{NULL}, to report the difference with an \code{NA} standard error.
-}
-When two or more custom measures are compared, pass a list named by bare
-measure name, e.g. \code{list(huber = "mean", nrmse = my_se_fn)}. Ignored, with
-a warning, when no custom measure is present.}
-}
-\value{
-See \code{\link[=model_compare]{model_compare()}}.
-}
-\description{
-\code{loo_compare()} is the previous name of \code{\link[=model_compare]{model_compare()}} and is kept as a
-working alias. It is a generic so that packages registering their own
-\code{loo_compare} methods keep dispatching as before; the default method simply
-forwards to \code{\link[=model_compare]{model_compare()}}.
-
-New code should call \code{\link[=model_compare]{model_compare()}}, which additionally compares
-\code{\link[=kfold_pred_measure]{kfold_pred_measure()}},
-\code{\link[=test_pred_measure]{test_pred_measure()}}, and
-\code{\link[=insample_pred_measure]{insample_pred_measure()}} results.
+\code{loo_compare()} remains an exported generic so that \code{loo_compare} methods
+registered by other packages keep dispatching as before, but it is frozen at
+its previous behavior: it compares \code{"loo"}, \code{"waic"}, and \code{"kfold"} objects on
+\link[=loo-glossary]{ELPD} only. Comparing
+\code{\link{pred_measure}} results, or using the \code{rank_by} and
+\code{custom_se_fn} arguments, requires \code{\link[=model_compare]{model_compare()}}.
 }
 \examples{
 LL <- example_loglik_array()
-loo1 <- loo(LL)     # should be worst model when compared
-loo2 <- loo(LL + 1) # should be second best model when compared
-loo3 <- loo(LL + 2) # should be best model when compared
+loo1 <- loo(LL)
+loo2 <- loo(LL + 1)
 
-comp <- loo_compare(loo1, loo2, loo3)
-print(comp, digits = 2)
-print(comp, simplify = FALSE) # full table
+# deprecated; identical to model_compare(loo1, loo2)
+suppressWarnings(loo_compare(loo1, loo2))
 
-# can use a list of objects with custom names
-# the names will be used in the output
-loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
-
-# identical to model_compare(loo1, loo2)
-loo_compare(loo1, loo2)
+# use this instead
+model_compare(loo1, loo2)
 
 }
 \seealso{

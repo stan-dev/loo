@@ -90,9 +90,12 @@ With the introduction of the *`pred_measure` family*, we have deprecated
 backward compatibility, it also expands functionality to handle outputs from
 the `pred_measure` family.
 
-Both functions will remain available for the time being, though `loo_compare`
-will be removed in a future release. For more details, please see our
-**Migration guide**[TODO].
+`loo_compare` still works and is still a generic, so methods registered by other
+packages keep dispatching, but it now warns and is frozen at its previous
+behavior: `loo` objects compared on ELPD only. The `pred_measure` sources,
+`rank_by`, and `custom_se_fn` described in this article require `model_compare`.
+`loo_compare` will be removed in a future release. For more details, see
+`vignette("migration-guide", package = "loo")`.
 :::
 
 ## Running example (count data)

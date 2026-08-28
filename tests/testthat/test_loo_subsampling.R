@@ -892,7 +892,7 @@ test_that("update.psis_loo_ss works as expected (compared with loo)", {
   ))
 })
 
-test_that("loo_compare_subsample", {
+test_that("model_compare_subsample", {
   skip_on_cran() # to get under cran check time limit
 
   set.seed(123)
@@ -1019,26 +1019,26 @@ test_that("loo_compare_subsample", {
   )
 
   expect_snapshot(
-    lcss <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3))
+    lcss <- loo:::model_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3))
   )
   expect_warning(
-    lcss2 <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3o1))
+    lcss2 <- loo:::model_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3o1))
   )
   expect_silent(
-    lcsso <- loo:::loo_compare.psis_loo_ss_list(x = list(lss1, lss2o1, lss3o1))
+    lcsso <- loo:::model_compare.psis_loo_ss_list(x = list(lss1, lss2o1, lss3o1))
   )
   expect_warning(
-    lcssohh <- loo:::loo_compare.psis_loo_ss_list(
+    lcssohh <- loo:::model_compare.psis_loo_ss_list(
       x = list(lss1, lss2hh, lss3o1)
     )
   )
   expect_message(
-    lcssf1 <- loo:::loo_compare.psis_loo_ss_list(
+    lcssf1 <- loo:::model_compare.psis_loo_ss_list(
       x = list(loo:::as.psis_loo_ss.psis_loo(l1), lss2o1, lss3o1)
     )
   )
   expect_message(
-    lcssf2 <- loo:::loo_compare.psis_loo_ss_list(
+    lcssf2 <- loo:::model_compare.psis_loo_ss_list(
       x = list(
         loo:::as.psis_loo_ss.psis_loo(l1),
         lss2o1,
@@ -1061,15 +1061,15 @@ test_that("loo_compare_subsample", {
   expect_equal(lcssohh[, 2][3], lcsso[, 2][3])
 
   expect_silent(
-    lcss2m <- loo:::loo_compare.psis_loo_ss_list(x = list(lss2o1, lss3o1))
+    lcss2m <- loo:::model_compare.psis_loo_ss_list(x = list(lss2o1, lss3o1))
   )
   expect_equal(unname(lcss2m[,]), unname(lcsso[1:2, ]))
 
-  expect_snapshot(lcssapi <- loo_compare(lss1, lss2, lss3))
+  expect_snapshot(lcssapi <- model_compare(lss1, lss2, lss3))
   expect_equal(lcssapi, lcss)
-  expect_warning(lcssohhapi <- loo_compare(lss1, lss2hh, lss3o1))
+  expect_warning(lcssohhapi <- model_compare(lss1, lss2hh, lss3o1))
   expect_equal(lcssohhapi, lcssohh)
-  expect_silent(lcss2mapi <- loo_compare(lss2o1, lss3o1))
+  expect_silent(lcss2mapi <- model_compare(lss2o1, lss3o1))
   expect_equal(lcss2mapi, lcss2m)
 })
 

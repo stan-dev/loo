@@ -1,4 +1,4 @@
-# loo_compare works with three loo_pred_measure models
+# model_compare works with three loo_pred_measure models
 
     Code
       print(comp)
@@ -22,10 +22,10 @@
       
       Other measures compared: elpd, r2. Use print(x, measures = "all").
 
-# loo_compare informs when measure signs are converted
+# model_compare informs when measure signs are converted
 
     Code
-      comp <- loo_compare(pm1, pm2)
+      comp <- model_compare(pm1, pm2)
     Message
       For model comparison, differences for mse is
       reported on a utility scale (higher is better).
@@ -140,7 +140,7 @@
       
       Other measures compared: elpd, r2. Use print(x, measures = "all").
 
-# loo_compare returns expected results (2 models)
+# model_compare returns expected results (2 models)
 
     WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
     ZGVsMgAAAA4AAAACAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAACAAAAAAAAAAAAAAAAAAAAAAAA
@@ -238,7 +238,7 @@
        model1       0.0     0.0     -83.5          4.3    3.3       1.1 167.1     8.5
        model2      -4.1     0.1     -87.6          4.3   11.2       1.1 175.2     8.6
 
-# loo_compare returns expected result (3 models)
+# model_compare returns expected result (3 models)
 
     WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
     ZGVsMgAEAAkAAAAGbW9kZWwzAAAADgAAAAMAAAAAAAAAAMAQOlNfnEXuwDANypG2BBgAAAAO
@@ -275,7 +275,7 @@
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
 
-# loo_compare with simplify=FALSE returns expected result
+# model_compare with simplify=FALSE returns expected result
 
     Code
       print(comp, simplify = FALSE)

@@ -7,9 +7,14 @@
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].
-* `loo_compare()` is now called `model_compare()`. `loo_compare()` remains a
-  working alias and is still a generic, so existing code and methods registered
-  by other packages keep working.
+* `loo_compare()` is now called `model_compare()`, and `loo_compare()` is
+  deprecated. It still works and is still a generic, so `loo_compare` methods
+  registered by other packages (e.g. `loo_compare.brmsfit` in **brms**,
+  `loo_compare.stanreg` in **rstanarm**) keep dispatching, but it now warns and
+  is frozen at its previous behaviour: `"loo"`, `"waic"`, and `"kfold"` objects
+  compared on ELPD only, returning exactly what `model_compare()` returns for
+  those inputs. Comparing `pred_measure` results, or using `rank_by` or
+  `custom_se_fn`, requires `model_compare()`.
 * `model_compare()` supports every `pred_measure` result --- from
   `loo_pred_measure()`, `kfold_pred_measure()`, `test_pred_measure()`, and
   `insample_pred_measure()` --- with paired differences for all measures common
