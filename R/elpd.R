@@ -67,9 +67,9 @@ elpd_object <- function(pointwise, dims) {
 }
 #' @export
 print_dims.elpd_generic <- function(x, ...) {
+  dims <- dim(x)
   cat(
-    "Computed from",
-    paste(dim(x), collapse = " by "),
-    "log-likelihood matrix using the generic elpd function\n"
+    "Computed from", dims[1], "posterior draws and",
+    dims[2], "log-likelihood terms using the generic elpd function.\n"
   )
 }
