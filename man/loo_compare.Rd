@@ -10,44 +10,74 @@ loo_compare(x, ..., rank_by = NULL, custom_se_fn)
 
 \method{loo_compare}{default}(x, ..., rank_by = NULL, custom_se_fn)
 
-\method{loo_compare}{psis_loo_ss_list}(x, ...)
+\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE)
+
+\method{print}{compare.loo_ss}(x, ..., digits = 1)
 }
 \arguments{
-\item{x}{An object of class \code{"loo"} or \code{"pred_measure"}, or a list of
-such objects. If a list is used then the list names will be used as the
-model names in the output. See \strong{Examples}.}
+\item{x}{An object of class \code{"loo"} or a list of such objects. If a list is
+used then the list names will be used as the model names in the output. See
+\strong{Examples}.}
 
-\item{...}{Additional objects of class \code{"loo"} or \code{"pred_measure"}, if not
-passed in as a single list.}
+\item{...}{Additional objects of class \code{"loo"}, if not passed in as a single
+list.}
 
-\item{rank_by}{A single string naming either a \strong{measure} or a \strong{model},
-used to define one reference model for all pairwise differences.
+\item{digits}{For the print method only, the number of digits to use when
+printing.}
 
-A \strong{measure name} (\code{\link{pred_measure}} comparisons only) ranks
-models by that measure and makes the top-ranked model the reference. Bare
-names are used regardless of source, so \code{rank_by = "rmse"} selects
-\code{rmse_loo}, \code{rmse_kfold}, or \code{rmse_test} as appropriate. For example,
-\code{rank_by = "mse"} ranks models by predictive MSE (best/lowest MSE first)
-and computes \emph{all} measure differences relative to that one model on a
-utility scale (higher is better; loss measures such as MSE have their sign
-flipped).
+\item{p_worse}{For the print method only, should we include the normal
+approximation based probability of each model having worse performance than
+the best model? The default is \code{TRUE}.}
 
-A \strong{model name} (one of the names shown in the \code{model} column, i.e. the
-list names or \code{model1}, \code{model2}, ...) pins that model as the reference for
-all differences, whichever model performs best. Rows stay ordered by
-\code{"elpd"}. This form also works for plain \code{"loo"} comparisons, where
-\code{elpd_diff} is then relative to the named model rather than to the best
-one. If a name matches both a measure and a model, the measure wins and a
-warning is issued.
+\item{simplify}{For the print method only, should the output be simplified to
+only include the model names, ELPD differences, and (when \code{p_worse = TRUE})
+diagnostic columns? The default is \code{TRUE}. Set to \code{FALSE} to also print the
+available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
+errors).}
+}
+\value{
+A data frame with class \code{"compare.loo"} that has its own
+print method. See the \strong{Details} and \strong{Examples} sections.
+}
+\description{
+Compare fitted models based on \link[=loo-glossary]{ELPD}.
+}
+\details{
+When comparing two fitted models, we can estimate the difference in their
+expected predictive accuracy by the difference in
+\code{\link[=loo-glossary]{elpd_loo}} or \code{elpd_waic} (or multiplied by \eqn{-2}, if
+desired, to be on the deviance scale).
+\subsection{\code{elpd_diff} and \code{se_diff}}{
 
-When \code{rank_by} is \code{NULL} (the default), rows are ordered by \code{"elpd"} but
-each measure is compared against \emph{its own} best model, so \code{mse_diff} may be
-relative to a different model than \code{elpd_diff}. Each \verb{\{measure\}_diff}
-column then has exactly one \code{0} entry, at that measure's best model.}
+When using \code{loo_compare()}, the returned data frame will have one row per
+model and several columns of estimates. The values of
+\code{\link[=loo-glossary]{elpd_diff}} and \code{\link[=loo-glossary]{se_diff}} are computed by
+making pairwise comparisons between each model and the model with the
+largest ELPD (the model listed first). Therefore, the first \code{elpd_diff}
+value will always be \code{0} (i.e., the difference between the preferred model
+and itself) and the rest of the values will be negative.
 
-\item{custom_se_fn}{How to compute the standard error of the difference
-between two models for a \strong{custom} measure. Required whenever a custom
-measure is compared; nothing is inferred from the measure's values. One of:
+To compute the standard error of the difference in \link[=loo-glossary]{ELPD} ---
+which should not be expected to equal the difference of the standard errors
+--- we use a paired estimate to take advantage of the fact that the same
+set of \eqn{N} data points was used to fit both models. These calculations
+should be most useful when \eqn{N} is large, because then non-normality of
+the distribution is not such an issue when estimating the uncertainty in
+these sums. These standard errors, for all their flaws, should give a
+better sense of uncertainty than what is obtained using the current
+standard approach of comparing differences of deviances to a Chi-squared
+distribution, a practice derived for Gaussian linear models or
+asymptotically, and which only applies to nested models in any case.
+}
+
+\subsection{\code{p_worse}, \code{diag_diff}, and \code{diag_elpd}}{
+
+The values in the \code{p_worse} column show the probability of each model
+having worse ELPD than the best model. These probabilities are computed
+with a normal approximation using the values from \code{elpd_diff} and
+\code{se_diff}. Sivula et al. (2025) present the conditions when the normal
+approximation used for SE and \code{se_diff} is good, and the column
+\code{diag_diff} contains possible diagnostic messages:
 \itemize{
 \item a \strong{function} called as \code{custom_se_fn(ref, cmp)} (see
 \strong{Custom measure standard errors} below);
@@ -77,8 +107,17 @@ New code should call \code{\link[=model_compare]{model_compare()}}, which additi
 }
 \examples{
 LL <- example_loglik_array()
-loo1 <- loo(LL)
-loo2 <- loo(LL + 1)
+loo1 <- loo(LL)     # should be worst model when compared
+loo2 <- loo(LL + 1) # should be second best model when compared
+loo3 <- loo(LL + 2) # should be best model when compared
+
+comp <- loo_compare(loo1, loo2, loo3)
+print(comp, digits = 2)
+print(comp, simplify = FALSE) # full table
+
+# can use a list of objects with custom names
+# the names will be used in the output
+loo_compare(list("apple" = loo1, "banana" = loo2, "cherry" = loo3))
 
 # identical to model_compare(loo1, loo2)
 loo_compare(loo1, loo2)

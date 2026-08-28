@@ -103,6 +103,16 @@
 * `print()` on a multi-measure comparison now labels each measure's standard
   error column `{measure}_se_diff`, matching the column name on the returned
   data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.
+* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
+#328.
+
+# loo 2.10.1
+
+* Revert behavior of internal `psis_smooth_tail()` function that led to several
+failing tests not caught by CRAN reverse dependency checks. This change should
+not directly affect individual users. by @VisruthSK in #381
+* `print.compare.loo()` regains a `simplify` argument for showing the full
+comparison table with `simplify = FALSE` by @florence-bockting in #383.
 
 # loo 2.10.0
 
