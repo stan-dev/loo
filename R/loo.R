@@ -511,18 +511,6 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
   sqrt(var_elpd)
 }
 
-
-#' Warning message if r_eff not specified
-#' @noRd
-throw_loo_r_eff_warning <- function() {
-  warning(
-    "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-    "For models fit with MCMC, the reported PSIS ESS and \n",
-    "MCSE estimates can be over-optimistic.",
-    call. = FALSE
-  )
-}
-
 #' Combine many psis objects into a single psis object
 #'
 #' @noRd

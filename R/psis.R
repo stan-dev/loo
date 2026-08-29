@@ -384,27 +384,3 @@ prepare_psis_r_eff <- function(r_eff, len) {
   }
   r_eff
 }
-
-#' Check if `psis()` was called from one of the loo methods
-#'
-#' @noRd
-#' @return `TRUE` if the `loo()` array, matrix, or function method is found in
-#'   the active call list, `FALSE` otherwise.
-#'
-called_from_loo <- function() {
-  calls <- sys.calls()
-  txt <- unlist(lapply(calls, deparse))
-  patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
-  check <- sapply(txt, function(x) grepl(patts, x))
-  isTRUE(any(check))
-}
-
-#' Warning message about missing `r_eff` argument
-#' @noRd
-throw_psis_r_eff_warning <- function() {
-  warning(
-    "Relative effective sample sizes ('r_eff' argument) not specified. ",
-    "PSIS ESS (n_eff) will not be adjusted based on MCMC ESS (n_eff).",
-    call. = FALSE
-  )
-}

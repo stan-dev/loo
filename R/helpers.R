@@ -182,18 +182,6 @@ loo_cores <- function(cores) {
   return(cores)
 }
 
-
-# nocov start
-# release reminders (for devtools)
-release_questions <- function() {
-  c(
-    "Have you updated references?",
-    "Have you updated inst/CITATION?",
-    "Have you updated the vignettes?"
-  )
-}
-# nocov end
-
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
 }
