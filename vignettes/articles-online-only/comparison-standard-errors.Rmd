@@ -24,8 +24,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  message = FALSE,
-  warning = FALSE,
+  message = TRUE,
+  warning = TRUE,
   eval = params$EVAL,
   fig.width = 7,
   fig.height = 4,
@@ -39,11 +39,13 @@ devtools::load_all(".")
 
 + How detailed should the math for the computation be and how to attribute properly the work from the overleaf document? Are you considering to publish it? -> Answered: we target for a preprint that we can cite.
 + Currently, `elpd` is computed by default in `pred_measure`. This is helpful, when we want to have it by default in `model_compare`. Do we want this default behavior?
++ Related question: The default print method of `model_compare` shows only the `elpd`, only when `print(..., measures = "all")` is passed, all measures are shown. Do we want this?
 + For `elpd`, we provide in the `model_compare` output the additional columns `p_worse`, `diag_diff`, `diag_elpd`.
   + Do we want to have `p_worse` and `diag_diff` for all measures?
   + I moved the column `diag_elpd` out from the elpd-specific measure block and treat it as an "overall" information (see printed output below).
   + Furthermore, I renamed `diag_elpd` to `diag_psis` as it seems not be specific to elpd or do I misunderstand this?
 + General: Is the current design of `model_compare()` okay?
++ Which warnings/messages do we want to provide and which should only be part of the function documentation?
 :::
 
 ::: {.callout .callout-note}
@@ -78,8 +80,8 @@ measures** produced by `<type>_pred_measure()` and explain:
 2. How to compute the point estimate and standard error of the difference for
    a **custom** measure.
 
-::: {.callout .callout-tip}
-**Note: Relation between `model_compare` and `loo_compare`**
+::: {.callout .callout-note}
+**Relation between `model_compare` and `loo_compare`**
 
 The `loo_compare` function has traditionally been used for model comparison in
 loo, accepting any object that inherits from the `loo` class (such as those
@@ -134,19 +136,43 @@ Provide a section where we use kfold_pred_measure, test_pred_measure, etc.
 measures <- c("mae", "mse", "rmse", "r2", "rps") # elpd is computed by default
 ```
 
-## Preview: Glimpse into the model comparison results
+## The classical `loo_compare` output
 
 As the actual model building workflow is not the focus of this tutorial, we skip
 this part and load the results from a pre-fitted object in the variable `res`.
-Then, we use `loo_pred_measure()` to compute the predictive performance for
-each model (`m1, m2, m3`) and measure (see list above).
-Finally, we compare the performance of the three models using `model_compare()`.
+Among other things, it stores a `loo` object (as returned by `loo::loo()`) for
+each of the three models.
 
-<a id="example"></a>
 ```{r example}
 path <- "../../tests/testthat/data-for-tests/test_data_roaches_compare.Rds"
 res <- readRDS(path)
 
+loos <- list(m1 = res$loo_p_m1, m2 = res$loo_p_m2, m3 = res$loo_p_m3)
+```
+
+Passing these `loo` objects to the classical `loo_compare()` reproduces the
+familiar ELPD-only comparison, and warns once per session that `model_compare()`
+is now the preferred function:
+
+```{r loo_compare, warning=TRUE}
+loo_compare(loos)
+```
+
+When we use `model_compare` instead, we get the same output for `loo` objects:
+
+```{r model_compare_wloo, warning=TRUE}
+model_compare(loos)
+```
+
+## Preview: Glimpse into the model comparison results
+
+We now use `loo_pred_measure()` to compute the predictive performance for
+each model (`m1, m2, m3`) and measure (see list above).
+Finally, we compare the performance of the three models using `model_compare()`.
+By default, only the `elpd` measure is shown.
+
+<a id="example"></a>
+```{r pred-measure}
 fit_measure <- function(i, measure) {
   loo_pred_measure(
     y = res$y,
@@ -161,7 +187,19 @@ m1 <- fit_measure(1, measures)
 m2 <- fit_measure(2, measures)
 m3 <- fit_measure(3, measures)
 
-comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3))
+(comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3)))
+```
+
+When we want to see a specific measure, we can change this by passing the 
+information to the `print` method:
+
+```{r pred-measure-r2}
+print(comp, measures = "r2")
+```
+
+Or in order to see all measures we can use `measures = "all"`:
+
+```{r pred-measure-all}
 print(comp, measures = "all")
 ```
 
@@ -205,7 +243,7 @@ information for each performance measure.
 ```{r meta-attribute, class.output="scroll-output"}
 meta <- attr(m1, "measure_info")
 
-# meta info for each single measure (e.g., R2)
+# measure info for each single measure (e.g., R2)
 names(meta$r2)
 ```
 
