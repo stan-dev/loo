@@ -389,6 +389,19 @@ measure_acc <- function(
 measure_bacc <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
 ) {
+  if (is.null(pointwise)) {
+    .validate_numeric_vector(y, arg = "y")
+  }
+
+  classes <- sort(unique(y))
+  K <- length(classes)
+  class_id <- match(y, classes)
+  n_c <- tabulate(class_id, nbins = K)
+
+  if (is.null(pointwise) && K < 2) {
+    cli::cli_abort("{.fn bacc} requires at least two outcome classes.")
+  }
+
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
       pointwise,
@@ -401,12 +414,6 @@ measure_bacc <- function(
   } else {
     n_draws <- nrow(mupred)
     n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    classes <- sort(unique(y))
-    K <- length(classes)
-    if (K < 2) {
-      cli::cli_abort("{.fn bacc} requires at least two outcome classes.")
-    }
     if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
       cli::cli_abort("{.arg mupred} must be a numeric matrix or 3D numeric array.")
     }
@@ -436,13 +443,6 @@ measure_bacc <- function(
     }
     acc_i <- (mupred_hat == y) * 1L
   }
-  
-  # recomputed rather than reused from the branch above, which the
-  # precomputed-`pointwise` branch never enters
-  classes <- sort(unique(y))
-  K <- length(classes)
-  class_id <- match(y, classes)
-  n_c <- tabulate(class_id, nbins = K)
 
   acc_c <- vapply(classes, function(c) mean(acc_i[y == c]), numeric(1))
   bacc_i <- acc_i / (K * n_c[class_id])
