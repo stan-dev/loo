@@ -196,7 +196,7 @@ is_constant <- function(x, tol = .Machine$double.eps) {
 #'
 #' @noRd
 #' @param id Identifier for the deprecation; one warning per `id` per session.
-#' @param new,old Passed to [base::.Deprecated()].
+#' @param new,old Name of the replacement and deprecated function.
 #' @return `TRUE` if a warning was issued, `FALSE` otherwise, invisibly.
 #'
 .deprecate_once <- local({
@@ -206,7 +206,10 @@ is_constant <- function(x, tol = .Machine$double.eps) {
       return(invisible(FALSE))
     }
     state[[id]] <- TRUE
-    .Deprecated(new = new, old = old)
+    warning(
+      "\n'", old, "' is deprecated. Use '", new, "' instead.\n",
+      call. = TRUE, immediate. = TRUE
+    )
     invisible(TRUE)
   }
 })

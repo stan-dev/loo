@@ -315,7 +315,7 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #'
 throw_pareto_warnings <- function(k, k_threshold) {
   if (isTRUE(any(k > k_threshold))) {
-    .warn("Some Pareto k diagnostic values are too high. ", .k_help())
+    .warn("Some Pareto k diagnostic values are too high.\n", .k_help())
   }
 }
 

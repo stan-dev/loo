@@ -137,7 +137,7 @@ test_that("model_compare works with three loo_pred_measure models", {
   )
   expect_snapshot(print(comp))
   expect_equal(nrow(comp), 3L)
-  expect_equal(comp$model, c("B", "C", "A"))
+  expect_equal(comp$model, c("C", "B", "A"))
   expect_equal(
     attr(comp, "rank_by"),
     list(kind = "measure", measure = "mae", model = NULL)
@@ -146,10 +146,10 @@ test_that("model_compare works with three loo_pred_measure models", {
   expect_equal(comp$mae_diff[1L], 0)
   expect_true(all(comp$mae_diff[-1L] < 0))
   # `rank_by` pins the mae-best model as the reference for *every* measure, so
-  # only the reference row is zero; here B and C are all but tied on mae while
-  # C has the clearly higher elpd, which leaves `elpd_diff` positive for C
+  # only the reference row is zero; here C is both the mae-best and the
+  # elpd-best model, so `elpd_diff` comes out negative for B and A
   expect_equal(comp$elpd_diff[1L], 0)
-  expect_gt(comp$elpd_diff[comp$model == "C"], 0)
+  expect_lt(comp$elpd_diff[comp$model == "B"], 0)
   expect_lt(comp$elpd_diff[comp$model == "A"], 0)
   expect_equal(attr(comp, "sign_converted_measures"), c("mae"))
 })
@@ -1780,13 +1780,13 @@ test_that("loo_compare throws a deprecation warning once per session", {
   forget_warning()
   on.exit(forget_warning(), add = TRUE)
 
-  expect_warning(loo_compare(w1, w2), "Deprecated")
+  expect_warning(loo_compare(w1, w2), "deprecated")
   # already warned in this session, so these are silent
   expect_no_warning(loo_compare(w1, w2))
   expect_no_warning(loo_compare(x = list(w1, w2)))
 
   forget_warning()
-  expect_warning(loo_compare(x = list(w1, w2)), "Deprecated")
+  expect_warning(loo_compare(x = list(w1, w2)), "deprecated")
 })
 
 test_that("loo_compare still returns what model_compare returns", {

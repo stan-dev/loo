@@ -177,11 +177,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       # has to say which measures exist and how to see them.
       message(
         if (has_diag_msg) "\n",
-        .wrap(
-          "Other measures compared: ",
-          paste(other, collapse = ", "),
-          ". Use print(x, measures = \"all\")."
-        )
+        "Use print(x, measures = \"all\") to see all measures."
       )
     }
   }
