@@ -11,6 +11,9 @@
 #' [`pred_measure`][pred_measure] results, or using the `rank_by` and
 #' `custom_se_fn` arguments, requires [model_compare()].
 #'
+#' The deprecation warning is issued once per session, so a script that calls
+#' `loo_compare()` repeatedly is not flooded with warnings.
+#'
 #' @export
 #' @param x An object of class `"loo"` or a list of such objects. If a list is
 #'   used then the list names will be used as the model names in the output.
@@ -39,14 +42,11 @@ loo_compare <- function(x, ...) {
 #' @rdname loo_compare
 #' @export
 loo_compare.default <- function(x, ...) {
-  # `old` is set explicitly: without it `.Deprecated()` reports the method name
-  # (e.g. "loo_compare.default") rather than the function users called.
-  .Deprecated("model_compare", old = "loo_compare")
+  .deprecate_once("loo_compare", new = "model_compare")
 
   # `loo_compare()` keeps its old signature, so the arguments added to
   # `model_compare()` would arrive through `...` and be mistaken for models.
-  dots <- list(...)
-  new_args <- intersect(names(dots), c("rank_by", "custom_se_fn"))
+  new_args <- intersect(names(list(...)), c("rank_by", "custom_se_fn"))
   if (length(new_args)) {
     stop(
       "`", new_args[1L], "` is not supported by the deprecated `loo_compare()`. ",
@@ -70,8 +70,6 @@ loo_compare.default <- function(x, ...) {
 #' @rdname loo_compare
 #' @export
 loo_compare.psis_loo_ss_list <- function(x, ...) {
-  # `old` is set explicitly: without it `.Deprecated()` reports the method name
-  # (e.g. "loo_compare.default") rather than the function users called.
-  .Deprecated("model_compare", old = "loo_compare")
+  .deprecate_once("loo_compare", new = "model_compare")
   model_compare.psis_loo_ss_list(x, ...)
 }

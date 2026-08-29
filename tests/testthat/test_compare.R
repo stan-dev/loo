@@ -1772,8 +1772,20 @@ test_that("model_compare rank_by prefers the measure when a model shares its nam
 
 # Tests for deprecated loo_compare() --------------------------------------
 
-test_that("loo_compare throws deprecation warnings", {
+test_that("loo_compare throws a deprecation warning once per session", {
+  # forget that the warning was already issued earlier in this session
+  forget_warning <- function() {
+    assign("loo_compare", FALSE, envir = environment(loo:::.deprecate_once)$state)
+  }
+  forget_warning()
+  on.exit(forget_warning(), add = TRUE)
+
   expect_warning(loo_compare(w1, w2), "Deprecated")
+  # already warned in this session, so these are silent
+  expect_no_warning(loo_compare(w1, w2))
+  expect_no_warning(loo_compare(x = list(w1, w2)))
+
+  forget_warning()
   expect_warning(loo_compare(x = list(w1, w2)), "Deprecated")
 })
 

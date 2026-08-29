@@ -10,8 +10,8 @@
 * `loo_compare()` is now called `model_compare()`, and `loo_compare()` is
   deprecated. It still works and is still a generic, so `loo_compare` methods
   registered by other packages (e.g. `loo_compare.brmsfit` in **brms**,
-  `loo_compare.stanreg` in **rstanarm**) keep dispatching, but it now warns and
-  is frozen at its previous behaviour: `"loo"`, `"waic"`, and `"kfold"` objects
+  `loo_compare.stanreg` in **rstanarm**) keep dispatching, but it now warns
+  (once per session) and is frozen at its previous behaviour: `"loo"`, `"waic"`, and `"kfold"` objects
   compared on ELPD only, returning exactly what `model_compare()` returns for
   those inputs. Comparing `pred_measure` results, or using `rank_by` or
   `custom_se_fn`, requires `model_compare()`.

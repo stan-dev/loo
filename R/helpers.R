@@ -197,3 +197,28 @@ release_questions <- function() {
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
 }
+
+#' Issue a deprecation warning the first time it is triggered in a session
+#'
+#' Repeated calls with the same `id` are silent, so a script calling a
+#' deprecated function in a loop is not flooded with warnings. `old` is passed
+#' on explicitly so the message does not depend on which method called this.
+#' Which `id`s have already warned is kept in `state`, an environment created
+#' once when the package is built and private to this function.
+#'
+#' @noRd
+#' @param id Identifier for the deprecation; one warning per `id` per session.
+#' @param new,old Passed to [base::.Deprecated()].
+#' @return `TRUE` if a warning was issued, `FALSE` otherwise, invisibly.
+#'
+.deprecate_once <- local({
+  state <- new.env(parent = emptyenv())
+  function(id, new, old = id) {
+    if (isTRUE(state[[id]])) {
+      return(invisible(FALSE))
+    }
+    state[[id]] <- TRUE
+    .Deprecated(new = new, old = old)
+    invisible(TRUE)
+  }
+})
