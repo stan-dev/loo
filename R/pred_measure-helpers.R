@@ -88,6 +88,16 @@
         call. = FALSE
       )
     }
+  } else {
+    attr_name <- attr(fun, "measure_name", exact = TRUE)
+    if (!is.null(attr_name) && length(attr_name) == 1L && nzchar(attr_name) &&
+        !identical(attr_name, name)) {
+      cli::cli_warn(c(
+        "Custom measure named {.val {name}} in {.arg measure} also has",
+        "{.code attr(fun, \"measure_name\") = {.val {attr_name}}}.",
+        "i" = "Using the list name {.val {name}}; the attribute is ignored here."
+      ))
+    }
   }
 
   loss <- attr(fun, "measure_loss", exact = TRUE)

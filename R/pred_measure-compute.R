@@ -57,11 +57,15 @@
 #'   measure function and it is stored alongside the estimates and passed on to
 #'   `custom_se_fn`; the built-in `r2` uses it for the baseline
 #'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
-#' @param measure_name For a single custom function, set
-#'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
-#'   `measure`. A custom measure passed inside a list takes its name from the
-#'   list element instead, but `attr(my_fun, "measure_loss")` is read in both
-#'   forms.
+#' @param measure_name Only needed when `measure` is a single custom function
+#'   passed directly (not inside a list) — it sets the name that function is
+#'   reported under. Set it with `attr(my_fun, "measure_name") <- "my_metric"`
+#'   before passing `my_fun` to `measure`. If you pass the same function inside
+#'   a list instead (e.g. `list(my_metric = my_fun)`), it takes its name from
+#'   the list element and `measure_name` isn't needed — this also lets the
+#'   same function be reused under several names. If both are set and disagree,
+#'   the list name wins and a warning is issued. Either way,
+#'   `attr(my_fun, "measure_loss")` is still read from the function itself.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with
