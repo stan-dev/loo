@@ -243,24 +243,16 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   data.frame(bad_k = field(2L), threshold = field(3L))
 }
 
-#' Wrap printed prose to the conventional 80-column terminal width
+#' Print prose wrapped to the conventional 80-column terminal width
 #'
 #' Tables are wrapped by `print.data.frame()` at `getOption("width")`; this does
 #' the same for the sentences around them, capped at 80 so the output stays
 #' within a standard terminal however wide the option is set.
 #' @noRd
 #' @param ... Pieces of a single line, pasted together.
-#' @return A single string with embedded newlines.
-.wrap <- function(...) {
-  width <- min(getOption("width", 80L), 80L)
-  paste(strwrap(paste0(...), width = width), collapse = "\n")
-}
-
-#' Print prose wrapped to 80 columns
-#' @noRd
-#' @param ... Pieces of a single line, pasted together.
 .cat_wrapped <- function(...) {
-  cat(.wrap(...), "\n", sep = "")
+  width <- min(getOption("width", 80L), 80L)
+  cat(paste(strwrap(paste0(...), width = width), collapse = "\n"), "\n", sep = "")
 }
 
 #' Describe how many of the compared models a flag applies to

@@ -3,9 +3,9 @@
 #' @param x A list with `psis_loo` objects.
 #' @param ... Currently ignored.
 #' @param custom_se_fn Not supported here; subsampled objects are compared on
-#'   elpd only.
+#'   elpd only. Explicit argument here such that a caller does not absorb it
+#'   into ... and silently ignore.
 #' @return A `compare.loo_ss` object.
-#' @author Mans Magnusson
 #' @export
 model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
   if (!missing(custom_se_fn)) {
