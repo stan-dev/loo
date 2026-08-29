@@ -269,9 +269,10 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
       measure_info[[bare]]
     })
     has_info <- !vapply(infos, is.null, logical(1))
-    if (any(has_info) && !all(has_info)) {
+    if (!all(has_info)) {
       stop(
-        "Not all models provide `measure_info` for measure '",
+        if (any(has_info)) "Not all models provide" else "No model provides",
+        " `measure_info` for measure '",
         bare,
         "'. Recompute all inputs with the current version of `loo_pred_measure()`.",
         call. = FALSE
@@ -542,8 +543,9 @@ inform_compare_sign_conversion <- function(cols, loos) {
 #' `"measure_specific"` when the built-in measure supplies its own
 #' `se_diff_fun`, and `"custom"` for custom measures, whose standard error is
 #' supplied at comparison time through `model_compare(custom_se_fn = )`.
-#' Nothing is inferred. `"estimates_only"` is only reached by legacy objects
-#' carrying no `measure_info` at all.
+#' Nothing is inferred. Every compared measure carries a `diff_method`;
+#' `.compare_metadata_check()` has already rejected the inputs otherwise, so the
+#' `elpd`/`ic` branch below only covers direct internal calls.
 #' @noRd
 .measure_pointwise_diff_method <- function(loos, col) {
   bare <- .display_name(col, loos)
@@ -556,7 +558,12 @@ inform_compare_sign_conversion <- function(cols, loos) {
     return("sum")
   }
 
-  "estimates_only"
+  stop(
+    "No `measure_info` for measure '",
+    bare,
+    "'. Recompute all inputs with the current version of `loo_pred_measure()`.",
+    call. = FALSE
+  )
 }
 
 #' Check that a declared `"sum"`/`"mean"` aggregation matches the estimate
@@ -833,13 +840,6 @@ inform_compare_sign_conversion <- function(cols, loos) {
         se = .validate_se_diff(se, col, loos, what = "custom_se_fn")
       ))
     }
-  }
-
-  if (method == "estimates_only") {
-    return(c(
-      diff = est_utility(cmp$estimates) - est_utility(ref$estimates),
-      se = NA_real_
-    ))
   }
 
   if (method == "measure_specific") {

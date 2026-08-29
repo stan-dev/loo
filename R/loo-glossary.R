@@ -360,23 +360,21 @@
 #' list of per-measure information used by [model_compare()]. Each entry
 #' is a list with:
 #'
-#' * `loss` — whether lower values of the measure are better. Measure values are
+#' * `loss`: whether lower values of the measure are better. Measure values are
 #'   always stored on the measure's own scale, so this describes both the
 #'   measure and the values recorded for it
-#' * `diff_method` — how the standard error of the difference is obtained:
+#' * `diff_method`: how the standard error of the difference is obtained:
 #'   `"sum"` or `"mean"` (paired pointwise differences),
 #'   `"measure_specific"` (the built-in measure's own `se_diff_fun`), or
 #'   `"custom"`. Nothing is inferred from a measure's values. Under `"custom"` the standard error is resolved at
 #'   comparison time from the `custom_se_fn` argument of [model_compare()],
 #'   which supplies either a function, the `"sum"`/`"mean"` pointwise formulas,
 #'   or `NULL` for an `NA` standard error. A missing standard error is not an
-#'   error state — the difference itself is still reported.
-#'   `"estimates_only"` appears only for legacy objects that carry no
-#'   `measure_info` at all.
-#' * `se_diff_fun` — for built-in measures with
+#'   error state as the difference itself is still reported.
+#' * `se_diff_fun`: for built-in measures with
 #'   `diff_method = "measure_specific"`, the name of the built-in implementation
 #'   used. Custom measures never store a function here.
-#' * `extra` — optional list of auxiliary data the measure stored for the
+#' * `extra`: optional list of auxiliary data the measure stored for the
 #'   standard error of its difference, present only for measures that need it
 #'   (`r2` stores the pointwise baseline `(y_i - mean(y))^2`, which `y` no
 #'   longer supplies by the time [model_compare()] runs; `bacc` stores the class

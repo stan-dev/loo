@@ -377,23 +377,21 @@ Attribute on all \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_mea
 list of per-measure information used by \code{\link[=model_compare]{model_compare()}}. Each entry
 is a list with:
 \itemize{
-\item \code{loss} — whether lower values of the measure are better. Measure values are
+\item \code{loss}: whether lower values of the measure are better. Measure values are
 always stored on the measure's own scale, so this describes both the
 measure and the values recorded for it
-\item \code{diff_method} — how the standard error of the difference is obtained:
+\item \code{diff_method}: how the standard error of the difference is obtained:
 \code{"sum"} or \code{"mean"} (paired pointwise differences),
 \code{"measure_specific"} (the built-in measure's own \code{se_diff_fun}), or
 \code{"custom"}. Nothing is inferred from a measure's values. Under \code{"custom"} the standard error is resolved at
 comparison time from the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}},
 which supplies either a function, the \code{"sum"}/\code{"mean"} pointwise formulas,
 or \code{NULL} for an \code{NA} standard error. A missing standard error is not an
-error state — the difference itself is still reported.
-\code{"estimates_only"} appears only for legacy objects that carry no
-\code{measure_info} at all.
-\item \code{se_diff_fun} — for built-in measures with
+error state as the difference itself is still reported.
+\item \code{se_diff_fun}: for built-in measures with
 \code{diff_method = "measure_specific"}, the name of the built-in implementation
 used. Custom measures never store a function here.
-\item \code{extra} — optional list of auxiliary data the measure stored for the
+\item \code{extra}: optional list of auxiliary data the measure stored for the
 standard error of its difference, present only for measures that need it
 (\code{r2} stores the pointwise baseline \code{(y_i - mean(y))^2}, which \code{y} no
 longer supplies by the time \code{\link[=model_compare]{model_compare()}} runs; \code{bacc} stores the class

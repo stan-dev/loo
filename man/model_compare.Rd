@@ -240,9 +240,6 @@ its own standard error of the difference.
 supplied. \verb{\{measure\}_se_diff} is \code{NA} only when \code{custom_se_fn} is an
 explicit \code{NULL} for that measure.
 }
-
-Objects carrying no \code{measure_info} at all fall back to the difference
-between overall estimates, with \verb{\{measure\}_se_diff} set to \code{NA}.
 }
 
 \subsection{Source-specific behavior}{

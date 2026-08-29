@@ -206,9 +206,6 @@
 #'     supplied. `{measure}_se_diff` is `NA` only when `custom_se_fn` is an
 #'     explicit `NULL` for that measure.
 #'
-#'   Objects carrying no `measure_info` at all fall back to the difference
-#'   between overall estimates, with `{measure}_se_diff` set to `NA`.
-#'
 #' ## Source-specific behavior
 #'   Comparisons behave the same way across sources, with three exceptions:
 #'
