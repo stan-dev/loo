@@ -145,11 +145,45 @@ detect the problem.
 }
 }
 
+\section{Model comparison with \code{model_compare()} and \code{loo_compare()}}{
+
+
+Two functions perform model comparison, and both are available to users:
+\itemize{
+\item \code{\link[=model_compare]{model_compare()}} is the current interface. It compares \code{"loo"}, \code{"waic"},
+and \code{"kfold"} objects on ELPD, and \code{\link{pred_measure}} results
+on every predictive measure the models share. The \code{rank_by} and
+\code{custom_se_fn} arguments are available here only.
+\item \code{\link[=loo_compare]{loo_compare()}} is \strong{deprecated} in favor of \code{model_compare()}, but it
+still works and is still an exported generic, so \code{loo_compare} methods
+registered by other packages keep dispatching. It keeps its previous
+behavior: it accepts only \code{"loo"}, \code{"waic"}, and \code{"kfold"} objects and
+compares them on ELPD. Passing \code{\link{pred_measure}} results,
+\code{rank_by}, or \code{custom_se_fn} arguments produces an error. The deprecation
+warning is issued once per session.
+}
+
+\code{loo_compare()} and \code{model_compare()} return the same object: a data frame
+including the \code{p_worse}, \code{diag_diff}, and \code{diag_elpd} columns. The terms
+\code{elpd_diff}, \code{se_diff}, \code{p_worse}, \code{diag_diff}, and \code{diag_elpd} are defined
+below. The remaining sections, on comparisons of several predictive
+measures at once, apply to \code{model_compare()} only, since \code{loo_compare()}
+cannot produce such a comparison. See
+\code{vignette("migration-guide", package = "loo")} for the migration path.
+
+Below, "the comparison output" refers to the object returned by either
+function, and "the reference model" to the model each difference is computed
+against, which is by default the best model on the measure unless
+\code{model_compare()} was given \code{rank_by}.
+}
+
 \section{elpd_diff}{
 
 \code{elpd_diff} is the difference in \code{elpd_loo} for two models. If more
 than two models are compared, the difference is computed relative to the
-model with highest \code{elpd_loo}.
+reference model, which is the model with the highest \code{elpd_loo} in
+\code{loo_compare()} and in \code{model_compare()} by default the model with the best
+performance per measure unless stated otherwise via \code{rank_by}.
 }
 
 \section{se_diff}{
@@ -171,35 +205,37 @@ approximation to the uncertainty in \code{elpd_diff}. It is computed as
 \if{html}{\out{<div class="sourceCode">}}\preformatted{p_worse = pnorm(0, elpd_diff, se_diff).
 }\if{html}{\out{</div>}}
 
-The best-ranked model (the first row in the \code{model_compare()} output, where
+The reference model (the row of the comparison output where
 \code{elpd_diff = 0}) always receives \code{NA}, since the comparison is defined
 relative to that model.
 
 Because models are ordered by \code{elpd_loo} before computing \code{p_worse}, all
-reported values are at least 0.5 by construction. A value close to 0.5
-indicates that the models are nearly indistinguishable in predictive
-performance and that the ranking could easily be reversed with different
-data. A value close to 1 indicates that the lower-ranked model is almost
+reported values are at least 0.5 by construction. This always holds for
+\code{loo_compare()}, and for \code{model_compare()} unless \code{rank_by} pins a reference
+model that is not the best one; models better than a pinned reference then
+have \code{p_worse < 0.5}. A value close to 0.5 indicates that the models are
+nearly indistinguishable in predictive performance and that the ranking could
+easily be reversed with different data. A value close to 1 indicates that the
+lower-ranked model is almost
 certainly worse. \code{p_worse} inherits all the limitations of \code{se_diff} and the
 normal approximation on which it is based. In particular, when \code{se_diff} is
 underestimated, \code{p_worse} will be estimated too close to 1, making a model
 appear more clearly worse than the data actually support. Conversely, when
 \code{elpd_diff} is biased due to an unreliable LOO approximation, \code{p_worse} can
 point in the wrong direction entirely. When any of these conditions are
-present, \code{diag_diff} or \code{diag_elpd} will be flagged in the \code{model_compare()}
-output.
-For further guidance, see the sections below and the case study on
+present, \code{diag_diff} or \code{diag_elpd} will be flagged in the comparison
+output. For further guidance, see the sections below and the case study on
 \href{https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html}{Uncertainty in Bayesian LOO-CV Model Comparison}.
 }
 
 \section{\code{diag_diff} (pairwise comparison diagnostics)}{
 
 
-\code{diag_diff} is a diagnostic column in the \code{model_compare()} output for each
-model comparison against the current reference model. It flags conditions
-under which the normal approximation behind \code{se_diff} and \code{p_worse} is likely
-to be poorly calibrated. The column contains a short label when a condition
-is detected, and is empty otherwise.
+\code{diag_diff} is a diagnostic column in the \code{model_compare()} and
+\code{loo_compare()} output for each model comparison against the current
+reference model. It flags conditions under which the normal approximation
+behind \code{se_diff} and \code{p_worse} is likely to be poorly calibrated. The column
+contains a short label when a condition is detected, and is empty otherwise.
 
 The column \code{diag_diff} currently flags two problems:
 \subsection{\code{N < 100}}{
@@ -222,7 +258,7 @@ supports treating the models as predictively similar.
 
 The conditions flagged by \code{diag_diff} are not independent: they tend to
 co-occur, and when they do, some flags carry more information than others.
-\code{model_compare()} therefore follows a priority hierarchy and shows only the
+Both functions therefore follow a priority hierarchy and show only the
 most critical flag in the table output.
 
 The hierarchy is as follows:
@@ -247,12 +283,12 @@ For further guidance, see the case study on
 \section{\code{diag_elpd}}{
 
 
-\code{diag_elpd} is a diagnostic column in the \code{model_compare()} output that flags
-when the PSIS-LOO approximation for an individual model is unreliable. Unlike
-\code{diag_diff}, which concerns the \emph{comparison} between models, \code{diag_elpd}
-concerns the quality of the \code{elpd_loo} estimate for each model individually.
-It contains a short text label when a problem is detected, and is empty
-otherwise.
+\code{diag_elpd} is a diagnostic column in the \code{model_compare()} and
+\code{loo_compare()} output that flags when the PSIS-LOO approximation for an
+individual model is unreliable. Unlike \code{diag_diff}, which concerns the
+\emph{comparison} between models, \code{diag_elpd} concerns the quality of the
+\code{elpd_loo} estimate for each model individually. It contains a short text
+label when a problem is detected, and is empty otherwise.
 \subsection{\verb{K k_psis > t} (K observations with Pareto-k values > t)}{
 
 This label indicates that K observations for this model have Pareto-k values
@@ -265,13 +301,15 @@ either model's estimate propagates directly into \code{elpd_diff} and \code{p_wo
 This is qualitatively different from the calibration issues flagged by
 \code{diag_diff}: here the estimate itself may be wrong, not just uncertain.
 
-The same importance weights produce every other PSIS-LOO measure, so the flag
-is not specific to ELPD: \code{mae_loo}, \code{mse_loo}, \code{r2_loo} and the rest are
-biased by unreliable importance sampling for the same reason. It is a
-property of one model's approximation, and does not depend on which model is
-used as the comparison reference. \code{print()} therefore reports it once per
-model above the per-measure difference tables rather than inside any one of
-them.
+The flag is not specific to ELPD: \code{mae_loo}, \code{mse_loo}, \code{r2_loo} and the
+rest are biased by unreliable importance sampling for the same reason. It is
+a property of one model's approximation, and does not depend on which model
+is used as the comparison reference. In an ELPD-only comparison (i.e., all
+\code{loo_compare()} output, and \code{model_compare()} on \code{"loo"}, \code{"waic"}, or
+\code{"kfold"} objects) \code{print()} shows it as a column of the single difference
+table. In a multi-measure \code{model_compare()} comparison it is instead reported
+once per model above the per-measure difference tables, rather than inside
+any one of them.
 
 See for further information on Pareto-k values the "Pareto k estimates"
 section.
@@ -280,6 +318,11 @@ section.
 
 \section{Multi-measure model comparisons}{
 
+
+The remaining sections describe comparisons that only \code{\link[=model_compare]{model_compare()}} can
+produce; the deprecated \code{loo_compare()} rejects
+\code{\link{pred_measure}} inputs and the \code{rank_by} and \code{custom_se_fn}
+arguments.
 
 When comparing \code{\link[=loo_pred_measure]{loo_pred_measure()}} objects with
 \code{model_compare()}, paired differences are computed for every predictive
@@ -370,19 +413,20 @@ each shared measure; a mismatched \code{measure_loss} declaration, or missing
 \code{measure_info} on some models, produces an error.
 }
 
-\subsection{\code{rank_by}, \code{compare_measures}, and related attributes`}{
+\subsection{\code{rank_by}, \code{compare_measures}, and related attributes}{
 
 The \code{rank_by} argument takes either a measure name or a model name. A
 measure name selects which measure determines model ordering, and pins the
 top-ranked model as the single reference model for all pairwise differences.
 A model name keeps the \code{"elpd"} ordering but pins that model as the single
 reference model, whether or not it is the best one. When \code{rank_by} is
-omitted, models are ordered by \code{"elpd"} and
-each measure is compared against its own best model; attribute \code{rank_by} is
-set only when \code{rank_by} names a measure, and attribute \code{compare_ref_model}
-only when it names a model. Attribute \code{compare_reference}
-is a named character vector recording the reference model used for each
-measure. Attribute \code{compare_measures} lists all measures that
+omitted, models are ordered by \code{"elpd"} and each measure is compared against
+its own best model. Attribute \code{rank_by} records which of these three cases
+applied, as a list with elements \code{kind} (\code{"default"}, \code{"measure"}, or
+\code{"model"}), \code{measure} (the measure the rows are ordered by, always set) and
+\code{model} (the pinned reference model, or \code{NULL}). Attribute
+\code{compare_reference} is a named character vector recording the reference model
+used for each measure. Attribute \code{compare_measures} lists all measures that
 were compared, and \code{sign_converted_measures} lists loss measures whose sign
 was flipped onto the utility scale. The print method shows the ranking
 measure by default
@@ -415,4 +459,7 @@ Gelman, A. (2019), Visualization in Bayesian workflow.
 (\href{https://rss.onlinelibrary.wiley.com/doi/full/10.1111/rssa.12378}{journal version},
 \href{https://arxiv.org/abs/1709.01449}{preprint arXiv:1709.01449},
 \href{https://github.com/jgabry/bayes-vis-paper}{code on GitHub})
+}
+\seealso{
+\code{\link[=model_compare]{model_compare()}}, \code{\link[=loo_compare]{loo_compare()}}
 }

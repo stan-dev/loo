@@ -33,6 +33,9 @@ its previous behavior: it compares \code{"loo"}, \code{"waic"}, and \code{"kfold
 \link[=loo-glossary]{ELPD} only. Comparing
 \code{\link{pred_measure}} results, or using the \code{rank_by} and
 \code{custom_se_fn} arguments, requires \code{\link[=model_compare]{model_compare()}}.
+
+The deprecation warning is issued once per session, so a script that calls
+\code{loo_compare()} repeatedly is not flooded with warnings.
 }
 \examples{
 LL <- example_loglik_array()
