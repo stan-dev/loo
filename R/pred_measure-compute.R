@@ -216,22 +216,22 @@ do_pred_measure <- function(
     psis_object = psis_object,
     save_psis = save_psis
   )
-  
+
   predperf_res <- .add_attributes(
-    save_psis,
-    predperf_res, 
-    y, 
-    ypred, 
-    mupred, 
-    ylp,
-    ylp_test,
-    kfold, 
-    loo, 
-    predperf, 
-    source
+    save_psis = save_psis,
+    predperf_res = predperf_res,
+    y = y,
+    ypred = ypred,
+    mupred = mupred,
+    ylp = ylp,
+    ylp_test = ylp_test,
+    kfold = kfold,
+    loo = loo,
+    predperf = predperf,
+    source = source
   )
   predperf_res
-  }
+}
 
 # internal helper functions ---------------------------------------------------
 
@@ -347,14 +347,14 @@ do_pred_measure <- function(
 
 #' @noRd
 .compute_measure <- function(
-    y,
-    ypred,
-    mupred,
-    ylp,
-    measure_entry,
-    log_weights,
-    control = list(),
-    base_measure
+  y,
+  ypred,
+  mupred,
+  ylp,
+  measure_entry,
+  log_weights,
+  control = list(),
+  base_measure
 ) {
   if (measure_entry$type == "builtin") {
     spec <- .measure_spec[[measure_entry$key]]
@@ -365,7 +365,7 @@ do_pred_measure <- function(
   } else {
     measure_fun <- measure_entry$key
   }
-  
+
   if (identical(measure_fun, measure_mlpd) || identical(measure_fun, measure_ic)) {
     elpd_i <- base_measure$pointwise[, 1]
     # ensure elpd_i is in correct orientation (negative log predictive density)
@@ -382,8 +382,6 @@ do_pred_measure <- function(
     measure_control <- list()
   }
 
-  is_custom <- measure_entry$type == "custom"
-
   pool <- c(
     list(
       y = y,
@@ -396,7 +394,7 @@ do_pred_measure <- function(
   )
   args <- pool[intersect(names(formals(measure_fun)), names(pool))]
   res <- do.call(measure_fun, args)
-  if (is_custom) {
+  if (measure_entry$type == "custom") {
     n_obs <- .measure_n_obs(y, ypred, mupred, ylp)
     res <- .validate_measure_result(res, measure_entry$name, n_obs = n_obs)
   }
@@ -757,7 +755,7 @@ do_pred_measure <- function(
       predperf$psis_object <- NULL
     }
     attributes(predperf_res) <- attributes(predperf)
-    
+
     dims <- if (!is.null(ypred)) {
       dim(ypred)
     } else if (!is.null(mupred)) {
@@ -780,7 +778,7 @@ do_pred_measure <- function(
 
     return(predperf_res)
   }
-  
+
   predperf_res <- switch(
     source,
     kfold = .copy_attrs(
@@ -832,6 +830,5 @@ do_pred_measure <- function(
   }
   attr(predperf_res, "measure_info") <- measure_info
 
-  return(predperf_res)
+  predperf_res
 }
-
