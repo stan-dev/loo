@@ -306,27 +306,7 @@ print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
     return(invisible(x))
   }
 
-  n <- length(pareto_k)
-  labels <- c("good", "bad", "very bad")
-  ranges <- c("k <= 0.7", "0.7 < k <= 1", "k > 1")
-  bins <- cut(
-    pareto_k,
-    breaks = c(-Inf, 0.7, 1, Inf),
-    labels = labels,
-    include.lowest = TRUE
-  )
-  counts <- tabulate(as.integer(bins[!is.na(bins)]), nbins = length(labels))
-
-  cat("Pareto k diagnostic values:\n")
-  for (i in seq_along(labels)) {
-    cat(sprintf(
-      "  %s (%s): %d (%.1f%%)\n",
-      labels[i],
-      ranges[i],
-      counts[i],
-      100 * counts[i] / n
-    ))
-  }
+  print(pareto_k_table(x), digits = digits)
 
   if (plot_k) {
     graphics::plot(

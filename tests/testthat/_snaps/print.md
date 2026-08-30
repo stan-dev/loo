@@ -10,9 +10,10 @@
     r2_loo        0.2   0.1
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -27,9 +28,10 @@
     rmse_loo     44.6   4.6
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -45,9 +47,10 @@
     mse_loo    1991.3 413.8
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -64,9 +67,10 @@
     mae_loo      24.6   2.3
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -84,9 +88,10 @@
     rps_loo      22.3   2.3
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -105,9 +110,10 @@
     srps_loo     -5.0   0.4
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -127,9 +133,10 @@
     mlpd_loo    -20.8   2.6
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -143,9 +150,10 @@
     srps_loo     -5.0   0.4
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -160,9 +168,10 @@
     r2_loo        0.2   0.1
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -178,9 +187,10 @@
     mae_loo      24.6   2.3
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -197,9 +207,10 @@
     mse_loo    1991.3 413.8
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -217,9 +228,10 @@
     mlpd_loo    -20.8   2.6
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -238,9 +250,10 @@
     rmse_loo     44.6   4.6
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 ---
 
@@ -260,9 +273,10 @@
     rps_loo      22.3   2.3
     ------
     Pareto k diagnostic values:
-      good (k <= 0.7): 249 (95.0%)
-      bad (0.7 < k <= 1): 6 (2.3%)
-      very bad (k > 1): 7 (2.7%)
+                              Count Pct.    Min. ESS
+    (-Inf, 0.62]   (good)     244   93.1%   35      
+       (0.62, 1]   (bad)       11    4.2%   <NA>    
+        (1, Inf)   (very bad)   7    2.7%   <NA>    
 
 # test_pred_measure print output
 

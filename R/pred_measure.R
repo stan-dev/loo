@@ -475,3 +475,8 @@ pred_measure <- function(
     control = control
   )
 }
+
+#' @export
+dim.pred_measure <- function(x) {
+  attr(x, "dims")
+}
