@@ -78,11 +78,17 @@ do_pred_measure <- function(
 ) {
   # input validation ---------------------------------------------------
   .validate_control(control)
-  
+
+  if (!is.null(group_ids)) {
+    cli::cli_abort(
+      "`group_ids` is reserved for future feature but is not yet implemented."
+    )
+  }
+
   measures <- .prepare_measures(
     measure, predperf, supported_measures_list, source
   )
-  
+
   if (source == "loo") {
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {

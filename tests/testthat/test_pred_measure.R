@@ -3,6 +3,15 @@ res <- readRDS("data-for-tests/test_data_roaches.Rds")
 res_sleep_test <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
 
 # unit tests ----------------------
+test_that("group_ids errors as not yet implemented", {
+  expect_error(
+    insample_pred_measure(
+      ylp = res$ylp, measure = "elpd", group_ids = rep(1:2, 131)
+    ),
+    "not yet implemented"
+  )
+})
+
 ## .compute_measure() --------------------
 
 .builtin_entry <- function(name) {
