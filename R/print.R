@@ -256,7 +256,6 @@ convert_old_object <- function(x, digits = 1, ...) {
 
 #' @export
 print.pred_measure <- function(x, digits = 1, ...) {
-  # TODO: ppl should be able to choose what is printed
   dims <- attr(x, "dims")
   if (is.null(dims) && !is.null(x$log_weights)) {
     dims <- dim(x$log_weights)
@@ -278,21 +277,6 @@ print.pred_measure <- function(x, digits = 1, ...) {
     format(round(as.data.frame(x$estimates), digits), nsmall = digits),
     quote = FALSE
   )
-  invisible(x)
-}
-
-#' @export
-print.kfold_pred_measure <- function(x, digits = 1, ...) {
-  print.pred_measure(x, digits = digits, ...)
-  if (!is.null(x$metadata$fold_id)) {
-    cat(sprintf("Folds: %s\n", length(unique(x$metadata$fold_id))))
-  }
-  invisible(x)
-}
-
-#' @export
-print.test_pred_measure <- function(x, digits = 1, ...) {
-  print.pred_measure(x, digits = digits, ...)
   invisible(x)
 }
 
@@ -345,6 +329,6 @@ print.measure <- function(x, digits = 2, ...) {
   }
 
   print(.fr(x$estimates, digits), quote = FALSE)
-  
+
   invisible(x)
 }

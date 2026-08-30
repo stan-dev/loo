@@ -288,40 +288,10 @@ do_pred_measure <- function(
     ))
   }}
 
-#' Compute a single predictive measure
-#'
-#' @description
-#' Dispatches one requested predictive measure to the appropriate summary
-#' function. The measure's `family` in `.measure_spec` determines which inputs
-#' are passed through:
-#'
-#' \describe{
-#'   \item{`metrics`}{`y` and `mupred` (e.g. MAE, RMSE, accuracy).}
-#'   \item{`rank_scores`}{`y` and `ypred` (e.g. RPS, CRPS).}
-#'   \item{`density_scores`}{`ylp` (e.g. ELPD, MLPD).}
-#' }
-#'
-#' @param y Vector of observed values (n).
-#' @param ypred Matrix of posterior predictive draws (S × n).
-#' @param mupred Matrix of posterior point predictions (S × n).
-#' @param ylp Matrix of pointwise log predictive densities (S × n).
-#' @param measure_entry A normalized measure entry with elements 
-#'   `name`, `type` (`"builtin"` or `"custom"`), and `key`.
-#' @param log_weights Matrix of log-weights (S × n), as returned by 
-#'   `.compute_log_weights()`.
-#' @param control Named list of per-measure settings passed from
-#'   [pred_measure()]; the active slice is `control[[measure_entry$name]]`.
-#'
-#' @return A named list with three elements:
-#'   \describe{
-#'     \item{`estimate`}{Scalar point estimate for the measure.}
-#'     \item{`se`}{Scalar standard error for the estimate.}
-#'     \item{`pointwise`}{Length-`n` vector of observation-level contributions.}
-#'   }
-#'
 #' Extract estimate and SE from a measure result
 #'
-#' Supports `estimate`/`se` (pred_measure functions) and `estimates` (CRPS).
+#' `.create_measure_structure()` gives every builtin measure an `estimates`
+#' matrix. A custom measure returns either `estimates` or `estimate` and `se`.
 #'
 #' @noRd
 .measure_estimate_se <- function(res) {
@@ -353,6 +323,43 @@ do_pred_measure <- function(
   base_measure$pointwise[, hit[1L]]
 }
 
+#' Compute a single predictive measure
+#'
+#' @description
+#' Dispatches one requested predictive measure to the appropriate summary
+#' function. No measure has a fixed input list. The function builds a pool of
+#' candidate arguments, then keeps only the ones the measure function declares:
+#'
+#'   `args <- pool[intersect(names(formals(measure_fun)), names(pool))]`
+#'
+#' The pool holds `y`, `ypred`, `mupred`, `ylp` and `log_weights`, plus the
+#' measure's slice of `control`. A measure that sets `needs_elpd` in
+#' `.measure_spec` gets a different pool: `pointwise` holds the ELPD column
+#' taken from `base_measure`, and `ylp` and `log_weights` are `NULL`.
+#'
+#' @param y Vector of observed values (n).
+#' @param ypred Matrix of posterior predictive draws (S × n).
+#' @param mupred Matrix of posterior point predictions (S × n).
+#' @param ylp Matrix of pointwise log predictive densities (S × n).
+#' @param measure_entry A normalized measure entry with elements 
+#'   `name`, `type` (`"builtin"` or `"custom"`), and `key`.
+#' @param log_weights Matrix of log-weights (S × n), as returned by 
+#'   `.compute_log_weights()`.
+#' @param control Named list of per-measure settings passed from
+#'   [pred_measure()]; the active slice is `control[[measure_entry$name]]`.
+#' @param base_measure The base measure block from `.compute_base_measure()`.
+#'   Read only when the measure sets `needs_elpd` in `.measure_spec`.
+#'
+#' @return The result of the measure function, in one of two shapes.
+#'   \describe{
+#'     \item{builtin}{A `"measure"` object from `.create_measure_structure()`:
+#'       `estimates`, a 1 by 2 matrix with columns `Estimate` and `SE`, and
+#'       `pointwise`, an n by 1 matrix.}
+#'     \item{custom}{Either `estimates`, a length-2 numeric vector, or
+#'       `estimate` and `se` as scalars. `pointwise` is a numeric vector.
+#'       `.validate_measure_result()` accepts both.}
+#'   }
+#'
 #' @noRd
 .compute_measure <- function(
     y,

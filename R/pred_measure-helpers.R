@@ -729,9 +729,5 @@ subset_measures <- function(x, measures, components) {
     result$pointwise <- result$pointwise[, cols, drop = FALSE]
   }
 
-  if ("diagnostics" %in% components) {
-    result$diagnostics <- result$diagnostics
-  }
-
   result
 }
