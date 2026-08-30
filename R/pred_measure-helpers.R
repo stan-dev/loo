@@ -421,6 +421,75 @@
   )
 }
 
+#' Probability-weighted moment estimator of E|X - X'|
+#'
+#' @description
+#' Estimates \eqn{E[|X - X'|]}, the expected absolute difference between two
+#' independent draws from the predictive distribution, which is the term the
+#' (S)RPS and (S)CRPS scores in [measure_rps()] are built from. Written as a
+#' weighted U-statistic over draw pairs, the estimator is
+#' \deqn{E[|X - X'|] = \frac{\sum_i \sum_{j \neq i} w_i w_j |x_i - x_j|}{1 -
+#'   \sum_i w_i^2} = \frac{2 \sum_s w_{(s)} x_{(s)} (C_s + C_{s-1} - 1)}{1 -
+#'   \sum_s w_{(s)}^2},}
+#' where \eqn{x_{(s)}} are the draws sorted in ascending order, \eqn{w_{(s)}}
+#' their weights, and \eqn{C_s = \sum_{k \le s} w_{(k)}}. The second form is the
+#' one computed here and needs only a single sort and cumulative sum per column.
+#'
+#' With equal weights \eqn{w_{(s)} = 1/S} this reduces exactly to the classic
+#' unbiased pairwise estimator with the \eqn{1 / (S (S - 1))} normalization,
+#' i.e. `colMeans(x_sorted * 2 * (2 * (1:S) - S - 1) / (S - 1))`, which is the
+#' probability-weighted moment estimator of Taillardat et al. (2016). Because
+#' the estimate is a convex combination of \eqn{|x_i - x_j|} it is always
+#' non-negative, so `log()` of it in the scaled scores is always defined, and
+#' the coefficients sum to zero, so it is invariant to shifts of `ypred`.
+#'
+#' @param ypred Numeric matrix of posterior predictive draws (`n_draws`
+#'   \eqn{\times} `n_obs`), where rows are draws and columns are observations.
+#' @param w Optional numeric matrix of column-normalized weights on the
+#'   probability scale, of the same dimensions as `ypred`. `NULL` (the default)
+#'   uses equal weights and takes the faster unweighted path.
+#'
+#' @return Numeric vector of length `ncol(ypred)` with one estimate of
+#'   \eqn{E[|X - X'|]} per observation.
+#'
+#' @noRd
+.exx_pwm <- function(ypred, w = NULL) {
+  n_draws <- nrow(ypred)
+  if (n_draws < 2) {
+    stop(
+      "`ypred` must have at least 2 draws (rows) to estimate E|X - X'|, ",
+      "which the RPS/CRPS measures require.",
+      call. = FALSE
+    )
+  }
+
+  if (is.null(w)) {
+    ypred_sorted <- apply(ypred, 2, sort)
+    coefs <- 2 * (2 * seq_len(n_draws) - n_draws - 1) / (n_draws - 1)
+    return(colMeans(ypred_sorted * coefs))
+  }
+
+  vapply(
+    seq_len(ncol(ypred)),
+    function(j) {
+      ord <- order(ypred[, j])
+      x_sorted <- ypred[ord, j]
+      w_sorted <- w[ord, j]
+      denominator <- 1 - sum(w_sorted^2)
+      # All the weight sits on a single draw: the pair (X, X') is degenerate
+      # and E|X - X'| is 0.
+      if (denominator <= 0) {
+        return(0)
+      }
+      # C_s + C_{s-1} = 2 * C_s - w_(s)
+      coefs <- 2 * cumsum(w_sorted) - w_sorted - 1
+      2 * sum(w_sorted * x_sorted * coefs) / denominator
+    },
+    numeric(1)
+  )
+}
+
+
 
 #' Validate control argument
 #' 
