@@ -350,11 +350,11 @@ measure_acc <- function(
     } else {
       weights <- rep(1 / nrow(mupred), nrow(mupred))
     }
-    
+
     if (length(dim(mupred)) == 3) {
       # Multiclass: (draws × obs × categories) > argmax over categories
       weighted_mupred <- apply(
-        sweep(mupred, 1, weights, `*`),
+        array(weights, dim(mupred)) * mupred,
         c(2, 3),
         sum
       )
@@ -430,7 +430,7 @@ measure_bacc <- function(
     if (length(dim(mupred)) == 3) {
       # Multiclass: (draws × obs × categories) > argmax over categories
       weighted_mupred <- apply(
-        sweep(mupred, 1, weights, `*`),
+        array(weights, dim(mupred)) * mupred,
         c(2, 3),
         sum
       )
@@ -714,7 +714,7 @@ measure_r2 <- function(
     log_weights = log_weights,
     pointwise = pointwise
   )
-  mse_hat <- mse_res$estimate[1]
+  mse_hat <- mse_res$estimates[1]
   sqe_i <- mse_res$pointwise
   n_obs <- length(sqe_i)
   n_draws <- if (is.null(pointwise)) nrow(mupred) else NULL
@@ -722,7 +722,7 @@ measure_r2 <- function(
   mse_y_i <- (y - mean(y))^2
   mse_y_hat <- mean(mse_y_i)
    
-  var_mse_hat <- mse_res$estimate[2]^2     
+  var_mse_hat <- mse_res$estimates[2]^2
   cov_mse_msey <- stats::cov(sqe_i, mse_y_i) / n_obs              
   var_mse_y_hat <- var(mse_y_i) / n_obs 
   
@@ -857,7 +857,11 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
     w <- if (is.null(log_weights)) {
       NULL
     } else {
-      exp(.normalize_log_weights(log_weights))
+      exp(.normalize_and_validate_log_weights(
+        log_weights = log_weights,
+        n_draws = n_draws,
+        n_obs = n_obs
+      ))
     }
 
     EXX <- .exx_pwm(ypred, w)

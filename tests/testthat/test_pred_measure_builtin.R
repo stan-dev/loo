@@ -157,6 +157,18 @@ testthat::test_that("measure_rps() for categorical data with log-weights works a
   expect_true(all(res$pointwise >= 0))
 })
 
+testthat::test_that("measure_rps() validates the shape of log_weights", {
+  bad_log_weights <- res_binom$log_weights[, -1, drop = FALSE]
+  expect_error(
+    measure_rps(
+      y = res_binom$y,
+      ypred = res_binom$ypred,
+      log_weights = bad_log_weights
+    ),
+    regexp = "`log_weights` must have"
+  )
+})
+
 testthat::test_that("measure_rps() with continuous data works as expected", {
   res <- measure_rps(res_sleep$y, res_sleep$ypred)
 
@@ -256,7 +268,7 @@ testthat::test_that("measure_mae() works as expected", {
 
 testthat::test_that("measure_mae() with log_weights works as expected", {
   res <- measure_mae(y = res_roaches$y, mupred = res_roaches$mupred,
-    log_weights = res_roaches$loo1$psis_object$log_weights)
+    log_weights = res_roaches$log_weights)
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
@@ -324,7 +336,7 @@ testthat::test_that("measure_r2() works as expected", {
 
 testthat::test_that("measure_r2() with log_weights works as expected", {
   res <- measure_r2(y = res_roaches$y, mupred = res_roaches$mupred,
-    log_weights = res_roaches$loo1$psis_object$log_weights)
+    log_weights = res_roaches$log_weights)
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
@@ -359,13 +371,34 @@ testthat::test_that("measure_acc() with log-weights works as expected", {
   res <- measure_acc(
     y = as.integer(res_cat$y),
     mupred = res_cat$mupred,
-    log_weights = res_cat$loo$psis_object$log_weights
+    log_weights = res_cat$log_weights
   )
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
+})
+
+testthat::test_that("measure_acc() broadcasts weights over categories without warning", {
+  y <- as.integer(res_cat$y)
+  lw <- res_cat$log_weights
+
+  expect_no_warning(res <- measure_acc(
+    y = y, mupred = res_cat$mupred, log_weights = lw
+  ))
+  expect_no_warning(measure_bacc(
+    y = y, mupred = res_cat$mupred, log_weights = lw
+  ))
+
+  w <- exp(.normalize_log_weights(lw))
+  n_cat <- dim(res_cat$mupred)[3]
+  manual <- vapply(
+    seq_len(n_cat),
+    function(k) colSums(w * res_cat$mupred[, , k]),
+    numeric(length(y))
+  )
+  expect_equal(as.numeric(res$pointwise), (apply(manual, 1, which.max) == y) * 1)
 })
 
 testthat::test_that("measure_bacc() pointwise contributions sum to estimate", {
@@ -413,7 +446,7 @@ testthat::test_that("measure_bacc() with log-weights works as expected", {
   res <- measure_bacc(
     y = as.integer(res_cat$y),
     mupred = res_cat$mupred,
-    log_weights = res_cat$loo$psis_object$log_weights
+    log_weights = res_cat$log_weights
   )
 
   expect_equal(names(res), c("estimates", "pointwise"))
