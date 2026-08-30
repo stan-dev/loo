@@ -153,6 +153,20 @@ test_that(".compute_base_measure() computes elpd_kfold as expected", {
   )
 })
 
+## .get_psis_object() -------------------------
+
+test_that(".get_psis_object() accepts loo and psis_object together", {
+  expect_identical(
+    .get_psis_object(
+      ylp = res$ylp,
+      loo = res$loo,
+      predperf = NULL,
+      psis_object = res$loo$psis_object
+    ),
+    res$loo$psis_object
+  )
+})
+
 ## .merge_matrix() ---------------------------
 
 test_that(".merge_matrix() works as expected", {

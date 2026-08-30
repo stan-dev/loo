@@ -237,7 +237,10 @@ do_pred_measure <- function(
 ) {
   # psis_object + loo are both provided -> return psis_object
   if (!is.null(psis_object) && !is.null(loo)) {
-    psis_equal_loo <- all(psis_object == loo$psis_object)
+    psis_equal_loo <- isTRUE(all.equal(
+      psis_object$log_weights,
+      loo$psis_object$log_weights
+    ))
     if (!psis_equal_loo) {
       cli::cli_abort(
         "Provided `psis_object` and `loo$psis_object` are not identical."
