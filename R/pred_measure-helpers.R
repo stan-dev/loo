@@ -431,6 +431,53 @@
   )
 }
 
+#' Weighted pointwise classification accuracy
+#'
+#' @description
+#' Shared by `measure_acc()` and `measure_bacc()`. Maps each observation to a
+#' predicted class, then compares it with `y`. Binary `mupred` is thresholded
+#' at 0.5. A 3-D `mupred` takes the argmax over categories.
+#'
+#' @param y An integer vector of observed class labels.
+#' @param mupred A draws x observations matrix, or a draws x observations x
+#'   categories array, of predicted probabilities.
+#' @param log_weights Optional log weights. Draws are equally weighted when
+#'   `NULL`.
+#'
+#' @return An integer vector of 0/1 accuracy contributions.
+#'
+#' @noRd
+.acc_pointwise <- function(y, mupred, log_weights) {
+  if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
+    cli::cli_abort(
+      "{.arg mupred} must be a numeric matrix or 3D numeric array."
+    )
+  }
+  .validate_probs(mupred, arg = "mupred")
+
+  if (!is.null(log_weights)) {
+    weights <- exp(.normalize_and_validate_log_weights(
+      log_weights = log_weights,
+      n_draws = nrow(mupred),
+      n_obs = dim(mupred)[2]
+    ))
+  } else {
+    weights <- rep(1 / nrow(mupred), nrow(mupred))
+  }
+
+  if (length(dim(mupred)) == 3) {
+    # Multiclass: (draws × obs × categories) > argmax over categories
+    weighted_mupred <- apply(array(weights, dim(mupred)) * mupred, c(2, 3), sum)
+    mupred_hat <- apply(weighted_mupred, 1, which.max)
+  } else {
+    .validate_numeric_matrix(mupred, arg = "mupred")
+    weighted_mupred <- colSums(mupred * weights)
+    mupred_hat <- (weighted_mupred > 0.5) * 1L
+  }
+
+  (mupred_hat == y) * 1L
+}
+
 #' Copy selected attributes between objects
 #'
 #' @description
