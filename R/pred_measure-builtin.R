@@ -146,29 +146,9 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 measure_elpd <- function(
   ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {  
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_elpd"
-    )
-    lppd_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-  }
-  
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_elpd")
+  lppd_i <- inputs$lppd_i
+
   if (length(lppd_i) == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -180,7 +160,8 @@ measure_elpd <- function(
   )
   
   .create_measure_structure(
-    res, higher_is_better, "elpd", n_draws = n_draws, n_obs = n_obs
+    res, higher_is_better, "elpd",
+    n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -201,32 +182,10 @@ measure_elpd <- function(
 measure_mlpd <- function(
   ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_mlpd"
-    )
-    lppd_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-  }
-  
-  n_obs <- length(lppd_i)
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_mlpd")
+  lppd_i <- inputs$lppd_i
+  n_obs <- inputs$n_obs
+
   if (n_obs == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -237,7 +196,7 @@ measure_mlpd <- function(
     pointwise = lppd_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mlpd", n_draws = n_draws, n_obs = n_obs
+    res, higher_is_better, "mlpd", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 
@@ -260,33 +219,10 @@ measure_mlpd <- function(
 measure_ic <- function(
   ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_ic"
-    )
-    ic_i <- pointwise
-    n_draws = NULL
-    n_obs = length(pointwise)
-  } else {
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-    ic_i <- -2 * lppd_i
-  }
-  
-  n_obs <- length(ic_i)
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_ic")
+  ic_i <- if (is.null(pointwise)) -2 * inputs$lppd_i else inputs$lppd_i
+  n_obs <- inputs$n_obs
+
   if (n_obs == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -297,7 +233,7 @@ measure_ic <- function(
     pointwise = ic_i
   )
   .create_measure_structure(
-    res, higher_is_better, "ic", n_draws = n_draws, n_obs = n_obs
+    res, higher_is_better, "ic", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 

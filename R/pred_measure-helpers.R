@@ -382,6 +382,55 @@
   }
 }
 
+#' Pointwise log predictive density from measure inputs
+#'
+#' @description
+#' `measure_elpd()`, `measure_mlpd()` and `measure_ic()` take the same inputs:
+#' precomputed `pointwise` values, or an `ylp` matrix with optional
+#' `log_weights`. This helper holds their shared validation.
+#'
+#' @param ylp A draws x observations matrix of log predictive densities, or a
+#'   3-D array.
+#' @param log_weights Optional log weights, normalized before use.
+#' @param pointwise Optional numeric vector of precomputed pointwise values.
+#' @param fun_name Name of the calling measure. Used in the message that
+#'   reports ignored inputs.
+#'
+#' @return A list with `lppd_i`, `n_draws` (`NULL` when `pointwise` is
+#'   supplied) and `n_obs`.
+#'
+#' @noRd
+.lppd_from_inputs <- function(ylp, log_weights, pointwise, fun_name) {
+  if (!is.null(pointwise)) {
+    .validate_numeric_vector(pointwise, arg = "pointwise")
+    .inform_ignored_inputs(
+      pointwise,
+      ignored_args = list(ylp = ylp, log_weights = log_weights),
+      fun_name = fun_name
+    )
+    return(list(lppd_i = pointwise, n_draws = NULL, n_obs = length(pointwise)))
+  }
+
+  .validate_numeric_matrix(ylp, arg = "ylp")
+  ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) {
+    llarray_to_matrix(ylp)
+  } else {
+    ylp
+  }
+  n_draws <- nrow(ylp)
+  n_obs <- ncol(ylp)
+  if (!is.null(log_weights)) {
+    log_weights <- .normalize_and_validate_log_weights(
+      log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
+    )
+  }
+  list(
+    lppd_i = ptw_log_pred_density(ylp, log_weights),
+    n_draws = n_draws,
+    n_obs = n_obs
+  )
+}
+
 #' Copy selected attributes between objects
 #'
 #' @description
