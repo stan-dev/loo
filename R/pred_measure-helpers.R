@@ -82,7 +82,7 @@
   list(name = name, type = "custom", key = fun)
 }
 
-#' Check duplicate and reserved measure names
+#' Check duplicate measure names
 #'
 #' @param entries List of normalized measure entries from `.normalize_measure()`.
 #' @noRd
@@ -107,11 +107,15 @@
 #' @param measure User-supplied `measure` argument (see `.normalize_measure()`).
 #' @param predperf Existing pred_measure object used when accumulating measures.
 #' @param supported_measures_list Character vector of allowed built-in names.
+#' @param source Character evaluation mode (`"insample"`, `"loo"`, `"kfold"`,
+#'   or `"test"`); selects the row-name suffix used to match `predperf`.
 #'
 #' @return A list of normalized measure entries ready for computation.
 #'
 #' @noRd
-.prepare_measures <- function(measure, predperf, supported_measures_list) {
+.prepare_measures <- function(
+  measure, predperf, supported_measures_list, source
+) {
   entries <- .normalize_measure(measure)
   if (length(entries) == 0L) {
     return(entries)
@@ -137,7 +141,11 @@
 
   if (!is.null(predperf)) {
     existing_measures <- rownames(predperf$estimates)
-    entry_names <- vapply(entries, function(e) e$name, character(1L))
+    entry_names <- vapply(
+      entries,
+      function(e) .measure_result_name(source, e$name),
+      character(1L)
+    )
     dups <- intersect(entry_names, existing_measures)
     if (length(dups) > 0L) {
       cli::cli_warn(c(
@@ -145,11 +153,7 @@
         "already present in {.arg predperf} and will be skipped."
       ))
     }
-    keep <- !vapply(
-      entries,
-      function(e) e$name %in% existing_measures,
-      logical(1L)
-    )
+    keep <- !(entry_names %in% existing_measures)
     entries <- entries[keep]
   }
 

@@ -79,7 +79,9 @@ do_pred_measure <- function(
   # input validation ---------------------------------------------------
   .validate_control(control)
   
-  measures <- .prepare_measures(measure, predperf, supported_measures_list)
+  measures <- .prepare_measures(
+    measure, predperf, supported_measures_list, source
+  )
   
   if (source == "loo") {
     if (is.null(predperf)) {

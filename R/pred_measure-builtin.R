@@ -212,16 +212,15 @@ measure_mlpd <- function(
     n_draws <- NULL
     n_obs <- length(pointwise)
   } else {
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
     .validate_numeric_matrix(ylp, arg = "ylp")
     ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    
+    n_draws <- nrow(ylp)
+    n_obs <- ncol(ylp)
     if (!is.null(log_weights)) {
       log_weights <- .normalize_and_validate_log_weights(
         log_weights = log_weights,
-        n_draws = nrow(ylp),
-        n_obs = ncol(ylp)
+        n_draws = n_draws,
+        n_obs = n_obs
       )
     }
     lppd_i <- ptw_log_pred_density(ylp, log_weights)
@@ -272,10 +271,10 @@ measure_ic <- function(
     n_draws = NULL
     n_obs = length(pointwise)
   } else {
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
     .validate_numeric_matrix(ylp, arg = "ylp")
     ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
+    n_draws <- nrow(ylp)
+    n_obs <- ncol(ylp)
     if (!is.null(log_weights)) {
       log_weights <- .normalize_and_validate_log_weights(
         log_weights = log_weights,
@@ -395,7 +394,16 @@ measure_acc <- function(
 measure_bacc <- function(
   y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {
+  .validate_numeric_vector(y, arg = "y")
+  classes <- sort(unique(y))
+  K <- length(classes)
+  if (K < 2) {
+    cli::cli_abort("{.fn bacc} requires at least two outcome classes.")
+  }
   if (!is.null(pointwise)) {
+    if (length(pointwise) != length(y)) {
+      cli::cli_abort("{.arg pointwise} and {.arg y} must have the same length.")
+    }
     .inform_ignored_inputs(
       pointwise,
       ignored_args = list(mupred = mupred, log_weights = log_weights),
@@ -407,12 +415,7 @@ measure_bacc <- function(
   } else {
     n_draws <- nrow(mupred)
     n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    classes <- sort(unique(y))
-    K <- length(classes)
-    if (K < 2) {
-      cli::cli_abort("{.fn bacc} requires at least two outcome classes.")
-    }
+
     if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
       cli::cli_abort("{.arg mupred} must be a numeric matrix or 3D numeric array.")
     }

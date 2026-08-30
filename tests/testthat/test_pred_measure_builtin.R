@@ -433,6 +433,26 @@ testthat::test_that("measure_bacc() works as expected", {
   expect_snapshot_output(measure_bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
 })
 
+testthat::test_that("measure_bacc() accepts precomputed pointwise values", {
+  y <- c(1L, 1L, 2L, 2L)
+  acc_i <- c(1L, 0L, 1L, 1L)
+  res <- measure_bacc(y = y, mupred = NULL, pointwise = acc_i)
+
+  expect_equal(unname(res$estimates[1, "Estimate"]), 0.75)
+  expect_error(
+    measure_bacc(y = y, mupred = NULL, pointwise = acc_i[-1]),
+    regexp = "must have the same length"
+  )
+})
+
+testthat::test_that("mlpd and ic count draws after the 3-D conversion", {
+  LLarr <- example_loglik_array()
+  dims_elpd <- attr(measure_elpd(LLarr), "dims")
+
+  expect_equal(attr(measure_mlpd(LLarr), "dims"), dims_elpd)
+  expect_equal(attr(measure_ic(LLarr), "dims"), dims_elpd)
+})
+
 testthat::test_that("measure_bacc() rejects out-of-range mupred", {
   bad_mupred <- res_cat$mupred
   bad_mupred[1, 1, 1] <- 1.2

@@ -324,7 +324,7 @@ test_that("pred_measure() provides warning for duplicate measure", {
       predperf = predperf_loo,
       measure = "r2"
     ),
-    regexp = "already present in results. Skipping the update."
+    regexp = "already present in .* and will be skipped"
   )
 
   expect_error(
