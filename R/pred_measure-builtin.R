@@ -426,38 +426,10 @@ measure_brier <- function(
 measure_mae <- function(
   y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(mupred = mupred, log_weights = log_weights),
-      fun_name = "mae"
-    )
-    mae_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    n_draws <- nrow(mupred)
-    n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    if (!is.null(mupred) && !is.matrix(mupred)){
-      .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
-      cli::cli_inform(
-        "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn mae}."
-      )
-      mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
-    }
-    .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
-    if (is.null(log_weights)) {
-      mae_i <- abs(y - colMeans(mupred))
-    } else {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-      mae_i <- abs(y - colSums(weights * mupred))
-    }
-  }
+  inputs <- .point_error_from_inputs(
+    y, mupred, log_weights, pointwise, "mae", abs
+  )
+  mae_i <- inputs$err_i
   
   res <- list(
     estimate = mean(mae_i),
@@ -465,7 +437,8 @@ measure_mae <- function(
     pointwise = mae_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mae", n_draws = n_draws, n_obs = n_obs
+    res, higher_is_better, "mae",
+    n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -485,38 +458,10 @@ measure_mae <- function(
 measure_mse <- function(
   y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
 ) {  
-  if (!is.null(pointwise)) {
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(mupred = mupred, log_weights = log_weights),
-      fun_name = "mse"
-    )
-    sqe_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    n_draws <- nrow(mupred)
-    n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    if (!is.null(mupred) && !is.matrix(mupred)){
-      .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
-      cli::cli_inform(
-        "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn mse}."
-      )
-      mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
-    }
-    .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
-    if (is.null(log_weights)) {
-      sqe_i <- (y - colMeans(mupred))^2
-    } else {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-      sqe_i <- (y - colSums(weights * mupred))^2
-    }
-  }
+  inputs <- .point_error_from_inputs(
+    y, mupred, log_weights, pointwise, "mse", function(e) e^2
+  )
+  sqe_i <- inputs$err_i
 
   res <- list(
     estimate = mean(sqe_i),
@@ -524,7 +469,8 @@ measure_mse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mse", n_draws = n_draws, n_obs = n_obs
+    res, higher_is_better, "mse",
+    n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 

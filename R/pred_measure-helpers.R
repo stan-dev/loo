@@ -478,6 +478,60 @@
   (mupred_hat == y) * 1L
 }
 
+#' Pointwise prediction error from measure inputs
+#'
+#' @description
+#' Shared by `measure_mae()` and `measure_mse()`. Forms a point prediction for
+#' each observation, then applies `transform` to the residual. The point
+#' prediction is the mean of the `mupred` draws, or their weighted mean when
+#' `log_weights` is supplied.
+#'
+#' @param y A numeric vector of observed outcomes.
+#' @param mupred A draws x observations matrix of point predictions. A vector
+#'   is coerced to a 1 x n matrix.
+#' @param log_weights Optional log weights, normalized before use.
+#' @param pointwise Optional numeric vector of precomputed pointwise errors.
+#' @param fun_name Name of the calling measure. Used in the messages that
+#'   report ignored inputs and the coercion of `mupred`.
+#' @param transform Function applied to the residual `y - yhat`.
+#'
+#' @return A list with `err_i`, `n_draws` (`NULL` when `pointwise` is
+#'   supplied) and `n_obs`.
+#'
+#' @noRd
+.point_error_from_inputs <- function(y, mupred, log_weights, pointwise,
+                                     fun_name, transform) {
+  if (!is.null(pointwise)) {
+    .inform_ignored_inputs(
+      pointwise,
+      ignored_args = list(mupred = mupred, log_weights = log_weights),
+      fun_name = fun_name
+    )
+    return(list(err_i = pointwise, n_draws = NULL, n_obs = length(pointwise)))
+  }
+
+  n_draws <- nrow(mupred)
+  n_obs <- ncol(mupred)
+  .validate_numeric_vector(y, arg = "y")
+  if (!is.null(mupred) && !is.matrix(mupred)) {
+    .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
+    cli::cli_inform(
+      "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn {fun_name}}."
+    )
+    mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
+  }
+  .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
+  if (is.null(log_weights)) {
+    yhat <- colMeans(mupred)
+  } else {
+    weights <- exp(.normalize_and_validate_log_weights(
+      log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
+    ))
+    yhat <- colSums(weights * mupred)
+  }
+  list(err_i = transform(y - yhat), n_draws = n_draws, n_obs = n_obs)
+}
+
 #' Copy selected attributes between objects
 #'
 #' @description
