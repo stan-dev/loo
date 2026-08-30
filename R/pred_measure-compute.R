@@ -311,6 +311,28 @@ do_pred_measure <- function(
   c(res$estimate, res$se)
 }
 
+#' Pointwise ELPD from the base measure block
+#'
+#' `.compute_base_measure()` appends the source suffix to the base column names,
+#' so the column is one of `elpd`, `elpd_loo`, `elpd_kfold`, `elpd_test`.
+#' Measures that declare `needs_elpd` in `.measure_spec` read the log predictive
+#' density here instead of recomputing it from `ylp`. `ylp` is absent when only
+#' a `loo` or `kfold` object is supplied, and on the `test` source it holds the
+#' training data while the base block holds the holdout data.
+#'
+#' @noRd
+.base_elpd_pointwise <- function(base_measure) {
+  known <- c("elpd", "elpd_loo", "elpd_kfold", "elpd_test")
+  hit <- intersect(known, colnames(base_measure$pointwise))
+  if (length(hit) == 0L) {
+    cli::cli_abort(c(
+      "No {.field elpd} column found in the base measure.",
+      "i" = "{.val mlpd} and {.val ic} are derived from {.val elpd}."
+    ))
+  }
+  base_measure$pointwise[, hit[1L]]
+}
+
 #' @noRd
 .compute_measure <- function(
     y,
@@ -323,23 +345,14 @@ do_pred_measure <- function(
     base_measure
 ) {
   if (measure_entry$type == "builtin") {
-    measure_fun <- .measure_spec[[measure_entry$key]]$fun
+    spec <- .measure_spec[[measure_entry$key]]
+    measure_fun <- spec$fun
     if (is.null(measure_fun)) {
       cli::cli_abort("Unknown built-in measure {.val {measure_entry$key}}.")
     }
   } else {
+    spec <- NULL
     measure_fun <- measure_entry$key
-  }
-  
-  if (identical(measure_fun, measure_mlpd) || identical(measure_fun, measure_ic)) {
-    elpd_i <- base_measure$pointwise[, 1]
-    # ensure elpd_i is in correct orientation (negative log predictive density)
-    if (any(elpd_i > 0)) elpd_i <- -elpd_i
-
-    if (identical(measure_fun, measure_mlpd)) {
-      return(measure_mlpd(ylp = NULL, pointwise = elpd_i))
-    }
-    return(measure_ic(ylp = NULL, pointwise = -2 * elpd_i))
   }
 
   measure_control <- control[[measure_entry$name]]
@@ -347,16 +360,25 @@ do_pred_measure <- function(
     measure_control <- list()
   }
 
-  pool <- c(
+  pool <- if (isTRUE(spec$needs_elpd)) {
+    lppd_i <- .base_elpd_pointwise(base_measure)
+    if (is.function(spec$elpd_transform)) {
+      lppd_i <- spec$elpd_transform(lppd_i)
+    }
+    # `ylp` has no default, and `.inform_ignored_inputs()` forces it. Pass it as
+    # NULL rather than leaving it out.
+    list(ylp = NULL, log_weights = NULL, pointwise = lppd_i)
+  } else {
     list(
       y = y,
       ypred = ypred,
       mupred = mupred,
       ylp = ylp,
       log_weights = log_weights
-    ),
-    measure_control
-  )
+    )
+  }
+
+  pool <- c(pool, measure_control)
   args <- pool[intersect(names(formals(measure_fun)), names(pool))]
   res <- do.call(measure_fun, args)
   if (measure_entry$type == "custom") {
