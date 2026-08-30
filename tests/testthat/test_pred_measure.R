@@ -282,6 +282,31 @@ test_that("pred_measure() updates loo results as expected", {
   expect_equal(dim(updated_predperf$estimates), c(5, 2))
 })
 
+test_that("pred_measure() keeps dims when the update has no matrix input", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,
+    measure = "r2", save_psis = TRUE
+  )
+  updated <- pred_measure(predperf = predperf_loo, measure = "mlpd")
+
+  expect_false(is.null(attr(updated, "dims")))
+  expect_equal(attr(updated, "dims"), attr(predperf_loo, "dims"))
+})
+
+test_that("pred_measure() reuses stored log_weights when save_psis = FALSE", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,
+    measure = "r2"
+  )
+  expect_null(predperf_loo$psis_object)
+  expect_false(is.null(predperf_loo$log_weights))
+
+  updated <- pred_measure(
+    y = res$y, mupred = res$mupred, predperf = predperf_loo, measure = "mae"
+  )
+  expect_true("mae_loo" %in% rownames(updated$estimates))
+})
+
 test_that("pred_measure() provides warning for duplicate measure", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo,

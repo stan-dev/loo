@@ -218,6 +218,8 @@ do_pred_measure <- function(
 #'   \item Extract from `loo$psis_object` when `loo` is provided.
 #'   \item Use the supplied `psis_object`.
 #'   \item Reuse `predperf$psis_object` when accumulating measures.
+#'   \item Reuse `predperf$log_weights` when only the weights were stored
+#'     (`save_psis = FALSE`); the result carries no `diagnostics`.
 #'   \item Compute from `ylp` via [loo::psis()] on `-ylp` log ratios.
 #' }
 #'
@@ -260,6 +262,9 @@ do_pred_measure <- function(
   # predperf with psis_object is provided
   } else if (!is.null(predperf$psis_object)) {
     return(predperf$psis_object)
+  # predperf carries log_weights only (save_psis = FALSE)
+  } else if (!is.null(predperf$log_weights)) {
+    return(list(log_weights = predperf$log_weights))
   # ylp is provided
   } else if (is.null(loo) && is.null(psis_object) && !is.null(ylp)) {
     cli::cli_inform(
@@ -455,7 +460,7 @@ do_pred_measure <- function(
   if (!is.null(predperf)) return(predperf)
   
   if (source == "kfold") {
-    components <- if ("diagnostics" %in% kfold) {
+    components <- if ("diagnostics" %in% names(kfold)) {
       c("estimates", "pointwise", "diagnostics")
     } else {
       c("estimates", "pointwise")
@@ -688,6 +693,8 @@ do_pred_measure <- function(
       dim(mupred)
     } else if (!is.null(ylp)) {
       dim(ylp)
+    } else {
+      attr(predperf, "dims")
     }
     attr(predperf_res, "dims") <- dims
     
