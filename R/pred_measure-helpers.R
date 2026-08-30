@@ -236,6 +236,8 @@
       "length {.val {n_obs}}, not {.val {length(res$pointwise)}}."
     ))
   }
+  # pass measure name if user set it as attribute
+  attr(res, "measure") <- measure_name
 
   invisible(res)
 }

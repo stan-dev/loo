@@ -142,14 +142,6 @@ do_pred_measure <- function(
   log_weights <- if (!is.null(psis_object)) psis_object$log_weights else NULL
 
   for (entry in measures) {
-    name_updated <- .measure_result_name(source, entry$name)
-    if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
-      cli::cli_warn(c(
-        "{.field {name_updated}} already present in results. Skipping the update."
-      ))
-      next
-    }
-
     sel_measure <- .compute_measure(
       y = y,
       ypred = ypred,
@@ -160,17 +152,29 @@ do_pred_measure <- function(
       control = control,
       base_measure = base_measure
     )
+    result_name <- attr(sel_measure, "measure")
+    if (is.null(result_name)) {
+      result_name <- entry$name
+    }
+    # add new measures to existing pred_measure results
+    name_updated <- .measure_result_name(source, result_name)
+    if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
+      cli::cli_warn(c(
+        "{.field {name_updated}} already present in results. Skipping the update."
+      ))
+      next
+    }
     estimates <- .merge_matrix(
       source = source,
       mat = estimates,
-      name = entry$name,
+      name = result_name,
       values = .measure_estimate_se(sel_measure),
       margin = 1
     )
     pointwise <- .merge_matrix(
       source = source,
       mat = pointwise,
-      name = entry$name,
+      name = result_name,
       values = sel_measure$pointwise,
       margin = 2
     )

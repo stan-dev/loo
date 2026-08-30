@@ -244,6 +244,20 @@ test_that("duplicate measure warns once and skips estimates and pointwise", {
 # integration tests ------------------------------
 ## loo_pred_measure() / pred_measure() / kfold_pred_measure() ---------
 
+test_that("control scaled = TRUE stores the result as srps, not rps", {
+  out <- insample_pred_measure(
+    y = res$y,
+    ypred = res$ypred,
+    ylp = res$ylp,
+    measure = "rps",
+    control = list(rps = list(scaled = TRUE))
+  )
+
+  expect_true("srps" %in% rownames(out$estimates))
+  expect_false("rps" %in% rownames(out$estimates))
+  expect_true("srps" %in% colnames(out$pointwise))
+})
+
 test_that("pred_measure() updates loo results as expected", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo,
