@@ -341,23 +341,15 @@ print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
 }
 
 .pred_measure_source_label <- function(x) {
+  labels <- c(loo = "loo", insample = "in-sample", kfold = "k-fold", test = "test")
+  source <- attr(x, "source")
+  if (!is.null(source) && source %in% names(labels)) {
+    return(unname(labels[source]))
+  }
+  # fall back to the class, for objects that lost their attributes
   cls <- class(x)
-  if ("loo_pred_measure" %in% cls) {
-    return("loo")
-  }
-  if ("insample_pred_measure" %in% cls) {
-    return("in-sample")
-  }
-  if ("kfold_pred_measure" %in% cls) {
-    return("k-fold")
-  }
-  if ("test_pred_measure" %in% cls) {
-    return("test")
-  }
-  if (!is.null(x$metadata$source)) {
-    return(as.character(x$metadata$source))
-  }
-  "unknown"
+  hit <- names(labels)[paste0(names(labels), "_pred_measure") %in% cls]
+  if (length(hit)) unname(labels[hit[1]]) else "unknown"
 }
 
 #' @export

@@ -494,13 +494,12 @@ do_pred_measure <- function(
     test = measure_elpd(ylp_test)
   )
   
-  if (!is.null(elpd_res$estimates)) {
-    elpd_res <- list(
-      estimate = unname(elpd_res$estimates[1]),
-      se = unname(elpd_res$estimates[2]),
-      pointwise = elpd_res$pointwise
-    )
-  }
+  est_se <- .measure_estimate_se(elpd_res)
+  elpd_res <- list(
+    estimate = unname(est_se[1]),
+    se = unname(est_se[2]),
+    pointwise = elpd_res$pointwise
+  )
   
   suffix <- if (source == "insample") "" else paste0("_", source)
   add_p_eff <- source == "loo"
