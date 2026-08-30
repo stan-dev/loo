@@ -854,35 +854,38 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
     n_draws <- nrow(ypred)
     n_obs <- ncol(ypred)
     
-    if (is.null(log_weights)) {
-      EXy <- colMeans(abs(sweep(ypred, 2, y)))
-      ypred_sorted <- apply(ypred, 2, sort)
-      EXX  <- colMeans(ypred_sorted * ((1:n_draws) * (4 / (n_draws - 1)) - 2))
-      if (scaled) {
-        # Scaled version by Bolin & Wallin (2023)
-        rps_i <- -EXy/EXX - 0.5 * log(EXX)
-      } else {
-        # Gneiting & Raftery (2007)
-        rps_i <- - 0.5 * EXX + EXy
-      }
+    w <- if (is.null(log_weights)) {
+      NULL
     } else {
-      w <- exp(.normalize_log_weights(log_weights))
-      w_csum <- sapply(1:n_obs, function(j) {
-        perm <- order(ypred[,j])
-        result <- numeric(n_draws)
-        result[perm] <- cumsum(w[perm, j])
-        result
-      })
-      
-      EXX <- 2 * colSums(ypred * w * (1 - (2*(1 - w_csum)) / (1 - w)))
-      EXy <- colSums(w * abs(sweep(ypred, 2, y)))
-      if (scaled) {
-        # Scaled version by Bolin & Wallin (2023)
-        rps_i <- -EXy/EXX - 0.5 * log(EXX)
-      } else {
-        # Gneiting & Raftery (2007)
-        rps_i <- EXy - 0.5 * EXX
+      exp(.normalize_log_weights(log_weights))
+    }
+
+    EXX <- .exx_pwm(ypred, w)
+    EXy <- if (is.null(w)) {
+      colMeans(abs(sweep(ypred, 2, y)))
+    } else {
+      colSums(w * abs(sweep(ypred, 2, y)))
+    }
+
+    rps_i <- if (scaled) {
+      # Scaled version by Bolin & Wallin (2023). The scaling divides by
+      # E|X - X'| and takes its logarithm, so a point-mass predictive
+      # distribution leaves the score undefined.
+      degenerate <- which(EXX == 0)
+      if (length(degenerate) > 0L) {
+        cli::cli_abort(c(
+          "The scaled rps score is undefined for {cli::qty(length(degenerate))}
+           observation{?s} {.val {degenerate}}.",
+          "i" = "{.code E|X - X'|} is 0 there: all the weight sits on a single
+                 draw, so the predictive distribution is a point mass.",
+          "i" = "Check the PSIS diagnostics, or use the unscaled score
+                 {.code scaled = FALSE}."
+        ))
       }
+      -EXy / EXX - 0.5 * log(EXX)
+    } else {
+      # Gneiting & Raftery (2007)
+      EXy - 0.5 * EXX
     }
   } else {
     rps_i <- pointwise
@@ -939,10 +942,17 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 # @noRd
 # @param measure The measure used.
 # @return The measure specification.
+#
+# `needs_elpd = TRUE` marks a measure that is derived from the pointwise ELPD of
+# the base measure block rather than from the raw inputs. `.compute_measure()`
+# then supplies `pointwise`, optionally passed through `elpd_transform` first.
 .measure_spec <- list(
   elpd = list(fun = measure_elpd, loss = FALSE),
-  ic = list(fun = measure_ic, loss = TRUE),
-  mlpd = list(fun = measure_mlpd, loss = FALSE),
+  ic = list(
+    fun = measure_ic, loss = TRUE,
+    needs_elpd = TRUE, elpd_transform = function(x) -2 * x
+  ),
+  mlpd = list(fun = measure_mlpd, loss = FALSE, needs_elpd = TRUE),
   mae = list(fun = measure_mae, loss = TRUE),
   r2 = list(fun = measure_r2, loss = FALSE),
   rmse = list(fun = measure_rmse, loss = TRUE),
