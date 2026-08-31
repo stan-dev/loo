@@ -195,6 +195,13 @@ do_pred_measure <- function(
     if (is.null(result_name)) {
       result_name <- entry$name
     }
+    # A measure may rename its own result: `rps` with `scaled = TRUE` returns
+    # `srps`. Read the spec under that name, or the requested measure's
+    # orientation leaks into the renamed row and inverts the ranking.
+    info_entry <- entry
+    if (entry$type == "builtin" && !is.null(.measure_spec[[result_name]])) {
+      info_entry$key <- result_name
+    }
     # add new measures to existing pred_measure results
     name_updated <- .measure_result_name(source, result_name)
     if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
@@ -209,7 +216,7 @@ do_pred_measure <- function(
       name = result_name,
       values = .measure_estimate_se(sel_measure),
       margin = 1,
-      measure_entry = entry,
+      measure_entry = info_entry,
       extra = sel_measure$extra
     )
     pointwise <- .merge_matrix(

@@ -1911,3 +1911,36 @@ test_that("rps is sign-converted for comparison but srps is not", {
     "m1"
   )
 })
+
+test_that("control scaled = TRUE does not invert the srps ranking", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  mk <- function(sfx, measure, control = list()) {
+    loo_pred_measure(
+      loo = res[[paste0("loo_p_", sfx)]],
+      y = res$y,
+      ypred = res[[paste0("ypred_", sfx)]],
+      ylp = res[[paste0("ylp_", sfx)]],
+      measure = measure,
+      control = control
+    )
+  }
+  scaled <- list(rps = list(scaled = TRUE))
+  by_name <- list(m1 = mk("m1", "srps"), m2 = mk("m2", "srps"))
+  by_ctrl <- list(
+    m1 = mk("m1", "rps", scaled),
+    m2 = mk("m2", "rps", scaled)
+  )
+
+  # the scaled result renames itself to `srps`, so it must carry the `srps`
+  # orientation and not the `rps` one
+  expect_equal(rownames(by_ctrl$m1$estimates), c("elpd_loo", "p_loo", "srps_loo"))
+  expect_false(attr(by_ctrl$m1, "measure_info")$srps$loss)
+
+  cmp_name <- suppressMessages(model_compare(by_name))
+  cmp_ctrl <- suppressMessages(model_compare(by_ctrl))
+
+  # a utility is never sign-converted, whichever route requested it
+  expect_equal(attr(cmp_ctrl, "sign_converted_measures"), character(0))
+  expect_equal(cmp_ctrl$model, cmp_name$model)
+  expect_equal(cmp_ctrl$srps_diff, cmp_name$srps_diff)
+})
