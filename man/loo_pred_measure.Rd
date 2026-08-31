@@ -37,7 +37,7 @@ summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
-\code{\link[=supported_measures_list]{supported_measures_list()}}.
+\link{supported_measures_list}.
 \item A \strong{function} with attribute \code{"measure_name"} for one custom measure.
 \item A \strong{list} mixing character scalars (built-in names) and named
 functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
@@ -95,8 +95,10 @@ inherited (e.g. \code{"psis_loo"}). In addition to \code{estimates} and
 \code{pointwise}, the list may contain:
 \describe{
 \item{\code{diagnostics}}{PSIS diagnostics, including Pareto \eqn{\hat{k}} in
-\code{diagnostics$pareto_k}. Values above 0.7 suggest unreliable
-LOO estimates for those observations.}
+\code{diagnostics$pareto_k}. A value above the sample-size dependent
+threshold \eqn{\min(1 - 1 / \log_{10}(S), 0.7)}, where \eqn{S} is the
+number of draws, suggests an unreliable LOO estimate for that
+observation. The \code{print()} method reports the threshold it used.}
 \item{\code{log_weights}}{Normalized log importance weights used for LOO
 scoring.}
 \item{\code{psis_object}}{Stored when \code{save_psis = TRUE}; needed to add

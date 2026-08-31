@@ -140,29 +140,9 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 measure_elpd <- function(
   ylp, log_weights = NULL, pointwise = NULL
 ) {  
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_elpd"
-    )
-    lppd_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-  }
-  
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_elpd")
+  lppd_i <- inputs$lppd_i
+
   if (length(lppd_i) == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -174,7 +154,7 @@ measure_elpd <- function(
   )
   
   .create_measure_structure(
-    res, "elpd", n_draws = n_draws, n_obs = n_obs
+    res, "elpd", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -195,33 +175,10 @@ measure_elpd <- function(
 measure_mlpd <- function(
   ylp, log_weights = NULL, pointwise = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_mlpd"
-    )
-    lppd_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = nrow(ylp),
-        n_obs = ncol(ylp)
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-  }
-  
-  n_obs <- length(lppd_i)
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_mlpd")
+  lppd_i <- inputs$lppd_i
+  n_obs <- inputs$n_obs
+
   if (n_obs == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -232,7 +189,7 @@ measure_mlpd <- function(
     pointwise = lppd_i
   )
   .create_measure_structure(
-    res, "mlpd", n_draws = n_draws, n_obs = n_obs
+    res, "mlpd", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 
@@ -245,7 +202,7 @@ measure_mlpd <- function(
 #' @inheritParams measure_density_params
 #' @inheritParams measure_params
 #' @param pointwise Optional numeric vector of precomputed pointwise
-#'   contributions \eqn{\mathrm{ic}_i = -1 \cdot \mathrm{lppd}_i}. If provided, 
+#'   contributions \eqn{\mathrm{ic}_i = -2 \cdot \mathrm{lppd}_i}. If provided, 
 #'   `ylp` and `log_weights` are ignored.
 #'
 #' @examples
@@ -255,33 +212,10 @@ measure_mlpd <- function(
 measure_ic <- function(
   ylp, log_weights = NULL, pointwise = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .validate_numeric_vector(pointwise, arg = "pointwise")
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(ylp = ylp, log_weights = log_weights),
-      fun_name = "measure_ic"
-    )
-    ic_i <- pointwise
-    n_draws = NULL
-    n_obs = length(pointwise)
-  } else {
-    n_draws <- nrow(ylp)
-    n_obs <- ncol(ylp)
-    .validate_numeric_matrix(ylp, arg = "ylp")
-    ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) llarray_to_matrix(ylp) else ylp
-    if (!is.null(log_weights)) {
-      log_weights <- .normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      )
-    }
-    lppd_i <- ptw_log_pred_density(ylp, log_weights)
-    ic_i <- -2 * lppd_i
-  }
-  
-  n_obs <- length(ic_i)
+  inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_ic")
+  ic_i <- if (is.null(pointwise)) -2 * inputs$lppd_i else inputs$lppd_i
+  n_obs <- inputs$n_obs
+
   if (n_obs == 1L) {
     cli::cli_warn("Only one pointwise value supplied; standard error is set to 0.")
   }
@@ -292,7 +226,7 @@ measure_ic <- function(
     pointwise = ic_i
   )
   .create_measure_structure(
-    res, "ic", n_draws = n_draws, n_obs = n_obs
+    res, "ic", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 
@@ -330,35 +264,7 @@ measure_acc <- function(
     n_draws <- nrow(mupred)
     n_obs <- dim(mupred)[2]
     .validate_numeric_vector(y, arg = "y")
-    if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
-      cli::cli_abort("{.arg mupred} must be a numeric matrix or 3D numeric array.")
-    }
-    .validate_probs(mupred, arg = "mupred")
-    
-    if (!is.null(log_weights)) {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-    } else {
-      weights <- rep(1 / nrow(mupred), nrow(mupred))
-    }
-    
-    if (length(dim(mupred)) == 3) {
-      # Multiclass: (draws × obs × categories) > argmax over categories
-      weighted_mupred <- apply(
-        sweep(mupred, 1, weights, `*`),
-        c(2, 3),
-        sum
-      )
-      mupred_hat <- apply(weighted_mupred, 1, which.max)
-    } else {
-      weighted_mupred <- colSums(mupred * weights)
-      mupred_hat <- (weighted_mupred > 0.5) * 1L
-    }
-    
-    acc_i <- (mupred_hat == y) * 1L
+    acc_i <- .acc_pointwise(y, mupred, log_weights)
   }
   
   res <- list(
@@ -403,6 +309,9 @@ measure_bacc <- function(
   }
 
   if (!is.null(pointwise)) {
+    if (length(pointwise) != length(y)) {
+      cli::cli_abort("{.arg pointwise} and {.arg y} must have the same length.")
+    }
     .inform_ignored_inputs(
       pointwise,
       ignored_args = list(mupred = mupred, log_weights = log_weights),
@@ -414,34 +323,7 @@ measure_bacc <- function(
   } else {
     n_draws <- nrow(mupred)
     n_obs <- ncol(mupred)
-    if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
-      cli::cli_abort("{.arg mupred} must be a numeric matrix or 3D numeric array.")
-    }
-    .validate_probs(mupred, arg = "mupred")
-    
-    if (!is.null(log_weights)) {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-    } else {
-      weights <- rep(1 / nrow(mupred), nrow(mupred))
-    }
-    if (length(dim(mupred)) == 3) {
-      # Multiclass: (draws × obs × categories) > argmax over categories
-      weighted_mupred <- apply(
-        sweep(mupred, 1, weights, `*`),
-        c(2, 3),
-        sum
-      )
-      mupred_hat <- apply(weighted_mupred, 1, which.max)
-    } else {
-      .validate_numeric_matrix(mupred, arg = "mupred")
-      weighted_mupred <- colSums(mupred * weights)
-      mupred_hat <- (weighted_mupred > 0.5) * 1L
-    }
-    acc_i <- (mupred_hat == y) * 1L
+    acc_i <- .acc_pointwise(y, mupred, log_weights)
   }
 
   acc_c <- vapply(classes, function(c) mean(acc_i[y == c]), numeric(1))
@@ -548,38 +430,10 @@ measure_brier <- function(
 measure_mae <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
 ) {
-  if (!is.null(pointwise)) {
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(mupred = mupred, log_weights = log_weights),
-      fun_name = "mae"
-    )
-    mae_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    n_draws <- nrow(mupred)
-    n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    if (!is.null(mupred) && !is.matrix(mupred)){
-      .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
-      cli::cli_inform(
-        "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn mae}."
-      )
-      mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
-    }
-    .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
-    if (is.null(log_weights)) {
-      mae_i <- abs(y - colMeans(mupred))
-    } else {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-      mae_i <- abs(y - colSums(weights * mupred))
-    }
-  }
+  inputs <- .point_error_from_inputs(
+    y, mupred, log_weights, pointwise, "mae", abs
+  )
+  mae_i <- inputs$err_i
   
   res <- list(
     estimate = mean(mae_i),
@@ -587,7 +441,7 @@ measure_mae <- function(
     pointwise = mae_i
   )
   .create_measure_structure(
-    res, "mae", n_draws = n_draws, n_obs = n_obs
+    res, "mae", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -597,6 +451,8 @@ measure_mae <- function(
 #' predictions. Point predictions are obtained by averaging `mupred` draws, or
 #' by PSIS-weighted averaging when `log_weights` is provided.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `y`, `mupred`, and `log_weights` are ignored.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -607,38 +463,10 @@ measure_mae <- function(
 measure_mse <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
 ) {  
-  if (!is.null(pointwise)) {
-    .inform_ignored_inputs(
-      pointwise,
-      ignored_args = list(mupred = mupred, log_weights = log_weights),
-      fun_name = "mse"
-    )
-    sqe_i <- pointwise
-    n_draws <- NULL
-    n_obs <- length(pointwise)
-  } else {
-    n_draws <- nrow(mupred)
-    n_obs <- ncol(mupred)
-    .validate_numeric_vector(y, arg = "y")
-    if (!is.null(mupred) && !is.matrix(mupred)){
-      .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
-      cli::cli_inform(
-        "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn mse}."
-      )
-      mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
-    }
-    .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
-    if (is.null(log_weights)) {
-      sqe_i <- (y - colMeans(mupred))^2
-    } else {
-      weights <- exp(.normalize_and_validate_log_weights(
-        log_weights = log_weights,
-        n_draws = n_draws,
-        n_obs = n_obs
-      ))
-      sqe_i <- (y - colSums(weights * mupred))^2
-    }
-  }
+  inputs <- .point_error_from_inputs(
+    y, mupred, log_weights, pointwise, "mse", function(e) e^2
+  )
+  sqe_i <- inputs$err_i
 
   res <- list(
     estimate = mean(sqe_i),
@@ -646,7 +474,7 @@ measure_mse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, "mse", n_draws = n_draws, n_obs = n_obs
+    res, "mse", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -655,6 +483,8 @@ measure_mse <- function(
 #' Computes RMSE as the square root of MSE and propagates uncertainty via a
 #' first-order delta-method approximation.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `y`, `mupred`, and `log_weights` are ignored.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -723,6 +553,9 @@ measure_rmse <- function(
 #' the empirical variance of `y`. The standard error is computed with a
 #' first-order delta-method approximation.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `mupred` and `log_weights` are ignored. `y` is always
+#'   required, because `r2` needs the variance of `y` as its baseline.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -746,7 +579,7 @@ measure_r2 <- function(
     log_weights = log_weights,
     pointwise = pointwise
   )
-  mse_hat <- mse_res$estimate[1]
+  mse_hat <- mse_res$estimates[1]
   sqe_i <- mse_res$pointwise
   n_obs <- length(sqe_i)
   n_draws <- if (is.null(pointwise)) nrow(mupred) else NULL
@@ -789,7 +622,7 @@ measure_r2 <- function(
 #'   distributions for ordered discrete outcomes.
 #' - **CRPS** (Matheson & Winkler, 1976; Gneiting & Raftery, 2007): Generalizes
 #'   RPS to continuous outcomes. Defined as
-#'   \deqn{\mathrm{CRPS}(X; y) = \frac{1}{2} E[|X - X'|] - E[|X - y|],}
+#'   \deqn{\mathrm{CRPS}(X; y) = E[|X - y|] - \frac{1}{2} E[|X - X'|],}
 #'   where \eqn{X, X'} are independent draws from the predictive distribution.
 #' - **SRPS/SCRPS** (Bolin & Wallin, 2023): Scaled variants that are invariant
 #'   to the scale of the predictive distribution. Defined as
@@ -902,7 +735,11 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     w <- if (is.null(log_weights)) {
       NULL
     } else {
-      exp(.normalize_log_weights(log_weights))
+      exp(.normalize_and_validate_log_weights(
+        log_weights = log_weights,
+        n_draws = n_draws,
+        n_obs = n_obs
+      ))
     }
 
     EXX <- .exx_pwm(ypred, w)
@@ -913,7 +750,20 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
     }
 
     rps_i <- if (scaled) {
-      # Scaled version by Bolin & Wallin (2023)
+      # Scaled version by Bolin & Wallin (2023). The scaling divides by
+      # E|X - X'| and takes its logarithm, so a point-mass predictive
+      # distribution leaves the score undefined.
+      degenerate <- which(EXX == 0)
+      if (length(degenerate) > 0L) {
+        cli::cli_abort(c(
+          "The scaled rps score is undefined for {cli::qty(length(degenerate))}
+           observation{?s} {.val {degenerate}}.",
+          "i" = "{.code E|X - X'|} is 0 there: all the weight sits on a single
+                 draw, so the predictive distribution is a point mass.",
+          "i" = "Check the PSIS diagnostics, or use the unscaled score
+                 {.code scaled = FALSE}."
+        ))
+      }
       -EXy / EXX - 0.5 * log(EXX)
     } else {
       # Gneiting & Raftery (2007)
@@ -973,10 +823,25 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
 # @noRd
 # @param measure The measure used.
 # @return The measure specification.
+#
+# `needs_elpd = TRUE` marks a measure that is derived from the pointwise ELPD of
+# the base measure block rather than from the raw inputs. `.compute_measure()`
+# then supplies `pointwise`, optionally passed through `elpd_transform` first.
 .measure_spec <- list(
   elpd = list(fun = measure_elpd, loss = FALSE, diff_method = "sum"),
-  ic = list(fun = measure_ic, loss = TRUE, diff_method = "sum"),
-  mlpd = list(fun = measure_mlpd, loss = FALSE, diff_method = "mean"),
+  ic = list(
+    fun = measure_ic,
+    loss = TRUE,
+    diff_method = "sum",
+    needs_elpd = TRUE,
+    elpd_transform = function(x) -2 * x
+  ),
+  mlpd = list(
+    fun = measure_mlpd,
+    loss = FALSE,
+    diff_method = "mean",
+    needs_elpd = TRUE
+  ),
   mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
   r2 = list(
     fun = measure_r2,

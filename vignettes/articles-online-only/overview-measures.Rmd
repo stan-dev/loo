@@ -23,20 +23,24 @@ In Bayesian model evaluation, predictive performance is assessed by comparing a 
 
 The table below summarizes the core metrics implemented in our framework. 
 
-| Metric Keyword | Full Name | Metric Type | Orientation | Target Outcome Type |
+| Measure Keyword | Full Name | Metric Type | Orientation | Target Outcome Type |
 | :--- | :--- | :--- | :--- | :--- |
-| `lppd` / `elppd` | (Expected) Log Pointwise Predictive Density | Scoring Rule (Distributional) | Higher is Better | Any |
-| `acc` | Accuracy | Proper Scoring Rule | Higher is Better | Nominal Categorical |
+| `elpd` | Expected Log Pointwise Predictive Density (sum) | Scoring Rule (Distributional) | Higher is Better | Any |
+| `mlpd` | Mean Log Predictive Density (`elpd` divided by `n`) | Scoring Rule (Distributional) | Higher is Better | Any |
+| `ic` | Information Criterion (`-2 * elpd`) | Scoring Rule (Distributional) | Lower is Better | Any |
+| `acc` | Accuracy | Classification Metric | Higher is Better | Nominal Categorical |
 | `bacc` | Balanced Accuracy | Adjusted Classification Metric | Higher is Better | Imbalanced Categorical |
 | `brier` | Brier Score | Proper Scoring Rule | Lower is Better | Binary |
-| `crps` | Continuous Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous |
-| `scrps` | Scaled Continuous Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous |
-| `rps` | Ranked Probability Score | Proper Scoring Rule | Lower is Better | Ordered Categorical |
-| `srps` | Scaled Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Ordered Categorical |
+| `rps` | (Continuous) Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous or Ordered Categorical |
+| `srps` | Scaled (Continuous) Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous or Ordered Categorical |
 | `mae` | Mean Absolute Error | Point Estimation Metric | Lower is Better | Continuous |
 | `mse` | Mean Squared Error | Point Estimation Metric | Lower is Better | Continuous |
 | `rmse` | Root Mean Squared Error | Point Estimation Metric | Lower is Better | Continuous |
 | `r2` | Coefficient of Determination | Summary Fit Metric | Higher is Better | Continuous |
+
+`measure_rps()` scores continuous outcomes as the CRPS and ordered categorical
+outcomes as the RPS. `measure_srps()` does the same for the scaled versions.
+Sections below show both cases.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -44,19 +48,16 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE
 )
-devtools::load_all(".")
 ```
 
 ## Data Examples
-```{r, message=FALSE, warnings=FALSE, include = FALSE}
-library(tidyr)
-library(dplyr)
+```{r, message=FALSE, warnings=FALSE}
+library(loo)
 library(ggplot2)
 ```
 
 ```{r, include = FALSE}
 plot_ptw <- function(ws, loo, kfold, label, show_estimate = TRUE){
-  
   # 1. Safe estimation extractor
   ptw_est <- function(x) {
     if (is.null(x)) return(NA)
@@ -67,44 +68,50 @@ plot_ptw <- function(ws, loo, kfold, label, show_estimate = TRUE){
   }
 
   # 2. Build estimates and create the formatted labels right away
-  estimates <- tibble(
+  estimates <- data.frame(
     source = c("ws", "loo", "kfold"),
     estimate = c(ptw_est(ws), ptw_est(loo), ptw_est(kfold))
-  ) |> 
-    mutate(source_label = if_else(
-      is.na(estimate), 
-      paste0(source, " (no data)"), 
-      paste0(source, " (est. = ", round(estimate, 2), ")")
-    ))
+  )
+  estimates$source_label <- ifelse(
+    is.na(estimates$estimate),
+    paste0(estimates$source, " (no data)"),
+    paste0(estimates$source, " (est. = ", round(estimates$estimate, 2), ")")
+  )
   
   # Turn into a factor to preserve the ws -> loo -> kfold order
   estimates$source_label <- factor(estimates$source_label, levels = estimates$source_label)
   
-  # 3. Safe data binding for the dots
-  g_data <- dplyr::bind_rows(
-    tibble(source = "ws", value = if (!is.null(ws)) ws$pointwise else as.numeric(NA)),
-    tibble(source = "loo", value = if (!is.null(loo)) loo$pointwise else as.numeric(NA)),
-    tibble(source = "kfold", value = if (!is.null(kfold)) kfold$pointwise else as.numeric(NA))
+  # 3. Safe data binding for the dots. `$pointwise` is an n x 1 matrix,
+  #    so as.vector() keeps `value` a single numeric column.
+  ptw_val <- function(x) if (is.null(x)) NA_real_ else as.vector(x$pointwise)
+  g_data <- rbind(
+    data.frame(source = "ws", value = ptw_val(ws)),
+    data.frame(source = "loo", value = ptw_val(loo)),
+    data.frame(source = "kfold", value = ptw_val(kfold))
   )
-  
+
   # 4. Align facet names for the dots data
-  plot_df <- g_data |> 
-    left_join(estimates, by = "source") |>
-    mutate(source = source_label)
-  
+  idx <- match(g_data$source, estimates$source)
+  plot_df <- data.frame(
+    value = g_data$value,
+    source = estimates$source_label[idx],
+    estimate = estimates$estimate[idx]
+  )
+
   # 5. Align facet names for the line data so ggplot matches them up perfectly
-  line_data <- estimates |> 
-    mutate(source = source_label)
-  
+  line_data <- estimates
+  line_data$source <- line_data$source_label
+
   # Plotting
   g <- ggplot(plot_df, mapping = aes(x = value)) +
     geom_dotplot()
-  
+
   if (isTRUE(show_estimate)) {
     g <- g +
       geom_vline(
         data = line_data, # Uses the aligned facet labels now
-        aes(xintercept = estimate), color = "red", linetype = "solid", linewidth = 1
+        aes(xintercept = estimate),
+        color = "red", linetype = "solid", linewidth = 1
       )
   }
 
@@ -235,20 +242,15 @@ invisible(str(elpd_ws))
 
 # psis-loo elpd
 elpd_psis1 <- measure_elpd(
-  ylp = res_roaches$ylp, 
+  ylp = res_roaches$ylp,
   log_weights = res_roaches$log_weights
 )
-elpd_psis2 <- measure_elpd(
-  ylp = NULL, 
-  pointwise = res_roaches$loo$pointwise[, "elpd_loo"]
-)
-# expect_equal(elpd_psis1, elpd_psis2)
 message("psis-loo elpd:")
 invisible(str(elpd_psis1))
 
 # kfold elpd
 elpd_kfold <- measure_elpd(
-  ylp = NULL, 
+  ylp = NULL,
   pointwise = res_roaches$kfold$pointwise[, "elpd_kfold"]
 )
 message("kfold elpd:")
@@ -323,22 +325,23 @@ or using information criteria that correct in-sample bias.
 
 ## Accuracy (`acc`)
 
-Accuracy here is the posterior predictive probability assigned to the observed category, averaged across (weighted) posterior draws.
-Accuracy is a proper scoring rule suitable for nominal categorical outcomes and is positively oriented (higher is better). Accuracy ranges between 0 (all predictions are wrong) and 1 (all predictions are correct).
+Accuracy here is the share of observations whose predicted class equals the observed class. The predicted class comes from the (weighted) posterior mean probabilities: `which.max` over categories, or a 0.5 cut for binary outcomes.
+Accuracy suits nominal categorical outcomes and is positively oriented (higher is better). It ranges between 0 (all predictions are wrong) and 1 (all predictions are correct). It is not a proper scoring rule: it uses the hard class label, not the full predictive distribution.
 
-- Predictive probability of the observed class, Monte Carlo:
+- Predicted class, Monte Carlo:
   $$
-  \hat p_i = \frac{1}{S}\sum_{s=1}^S \Pr(Y_i = y_i \mid \theta^{(s)}),\quad
-  \hat p_i^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i = y_i \mid \theta^{(s)})
+  \hat p_{ik} = \frac{1}{S}\sum_{s=1}^S \Pr(Y_i = k \mid \theta^{(s)}),\quad
+  \hat p_{ik}^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i = k \mid \theta^{(s)}),\quad
+  \hat y_i = \arg\max_k \hat p_{ik}^w
   $$
 - Pointwise:
   $$
-  \text{acc}_i = \hat p_i \ \text{ or }\ \hat p_i^w
+  \text{acc}_i = \mathbb{1}\{\hat y_i = y_i\}
   $$
 - Estimate and Standard Error:
   $$
   \widehat{\text{acc}} = \frac{1}{n}\sum_{i=1}^n \text{acc}_i,\quad
-  se(\widehat{\text{acc}}) = \sqrt{\frac{\widehat{\text{Var}}(\text{acc}_i)}{n}}
+  se(\widehat{\text{acc}}) = \sqrt{\frac{\widehat{\text{acc}}(1-\widehat{\text{acc}})}{n}}
   $$
 
 ::: {.callout-tip}
@@ -356,17 +359,11 @@ acc_loo <- measure_acc(
   mupred = res_penguins$mupred,
   log_weights = res_penguins$log_weights
 )
-# acc_kfold <- measure_acc(
-#   y = as.numeric(res_penguins$y), 
-#   mupred = res_penguins$mupred_kfold
-# )
-  
+
 message("within-sample acc:")
 invisible(str(acc_ws))
-message("psis-loo acc:") 
+message("psis-loo acc:")
 invisible(str(acc_loo))
-# message("kfold acc:") 
-# invisible(str(acc_kfold))
 ```
 
 ```{r, fig.height=3, fig.width=7, fig.align="center"}
@@ -375,29 +372,29 @@ plot_ptw(acc_ws, acc_loo, NULL, "acc_i")
 
 ## Balanced Accuracy (`bacc`)
 
-Balanced accuracy averages the within-class mean of the predicted probability assigned to the correct class, giving each class equal weight.
+Balanced accuracy averages the within-class accuracy, giving each class equal weight.
 
 Let $\mathcal{C} = \{1, \ldots, K\}$ be the set of classes and 
 $n_c = |\{i : y_i = c\}|$ the number of observations in class $c$. The 
-class-specific accuracy is the mean predicted probability of the correct 
-category among observations that truly belong to class $c$:
+class-specific accuracy is the share of correct predictions among observations 
+that truly belong to class $c$:
 
 - Class-specific accuracy:
   $$
-  \text{acc}_c = \frac{1}{n_c} \sum_{i: y_i=c} \hat p_i^w
+  \text{acc}_c = \frac{1}{n_c} \sum_{i: y_i=c} \text{acc}_i
   $$
 - Balanced accuracy:
   $$
   \widehat{\text{bacc}} = \frac{1}{K}\sum_{c=1}^K \text{acc}_c
   $$
-- A convenient pointwise contribution that yields the same mean:
+- A pointwise contribution that *sums* to the estimate:
 $$
-\text{bacc}_i = \frac{\hat p_i^w}{n_{y_i}}
+\text{bacc}_i = \frac{\text{acc}_i}{K\,n_{y_i}},\quad
+\widehat{\text{bacc}} = \sum_{i=1}^n \text{bacc}_i
 $$
-- Estimate and Standard Error:
+- Standard Error (stratified over classes):
   $$
-  \widehat{\text{bacc}} = \frac{1}{K}\sum_{c=1}^K \frac{1}{n_c}\sum_{i: y_i=c} \hat p_i^w,\quad
-  se(\widehat{\text{bacc}}) = \sqrt{\frac{\widehat{\text{Var}}(\text{bacc}_i)}{n}}
+  se(\widehat{\text{bacc}}) = \frac{1}{K}\sqrt{\sum_{c=1}^K \frac{\text{acc}_c(1-\text{acc}_c)}{n_c}}
   $$
 
 ::: {.callout-note}
@@ -418,17 +415,11 @@ bacc_loo <- measure_bacc(
   mupred = res_penguins$mupred,
   log_weights = res_penguins$log_weights
 )
-# bacc_kfold <- measure_bacc(
-#   y = as.numeric(res_penguins$y), 
-#   mupred = res_penguins$mupred_kfold
-# )
-  
+
 message("within-sample bacc:")
 invisible(str(bacc_ws))
-message("psis-loo bacc:") 
+message("psis-loo bacc:")
 invisible(str(bacc_loo))
-# message("kfold bacc:") 
-# invisible(str(bacc_kfold))
 ```
 
 ```{r, fig.height=3, fig.width=7, fig.align="center"}
@@ -495,32 +486,44 @@ $$
 Equivalently, via the energy score representation (when $F_i$ has a finite 
 first moment):
 $$
-\text{crps}_i = \mathbb E_F\big[Y - y_i\big] - \frac{1}{2}\mathbb E_F \big[Y-Y'\big]
+\text{crps}_i = \mathbb E_F\big[|Y - y_i|\big] - \frac{1}{2}\mathbb E_F \big[|Y-Y'|\big]
 $$
 where $Y, Y'$ are independent draws from the predictive distribution $F_i$. 
-Because computing $\mathbb{E}_F[|Y - Y'|]$ requires two independent sets of 
-predictive draws, we instead use the identity (valid when $F$ is continuous):
+This is the form we compute. The second term needs no second set of draws: we 
+estimate $\mathbb{E}_F[|Y - Y'|]$ from the single set by a probability-weighted 
+moment estimator.
+
+- Weighted Monte Carlo estimator of the first term (PSIS weights $\tilde w_i^{(s)}$; unweighted is the special case $\tilde w = 1/S$):
 $$
-\text{crps}_i = \mathbb E_F\big[Y - y_i\big] + \mathbb E_F\big[Y\big] - 2\mathbb E_F \big[Y\cdot F(Y)\big]
+\mathbb{E}_F\big[|Y - y_i|\big] \approx \sum_{s=1}^S \tilde w_i^s \big|Y_i^s - y_i\big|
 $$
-which requires only a single set of draws.
-- Weighted Monte Carlo estimators (PSIS weights $\tilde w_i^{(s)}$; unweighted is the special case $\tilde w = 1/S$):
+- Weighted estimator of the second term. Sort the draws of observation $i$ in 
+ascending order. Write $Y_i^{(s)}$ for the sorted draws, $\tilde w_i^{(s)}$ for 
+their weights, and $C_s = \sum_{k \leq s} \tilde w_i^{(k)}$ for the cumulative 
+weight, with $C_0 = 0$. The weighted U-statistic over draw pairs then collapses 
+to one sort and one cumulative sum:
 $$
-\hat F_i^w(x) = \sum_{s=1}^S \tilde w_i^s \mathbf{1}(Y_i^s \leq x)
+\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
+  \frac{\sum_{s}\sum_{t \neq s} \tilde w_i^{s}\tilde w_i^{t}\big|Y_i^{s} - Y_i^{t}\big|}
+       {1 - \sum_s \big(\tilde w_i^{s}\big)^2}
+= \frac{2\sum_s \tilde w_i^{(s)} Y_i^{(s)}\left(C_s + C_{s-1} - 1\right)}
+       {1 - \sum_s \big(\tilde w_i^{(s)}\big)^2}
 $$
-- Computation:
+With equal weights this reduces exactly to the unbiased pairwise estimator with 
+the $1/(S(S-1))$ normalization, the probability-weighted moment estimator of 
+Taillardat et al. (2016):
 $$
-\mathbb{E}_F\big[|Y - y_i|\big] \approx \sum_{s=1}^S \tilde w_i^s \big|Y_i^s - y_i\big|, \qquad
-\mathbb{E}_F[Y] \approx \sum_{s=1}^S \tilde w_i^s Y_i^s,
+\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
+  \frac{1}{S}\sum_{s=1}^S Y_i^{(s)}\,\frac{2\,(2s - S - 1)}{S - 1}
 $$
-$$
-\mathbb{E}_F\big[Y \cdot F(Y)\big] \approx \sum_{s=1}^S \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
-$$
-giving the pointwise estimator
+The estimate is a convex combination of the $\big|Y_i^{s} - Y_i^{t}\big|$, so it 
+is never negative, and its coefficients sum to zero, so it is invariant to 
+shifts of the draws. The logarithm in the scaled score below is therefore always 
+defined.
+- Together these give the pointwise estimator
 $$
 \widehat{\text{crps}}_i = \sum_s \tilde w_i^s \big|Y_i^s - y_i\big|
-  + \sum_s \tilde w_i^s Y_i^s
-  - 2 \sum_s \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
+  - \frac{1}{2}\,\widehat{\mathbb{E}}_F\big[|Y - Y'|\big]
 $$
 + Estimate and Standard Error:
   $$
@@ -563,20 +566,14 @@ $$
 \text{scrps}_i = -\frac{\mathbb{E}_F\big[|Y - y_i|\big]}{\mathbb{E}_F\big[|Y - Y'|\big]}
 - \frac{1}{2}\log \mathbb{E}_F\big[|Y - Y'|\big]
 $$
-- Use the same weighted estimators for the two expectations as above.
-- Rather than requiring two independent draw matrices, we recover
-$\mathbb{E}_F[|Y-Y'|]$ from quantities already computed for the crps via the 
-identity
-$$
-\mathbb{E}_F\big[|Y - Y'|\big] = 4\,\mathbb{E}_F\big[Y \cdot F(Y)\big] - 2\,\mathbb{E}_F[Y]
-$$
-- With importance weights this becomes
-$$
-\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
-  4\sum_s \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
-  - 2\sum_s \tilde w_i^s Y_i^s
-$$
-so the pointwise scrps estimator is
+- Use the same two weighted estimators as above. In particular, 
+$\widehat{\mathbb{E}}_F[|Y - Y'|]$ is the probability-weighted moment estimator, 
+already computed for the crps.
+- The scaled score divides by $\widehat{\mathbb{E}}_F[|Y-Y'|]$ and takes its 
+logarithm. A degenerate predictive distribution, where all the weight sits on a 
+single draw, makes that term $0$ and the score undefined. `measure_rps()` stops 
+with an error and names the affected observations.
+- The pointwise scrps estimator is therefore
 $$
 \widehat{\text{scrps}}_i =
   -\frac{\displaystyle\sum_s \tilde w_i^s \big|Y_i^s - y_i\big|}
@@ -621,16 +618,26 @@ RPS is a strictly proper scoring rule for ordered categorical outcomes with $K$ 
 step CDF and generalizes the Brier score ($K=2$ recovers Brier). The standard 
 definition is negatively oriented (lower is better). The range of rps is $[0, K-1]$.
 
-- Predictive class probabilities and CDFs:
+- Predictive class probabilities and CDFs define the score:
   $$
-  \hat p_{i,k}^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i=k\mid \theta^{(s)}),\quad
-  \hat F_{i,k}^w = \sum_{j=1}^k \hat p_{i,j}^w
+  p_{i,k} = \Pr(Y_i=k \mid y),\quad
+  F_{i,k} = \sum_{j=1}^k p_{i,j},\quad
+  O_{i,k} = \mathbf{1}(y_i \le k)
   $$
-- Observed step CDF $O_{i,k} = \mathbf{1}(y_i \le k)$.
 - Pointwise term:
   $$
-  \widehat{\text{rps}}_i^{\text{raw}} = \sum_{k=1}^{K-1} (\hat F_{i,k}^w - O_{i,k})^2
+  \text{rps}_i = \sum_{k=1}^{K-1} \big(F_{i,k} - O_{i,k}\big)^2
   $$
+- `measure_rps()` takes no class probabilities. It takes `ypred`, a matrix of 
+predictive draws on the integer support, and runs the same estimator as the 
+crps:
+  $$
+  \widehat{\text{rps}}_i = \widehat{\mathbb{E}}_F\big[|Y - y_i|\big]
+    - \frac{1}{2}\,\widehat{\mathbb{E}}_F\big[|Y - Y'|\big]
+  $$
+  with $\widehat{\mathbb{E}}_F[|Y - Y'|]$ from the probability-weighted moment 
+estimator above. On a unit-spaced integer grid the two forms are the same 
+quantity, so the numbers agree.
 - Estimate and Standard Error:
   $$
   \widehat{\text{rps}} = \frac{1}{n}\sum_{i=1}^n \text{rps}_i,\quad
@@ -673,17 +680,23 @@ $$
 - \frac{1}{2}\log \mathbb{E}_F\big[|Y - Y'|\big]
 $$
 
-For ordered discrete support:
+For ordered discrete support the two expectations have closed forms in the class 
+probabilities:
 
-- Weighted mean absolute deviation:
+- Mean absolute deviation:
   $$
-  \widehat{\mathbb{E}}_F[|Y-y_i|] = \sum_{k=1}^K \hat p_{i,k}^w\,|k - y_i|
+  \mathbb{E}_F[|Y-y_i|] = \sum_{k=1}^K p_{i,k}\,|k - y_i|
   $$
 - Predictive spread:
   $$
-  \widehat{\mathbb{E}}_F[|Y - Y'|] = 2\sum_{k=1}^{K-1} \hat F_{i,k}^w\big(1 - \hat F_{i,k}^w\big)
+  \mathbb{E}_F[|Y - Y'|] = 2\sum_{k=1}^{K-1} F_{i,k}\big(1 - F_{i,k}\big)
   $$
-Estimation and SE follow the same mean/variance recipe as above. The srps has a positive direction, i.e., "higher is better".
+
+`measure_srps()` uses neither closed form. It estimates both expectations from 
+the `ypred` draws, exactly as the scrps does: the weighted mean absolute 
+deviation, and the probability-weighted moment estimator of 
+$\mathbb{E}_F[|Y - Y'|]$. Estimation and SE follow the same mean/variance recipe 
+as above. The srps has a positive direction, i.e., "higher is better".
 
 ```{r}
 srps_ws <- measure_srps(
@@ -740,18 +753,19 @@ $$
 
 ```{r}
 mae_ws <- measure_mae(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 mae_loo <- measure_mae(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 mae_kfold <- measure_mae(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
-  
+
 message("within-sample mae:")
 invisible(str(mae_ws))
 message("psis-loo mae:")
@@ -765,14 +779,13 @@ plot_ptw(mae_ws, mae_loo, mae_kfold, "mae_i")
 ```
 
 ## (Root) mean squared error (`rmse`/`mse`)
-RMSE uses squared loss, has the same units as `y` and has a positive direction 
+RMSE uses squared loss, has the same units as `y` and the direction 
 ("lower is better").
 RMSE evaluates point predictions $\hat\mu_i$ against observed outcomes $y_i$ 
-using squared loss and then takes the square root of the average. It has the 
-same units as $y$ and the direction "lower is better". In our setup, `mupred` 
-is the point prediction per observation, computed as the posterior predictive 
-mean (e.g., via `posterior_epred`) or its PSIS-LOO analogue via `E_loo`. RMSE 
-is the square root of the mean squared error (MSE).
+using squared loss and then takes the square root of the average. In our setup,
+`mupred` is the point prediction per observation, computed as the posterior
+predictive mean (e.g., via `posterior_epred`) or its PSIS-LOO analogue via
+`E_loo`. RMSE is the square root of the mean squared error (MSE).
 
 - Pointwise squared error: 
   $$
@@ -805,15 +818,16 @@ $$
 
 ```{r}
 rmse_ws <- measure_rmse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 rmse_loo <- measure_rmse(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 rmse_kfold <- measure_rmse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
 
@@ -831,18 +845,19 @@ plot_ptw(rmse_ws, rmse_loo, rmse_kfold, "squared-error_i", show_estimate = FALSE
 
 ```{r}
 mse_ws <- measure_mse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 mse_loo <- measure_mse(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 mse_kfold <- measure_mse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
-  
+
 message("within-sample mse:")
 invisible(str(mse_ws))
 message("psis-loo mse:")
@@ -886,15 +901,16 @@ based on a model’s residual variance parameter.
 
 ```{r}
 r2_ws <- measure_r2(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 r2_loo <- measure_r2(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 r2_kfold <- measure_r2(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
 

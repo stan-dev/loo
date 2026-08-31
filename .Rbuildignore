@@ -28,3 +28,10 @@ vignettes/loo2-non-factorized_cache/*
 ^.git-blame-ignore-revs
 ^notes-release.md
 ^notes$
+^\.agents$
+^agent$
+^\.claude$
+^\.refactor-review$
+^internal-notes$
+^scratch-files$
+^skills-lock\.json$

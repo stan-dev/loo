@@ -115,7 +115,7 @@
   list(name = name, type = "custom", key = fun, loss = loss)
 }
 
-#' Check duplicate and reserved measure names
+#' Check duplicate measure names
 #'
 #' @param entries List of normalized measure entries from `.normalize_measure()`.
 #' @noRd
@@ -140,11 +140,15 @@
 #' @param measure User-supplied `measure` argument (see `.normalize_measure()`).
 #' @param predperf Existing pred_measure object used when accumulating measures.
 #' @param supported_measures_list Character vector of allowed built-in names.
+#' @param source Character evaluation mode (`"insample"`, `"loo"`, `"kfold"`,
+#'   or `"test"`); selects the row-name suffix used to match `predperf`.
 #'
 #' @return A list of normalized measure entries ready for computation.
 #'
 #' @noRd
-.prepare_measures <- function(measure, predperf, supported_measures_list) {
+.prepare_measures <- function(
+  measure, predperf, supported_measures_list, source
+) {
   entries <- .normalize_measure(measure)
   if (length(entries) == 0L) {
     return(entries)
@@ -170,7 +174,11 @@
 
   if (!is.null(predperf)) {
     existing_measures <- rownames(predperf$estimates)
-    entry_names <- vapply(entries, function(e) e$name, character(1L))
+    entry_names <- vapply(
+      entries,
+      function(e) .measure_result_name(source, e$name),
+      character(1L)
+    )
     dups <- intersect(entry_names, existing_measures)
     if (length(dups) > 0L) {
       cli::cli_warn(c(
@@ -178,11 +186,7 @@
         "already present in {.arg predperf} and will be skipped."
       ))
     }
-    keep <- !vapply(
-      entries,
-      function(e) e$name %in% existing_measures,
-      logical(1L)
-    )
+    keep <- !(entry_names %in% existing_measures)
     entries <- entries[keep]
   }
 
@@ -269,6 +273,8 @@
       "length {.val {n_obs}}, not {.val {length(res$pointwise)}}."
     ))
   }
+  # pass measure name if user set it as attribute
+  attr(res, "measure") <- measure_name
   if (!is.null(res$extra) && !is.list(res$extra)) {
     cli::cli_abort(c(
       "{.field extra} from custom measure {.val {measure_name}} must be a list.",
@@ -296,7 +302,7 @@
 #'
 #' @noRd
 .validate_numeric_matrix <- function(x, arg, nrow = NULL, ncol = NULL) {
-  if (!is.matrix(x) && !is.array(x)) {
+  if (!is.numeric(x) || (!is.matrix(x) && !is.array(x))) {
     cli::cli_abort(
       "{.arg {arg}} must be a numeric matrix or array, not {.obj_type_friendly {x}}."
     )
@@ -414,6 +420,156 @@
   if (!all(x >= 0 & x <= 1)) {
     cli::cli_abort("{.arg {arg}} must contain values in [0, 1].")
   }
+}
+
+#' Pointwise log predictive density from measure inputs
+#'
+#' @description
+#' `measure_elpd()`, `measure_mlpd()` and `measure_ic()` take the same inputs:
+#' precomputed `pointwise` values, or an `ylp` matrix with optional
+#' `log_weights`. This helper holds their shared validation.
+#'
+#' @param ylp A draws x observations matrix of log predictive densities, or a
+#'   3-D array.
+#' @param log_weights Optional log weights, normalized before use.
+#' @param pointwise Optional numeric vector of precomputed pointwise values.
+#' @param fun_name Name of the calling measure. Used in the message that
+#'   reports ignored inputs.
+#'
+#' @return A list with `lppd_i`, `n_draws` (`NULL` when `pointwise` is
+#'   supplied) and `n_obs`.
+#'
+#' @noRd
+.lppd_from_inputs <- function(ylp, log_weights, pointwise, fun_name) {
+  if (!is.null(pointwise)) {
+    .validate_numeric_vector(pointwise, arg = "pointwise")
+    .inform_ignored_inputs(
+      pointwise,
+      ignored_args = list(ylp = ylp, log_weights = log_weights),
+      fun_name = fun_name
+    )
+    return(list(lppd_i = pointwise, n_draws = NULL, n_obs = length(pointwise)))
+  }
+
+  .validate_numeric_matrix(ylp, arg = "ylp")
+  ylp <- if (is.array(ylp) && length(dim(ylp)) == 3) {
+    llarray_to_matrix(ylp)
+  } else {
+    ylp
+  }
+  n_draws <- nrow(ylp)
+  n_obs <- ncol(ylp)
+  if (!is.null(log_weights)) {
+    log_weights <- .normalize_and_validate_log_weights(
+      log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
+    )
+  }
+  list(
+    lppd_i = ptw_log_pred_density(ylp, log_weights),
+    n_draws = n_draws,
+    n_obs = n_obs
+  )
+}
+
+#' Weighted pointwise classification accuracy
+#'
+#' @description
+#' Shared by `measure_acc()` and `measure_bacc()`. Maps each observation to a
+#' predicted class, then compares it with `y`. Binary `mupred` is thresholded
+#' at 0.5. A 3-D `mupred` takes the argmax over categories.
+#'
+#' @param y An integer vector of observed class labels.
+#' @param mupred A draws x observations matrix, or a draws x observations x
+#'   categories array, of predicted probabilities.
+#' @param log_weights Optional log weights. Draws are equally weighted when
+#'   `NULL`.
+#'
+#' @return An integer vector of 0/1 accuracy contributions.
+#'
+#' @noRd
+.acc_pointwise <- function(y, mupred, log_weights) {
+  if (!is.numeric(mupred) || (length(dim(mupred)) != 2 && length(dim(mupred)) != 3)) {
+    cli::cli_abort(
+      "{.arg mupred} must be a numeric matrix or 3D numeric array."
+    )
+  }
+  .validate_probs(mupred, arg = "mupred")
+
+  if (!is.null(log_weights)) {
+    weights <- exp(.normalize_and_validate_log_weights(
+      log_weights = log_weights,
+      n_draws = nrow(mupred),
+      n_obs = dim(mupred)[2]
+    ))
+  } else {
+    weights <- rep(1 / nrow(mupred), nrow(mupred))
+  }
+
+  if (length(dim(mupred)) == 3) {
+    # Multiclass: (draws × obs × categories) > argmax over categories
+    weighted_mupred <- apply(array(weights, dim(mupred)) * mupred, c(2, 3), sum)
+    mupred_hat <- apply(weighted_mupred, 1, which.max)
+  } else {
+    .validate_numeric_matrix(mupred, arg = "mupred")
+    weighted_mupred <- colSums(mupred * weights)
+    mupred_hat <- (weighted_mupred > 0.5) * 1L
+  }
+
+  (mupred_hat == y) * 1L
+}
+
+#' Pointwise prediction error from measure inputs
+#'
+#' @description
+#' Shared by `measure_mae()` and `measure_mse()`. Forms a point prediction for
+#' each observation, then applies `transform` to the residual. The point
+#' prediction is the mean of the `mupred` draws, or their weighted mean when
+#' `log_weights` is supplied.
+#'
+#' @param y A numeric vector of observed outcomes.
+#' @param mupred A draws x observations matrix of point predictions. A vector
+#'   is coerced to a 1 x n matrix.
+#' @param log_weights Optional log weights, normalized before use.
+#' @param pointwise Optional numeric vector of precomputed pointwise errors.
+#' @param fun_name Name of the calling measure. Used in the messages that
+#'   report ignored inputs and the coercion of `mupred`.
+#' @param transform Function applied to the residual `y - yhat`.
+#'
+#' @return A list with `err_i`, `n_draws` (`NULL` when `pointwise` is
+#'   supplied) and `n_obs`.
+#'
+#' @noRd
+.point_error_from_inputs <- function(y, mupred, log_weights, pointwise,
+                                     fun_name, transform) {
+  if (!is.null(pointwise)) {
+    .inform_ignored_inputs(
+      pointwise,
+      ignored_args = list(mupred = mupred, log_weights = log_weights),
+      fun_name = fun_name
+    )
+    return(list(err_i = pointwise, n_draws = NULL, n_obs = length(pointwise)))
+  }
+
+  n_draws <- nrow(mupred)
+  n_obs <- ncol(mupred)
+  .validate_numeric_vector(y, arg = "y")
+  if (!is.null(mupred) && !is.matrix(mupred)) {
+    .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
+    cli::cli_inform(
+      "Coercing {.arg mupred} from vector to 1 x n matrix for {.fn {fun_name}}."
+    )
+    mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
+  }
+  .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
+  if (is.null(log_weights)) {
+    yhat <- colMeans(mupred)
+  } else {
+    weights <- exp(.normalize_and_validate_log_weights(
+      log_weights = log_weights, n_draws = n_draws, n_obs = n_obs
+    ))
+    yhat <- colSums(weights * mupred)
+  }
+  list(err_i = transform(y - yhat), n_draws = n_draws, n_obs = n_obs)
 }
 
 #' Copy selected attributes between objects
@@ -534,7 +690,6 @@
   )
 }
 
-
 #' Validate control argument
 #'
 #' @description
@@ -647,10 +802,6 @@ subset_measures <- function(x, measures, components) {
   if ("pointwise" %in% components) {
     cols <- intersect(measures, colnames(result$pointwise))
     result$pointwise <- result$pointwise[, cols, drop = FALSE]
-  }
-
-  if ("diagnostics" %in% components) {
-    result$diagnostics <- result$diagnostics
   }
 
   result

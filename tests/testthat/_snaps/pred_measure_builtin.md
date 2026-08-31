@@ -1,34 +1,34 @@
 # measure_elpd() works as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
-         Estimate SE      
-    elpd -5215.27   648.74
+         Estimate SE     
+    elpd -706.65   146.52
 
 # measure_ic() works as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
-       Estimate SE      
-    ic 10430.53  1297.48
+       Estimate SE     
+    ic 1413.31   293.04
 
 # measure_mlpd() works as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
          Estimate SE    
-    mlpd -19.91     2.48
+    mlpd -13.33     2.76
 
 # measure_mlpd() with pointwise works as expected
 
     
-    Computed from 262 pointwise terms.
+    Computed from 53 pointwise terms.
     
          Estimate SE    
-    mlpd -19.91     2.48
+    mlpd -13.33     2.76
 
 # measure_rps() with ordered categorial data works as expected
 
@@ -49,10 +49,10 @@
 # measure_rps() with continuous data works as expected
 
     
-    Computed from 400 draws by 144 observations.
+    Computed from 400 draws by 29 observations.
     
         Estimate SE   
-    rps 28.28     1.82
+    rps 24.61     3.29
 
 # measure_brier() works as expected
 
@@ -65,48 +65,48 @@
 # measure_mae() works as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
         Estimate SE   
-    mae 24.02     2.23
+    mae 17.21     2.65
 
 # measure_mse() and measure_rmse() work as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
-        Estimate SE     
-    mse 1872.47   384.98
+        Estimate SE    
+    mse 661.01   224.17
 
 ---
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
          Estimate SE   
-    rmse 43.27     4.45
+    rmse 25.71     4.36
 
 # measure_r2() works as expected
 
     
-    Computed from 400 draws by 262 observations.
+    Computed from 400 draws by 53 observations.
     
        Estimate SE  
-    r2 0.27     0.11
+    r2 0.58     0.17
 
 # measure_acc() works as expected
 
     
-    Computed from 400 draws by 333 observations.
+    Computed from 400 draws by 67 observations.
     
         Estimate SE  
-    acc 0.96     0.01
+    acc 0.97     0.02
 
 # measure_bacc() works as expected
 
     
-    Computed from 400 draws by 333 observations.
+    Computed from 400 draws by 67 observations.
     
          Estimate SE  
-    bacc 0.95     0.01
+    bacc 0.95     0.03
 

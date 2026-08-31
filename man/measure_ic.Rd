@@ -22,7 +22,7 @@ weights with dimensions \eqn{S \times n}. Weights are column-normalized
 before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise
-contributions \eqn{\mathrm{ic}_i = -1 \cdot \mathrm{lppd}_i}. If provided,
+contributions \eqn{\mathrm{ic}_i = -2 \cdot \mathrm{lppd}_i}. If provided,
 \code{ylp} and \code{log_weights} are ignored.}
 }
 \description{

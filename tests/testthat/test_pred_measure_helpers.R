@@ -74,35 +74,39 @@ test_that(".normalize_measure() errors on unnamed list function", {
 
 test_that(".prepare_measures() errors on invalid built-in names", {
   expect_error(
-    .prepare_measures("pps", res$predperf, supported_measures_list),
+    .prepare_measures(
+      "pps", res$predperf, supported_measures_list, source = "insample"
+    ),
     regexp = "Invalid measure"
   )
 })
 
 test_that(".prepare_measures() filters measures already in predperf", {  
   expect_warning(
-    .prepare_measures(c("mse", "elpd"), 
-    predperf = res$predperf, supported_measures_list),
+    .prepare_measures(
+      c("mse", "elpd"), predperf = res$predperf,
+      supported_measures_list, source = "insample"
+    ),
     regexp = "already present in"
   )
 
   expect_warning(
-    .prepare_measures(c("mse", "elpd", "r2"), 
-    predperf = res$predperf, supported_measures_list),
+    .prepare_measures(
+      c("mse", "elpd", "r2"), predperf = res$predperf,
+      supported_measures_list, source = "insample"
+    ),
     regexp = "already present in"
   )
 
   entries <- .prepare_measures(
-    c("mse", "rps"),
-    predperf = res$predperf,
-    supported_measures_list
+    c("mse", "rps"), predperf = res$predperf,
+    supported_measures_list, source = "insample"
   )
   expect_equal(vapply(entries, `[[`, "", "name"), c("mse", "rps"))
 
   entries <- .prepare_measures(
-    c("mse"),
-    predperf = res$predperf,
-    supported_measures_list
+    c("mse"), predperf = res$predperf,
+    supported_measures_list, source = "insample"
   )
   expect_equal(vapply(entries, `[[`, "", "name"), "mse")
 })

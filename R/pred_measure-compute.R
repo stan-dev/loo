@@ -26,7 +26,7 @@
 #'   included when `ylp` is available). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
-#'       [supported_measures_list()].
+#'       [supported_measures_list].
 #'     \item A **function** with attribute `"measure_name"` for one custom measure.
 #'     \item A **list** mixing character scalars (built-in names) and named
 #'       functions (custom measures), e.g. `list("rps", my_metric = my_fun)`.
@@ -106,12 +106,20 @@ do_pred_measure <- function(
   control = list()
 ) {
   # input validation ---------------------------------------------------
-  measures <- .prepare_measures(measure, predperf, supported_measures_list)
+  if (!is.null(group_ids)) {
+    cli::cli_abort(
+      "`group_ids` is reserved for future feature but is not yet implemented."
+    )
+  }
+
+  measures <- .prepare_measures(
+    measure, predperf, supported_measures_list, source
+  )
   # validated against every requested measure, including the ones
   # `.prepare_measures()` dropped as already present: those are reported by their
   # own warning, and a control entry for them is not a mistake
   .validate_control(control, .normalize_measure(measure))
-  
+
   if (source == "loo") {
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {
@@ -173,14 +181,6 @@ do_pred_measure <- function(
   log_weights <- if (!is.null(psis_object)) psis_object$log_weights else NULL
 
   for (entry in measures) {
-    name_updated <- .measure_result_name(source, entry$name)
-    if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
-      cli::cli_warn(c(
-        "{.field {name_updated}} already present in results. Skipping the update."
-      ))
-      next
-    }
-
     sel_measure <- .compute_measure(
       y = y,
       ypred = ypred,
@@ -191,10 +191,22 @@ do_pred_measure <- function(
       control = control,
       base_measure = base_measure
     )
+    result_name <- attr(sel_measure, "measure")
+    if (is.null(result_name)) {
+      result_name <- entry$name
+    }
+    # add new measures to existing pred_measure results
+    name_updated <- .measure_result_name(source, result_name)
+    if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
+      cli::cli_warn(c(
+        "{.field {name_updated}} already present in results. Skipping the update."
+      ))
+      next
+    }
     estimates <- .merge_matrix(
       source = source,
       mat = estimates,
-      name = entry$name,
+      name = result_name,
       values = .measure_estimate_se(sel_measure),
       margin = 1,
       measure_entry = entry,
@@ -203,7 +215,7 @@ do_pred_measure <- function(
     pointwise <- .merge_matrix(
       source = source,
       mat = pointwise,
-      name = entry$name,
+      name = result_name,
       values = sel_measure$pointwise,
       margin = 2
     )
@@ -248,6 +260,8 @@ do_pred_measure <- function(
 #'   \item Extract from `loo$psis_object` when `loo` is provided.
 #'   \item Use the supplied `psis_object`.
 #'   \item Reuse `predperf$psis_object` when accumulating measures.
+#'   \item Reuse `predperf$log_weights` when only the weights were stored
+#'     (`save_psis = FALSE`); the result carries no `diagnostics`.
 #'   \item Compute from `ylp` via [loo::psis()] on `-ylp` log ratios.
 #' }
 #'
@@ -271,7 +285,10 @@ do_pred_measure <- function(
 ) {
   # psis_object + loo are both provided -> return psis_object
   if (!is.null(psis_object) && !is.null(loo)) {
-    psis_equal_loo <- all(psis_object == loo$psis_object)
+    psis_equal_loo <- isTRUE(all.equal(
+      psis_object$log_weights,
+      loo$psis_object$log_weights
+    ))
     if (!psis_equal_loo) {
       cli::cli_abort(
         "Provided `psis_object` and `loo$psis_object` are not identical."
@@ -287,6 +304,9 @@ do_pred_measure <- function(
   # predperf with psis_object is provided
   } else if (!is.null(predperf$psis_object)) {
     return(predperf$psis_object)
+  # predperf carries log_weights only (save_psis = FALSE)
+  } else if (!is.null(predperf$log_weights)) {
+    return(list(log_weights = predperf$log_weights))
   # ylp is provided
   } else if (is.null(loo) && is.null(psis_object) && !is.null(ylp)) {
     cli::cli_inform(
@@ -302,18 +322,54 @@ do_pred_measure <- function(
     ))
   }}
 
+#' Extract estimate and SE from a measure result
+#'
+#' `.create_measure_structure()` gives every builtin measure an `estimates`
+#' matrix. A custom measure returns either `estimates` or `estimate` and `se`.
+#'
+#' @noRd
+.measure_estimate_se <- function(res) {
+  if (!is.null(res$estimates)) {
+    return(res$estimates)
+  }
+  c(res$estimate, res$se)
+}
+
+#' Pointwise ELPD from the base measure block
+#'
+#' `.compute_base_measure()` appends the source suffix to the base column names,
+#' so the column is one of `elpd`, `elpd_loo`, `elpd_kfold`, `elpd_test`.
+#' Measures that declare `needs_elpd` in `.measure_spec` read the log predictive
+#' density here instead of recomputing it from `ylp`. `ylp` is absent when only
+#' a `loo` or `kfold` object is supplied, and on the `test` source it holds the
+#' training data while the base block holds the holdout data.
+#'
+#' @noRd
+.base_elpd_pointwise <- function(base_measure) {
+  known <- c("elpd", "elpd_loo", "elpd_kfold", "elpd_test")
+  hit <- intersect(known, colnames(base_measure$pointwise))
+  if (length(hit) == 0L) {
+    cli::cli_abort(c(
+      "No {.field elpd} column found in the base measure.",
+      "i" = "{.val mlpd} and {.val ic} are derived from {.val elpd}."
+    ))
+  }
+  base_measure$pointwise[, hit[1L]]
+}
+
 #' Compute a single predictive measure
 #'
 #' @description
 #' Dispatches one requested predictive measure to the appropriate summary
-#' function. The measure's `family` in `.measure_spec` determines which inputs
-#' are passed through:
+#' function. No measure has a fixed input list. The function builds a pool of
+#' candidate arguments, then keeps only the ones the measure function declares:
 #'
-#' \describe{
-#'   \item{`metrics`}{`y` and `mupred` (e.g. MAE, RMSE, accuracy).}
-#'   \item{`rank_scores`}{`y` and `ypred` (e.g. RPS, CRPS).}
-#'   \item{`density_scores`}{`ylp` (e.g. ELPD, MLPD).}
-#' }
+#'   `args <- pool[intersect(names(formals(measure_fun)), names(pool))]`
+#'
+#' The pool holds `y`, `ypred`, `mupred`, `ylp` and `log_weights`, plus the
+#' measure's slice of `control`. A measure that sets `needs_elpd` in
+#' `.measure_spec` gets a different pool: `pointwise` holds the ELPD column
+#' taken from `base_measure`, and `ylp` and `log_weights` are `NULL`.
 #'
 #' @param y Vector of observed values (n).
 #' @param ypred Matrix of posterior predictive draws (S × n).
@@ -325,26 +381,19 @@ do_pred_measure <- function(
 #'   `.compute_log_weights()`.
 #' @param control Named list of per-measure settings passed from
 #'   [pred_measure()]; the active slice is `control[[measure_entry$name]]`.
+#' @param base_measure The base measure block from `.compute_base_measure()`.
+#'   Read only when the measure sets `needs_elpd` in `.measure_spec`.
 #'
-#' @return A named list with three elements:
+#' @return The result of the measure function, in one of two shapes.
 #'   \describe{
-#'     \item{`estimate`}{Scalar point estimate for the measure.}
-#'     \item{`se`}{Scalar standard error for the estimate.}
-#'     \item{`pointwise`}{Length-`n` vector of observation-level contributions.}
+#'     \item{builtin}{A `"measure"` object from `.create_measure_structure()`:
+#'       `estimates`, a 1 by 2 matrix with columns `Estimate` and `SE`, and
+#'       `pointwise`, an n by 1 matrix.}
+#'     \item{custom}{Either `estimates`, a length-2 numeric vector, or
+#'       `estimate` and `se` as scalars. `pointwise` is a numeric vector.
+#'       `.validate_measure_result()` accepts both.}
 #'   }
 #'
-#' Extract estimate and SE from a measure result
-#'
-#' Supports `estimate`/`se` (pred_measure functions) and `estimates` (CRPS).
-#'
-#' @noRd
-.measure_estimate_se <- function(res) {
-  if (!is.null(res$estimates)) {
-    return(res$estimates)
-  }
-  c(res$estimate, res$se)
-}
-
 #' @noRd
 .compute_measure <- function(
   y,
@@ -363,18 +412,8 @@ do_pred_measure <- function(
     }
     measure_fun <- spec$fun
   } else {
+    spec <- NULL
     measure_fun <- measure_entry$key
-  }
-
-  if (identical(measure_fun, measure_mlpd) || identical(measure_fun, measure_ic)) {
-    elpd_i <- base_measure$pointwise[, 1]
-    # ensure elpd_i is in correct orientation (negative log predictive density)
-    if (any(elpd_i > 0)) elpd_i <- -elpd_i
-
-    if (identical(measure_fun, measure_mlpd)) {
-      return(measure_mlpd(ylp = NULL, pointwise = elpd_i))
-    }
-    return(measure_ic(ylp = NULL, pointwise = -2 * elpd_i))
   }
 
   measure_control <- control[[measure_entry$name]]
@@ -382,16 +421,25 @@ do_pred_measure <- function(
     measure_control <- list()
   }
 
-  pool <- c(
+  pool <- if (isTRUE(spec$needs_elpd)) {
+    lppd_i <- .base_elpd_pointwise(base_measure)
+    if (is.function(spec$elpd_transform)) {
+      lppd_i <- spec$elpd_transform(lppd_i)
+    }
+    # `ylp` has no default, and `.inform_ignored_inputs()` forces it. Pass it as
+    # NULL rather than leaving it out.
+    list(ylp = NULL, log_weights = NULL, pointwise = lppd_i)
+  } else {
     list(
       y = y,
       ypred = ypred,
       mupred = mupred,
       ylp = ylp,
       log_weights = log_weights
-    ),
-    measure_control
-  )
+    )
+  }
+
+  pool <- c(pool, measure_control)
   args <- pool[intersect(names(formals(measure_fun)), names(pool))]
   res <- do.call(measure_fun, args)
   if (measure_entry$type == "custom") {
@@ -461,7 +509,7 @@ do_pred_measure <- function(
   if (!is.null(predperf)) return(predperf)
   
   if (source == "kfold") {
-    components <- if ("diagnostics" %in% kfold) {
+    components <- if ("diagnostics" %in% names(kfold)) {
       c("estimates", "pointwise", "diagnostics")
     } else {
       c("estimates", "pointwise")
@@ -487,13 +535,12 @@ do_pred_measure <- function(
     test = measure_elpd(ylp_test)
   )
   
-  if (!is.null(elpd_res$estimates)) {
-    elpd_res <- list(
-      estimate = unname(elpd_res$estimates[1]),
-      se = unname(elpd_res$estimates[2]),
-      pointwise = elpd_res$pointwise
-    )
-  }
+  est_se <- .measure_estimate_se(elpd_res)
+  elpd_res <- list(
+    estimate = unname(est_se[1]),
+    se = unname(est_se[2]),
+    pointwise = elpd_res$pointwise
+  )
   
   suffix <- if (source == "insample") "" else paste0("_", source)
   add_p_eff <- source == "loo"
@@ -762,6 +809,8 @@ do_pred_measure <- function(
       dim(mupred)
     } else if (!is.null(ylp)) {
       dim(ylp)
+    } else {
+      attr(predperf, "dims")
     }
     attr(predperf_res, "dims") <- dims
     measure_info <- attr(predperf, "measure_info")

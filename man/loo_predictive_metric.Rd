@@ -77,7 +77,7 @@ See \code{vignette("migration-guide", package = "loo")} for a full mapping table
 \details{
 The replacement API uses \code{mupred} (posterior expected values) rather than
 pre-computed LOO expectations passed as \code{x}. Metric names also differ:
-\code{"balanced_acc"} maps to \code{"bacc"} in \code{\link[=supported_measures_list]{supported_measures_list()}}.
+\code{"balanced_acc"} maps to \code{"bacc"} in \link{supported_measures_list}.
 
 The \code{loo_predictive_metric()} function computes estimates of leave-one-out
 predictive metrics given a set of predictions and observations. Currently
@@ -117,5 +117,5 @@ mae_90q <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
 }
 }
 \seealso{
-\code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=measure_mae]{measure_mae()}}, \code{\link[=supported_measures_list]{supported_measures_list()}}
+\code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=measure_mae]{measure_mae()}}, \link{supported_measures_list}
 }

@@ -1245,7 +1245,6 @@ test_that("model_compare warns when rank_by is ignored for classic loo objects",
 
 test_that("model_compare works for all built-in measures", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  res_roaches <- readRDS("data-for-tests/test_data_roaches.Rds")
   roaches_measures <- c(
     "ic", "mlpd", "mae", "r2", "rmse", "mse"
   )
@@ -1261,14 +1260,14 @@ test_that("model_compare works for all built-in measures", {
     pm1 <- loo_pred_measure(
       loo = res$loo_p_m1,
       y = res$y,
-      ypred = res_roaches$ypred,
+      ypred = res$ypred_m1,
       ylp = res$ylp_m1,
       measure = measure
     )
     pm2 <- loo_pred_measure(
       loo = res$loo_p_m2,
       y = res$y,
-      ypred = res_roaches$ypred,
+      ypred = res$ypred_m2,
       ylp = res$ylp_m2,
       measure = measure
     )

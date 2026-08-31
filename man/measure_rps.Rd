@@ -47,7 +47,7 @@ value of \code{scaled}:
 distributions for ordered discrete outcomes.
 \item \strong{CRPS} (Matheson & Winkler, 1976; Gneiting & Raftery, 2007): Generalizes
 RPS to continuous outcomes. Defined as
-\deqn{\mathrm{CRPS}(X; y) = \frac{1}{2} E[|X - X'|] - E[|X - y|],}
+\deqn{\mathrm{CRPS}(X; y) = E[|X - y|] - \frac{1}{2} E[|X - X'|],}
 where \eqn{X, X'} are independent draws from the predictive distribution.
 \item \strong{SRPS/SCRPS} (Bolin & Wallin, 2023): Scaled variants that are invariant
 to the scale of the predictive distribution. Defined as

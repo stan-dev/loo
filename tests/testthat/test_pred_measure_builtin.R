@@ -63,12 +63,19 @@ testthat::test_that("measure_elpd() with unnormalized log-weights works as expec
 })
 
 testthat::test_that("measure_elpd() with normalized log-weights works as expected", {
-  res <- measure_elpd(ylp = res_roaches$ylp, log_weights = res_roaches$predperf_loo$log_weights)
+  log_weights <- .normalize_log_weights(res_roaches$log_weights)
+  res <- measure_elpd(ylp = res_roaches$ylp, log_weights = log_weights)
 
+  expect_equal(.normalize_log_weights(log_weights), log_weights)
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates[1]), 1)
   expect_equal(length(res$estimates[2]), 1)
   expect_equal(length(res$pointwise), dim(res_roaches$ylp)[2])
+  # measure_elpd() normalizes internally, so the result must not change
+  expect_equal(
+    res,
+    measure_elpd(ylp = res_roaches$ylp, log_weights = res_roaches$log_weights)
+  )
 })
 
 # measure_ic() -----------------------------------
@@ -155,6 +162,18 @@ testthat::test_that("measure_rps() for categorical data with log-weights works a
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_binary$y))
   expect_true(all(res$pointwise >= 0))
+})
+
+testthat::test_that("measure_rps() validates the shape of log_weights", {
+  bad_log_weights <- res_binom$log_weights[, -1, drop = FALSE]
+  expect_error(
+    measure_rps(
+      y = res_binom$y,
+      ypred = res_binom$ypred,
+      log_weights = bad_log_weights
+    ),
+    regexp = "`log_weights` must have"
+  )
 })
 
 testthat::test_that("measure_rps() with continuous data works as expected", {
@@ -383,7 +402,7 @@ testthat::test_that("measure_mae() works as expected", {
 
 testthat::test_that("measure_mae() with log_weights works as expected", {
   res <- measure_mae(y = res_roaches$y, mupred = res_roaches$mupred,
-    log_weights = res_roaches$loo1$psis_object$log_weights)
+    log_weights = res_roaches$log_weights)
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
@@ -431,6 +450,11 @@ testthat::test_that("rps is a loss and srps a utility", {
   )
 })
 
+testthat::test_that("the raw rps score is a non-negative loss", {
+  raw <- measure_rps(res_sleep$y, res_sleep$ypred)
+  expect_true(all(raw$pointwise >= 0))
+})
+
 testthat::test_that("measure_rmse() works with se=0", {
   mupred0 <- t(replicate(4000, res_roaches$y))
 
@@ -457,7 +481,7 @@ testthat::test_that("measure_r2() works as expected", {
 
 testthat::test_that("measure_r2() with log_weights works as expected", {
   res <- measure_r2(y = res_roaches$y, mupred = res_roaches$mupred,
-    log_weights = res_roaches$loo1$psis_object$log_weights)
+    log_weights = res_roaches$log_weights)
 
   expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
@@ -492,13 +516,34 @@ testthat::test_that("measure_acc() with log-weights works as expected", {
   res <- measure_acc(
     y = as.integer(res_cat$y),
     mupred = res_cat$mupred,
-    log_weights = res_cat$loo$psis_object$log_weights
+    log_weights = res_cat$log_weights
   )
 
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
+})
+
+testthat::test_that("measure_acc() broadcasts weights over categories without warning", {
+  y <- as.integer(res_cat$y)
+  lw <- res_cat$log_weights
+
+  expect_no_warning(res <- measure_acc(
+    y = y, mupred = res_cat$mupred, log_weights = lw
+  ))
+  expect_no_warning(measure_bacc(
+    y = y, mupred = res_cat$mupred, log_weights = lw
+  ))
+
+  w <- exp(.normalize_log_weights(lw))
+  n_cat <- dim(res_cat$mupred)[3]
+  manual <- vapply(
+    seq_len(n_cat),
+    function(k) colSums(w * res_cat$mupred[, , k]),
+    numeric(length(y))
+  )
+  expect_equal(as.numeric(res$pointwise), (apply(manual, 1, which.max) == y) * 1)
 })
 
 testthat::test_that("measure_bacc() pointwise contributions sum to estimate", {
@@ -533,6 +578,26 @@ testthat::test_that("measure_bacc() works as expected", {
   expect_snapshot_output(measure_bacc(y = as.integer(res_cat$y), mupred = res_cat$mupred))
 })
 
+testthat::test_that("measure_bacc() accepts precomputed pointwise values", {
+  y <- c(1L, 1L, 2L, 2L)
+  acc_i <- c(1L, 0L, 1L, 1L)
+  res <- measure_bacc(y = y, mupred = NULL, pointwise = acc_i)
+
+  expect_equal(unname(res$estimates[1, "Estimate"]), 0.75)
+  expect_error(
+    measure_bacc(y = y, mupred = NULL, pointwise = acc_i[-1]),
+    regexp = "must have the same length"
+  )
+})
+
+testthat::test_that("mlpd and ic count draws after the 3-D conversion", {
+  LLarr <- example_loglik_array()
+  dims_elpd <- attr(measure_elpd(LLarr), "dims")
+
+  expect_equal(attr(measure_mlpd(LLarr), "dims"), dims_elpd)
+  expect_equal(attr(measure_ic(LLarr), "dims"), dims_elpd)
+})
+
 testthat::test_that("measure_bacc() rejects out-of-range mupred", {
   bad_mupred <- res_cat$mupred
   bad_mupred[1, 1, 1] <- 1.2
@@ -546,11 +611,116 @@ testthat::test_that("measure_bacc() with log-weights works as expected", {
   res <- measure_bacc(
     y = as.integer(res_cat$y),
     mupred = res_cat$mupred,
-    log_weights = res_cat$loo$psis_object$log_weights
+    log_weights = res_cat$log_weights
   )
 
   expect_equal(names(res), c("estimates", "pointwise", "extra"))
   expect_equal(length(res$estimates), 2)
   expect_equal(length(res$pointwise), length(res_cat$y))
   expect_true(!all(res$pointwise < 0 | res$pointwise > 1))
+})
+
+# mlpd / ic derived from elpd ------------------------
+testthat::test_that("mlpd and ic keep the sign of a positive pointwise lppd", {
+  # lppd_i is a log density and is positive for concentrated predictions.
+  set.seed(1)
+  S <- 200
+  n <- 30
+  y <- rnorm(n, 0, 0.05)
+  mu <- matrix(rnorm(S * n, 0, 0.01), S, n)
+  ylp <- t(sapply(1:S, function(s) dnorm(y, mu[s, ], 0.05, log = TRUE)))
+  lppd <- matrixStats::colLogSumExps(ylp) - log(S)
+
+  # the removed heuristic negated every entry as soon as one was positive
+  expect_true(any(lppd > 0))
+  expect_true(any(lppd < 0))
+
+  res <- insample_pred_measure(ylp = ylp, measure = c("mlpd", "ic"))
+
+  expect_equal(unname(res$estimates["mlpd", 1]), mean(lppd))
+  expect_equal(unname(res$estimates["ic", 1]), sum(-2 * lppd))
+  expect_equal(unname(res$pointwise[, "mlpd"]), unname(lppd))
+  expect_equal(unname(res$pointwise[, "ic"]), unname(-2 * lppd))
+  expect_equal(cor(res$pointwise[, "elpd"], res$pointwise[, "mlpd"]), 1)
+})
+
+testthat::test_that("mlpd on the test source uses ylp_test, not ylp", {
+  set.seed(2)
+  S <- 100
+  ylp <- matrix(rnorm(S * 20, -1, 0.1), S, 20)
+  ylp_test <- matrix(rnorm(S * 8, -5, 0.1), S, 8)
+  lppd_test <- matrixStats::colLogSumExps(ylp_test) - log(S)
+
+  res <- test_pred_measure(ylp = ylp, ylp_test = ylp_test, measure = "mlpd")
+
+  expect_equal(unname(res$estimates["mlpd_test", 1]), mean(lppd_test))
+  expect_equal(unname(res$pointwise[, "mlpd_test"]), unname(lppd_test))
+})
+
+testthat::test_that("mlpd and ic work when only a loo object is given", {
+  LL <- example_loglik_matrix()
+  lo <- suppressWarnings(
+    loo(LL, save_psis = TRUE, r_eff = rep(1, ncol(LL)))
+  )
+
+  res <- loo_pred_measure(loo = lo, measure = c("mlpd", "ic"))
+
+  elpd_loo_i <- lo$pointwise[, "elpd_loo"]
+  expect_equal(unname(res$estimates["mlpd_loo", 1]), mean(elpd_loo_i))
+  expect_equal(unname(res$estimates["ic_loo", 1]), sum(-2 * elpd_loo_i))
+})
+
+# .exx_pwm ------------------------
+testthat::test_that(".exx_pwm() reduces to the classic unbiased PWM estimator", {
+  set.seed(3)
+  S <- 500
+  x <- matrix(rnorm(S * 6), S, 6)
+  ref <- colMeans(apply(x, 2, sort) * (2 * (2 * seq_len(S) - S - 1) / (S - 1)))
+
+  expect_equal(.exx_pwm(x), ref)
+  expect_equal(.exx_pwm(x, matrix(1 / S, S, 6)), .exx_pwm(x))
+})
+
+testthat::test_that(".exx_pwm() stays non-negative under concentrated weights", {
+  # E|X - X'| is non-negative by definition. The previous inline estimator
+  # divided by (1 - w) and drove the estimate negative when one draw dominated,
+  # which made log(EXX) in srps NaN.
+  set.seed(4)
+  S <- 200
+  x <- matrix(rgamma(S * 4, 2, 1), S, 4)
+  lw <- matrix(0, S, 4)
+  lw[1, ] <- 8 # one draw carries most, but not all, of the weight
+  w <- exp(.normalize_log_weights(lw))
+  expect_gt(max(w), 0.9)
+
+  EXX <- .exx_pwm(x, w)
+  expect_true(all(EXX > 0))
+  expect_true(all(is.finite(EXX)))
+
+  srps <- measure_rps(y = colMeans(x), ypred = x, log_weights = lw, scaled = TRUE)
+  expect_true(all(is.finite(srps$pointwise)))
+})
+
+testthat::test_that("the scaled score aborts on a point-mass predictive", {
+  # All the weight on one draw makes E|X - X'| exactly 0, so the scaling term
+  # log(E|X - X'|) is undefined. The unscaled score stays well defined.
+  set.seed(5)
+  S <- 100
+  x <- matrix(rgamma(S * 3, 2, 1), S, 3)
+  lw <- matrix(0, S, 3)
+  lw[1, ] <- 60
+  y <- colMeans(x)
+
+  expect_equal(.exx_pwm(x, exp(.normalize_log_weights(lw))), rep(0, 3))
+  expect_error(
+    measure_rps(y = y, ypred = x, log_weights = lw, scaled = TRUE),
+    "point mass"
+  )
+  expect_true(all(is.finite(
+    measure_rps(y = y, ypred = x, log_weights = lw)$pointwise
+  )))
+})
+
+testthat::test_that(".exx_pwm() requires at least two draws", {
+  expect_error(.exx_pwm(matrix(1, 1, 3)), "at least 2 draws")
 })

@@ -9,7 +9,7 @@
 #' @details
 #' The replacement API uses `mupred` (posterior expected values) rather than
 #' pre-computed LOO expectations passed as `x`. Metric names also differ:
-#' `"balanced_acc"` maps to `"bacc"` in [supported_measures_list()].
+#' `"balanced_acc"` maps to `"bacc"` in [supported_measures_list].
 #'
 #' The `loo_predictive_metric()` function computes estimates of leave-one-out
 #' predictive metrics given a set of predictions and observations. Currently
@@ -60,7 +60,7 @@
 #'   Standard error of the estimate.
 #'   }
 #'  }
-#' @seealso [loo_pred_measure()], [measure_mae()], [supported_measures_list()]
+#' @seealso [loo_pred_measure()], [measure_mae()], [supported_measures_list]
 #' @export
 #'
 #' @examples
