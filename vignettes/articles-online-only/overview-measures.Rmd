@@ -48,19 +48,16 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE
 )
-devtools::load_all(".")
 ```
 
 ## Data Examples
-```{r, message=FALSE, warnings=FALSE, include = FALSE}
-library(tidyr)
-library(dplyr)
+```{r, message=FALSE, warnings=FALSE}
+library(loo)
 library(ggplot2)
 ```
 
 ```{r, include = FALSE}
 plot_ptw <- function(ws, loo, kfold, label, show_estimate = TRUE){
-  
   # 1. Safe estimation extractor
   ptw_est <- function(x) {
     if (is.null(x)) return(NA)
@@ -71,44 +68,50 @@ plot_ptw <- function(ws, loo, kfold, label, show_estimate = TRUE){
   }
 
   # 2. Build estimates and create the formatted labels right away
-  estimates <- tibble(
+  estimates <- data.frame(
     source = c("ws", "loo", "kfold"),
     estimate = c(ptw_est(ws), ptw_est(loo), ptw_est(kfold))
-  ) |> 
-    mutate(source_label = if_else(
-      is.na(estimate), 
-      paste0(source, " (no data)"), 
-      paste0(source, " (est. = ", round(estimate, 2), ")")
-    ))
+  )
+  estimates$source_label <- ifelse(
+    is.na(estimates$estimate),
+    paste0(estimates$source, " (no data)"),
+    paste0(estimates$source, " (est. = ", round(estimates$estimate, 2), ")")
+  )
   
   # Turn into a factor to preserve the ws -> loo -> kfold order
   estimates$source_label <- factor(estimates$source_label, levels = estimates$source_label)
   
-  # 3. Safe data binding for the dots
-  g_data <- dplyr::bind_rows(
-    tibble(source = "ws", value = if (!is.null(ws)) ws$pointwise else as.numeric(NA)),
-    tibble(source = "loo", value = if (!is.null(loo)) loo$pointwise else as.numeric(NA)),
-    tibble(source = "kfold", value = if (!is.null(kfold)) kfold$pointwise else as.numeric(NA))
+  # 3. Safe data binding for the dots. `$pointwise` is an n x 1 matrix,
+  #    so as.vector() keeps `value` a single numeric column.
+  ptw_val <- function(x) if (is.null(x)) NA_real_ else as.vector(x$pointwise)
+  g_data <- rbind(
+    data.frame(source = "ws", value = ptw_val(ws)),
+    data.frame(source = "loo", value = ptw_val(loo)),
+    data.frame(source = "kfold", value = ptw_val(kfold))
   )
-  
+
   # 4. Align facet names for the dots data
-  plot_df <- g_data |> 
-    left_join(estimates, by = "source") |>
-    mutate(source = source_label)
-  
+  idx <- match(g_data$source, estimates$source)
+  plot_df <- data.frame(
+    value = g_data$value,
+    source = estimates$source_label[idx],
+    estimate = estimates$estimate[idx]
+  )
+
   # 5. Align facet names for the line data so ggplot matches them up perfectly
-  line_data <- estimates |> 
-    mutate(source = source_label)
-  
+  line_data <- estimates
+  line_data$source <- line_data$source_label
+
   # Plotting
   g <- ggplot(plot_df, mapping = aes(x = value)) +
     geom_dotplot()
-  
+
   if (isTRUE(show_estimate)) {
     g <- g +
       geom_vline(
         data = line_data, # Uses the aligned facet labels now
-        aes(xintercept = estimate), color = "red", linetype = "solid", linewidth = 1
+        aes(xintercept = estimate),
+        color = "red", linetype = "solid", linewidth = 1
       )
   }
 
@@ -247,7 +250,7 @@ invisible(str(elpd_psis1))
 
 # kfold elpd
 elpd_kfold <- measure_elpd(
-  ylp = NULL, 
+  ylp = NULL,
   pointwise = res_roaches$kfold$pointwise[, "elpd_kfold"]
 )
 message("kfold elpd:")
