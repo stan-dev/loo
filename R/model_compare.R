@@ -612,11 +612,18 @@ find_model_names <- function(x) {
 
 #' Build estimates table for `model_compare()` ordering and matrix output
 #' @noRd
-.model_compare_estimates_table <- function(loos, bare_names = FALSE) {
+.model_compare_estimates_table <- function(loos, bare_names = FALSE,
+                                          subsampling = FALSE) {
   sapply(loos, function(x) {
     est <- x$estimates
     rows <- if (bare_names) .display_name(rownames(est), loos) else rownames(est)
-    setNames(c(est), nm = c(rows, paste0("se_", rows)))
+    nms <- c(rows, paste0("se_", rows))
+    # A `psis_loo_ss` object carries a third estimate column, the subsampling
+    # standard error, so its table needs a third name set.
+    if (subsampling) {
+      nms <- c(nms, paste0("subsampling_se_", rows))
+    }
+    setNames(c(est), nm = nms)
   })
 }
 
@@ -625,8 +632,13 @@ find_model_names <- function(x) {
 #' @param loos List of `"loo"` objects.
 #' @param bare_names If `TRUE`, strip `_loo` suffixes from estimate row names.
 #' @param ord Optional model ordering indices; computed from ELPD when `NULL`.
-model_compare_matrix <- function(loos, bare_names = FALSE, ord = NULL) {
-  tmp <- .model_compare_estimates_table(loos, bare_names = bare_names)
+model_compare_matrix <- function(loos, bare_names = FALSE, ord = NULL,
+                                 subsampling = FALSE) {
+  tmp <- .model_compare_estimates_table(
+    loos,
+    bare_names = bare_names,
+    subsampling = subsampling
+  )
   colnames(tmp) <- find_model_names(loos)
   comp <- t(tmp)
 
@@ -637,6 +649,10 @@ model_compare_matrix <- function(loos, bare_names = FALSE, ord = NULL) {
 
   patts <- if (bare_names) {
     c("^elpd$", "^p$", "^se_elpd$", "^se_p$")
+  } else if (subsampling) {
+    # Left unanchored, so each `subsampling_se_*` column is picked up beside
+    # its `se_*` counterpart.
+    c("elpd", "p_", "^waic$|^looic$", "se_waic$|se_looic$")
   } else {
     c("elpd", "p_", "^waic$|^looic$", "^se_waic$|^se_looic$")
   }

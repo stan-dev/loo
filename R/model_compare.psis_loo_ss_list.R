@@ -25,7 +25,7 @@ model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
   # check compares the full data size instead.
   model_compare_checks(x, n_fun = function(x) x$loo_subsampling$data_dim[1])
 
-  comp <- model_compare_matrix.psis_loo_ss_list(x)
+  comp <- model_compare_matrix(x, subsampling = TRUE)
   ord <- model_compare_order(x)
   names(x) <- rownames(comp)[ord]
 
@@ -147,27 +147,3 @@ print.compare.loo_ss <- function(x, ..., digits = 1) {
   invisible(x)
 }
 
-
-#' Compute comparison matrix for `psis_loo_ss` objects
-#' @noRd
-#' @keywords internal
-#' @param loos List of `psis_loo_ss` objects.
-#' @return A `compare.loo_ss` matrix.
-model_compare_matrix.psis_loo_ss_list <- function(loos){
-  tmp <- sapply(loos, function(x) {
-    est <- x$estimates
-    setNames(c(est), nm = c(rownames(est),
-                            paste0("se_", rownames(est)),
-                            paste0("subsampling_se_", rownames(est))))
-  })
-  colnames(tmp) <- find_model_names(loos)
-  rnms <- rownames(tmp)
-  comp <- tmp
-  ord <- model_compare_order(loos)
-  comp <- t(comp)[ord, ]
-  patts <- c("elpd", "p_", "^waic$|^looic$", "se_waic$|se_looic$")
-  col_ord <- unlist(sapply(patts, function(p) grep(p, colnames(comp))),
-                    use.names = FALSE)
-  comp <- comp[, col_ord]
-  comp
-}
