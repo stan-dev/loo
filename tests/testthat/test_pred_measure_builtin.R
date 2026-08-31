@@ -63,12 +63,19 @@ testthat::test_that("measure_elpd() with unnormalized log-weights works as expec
 })
 
 testthat::test_that("measure_elpd() with normalized log-weights works as expected", {
-  res <- measure_elpd(ylp = res_roaches$ylp, log_weights = res_roaches$predperf_loo$log_weights)
+  log_weights <- .normalize_log_weights(res_roaches$log_weights)
+  res <- measure_elpd(ylp = res_roaches$ylp, log_weights = log_weights)
 
+  expect_equal(.normalize_log_weights(log_weights), log_weights)
   expect_equal(names(res), c("estimates", "pointwise"))
   expect_equal(length(res$estimates[1]), 1)
   expect_equal(length(res$estimates[2]), 1)
   expect_equal(length(res$pointwise), dim(res_roaches$ylp)[2])
+  # measure_elpd() normalizes internally, so the result must not change
+  expect_equal(
+    res,
+    measure_elpd(ylp = res_roaches$ylp, log_weights = res_roaches$log_weights)
+  )
 })
 
 # measure_ic() -----------------------------------
