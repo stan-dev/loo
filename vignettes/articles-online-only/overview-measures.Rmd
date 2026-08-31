@@ -23,20 +23,24 @@ In Bayesian model evaluation, predictive performance is assessed by comparing a 
 
 The table below summarizes the core metrics implemented in our framework. 
 
-| Metric Keyword | Full Name | Metric Type | Orientation | Target Outcome Type |
+| Measure Keyword | Full Name | Metric Type | Orientation | Target Outcome Type |
 | :--- | :--- | :--- | :--- | :--- |
-| `lppd` / `elppd` | (Expected) Log Pointwise Predictive Density | Scoring Rule (Distributional) | Higher is Better | Any |
+| `elpd` | Expected Log Pointwise Predictive Density (sum) | Scoring Rule (Distributional) | Higher is Better | Any |
+| `mlpd` | Mean Log Predictive Density (`elpd` divided by `n`) | Scoring Rule (Distributional) | Higher is Better | Any |
+| `ic` | Information Criterion (`-2 * elpd`) | Scoring Rule (Distributional) | Lower is Better | Any |
 | `acc` | Accuracy | Classification Metric | Higher is Better | Nominal Categorical |
 | `bacc` | Balanced Accuracy | Adjusted Classification Metric | Higher is Better | Imbalanced Categorical |
 | `brier` | Brier Score | Proper Scoring Rule | Lower is Better | Binary |
-| `crps` | Continuous Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous |
-| `scrps` | Scaled Continuous Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous |
-| `rps` | Ranked Probability Score | Proper Scoring Rule | Lower is Better | Ordered Categorical |
-| `srps` | Scaled Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Ordered Categorical |
+| `rps` | (Continuous) Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous or Ordered Categorical |
+| `srps` | Scaled (Continuous) Ranked Probability Score | Scale-Invariant Proper Scoring Rule | Higher is Better | Continuous or Ordered Categorical |
 | `mae` | Mean Absolute Error | Point Estimation Metric | Lower is Better | Continuous |
 | `mse` | Mean Squared Error | Point Estimation Metric | Lower is Better | Continuous |
 | `rmse` | Root Mean Squared Error | Point Estimation Metric | Lower is Better | Continuous |
 | `r2` | Coefficient of Determination | Summary Fit Metric | Higher is Better | Continuous |
+
+`measure_rps()` scores continuous outcomes as the CRPS and ordered categorical
+outcomes as the RPS. `measure_srps()` does the same for the scaled versions.
+Sections below show both cases.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -235,14 +239,9 @@ invisible(str(elpd_ws))
 
 # psis-loo elpd
 elpd_psis1 <- measure_elpd(
-  ylp = res_roaches$ylp, 
+  ylp = res_roaches$ylp,
   log_weights = res_roaches$log_weights
 )
-elpd_psis2 <- measure_elpd(
-  ylp = NULL, 
-  pointwise = res_roaches$loo$pointwise[, "elpd_loo"]
-)
-# expect_equal(elpd_psis1, elpd_psis2)
 message("psis-loo elpd:")
 invisible(str(elpd_psis1))
 
@@ -357,17 +356,11 @@ acc_loo <- measure_acc(
   mupred = res_penguins$mupred,
   log_weights = res_penguins$log_weights
 )
-# acc_kfold <- measure_acc(
-#   y = as.numeric(res_penguins$y), 
-#   mupred = res_penguins$mupred_kfold
-# )
-  
+
 message("within-sample acc:")
 invisible(str(acc_ws))
-message("psis-loo acc:") 
+message("psis-loo acc:")
 invisible(str(acc_loo))
-# message("kfold acc:") 
-# invisible(str(acc_kfold))
 ```
 
 ```{r, fig.height=3, fig.width=7, fig.align="center"}
@@ -419,17 +412,11 @@ bacc_loo <- measure_bacc(
   mupred = res_penguins$mupred,
   log_weights = res_penguins$log_weights
 )
-# bacc_kfold <- measure_bacc(
-#   y = as.numeric(res_penguins$y), 
-#   mupred = res_penguins$mupred_kfold
-# )
-  
+
 message("within-sample bacc:")
 invisible(str(bacc_ws))
-message("psis-loo bacc:") 
+message("psis-loo bacc:")
 invisible(str(bacc_loo))
-# message("kfold bacc:") 
-# invisible(str(bacc_kfold))
 ```
 
 ```{r, fig.height=3, fig.width=7, fig.align="center"}
@@ -763,18 +750,19 @@ $$
 
 ```{r}
 mae_ws <- measure_mae(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 mae_loo <- measure_mae(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 mae_kfold <- measure_mae(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
-  
+
 message("within-sample mae:")
 invisible(str(mae_ws))
 message("psis-loo mae:")
@@ -788,14 +776,13 @@ plot_ptw(mae_ws, mae_loo, mae_kfold, "mae_i")
 ```
 
 ## (Root) mean squared error (`rmse`/`mse`)
-RMSE uses squared loss, has the same units as `y` and has a positive direction 
+RMSE uses squared loss, has the same units as `y` and the direction 
 ("lower is better").
 RMSE evaluates point predictions $\hat\mu_i$ against observed outcomes $y_i$ 
-using squared loss and then takes the square root of the average. It has the 
-same units as $y$ and the direction "lower is better". In our setup, `mupred` 
-is the point prediction per observation, computed as the posterior predictive 
-mean (e.g., via `posterior_epred`) or its PSIS-LOO analogue via `E_loo`. RMSE 
-is the square root of the mean squared error (MSE).
+using squared loss and then takes the square root of the average. In our setup,
+`mupred` is the point prediction per observation, computed as the posterior
+predictive mean (e.g., via `posterior_epred`) or its PSIS-LOO analogue via
+`E_loo`. RMSE is the square root of the mean squared error (MSE).
 
 - Pointwise squared error: 
   $$
@@ -828,15 +815,16 @@ $$
 
 ```{r}
 rmse_ws <- measure_rmse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 rmse_loo <- measure_rmse(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 rmse_kfold <- measure_rmse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
 
@@ -854,18 +842,19 @@ plot_ptw(rmse_ws, rmse_loo, rmse_kfold, "squared-error_i", show_estimate = FALSE
 
 ```{r}
 mse_ws <- measure_mse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 mse_loo <- measure_mse(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 mse_kfold <- measure_mse(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
-  
+
 message("within-sample mse:")
 invisible(str(mse_ws))
 message("psis-loo mse:")
@@ -909,15 +898,16 @@ based on a model’s residual variance parameter.
 
 ```{r}
 r2_ws <- measure_r2(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred
 )
 r2_loo <- measure_r2(
-  y = res_sleep$y, 
-  mupred = res_sleep$mupred_loo
+  y = res_sleep$y,
+  mupred = res_sleep$mupred,
+  log_weights = res_sleep$log_weights
 )
 r2_kfold <- measure_r2(
-  y = res_sleep$y, 
+  y = res_sleep$y,
   mupred = res_sleep$mupred_kfold
 )
 
