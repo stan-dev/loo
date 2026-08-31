@@ -47,10 +47,6 @@ knitr::opts_chunk$set(
 + Which warnings/messages do we want to provide and which should only be part of the function documentation?
 :::
 
-```{r load-libraries}
-library(loo)
-```
-
 ```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
 ```
 
@@ -139,6 +135,10 @@ draws `ypred`; the error measures are computed from the posterior expectation
 Provide a section where we use kfold_pred_measure, test_pred_measure, etc.
 -->
 
+```{r load-libraries}
+library(loo)
+```
+
 ```{r setup-example}
 measures <- c("mae", "mse", "rmse", "r2", "rps") # elpd is computed by default
 ```
@@ -149,7 +149,7 @@ As the actual model building workflow is not the focus of this tutorial, we fit
 the three models here without further comment. `add_criterion()` attaches a
 `loo` object (as returned by `loo::loo()`) to each fit.
 
-```{r fit-models, results="hide"}
+```{r fit-models, results="hide", warning=FALSE, message=FALSE}
 SEED <- 42
 
 data(roaches, package = "rstanarm")
@@ -755,8 +755,8 @@ First, we compute the predictive performance measures for two different models
 using `"rmse"` and the custom Huber loss as performance criteria.
 
 ```{r custom-measure}
-h1 <- fit_measure(1, measure = list("rmse", "huber" = huber_fn))
-h3 <- fit_measure(3, measure = list("rmse", "huber" = huber_fn))
+h1 <- fit_measure(fit_m1, measure = list("rmse", "huber" = huber_fn))
+h3 <- fit_measure(fit_m3, measure = list("rmse", "huber" = huber_fn))
 ```
 
 (Remember that we have created the `fit_measure` helper at the [beginning of
@@ -824,8 +824,8 @@ models using `"rmse"`, the custom Huber loss, and the custom normalized RMSE
 (`"nrmse"`) as performance criteria.
 
 ```{r extended-example-fit}
-n1 <- fit_measure(1, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
-n3 <- fit_measure(3, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
+n1 <- fit_measure(fit_m1, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
+n3 <- fit_measure(fit_m3, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
 ```
 
 Additionally, we provide a custom function for computing the standard error
