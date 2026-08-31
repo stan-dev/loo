@@ -500,6 +500,21 @@ se_elpd_diff <- function(diffs) {
   sqrt(N) * sd(diffs)
 }
 
+#' Warn when k-fold results do not share the same number of folds
+#' @noRd
+#' @param loos List of `"kfold"` or `"kfold_pred_measure"` objects.
+throw_kfold_K_mismatch_warning <- function(loos) {
+  Ks <- unlist(lapply(loos, attr, which = "K"))
+  if (length(Ks) == length(loos) && !all(Ks == Ks[1])) {
+    warning(
+      "Not all kfold objects have the same K value. ",
+      "For a more accurate comparison use the same number of folds. ",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
+}
+
 #' Perform checks on `"loo"` objects before comparison
 #' @noRd
 #' @param loos List of `"loo"` objects.
@@ -550,14 +565,7 @@ model_compare_checks <- function(
   }
 
   if (all(vapply(loos, is.kfold, logical(1)))) {
-    Ks <- unlist(lapply(loos, attr, which = "K"))
-    if (!all(Ks == Ks[1])) {
-      warning(
-        "Not all kfold objects have the same K value. ",
-        "For a more accurate comparison use the same number of folds. ",
-        call. = FALSE
-      )
-    }
+    throw_kfold_K_mismatch_warning(loos)
   } else if (any(vapply(loos, is.kfold, logical(1))) &&
       any(vapply(loos, is.psis_loo, logical(1)))) {
     warning(

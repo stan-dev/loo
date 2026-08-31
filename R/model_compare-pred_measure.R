@@ -65,21 +65,6 @@ throw_insample_compare_warning <- function(source) {
   invisible(NULL)
 }
 
-#' Warn when k-fold results do not share the same number of folds
-#' @noRd
-#' @param loos List of `"kfold"` or `"kfold_pred_measure"` objects.
-throw_kfold_K_mismatch_warning <- function(loos) {
-  Ks <- unlist(lapply(loos, attr, which = "K"))
-  if (length(Ks) == length(loos) && !all(Ks == Ks[1])) {
-    warning(
-      "Not all kfold objects have the same K value. ",
-      "For a more accurate comparison use the same number of folds. ",
-      call. = FALSE
-    )
-  }
-  invisible(NULL)
-}
-
 #' Compare `loo_pred_measure` objects (multi-measure path)
 #' @noRd
 #' @param loos List of `pred_measure` objects, all sharing one evaluation
