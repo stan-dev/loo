@@ -1,6 +1,7 @@
 # load data -----------------------------
 res <- readRDS("data-for-tests/test_data_roaches.Rds")
 res_sleep_test <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
+n_test <- length(res_sleep_test$y_test)
 
 # unit tests ----------------------
 test_that("group_ids errors as not yet implemented", {
@@ -448,8 +449,8 @@ test_that("test_pred_measure() computes holdout measures as expected", {
     c("elpd_test", "rmse_test", "r2_test")
   )
   expect_equal(dim(test_res$estimates), c(3, 2))
-  expect_equal(attr(test_res, "dims"), c(400L, 40L))
-  expect_equal(dim(test_res$pointwise), c(40L, 3L))
+  expect_equal(attr(test_res, "dims"), c(400L, n_test))
+  expect_equal(dim(test_res$pointwise), c(n_test, 3L))
 })
 
 test_that("test_pred_measure() works with ylp_test only for base summary", {
@@ -485,7 +486,7 @@ test_that("pred_measure() updates test_pred_measure results as expected", {
     c("elpd_test", "rmse_test", "mae_test")
   )
   expect_equal(attr(updated, "source"), "test")
-  expect_equal(dim(updated$pointwise), c(40L, 3L))
+  expect_equal(dim(updated$pointwise), c(n_test, 3L))
 })
 
 # pred_measure() with custom function ------------------------------

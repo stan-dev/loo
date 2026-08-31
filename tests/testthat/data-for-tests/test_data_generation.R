@@ -84,6 +84,121 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
   }
 }
 
+# ---- fixture shrinking ------------------------------------------------------
+# These fixtures ship in the source tarball, which CRAN limits to 5 MB. Keep
+# only a subset of the observations. The draws stay at 400, so the Pareto k
+# threshold ps_khat_threshold(400) does not move.
+N_KEEP <- c(
+  roaches = 53, categorical = 67, sleep = 29,
+  sleep_test = 20, sleep_train = 26
+)
+
+# Estimate and SE of a summed pointwise column, in loo's convention.
+.estimates_from_pointwise <- function(pointwise, cols) {
+  pw <- pointwise[, cols, drop = FALSE]
+  cbind(Estimate = colSums(pw), SE = sqrt(nrow(pw) * apply(pw, 2, var)))
+}
+
+# Index of the observations to keep. `strata` allocates proportionally, so
+# every level of a categorical outcome survives.
+.keep_index <- function(n, n_keep, strata = NULL) {
+  set.seed(SEED)
+  if (is.null(strata)) {
+    return(sort(sample.int(n, n_keep)))
+  }
+  strata <- as.factor(strata)
+  per <- pmax(1L, round(n_keep * as.vector(table(strata)) / n))
+  idx <- unlist(Map(
+    function(lev, k) sample(which(strata == lev), k),
+    levels(strata), per
+  ))
+  sort(as.integer(idx))
+}
+
+# PSIS smoothing is per observation, so subsetting columns is exact. Only the
+# aggregates need recomputing.
+.shrink_psis_loo <- function(x, keep) {
+  x$pointwise <- x$pointwise[keep, , drop = FALSE]
+  x$diagnostics <- lapply(x$diagnostics, function(d) d[keep])
+
+  po <- x$psis_object
+  po$log_weights <- po$log_weights[, keep, drop = FALSE]
+  po$diagnostics <- lapply(po$diagnostics, function(d) d[keep])
+  for (a in c("norm_const_log", "tail_len", "r_eff")) {
+    attr(po, a) <- attr(po, a)[keep]
+  }
+  attr(po, "dims") <- c(attr(po, "dims")[1], length(keep))
+  x$psis_object <- po
+
+  est <- .estimates_from_pointwise(x$pointwise, c("elpd_loo", "p_loo", "looic"))
+  x$estimates <- est
+  x$elpd_loo <- est["elpd_loo", "Estimate"]
+  x$p_loo <- est["p_loo", "Estimate"]
+  x$looic <- est["looic", "Estimate"]
+  x$se_elpd_loo <- est["elpd_loo", "SE"]
+  x$se_p_loo <- est["p_loo", "SE"]
+  x$se_looic <- est["looic", "SE"]
+  attr(x, "dims") <- c(attr(x, "dims")[1], length(keep))
+  x
+}
+
+.shrink_kfold <- function(x, keep) {
+  x$pointwise <- x$pointwise[keep, , drop = FALSE]
+  x$estimates <- .estimates_from_pointwise(x$pointwise, colnames(x$pointwise))
+  attr(x, "folds") <- attr(x, "folds")[keep]
+  x
+}
+
+shrink_res <- function(model, res) {
+  # binary and binomial hold 50 observations and 86 KB in total. Leave them.
+  if (model %in% c("binary", "binomial")) {
+    return(res)
+  }
+  if (model == "sleep_test") {
+    keep_test <- .keep_index(length(res$y_test), N_KEEP[["sleep_test"]])
+    keep_train <- .keep_index(ncol(res$ylp_train), N_KEEP[["sleep_train"]])
+    res$y_test <- res$y_test[keep_test]
+    for (nm in c("ypred_test", "mupred_test", "ylp_test")) {
+      res[[nm]] <- res[[nm]][, keep_test, drop = FALSE]
+    }
+    res$ylp_train <- res$ylp_train[, keep_train, drop = FALSE]
+    return(res)
+  }
+
+  keep <- if (model == "categorical") {
+    .keep_index(length(res$y), N_KEEP[["categorical"]], strata = res$y)
+  } else {
+    .keep_index(length(res$y), N_KEEP[[model]])
+  }
+
+  res$y <- res$y[keep]
+  for (nm in c("ypred", "mupred", "ylp", "log_weights",
+               "ypred_kfold", "mupred_kfold")) {
+    if (!is.null(res[[nm]]) && length(dim(res[[nm]])) == 2L) {
+      res[[nm]] <- res[[nm]][, keep, drop = FALSE]
+    }
+  }
+  # A categorical mupred is draws x observations x categories.
+  if (!is.null(res$mupred) && length(dim(res$mupred)) == 3L) {
+    res$mupred <- res$mupred[, keep, , drop = FALSE]
+  }
+  if (!is.null(res$mupred_loo)) {
+    res$mupred_loo <- res$mupred_loo[keep]
+  }
+  if (!is.null(res$loo)) {
+    res$loo <- .shrink_psis_loo(res$loo, keep)
+  }
+  if (!is.null(res$kfold)) {
+    res$kfold <- .shrink_kfold(res$kfold, keep)
+  }
+  if (!is.null(res$predperf)) {
+    res$predperf <- insample_pred_measure(
+      y = res$y, mupred = res$mupred, measure = "r2", ylp = res$ylp
+    )
+  }
+  res
+}
+
 get_binary_res <- function() {
   set.seed(SEED)
   df_binary <- data.frame(y = rbinom(50, 1, 0.3))
@@ -245,12 +360,12 @@ generate_test_data <- function() {
   full_sleep_test <- get_sleep_test_train_res()
 
   test_path <- "tests/testthat/data-for-tests/"
-  saveRDS(full_roaches$res, paste0(test_path, "test_data_roaches.Rds"))
-  saveRDS(full_binary$res, paste0(test_path, "test_data_binary.Rds"))
-  saveRDS(full_penguins$res, paste0(test_path, "test_data_penguins.Rds"))
-  saveRDS(full_binomial$res, paste0(test_path, "test_data_binomial.Rds"))
-  saveRDS(full_sleep$res, paste0(test_path, "test_data_sleep.Rds"))
-  saveRDS(full_sleep_test$res, paste0(test_path, "test_data_sleep_cv.Rds"))
+  saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"))
+  saveRDS(shrink_res("binary", full_binary$res), paste0(test_path, "test_data_binary.Rds"))
+  saveRDS(shrink_res("categorical", full_penguins$res), paste0(test_path, "test_data_penguins.Rds"))
+  saveRDS(shrink_res("binomial", full_binomial$res), paste0(test_path, "test_data_binomial.Rds"))
+  saveRDS(shrink_res("sleep", full_sleep$res), paste0(test_path, "test_data_sleep.Rds"))
+  saveRDS(shrink_res("sleep_test", full_sleep_test$res), paste0(test_path, "test_data_sleep_cv.Rds"))
   message("Saved test fixtures to ", test_path)
 
   elapsed_min <- round((proc.time() - t0)[3] / 60, 1)
