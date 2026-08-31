@@ -141,8 +141,10 @@ insample_pred_measure <- function(
 #' `pointwise`, the list may contain:
 #' \describe{
 #'   \item{`diagnostics`}{PSIS diagnostics, including Pareto \eqn{\hat{k}} in
-#'     `diagnostics$pareto_k`. Values above 0.7 suggest unreliable
-#'     LOO estimates for those observations.}
+#'     `diagnostics$pareto_k`. A value above the sample-size dependent
+#'     threshold \eqn{\min(1 - 1 / \log_{10}(S), 0.7)}, where \eqn{S} is the
+#'     number of draws, suggests an unreliable LOO estimate for that
+#'     observation. The `print()` method reports the threshold it used.}
 #'   \item{`log_weights`}{Normalized log importance weights used for LOO
 #'     scoring.}
 #'   \item{`psis_object`}{Stored when `save_psis = TRUE`; needed to add
