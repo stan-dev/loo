@@ -628,16 +628,26 @@ RPS is a strictly proper scoring rule for ordered categorical outcomes with $K$ 
 step CDF and generalizes the Brier score ($K=2$ recovers Brier). The standard 
 definition is negatively oriented (lower is better). The range of rps is $[0, K-1]$.
 
-- Predictive class probabilities and CDFs:
+- Predictive class probabilities and CDFs define the score:
   $$
-  \hat p_{i,k}^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i=k\mid \theta^{(s)}),\quad
-  \hat F_{i,k}^w = \sum_{j=1}^k \hat p_{i,j}^w
+  p_{i,k} = \Pr(Y_i=k \mid y),\quad
+  F_{i,k} = \sum_{j=1}^k p_{i,j},\quad
+  O_{i,k} = \mathbf{1}(y_i \le k)
   $$
-- Observed step CDF $O_{i,k} = \mathbf{1}(y_i \le k)$.
 - Pointwise term:
   $$
-  \widehat{\text{rps}}_i^{\text{raw}} = \sum_{k=1}^{K-1} (\hat F_{i,k}^w - O_{i,k})^2
+  \text{rps}_i = \sum_{k=1}^{K-1} \big(F_{i,k} - O_{i,k}\big)^2
   $$
+- `measure_rps()` takes no class probabilities. It takes `ypred`, a matrix of 
+predictive draws on the integer support, and runs the same estimator as the 
+crps:
+  $$
+  \widehat{\text{rps}}_i = \widehat{\mathbb{E}}_F\big[|Y - y_i|\big]
+    - \frac{1}{2}\,\widehat{\mathbb{E}}_F\big[|Y - Y'|\big]
+  $$
+  with $\widehat{\mathbb{E}}_F[|Y - Y'|]$ from the probability-weighted moment 
+estimator above. On a unit-spaced integer grid the two forms are the same 
+quantity, so the numbers agree.
 - Estimate and Standard Error:
   $$
   \widehat{\text{rps}} = \frac{1}{n}\sum_{i=1}^n \text{rps}_i,\quad
@@ -680,17 +690,23 @@ $$
 - \frac{1}{2}\log \mathbb{E}_F\big[|Y - Y'|\big]
 $$
 
-For ordered discrete support:
+For ordered discrete support the two expectations have closed forms in the class 
+probabilities:
 
-- Weighted mean absolute deviation:
+- Mean absolute deviation:
   $$
-  \widehat{\mathbb{E}}_F[|Y-y_i|] = \sum_{k=1}^K \hat p_{i,k}^w\,|k - y_i|
+  \mathbb{E}_F[|Y-y_i|] = \sum_{k=1}^K p_{i,k}\,|k - y_i|
   $$
 - Predictive spread:
   $$
-  \widehat{\mathbb{E}}_F[|Y - Y'|] = 2\sum_{k=1}^{K-1} \hat F_{i,k}^w\big(1 - \hat F_{i,k}^w\big)
+  \mathbb{E}_F[|Y - Y'|] = 2\sum_{k=1}^{K-1} F_{i,k}\big(1 - F_{i,k}\big)
   $$
-Estimation and SE follow the same mean/variance recipe as above. The srps has a positive direction, i.e., "higher is better".
+
+`measure_srps()` uses neither closed form. It estimates both expectations from 
+the `ypred` draws, exactly as the scrps does: the weighted mean absolute 
+deviation, and the probability-weighted moment estimator of 
+$\mathbb{E}_F[|Y - Y'|]$. Estimation and SE follow the same mean/variance recipe 
+as above. The srps has a positive direction, i.e., "higher is better".
 
 ```{r}
 srps_ws <- measure_srps(
