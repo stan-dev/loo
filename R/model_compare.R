@@ -24,7 +24,9 @@
 #'   objects. List names are used as the model names in the output. See
 #'   **Examples**.
 #' @param ... Additional objects of class `"loo"` or `"pred_measure"`, if not
-#'   passed in as a single list.
+#'   passed in as a single list. Naming every model here, as in
+#'   `model_compare(A = m1, B = m2)`, names the models in the output, exactly as
+#'   the list form does.
 #' @param rank_by A single string naming either a **measure** or a **model**,
 #'   used to pin one reference model for all pairwise differences.
 #'
@@ -312,6 +314,19 @@
 #' }
 #'
 model_compare <- function(x, ..., rank_by = NULL, custom_se_fn) {
+  if (missing(x)) {
+    dots <- list(...)
+    if (!length(dots)) {
+      stop("No models supplied.", call. = FALSE)
+    }
+    # `custom_se_fn` has no default: omitted and explicit `NULL` differ, so it
+    # is forwarded only when the caller supplied it.
+    args <- list(dots, rank_by = rank_by)
+    if (!missing(custom_se_fn)) {
+      args$custom_se_fn <- custom_se_fn
+    }
+    return(do.call(model_compare, args))
+  }
   UseMethod("model_compare")
 }
 

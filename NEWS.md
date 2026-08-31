@@ -110,6 +110,7 @@
   data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.
 * `print()` on a `pred_measure` comparison now accepts `simplify`. With 
   `simplify = FALSE` each measure table also shows that measure's per-model estimate and standard error, and an ELPD table also shows `p` and `se_p`.
+* `model_compare(A = m1, B = m2)` now works.
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in #328.
 
 # loo 2.10.1

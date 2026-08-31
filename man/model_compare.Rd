@@ -22,7 +22,9 @@ objects. List names are used as the model names in the output. See
 \strong{Examples}.}
 
 \item{...}{Additional objects of class \code{"loo"} or \code{"pred_measure"}, if not
-passed in as a single list.}
+passed in as a single list. Naming every model here, as in
+\code{model_compare(A = m1, B = m2)}, names the models in the output, exactly as
+the list form does.}
 
 \item{digits}{For the print method only, the number of digits to use when
 printing.}

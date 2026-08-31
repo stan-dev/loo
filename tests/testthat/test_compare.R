@@ -6,6 +6,15 @@ LLarr3 <- array(rnorm(prod(dim(LLarr)), c(LLarr), 1), dim = dim(LLarr))
 w1 <- suppressWarnings(waic(LLarr))
 w2 <- suppressWarnings(waic(LLarr2))
 
+test_that("model_compare accepts named models in `...`", {
+  named <- suppressWarnings(model_compare(A = w1, B = w2))
+  listed <- suppressWarnings(model_compare(list(A = w1, B = w2)))
+
+  expect_equal(named, listed)
+  expect_setequal(named$model, c("A", "B"))
+  expect_error(model_compare(), "No models supplied")
+})
+
 test_that("model_compare throws appropriate errors", {
   w3 <- suppressWarnings(waic(LLarr[,, -1]))
   w4 <- suppressWarnings(waic(LLarr[,, -(1:2)]))
