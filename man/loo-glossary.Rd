@@ -39,7 +39,7 @@ the actual SE can even be twice as large. Even for moderate N, when the SE
 estimate is an accurate estimate for the scale, it ignores the skewness. When
 making model comparisons, the SE of the component-wise (pairwise) differences
 should be used instead (see the \code{se_diff} section below and Eq 24 in
-VGG2017). Sivula et al. (2022) discuss the conditions when the normal
+VGG2017). Sivula et al. (2025) discuss the conditions when the normal
 approximation used for SE and \code{se_diff} is good.
 }
 

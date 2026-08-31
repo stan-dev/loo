@@ -146,4 +146,3 @@ print.compare.loo_ss <- function(x, ..., digits = 1) {
   print(.fr(xcopy, digits), quote = FALSE)
   invisible(x)
 }
-
