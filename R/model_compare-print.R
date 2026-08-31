@@ -6,10 +6,12 @@
 #'   approximation based probability of each model having worse performance than
 #'   the reference model? The default is `TRUE`.
 #' @param simplify For the print method only, should the output be simplified to
-#'   only include the model names, ELPD differences, and (when `p_worse = TRUE`)
+#'   only include the model names, differences, and (when `p_worse = TRUE`)
 #'   diagnostic columns? The default is `TRUE`. Set to `FALSE` to also print the
-#'   available estimate columns (pointwise ELPD, LOOIC/WAIC, and their standard
-#'   errors).
+#'   available estimate columns: pointwise ELPD, LOOIC/WAIC and their standard
+#'   errors for classic comparisons. For [`pred_measure`][pred_measure]
+#'   comparisons each printed table gains its own measure's estimate and
+#'   standard error, and an ELPD table also gains `p` and `se_p`.
 #' @param measures For `loo_pred_measure` comparisons only, which measures to
 #'   print diff tables for. `NULL` (default) prints only the ranking measure
 #'   (`"elpd"` when `rank_by` was not set, otherwise `rank_by`);
@@ -31,6 +33,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       x,
       digits = digits,
       p_worse = p_worse,
+      simplify = simplify,
       measures = measures
     ))
   }
@@ -79,7 +82,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 
 #' Print `compare.loo` results from `pred_measure` comparisons
 #' @noRd
-.print_compare_pred_measure <- function(x, digits, p_worse, measures) {
+.print_compare_pred_measure <- function(x, digits, p_worse, simplify,
+                                       measures) {
   rank_spec <- attr(x, "rank_by")
   compare_measures <- attr(x, "compare_measures")
   compare_source <- attr(x, "compare_source")
@@ -160,7 +164,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       x,
       measure = measure,
       digits = digits,
-      p_worse = p_worse
+      p_worse = p_worse,
+      simplify = simplify
     )
   }
 
@@ -343,7 +348,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 
 #' Print one measure's comparison table
 #' @noRd
-.print_compare_measure_table <- function(x, measure, digits, p_worse) {
+.print_compare_measure_table <- function(x, measure, digits, p_worse,
+                                        simplify = TRUE) {
   if (.is_elpd_measure(measure)) {
     diff_col <- "elpd_diff"
     se_col <- "se_diff"
@@ -384,6 +390,21 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
     x2$p_worse <- unname(.fr(x[["p_worse"]][ord], digits = 2))
     x2$diag_diff <- x[["diag_diff"]][ord]
   }
+
+  # The frame carries every measure's per-model estimate and SE under its bare
+  # name (`model_compare_matrix(bare_names = TRUE)`). `simplify = FALSE` adds
+  # the pair this table's own measure owns, after the diagnostic columns, as
+  # the classic path does. `p` is an ELPD companion, so it rides with it.
+  if (!simplify) {
+    est_cols <- c(measure, paste0("se_", measure))
+    if (.is_elpd_measure(measure)) {
+      est_cols <- c(est_cols, "p", "se_p")
+    }
+    for (col in intersect(est_cols, colnames(x))) {
+      x2[[col]] <- unname(.fr(x[[col]][ord], digits))
+    }
+  }
+
   print(x2, quote = FALSE, row.names = FALSE)
 }
 

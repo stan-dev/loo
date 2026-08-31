@@ -108,8 +108,9 @@
 * `print()` on a multi-measure comparison now labels each measure's standard
   error column `{measure}_se_diff`, matching the column name on the returned
   data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.
-* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
-#328.
+* `print()` on a `pred_measure` comparison now accepts `simplify`. With 
+  `simplify = FALSE` each measure table also shows that measure's per-model estimate and standard error, and an ELPD table also shows `p` and `se_p`.
+* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in #328.
 
 # loo 2.10.1
 

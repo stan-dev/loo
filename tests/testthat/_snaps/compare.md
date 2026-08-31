@@ -121,6 +121,65 @@
 ---
 
     Code
+      print(comp, simplify = FALSE)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p
+          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7
+          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2
+          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+
+---
+
+    Code
+      print(comp, measures = "all", simplify = FALSE)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- elpd (vs m2) --
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p
+          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7
+          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2
+          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff  r2 se_r2
+          m2     0.0        0.0 0.2   0.2
+          m3    -0.1        0.2 0.1   0.3
+          m1    -0.1        0.2 0.0   0.0
+      
+      -- mae (vs m3) --
+       model mae_diff mae_se_diff  mae se_mae
+          m3      0.0         0.0 21.9    3.6
+          m2     -0.1         1.2 22.0    3.4
+          m1     -6.3         3.1 28.2    3.2
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
       print(comp_mae)
     Output
       Models ranked by mae (reference: m2).
