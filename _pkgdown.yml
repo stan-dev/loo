@@ -54,6 +54,18 @@ articles:
       - loo2-large-data
       - loo2-moment-matching
       - loo2-mixis
+  - title: Migration
+    desc: |
+      Guides for updating code when APIs change.
+    contents:
+      - migration-guide
+  - title: Predictive performance measures
+    desc: |
+      Reference and workflow articles for the `*_pred_measure()` API (website
+      only; not included in the CRAN package).
+    contents:
+      - articles-online-only/pred-measure-workflow
+      - articles-online-only/overview-measures
   - title: Frequently asked questions
     contents:
       - faq
@@ -101,12 +113,22 @@ reference:
       - kfold_split_stratified
       - kfold_split_grouped
       - kfold
-      - elpd
+  - title: Predictive performance measures
+    desc: |
+      Unified API for predictive performance measures (density scores, scoring
+      rules, and point-prediction metrics) with in-sample, LOO, K-fold, and
+      holdout evaluation modes.
+    contents:
+      - insample_pred_measure
+      - loo_pred_measure
+      - kfold_pred_measure
+      - test_pred_measure
+      - pred_measure
+      - supported_measures_list
+      - starts_with("measure_")
+      - ptw_log_pred_density
   - title: Other functions
     contents:
-      - loo_predictive_metric
-      - crps
-      - elpd
       - waic
       - extract_log_lik
       - pointwise
@@ -120,5 +142,6 @@ reference:
       - update.psis_loo_ss
   - title: Deprecated functions
     contents:
-      - compare
-      - psislw
+      - elpd
+      - crps
+      - loo_predictive_metric

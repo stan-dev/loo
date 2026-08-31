@@ -1,4 +1,15 @@
-#' Continuously ranked probability score
+#' Continuously ranked probability score (deprecated)
+#'
+#' As of loo 3.0.0, `crps()`, `scrps()`, `loo_crps()`, and `loo_scrps()` are
+#' **deprecated**. Please use [measure_rps()] and [measure_srps()] instead,
+#' or [loo_pred_measure()] for leave-one-out predictive performance.
+#' See `vignette("migration-guide", package = "loo")` for a full mapping table.
+#'
+#' @details
+#' The new functions use a single matrix of posterior predictive draws
+#' (`ypred`) and a PWM estimator. The deprecated functions require two
+#' independent draw matrices (`x` and `x2`) and use a permutation-based
+#' estimator. See [measure_rps()] for migration details.
 #'
 #' The `crps()` and `scrps()` functions and their `loo_*()` counterparts can be
 #' used to compute the continuously ranked probability score (CRPS) and scaled
@@ -34,16 +45,19 @@
 #'   The former reports estimator and standard error and latter the pointwise
 #'   values. Following Bolin & Wallin (2023), a larger value is better.
 #'
+#' @seealso [measure_rps()], [measure_srps()], [loo_pred_measure()]
+#'
 #' @examples
 #' \dontrun{
-#' # An example using rstanarm
+#' # Deprecated:
 #' library(rstanarm)
 #' data("kidiq")
 #' fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 #' ypred1 <- posterior_predict(fit)
 #' ypred2 <- posterior_predict(fit)
 #' crps(ypred1, ypred2, y = fit$y)
-#' loo_crps(ypred1, ypred2, y = fit$y, log_lik = log_lik(fit))
+#' # ->
+#' measure_rps(y = fit$y, ypred = ypred1)
 #' }
 #'
 #' @references
@@ -80,6 +94,7 @@ loo_scrps <- function(x, ...) {
 #' @rdname crps
 #' @export
 crps.matrix <- function(x, x2, y, ..., permutations = 1) {
+  .Deprecated("measure_rps")
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -114,6 +129,7 @@ loo_crps.matrix <-
            permutations = 1,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
+  .Deprecated("loo_pred_measure")
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
@@ -128,6 +144,7 @@ loo_crps.matrix <-
 #' @rdname crps
 #' @export
 scrps.matrix <- function(x, x2, y, ..., permutations = 1) {
+  .Deprecated("measure_srps")
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -156,6 +173,7 @@ loo_scrps.matrix <-
     permutations = 1,
     r_eff = 1,
     cores = getOption("mc.cores", 1)) {
+  .Deprecated("loo_pred_measure")
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),

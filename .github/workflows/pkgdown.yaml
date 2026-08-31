@@ -39,7 +39,7 @@ jobs:
             local::.
             any::bayesplot
             any::BH
-            any::brms
+            paul-buerkner/brms
             any::ggplot2
             any::rmarkdown
             any::Rcpp
@@ -52,6 +52,7 @@ jobs:
             any::StanHeaders
             any::knitr
             any::withr
+            any::lme4
             stan-dev/pkgdown-config
 
       - name: Build site
