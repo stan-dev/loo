@@ -496,32 +496,44 @@ $$
 Equivalently, via the energy score representation (when $F_i$ has a finite 
 first moment):
 $$
-\text{crps}_i = \mathbb E_F\big[Y - y_i\big] - \frac{1}{2}\mathbb E_F \big[Y-Y'\big]
+\text{crps}_i = \mathbb E_F\big[|Y - y_i|\big] - \frac{1}{2}\mathbb E_F \big[|Y-Y'|\big]
 $$
 where $Y, Y'$ are independent draws from the predictive distribution $F_i$. 
-Because computing $\mathbb{E}_F[|Y - Y'|]$ requires two independent sets of 
-predictive draws, we instead use the identity (valid when $F$ is continuous):
+This is the form we compute. The second term needs no second set of draws: we 
+estimate $\mathbb{E}_F[|Y - Y'|]$ from the single set by a probability-weighted 
+moment estimator.
+
+- Weighted Monte Carlo estimator of the first term (PSIS weights $\tilde w_i^{(s)}$; unweighted is the special case $\tilde w = 1/S$):
 $$
-\text{crps}_i = \mathbb E_F\big[Y - y_i\big] + \mathbb E_F\big[Y\big] - 2\mathbb E_F \big[Y\cdot F(Y)\big]
+\mathbb{E}_F\big[|Y - y_i|\big] \approx \sum_{s=1}^S \tilde w_i^s \big|Y_i^s - y_i\big|
 $$
-which requires only a single set of draws.
-- Weighted Monte Carlo estimators (PSIS weights $\tilde w_i^{(s)}$; unweighted is the special case $\tilde w = 1/S$):
+- Weighted estimator of the second term. Sort the draws of observation $i$ in 
+ascending order. Write $Y_i^{(s)}$ for the sorted draws, $\tilde w_i^{(s)}$ for 
+their weights, and $C_s = \sum_{k \leq s} \tilde w_i^{(k)}$ for the cumulative 
+weight, with $C_0 = 0$. The weighted U-statistic over draw pairs then collapses 
+to one sort and one cumulative sum:
 $$
-\hat F_i^w(x) = \sum_{s=1}^S \tilde w_i^s \mathbf{1}(Y_i^s \leq x)
+\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
+  \frac{\sum_{s}\sum_{t \neq s} \tilde w_i^{s}\tilde w_i^{t}\big|Y_i^{s} - Y_i^{t}\big|}
+       {1 - \sum_s \big(\tilde w_i^{s}\big)^2}
+= \frac{2\sum_s \tilde w_i^{(s)} Y_i^{(s)}\left(C_s + C_{s-1} - 1\right)}
+       {1 - \sum_s \big(\tilde w_i^{(s)}\big)^2}
 $$
-- Computation:
+With equal weights this reduces exactly to the unbiased pairwise estimator with 
+the $1/(S(S-1))$ normalization, the probability-weighted moment estimator of 
+Taillardat et al. (2016):
 $$
-\mathbb{E}_F\big[|Y - y_i|\big] \approx \sum_{s=1}^S \tilde w_i^s \big|Y_i^s - y_i\big|, \qquad
-\mathbb{E}_F[Y] \approx \sum_{s=1}^S \tilde w_i^s Y_i^s,
+\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
+  \frac{1}{S}\sum_{s=1}^S Y_i^{(s)}\,\frac{2\,(2s - S - 1)}{S - 1}
 $$
-$$
-\mathbb{E}_F\big[Y \cdot F(Y)\big] \approx \sum_{s=1}^S \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
-$$
-giving the pointwise estimator
+The estimate is a convex combination of the $\big|Y_i^{s} - Y_i^{t}\big|$, so it 
+is never negative, and its coefficients sum to zero, so it is invariant to 
+shifts of the draws. The logarithm in the scaled score below is therefore always 
+defined.
+- Together these give the pointwise estimator
 $$
 \widehat{\text{crps}}_i = \sum_s \tilde w_i^s \big|Y_i^s - y_i\big|
-  + \sum_s \tilde w_i^s Y_i^s
-  - 2 \sum_s \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
+  - \frac{1}{2}\,\widehat{\mathbb{E}}_F\big[|Y - Y'|\big]
 $$
 + Estimate and Standard Error:
   $$
@@ -564,20 +576,14 @@ $$
 \text{scrps}_i = -\frac{\mathbb{E}_F\big[|Y - y_i|\big]}{\mathbb{E}_F\big[|Y - Y'|\big]}
 - \frac{1}{2}\log \mathbb{E}_F\big[|Y - Y'|\big]
 $$
-- Use the same weighted estimators for the two expectations as above.
-- Rather than requiring two independent draw matrices, we recover
-$\mathbb{E}_F[|Y-Y'|]$ from quantities already computed for the crps via the 
-identity
-$$
-\mathbb{E}_F\big[|Y - Y'|\big] = 4\,\mathbb{E}_F\big[Y \cdot F(Y)\big] - 2\,\mathbb{E}_F[Y]
-$$
-- With importance weights this becomes
-$$
-\widehat{\mathbb{E}}_F\big[|Y - Y'|\big] =
-  4\sum_s \tilde w_i^s Y_i^s \hat F_i^w\!\left(Y_i^s\right)
-  - 2\sum_s \tilde w_i^s Y_i^s
-$$
-so the pointwise scrps estimator is
+- Use the same two weighted estimators as above. In particular, 
+$\widehat{\mathbb{E}}_F[|Y - Y'|]$ is the probability-weighted moment estimator, 
+already computed for the crps.
+- The scaled score divides by $\widehat{\mathbb{E}}_F[|Y-Y'|]$ and takes its 
+logarithm. A degenerate predictive distribution, where all the weight sits on a 
+single draw, makes that term $0$ and the score undefined. `measure_rps()` stops 
+with an error and names the affected observations.
+- The pointwise scrps estimator is therefore
 $$
 \widehat{\text{scrps}}_i =
   -\frac{\displaystyle\sum_s \tilde w_i^s \big|Y_i^s - y_i\big|}
