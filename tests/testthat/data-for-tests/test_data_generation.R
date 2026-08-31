@@ -87,7 +87,7 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
 # only a subset of the observations. The draws stay at 400, so the Pareto k
 # threshold ps_khat_threshold(400) does not move.
 N_KEEP <- c(
-  roaches = 53, categorical = 67, sleep = 29,
+  roaches = 53, roaches_compare = 110, categorical = 67, sleep = 29,
   sleep_test = 20
 )
 
@@ -191,6 +191,22 @@ shrink_res <- function(model, res) {
   }
   res
 }
+
+# The model-comparison fixture holds four `psis_loo` objects and four sets of
+# draws. `.keep_index()` reseeds, so this keeps the same 53 observations as
+# `test_data_roaches.Rds`.
+shrink_roaches_compare <- function(res) {
+  keep <- .keep_index(length(res$y), N_KEEP[["roaches_compare"]])
+  res$y <- res$y[keep]
+  for (nm in grep("^(ypred|mupred|ylp)(_m[0-9]+)?$", names(res), value = TRUE)) {
+    res[[nm]] <- res[[nm]][, keep, drop = FALSE]
+  }
+  for (nm in grep("^loo_p(_m[0-9]+)?$", names(res), value = TRUE)) {
+    res[[nm]] <- .shrink_psis_loo(res[[nm]], keep)
+  }
+  res
+}
+
 
 get_binary_res <- function() {
   set.seed(SEED)
@@ -443,7 +459,7 @@ generate_test_data <- function() {
 
   test_path <- "tests/testthat/data-for-tests/"
   saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"))
-  saveRDS(full_roaches_compare, paste0(test_path, "test_data_roaches_compare.Rds"))
+  saveRDS(shrink_roaches_compare(full_roaches_compare), paste0(test_path, "test_data_roaches_compare.Rds"))
   saveRDS(shrink_res("binary", full_binary$res), paste0(test_path, "test_data_binary.Rds"))
   saveRDS(shrink_res("categorical", full_penguins$res), paste0(test_path, "test_data_penguins.Rds"))
   saveRDS(shrink_res("binomial", full_binomial$res), paste0(test_path, "test_data_binomial.Rds"))

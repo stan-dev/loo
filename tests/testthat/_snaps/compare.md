@@ -6,14 +6,14 @@
       Models ranked by mae (reference: C).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
        model bad_k
-           A     5
-           C     3
-           B     3
+           B     2
+           C     1
+           A     1
       
        model mae_diff mae_se_diff
            C      0.0         0.0
-           B     -0.1         0.7
-           A     -7.7         1.7
+           B     -0.1         1.2
+           A     -6.3         3.1
     Message
       
       Diagnostic flags present.
@@ -35,17 +35,17 @@
     Code
       print(comp)
     Output
-      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
        model bad_k
-          m1     5
-          m3     3
-          m2     3
+          m2     2
+          m3     1
+          m1     1
       
        model elpd_diff se_diff p_worse diag_diff
-          m3       0.0     0.0      NA          
-          m2    -208.9   227.0    0.82          
-          m1   -2752.6   637.9    1.00          
+          m2       0.0     0.0      NA          
+          m3     -25.5   129.1    0.58          
+          m1    -850.3   372.3    0.99          
     Message
       
       Diagnostic flags present.
@@ -59,30 +59,30 @@
     Code
       print(comp, measures = "all", digits = 2)
     Output
-      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
        model bad_k
-          m1     5
-          m3     3
-          m2     3
+          m2     2
+          m3     1
+          m1     1
       
-      -- elpd (vs m3) --
+      -- elpd (vs m2) --
        model elpd_diff se_diff p_worse diag_diff
-          m3      0.00    0.00      NA          
-          m2   -208.95  226.98    0.82          
-          m1  -2752.56  637.95    1.00          
+          m2      0.00    0.00      NA          
+          m3    -25.47  129.10    0.58          
+          m1   -850.29  372.31    0.99          
       
       -- r2 (vs m2) --
        model r2_diff r2_se_diff
           m2    0.00       0.00
-          m3   -0.01       0.07
-          m1   -0.22       0.09
+          m3   -0.09       0.18
+          m1   -0.10       0.22
       
       -- mae (vs m3) --
        model mae_diff mae_se_diff
           m3     0.00        0.00
-          m2    -0.14        0.70
-          m1    -7.74        1.65
+          m2    -0.07        1.24
+          m1    -6.34        3.08
     Message
       
       Diagnostic flags present.
@@ -94,24 +94,24 @@
     Code
       print(comp, measures = c("r2", "mae"))
     Output
-      Each measure compared against its own best model (elpd: m3, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
        model bad_k
-          m1     5
-          m3     3
-          m2     3
+          m2     2
+          m3     1
+          m1     1
       
       -- r2 (vs m2) --
        model r2_diff r2_se_diff
           m2     0.0        0.0
-          m3     0.0        0.1
-          m1    -0.2        0.1
+          m3    -0.1        0.2
+          m1    -0.1        0.2
       
       -- mae (vs m3) --
        model mae_diff mae_se_diff
           m3      0.0         0.0
-          m2     -0.1         0.7
-          m1     -7.7         1.7
+          m2     -0.1         1.2
+          m1     -6.3         3.1
     Message
       
       Diagnostic flags present.
@@ -126,12 +126,12 @@
       Models ranked by mae (reference: m2).
       PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
        model bad_k
-          m1     5
-          m2     3
+          m2     2
+          m1     1
       
        model mae_diff mae_se_diff
           m2      0.0         0.0
-          m1     -7.6         1.5
+          m1     -6.3         2.8
     Message
       
       Diagnostic flags present.
