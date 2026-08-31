@@ -26,7 +26,7 @@ The table below summarizes the core metrics implemented in our framework.
 | Metric Keyword | Full Name | Metric Type | Orientation | Target Outcome Type |
 | :--- | :--- | :--- | :--- | :--- |
 | `lppd` / `elppd` | (Expected) Log Pointwise Predictive Density | Scoring Rule (Distributional) | Higher is Better | Any |
-| `acc` | Accuracy | Proper Scoring Rule | Higher is Better | Nominal Categorical |
+| `acc` | Accuracy | Classification Metric | Higher is Better | Nominal Categorical |
 | `bacc` | Balanced Accuracy | Adjusted Classification Metric | Higher is Better | Imbalanced Categorical |
 | `brier` | Brier Score | Proper Scoring Rule | Lower is Better | Binary |
 | `crps` | Continuous Ranked Probability Score | Proper Scoring Rule (Distributional) | Lower is Better | Continuous |
@@ -323,22 +323,23 @@ or using information criteria that correct in-sample bias.
 
 ## Accuracy (`acc`)
 
-Accuracy here is the posterior predictive probability assigned to the observed category, averaged across (weighted) posterior draws.
-Accuracy is a proper scoring rule suitable for nominal categorical outcomes and is positively oriented (higher is better). Accuracy ranges between 0 (all predictions are wrong) and 1 (all predictions are correct).
+Accuracy here is the share of observations whose predicted class equals the observed class. The predicted class comes from the (weighted) posterior mean probabilities: `which.max` over categories, or a 0.5 cut for binary outcomes.
+Accuracy suits nominal categorical outcomes and is positively oriented (higher is better). It ranges between 0 (all predictions are wrong) and 1 (all predictions are correct). It is not a proper scoring rule: it uses the hard class label, not the full predictive distribution.
 
-- Predictive probability of the observed class, Monte Carlo:
+- Predicted class, Monte Carlo:
   $$
-  \hat p_i = \frac{1}{S}\sum_{s=1}^S \Pr(Y_i = y_i \mid \theta^{(s)}),\quad
-  \hat p_i^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i = y_i \mid \theta^{(s)})
+  \hat p_{ik} = \frac{1}{S}\sum_{s=1}^S \Pr(Y_i = k \mid \theta^{(s)}),\quad
+  \hat p_{ik}^w = \sum_{s=1}^S \tilde w_i^{(s)}\,\Pr(Y_i = k \mid \theta^{(s)}),\quad
+  \hat y_i = \arg\max_k \hat p_{ik}^w
   $$
 - Pointwise:
   $$
-  \text{acc}_i = \hat p_i \ \text{ or }\ \hat p_i^w
+  \text{acc}_i = \mathbb{1}\{\hat y_i = y_i\}
   $$
 - Estimate and Standard Error:
   $$
   \widehat{\text{acc}} = \frac{1}{n}\sum_{i=1}^n \text{acc}_i,\quad
-  se(\widehat{\text{acc}}) = \sqrt{\frac{\widehat{\text{Var}}(\text{acc}_i)}{n}}
+  se(\widehat{\text{acc}}) = \sqrt{\frac{\widehat{\text{acc}}(1-\widehat{\text{acc}})}{n}}
   $$
 
 ::: {.callout-tip}
@@ -375,29 +376,29 @@ plot_ptw(acc_ws, acc_loo, NULL, "acc_i")
 
 ## Balanced Accuracy (`bacc`)
 
-Balanced accuracy averages the within-class mean of the predicted probability assigned to the correct class, giving each class equal weight.
+Balanced accuracy averages the within-class accuracy, giving each class equal weight.
 
 Let $\mathcal{C} = \{1, \ldots, K\}$ be the set of classes and 
 $n_c = |\{i : y_i = c\}|$ the number of observations in class $c$. The 
-class-specific accuracy is the mean predicted probability of the correct 
-category among observations that truly belong to class $c$:
+class-specific accuracy is the share of correct predictions among observations 
+that truly belong to class $c$:
 
 - Class-specific accuracy:
   $$
-  \text{acc}_c = \frac{1}{n_c} \sum_{i: y_i=c} \hat p_i^w
+  \text{acc}_c = \frac{1}{n_c} \sum_{i: y_i=c} \text{acc}_i
   $$
 - Balanced accuracy:
   $$
   \widehat{\text{bacc}} = \frac{1}{K}\sum_{c=1}^K \text{acc}_c
   $$
-- A convenient pointwise contribution that yields the same mean:
+- A pointwise contribution that *sums* to the estimate:
 $$
-\text{bacc}_i = \frac{\hat p_i^w}{n_{y_i}}
+\text{bacc}_i = \frac{\text{acc}_i}{K\,n_{y_i}},\quad
+\widehat{\text{bacc}} = \sum_{i=1}^n \text{bacc}_i
 $$
-- Estimate and Standard Error:
+- Standard Error (stratified over classes):
   $$
-  \widehat{\text{bacc}} = \frac{1}{K}\sum_{c=1}^K \frac{1}{n_c}\sum_{i: y_i=c} \hat p_i^w,\quad
-  se(\widehat{\text{bacc}}) = \sqrt{\frac{\widehat{\text{Var}}(\text{bacc}_i)}{n}}
+  se(\widehat{\text{bacc}}) = \frac{1}{K}\sqrt{\sum_{c=1}^K \frac{\text{acc}_c(1-\text{acc}_c)}{n_c}}
   $$
 
 ::: {.callout-note}
