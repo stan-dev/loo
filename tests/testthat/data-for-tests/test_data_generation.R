@@ -35,7 +35,6 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
     mupred_kfold <- brms::kfold_predict(kfold, method = "fitted")$yrep
     ypred_kfold <- brms::kfold_predict(kfold, method = "predict")$yrep
     loo <- brms::loo(fit, save_psis = TRUE)
-    mupred_loo <- loo::E_loo(ypred, psis_object, type = "mean")$value
     predperf <- insample_pred_measure(y = fit$data$y, mupred = mupred, 
       measure = "r2", ylp = ylp)
   }
@@ -78,7 +77,6 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
       log_weights = psis_object$log_weights,
       ypred_kfold = ypred_kfold,
       mupred = mupred,
-      mupred_loo = mupred_loo,
       mupred_kfold = mupred_kfold
     )
   }
@@ -90,7 +88,7 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
 # threshold ps_khat_threshold(400) does not move.
 N_KEEP <- c(
   roaches = 53, categorical = 67, sleep = 29,
-  sleep_test = 20, sleep_train = 26
+  sleep_test = 20
 )
 
 # Estimate and SE of a summed pointwise column, in loo's convention.
@@ -156,12 +154,10 @@ shrink_res <- function(model, res) {
   }
   if (model == "sleep_test") {
     keep_test <- .keep_index(length(res$y_test), N_KEEP[["sleep_test"]])
-    keep_train <- .keep_index(ncol(res$ylp_train), N_KEEP[["sleep_train"]])
     res$y_test <- res$y_test[keep_test]
     for (nm in c("ypred_test", "mupred_test", "ylp_test")) {
       res[[nm]] <- res[[nm]][, keep_test, drop = FALSE]
     }
-    res$ylp_train <- res$ylp_train[, keep_train, drop = FALSE]
     return(res)
   }
 
@@ -181,9 +177,6 @@ shrink_res <- function(model, res) {
   # A categorical mupred is draws x observations x categories.
   if (!is.null(res$mupred) && length(dim(res$mupred)) == 3L) {
     res$mupred <- res$mupred[, keep, , drop = FALSE]
-  }
-  if (!is.null(res$mupred_loo)) {
-    res$mupred_loo <- res$mupred_loo[keep]
   }
   if (!is.null(res$loo)) {
     res$loo <- .shrink_psis_loo(res$loo, keep)
@@ -274,8 +267,7 @@ get_sleep_test_train_res <- function() {
       y_test = test_data$y,
       ypred_test = brms::posterior_predict(fit_sleep_train, newdata = test_data),
       mupred_test = brms::posterior_epred(fit_sleep_train, newdata = test_data),
-      ylp_test = brms::log_lik(fit_sleep_train, newdata = test_data),
-      ylp_train = brms::log_lik(fit_sleep_train)
+      ylp_test = brms::log_lik(fit_sleep_train, newdata = test_data)
     )
   )
 }
