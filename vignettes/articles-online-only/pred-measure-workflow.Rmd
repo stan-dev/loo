@@ -85,15 +85,76 @@ with `brms::log_lik()`, `brms::posterior_predict()`, and
 3. Repeat the workflow under LOO, k-fold, and out-of-sample evaluation.
 4. Compare results across evaluation strategies.
 
-```{r load-data, include=FALSE}
-# Pre-fitted brms models in data-for-vignettes/ (~99 MB, not in git).
-# Generate once (slow, ~10-20 min):
-#   Rscript tests/testthat/data-for-tests/test_data_generation.R --vignettes-only
-fit_sleep <- readRDS("data-for-vignettes/fit_sleep.Rds")
-fit_binary <- readRDS("data-for-vignettes/fit_binary.Rds")
-fit_roaches <- readRDS("data-for-vignettes/fit_roaches.Rds")
-fit_penguins <- readRDS("data-for-vignettes/fit_penguins.Rds")
-res_sleep_test <- readRDS("../../tests/testthat/data-for-tests/test_data_sleep_cv.Rds")
+This article fits five small **brms** models. Each uses 2 chains and 400
+iterations, so the whole article renders in a few minutes.
+
+```{r fit-models, results="hide"}
+SEED <- 42
+set.seed(SEED)
+
+# Continuous outcome: reaction times from lme4::sleepstudy
+data("sleepstudy", package = "lme4")
+sleepstudy <- sleepstudy |>
+  filter(Days >= 2) |>
+  mutate(Days = Days - 2, y = Reaction)
+
+prior_sleep <- brms::prior(normal(200, 100), class = b, coef = "Intercept") +
+  brms::prior(normal(0, 20), class = b, coef = "Days") +
+  brms::prior(exponential(0.02), class = sigma)
+
+fit_sleep <- brms::brm(
+  y ~ 0 + Intercept + Days,
+  data = sleepstudy,
+  family = gaussian(),
+  prior = prior_sleep,
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+
+# The same model, fitted without five held-out subjects
+test_subjects <- sample(unique(sleepstudy$Subject), size = 5)
+train_data <- filter(sleepstudy, !Subject %in% test_subjects)
+test_data <- filter(sleepstudy, Subject %in% test_subjects)
+
+fit_sleep_train <- brms::brm(
+  y ~ 0 + Intercept + Days,
+  data = train_data,
+  family = gaussian(),
+  prior = prior_sleep,
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+
+# Binary outcome
+df_binary <- data.frame(y = rbinom(50, 1, 0.3))
+
+fit_binary <- brms::brm(
+  y ~ 1,
+  data = df_binary,
+  family = brms::bernoulli(),
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+
+# Count outcome: rstanarm::roaches
+data("roaches", package = "rstanarm")
+roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+
+fit_roaches <- brms::brm(
+  y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
+  data = roaches,
+  family = poisson(),
+  prior = brms::prior(normal(0, 1), class = b),
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+
+# Categorical outcome: datasets::iris
+data("iris")
+iris$y <- iris$Species
+
+fit_iris <- brms::brm(
+  y ~ Sepal.Length + Sepal.Width,
+  data = iris,
+  family = brms::categorical(),
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
 ```
 
 ## Quick start
@@ -245,7 +306,8 @@ hamming_loss <- function(y, ypred, log_weights = NULL, higher_is_better = NULL) 
   if (is.null(log_weights)) {
     hamming_i <- colMeans(sweep(ypred, 2, y, "!="))
   } else {
-    w <- exp(.normalize_log_weights(log_weights))
+    lw <- sweep(log_weights, 2, matrixStats::colLogSumExps(log_weights), "-")
+    w <- exp(lw)
     hamming_i <- colSums(w * sweep(ypred, 2, y, "!="))
   }
   
@@ -401,23 +463,23 @@ str(kfold_measure)
 ### Holdout evaluation
 
 For genuinely new data, use `test_pred_measure()` in the same one-shot way.
-We load precomputed predictive inputs from the package test fixtures (a random
-train/test split of the sleep study):
+The inputs come from `fit_sleep_train`, which never saw the five held-out
+subjects:
 
 ```{r test-measures}
 test_measure <- test_pred_measure(
-  y = res_sleep_test$y_test,
-  ypred = res_sleep_test$ypred_test,
-  mupred = res_sleep_test$mupred_test,
-  ylp = res_sleep_test$ylp_train,
-  ylp_test = res_sleep_test$ylp_test,
+  y = test_data$y,
+  ypred = brms::posterior_predict(fit_sleep_train, newdata = test_data),
+  mupred = brms::posterior_epred(fit_sleep_train, newdata = test_data),
+  ylp = brms::log_lik(fit_sleep_train),
+  ylp_test = brms::log_lik(fit_sleep_train, newdata = test_data),
   measure = c("rps", "srps", "r2")
 )
 print(test_measure)
 ```
 
-Holdout measures use a `_test` suffix and reflect performance on the 50
-held-out observations only. The base summary `elpd_test` comes from `ylp_test`.
+Holdout measures use a `_test` suffix and reflect performance on the held-out
+subjects only. The base summary `elpd_test` comes from `ylp_test`.
 
 ## Other outcome types
 
@@ -445,9 +507,7 @@ roaches_measure <- insample_pred_measure(
   ylp = brms::log_lik(fit_roaches),
   y = fit_roaches$data$y,
   ypred = ypred_roaches,
-  measure = c("rps", "srps"),
-  control = list(rps = list(size = as.integer(max(ypred_roaches))),
-                 srps = list(size = as.integer(max(ypred_roaches))))
+  measure = c("rps", "srps")
 )
 print(roaches_measure)
 ```
@@ -455,13 +515,13 @@ print(roaches_measure)
 ### Categorical outcomes
 
 ```{r categorical-example}
-penguins_measure <- insample_pred_measure(
-  ylp = brms::log_lik(fit_penguins),
-  y = as.integer(fit_penguins$data$y),
-  mupred = brms::posterior_epred(fit_penguins),
+iris_measure <- insample_pred_measure(
+  ylp = brms::log_lik(fit_iris),
+  y = as.integer(fit_iris$data$y),
+  mupred = brms::posterior_epred(fit_iris),
   measure = c("acc", "bacc")
 )
-print(penguins_measure)
+print(iris_measure)
 ```
 
 See the [overview of scores and metrics](overview-measures.html) article for which

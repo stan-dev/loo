@@ -1,14 +1,11 @@
-# Data-generation pipeline for pred_measure tests and online-only vignettes.
+# Data-generation pipeline for the pred_measure test fixtures.
 #
 # Slow: fits ~6 brms models with k-fold / LOO postprocessing (~10-20 min).
 # Run from package root:
 #   Rscript tests/testthat/data-for-tests/test_data_generation.R
-# Vignette fits only (pkgdown CI; test RDS files stay as committed in git):
-#   Rscript tests/testthat/data-for-tests/test_data_generation.R --vignettes-only
 #
 # Outputs:
-#   tests/testthat/data-for-tests/test_data_*.Rds  (unless --vignettes-only)
-#   vignettes/articles-online-only/data-for-vignettes/fit_*.Rds
+#   tests/testthat/data-for-tests/test_data_*.Rds
 library(rstanarm)
 # brms features used here require GitHub master (not yet on CRAN)
 if (!requireNamespace("remotes", quietly = TRUE)) {
@@ -236,18 +233,8 @@ get_binomial_res <- function() {
   )
 }
 
-generate_test_data <- function(vignettes_only = FALSE) {
-  if (vignettes_only) {
-    message(
-      "Generating vignette brms fits only (test fixtures unchanged). ",
-      "This may take 10-20 minutes."
-    )
-  } else {
-    message(
-      "Generating test fixtures and vignette brms fits. ",
-      "This may take 10-20 minutes."
-    )
-  }
+generate_test_data <- function() {
+  message("Generating test fixtures. This may take 10-20 minutes.")
   t0 <- proc.time()
 
   full_roaches <- get_roaches_res()
@@ -257,41 +244,18 @@ generate_test_data <- function(vignettes_only = FALSE) {
   full_sleep <- get_sleep_res()
   full_sleep_test <- get_sleep_test_train_res()
 
-  if (!vignettes_only) {
-    test_path <- "tests/testthat/data-for-tests/"
-    saveRDS(full_roaches$res, paste0(test_path, "test_data_roaches.Rds"))
-    saveRDS(full_binary$res, paste0(test_path, "test_data_binary.Rds"))
-    saveRDS(full_penguins$res, paste0(test_path, "test_data_penguins.Rds"))
-    saveRDS(full_binomial$res, paste0(test_path, "test_data_binomial.Rds"))
-    saveRDS(full_sleep$res, paste0(test_path, "test_data_sleep.Rds"))
-    saveRDS(full_sleep_test$res, paste0(test_path, "test_data_sleep_cv.Rds"))
-    message("Saved test fixtures to ", test_path)
-  }
-
-  vignette_path <- "vignettes/articles-online-only/data-for-vignettes/"
-  dir.create(vignette_path, recursive = TRUE, showWarnings = FALSE)
-  saveRDS(full_roaches$fit, paste0(vignette_path, "fit_roaches.Rds"))
-  saveRDS(full_binary$fit, paste0(vignette_path, "fit_binary.Rds"))
-  saveRDS(full_penguins$fit, paste0(vignette_path, "fit_penguins.Rds"))
-  saveRDS(full_binomial$fit, paste0(vignette_path, "fit_binomial.Rds"))
-  saveRDS(full_sleep$fit, paste0(vignette_path, "fit_sleep.Rds"))
-  message("Saved vignette fits to ", vignette_path)
+  test_path <- "tests/testthat/data-for-tests/"
+  saveRDS(full_roaches$res, paste0(test_path, "test_data_roaches.Rds"))
+  saveRDS(full_binary$res, paste0(test_path, "test_data_binary.Rds"))
+  saveRDS(full_penguins$res, paste0(test_path, "test_data_penguins.Rds"))
+  saveRDS(full_binomial$res, paste0(test_path, "test_data_binomial.Rds"))
+  saveRDS(full_sleep$res, paste0(test_path, "test_data_sleep.Rds"))
+  saveRDS(full_sleep_test$res, paste0(test_path, "test_data_sleep_cv.Rds"))
+  message("Saved test fixtures to ", test_path)
 
   elapsed_min <- round((proc.time() - t0)[3] / 60, 1)
   message("Data generation finished in ", elapsed_min, " minutes.")
   invisible(NULL)
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) > 0L) {
-  if (!("--vignettes-only" %in% args)) {
-    stop(
-      "Unknown argument(s): ", paste(args, collapse = ", "),
-      ". Usage: [--vignettes-only]",
-      call. = FALSE
-    )
-  }
-  generate_test_data(vignettes_only = TRUE)
-} else {
-  generate_test_data(vignettes_only = FALSE)
-}
+generate_test_data()
