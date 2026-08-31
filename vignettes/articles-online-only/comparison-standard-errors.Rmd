@@ -51,6 +51,9 @@ knitr::opts_chunk$set(
 library(loo)
 ```
 
+```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
+```
+
 ::: {.callout .callout-note}
 **Acknowledgements**
 
@@ -142,16 +145,38 @@ measures <- c("mae", "mse", "rmse", "r2", "rps") # elpd is computed by default
 
 ## The classical `loo_compare` output
 
-As the actual model building workflow is not the focus of this tutorial, we skip
-this part and load the results from a pre-fitted object in the variable `res`.
-Among other things, it stores a `loo` object (as returned by `loo::loo()`) for
-each of the three models.
+As the actual model building workflow is not the focus of this tutorial, we fit
+the three models here without further comment. `add_criterion()` attaches a
+`loo` object (as returned by `loo::loo()`) to each fit.
 
-```{r example}
-path <- "../../tests/testthat/data-for-tests/test_data_roaches_compare.Rds"
-res <- readRDS(path)
+```{r fit-models, results="hide"}
+SEED <- 42
 
-loos <- list(m1 = res$loo_p_m1, m2 = res$loo_p_m2, m3 = res$loo_p_m3)
+data(roaches, package = "rstanarm")
+roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+
+fit_m1 <- brms::brm(
+  y ~ treatment + senior,
+  data = roaches,
+  family = poisson,
+  prior = brms::prior(normal(0, 1), class = b),
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+fit_m2 <- update(fit_m1, formula = y ~ sqrt_roach1 + senior,
+                 newdata = roaches, refresh = 0)
+fit_m3 <- update(fit_m1, formula = y ~ sqrt_roach1 + treatment,
+                 newdata = roaches, refresh = 0)
+
+add_loo <- function(fit) {
+  brms::add_criterion(fit, criterion = "loo", moment_match = TRUE,
+                      save_psis = TRUE)
+}
+fit_m1 <- add_loo(fit_m1)
+fit_m2 <- add_loo(fit_m2)
+fit_m3 <- add_loo(fit_m3)
+
+loos <- list(m1 = fit_m1$criteria$loo, m2 = fit_m2$criteria$loo,
+             m3 = fit_m3$criteria$loo)
 ```
 
 Passing these `loo` objects to the classical `loo_compare()` reproduces the
@@ -177,19 +202,20 @@ By default, only the `elpd` measure is shown.
 
 <a id="example"></a>
 ```{r pred-measure}
-fit_measure <- function(i, measure) {
+fit_measure <- function(fit, measure) {
   loo_pred_measure(
-    y = res$y,
-    ypred = res[[paste0("ypred_m", i)]],
-    mupred = res[[paste0("mupred_m", i)]],
-    ylp = res[[paste0("ylp_m", i)]],
+    y = fit$data$y,
+    ypred = brms::posterior_predict(fit),
+    mupred = brms::posterior_epred(fit),
+    ylp = brms::log_lik(fit),
     measure = measure
   )
 }
 
-m1 <- fit_measure(1, measures)
-m2 <- fit_measure(2, measures)
-m3 <- fit_measure(3, measures)
+set.seed(SEED)
+m1 <- fit_measure(fit_m1, measures)
+m2 <- fit_measure(fit_m2, measures)
+m3 <- fit_measure(fit_m3, measures)
 
 (comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3)))
 ```
@@ -616,8 +642,24 @@ generated the data, while `m_b` uses a noisy version `w` of it and therefore
 classifies part of the observations differently.
 
 ```{r bacc-fit}
-fit_bacc_x <- readRDS("data-for-vignettes/fit_bacc_x.Rds")
-fit_bacc_w <- readRDS("data-for-vignettes/fit_bacc_w.Rds")
+set.seed(2024)
+n_obs <- 200
+x <- rnorm(n_obs)
+df_bacc <- data.frame(
+  y = rbinom(n_obs, 1, plogis(-1.4 + 1.6 * x)),
+  x = x,
+  w = x + rnorm(n_obs, sd = 1.5)
+)
+
+fit_bacc_x <- brms::brm(
+  y ~ x,
+  data = df_bacc,
+  family = brms::bernoulli(),
+  prior = brms::prior(normal(0, 2), class = b),
+  chains = 2, iter = 1000, seed = SEED, refresh = 0
+)
+fit_bacc_w <- update(fit_bacc_x, formula = y ~ w, newdata = df_bacc,
+                     refresh = 0)
 
 y <- fit_bacc_x$data$y
 
