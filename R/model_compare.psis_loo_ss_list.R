@@ -21,7 +21,9 @@ model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
     if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
   }
 
-  model_compare_checks.psis_loo_ss_list(x)
+  # A `psis_loo_ss` object subsamples its `pointwise` matrix, so the shared
+  # check compares the full data size instead.
+  model_compare_checks(x, n_fun = function(x) x$loo_subsampling$data_dim[1])
 
   comp <- model_compare_matrix.psis_loo_ss_list(x)
   ord <- model_compare_order(x)
@@ -133,52 +135,6 @@ model_compare_ss_diff <- function(ref_loo, compare_loo){
 }
 
 
-#' Check list of `psis_loo` objects
-#' @details Similar to `model_compare_checks()` but checks dim size rather than
-#' pointwise dim since different pointwise sizes of `psis_loo_ss` will work.
-#' Can probably be removed by refactoring `model_compare_checks()`.
-#' @noRd
-#' @inheritParams model_compare_ss
-#' @return A 1 by 3 elpd_diff estimation.
-model_compare_checks.psis_loo_ss_list <- function(loos) {
-  ## errors
-  if (length(loos) <= 1L) {
-    stop("At least two models are required for comparison.", call. = FALSE)
-  }
-  if (!all(sapply(loos, is.loo))) {
-    stop("All inputs should have class 'loo'.", call.=FALSE)
-  }
-
-  Ns <- sapply(loos, function(x) x$loo_subsampling$data_dim[1])
-  if (!all(Ns == Ns[1L])) {
-    stop("Not all models have the same number of data points.", call.=FALSE)
-  }
-
-  ## warnings
-
-  yhash <- lapply(loos, attr, which = "yhash")
-  yhash_ok <- sapply(yhash, function(x) { # ok only if all yhash are same (all NULL is ok)
-    isTRUE(all.equal(x, yhash[[1]]))
-  })
-  if (!all(yhash_ok)) {
-    warning("Not all models have the same y variable. ('yhash' attributes do not match)",
-            call. = FALSE)
-  }
-
-  if (all(sapply(loos, is.kfold))) {
-    Ks <- unlist(lapply(loos, attr, which = "K"))
-    if (!all(Ks == Ks[1])) {
-      warning("Not all kfold objects have the same K value. ",
-              "For a more accurate comparison use the same number of folds. ",
-              call. = FALSE)
-    }
-  } else if (any(sapply(loos, is.kfold)) && any(sapply(loos, is.psis_loo))) {
-    warning("Comparing LOO-CV to K-fold-CV. ",
-            "For a more accurate comparison use the same number of folds ",
-            "or loo for all models compared.",
-            call. = FALSE)
-  }
-}
 
 #' @rdname model_compare
 #' @export

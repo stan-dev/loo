@@ -521,12 +521,16 @@ throw_kfold_K_mismatch_warning <- function(loos) {
 #' @param class_check Function returning `TRUE` for valid input objects.
 #' @param class_msg Error message when `class_check` fails.
 #' @param kfold_checks If `TRUE`, run k-fold comparison warnings.
+#' @param n_fun Function returning one model's number of observations. A
+#'   `"psis_loo_ss"` object subsamples its `pointwise` matrix, so it reports the
+#'   size of the full data instead.
 #' @return Nothing, just possibly throws errors/warnings.
 model_compare_checks <- function(
   loos,
   class_check = is.loo,
   class_msg = "All inputs should have class 'loo'.",
-  kfold_checks = TRUE
+  kfold_checks = TRUE,
+  n_fun = function(x) nrow(x$pointwise)
 ) {
   ## errors
   if (length(loos) <= 1L) {
@@ -536,7 +540,7 @@ model_compare_checks <- function(
     stop(class_msg, call. = FALSE)
   }
 
-  Ns <- vapply(loos, function(x) nrow(x$pointwise), integer(1))
+  Ns <- vapply(loos, function(x) as.integer(n_fun(x)), integer(1))
   if (any(Ns != Ns[1L])) {
     stop(
       paste0(
