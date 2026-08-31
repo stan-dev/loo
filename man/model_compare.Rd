@@ -391,7 +391,7 @@ correction of selection-induced bias with order statistics.
 \item The \href{https://mc-stan.org/loo/articles/online-only/faq.html}{FAQ page} on
 the \strong{loo} website for answers to frequently asked questions.
 \item The article
-\href{https://mc-stan.org/loo/articles/online-only/comparison-standard-errors.html}{Differences and their standard errors in model comparison}
+\href{https://mc-stan.org/loo/articles/online-only/model-comparison.html}{Differences and their standard errors in model comparison}
 on the \strong{loo} website, for how the differences and their standard errors
 are computed for each measure and when the normal approximation behind
 \code{p_worse} can be trusted.

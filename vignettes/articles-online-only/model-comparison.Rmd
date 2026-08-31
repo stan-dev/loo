@@ -12,7 +12,7 @@ output:
 params:
   EVAL: TRUE #!r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
-  %\VignetteIndexEntry{comparison-standard-errors}
+  %\VignetteIndexEntry{Differences and their standard errors in model comparison}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
