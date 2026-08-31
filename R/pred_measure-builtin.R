@@ -209,7 +209,7 @@ measure_mlpd <- function(
 #' @inheritParams measure_density_params
 #' @inheritParams measure_params
 #' @param pointwise Optional numeric vector of precomputed pointwise
-#'   contributions \eqn{\mathrm{ic}_i = -1 \cdot \mathrm{lppd}_i}. If provided, 
+#'   contributions \eqn{\mathrm{ic}_i = -2 \cdot \mathrm{lppd}_i}. If provided, 
 #'   `ylp` and `log_weights` are ignored.
 #'
 #' @examples
@@ -448,6 +448,8 @@ measure_mae <- function(
 #' predictions. Point predictions are obtained by averaging `mupred` draws, or
 #' by PSIS-weighted averaging when `log_weights` is provided.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `y`, `mupred`, and `log_weights` are ignored.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -479,6 +481,8 @@ measure_mse <- function(
 #' Computes RMSE as the square root of MSE and propagates uncertainty via a
 #' first-order delta-method approximation.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `y`, `mupred`, and `log_weights` are ignored.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -520,6 +524,9 @@ measure_rmse <- function(
 #' the empirical variance of `y`. The standard error is computed with a
 #' first-order delta-method approximation.
 #'
+#' @param pointwise Optional numeric vector of precomputed pointwise squared
+#'   errors. If provided, `mupred` and `log_weights` are ignored. `y` is always
+#'   required, because `r2` needs the variance of `y` as its baseline.
 #' @inheritParams measure_mae
 #'
 #' @examples
@@ -590,7 +597,7 @@ measure_r2 <- function(
 #'   distributions for ordered discrete outcomes.
 #' - **CRPS** (Matheson & Winkler, 1976; Gneiting & Raftery, 2007): Generalizes
 #'   RPS to continuous outcomes. Defined as
-#'   \deqn{\mathrm{CRPS}(X; y) = \frac{1}{2} E[|X - X'|] - E[|X - y|],}
+#'   \deqn{\mathrm{CRPS}(X; y) = E[|X - y|] - \frac{1}{2} E[|X - X'|],}
 #'   where \eqn{X, X'} are independent draws from the predictive distribution.
 #' - **SRPS/SCRPS** (Bolin & Wallin, 2023): Scaled variants that are invariant
 #'   to the scale of the predictive distribution. Defined as

@@ -35,7 +35,7 @@ summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 included when \code{ylp} is available). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
-\code{\link[=supported_measures_list]{supported_measures_list()}}.
+\link{supported_measures_list}.
 \item A \strong{function} with attribute \code{"measure_name"} for one custom measure.
 \item A \strong{list} mixing character scalars (built-in names) and named
 functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.

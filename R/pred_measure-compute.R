@@ -26,7 +26,7 @@
 #'   included when `ylp` is available). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
-#'       [supported_measures_list()].
+#'       [supported_measures_list].
 #'     \item A **function** with attribute `"measure_name"` for one custom measure.
 #'     \item A **list** mixing character scalars (built-in names) and named
 #'       functions (custom measures), e.g. `list("rps", my_metric = my_fun)`.

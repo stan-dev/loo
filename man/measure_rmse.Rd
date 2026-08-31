@@ -22,7 +22,7 @@ dimensions draws x observations. A length-\code{n} vector is also accepted.}
 weights with dimensions \eqn{S \times n}. Weights are column-normalized
 before computing each per-observation contribution.}
 
-\item{pointwise}{Optional numeric vector of precomputed pointwise absolute
+\item{pointwise}{Optional numeric vector of precomputed pointwise squared
 errors. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
 
 \item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
