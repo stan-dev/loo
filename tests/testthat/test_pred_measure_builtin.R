@@ -310,6 +310,17 @@ testthat::test_that("higher_is_better reorients loss measures to utility scale",
   expect_equal(res_mse_utility$pointwise, -res_mse$pointwise)
 })
 
+testthat::test_that("higher_is_better reorients rps and srps", {
+  raw <- measure_rps(res_sleep$y, res_sleep$ypred)
+  expect_true(all(raw$pointwise >= 0))
+  up <- measure_rps(res_sleep$y, res_sleep$ypred, higher_is_better = TRUE)
+  expect_equal(up$pointwise, -raw$pointwise)
+
+  s_raw <- measure_srps(res_sleep$y, res_sleep$ypred)
+  s_dn <- measure_srps(res_sleep$y, res_sleep$ypred, higher_is_better = FALSE)
+  expect_equal(s_dn$pointwise, -s_raw$pointwise)
+})
+
 testthat::test_that("measure_rmse() works with se=0", {
   mupred0 <- t(replicate(4000, res_roaches$y))
 

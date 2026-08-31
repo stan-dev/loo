@@ -613,11 +613,9 @@ measure_r2 <- function(
 #'
 #' **Sign convention:**
 #'
-#' Unscaled scores are returned as utilities (higher is better), consistent 
-#' with the sign convention of log score / ELPD. Scaled scores are negatively
-#' oriented (lower is better). Use `higher_is_better = NULL` to obtain the
-#' loss convention (lower is better) used in some references for unscaled scores,
-#' or `higher_is_better = TRUE` for a utility scale when using scaled scores.
+#' Unscaled scores are returned as losses (lower is better). Scaled scores are
+#' returned as utilities (higher is better), after Bolin & Wallin (2023). Set
+#' `higher_is_better` to select the orientation you want.
 #'
 #' @param y A numeric vector of \eqn{n} observed outcomes. May be integer-valued
 #'   (for RPS/SRPS) or continuous (for CRPS/SCRPS).
@@ -792,8 +790,8 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   mse = list(fun = measure_mse, loss = TRUE),
   acc = list(fun = measure_acc, loss = FALSE),
   bacc = list(fun = measure_bacc, loss = FALSE),
-  rps = list(fun = measure_rps, loss = FALSE),
-  srps = list(fun = measure_srps, loss = TRUE),
+  rps = list(fun = measure_rps, loss = TRUE),
+  srps = list(fun = measure_srps, loss = FALSE),
   brier = list(fun = measure_brier, loss = TRUE)
 )
 

@@ -80,11 +80,9 @@ accounts for the importance weights when estimating expectations.
 
 \strong{Sign convention:}
 
-Unscaled scores are returned as utilities (higher is better), consistent
-with the sign convention of log score / ELPD. Scaled scores are negatively
-oriented (lower is better). Use \code{higher_is_better = NULL} to obtain the
-loss convention (lower is better) used in some references for unscaled scores,
-or \code{higher_is_better = TRUE} for a utility scale when using scaled scores.
+Unscaled scores are returned as losses (lower is better). Scaled scores are
+returned as utilities (higher is better), after Bolin & Wallin (2023). Set
+\code{higher_is_better} to select the orientation you want.
 }
 \examples{
 # Discrete outcomes: RPS
