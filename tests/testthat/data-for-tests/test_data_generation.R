@@ -226,40 +226,6 @@ get_binary_res <- function() {
   )
 }
 
-get_bacc_compare_res <- function() {
-  # Binary example for the model-comparison vignette: the same outcome is
-  # modelled once with the predictor that generated it (x) and once with a
-  # noisy version of that predictor (w), so that the two models classify part
-  # of the observations differently.
-  set.seed(2024)
-  n_obs <- 200
-  x <- rnorm(n_obs)
-  df_bacc <- data.frame(
-    y = rbinom(n_obs, 1, plogis(-1.4 + 1.6 * x)),
-    x = x,
-    w = x + rnorm(n_obs, sd = 1.5)
-  )
-
-  fit_bacc_x <- brms::brm(
-    y ~ x,
-    data = df_bacc,
-    family = bernoulli(),
-    prior = prior(normal(0, 2), class = b),
-    chains = 2,
-    iter = 1000,
-    seed = SEED,
-    refresh = 0
-  )
-  fit_bacc_w <- update(
-    fit_bacc_x,
-    formula = y ~ w,
-    newdata = df_bacc,
-    refresh = 0
-  )
-
-  list(fit_x = fit_bacc_x, fit_w = fit_bacc_w)
-}
-
 get_roaches_res <- function() {
   data(roaches, package = "rstanarm")
   roaches$sqrt_roach1 <- sqrt(roaches$roach1)
@@ -455,7 +421,6 @@ generate_test_data <- function() {
   full_sleep <- get_sleep_res()
   full_sleep_test <- get_sleep_test_train_res()
   full_roaches_compare <- get_roaches_compare_res()
-  full_bacc <- get_bacc_compare_res()
 
   test_path <- "tests/testthat/data-for-tests/"
   saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"))
@@ -466,17 +431,6 @@ generate_test_data <- function() {
   saveRDS(shrink_res("sleep", full_sleep$res), paste0(test_path, "test_data_sleep.Rds"))
   saveRDS(shrink_res("sleep_test", full_sleep_test$res), paste0(test_path, "test_data_sleep_cv.Rds"))
   message("Saved test fixtures to ", test_path)
-
-  vignette_path <- "vignettes/articles-online-only/data-for-vignettes/"
-  dir.create(vignette_path, recursive = TRUE, showWarnings = FALSE)
-  saveRDS(full_roaches$fit, paste0(vignette_path, "fit_roaches.Rds"))
-  saveRDS(full_binary$fit, paste0(vignette_path, "fit_binary.Rds"))
-  saveRDS(full_penguins$fit, paste0(vignette_path, "fit_penguins.Rds"))
-  saveRDS(full_binomial$fit, paste0(vignette_path, "fit_binomial.Rds"))
-  saveRDS(full_sleep$fit, paste0(vignette_path, "fit_sleep.Rds"))
-  saveRDS(full_bacc$fit_x, paste0(vignette_path, "fit_bacc_x.Rds"))
-  saveRDS(full_bacc$fit_w, paste0(vignette_path, "fit_bacc_w.Rds"))
-  message("Saved vignette fits to ", vignette_path)
 
   elapsed_min <- round((proc.time() - t0)[3] / 60, 1)
   message("Data generation finished in ", elapsed_min, " minutes.")
