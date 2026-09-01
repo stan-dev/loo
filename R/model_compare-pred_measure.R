@@ -198,6 +198,17 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   )
   attr(comp, "compare_reference") <- ref_models
   attr(comp, "compare_source") <- source
+  # Both numbers qualify the source in the printed header. `model_compare()`
+  # already rejects models that differ in `n_obs`, so one number describes the
+  # whole comparison.
+  # `NULL` for any other source, and for folds that disagree, which
+  # `throw_kfold_K_mismatch_warning()` already reported: no single number then
+  # describes the comparison.
+  attr(comp, "compare_K") <- if (identical(source, "kfold")) {
+    Ks <- unlist(lapply(loos, attr, which = "K"))
+    if (length(Ks) == length(loos) && all(Ks == Ks[[1L]])) unname(Ks[[1L]])
+  }
+  attr(comp, "compare_N") <- n_obs
   attr(comp, "compare_measures") <- .compare_measures(loos)
   attr(comp, "sign_converted_measures") <- .compare_sign_converted_measures(
     compare_cols,

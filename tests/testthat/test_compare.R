@@ -1850,7 +1850,26 @@ test_that("print.compare.loo names the source for non-loo comparisons", {
                            kfold = res$kfold, measure = "rmse")
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
 
-  expect_output(print(comp), "K-fold cross-validation", fixed = TRUE)
+  # the fold count qualifies a k-fold comparison
+  expect_output(print(comp), "10-fold cross-validation", fixed = TRUE)
+  expect_equal(attr(comp, "compare_K"), 10)
+
+  # the held-out size qualifies a test comparison
+  res_cv <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
+  t1 <- test_pred_measure(
+    y = res_cv$y_test, mupred = res_cv$mupred_test,
+    ylp_test = res_cv$ylp_test, measure = "rmse"
+  )
+  t2 <- test_pred_measure(
+    y = res_cv$y_test, mupred = .jitter_mupred(res_cv$mupred_test, 5),
+    ylp_test = res_cv$ylp_test, measure = "rmse"
+  )
+  comp_test <- suppressMessages(model_compare(list(m1 = t1, m2 = t2)))
+  expect_output(
+    print(comp_test),
+    paste0("held-out test data (N = ", length(res_cv$y_test), ")"),
+    fixed = TRUE
+  )
 
   # LOO is the default and stays unlabelled
   l1 <- loo_pred_measure(loo = res$loo, y = res$y, mupred = res$mupred,

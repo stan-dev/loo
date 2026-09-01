@@ -134,13 +134,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   if (!is.null(compare_source) && !identical(compare_source, "loo")) {
     .cat_wrapped(
       "Predictive measures evaluated on ",
-      switch(
-        compare_source,
-        kfold = "K-fold cross-validation",
-        test = "held-out test data",
-        insample = "in-sample (training) data",
-        compare_source
-      ),
+      .compare_source_phrase(x, compare_source),
       "."
     )
   }
@@ -191,6 +185,31 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   }
 
   invisible(x)
+}
+
+#' Name the source a comparison was evaluated on
+#'
+#' The fold count and the number of held-out observations tell the reader how
+#' much data each estimate rests on, so they are named where the source is.
+#' Either falls back to the plain phrase when the number is unknown.
+#' @noRd
+.compare_source_phrase <- function(x, source) {
+  switch(
+    source,
+    kfold = {
+      K <- attr(x, "compare_K")
+      paste0(if (is.null(K)) "K" else K, "-fold cross-validation")
+    },
+    test = {
+      n <- attr(x, "compare_N")
+      paste0(
+        "held-out test data",
+        if (is.null(n)) "" else paste0(" (N = ", n, ")")
+      )
+    },
+    insample = "in-sample (training) data",
+    source
+  )
 }
 
 #' Header line naming the reference each difference is computed against
