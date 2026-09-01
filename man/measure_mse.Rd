@@ -4,13 +4,7 @@
 \alias{measure_mse}
 \title{Mean squared error (\code{mse})}
 \usage{
-measure_mse(
-  y,
-  mupred,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_mse(y, mupred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{y}{A numeric vector of observed outcomes.}
@@ -24,12 +18,6 @@ before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise squared
 errors. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes MSE between observed outcomes and posterior predictive point

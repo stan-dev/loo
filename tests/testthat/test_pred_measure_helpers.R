@@ -35,6 +35,26 @@ test_that(".normalize_measure() handles a mixed list", {
   expect_equal(entries[[2]]$name, "custom_mae")
 })
 
+test_that(".normalize_measure() reads the `measure_loss` declaration", {
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  attr(f, "measure_name") <- "custom_mae"
+
+  # a custom measure is a utility unless it says otherwise
+  expect_false(.normalize_measure(f)[[1]]$loss)
+
+  attr(f, "measure_loss") <- TRUE
+  expect_true(.normalize_measure(f)[[1]]$loss)
+  # the list form takes its name from the element, but the same declaration
+  expect_true(.normalize_measure(list(my_loss = f))[[1]]$loss)
+
+  attr(f, "measure_loss") <- "yes"
+  expect_error(.normalize_measure(f), regexp = "measure_loss")
+  attr(f, "measure_loss") <- c(TRUE, FALSE)
+  expect_error(.normalize_measure(list(my_loss = f)), regexp = "measure_loss")
+  attr(f, "measure_loss") <- NA
+  expect_error(.normalize_measure(f), regexp = "measure_loss")
+})
+
 test_that(".normalize_measure() errors on duplicate names", {
   expect_error(
     .normalize_measure(c("mse", "mse")),
@@ -124,7 +144,7 @@ test_that(".validate_control() accepts valid control silently", {
   expect_invisible(.validate_control(list(rps = list(scaled = TRUE))))
   expect_invisible(.validate_control(list(
     rps = list(scaled = TRUE),
-    srps = list(higher_is_better = TRUE)
+    srps = list(pointwise = NULL)
   )))
 })
 
@@ -166,9 +186,44 @@ test_that(".validate_control() errors on malformed control", {
     .validate_control(list(rps = c(scaled = TRUE))),
     regexp = "must be a named list of named lists."
   )
-  expect_error(
-    .validate_control(list(not_a_function = list(x = 1))),
-    regexp = "not_a_function"
+})
+
+test_that(".validate_control() warns on a control entry naming no measure", {
+  expect_warning(
+    .validate_control(list(not_a_measure = list(x = 1))),
+    regexp = "not_a_measure.*matches no"
+  )
+  # the same when the requested measures are known
+  expect_warning(
+    .validate_control(
+      list(mse = list(pointwise = NULL)),
+      measures = .normalize_measure("rps")
+    ),
+    regexp = "mse.*matches no"
+  )
+})
+
+test_that(".validate_control() validates custom measures against their formals", {
+  f <- function(y, mupred, delta = 1) {
+    list(estimate = 1, se = 0, pointwise = y)
+  }
+  attr(f, "measure_name") <- "custom_huber"
+  entries <- .normalize_measure(f)
+
+  # only the custom function's own formals are accepted
+  expect_silent(
+    .validate_control(list(custom_huber = list(delta = 2)), entries)
+  )
+  expect_warning(
+    .validate_control(
+      list(custom_huber = list(higher_is_better = TRUE)),
+      entries
+    ),
+    regexp = "Ignoring `higher_is_better` as it is not a valid argument"
+  )
+  expect_warning(
+    .validate_control(list(custom_huber = list(nope = 1)), entries),
+    regexp = "Ignoring `nope` as it is not a valid argument"
   )
 })
 

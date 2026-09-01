@@ -87,7 +87,7 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
 # only a subset of the observations. The draws stay at 400, so the Pareto k
 # threshold ps_khat_threshold(400) does not move.
 N_KEEP <- c(
-  roaches = 53, categorical = 67, sleep = 29,
+  roaches = 53, roaches_compare = 110, categorical = 67, sleep = 29,
   sleep_test = 20
 )
 
@@ -192,6 +192,22 @@ shrink_res <- function(model, res) {
   res
 }
 
+# The model-comparison fixture holds four `psis_loo` objects and four sets of
+# draws. `.keep_index()` reseeds, so this keeps the same 53 observations as
+# `test_data_roaches.Rds`.
+shrink_roaches_compare <- function(res) {
+  keep <- .keep_index(length(res$y), N_KEEP[["roaches_compare"]])
+  res$y <- res$y[keep]
+  for (nm in grep("^(ypred|mupred|ylp)(_m[0-9]+)?$", names(res), value = TRUE)) {
+    res[[nm]] <- res[[nm]][, keep, drop = FALSE]
+  }
+  for (nm in grep("^loo_p(_m[0-9]+)?$", names(res), value = TRUE)) {
+    res[[nm]] <- .shrink_psis_loo(res[[nm]], keep)
+  }
+  res
+}
+
+
 get_binary_res <- function() {
   set.seed(SEED)
   df_binary <- data.frame(y = rbinom(50, 1, 0.3))
@@ -228,6 +244,60 @@ get_roaches_res <- function() {
     fit = fit_roaches,
     res = postprocess_res("roaches", fit_roaches)
   )
+}
+
+get_roaches_compare_res <- function() {
+  data(roaches, package = "rstanarm")
+  roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+  
+  fit_p <- brm(
+    y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
+    data = roaches,
+    family = poisson,
+    prior = prior(normal(0, 1), class = b),
+    chains = 2,
+    iter = 400,
+    refresh = 0,
+    seed = SEED
+  )
+
+  fit_p <- add_criterion(
+    fit_p,
+    criterion = "loo",
+    moment_match = TRUE,
+    save_psis = TRUE,
+    overwrite = TRUE
+  )
+
+  fit_p_m1 <- update(fit_p, formula = y ~ treatment + senior) |>
+    add_criterion(criterion = "loo", moment_match = TRUE, save_psis = TRUE)
+  fit_p_m2 <- update(fit_p, formula = y ~ sqrt_roach1 + senior)  |>
+    add_criterion(criterion = "loo", moment_match = TRUE, save_psis = TRUE)
+  fit_p_m3 <- update(fit_p, formula = y ~ sqrt_roach1 + treatment) |>
+    add_criterion(criterion = "loo", moment_match = TRUE, save_psis = TRUE)
+
+  # `ypred` (posterior predictive draws) is needed by the sampling-based scores
+  # such as `rps`/`srps`; `mupred` (posterior_epred) is not enough for those.
+  set.seed(SEED)
+  return(list(
+    y = fit_p$data$y,
+    loo_p = fit_p$criteria$loo,
+    ypred = brms::posterior_predict(fit_p),
+    mupred = brms::posterior_epred(fit_p),
+    ylp = brms::log_lik(fit_p),
+    loo_p_m1 = fit_p_m1$criteria$loo,
+    ypred_m1 = brms::posterior_predict(fit_p_m1),
+    mupred_m1 = brms::posterior_epred(fit_p_m1),
+    ylp_m1 = brms::log_lik(fit_p_m1),
+    loo_p_m2 = fit_p_m2$criteria$loo,
+    ypred_m2 = brms::posterior_predict(fit_p_m2),
+    mupred_m2 = brms::posterior_epred(fit_p_m2),
+    ylp_m2 = brms::log_lik(fit_p_m2),
+    loo_p_m3 = fit_p_m3$criteria$loo,
+    ypred_m3 = brms::posterior_predict(fit_p_m3),
+    mupred_m3 = brms::posterior_epred(fit_p_m3),
+    ylp_m3 = brms::log_lik(fit_p_m3)
+  ))
 }
 
 get_sleep_test_train_res <- function() {
@@ -350,9 +420,11 @@ generate_test_data <- function() {
   full_binomial <- get_binomial_res()
   full_sleep <- get_sleep_res()
   full_sleep_test <- get_sleep_test_train_res()
+  full_roaches_compare <- get_roaches_compare_res()
 
   test_path <- "tests/testthat/data-for-tests/"
   saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"))
+  saveRDS(shrink_roaches_compare(full_roaches_compare), paste0(test_path, "test_data_roaches_compare.Rds"))
   saveRDS(shrink_res("binary", full_binary$res), paste0(test_path, "test_data_binary.Rds"))
   saveRDS(shrink_res("categorical", full_penguins$res), paste0(test_path, "test_data_penguins.Rds"))
   saveRDS(shrink_res("binomial", full_binomial$res), paste0(test_path, "test_data_binomial.Rds"))

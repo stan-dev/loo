@@ -14,6 +14,8 @@
 #'   Note: VGG2017 refers to Vehtari, Gelman, and Gabry (2017). See
 #'   **References**, below.
 #'
+#' @seealso [model_compare()], [loo_compare()]
+#'
 #' @section ELPD and `elpd_loo`:
 #'
 #' The ELPD is the theoretical expected log pointwise predictive density for a new
@@ -39,7 +41,7 @@
 #' estimate is an accurate estimate for the scale, it ignores the skewness. When
 #' making model comparisons, the SE of the component-wise (pairwise) differences
 #' should be used instead (see the `se_diff` section below and Eq 24 in
-#' VGG2017). Sivula et al. (2022) discuss the conditions when the normal
+#' VGG2017). Sivula et al. (2025) discuss the conditions when the normal
 #' approximation used for SE and `se_diff` is good.
 #'
 #' @section Monte Carlo SE of elpd_loo:
@@ -141,10 +143,42 @@
 #' detect the problem.
 #' }
 #'
+#' @section Model comparison with `model_compare()` and `loo_compare()`:
+#'
+#' Two functions perform model comparison, and both are available to users:
+#'
+#' * [model_compare()] is the current interface. It compares `"loo"`, `"waic"`,
+#'   and `"kfold"` objects on ELPD, and [`pred_measure`][pred_measure] results
+#'   on every predictive measure the models share. The `rank_by` and
+#'   `custom_se_fn` arguments are available here only.
+#'
+#' * [loo_compare()] is **deprecated** in favor of `model_compare()`, but it
+#'   still works and is still an exported generic, so `loo_compare` methods
+#'   registered by other packages keep dispatching. It keeps its previous
+#'   behavior: it accepts only `"loo"`, `"waic"`, and `"kfold"` objects and
+#'   compares them on ELPD. Passing [`pred_measure`][pred_measure] results,
+#'   `rank_by`, or `custom_se_fn` arguments produces an error. The deprecation
+#'   warning is issued once per session.
+#'
+#' `loo_compare()` and `model_compare()` return the same object: a data frame
+#' including the `p_worse`, `diag_diff`, and `diag_elpd` columns. The terms
+#' `elpd_diff`, `se_diff`, `p_worse`, `diag_diff`, and `diag_elpd` are defined
+#' below. The remaining sections, on comparisons of several predictive
+#' measures at once, apply to `model_compare()` only, since `loo_compare()`
+#' cannot produce such a comparison. See
+#' `vignette("migration-guide", package = "loo")` for the migration path.
+#'
+#' Below, "the comparison output" refers to the object returned by either
+#' function, and "the reference model" to the model each difference is computed
+#' against, which is by default the best model on the measure unless
+#' `model_compare()` was given `rank_by`.
+#'
 #' @section elpd_diff:
 #' `elpd_diff` is the difference in `elpd_loo` for two models. If more
 #' than two models are compared, the difference is computed relative to the
-#' model with highest `elpd_loo`.
+#' reference model, which is the model with the highest `elpd_loo` in
+#' `loo_compare()` and in `model_compare()` by default the model with the best
+#' performance per measure unless stated otherwise via `rank_by`.
 #'
 #' @section se_diff:
 #'
@@ -161,34 +195,36 @@
 #'
 #'     p_worse = pnorm(0, elpd_diff, se_diff).
 #'
-#' The best-ranked model (the first row in the `loo_compare()` output, where
+#' The reference model (the row of the comparison output where
 #' `elpd_diff = 0`) always receives `NA`, since the comparison is defined
 #' relative to that model.
 #'
 #' Because models are ordered by `elpd_loo` before computing `p_worse`, all
-#' reported values are at least 0.5 by construction. A value close to 0.5
-#' indicates that the models are nearly indistinguishable in predictive
-#' performance and that the ranking could easily be reversed with different
-#' data. A value close to 1 indicates that the lower-ranked model is almost
+#' reported values are at least 0.5 by construction. This always holds for
+#' `loo_compare()`, and for `model_compare()` unless `rank_by` pins a reference
+#' model that is not the best one; models better than a pinned reference then
+#' have `p_worse < 0.5`. A value close to 0.5 indicates that the models are
+#' nearly indistinguishable in predictive performance and that the ranking could
+#' easily be reversed with different data. A value close to 1 indicates that the
+#' lower-ranked model is almost
 #' certainly worse. `p_worse` inherits all the limitations of `se_diff` and the
 #' normal approximation on which it is based. In particular, when `se_diff` is
 #' underestimated, `p_worse` will be estimated too close to 1, making a model
 #' appear more clearly worse than the data actually support. Conversely, when
 #' `elpd_diff` is biased due to an unreliable LOO approximation, `p_worse` can
 #' point in the wrong direction entirely. When any of these conditions are
-#' present, `diag_diff` or `diag_elpd` will be flagged in the `loo_compare()`
-#' output. 
-#' For further guidance, see the sections below and the case study on
+#' present, `diag_diff` or `diag_elpd` will be flagged in the comparison
+#' output. For further guidance, see the sections below and the case study on
 #' [Uncertainty in Bayesian LOO-CV Model Comparison](
 #' https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html).
 #'
 #' @section `diag_diff` (pairwise comparison diagnostics):
 #'
-#' `diag_diff` is a diagnostic column in the `loo_compare()` output for each
-#' model comparison against the current reference model. It flags conditions
-#' under which the normal approximation behind `se_diff` and `p_worse` is likely
-#' to be poorly calibrated. The column contains a short label when a condition
-#' is detected, and is empty otherwise.
+#' `diag_diff` is a diagnostic column in the `model_compare()` and
+#' `loo_compare()` output for each model comparison against the current
+#' reference model. It flags conditions under which the normal approximation
+#' behind `se_diff` and `p_worse` is likely to be poorly calibrated. The column
+#' contains a short label when a condition is detected, and is empty otherwise.
 #'
 #' The column `diag_diff` currently flags two problems:
 #'
@@ -210,7 +246,7 @@
 #'
 #' The conditions flagged by `diag_diff` are not independent: they tend to
 #' co-occur, and when they do, some flags carry more information than others.
-#' `loo_compare()` therefore follows a priority hierarchy and shows only the
+#' Both functions therefore follow a priority hierarchy and show only the
 #' most critical flag in the table output.
 #'
 #' The hierarchy is as follows:
@@ -233,12 +269,12 @@
 #' 
 #' @section `diag_elpd`:
 #'
-#' `diag_elpd` is a diagnostic column in the `loo_compare()` output that flags
-#' when the PSIS-LOO approximation for an individual model is unreliable. Unlike
-#' `diag_diff`, which concerns the *comparison* between models, `diag_elpd`
-#' concerns the quality of the `elpd_loo` estimate for each model individually.
-#' It contains a short text label when a problem is detected, and is empty
-#' otherwise.
+#' `diag_elpd` is a diagnostic column in the `model_compare()` and
+#' `loo_compare()` output that flags when the PSIS-LOO approximation for an
+#' individual model is unreliable. Unlike `diag_diff`, which concerns the
+#' *comparison* between models, `diag_elpd` concerns the quality of the
+#' `elpd_loo` estimate for each model individually. It contains a short text
+#' label when a problem is detected, and is empty otherwise.
 #'
 #' ### `K k_psis > t` (K observations with Pareto-k values > t)
 #'
@@ -252,6 +288,129 @@
 #' This is qualitatively different from the calibration issues flagged by
 #' `diag_diff`: here the estimate itself may be wrong, not just uncertain.
 #'
+#' The flag is not specific to ELPD: `mae_loo`, `mse_loo`, `r2_loo` and the
+#' rest are biased by unreliable importance sampling for the same reason. It is
+#' a property of one model's approximation, and does not depend on which model
+#' is used as the comparison reference. In an ELPD-only comparison (i.e., all
+#' `loo_compare()` output, and `model_compare()` on `"loo"`, `"waic"`, or
+#' `"kfold"` objects) `print()` shows it as a column of the single difference
+#' table. In a multi-measure `model_compare()` comparison it is instead reported
+#' once per model above the per-measure difference tables, rather than inside
+#' any one of them.
+#'
 #' See for further information on Pareto-k values the "Pareto k estimates"
 #' section.
+#'
+#' @section Multi-measure model comparisons:
+#'
+#' The remaining sections describe comparisons that only [model_compare()] can
+#' produce; the deprecated `loo_compare()` rejects
+#' [`pred_measure`][pred_measure] inputs and the `rank_by` and `custom_se_fn`
+#' arguments.
+#'
+#' When comparing [`loo_pred_measure()`][loo_pred_measure] objects with
+#' `model_compare()`, paired differences are computed for every predictive
+#' measure common to all models. Rows are ordered by the `rank_by` argument
+#' (default `"elpd"`). By default each measure is compared against the model
+#' that is best on that measure, so different difference columns may use
+#' different reference models. Supplying `rank_by` pins the top-ranked model as
+#' the single reference for all difference columns.
+#'
+#' ### `{measure}_diff` and `{measure}_se_diff`
+#'
+#' For each non-ELPD measure `m`, `model_compare()` adds columns `m_diff` and
+#' `m_se_diff`. In all cases `m_diff` is the difference between the two overall
+#' estimates on a utility scale (higher is better; loss measures such as MSE,
+#' Brier score, and SRPS have their sign flipped from the raw loss orientation).
+#' Measures already returned on a utility scale (e.g. ELPD, CRPS/RPS) are not
+#' sign-flipped. Negative `m_diff` values then indicate worse performance than
+#' the reference model, which has `m_diff = 0`.
+#'
+#' How `m_se_diff` is obtained depends on the measure:
+#'
+#' * When the overall estimate is a sum or mean of pointwise contributions, it
+#'   is computed from paired pointwise differences using the same approach as
+#'   `elpd_diff` and `se_diff` (Eq 24 in VGG2017 for sums; the mean analogue for
+#'   means). This covers ELPD, `mlpd`, `ic`, `mae`, `mse`, `acc`, `brier`, and
+#'   the ranked probability scores.
+#' * When a built-in measure is a transformation of such quantities, it supplies
+#'   its own delta-method standard error (`se_diff_fun`). For `rmse` this is the
+#'   first-order bivariate Taylor approximation propagated from the MSE scale,
+#'   which requires the covariance between the two models' pointwise squared
+#'   errors and is therefore not a paired pointwise standard deviation. For
+#'   `r2` it is the trivariate analogue, which additionally propagates the
+#'   uncertainty in the baseline `MSE(y)` shared by both models.
+#' * For custom measures it comes from the `custom_se_fn` argument of
+#'   [model_compare()], which must be supplied whenever a custom measure is
+#'   compared. It is `NA` when `custom_se_fn` is `NULL` for that measure.
+#'
+#' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
+#' Which measures are losses is recorded in the `loss` element of the
+#' `measure_info` attribute on each `*_pred_measure()` result; when a loss is
+#' compared on a utility scale, `model_compare()` emits a short message naming
+#' those measures (see [model_compare()]).
+#'
+#' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
+#' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;
+#' these diagnostics do not apply to other predictive measures.
+#'
+#' ### `measure_info`
+#'
+#' Attribute on all `*_pred_measure()` and [pred_measure()] results: a named
+#' list of per-measure information used by [model_compare()]. Each entry
+#' is a list with:
+#'
+#' * `loss`: whether lower values of the measure are better. Measure values are
+#'   always stored on the measure's own scale, so this describes both the
+#'   measure and the values recorded for it
+#' * `diff_method`: how the standard error of the difference is obtained:
+#'   `"sum"` or `"mean"` (paired pointwise differences),
+#'   `"measure_specific"` (the built-in measure's own `se_diff_fun`), or
+#'   `"custom"`. Nothing is inferred from a measure's values. Under `"custom"` the standard error is resolved at
+#'   comparison time from the `custom_se_fn` argument of [model_compare()],
+#'   which supplies either a function, the `"sum"`/`"mean"` pointwise formulas,
+#'   or `NULL` for an `NA` standard error. A missing standard error is not an
+#'   error state as the difference itself is still reported.
+#' * `se_diff_fun`: for built-in measures with
+#'   `diff_method = "measure_specific"`, the name of the built-in implementation
+#'   used. Custom measures never store a function here.
+#' * `extra`: optional list of auxiliary data the measure stored for the
+#'   standard error of its difference, present only for measures that need it
+#'   (`r2` stores the pointwise baseline `(y_i - mean(y))^2`, which `y` no
+#'   longer supplies by the time [model_compare()] runs; `bacc` stores the class
+#'   index of each observation, which its pointwise values do not determine).
+#'   Custom measures return it as an `extra` element, and it is passed on to
+#'   `custom_se_fn`. It is excluded from the consistency check below, since it
+#'   varies with the data rather than with the measure itself.
+#'
+#' Built-in measures take `loss`, `diff_method`, and `se_diff_fun` from the
+#' package measure registry. Custom measures always get `diff_method = "custom"`
+#' and take `loss` from `attr(my_fun, "measure_loss") <- TRUE`, which declares
+#' that lower values are better; without it they are treated as utilities (see
+#' [insample_pred_measure()]).
+#' [model_compare()] requires all models to provide matching `measure_info` for
+#' each shared measure; a mismatched `measure_loss` declaration, or missing
+#' `measure_info` on some models, produces an error.
+#'
+#' ### `rank_by`, `compare_measures`, and related attributes
+#'
+#' The `rank_by` argument takes either a measure name or a model name. A
+#' measure name selects which measure determines model ordering, and pins the
+#' top-ranked model as the single reference model for all pairwise differences.
+#' A model name keeps the `"elpd"` ordering but pins that model as the single
+#' reference model, whether or not it is the best one. When `rank_by` is
+#' omitted, models are ordered by `"elpd"` and each measure is compared against
+#' its own best model. Attribute `rank_by` records which of these three cases
+#' applied, as a list with elements `kind` (`"default"`, `"measure"`, or
+#' `"model"`), `measure` (the measure the rows are ordered by, always set) and
+#' `model` (the pinned reference model, or `NULL`). Attribute
+#' `compare_reference` is a named character vector recording the reference model
+#' used for each measure. Attribute `compare_measures` lists all measures that
+#' were compared, and `sign_converted_measures` lists loss measures whose sign
+#' was flipped onto the utility scale. The print method shows the ranking
+#' measure by default
+#' (`"elpd"` when `rank_by` was not set); use `print(x, measures = "all")` or
+#' `print(x, measures = c("rmse", "r2"))` to display additional measure tables.
+#' Each printed table is sorted by its own measure, best model first, so the
+#' same model need not lead every table.
 NULL

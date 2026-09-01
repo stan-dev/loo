@@ -1,0 +1,1075 @@
+---
+title: "Differences and their standard errors in model comparison"
+author: "Florence Bockting"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    css:
+      - !expr system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown")
+      - styles.css
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: TRUE #!r identical(Sys.getenv("NOT_CRAN"), "true")
+vignette: >
+  %\VignetteIndexEntry{Differences and their standard errors in model comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, child="../children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = TRUE,
+  warning = TRUE,
+  eval = params$EVAL,
+  fig.width = 7,
+  fig.height = 4,
+  fig.align = "center"
+)
+```
+
+::: {.callout .callout-warning}
+**Questions**
+
++ ~How detailed should the math for the computation be and how to attribute properly the work from the overleaf document? Are you considering to publish it?~ -> Answered: we target for a preprint that we can cite.
++ Currently, `elpd` is computed by default in `pred_measure`. This is helpful, when we want to have it by default in `model_compare`. Do we want this default behavior?
++ Related question: The default print method of `model_compare` shows `elpd` output only. Using `print(..., measures = "all")` allows to see all measures. See below for example. Do we want this?
++ For `elpd`, we provide in the `model_compare` output the additional columns `p_worse`, `diag_diff`, `diag_elpd`.
+  + Do we want to have `p_worse` and `diag_diff` for all measures?
+  + I moved the column `diag_elpd` out from the elpd-specific measure block and treat it as an "overall" (and not measure-specific) information (see printed output below).
++ Currently, there are a lot of warnings/messages. Which ones do we want to provide in output and which ones in function documentation?
+:::
+
+```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
+```
+
+## Introduction
+In the following, our goal is to compare performance between two or more
+models. To do this, we will use the function `loo::model_compare()`.
+
+`model_compare()` compares model performance between multiple models based
+on one or more performance criteria. We provide a list of built-in criteria
+including `elpd, ic, mlpd, mae, mse, acc, brier, rps, srps, rmse, r2, bacc`
+(see the [Overview of scores and metrics](overview-measures.html)
+article).
+Additionally, it is possible to define a custom performance criterion.
+
+The `model_compare()` function accepts any object that inherits from the `loo`
+class. This includes outputs from:
+
++ `loo()`, `kfold()`, and `waic()`
++ all `<type>_pred_measure` functions (with `<type>` being a placeholder for `loo`, `kfold`, `test`, or `insample`)
+
+In this vignette we focus on the comparison of **predictive performance
+measures** produced by `<type>_pred_measure()` and explain:
+
+1. The approaches for computing the point estimate and standard error of the
+   difference for each `<type>` and built-in measure.
+2. How to compute the point estimate and standard error of the difference for
+   a **custom** measure.
+
+::: {.callout .callout-note}
+**Relation between `model_compare` and `loo_compare`**
+
+The `loo_compare` function has traditionally been used for model comparison in
+loo, accepting any object that inherits from the `loo` class (such as those
+produced by `loo()`, `kfold()`, and `waic()`).
+
+With the introduction of the *`pred_measure` family*, we have deprecated
+`loo_compare` and introduced `model_compare`. While `model_compare` retains full
+backward compatibility, it also expands functionality to handle outputs from
+the `pred_measure` family.
+
+`loo_compare` still works and is still a generic, so methods registered by other
+packages keep dispatching, but it now warns and is frozen at its previous
+behavior: `loo` objects compared on ELPD only. The `pred_measure` sources,
+`rank_by`, and `custom_se_fn` described in this article require `model_compare`.
+`loo_compare` will be removed in a future release. For more details, see
+`vignette("migration-guide", package = "loo")`.
+:::
+
+## Running example (count data)
+
+To illustrate the functionality of `model_compare()` we first introduce a
+*running example*. In this example, we compare three Poisson regression
+models fitted to the **`roaches` data** from `rstanarm`
+(Gelman and Hill, 2007). This data set records a pest-management trial in
+262 apartment buildings. The outcome `y`
+is the number of roaches caught in traps after treatment and ranges from 0 to
+357. The predictors are:
+
++ `roach1`: pre-treatment roach count (used as `sqrt_roach1 = sqrt(roach1)`)
++ `treatment`: whether the building received pest management
++ `senior`: whether the building is restricted to elderly residents
+
+The **three models** used in the following comparison tasks are defined as
+follows:
+
+```
+  m1:      y ~ treatment + senior
+  m2:      y ~ sqrt_roach1 + senior
+  m3:      y ~ sqrt_roach1 + treatment
+```
+
+As **performance criteria** we select six predictive performance measures:
+`elpd`, `mae`, `mse`, `rmse`, `r2`, and `rps` computed by `loo_pred_measure`.
+Note that `rps` is the only one of these that needs the posterior *predictive*
+draws `ypred`; the error measures are computed from the posterior expectation
+`mupred` (see the input requirements table in `?loo_pred_measure`).
+
+```{r load-libraries}
+library(loo)
+```
+
+```{r setup-example}
+measures <- c("mae", "mse", "rmse", "r2", "rps") # elpd is computed by default
+```
+
+## The classical `loo_compare` output
+
+As the actual model building workflow is not the focus of this tutorial, we fit
+the three models here without further comment. `add_criterion()` attaches a
+`loo` object (as returned by `loo::loo()`) to each fit.
+
+```{r fit-models, results="hide", warning=FALSE, message=FALSE}
+SEED <- 42
+
+data(roaches, package = "rstanarm")
+roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+
+fit_m1 <- brms::brm(
+  y ~ treatment + senior,
+  data = roaches,
+  family = poisson,
+  prior = brms::prior(normal(0, 1), class = b),
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+fit_m2 <- update(fit_m1, formula = y ~ sqrt_roach1 + senior,
+                 newdata = roaches, refresh = 0)
+fit_m3 <- update(fit_m1, formula = y ~ sqrt_roach1 + treatment,
+                 newdata = roaches, refresh = 0)
+
+add_loo <- function(fit) {
+  brms::add_criterion(fit, criterion = "loo", moment_match = TRUE,
+                      save_psis = TRUE)
+}
+fit_m1 <- add_loo(fit_m1)
+fit_m2 <- add_loo(fit_m2)
+fit_m3 <- add_loo(fit_m3)
+
+loos <- list(m1 = fit_m1$criteria$loo, m2 = fit_m2$criteria$loo,
+             m3 = fit_m3$criteria$loo)
+```
+
+Passing these `loo` objects to the classical `loo_compare()` reproduces the
+familiar ELPD-only comparison, and warns once per session that `model_compare()`
+is now the preferred function:
+
+```{r loo_compare}
+loo_compare(loos)
+```
+
+When we use `model_compare` instead, we get the same output for `loo` objects:
+
+```{r model_compare_wloo}
+model_compare(loos)
+```
+
+It also supports the `simplify` argument in the print method:
+
+```{r model_compare_wloo_simplify}
+print(model_compare(loos), simplify = FALSE)
+```
+
+## Preview: Glimpse into the model comparison results
+
+We now use `loo_pred_measure()` to compute the predictive performance for
+each model (`m1, m2, m3`) and measure (see list above).
+Finally, we compare the performance of the three models using `model_compare()`.
+By default, only the `elpd` measure is shown.
+
+<a id="example"></a>
+```{r pred-measure}
+fit_measure <- function(fit, measure) {
+  loo_pred_measure(
+    y = fit$data$y,
+    ypred = brms::posterior_predict(fit),
+    mupred = brms::posterior_epred(fit),
+    ylp = brms::log_lik(fit),
+    measure = measure
+  )
+}
+
+set.seed(SEED)
+m1 <- fit_measure(fit_m1, measures)
+m2 <- fit_measure(fit_m2, measures)
+m3 <- fit_measure(fit_m3, measures)
+
+(comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3)))
+```
+
+When we want to see a specific measure, we can change this by passing the 
+information to the `print` method:
+
+```{r pred-measure-r2}
+print(comp, measures = "r2")
+```
+
+Or if you want to see all columns related to the measures specified in
+`measures` use `simplify = FALSE`:
+
+```{r pred-measure-r2-simplify}
+print(comp, measures = "r2", simplify = FALSE)
+```
+
+Or in order to see all measures we can use `measures = "all"`:
+
+```{r pred-measure-all}
+print(comp, measures = "all")
+```
+
+### Output of `model_compare()`
+
+Using `print(., measures = "all")` returns a subsection for each measure.
+The *rows* represent the different models, with the best model always in the
+first row, followed by the second best, and so on.
+The *columns*:
+
+  + `model`: Name of each model
+  + `<measure>_diff`: The point estimate representing the difference in the measure between the current model and the reference model$^{(1)}$ (calculated as model - reference). For the reference model itself, this value is always zero.
+  + `<measure>_se_diff`$^{(2)}$: The standard error of the difference
+  + `p_worse`: (only for `elpd`) Estimated probability that a model has worse predictive performance than the reference model
+  + `diag_diff`: (only for `elpd`) Diagnostic column flagging miscalibration of the normal approximation behind `p_worse` and `se_diff`
+
+Above the measure subsections, `print()` names the reference model each set of
+differences was computed against, and, for `loo_pred_measure()` inputs, reports
+the PSIS-LOO diagnostic once per model:
+
+  + `bad_k`: Number of observations whose Pareto $\hat{k}$ exceeds the PSIS
+    reliability threshold. Pareto $\hat{k}$ describes a model's PSIS-LOO
+    approximation rather than any single measure or any pair of models --- all
+    LOO measures are computed from the same importance weights, and the value
+    does not depend on the reference model. It is therefore reported once per
+    model instead of as a column in the difference tables. On the returned
+    object the same information is available in the `diag_elpd` column.
+
+This block is omitted when no model is flagged, and for `kfold`, `test`, and
+`insample` sources, which have no Pareto $\hat{k}$ diagnostic.
+
+$^{(1)}$ By default, the reference model is the best model (per measure). For additional information, see Section [Selecting the reference model](#selecting-the-reference-model)
+
+$^{(2)}$ The only measure that deviates from this naming convention is `elpd`, where the column is called `se_diff` instead of `elpd_se_diff` for backwards compatibility.
+
+### The `measure_info` attribute
+
+Each model has a `measure_info` attribute, which provides meta
+information for each performance measure.
+
+```{r meta-attribute, class.output="scroll-output"}
+meta <- attr(m1, "measure_info")
+
+# measure info for each single measure (e.g., R2)
+names(meta$r2)
+```
+
+The information is stored in different *slots*:
+
+| slot | description | functionality |
+| :--- | :---- | :----- |
+| `loss` | Whether the measure is a *loss* (`TRUE`; lower values of the measure are better) or a *utility* (`FALSE`, higher values are better) | During model comparison, loss measures have their sign flipped so that all differences are reported on a utility scale (higher is better) |
+| `diff_method` | How paired pointwise differences are aggregated within model comparison: `"sum"`, `"mean"`, `"measure_specific"`, or `"custom"` | Selects the formula for `<measure>_se_diff` (see the table in Section [Computation of the standard error](#computation-of-the-standard-error-measure_se_diff)) |
+| `se_diff_fun` | Name of the measure's own standard-error function for computing `<measure>_se_diff`, only set when `diff_method = "measure_specific"` (`"rmse"`, `"r2"`, `"bacc"`) | Points to the built-in function that computes `<measure>_se_diff` for measures whose estimate is not a plain sum or mean of pointwise values |
+| `extra` | Optional auxiliary data the measure stored for its `se_diff_fun`, on the measure's natural scale (e.g., `mse_y_i` for `r2`, `class_id` for `bacc`); `NULL` for measures that need none | Carries the quantities the standard error needs but the pointwise values do not contain; passed to `se_diff_fun()` (and to `custom_se_fn()`) as part of each model's input |
+
+## Background: Computation underlying `model_compare` output
+
+In this section, we explain (1) how the point estimate `<measure>_diff` and the
+(2) standard error of the difference `<measure>_se_diff` are computed for
+each measure. While the point estimate is computed in the same way for all
+measures, the computation of the standard error depends on the
+measure.
+
+### Computation of the point estimate `<measure>_diff`
+The estimates `elpd_diff`, `mae_diff`, `rmse_diff`, and `r2_diff` in the
+output of the running example represent the point estimates of the pairwise
+model comparisons.
+They are computed as the measure-specific difference between two model
+estimates (comparison model - reference model).
+
+For example, the difference in `elpd` between model `m1` (comparison) and model
+`m3` (reference) is computed as follows:
+
+```{r, eval=FALSE}
+m1_elpd <- m1$estimates["elpd_loo", "Estimate"]
+m3_elpd <- m3$estimates["elpd_loo", "Estimate"]
+
+m1_elpd - m3_elpd
+```
+
+This computation is done for each measure and each pairwise model comparison.
+
+By default, however, the reference model is chosen *per measure* as the best
+model for that measure (see Section
+[Selecting the reference model](#selecting-the-reference-model)), so `m3` is not
+the reference for every measure. The reference used for each measure is recorded
+in the `compare_reference` attribute:
+
+```{r reference-models}
+models <- list(m1 = m1, m2 = m2, m3 = m3)
+ref <- attr(comp, "compare_reference")
+ref
+```
+
+The following code block shows, for model `m1`, the hand-computed differences
+against each measure's own reference model and the differences reported in the
+`comp` object:
+
+```{r point-estimate}
+est <- function(x, measure) x$estimates[measure, "Estimate"]
+measures_all <- c("elpd", "mse", "mae", "rmse", "r2")
+
+data.frame(
+  reference = ref[measures_all],
+  by_hand   = sapply(measures_all, function(m) {
+    est(m1, paste0(m, "_loo")) - est(models[[ref[[m]]]], paste0(m, "_loo"))
+  }),
+  reported  = sapply(measures_all, function(m) {
+    comp[[paste0(m, "_diff")]][comp$model == "m1"]
+  })
+)
+```
+
+Note that in the above output, the sign for some measures is flipped between
+the `by_hand` and `reported` column, specifically for `mse`, `mae`, and `rmse`.
+These measures are *losses* (see callout box below).
+
+However, when we compare all measures together, we want them all to be
+on the same scale, which in our case is the **utility scale**. Therefore, losses
+are converted to the utility scale. As such, higher values are always better.
+Consequently, the best model has the highest value, and in the default case in
+which the best model is also the reference model, the estimated difference
+`<measure>_diff` (computed as comp - reference) is always non-positive.
+
+When a measure is converted to the utility scale, `model_compare()` informs the
+user about this change:
+
+```{r sign-message, warning=TRUE, message=TRUE}
+comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3))
+```
+
+::: {.callout .callout-note}
+**Utility vs. loss scale**
+
+We call a measure a **loss** when it has, by default, the orientation
+*lower is better*.
+
+By contrast, we call a measure a **utility** if it has, by default, the
+orientation *higher is better*.
+
+Which orientation a measure has can be inspected from the `loss` slot of the
+`measure_info` attribute of the model object:
+```{r measure-meta}
+sapply(meta, function(x) x$loss)
+```
+
+:::
+
+### Computation of the standard error `<measure>_se_diff`
+
+<!-- Point towards material that explains the elpd diagnostics -->
+<!-- Provide reference to glossary -->
+
+The standard error summarizes the uncertainty in the estimated difference.
+Depending on the measure, different approaches for computing the standard error
+are used. We summarize them in four different categories:
+
+| `diff_method` | SE of the difference | Measures |
+| :--- | :--- | :--- |
+| `"sum"` | `sqrt(N) * sd(d_i)` | `elpd`, `ic` |
+| `"mean"` | `sd(d_i) / sqrt(N)` | `mlpd`, `mae`, `mse`, `acc`, `brier`, `rps`, `srps` |
+| `"measure_specific"` | the measure's own `se_diff_fun` | `rmse`, `r2`, `bacc` |
+| `"custom"` | supplied via `model_compare(custom_se_fn = )` | custom measures |
+
+where `N` is the number of observations and `d_i` the paired difference of
+the pointwise estimates of the two models (`comparison - reference`).
+
+The user can check which approach is used for each measure via the
+`diff_method` slot in the `measure_info` attribute of the model object:
+
+```{r diff-method}
+sapply(meta, function(x) x$diff_method)
+```
+
+#### Approach 1: "sum" {#approach-sum}
+
+For `elpd` and `ic` the model estimate is a **sum** of pointwise contributions,
+e.g., for `elpd`
+
+$$
+\widehat{\text{elpd}}_{\text{loo}} = \sum_{i=1}^{N} \widehat{\text{elpd}}_{\text{loo},i}.
+$$
+
+Let $d_i$ be the pointwise difference for observation $i$ between the
+comparison model $M_a$ and the reference model $M_b$,
+
+$$
+d_i = \widehat{\text{elpd}}_{\text{loo},i}(M_a) - \widehat{\text{elpd}}_{\text{loo},i}(M_b),
+$$
+
+and let $D = \sum_{i=1}^{N} d_i$ be the estimated total difference. Treating the
+$d_i$ as independent draws from a distribution with variance $\sigma_d^2$,
+
+$$
+\text{Var}(D) = \sum_{i=1}^{N} \text{Var}(d_i) = N \sigma_d^2
+\quad\Longrightarrow\quad
+\text{SE}(D) = \sqrt{N}\, \sigma_d .
+$$
+
+In practice $\sigma_d$ is replaced by the sample standard deviation of the
+pointwise differences, which gives the estimator used by `model_compare()`:
+
+$$
+\widehat{\text{SE}}(D) = \sqrt{N} \cdot \text{sd}(d)
+ = \Big( N \cdot \widehat{\text{Var}}(d) \Big)^{1/2}.
+$$
+
+```{r sum-method}
+n <- attr(m1, "dims")[2]
+d_elpd <- m1$pointwise[, "elpd_loo"] - m3$pointwise[, "elpd_loo"]
+
+c(
+  by_hand    = sqrt(n) * sd(d_elpd),
+  reported   = comp$se_diff[comp$model == "m1"]
+)
+```
+
+#### Approach 2: "mean" {#approach-mean}
+
+For `mlpd`, `mae`, `mse`, and most scoring rules, the model estimate is a
+**mean** of pointwise contributions, e.g., for `mse`
+
+$$
+\widehat{\text{mse}}_{\text{loo}} = \frac{1}{N} \sum_{i=1}^{N} \widehat{\text{mse}}_{\text{loo},i}.
+$$
+
+With $d_i$ defined as in [Approach 1](#approach-sum), the reported difference is
+the *mean* pointwise difference $\bar{d} = \frac{1}{N}\sum_{i=1}^{N} d_i = D/N$.
+As $\bar{d}$ is just $D$ rescaled by the constant $1/N$,
+
+$$
+\text{SE}(\bar{d}) = \frac{1}{N}\, \text{SE}(D) = \frac{1}{N} \sqrt{N}\, \sigma_d
+= \frac{\sigma_d}{\sqrt{N}},
+$$
+
+that is, the familiar standard error of a mean. Replacing $\sigma_d$ by the
+sample standard deviation of the pointwise differences gives the estimator used
+by `model_compare()`:
+
+$$
+\widehat{\text{SE}}(\bar{d}) = \frac{\text{sd}(d)}{\sqrt{N}}.
+$$
+
+By default every measure uses its *own* best model as the reference (see
+Section [Selecting the reference model](#selecting-the-reference-model)). For
+`mse` that is `m2`, not `m3` as for `elpd` above:
+
+```{r mean-method}
+d_mse <- m1$pointwise[, "mse_loo"] - m2$pointwise[, "mse_loo"]
+
+c(
+  by_hand  = sd(d_mse) / sqrt(n),
+  reported = comp$mse_se_diff[comp$model == "m1"]
+)
+```
+
+Note that `mse` is a loss, so `model_compare()` flips its sign before taking the
+difference (see the callout on *utility vs. loss scale* above). However,
+flipping the sign leaves `sd(d)` unaffected, which is why the raw pointwise
+differences above reproduce the reported value.
+
+#### Approach 3: "measure_specific" {#approach-measure-specific}
+
+The estimate of these measures is neither a sum nor a mean of pointwise
+contributions, so their standard error cannot be obtained from the paired
+pointwise differences alone. Instead, each such measure ships its own formula,
+recorded in the `se_diff_fun` slot of the `measure_info` attribute. We
+give the formulas for the built-in measures `rmse`, `r2`, and `bacc` below.
+
+**RMSE**
+
+For RMSE, the delta method (i.e., a first-order Taylor series approximation;
+see Ver Hoef, 2012, for its history) on the MSE scale is used
+and propagated through the square root:
+
+$$
+SE_{RMSE}(M_a, M_b) = \frac{1}{2}\sqrt{
+  \frac{SE_{MSE}(M_a)^2}{{MSE}(M_a)} + \frac{SE_{MSE}(M_b)^2}{{MSE}(M_b)}
+  - \frac{2 \mathrm{Cov}_{MSE}[M_a, M_b]}{{RMSE}(M_a) \cdot {RMSE}(M_b)}
+}
+$$
+
+All terms on the right-hand side are computable from the stored pointwise
+squared errors:
+
+```{r pairwise-rmse}
+# `rmse` is compared against its own reference model, `ref[["rmse"]]`
+sqe_a <- models[[ref[["rmse"]]]]$pointwise[, "rmse_loo"]
+sqe_b <- m1$pointwise[, "rmse_loo"]
+
+mse_a <- mean(sqe_a)
+mse_b <- mean(sqe_b)
+se_a <- sqrt(var(sqe_a) / n)
+se_b <- sqrt(var(sqe_b) / n)
+cov_rc <- sum((sqe_a - mse_a) * (sqe_b - mse_b)) / (n * (n - 1))
+
+se_rmse <- 0.5 * sqrt(
+  se_a^2 / mse_a + se_b^2 / mse_b -
+    2 * cov_rc / (sqrt(mse_a) * sqrt(mse_b))
+)
+
+c(
+  by_hand = se_rmse,
+  reported = comp$rmse_se_diff[comp$model == "m1"]
+)
+```
+
+**R2**
+
+The R2 used here is the leave-one-out version of the classical formula,
+$1 - \text{MSE}(M_k) / \text{MSE}(y)$, rather than Bayesian R2
+(Gelman et al., 2019).
+For R2, let $d_i = \text{sqe}_i(M_a) - \text{sqe}_i(M_b)$ be the
+pointwise difference in squared errors and
+$\text{MSE}(M_a, M_b) = \frac{1}{n}\sum_{i=1}^n d_i$ its mean. The
+difference in R2 is a ratio of two quantities estimated from the same data:
+
+$$
+R^2(M_a) - R^2(M_b) = -\frac{\text{MSE}(M_a, M_b)}{\text{MSE}(y)}
+$$
+
+A trivariate first-order Taylor expansion of that ratio gives
+
+$$
+SE_{R^2}(M_a, M_b) = \frac{1}{\text{MSE}(y)} \sqrt{
+  SE_{MSE}(M_a, M_b)^2\\
+  - 2\,\frac{\text{MSE}(M_a, M_b)}{\text{MSE}(y)}\,
+    \mathrm{Cov}\!\left[\text{MSE}(M_a, M_b),\, \text{MSE}(y)\right]\\
+  + \frac{\text{MSE}(M_a, M_b)^2}{\text{MSE}(y)^2}\,
+    \mathrm{Var}\!\left[\text{MSE}(y)\right]
+}
+$$
+
+With $c = \text{MSE}(M_a, M_b) / \text{MSE}(y)$ and the pointwise baseline
+$\text{sqe}(y)_i = (y_i - \bar{y})^2$, the expression above is equal to
+
+$$
+SE_{R^2}(M_a, M_b) = \frac{1}{\text{MSE}(y)} \cdot
+  \frac{\mathrm{sd}\!\left(d_i - c\,\text{sqe}(y)_i\right)}{\sqrt{n}}
+$$
+
+This is the form used in **loo**: it cannot go negative under the square root,
+and it is exactly zero when a model is compared against itself. The computation
+needs the pointwise baseline $\text{sqe}(y)_i$, which is stored in the `extra`
+slot of the `measure_info` attribute:
+
+```{r r2-extra}
+str(attr(m1, "measure_info")$r2$extra)
+```
+
+The following code block shows the hand-computed standard error and the
+reported standard error in the `comp` object for model `m1` against the
+reference model used for `r2`:
+
+```{r pairwise-r2}
+mse_y_i <- attr(m1, "measure_info")$r2$extra$mse_y_i
+mse_y   <- mean(mse_y_i)
+
+d_sqe  <- m1$pointwise[, "r2_loo"] - models[[ref[["r2"]]]]$pointwise[, "r2_loo"]
+scaled <- d_sqe - (mean(d_sqe) / mse_y) * mse_y_i
+
+c(by_hand  = sd(scaled) / sqrt(n) / mse_y,
+  reported = comp$r2_se_diff[comp$model == "m1"])
+```
+
+**bacc**
+
+For the balanced accuracy (bacc), let
+$d_i = \text{acc}_i(M_a) - \text{acc}_i(M_b)$ be the difference
+in pointwise accuracies. Because every class gets the same weight regardless of
+its size, the difference in bacc is not a mean of the $d_i$, but a mean of the
+$K$ class-wise mean differences:
+
+$$
+\text{bacc}(M_a, M_b) = \frac{1}{K} \sum_{c=1}^{K} \bar{d}_c,
+\qquad \bar{d}_c = \frac{1}{n_c} \sum_{i \in c} d_i
+$$
+
+where $K$ is the number of classes and $n_c$ the number of observations in
+class $c$. The variance of the class mean is
+$\text{Var}(\bar{d}_c) = s_c^2 / n_c$, and
+
+$$
+SE_{\text{bacc}}(M_a, M_b) = \frac{1}{K} \sqrt{\sum_{c=1}^{K} \frac{s_c^2}{n_c}},
+\qquad s_c^2 = \frac{1}{n_c - 1} \sum_{i \in c} \left(d_i - \bar{d}_c\right)^2
+$$
+
+with $s_c^2 := 0$ for any class holding a single observation.
+Writing $b_c$ and $m_c$ for the number of
+observations in class $c$ that only $M_a$, respectively only $M_b$, classifies
+correctly, the class term is a McNemar-type variance of a paired difference of
+proportions (McNemar, 1947),
+
+$$
+\frac{s_c^2}{n_c} = \frac{1}{n_c - 1}
+  \left(\frac{b_c + m_c}{n_c} - \frac{(b_c - m_c)^2}{n_c^2}\right)
+$$
+
+For binary outcomes balanced accuracy is
+$(\text{sensitivity} + \text{specificity}) / 2$, so the difference above
+is the estimand of Newcombe (2001) at a mixing parameter of one half, and half
+the difference of two Youden indices in a paired design (Chen et al., 2015).
+
+To demonstrate the computation of the standard error of the difference for bacc,
+we introduce another example where the outcome variable is binary.
+We simulate 200 observations from a logistic model with a single continuous
+predictor `x`, and fit two Bernoulli models: `m_a` uses the predictor `x` that
+generated the data, while `m_b` uses a noisy version `w` of it and therefore
+classifies part of the observations differently.
+
+```{r bacc-fit}
+set.seed(2024)
+n_obs <- 200
+x <- rnorm(n_obs)
+df_bacc <- data.frame(
+  y = rbinom(n_obs, 1, plogis(-1.4 + 1.6 * x)),
+  x = x,
+  w = x + rnorm(n_obs, sd = 1.5)
+)
+
+fit_bacc_x <- brms::brm(
+  y ~ x,
+  data = df_bacc,
+  family = brms::bernoulli(),
+  prior = brms::prior(normal(0, 2), class = b),
+  chains = 2, iter = 1000, seed = SEED, refresh = 0
+)
+fit_bacc_w <- update(fit_bacc_x, formula = y ~ w, newdata = df_bacc,
+                     refresh = 0)
+
+y <- fit_bacc_x$data$y
+
+m_a <- loo_pred_measure(
+  y = y,
+  mupred = brms::posterior_epred(fit_bacc_x),
+  ylp = brms::log_lik(fit_bacc_x),
+  measure = "bacc"
+)
+m_b <- loo_pred_measure(
+  y = y,
+  mupred = brms::posterior_epred(fit_bacc_w),
+  ylp = brms::log_lik(fit_bacc_w),
+  measure = "bacc"
+)
+
+comp_bacc <- model_compare(list(m_a = m_a, m_b = m_b))
+print(comp_bacc, measures = "all", digits = 3)
+```
+
+To compute the standard error we need to know which class each observation
+belongs to. This information is stored in the `extra` slot of the
+`measure_info` attribute of the model object:
+
+```{r bacc-extra}
+str(attr(m_a, "measure_info")$bacc$extra)
+```
+
+Undoing the pointwise weighting recovers the 0/1 accuracies, after which the
+class-wise variances can be computed as shown in the formula above:
+
+```{r pairwise-bacc}
+class_id <- attr(m_a, "measure_info")$bacc$extra$class_id
+n_c <- tabulate(class_id)
+K   <- length(n_c)
+
+d <- (m_b$pointwise[, "bacc_loo"] - m_a$pointwise[, "bacc_loo"]) *
+  (K * n_c[class_id])
+
+var_c <- sapply(seq_len(K), function(k) var(d[class_id == k]) / n_c[k])
+
+c(by_hand  = sqrt(sum(var_c)) / K,
+  reported = comp_bacc$bacc_se_diff[comp_bacc$model == "m_b"])
+```
+
+## Custom measures
+
+A custom measure is any function returning a list with `estimate`, `se`, and
+`pointwise`. It carries two attributes: `measure_name`, its name, and
+`measure_loss`, which declares whether lower values are better. It always gets
+`diff_method = "custom"`, and the user needs to provide information about how to
+compute the standard error of the difference via the `custom_se_fn` argument of
+`model_compare()`. `custom_se_fn` accepts one of four things:
+
+| value | meaning |
+| :--- | :--- |
+| `"mean"` | estimate is the mean of the pointwise values. SE is computed as `sd(d_i) / sqrt(N)` |
+| `"sum"` | estimate is the sum of the pointwise values. SE is computed as `sqrt(N) * sd(d_i)` |
+| a function | custom function for computing the SE, called as `custom_se_fn(ref, cmp)` |
+| `NULL` | only the estimate is computed. SE is reported as `NA` |
+
+### Example (one custom measure)
+
+In the following, we provide a custom measure that is not part of the built-in
+measures. The Huber loss is quadratic for small residuals and linear for
+large residuals. We define it as follows:
+
+```{r huber-measure}
+huber_fn <- function(y, mupred) {
+  delta <- 10
+  r <- y - colMeans(mupred)
+  l <- ifelse(abs(r) <= delta, 0.5 * r^2, delta * (abs(r) - 0.5 * delta))
+  list(estimate = mean(l), se = sd(l) / sqrt(length(l)), pointwise = l)
+}
+attr(huber_fn, "measure_name") <- "huber"
+attr(huber_fn, "measure_loss") <- TRUE
+```
+
+Furthermore, we provide the name of the measure (i.e., "huber") as an
+attribute, and declare that it is a loss rather than a utility (i.e., lower
+values are better). Note that a custom measure is by default considered to be a
+utility.
+
+::: {.callout .callout-warning}
+A custom measure is by default considered to be a utility (i.e., higher values
+are better).
+
+This can be changed by setting the `measure_loss` attribute of the
+custom-measure function to `TRUE` (see example above).
+:::
+
+First, we compute the predictive performance measures for two different models
+using `"rmse"` and the custom Huber loss as performance criteria.
+
+```{r custom-measure}
+h1 <- fit_measure(fit_m1, measure = list("rmse", "huber" = huber_fn))
+h3 <- fit_measure(fit_m3, measure = list("rmse", "huber" = huber_fn))
+```
+
+(Remember that we have created the `fit_measure` helper at the [beginning of
+this tutorial](#example). It simply wraps `loo_pred_measure()`.)
+
+Inspecting the attribute `measure_info` shows that the Huber loss
+uses `diff_method = "custom"`.
+
+```{r custom-diff-method}
+str(attr(h1, "measure_info"))
+```
+
+Consequently, we need to provide information to `model_compare()` on how to
+compute the standard error of the difference, which is done via the
+`custom_se_fn` argument. The Huber estimate *is* the mean of its pointwise
+values, so `custom_se_fn = "mean"` is the right declaration.
+
+```{r custom-mean-se}
+comp_h <- model_compare(list(m3 = h3, m1 = h1), custom_se_fn = "mean")
+print(comp_h, measures = "huber")
+```
+
+The same standard error can be spelled out as a function instead.
+This is the more general form, and the one to reach for when the measure
+needs a custom function for computing the standard error.
+It is called as `custom_se_fn(ref, cmp)`, where each argument is a list
+describing **one** model with elements `estimate`, `se`, `pointwise`, and
+`extra`:
+
+```{r custom-fn-check}
+huber_se_fn <- function(ref, cmp) {
+  d <- cmp$pointwise - ref$pointwise
+  sd(d) / sqrt(length(d))
+}
+
+comp_h_fn <- model_compare(list(m3 = h3, m1 = h1), custom_se_fn = huber_se_fn)
+print(comp_h_fn, measures = "huber")
+```
+
+As discussed above, the difference estimates are always reported on the utility
+scale. Therefore `huber_diff` for `m1` is negative.
+
+### Extended example (multiple custom measures)
+
+In the following, we extend the example above by adding one further custom
+measure and show how this is implemented. As an additional custom measure we
+use RMSE normalized by the standard deviation of the outcome:
+
+```{r extended-example-def}
+nrmse_fn <- function(y, mupred) {
+  sqe <- (y - colMeans(mupred))^2
+  list(
+    estimate  = sqrt(mean(sqe)) / sd(y),
+    se        = sqrt(var(sqe) / length(sqe)) / (2 * sqrt(mean(sqe))) / sd(y),
+    pointwise = sqe,
+    extra     = list(sd_y = sd(y))
+  )
+}
+attr(nrmse_fn, "measure_name") <- "nrmse"
+attr(nrmse_fn, "measure_loss") <- TRUE
+```
+
+Subsequently, we compute the predictive performance measures for two different
+models using `"rmse"`, the custom Huber loss, and the custom normalized RMSE
+(`"nrmse"`) as performance criteria.
+
+```{r extended-example-fit}
+n1 <- fit_measure(fit_m1, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
+n3 <- fit_measure(fit_m3, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
+```
+
+Additionally, we provide a custom function for computing the standard error
+of the difference for the new custom measure:
+
+```{r custom-se-diff-fun}
+nrmse_se_fn <- function(ref, cmp) {
+  n <- length(ref$pointwise)
+  mse_ref <- mean(ref$pointwise)
+  mse_cmp <- mean(cmp$pointwise)
+  se_ref  <- sqrt(var(ref$pointwise) / n)
+  se_cmp  <- sqrt(var(cmp$pointwise) / n)
+  cov_rc  <- sum((cmp$pointwise - mse_cmp) * (ref$pointwise - mse_ref)) /
+    (n * (n - 1))
+
+  rel_ref <- se_ref / sqrt(mse_ref)
+  rel_cmp <- se_cmp / sqrt(mse_cmp)
+  rho     <- cov_rc / (se_ref * se_cmp)
+
+  # algebraically the same as the RMSE formula shown earlier, but written so
+  # that a model compared against itself cancels to exactly zero
+  se_rmse <- 0.5 * sqrt(
+    (rel_cmp - rel_ref)^2 + 2 * rel_cmp * rel_ref * max(1 - rho, 0)
+  )
+
+  se_rmse / ref$extra$sd_y
+}
+```
+
+Finally, we perform model comparison with multiple custom measures:
+
+```{r extend-example-fit}
+comp_n <- model_compare(
+  list(m3 = n3, m1 = n1),
+  custom_se_fn = list("huber" = huber_se_fn, "nrmse" = nrmse_se_fn)
+)
+print(comp_n, measures = "all")
+```
+
+## Selecting the reference model
+
+Different measures do not have to agree on which model is best, and in the
+[roaches comparison example](#running-example-count-data) they do not.
+By default, for each measure the best model is used as reference model and
+printed in the first row of the output.
+
+```{r disagree-ranking}
+print(
+  model_compare(list(m1 = m1, m2 = m2, m3 = m3)),
+  measures = "all"
+)
+```
+
+We see that for `elpd` and `mae` the third model (`m3`) is best, while for
+the other measures the second model (`m2`) is best.
+
+We can change the reference model using the `rank_by` argument of
+`model_compare()`. For example, if we want `m3` to be the reference model for
+every measure, we use `rank_by = "m3"`.
+
+```{r diff-ref-model}
+print(
+  model_compare(list(m1 = m1, m2 = m2, m3 = m3), rank_by = "m3"),
+  measures = "all"
+)
+```
+
+Note that the ordering remains the same: the estimates are displayed in
+decreasing order (best model first).
+
+It is also possible to select as reference model the best model according to a
+specific measure. For example, suppose we want to use for all measures the same
+reference model as the one used for `r2`:
+
+```{r diff-ref-measure}
+print(
+  model_compare(list(m1 = m1, m2 = m2, m3 = m3), rank_by = "r2"),
+  measures = "all"
+)
+```
+
+## Comparing other predictive sources
+
+`model_compare()` treats every `*_pred_measure()` result the same way. Only the
+constructor changes. All models in one call must share one source. A mixed call
+is an error.
+
+### K-fold cross-validation
+
+`brms::kfold()` refits each model `K` times, so this is the most expensive step
+in this article.
+
+```{r kfold-compare, message=FALSE}
+kfold_measure <- function(fit, measure) {
+  kf <- brms::kfold(fit, K = 5, save_fits = TRUE)
+  kfold_pred_measure(
+    y = fit$data$y,
+    ypred = brms::kfold_predict(kf, method = "predict")$yrep,
+    mupred = brms::kfold_predict(kf, method = "fitted")$yrep,
+    kfold = kf,
+    measure = measure
+  )
+}
+
+set.seed(SEED)
+k1 <- kfold_measure(fit_m1, measures)
+k2 <- kfold_measure(fit_m2, measures)
+k3 <- kfold_measure(fit_m3, measures)
+
+model_compare(list(m1 = k1, m2 = k2, m3 = k3))
+```
+
+The measure names now carry a `_kfold` suffix. `print()` names the source above
+the table. The PSIS-LOO block is gone, because Pareto $\hat{k}$ describes the
+LOO approximation only.
+
+### Held-out test data
+
+Here we hold out 60 buildings, refit each model on the rest, and score the
+held-out ones. `ylp_test` supplies `elpd_test`; `ylp` stays the training
+log-likelihood.
+
+```{r test-compare}
+set.seed(SEED)
+test_id <- sample(nrow(roaches), 60)
+roaches_train <- roaches[-test_id, ]
+roaches_test <- roaches[test_id, ]
+
+test_measure <- function(fit, measure) {
+  fit_train <- update(fit, newdata = roaches_train, refresh = 0)
+  test_pred_measure(
+    y = roaches_test$y,
+    ypred = brms::posterior_predict(fit_train, newdata = roaches_test),
+    mupred = brms::posterior_epred(fit_train, newdata = roaches_test),
+    ylp = brms::log_lik(fit_train),
+    ylp_test = brms::log_lik(fit_train, newdata = roaches_test),
+    measure = measure
+  )
+}
+
+t1 <- test_measure(fit_m1, measures)
+t2 <- test_measure(fit_m2, measures)
+t3 <- test_measure(fit_m3, measures)
+
+model_compare(list(m1 = t1, m2 = t2, m3 = t3))
+```
+
+### In-sample
+
+In-sample scores need no refit. They are optimistically biased and favor the
+more complex model, so `model_compare()` warns:
+
+```{r insample-compare}
+insample_measure <- function(fit, measure) {
+  insample_pred_measure(
+    y = fit$data$y,
+    ypred = brms::posterior_predict(fit),
+    mupred = brms::posterior_epred(fit),
+    ylp = brms::log_lik(fit),
+    measure = measure
+  )
+}
+
+i1 <- insample_measure(fit_m1, measures)
+i2 <- insample_measure(fit_m2, measures)
+i3 <- insample_measure(fit_m3, measures)
+
+model_compare(list(m1 = i1, m2 = i2, m3 = i3))
+```
+
+Everything else in this article, `rank_by`, `custom_se_fn`, the `print`
+arguments `measures` and `simplify`, works unchanged for all four sources.
+
+## Summary
+
+```{r summary-table, echo=FALSE}
+knitr::kable(
+  data.frame(
+    Measure = c("elpd, ic", "mlpd, mae, mse, acc, brier, rps, srps",
+                "rmse", "r2", "bacc", "custom"),
+    `diff_method` = c("sum", "mean", "measure_specific",
+                      "measure_specific", "measure_specific",
+                      "custom"),
+    `Standard error` = c(
+      "sqrt(N) * sd(d_i)",
+      "sd(d_i) / sqrt(N)",
+      "delta method on the MSE scale",
+      "delta method, including baseline uncertainty",
+      "stratified by class, paired within class",
+      "from custom_se_fn: your function, \"sum\", \"mean\", or NA"
+    ),
+    check.names = FALSE
+  )
+)
+```
+
+The things worth remembering:
+
+1. The difference is always `estimate_cmp - estimate_ref`, reported so that
+   negative means worse.
+2. The standard error is always paired, because the models are evaluated on the
+   same observations.
+3. `NA` in a standard error column means "not available", not "zero" and not
+   "an error occurred".
+4. A custom measure is assumed to be a utility. If yours is a loss, say so with
+   `attr(my_fun, "measure_loss") <- TRUE`, or its differences and its `rank_by`
+   ordering will come out reversed.
+
+## References
+
+Chen, F., Xue, Y., Tan, M. T., and Chen, P. (2015). Efficient statistical tests
+to compare Youden index: accounting for contingency correlation. *Statistics in
+Medicine*, 34(9):1560–1576. doi:10.1002/sim.6432
+
+Gelman, A., Goodrich, B., Gabry, J., and Vehtari, A. (2019). R-squared for
+Bayesian regression models. *The American Statistician*, 73(3):307–309.
+doi:10.1080/00031305.2018.1549100
+
+Gelman, A., and Hill, J. (2007). *Data Analysis Using Regression and
+Multilevel/Hierarchical Models*. Cambridge University Press.
+
+McNemar, Q. (1947). Note on the sampling error of the difference between
+correlated proportions or percentages. *Psychometrika*, 12(2):153–157.
+doi:10.1007/BF02295996
+
+Newcombe, R. G. (2001). Simultaneous comparison of sensitivity and specificity
+of two tests in the paired design: a straightforward graphical approach.
+*Statistics in Medicine*, 20(6):907–915. doi:10.1002/sim.906
+
+Sivula, T., Magnusson, M., Matamoros, A. A., and Vehtari, A. (2025).
+Uncertainty in Bayesian leave-one-out cross-validation based model comparison.
+*Bayesian Analysis*. doi:10.1214/25-BA1569
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. *Statistics and
+Computing*, 27(5):1413–1432. doi:10.1007/s11222-016-9696-4
+
+Ver Hoef, J. M. (2012). Who invented the delta method? *The American
+Statistician*, 66(2):124–127. doi:10.1080/00031305.2012.687494
+
+## See also
+
+- [Computing predictive performance measures](pred-measure-workflow.html) — how
+  to produce the objects compared here.
+- [Overview of scores and metrics](overview-measures.html) — definitions and
+  formulas for each measure.
+- `?"loo-glossary"` — the `measure_info` attribute in full.

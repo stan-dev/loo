@@ -5,11 +5,6 @@
 #'   before computing each per-observation contribution.
 #' @param pointwise Optional numeric vector of precomputed per-observation
 #'   contributions. When supplied, `ylp` and `log_weights` are ignored.
-#' @param higher_is_better Logical or `NULL`; whether larger values indicate
-#'   better predictive performance. `NULL` (default) keeps each measure's
-#'   natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-#'   Set `TRUE` for a utility scale (higher is better) or `FALSE` for a loss
-#'   scale (lower is better).
 #'
 #' @return An object of class `"measure"`: a list with:
 #'   \describe{
@@ -117,7 +112,6 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 #' pointwise log predictive density contributions (\eqn{\mathrm{lppd}_i}), using
 #' [ptw_log_pred_density()]. ELPD is returned on the utility scale (higher is
 #' better), consistent with the sign convention used throughout this package.
-#' Manual change of sign convention is possible via `higher_is_better`.
 #'
 #' @inheritParams measure_density_params
 #' @inheritParams measure_params
@@ -144,7 +138,7 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 #' measure_elpd(LLarr)
 #' @export
 measure_elpd <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {  
   inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_elpd")
   lppd_i <- inputs$lppd_i
@@ -160,8 +154,7 @@ measure_elpd <- function(
   )
   
   .create_measure_structure(
-    res, higher_is_better, "elpd",
-    n_draws = inputs$n_draws, n_obs = inputs$n_obs
+    res, "elpd", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -180,7 +173,7 @@ measure_elpd <- function(
 #' measure_mlpd(ylp)
 #' @export
 measure_mlpd <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {
   inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_mlpd")
   lppd_i <- inputs$lppd_i
@@ -196,7 +189,7 @@ measure_mlpd <- function(
     pointwise = lppd_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mlpd", n_draws = inputs$n_draws, n_obs = n_obs
+    res, "mlpd", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 
@@ -217,7 +210,7 @@ measure_mlpd <- function(
 #' measure_ic(ylp)
 #' @export
 measure_ic <- function(
-  ylp, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  ylp, log_weights = NULL, pointwise = NULL
 ) {
   inputs <- .lppd_from_inputs(ylp, log_weights, pointwise, "measure_ic")
   ic_i <- if (is.null(pointwise)) -2 * inputs$lppd_i else inputs$lppd_i
@@ -233,7 +226,7 @@ measure_ic <- function(
     pointwise = ic_i
   )
   .create_measure_structure(
-    res, higher_is_better, "ic", n_draws = inputs$n_draws, n_obs = n_obs
+    res, "ic", n_draws = inputs$n_draws, n_obs = n_obs
   )
 }
 
@@ -256,7 +249,7 @@ measure_ic <- function(
 #' measure_acc(y, mupred)
 #' @export
 measure_acc <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -280,7 +273,7 @@ measure_acc <- function(
     pointwise = acc_i
   )
   .create_measure_structure(
-    res, higher_is_better, "acc", n_draws = n_draws, n_obs = n_obs
+    res, "acc", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -300,14 +293,21 @@ measure_acc <- function(
 #' measure_bacc(y, mupred)
 #' @export
 measure_bacc <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
-  .validate_numeric_vector(y, arg = "y")
+  if (is.null(pointwise)) {
+    .validate_numeric_vector(y, arg = "y")
+  }
+
   classes <- sort(unique(y))
   K <- length(classes)
-  if (K < 2) {
+  class_id <- match(y, classes)
+  n_c <- tabulate(class_id, nbins = K)
+
+  if (is.null(pointwise) && K < 2) {
     cli::cli_abort("{.fn bacc} requires at least two outcome classes.")
   }
+
   if (!is.null(pointwise)) {
     if (length(pointwise) != length(y)) {
       cli::cli_abort("{.arg pointwise} and {.arg y} must have the same length.")
@@ -325,18 +325,22 @@ measure_bacc <- function(
     n_obs <- ncol(mupred)
     acc_i <- .acc_pointwise(y, mupred, log_weights)
   }
-  
+
   acc_c <- vapply(classes, function(c) mean(acc_i[y == c]), numeric(1))
-  n_c <- tabulate(match(y, classes))
-  bacc_i <- acc_i / (K * n_c[match(y, classes)])
-  
+  bacc_i <- acc_i / (K * n_c[class_id])
+
   res <- list(
     estimate = mean(acc_c),
     se = sqrt(sum(acc_c * (1 - acc_c) / n_c)) / K,
-    pointwise = bacc_i
+    pointwise = bacc_i,
+    # the class strata are what makes a difference of balanced accuracies more
+    # than a mean of pointwise differences, and `.se_diff_bacc()` cannot
+    # recover them from `bacc_i`: every misclassified observation stores a
+    # zero whatever its class
+    extra = list(class_id = class_id)
   )
   .create_measure_structure(
-    res, higher_is_better, "bacc", n_draws = n_draws, n_obs = n_obs
+    res, "bacc", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -358,7 +362,7 @@ measure_bacc <- function(
 #' measure_brier(y, ypred)
 #' @export
 measure_brier <- function(
-  y, ypred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, ypred, log_weights = NULL, pointwise = NULL
 ) {
   if (!is.null(pointwise)) {
     .inform_ignored_inputs(
@@ -401,7 +405,7 @@ measure_brier <- function(
     pointwise = bs_i
   )
   .create_measure_structure(
-    res, higher_is_better, "brier", n_draws = n_draws, n_obs = n_obs
+    res, "brier", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -424,7 +428,7 @@ measure_brier <- function(
 #' measure_mae(y, mupred)
 #' @export
 measure_mae <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   inputs <- .point_error_from_inputs(
     y, mupred, log_weights, pointwise, "mae", abs
@@ -437,8 +441,7 @@ measure_mae <- function(
     pointwise = mae_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mae",
-    n_draws = inputs$n_draws, n_obs = inputs$n_obs
+    res, "mae", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -458,7 +461,7 @@ measure_mae <- function(
 #' measure_mse(y, mupred)
 #' @export
 measure_mse <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {  
   inputs <- .point_error_from_inputs(
     y, mupred, log_weights, pointwise, "mse", function(e) e^2
@@ -471,8 +474,7 @@ measure_mse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, higher_is_better, "mse",
-    n_draws = inputs$n_draws, n_obs = inputs$n_obs
+    res, "mse", n_draws = inputs$n_draws, n_obs = inputs$n_obs
   )
 }
 
@@ -491,7 +493,7 @@ measure_mse <- function(
 #' measure_rmse(y, mupred)
 #' @export
 measure_rmse <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   mse_res <- measure_mse(
     y = y, mupred = mupred, log_weights = log_weights, 
@@ -514,8 +516,35 @@ measure_rmse <- function(
     pointwise = sqe_i
   )
   .create_measure_structure(
-    res, higher_is_better, "rmse", n_draws = n_draws, n_obs = n_obs
+    res, "rmse", n_draws = n_draws, n_obs = n_obs
   )
+}
+
+#' Delta-method standard error of an R-squared quantity
+#'
+#' The R-squared of one model and the difference in R-squared between two
+#' models have the same form: a mean of squared-error contributions divided by
+#' the model-independent baseline `MSE(y)`. Their standard errors are therefore
+#' the same first-order Taylor approximation, evaluated either at one model's
+#' pointwise squared errors or at the pointwise differences between two models.
+#'
+#' Writing `c = mean(sqe) / MSE(y)`, the three-term expansion
+#' `Var[MSE] - 2 * c * Cov[MSE, MSE(y)] + c^2 * Var[MSE(y)]`, scaled by
+#' `MSE(y)^-1`, is exactly the standard error of the mean of
+#' `sqe_i - c * mse_y_i`. That is the form used here: it needs one variance
+#' rather than three moments, it cannot go negative under the square root, and
+#' it is exactly `0` when `sqe` is identically zero, as it is when a model is
+#' compared against itself.
+#'
+#' @noRd
+#' @param sqe Pointwise squared errors of one model, or pointwise differences
+#'   in squared error between two models.
+#' @param mse_y_i Pointwise baseline `(y_i - mean(y))^2`.
+#' @return Numeric scalar standard error.
+.se_r2_delta <- function(sqe, mse_y_i) {
+  mse_y_hat <- mean(mse_y_i)
+  scaled <- sqe - (mean(sqe) / mse_y_hat) * mse_y_i
+  sqrt(var(scaled) / length(sqe)) / mse_y_hat
 }
 
 #' Predictive R-squared (`r2`)
@@ -535,7 +564,7 @@ measure_rmse <- function(
 #' measure_r2(y, mupred)
 #' @export
 measure_r2 <- function(
-  y, mupred, log_weights = NULL, pointwise = NULL, higher_is_better = NULL
+  y, mupred, log_weights = NULL, pointwise = NULL
 ) {
   .validate_numeric_vector(y, arg = "y")
   if (var(y) == 0) {
@@ -557,25 +586,21 @@ measure_r2 <- function(
   
   mse_y_i <- (y - mean(y))^2
   mse_y_hat <- mean(mse_y_i)
-   
-  var_mse_hat <- mse_res$estimates[2]^2
-  cov_mse_msey <- stats::cov(sqe_i, mse_y_i) / n_obs              
-  var_mse_y_hat <- var(mse_y_i) / n_obs 
-  
-  t1 <- var_mse_hat
-  t2 <- -2 * (mse_hat / mse_y_hat) * cov_mse_msey
-  t3 <- (mse_hat^2 / mse_y_hat^2) * var_mse_y_hat
-  se_r2 <- sqrt(t1 + t2 + t3) * (1 / mse_y_hat)
-  
+
   est_r2 <- 1 - mse_hat / mse_y_hat
-  
+  se_r2 <- .se_r2_delta(sqe_i, mse_y_i)
+
   res <- list(
     estimate = est_r2,
     se = se_r2,
-    pointwise = sqe_i
+    pointwise = sqe_i,
+    # `model_compare()` needs the baseline to propagate uncertainty into the
+    # standard error of an r2 difference; `y` is gone by then. See
+    # `.se_diff_r2()`.
+    extra = list(mse_y_i = mse_y_i)
   )
   .create_measure_structure(
-    res, higher_is_better, "r2", n_draws = n_draws, n_obs = n_obs
+    res, "r2", n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -614,22 +639,39 @@ measure_r2 <- function(
 #' both discrete and continuous outcomes; see Hosking (1990, 1996) for
 #' theoretical justification in the discrete case.
 #'
-#' If log-weights (`log_weights`) are provided (e.g., PSIS weights
-#' for LOO cross-validation), a weighted PWM estimator is used instead, which
-#' accounts for the importance weights when estimating expectations.
+#' The term \eqn{E[|X - X'|]} is computed as a weighted average over all pairs
+#' of draws,
+#' \deqn{E[|X - X'|] = \frac{\sum_i \sum_{j \neq i} w_i w_j |x_i - x_j|}{1 -
+#'   \sum_i w_i^2},}
+#' which is evaluated in \eqn{O(S \log S)} using the sorted draws and the
+#' cumulative sums of their weights. If log-weights (`log_weights`) are provided
+#' (e.g., PSIS weights for LOO cross-validation), the \eqn{w_i} are the
+#' normalized importance weights and \eqn{E[|X - y|]} is likewise a weighted
+#' mean. Otherwise the weights are equal, \eqn{w_i = 1/S}, and the expression
+#' reduces to the usual unbiased PWM estimator with the \eqn{1 / (S (S - 1))}
+#' normalization. Because the estimate is a convex combination of
+#' \eqn{|x_i - x_j|}, it is always non-negative and invariant to shifts of
+#' `ypred`.
 #'
 #' **Sign convention:**
 #'
-#' Unscaled scores are returned as losses (lower is better). Scaled scores are
-#' returned as utilities (higher is better), after Bolin & Wallin (2023). Set
-#' `higher_is_better` to select the orientation you want.
+#' Unscaled scores (RPS, CRPS) are returned on the loss scale of Gneiting &
+#' Raftery (2007): lower is better. Scaled scores (SRPS, SCRPS) follow Bolin &
+#' Wallin (2023) and are returned on the utility scale: higher is better.
+#' [model_compare()] reports differences for both on the utility scale, so no
+#' manual conversion is needed there. The deprecated [crps()] returned the
+#' negated unscaled score; `-measure_rps(...)$pointwise` reproduces it.
 #'
 #' @param y A numeric vector of \eqn{n} observed outcomes. May be integer-valued
 #'   (for RPS/SRPS) or continuous (for CRPS/SCRPS).
 #' @param ypred A numeric matrix of posterior predictive draws with dimensions
 #'   \eqn{S \times n} (draws × observations).
-#' @param pointwise Optional numeric vector of precomputed pointwise rps values.
-#'   If provided, `y`, `ypred`, and `log_weights` are ignored.
+#' @param pointwise Optional numeric vector of precomputed pointwise values, on
+#'   the scale of the measure that is returned: RPS/CRPS when `scaled = FALSE`
+#'   and SRPS/SCRPS when `scaled = TRUE`. The values are used as they are, with
+#'   no further transformation; in particular, unscaled values are not converted
+#'   to the scaled variant. If provided, `y`, `ypred`, and `log_weights` are
+#'   ignored.
 #' @param scaled Logical; if `TRUE`, computes the scaled variant (SRPS for
 #'   discrete outcomes, SCRPS for continuous outcomes). Default is `FALSE`.
 #' @inheritParams measure_params
@@ -682,12 +724,14 @@ measure_r2 <- function(
 #' weather forecasts. *Mathematical Geosciences*, 50:209–234.
 #'
 #' @export
-measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled = FALSE, 
-  higher_is_better = NULL) {
+measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
+  scaled = FALSE) {
   if (is.null(pointwise)) {
+    .validate_numeric_vector(y, arg = "y")
+    .validate_numeric_matrix(ypred, arg = "ypred", ncol = length(y))
     n_draws <- nrow(ypred)
     n_obs <- ncol(ypred)
-    
+
     w <- if (is.null(log_weights)) {
       NULL
     } else {
@@ -738,7 +782,7 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
   )
   name <- if(isTRUE(scaled)) "srps" else "rps"
   .create_measure_structure(
-    res, higher_is_better, name, n_draws = n_draws, n_obs = n_obs
+    res, name, n_draws = n_draws, n_obs = n_obs
   )
 }
 
@@ -761,11 +805,10 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL, scaled =
 #' measure_srps(y, ypred)
 #'
 #' @export
-measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
-  higher_is_better = NULL) {
+measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   measure_rps(
-    y = y, ypred = ypred, log_weights = log_weights, 
-    scaled = TRUE, higher_is_better = higher_is_better
+    y = y, ypred = ypred, log_weights = log_weights, pointwise = pointwise,
+    scaled = TRUE
   )
 }
 
@@ -785,22 +828,245 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 # the base measure block rather than from the raw inputs. `.compute_measure()`
 # then supplies `pointwise`, optionally passed through `elpd_transform` first.
 .measure_spec <- list(
-  elpd = list(fun = measure_elpd, loss = FALSE),
+  elpd = list(fun = measure_elpd, loss = FALSE, diff_method = "sum"),
   ic = list(
-    fun = measure_ic, loss = TRUE,
-    needs_elpd = TRUE, elpd_transform = function(x) -2 * x
+    fun = measure_ic,
+    loss = TRUE,
+    diff_method = "sum",
+    needs_elpd = TRUE,
+    elpd_transform = function(x) -2 * x
   ),
-  mlpd = list(fun = measure_mlpd, loss = FALSE, needs_elpd = TRUE),
-  mae = list(fun = measure_mae, loss = TRUE),
-  r2 = list(fun = measure_r2, loss = FALSE),
-  rmse = list(fun = measure_rmse, loss = TRUE),
-  mse = list(fun = measure_mse, loss = TRUE),
-  acc = list(fun = measure_acc, loss = FALSE),
-  bacc = list(fun = measure_bacc, loss = FALSE),
-  rps = list(fun = measure_rps, loss = TRUE),
-  srps = list(fun = measure_srps, loss = FALSE),
-  brier = list(fun = measure_brier, loss = TRUE)
+  mlpd = list(
+    fun = measure_mlpd,
+    loss = FALSE,
+    diff_method = "mean",
+    needs_elpd = TRUE
+  ),
+  mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
+  r2 = list(
+    fun = measure_r2,
+    loss = FALSE,
+    diff_method = "measure_specific",
+    se_diff_fun = "r2"
+  ),
+  rmse = list(
+    fun = measure_rmse,
+    loss = TRUE,
+    diff_method = "measure_specific",
+    se_diff_fun = "rmse"
+  ),
+  mse = list(fun = measure_mse, loss = TRUE, diff_method = "mean"),
+  acc = list(fun = measure_acc, loss = FALSE, diff_method = "mean"),
+  bacc = list(
+    fun = measure_bacc,
+    loss = FALSE,
+    diff_method = "measure_specific",
+    se_diff_fun = "bacc"
+  ),
+  # unscaled RPS/CRPS is the Gneiting & Raftery (2007) loss; the scaled variant
+  # follows Bolin & Wallin (2023), where larger is better
+  rps = list(fun = measure_rps, loss = TRUE, diff_method = "mean"),
+  srps = list(fun = measure_srps, loss = FALSE, diff_method = "mean"),
+  brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
 )
+
+# measure-specific standard errors -----------------------------
+#
+# Measures whose overall estimate is not a sum or mean of pointwise
+# contributions cannot use the paired pointwise standard error. They register a
+# `se_diff_fun` in `.measure_spec`, naming an entry of `.se_diff_funs` below.
+# Custom measures take theirs from `model_compare(custom_se_fn = )` instead,
+# under the same calling contract.
+#
+# Such a function receives `ref` and `cmp`, each a list with the elements
+# `estimate`, `se`, `pointwise`, and `extra` for one model, always on the
+# measure's natural scale, and returns the standard
+# error of the difference as a numeric scalar. The difference itself is always
+# `estimate_cmp - estimate_ref` and is computed by `model_compare()`.
+
+#' Standard error of an RMSE difference
+#'
+#' First-order bivariate Taylor (delta method) approximation of the standard
+#' error of \eqn{RMSE(M_cmp) - RMSE(M_ref)}, propagated from the MSE scale on
+#' which the pointwise squared errors live.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds squared errors.
+#' @return Numeric scalar standard error.
+.se_diff_rmse <- function(ref, cmp) {
+  sqe_ref <- ref$pointwise
+  sqe_cmp <- cmp$pointwise
+  n <- length(sqe_ref)
+  mse_ref <- mean(sqe_ref)
+  mse_cmp <- mean(sqe_cmp)
+
+  # a perfect predictor leaves the ratios below undefined; `measure_rmse()`
+  # reports a zero standard error in that case, so do the same here
+  if (n <= 1L || mse_ref <= 0 || mse_cmp <= 0) {
+    return(0)
+  }
+
+  # `Var(mse_cmp) / mse_cmp + Var(mse_ref) / mse_ref -
+  # 2 * Cov(mse_cmp, mse_ref) / sqrt(mse_cmp * mse_ref)` is exactly the variance
+  # of the mean of the paired contrast below, so forming the contrast pointwise
+  # and taking one variance keeps the three terms from being computed and
+  # subtracted separately. That makes the estimator structurally non-negative
+  # (no correlation above one to clamp) and makes two models with the same
+  # squared errors cancel bit-for-bit rather than leave rounding noise that
+  # `sqrt()` then amplifies to ~1e-7.
+  z <- sqe_cmp / sqrt(mse_cmp) - sqe_ref / sqrt(mse_ref)
+
+  0.5 * sqrt(stats::var(z) / n)
+}
+
+#' Standard error of an R-squared difference
+#'
+#' First-order trivariate Taylor (delta method) approximation of the standard
+#' error of \eqn{R^2(M_cmp) - R^2(M_ref)}. The difference equals
+#' \eqn{-MSE(M_cmp, M_ref) / MSE(y)}, so it is the same expansion as the
+#' single-model standard error in `measure_r2()` with the pointwise squared
+#' errors replaced by their pointwise differences; both go through
+#' `.se_r2_delta()`.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds squared errors and
+#'   `extra$mse_y_i` the baseline `(y_i - mean(y))^2` stored by `measure_r2()`.
+#' @return Numeric scalar standard error, or `NA_real_` when the baseline is
+#'   unavailable.
+.se_diff_r2 <- function(ref, cmp) {
+  # the baseline is a property of `y`, so either model's copy will do; models
+  # fitted to different `y` are already reported by the `yhash` warning
+  mse_y_i <- if (!is.null(ref$extra$mse_y_i)) {
+    ref$extra$mse_y_i
+  } else {
+    cmp$extra$mse_y_i
+  }
+
+  # objects computed before the baseline was stored cannot support the
+  # covariance terms; report the difference without a standard error rather
+  # than refusing the whole comparison
+  if (!is.numeric(mse_y_i) || length(mse_y_i) != length(ref$pointwise)) {
+    return(NA_real_)
+  }
+
+  .se_r2_delta(cmp$pointwise - ref$pointwise, mse_y_i)
+}
+
+#' Standard error of a balanced-accuracy difference
+#'
+#' Balanced accuracy averages class-wise accuracies, so a difference of two
+#' balanced accuracies is a difference of two stratified means, not a mean of
+#' pointwise differences. The two sources of dependence separate: the class
+#' strata are disjoint sets of observations and so contribute independent
+#' variances, while within a stratum both models score the *same* `n_c`
+#' observations and are therefore paired. Writing
+#' \eqn{d_i = acc_i(M_cmp) - acc_i(M_ref)},
+#'
+#' \deqn{SE = \frac{1}{K} \sqrt{\sum_c Var(d_i : i \in c) / n_c}}
+#'
+#' which is the difference-analogue of the single-model
+#' \eqn{\sqrt{\sum_c acc_c (1 - acc_c) / n_c} / K} in `measure_bacc()`: the
+#' per-stratum binomial variance replaced by the paired-difference variance.
+#' Within a stratum this is the McNemar variance of a paired difference of
+#' proportions, \eqn{(b + c)/n_c^2 - (b - c)^2/n_c^3} in discordant-pair form,
+#' up to the \eqn{n_c/(n_c - 1)} of the sample variance.
+#'
+#' For binary outcomes balanced accuracy is \eqn{(sens + spec)/2}, so this is
+#' the estimand of Newcombe (2001) at a mixing parameter of one half, and half
+#' the difference of two Youden indices in a paired design (Chen et al., 2015).
+#'
+#' @references
+#' Newcombe, R. G. (2001). Simultaneous comparison of sensitivity and
+#' specificity of two tests in the paired design: a straightforward graphical
+#' approach. *Statistics in Medicine*, 20(6):907--915.
+#'
+#' Chen, F., Xue, Y., Tan, M. T., and Chen, P. (2015). Efficient statistical
+#' tests to compare Youden index: accounting for contingency correlation.
+#' *Statistics in Medicine*, 34(9):1560--1576.
+#'
+#' @noRd
+#' @param ref,cmp Per-model inputs; `pointwise` holds `acc_i / (K * n_c)` and
+#'   `extra$class_id` the class index stored by `measure_bacc()`.
+#' @return Numeric scalar standard error, or `NA_real_` when the class strata
+#'   are unavailable.
+.se_diff_bacc <- function(ref, cmp) {
+  # the strata are a property of `y`, so either model's copy will do; models
+  # fitted to different `y` are already reported by the `yhash` warning
+  class_id <- ref$extra$class_id
+  if (is.null(class_id)) {
+    class_id <- cmp$extra$class_id
+  }
+
+  n <- length(ref$pointwise)
+  # objects computed before the strata were stored cannot be stratified;
+  # report the difference without a standard error rather than refusing the
+  # whole comparison
+  if (!is.numeric(class_id) || length(class_id) != n) {
+    return(NA_real_)
+  }
+
+  n_c <- tabulate(class_id)
+  K <- length(n_c)
+  # undo the `acc_i / (K * n_c)` scaling to recover the 0/1 accuracies, so the
+  # variances below are on the natural per-observation scale
+  d <- (cmp$pointwise - ref$pointwise) * (K * n_c[class_id])
+
+  # a stratum holding a single observation supports no variance estimate and
+  # contributes nothing, matching `measure_bacc()`, where `acc_c` is then 0 or
+  # 1 and its binomial variance vanishes
+  var_c <- vapply(
+    seq_len(K),
+    function(k) {
+      if (n_c[k] < 2L) 0 else stats::var(d[class_id == k]) / n_c[k]
+    },
+    numeric(1)
+  )
+
+  sqrt(sum(var_c)) / K
+}
+
+# registry of built-in `se_diff_fun` implementations, referenced by name from
+# `.measure_spec` so that stored objects carry a string rather than a closure
+.se_diff_funs <- list(
+  rmse = .se_diff_rmse,
+  r2 = .se_diff_r2,
+  bacc = .se_diff_bacc
+)
+
+#' Return the per-measure information recorded on a result object
+#' @noRd
+#' @param measure_entry Normalized measure entry, or a built-in measure name.
+.measure_info <- function(measure_entry) {
+  if (is.character(measure_entry)) {
+    measure_entry <- list(
+      name = measure_entry,
+      type = "builtin",
+      key = measure_entry
+    )
+  }
+
+  if (measure_entry$type == "builtin") {
+    entry <- .measure_spec[[measure_entry$key]]
+    if (is.null(entry)) {
+      return(NULL)
+    }
+    return(list(
+      loss = isTRUE(entry$loss),
+      diff_method = entry$diff_method,
+      se_diff_fun = entry$se_diff_fun
+    ))
+  }
+
+  # Custom measures never declare how their standard error of the difference is
+  # computed. That is supplied at comparison time via
+  # `model_compare(custom_se_fn = )`, so nothing here is inferred and no closure
+  # is stored on the result object. Whether the measure is a loss is declared by
+  # the measure itself, through `attr(fun, "measure_loss")`.
+  list(
+    loss = isTRUE(measure_entry$loss),
+    diff_method = "custom"
+  )
+}
 
 #' Supported predictive measure names
 #'
@@ -812,17 +1078,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 supported_measures_list <- names(.measure_spec)
 
 # internal function that produces output format for measures
-.create_measure_structure <- function(
-  res, higher_is_better, measure_name, n_draws, n_obs
-) {
-  if (!is.null(higher_is_better)) {
-    spec <- .measure_spec[[measure_name]]
-    natural_higher <- is.null(spec) || !isTRUE(spec$loss)
-    if (xor(natural_higher, isTRUE(higher_is_better))) {
-      res$estimate <- -res$estimate
-      res$pointwise <- -res$pointwise
-    }
-  }
+.create_measure_structure <- function(res, measure_name, n_draws, n_obs) {
   out <- list()
   out$estimates <- matrix(
     c(res$estimate, res$se),
@@ -834,6 +1090,9 @@ supported_measures_list <- names(.measure_spec)
     ncol     = 1,
     dimnames = list(NULL, measure_name)
   )
+  # `extra` carries auxiliary data for `se_diff_fun()`, on the measure's
+  # natural scale; absent when the measure stores nothing
+  out$extra <- res$extra
 
   structure(
     out,

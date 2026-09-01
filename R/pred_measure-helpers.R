@@ -3,7 +3,8 @@
 #' @description
 #' Converts `measure` (character, function, list, or `NULL`) into a list of
 #' entries with elements `name`, `type` (`"builtin"` or `"custom"`), and `key`
-#' (built-in name or function).
+#' (built-in name or function). Custom entries also carry `loss`, taken from
+#' `attr(fun, "measure_loss")`.
 #'
 #' @param measure User-supplied `measure` argument.
 #'
@@ -46,7 +47,7 @@
             "i" = "Use {.code measure = list(my_metric = my_fun)}."
           ))
         }
-        list(name = nm, type = "custom", key = el)
+        .measure_entry_custom(el, name = nm)
       } else {
         cli::cli_abort(c(
           "Each element of {.arg measure} must be a character scalar (built-in",
@@ -68,18 +69,50 @@
 
 #' Build a custom measure entry from a function
 #'
+#' The name and the orientation of a measure are properties of its definition,
+#' so both are declared once on the function via `attr(fun, "measure_name")`
+#' and `attr(fun, "measure_loss")` rather than at every call. A custom measure
+#' is a utility (higher is better) unless it declares itself a loss.
+#'
 #' @param fun Function implementing a custom measure.
+#' @param name Measure name, when it comes from the name of a `measure` list
+#'   element rather than from `attr(fun, "measure_name")`.
 #' @noRd
-.measure_entry_custom <- function(fun) {
-  name <- attr(fun, "measure_name", exact = TRUE)
-  if (is.null(name) || length(name) != 1L || !nzchar(name)) {
-    cli::cli_abort(c(
-      "A custom function passed to {.arg measure} must have attribute",
-      "{.code measure_name}.",
-      "i" = "Set {.code attr(my_fun, \"measure_name\") <- \"my_metric\"}."
-    ))
+.measure_entry_custom <- function(fun, name = NULL) {
+  if (is.null(name)) {
+    name <- attr(fun, "measure_name", exact = TRUE)
+    if (is.null(name) || length(name) != 1L || !nzchar(name)) {
+      stop(
+        "A custom function passed to 'measure' must have attribute ",
+        "'measure_name', e.g. attr(my_fun, \"measure_name\") <- \"my_metric\".",
+        call. = FALSE
+      )
+    }
+  } else {
+    attr_name <- attr(fun, "measure_name", exact = TRUE)
+    if (!is.null(attr_name) && length(attr_name) == 1L && nzchar(attr_name) &&
+        !identical(attr_name, name)) {
+      cli::cli_warn(c(
+        "Custom measure named {.val {name}} in {.arg measure} also has",
+        "{.code attr(fun, \"measure_name\") = {.val {attr_name}}}.",
+        "i" = "Using the list name {.val {name}}; the attribute is ignored here."
+      ))
+    }
   }
-  list(name = name, type = "custom", key = fun)
+
+  loss <- attr(fun, "measure_loss", exact = TRUE)
+  if (is.null(loss)) {
+    loss <- FALSE
+  } else if (!is.logical(loss) || length(loss) != 1L || is.na(loss)) {
+    stop(
+      "Attribute 'measure_loss' of a custom measure must be TRUE or FALSE, ",
+      "e.g. attr(my_fun, \"measure_loss\") <- TRUE for a measure where lower ",
+      "values are better.",
+      call. = FALSE
+    )
+  }
+
+  list(name = name, type = "custom", key = fun, loss = loss)
 }
 
 #' Check duplicate measure names
@@ -242,6 +275,13 @@
   }
   # pass measure name if user set it as attribute
   attr(res, "measure") <- measure_name
+  if (!is.null(res$extra) && !is.list(res$extra)) {
+    cli::cli_abort(c(
+      "{.field extra} from custom measure {.val {measure_name}} must be a list.",
+      "i" = "It is handed to {.code custom_se_fn(ref, cmp)} as
+             {.code ref$extra} and {.code cmp$extra}."
+    ))
+  }
 
   invisible(res)
 }
@@ -577,6 +617,7 @@
   )
 }
 
+
 #' Probability-weighted moment estimator of E|X - X'|
 #'
 #' @description
@@ -598,6 +639,10 @@
 #' the estimate is a convex combination of \eqn{|x_i - x_j|} it is always
 #' non-negative, so `log()` of it in the scaled scores is always defined, and
 #' the coefficients sum to zero, so it is invariant to shifts of `ypred`.
+#'
+#' This is the bias-corrected weighted Gini mean difference, not the estimator
+#' derived in `notes/crps_pwm.pdf`; see decision D5 in `notes/developer-notes.md`
+#' for why that derivation is not used here.
 #'
 #' @param ypred Numeric matrix of posterior predictive draws (`n_draws`
 #'   \eqn{\times} `n_obs`), where rows are draws and columns are observations.
@@ -645,20 +690,22 @@
   )
 }
 
-
-
 #' Validate control argument
-#' 
+#'
 #' @description
-#' Validates that the arguments passed to the control list are valid 
-#' arguments for the corresponding function. If not, a warning is issued that 
+#' Validates that the arguments passed to the control list are valid
+#' arguments for the corresponding function. If not, a warning is issued that
 #' corresponding invalid argument is ignored.
-#' 
+#'
 #' @param control Named list of per-measure settings.
+#' @param measures Optional list of normalized measure entries from
+#'   `.prepare_measures()`. When supplied, control names are resolved against
+#'   the requested measures, so custom measures are validated against their own
+#'   formals; without it only built-in names can be checked.
 #'
 #' @keywords internal
 #' @noRd
-.validate_control <- function(control) {
+.validate_control <- function(control, measures = NULL) {
   res <- checkmate::check_list(control, types = "list", names = "named")
   if (!isTRUE(res)) {
     cli::cli_abort(c(
@@ -666,17 +713,45 @@
       "i" = "Expected format: {.code list(fun_name = list(arg1 = val1, arg2 = val2))}"
     ))
   }
-  
+
+  # without `measures` the requested measures are unknown, so a control name is
+  # only checked against the built-in registry
+  known_measures <- !is.null(measures)
+  if (is.null(measures)) {
+    measures <- list()
+  }
+  entries <- stats::setNames(
+    measures,
+    vapply(measures, function(e) e$name, character(1L))
+  )
+
   for (func_name in names(control)) {
-    invalid_args <- names(control[[func_name]])[
-      !names(control[[func_name]]) %in% names(formals(match.fun(paste0("measure_", func_name))))
-    ]
+    entry <- if (func_name %in% names(entries)) entries[[func_name]] else NULL
+    # custom measures are validated against their own formals, built-ins
+    # against the registry; a name matching neither accepts nothing
+    valid_args <- if (!is.null(entry) && identical(entry$type, "custom")) {
+      names(formals(entry$key))
+    } else if (is.null(entry) && known_measures) {
+      NULL
+    } else {
+      spec <- .measure_spec[[if (is.null(entry)) func_name else entry$key]]
+      if (is.null(spec)) NULL else names(formals(spec$fun))
+    }
+    if (is.null(valid_args)) {
+      cli::cli_warn(c(
+        "Ignoring {.arg control} entry {.val {func_name}}, which matches no",
+        "measure being computed."
+      ))
+      next
+    }
+    invalid_args <- setdiff(names(control[[func_name]]), valid_args)
     if (length(invalid_args) > 0) {
       cli::cli_warn(
         "Ignoring {.arg {invalid_args}} as it is not a valid argument of {.fn {func_name}}."
       )
     }
   }
+  invisible(NULL)
 }
 
 #' Subset measure results

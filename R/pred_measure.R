@@ -28,7 +28,11 @@
 #' }
 #'
 #' The attribute `source` is `"insample"`. Attribute `dims` gives posterior
-#' draws × observations. Use [print()] for a readable summary table.
+#' draws × observations. Attribute `measure_info` records what `model_compare()`
+#' needs to know about each measure; see section below. Use [print()]
+#' for a readable summary table.
+#'
+#' @template measure-info-attribute
 #'
 #' @details
 #' **Input requirements by measure.** Supply only the inputs each measure
@@ -51,6 +55,15 @@
 #' `measure_name` and return `estimate`, `se`, and `pointwise`. Only arguments
 #' declared in the function signature among `y`, `ypred`, `mupred`, `ylp`, and
 #' `log_weights` are supplied automatically.
+#'
+#' Custom measures are assumed to be on a utility scale (higher is better) in
+#' [model_compare()]. Declare a custom loss with
+#' `attr(my_fun, "measure_loss") <- TRUE` so that [model_compare()] converts and
+#' ranks it in the right direction.
+#'
+#' A custom measure declares nothing about the standard error of a difference
+#' between two models. Supply it when comparing, through the `custom_se_fn`
+#' argument of [model_compare()].
 #'
 #' @examples
 #' \donttest{
@@ -153,6 +166,8 @@ insample_pred_measure <- function(
 #'
 #' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `crps_loo`).
 #'
+#' @template measure-info-attribute
+#'
 #' @details
 #' **Three equivalent input patterns:**
 #'
@@ -243,6 +258,8 @@ loo_pred_measure <- function(
 #' list contains `estimates` and `pointwise`; measure names carry a `_kfold`
 #' suffix (e.g. `elpd_kfold`, `crps_kfold`).
 #'
+#' @template measure-info-attribute
+#'
 #' @details
 #' For distributional measures on held-out folds, obtain posterior predictions
 #' with `brms::kfold_predict()` and pass the resulting `yrep` matrices as
@@ -325,6 +342,8 @@ kfold_pred_measure <- function(
 #' `elpd_test`, `crps_test`). Attribute `dims` reflects the test-set size
 #' (from `ylp_test`), not the training data.
 #'
+#' @template measure-info-attribute
+#'
 #' @details
 #' The base summary `elpd_test` is computed from `ylp_test` on the holdout
 #' observations only.
@@ -403,7 +422,10 @@ test_pred_measure <- function(
 #' An updated object of the same class as `predperf`, with new rows in
 #' `estimates` and columns in `pointwise` for each requested measure. Base
 #' summaries (`elpd` and LOO/k-fold complexity terms such as `p_loo`) are not
-#' recomputed.
+#' recomputed. Attribute `measure_info` is extended for any newly added
+#' measures.
+#'
+#' @template measure-info-attribute
 #'
 #' @details
 #' **Typical workflow:**

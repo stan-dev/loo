@@ -54,7 +54,30 @@ functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
 }
 Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} that appear in their formals, plus arguments from \code{control}.
-They must return a list with  \code{estimates} and \code{pointwise}.}
+They must return a list with  \code{estimates} and \code{pointwise}.
+
+A custom measure declares whether it is a loss (lower is better) or a
+utility (higher is better) with attribute \code{"measure_loss"}:
+\code{attr(my_fun, "measure_loss") <- TRUE} for a loss. Without it a custom
+measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} uses the declaration to
+put all measures on a common utility scale and to rank models, so an
+undeclared loss is compared and ranked in the wrong direction.
+
+A custom measure declares nothing about the standard error of a difference
+between two models. That is supplied at comparison time through the
+\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which accepts a function
+\code{function(ref, cmp) ...}, the shorthands \code{"sum"} and \code{"mean"} for the
+paired pointwise formulas, or \code{NULL} to report the difference with an \code{NA}
+standard error. A function receives one list per model with elements
+\code{estimate}, \code{se}, \code{pointwise}, and \code{extra}, always on the measure's natural
+scale, and must return the standard error of the difference as a numeric
+scalar.
+
+\code{extra} is for anything the standard error needs that the pointwise values
+do not carry. Return it as an additional list element \code{extra} from the
+measure function and it is stored alongside the estimates and passed on to
+\code{custom_se_fn}; the built-in \code{r2} uses it for the baseline
+\code{(y_i - mean(y))^2}, which cannot be recovered once \code{y} is out of scope.}
 
 \item{predperf}{An existing predictive measure object (class
 \code{"pred_measure"}) to update. When supplied, base density summaries and
@@ -87,9 +110,15 @@ functions; required when calling \code{\link[=do_pred_measure]{do_pred_measure()
 element of \code{measure}; the value is a list of arguments passed to that
 measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 
-\item{measure_name}{For a single custom function, set
-\code{attr(my_fun, "measure_name") <- "my_metric"} before passing \code{my_fun} to
-\code{measure}.}
+\item{measure_name}{Only needed when \code{measure} is a single custom function
+passed directly (not inside a list) — it sets the name that function is
+reported under. Set it with \code{attr(my_fun, "measure_name") <- "my_metric"}
+before passing \code{my_fun} to \code{measure}. If you pass the same function inside
+a list instead (e.g. \code{list(my_metric = my_fun)}), it takes its name from
+the list element and \code{measure_name} isn't needed — this also lets the
+same function be reused under several names. If both are set and disagree,
+the list name wins and a warning is issued. Either way,
+\code{attr(my_fun, "measure_loss")} is still read from the function itself.}
 }
 \description{
 Parameter definitions shared by the user-facing entry points and the

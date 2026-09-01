@@ -1,0 +1,141 @@
+#' Compare `psis_loo_ss` objects
+#' @noRd
+#' @param x A list with `psis_loo` objects.
+#' @param ... Currently ignored.
+#' @param custom_se_fn Not supported here; subsampled objects are compared on
+#'   elpd only. Explicit argument here such that a caller does not absorb it
+#'   into ... and silently ignore.
+#' @return A `compare.loo` data frame, as `model_compare.default()` returns,
+#'   with an extra `subsampling_se_diff` column.
+#' @export
+model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
+  if (!missing(custom_se_fn)) {
+    stop(
+      "`custom_se_fn` is not supported for subsampled loo objects, which are ",
+      "compared on elpd only.",
+      call. = FALSE
+    )
+  }
+
+  checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
+  for(i in seq_along(x)){
+    if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])
+  }
+
+  # A `psis_loo_ss` object subsamples its `pointwise` matrix, so the shared
+  # check compares the full data size instead.
+  model_compare_checks(x, n_fun = function(x) x$loo_subsampling$data_dim[1])
+
+  comp <- model_compare_matrix(x, subsampling = TRUE)
+  ord <- model_compare_order(x)
+  names(x) <- rownames(comp)[ord]
+
+  rnms <- rownames(comp)
+  elpd_diff_mat <- matrix(0, nrow = nrow(comp), ncol = 3,
+                          dimnames = list(rnms, c("elpd_diff", "se_diff", "subsampling_se_diff")))
+  for(i in 2:length(ord)){
+    elpd_diff_mat[i,] <- model_compare_ss(ref_loo = x[ord[1]], compare_loo = x[ord[i]])
+  }
+  comp <- cbind(
+    data.frame(model = rnms, stringsAsFactors = FALSE),
+    as.data.frame(elpd_diff_mat),
+    as.data.frame(comp)
+  )
+  rownames(comp) <- NULL
+
+  class(comp) <- c("compare.loo", "data.frame")
+  return(comp)
+}
+
+#' Compare a reference loo object with a comparison loo object
+#' @noRd
+#' @param ref_loo A named list with a `psis_loo_ss` object.
+#' @param compare_loo A named list with a  `psis_loo_ss` object.
+#' @return A 1 by 3 elpd_diff estimation.
+model_compare_ss <- function(ref_loo, compare_loo){
+  checkmate::assert_list(ref_loo, names = "named")
+  checkmate::assert_list(compare_loo, names = "named")
+  checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
+  checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
+
+
+  ref_idx <- obs_idx(ref_loo[[1]])
+  compare_idx <- obs_idx(compare_loo[[1]])
+  intersect_idx <- base::intersect(ref_idx, compare_idx)
+  ref_subset_of_compare <- base::setequal(intersect_idx, ref_idx)
+  compare_subset_of_ref <- base::setequal(intersect_idx, compare_idx)
+
+  # Using HH estimation
+  if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
+    warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
+    return(model_compare_ss_naive(ref_loo, compare_loo))
+  }
+
+  # Same observations in both
+  if (compare_subset_of_ref & ref_subset_of_compare){
+    return(model_compare_ss_diff(ref_loo, compare_loo))
+  }
+
+  # Use subset
+  if (compare_subset_of_ref | ref_subset_of_compare){
+    if (compare_subset_of_ref) ref_loo[[1]] <- update(object = ref_loo[[1]], observations = compare_loo[[1]])
+    if (ref_subset_of_compare) compare_loo[[1]] <- update(compare_loo[[1]], observations = ref_loo[[1]])
+    message("Estimated elpd_diff using observations included in loo calculations for all models.")
+    return(model_compare_ss_diff(ref_loo, compare_loo))
+  }
+
+  # If different samples
+  if (!compare_subset_of_ref & !ref_subset_of_compare){
+    warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
+            "'. Naive diff SE is used.", call. = FALSE)
+    return(model_compare_ss_naive(ref_loo, compare_loo))
+  }
+}
+
+#' Compute a naive diff SE
+#' @noRd
+#' @inheritParams model_compare_ss
+#' @return a 1 by 3 elpd_diff estimation
+model_compare_ss_naive <- function(ref_loo, compare_loo){
+  checkmate::assert_list(ref_loo, names = "named")
+  checkmate::assert_list(compare_loo, names = "named")
+  checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
+  checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
+
+  elpd_loo_diff <- compare_loo[[1]]$estimates["elpd_loo", "Estimate"] -
+    ref_loo[[1]]$estimates["elpd_loo", "Estimate"]
+  elpd_loo_diff_se <- sqrt(
+    (ref_loo[[1]]$estimates["elpd_loo", "SE"])^2 +
+    (compare_loo[[1]]$estimates["elpd_loo", "SE"])^2)
+  elpd_loo_diff_subsampling_se <- sqrt(
+      (ref_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2 +
+      (compare_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2)
+
+  c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
+}
+
+#' Compare a effective diff SE
+#' @noRd
+#' @inheritParams model_compare_ss
+#' @return a 1 by 3 elpd_diff estimation
+model_compare_ss_diff <- function(ref_loo, compare_loo){
+  checkmate::assert_list(ref_loo, names = "named")
+  checkmate::assert_list(compare_loo, names = "named")
+  checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
+  checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
+  checkmate::assert_true(identical(obs_idx(ref_loo[[1]]), obs_idx(compare_loo[[1]])))
+
+  # Assert not none as loo approximation
+  checkmate::assert_true(ref_loo[[1]]$loo_subsampling$loo_approximation != "none")
+  checkmate::assert_true(compare_loo[[1]]$loo_subsampling$loo_approximation != "none")
+
+  diff_approx <- compare_loo[[1]]$loo_subsampling$elpd_loo_approx - ref_loo[[1]]$loo_subsampling$elpd_loo_approx
+  diff_sample <- compare_loo[[1]]$pointwise[,"elpd_loo"] - ref_loo[[1]]$pointwise[,"elpd_loo"]
+  est <- srs_diff_est(diff_approx, y = diff_sample, y_idx = ref_loo[[1]]$pointwise[,"idx"])
+
+  elpd_loo_diff <- est$y_hat
+  elpd_loo_diff_se <- sqrt(est$hat_v_y)
+  elpd_loo_diff_subsampling_se <- sqrt(est$v_y_hat)
+
+  c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
+}

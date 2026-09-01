@@ -4,13 +4,7 @@
 \alias{measure_srps}
 \title{Scaled Ranked Probability Score (SRPS, SCRPS)}
 \usage{
-measure_srps(
-  y,
-  ypred,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_srps(y, ypred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{y}{A numeric vector of \eqn{n} observed outcomes. May be integer-valued
@@ -23,14 +17,12 @@ measure_srps(
 weights with dimensions \eqn{S \times n}. Weights are column-normalized
 before computing each per-observation contribution.}
 
-\item{pointwise}{Optional numeric vector of precomputed pointwise rps values.
-If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
+\item{pointwise}{Optional numeric vector of precomputed pointwise values, on
+the scale of the measure that is returned: RPS/CRPS when \code{scaled = FALSE}
+and SRPS/SCRPS when \code{scaled = TRUE}. The values are used as they are, with
+no further transformation; in particular, unscaled values are not converted
+to the scaled variant. If provided, \code{y}, \code{ypred}, and \code{log_weights} are
+ignored.}
 }
 \description{
 A convenience wrapper around \code{\link[=measure_rps]{measure_rps()}} with \code{scaled = TRUE}. Computes the

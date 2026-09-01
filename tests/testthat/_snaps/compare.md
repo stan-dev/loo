@@ -1,6 +1,234 @@
-# loo_compare returns expected results (2 models)
+# model_compare works with three loo_pred_measure models
 
-    WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
+    Code
+      print(comp)
+    Output
+      Models ranked by mae (reference: C).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+           B     2
+           C     1
+           A     1
+      
+       model mae_diff mae_se_diff
+           C      0.0         0.0
+           B     -0.1         1.2
+           A     -6.3         3.1
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+
+# model_compare informs when measure signs are converted
+
+    Code
+      comp <- model_compare(pm1, pm2)
+    Message
+      For model comparison, differences for mse is
+      reported on a utility scale (higher is better).
+
+# print.compare.loo works for loo_pred_measure comparisons
+
+    Code
+      print(comp)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+       model elpd_diff se_diff p_worse diag_diff
+          m2       0.0     0.0      NA          
+          m3     -25.5   129.1    0.58          
+          m1    -850.3   372.3    0.99          
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+
+---
+
+    Code
+      print(comp, measures = "all", digits = 2)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- elpd (vs m2) --
+       model elpd_diff se_diff p_worse diag_diff
+          m2      0.00    0.00      NA          
+          m3    -25.47  129.10    0.58          
+          m1   -850.29  372.31    0.99          
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2    0.00       0.00
+          m3   -0.09       0.18
+          m1   -0.10       0.22
+      
+      -- mae (vs m3) --
+       model mae_diff mae_se_diff
+          m3     0.00        0.00
+          m2    -0.07        1.24
+          m1    -6.34        3.08
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
+      print(comp, measures = c("r2", "mae"))
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2     0.0        0.0
+          m3    -0.1        0.2
+          m1    -0.1        0.2
+      
+      -- mae (vs m3) --
+       model mae_diff mae_se_diff
+          m3      0.0         0.0
+          m2     -0.1         1.2
+          m1     -6.3         3.1
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
+      print(comp, simplify = FALSE)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p  r2 se_r2
+          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7 0.2   0.2
+          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2 0.1   0.3
+          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1 0.0   0.0
+        mae se_mae
+       22.0    3.4
+       21.9    3.6
+       28.2    3.2
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+
+---
+
+    Code
+      print(comp, measures = "all", simplify = FALSE)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- elpd (vs m2) --
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p
+          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7
+          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2
+          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff  r2 se_r2
+          m2     0.0        0.0 0.2   0.2
+          m3    -0.1        0.2 0.1   0.3
+          m1    -0.1        0.2 0.0   0.0
+      
+      -- mae (vs m3) --
+       model mae_diff mae_se_diff  mae se_mae
+          m3      0.0         0.0 21.9    3.6
+          m2     -0.1         1.2 22.0    3.4
+          m1     -6.3         3.1 28.2    3.2
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
+      print(comp, measures = "r2", simplify = FALSE)
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff  r2 se_r2
+          m2     0.0        0.0 0.2   0.2
+          m3    -0.1        0.2 0.1   0.3
+          m1    -0.1        0.2 0.0   0.0
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
+      print(comp_mae)
+    Output
+      Models ranked by mae (reference: m2).
+      PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m1     1
+      
+       model mae_diff mae_se_diff
+          m2      0.0         0.0
+          m1     -6.3         2.8
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+
+# model_compare returns expected results (2 models)
+
+    WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
     ZGVsMgAAAA4AAAACAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAACAAAAAAAAAAAAAAAAAAAAAAAA
     AA4AAAACf/AAAAAAB6J/8AAAAAAHogAAABAAAAACAAQACQAAAAAABAAJAAAAAAAAABAAAAAC
     AAQACQAAAAAABAAJAAAAAAAAAA4AAAACwFTh8N3JQljAVOHw3clCWAAAAA4AAAACQBEIPbMR
@@ -12,7 +240,11 @@
     AAAABnBfd2FpYwAEAAkAAAAJc2VfcF93YWljAAQACQAAAAR3YWljAAQACQAAAAdzZV93YWlj
     AAAEAgAAAAEABAAJAAAABWNsYXNzAAAAEAAAAAIABAAJAAAAC2NvbXBhcmUubG9vAAQACQAA
     AApkYXRhLmZyYW1lAAAEAgAAAAEABAAJAAAACXJvdy5uYW1lcwAAAA0AAAACgAAAAP////4A
-    AAD+
+    AAQCAAAAAQAEAAkAAAAHcmFua19ieQAAAhMAAAADAAAAEAAAAAEABAAJAAAAB2RlZmF1bHQA
+    AAAQAAAAAQAEAAkAAAAEZWxwZAAAAP4AAAQCAAAB/wAAABAAAAADAAQACQAAAARraW5kAAQA
+    CQAAAAdtZWFzdXJlAAQACQAAAAVtb2RlbAAAAP4AAAQCAAAAAQAEAAkAAAARY29tcGFyZV9y
+    ZWZlcmVuY2UAAAIQAAAAAQAEAAkAAAAGbW9kZWwxAAAEAgAAAf8AAAAQAAAAAQAEAAkAAAAE
+    ZWxwZAAAAP4AAAD+
 
 ---
 
@@ -25,7 +257,7 @@
 
 ---
 
-    WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
+    WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
     ZGVsMgAAAA4AAAACAAAAAAAAAADAEDpTX5xF7gAAAA4AAAACAAAAAAAAAAA/tmpHtC8TAQAA
     AA4AAAACf/AAAAAAB6I/8AAAAAAAAAAAABAAAAACAAQACQAAAAAABAAJAAAAB04gPCAxMDAA
     AAAQAAAAAgAEAAkAAAAAAAQACQAAAAAAAAAOAAAAAsBU4fDdyUJYwFXllhPDBrkAAAAOAAAA
@@ -37,7 +269,11 @@
     YWljAAQACQAAAAZwX3dhaWMABAAJAAAACXNlX3Bfd2FpYwAEAAkAAAAEd2FpYwAEAAkAAAAH
     c2Vfd2FpYwAABAIAAAABAAQACQAAAAVjbGFzcwAAABAAAAACAAQACQAAAAtjb21wYXJlLmxv
     bwAEAAkAAAAKZGF0YS5mcmFtZQAABAIAAAABAAQACQAAAAlyb3cubmFtZXMAAAANAAAAAoAA
-    AAD////+AAAA/g==
+    AAD////+AAAEAgAAAAEABAAJAAAAB3JhbmtfYnkAAAITAAAAAwAAABAAAAABAAQACQAAAAdk
+    ZWZhdWx0AAAAEAAAAAEABAAJAAAABGVscGQAAAD+AAAEAgAAAf8AAAAQAAAAAwAEAAkAAAAE
+    a2luZAAEAAkAAAAHbWVhc3VyZQAEAAkAAAAFbW9kZWwAAAD+AAAEAgAAAAEABAAJAAAAEWNv
+    bXBhcmVfcmVmZXJlbmNlAAACEAAAAAEABAAJAAAABm1vZGVsMQAABAIAAAH/AAAAEAAAAAEA
+    BAAJAAAABGVscGQAAAD+AAAA/g==
 
 ---
 
@@ -88,11 +324,11 @@
        model1       0.0     0.0     -83.5          4.3    3.3       1.1 167.1     8.5
        model2      -4.1     0.1     -87.6          4.3   11.2       1.1 175.2     8.6
 
-# loo_compare returns expected result (3 models)
+# model_compare returns expected result (3 models)
 
-    WAoAAAACAAQEAgACAwAAAAMTAAAADAAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
+    WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAADAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
     ZGVsMgAEAAkAAAAGbW9kZWwzAAAADgAAAAMAAAAAAAAAAMAQOlNfnEXuwDANypG2BBgAAAAO
-    AAAAAwAAAAAAAAAAP7ZqR7QvEwE/y6/t4TTtXgAAAA4AAAADf/AAAAAAB6I/8AAAAAAAAD/w
+    AAAAAwAAAAAAAAAAP7ZqR7QvEwE/y6/t4TTtYAAAAA4AAAADf/AAAAAAB6I/8AAAAAAAAD/w
     AAAAAAAAAAAAEAAAAAMABAAJAAAAAAAEAAkAAAAHTiA8IDEwMAAEAAkAAAAHTiA8IDEwMAAA
     ABAAAAADAAQACQAAAAAABAAJAAAAAAAEAAkAAAAAAAAADgAAAAPAVOHw3clCWMBV5ZYTwwa5
     wFjlY4I2w2IAAAAOAAAAA0ARCD2zEXBfQBEalRIN2T9AEPIF3GigEwAAAA4AAAADQAoowGHV
@@ -104,7 +340,11 @@
     d2FpYwAEAAkAAAAGcF93YWljAAQACQAAAAlzZV9wX3dhaWMABAAJAAAABHdhaWMABAAJAAAA
     B3NlX3dhaWMAAAQCAAAAAQAEAAkAAAAFY2xhc3MAAAAQAAAAAgAEAAkAAAALY29tcGFyZS5s
     b28ABAAJAAAACmRhdGEuZnJhbWUAAAQCAAAAAQAEAAkAAAAJcm93Lm5hbWVzAAAADQAAAAKA
-    AAAA/////QAAAP4=
+    AAAA/////QAABAIAAAABAAQACQAAAAdyYW5rX2J5AAACEwAAAAMAAAAQAAAAAQAEAAkAAAAH
+    ZGVmYXVsdAAAABAAAAABAAQACQAAAARlbHBkAAAA/gAABAIAAAH/AAAAEAAAAAMABAAJAAAA
+    BGtpbmQABAAJAAAAB21lYXN1cmUABAAJAAAABW1vZGVsAAAA/gAABAIAAAABAAQACQAAABFj
+    b21wYXJlX3JlZmVyZW5jZQAAAhAAAAABAAQACQAAAAZtb2RlbDEAAAQCAAAB/wAAABAAAAAB
+    AAQACQAAAARlbHBkAAAA/gAAAP4=
 
 ---
 
@@ -121,7 +361,7 @@
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
 
-# loo_compare with simplify=FALSE returns expected result
+# model_compare with simplify=FALSE returns expected result
 
     Code
       print(comp, simplify = FALSE)
