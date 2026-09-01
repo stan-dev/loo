@@ -10,8 +10,10 @@
 #'   diagnostic columns? The default is `TRUE`. Set to `FALSE` to also print the
 #'   available estimate columns: pointwise ELPD, LOOIC/WAIC and their standard
 #'   errors for classic comparisons. For [`pred_measure`][pred_measure]
-#'   comparisons each printed table gains its own measure's estimate and
-#'   standard error, and an ELPD table also gains `p` and `se_p`.
+#'   comparisons each printed table gains the estimate and standard error of
+#'   its own measure, and an ELPD table also gains `p` and `se_p`. With the
+#'   default `measures = NULL` one table is printed, and it gains the estimates
+#'   of every compared measure. The difference columns are never added.
 #' @param measures For `loo_pred_measure` comparisons only, which measures to
 #'   print diff tables for. `NULL` (default) prints only the ranking measure
 #'   (`"elpd"` when `rank_by` was not set, otherwise `rank_by`);
@@ -165,7 +167,8 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       measure = measure,
       digits = digits,
       p_worse = p_worse,
-      simplify = simplify
+      simplify = simplify,
+      all_estimates = is.null(measures)
     )
   }
 
@@ -348,8 +351,9 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 
 #' Print one measure's comparison table
 #' @noRd
-.print_compare_measure_table <- function(x, measure, digits, p_worse,
-                                        simplify = TRUE) {
+.print_compare_measure_table <- function(
+  x, measure, digits, p_worse, simplify = TRUE, all_estimates = FALSE
+) {
   if (.is_elpd_measure(measure)) {
     diff_col <- "elpd_diff"
     se_col <- "se_diff"
@@ -392,15 +396,43 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   }
 
   # The frame carries every measure's per-model estimate and SE under its bare
-  # name (`model_compare_matrix(bare_names = TRUE)`). `simplify = FALSE` adds
-  # the pair this table's own measure owns, after the diagnostic columns, as
-  # the classic path does. `p` is an ELPD companion, so it rides with it.
+  # name (`model_compare_matrix(bare_names = TRUE)`), plus one difference pair
+  # per measure. `simplify = FALSE` adds estimate columns after the diagnostic
+  # columns, as the classic path does. The difference columns are left out:
+  # each is relative to its own measure's reference model, so it belongs only
+  # in its own table. `measures` also selects the estimates. A table asked for
+  # by name carries its own measure alone, so `measures = "r2"` prints only r2
+  # columns. The default `measures = NULL` restricts nothing, so its single
+  # table carries every measure. `p` is an ELPD companion, so it rides with it.
   if (!simplify) {
-    est_cols <- c(measure, paste0("se_", measure))
-    if (.is_elpd_measure(measure)) {
-      est_cols <- c(est_cols, "p", "se_p")
+    if (all_estimates) {
+      all_measures <- attr(x, "compare_measures")
+      diff_cols <- c(
+        "elpd_diff", "se_diff",
+        paste0(all_measures, "_diff"), paste0(all_measures, "_se_diff")
+      )
+      est_cols <- setdiff(
+        colnames(x),
+        c("model", "p_worse", "diag_diff", "diag_elpd", diff_cols)
+      )
+      est_cols <- est_cols[vapply(x[est_cols], is.numeric, logical(1))]
+      # The frame keeps the estimates in one block and the standard errors in
+      # the next, so a wide table wraps with `se_r2` under `elpd`. Reorder each
+      # estimate next to its own SE. Only the order changes: a column outside
+      # `compare_measures` keeps its place at the end.
+      paired <- unlist(lapply(all_measures, function(m) {
+        pair <- c(m, paste0("se_", m))
+        if (.is_elpd_measure(m)) c(pair, "p", "se_p") else pair
+      }))
+      est_cols <- c(intersect(paired, est_cols), setdiff(est_cols, paired))
+    } else {
+      est_cols <- c(measure, paste0("se_", measure))
+      if (.is_elpd_measure(measure)) {
+        est_cols <- c(est_cols, "p", "se_p")
+      }
+      est_cols <- intersect(est_cols, colnames(x))
     }
-    for (col in intersect(est_cols, colnames(x))) {
+    for (col in est_cols) {
       x2[[col]] <- unname(.fr(x[[col]][ord], digits))
     }
   }

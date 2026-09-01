@@ -34,8 +34,10 @@ only include the model names, differences, and (when \code{p_worse = TRUE})
 diagnostic columns? The default is \code{TRUE}. Set to \code{FALSE} to also print the
 available estimate columns: pointwise ELPD, LOOIC/WAIC and their standard
 errors for classic comparisons. For \code{\link{pred_measure}}
-comparisons each printed table gains its own measure's estimate and
-standard error, and an ELPD table also gains \code{p} and \code{se_p}.}
+comparisons each printed table gains the estimate and standard error of
+its own measure, and an ELPD table also gains \code{p} and \code{se_p}. With the
+default \code{measures = NULL} one table is printed, and it gains the estimates
+of every compared measure. The difference columns are never added.}
 
 \item{measures}{For \code{loo_pred_measure} comparisons only, which measures to
 print diff tables for. \code{NULL} (default) prints only the ranking measure

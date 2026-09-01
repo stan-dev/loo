@@ -332,6 +332,8 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   expect_snapshot(print(comp, measures = c("r2", "mae")))
   expect_snapshot(print(comp, simplify = FALSE))
   expect_snapshot(print(comp, measures = "all", simplify = FALSE))
+  # A named measure restricts the estimates to that measure alone.
+  expect_snapshot(print(comp, measures = "r2", simplify = FALSE))
 
   comp_mae <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2), rank_by = "mae"))
   expect_snapshot(print(comp_mae))
