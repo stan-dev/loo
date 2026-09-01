@@ -36,26 +36,17 @@ knitr::opts_chunk$set(
 ::: {.callout .callout-warning}
 **Questions**
 
-+ How detailed should the math for the computation be and how to attribute properly the work from the overleaf document? Are you considering to publish it? -> Answered: we target for a preprint that we can cite.
++ ~How detailed should the math for the computation be and how to attribute properly the work from the overleaf document? Are you considering to publish it?~ -> Answered: we target for a preprint that we can cite.
 + Currently, `elpd` is computed by default in `pred_measure`. This is helpful, when we want to have it by default in `model_compare`. Do we want this default behavior?
-+ Related question: The default print method of `model_compare` shows only the `elpd`, only when `print(..., measures = "all")` is passed, all measures are shown. Do we want this?
++ Related question: The default print method of `model_compare` shows `elpd` output only. Using `print(..., measures = "all")` allows to see all measures. See below for example. Do we want this?
 + For `elpd`, we provide in the `model_compare` output the additional columns `p_worse`, `diag_diff`, `diag_elpd`.
   + Do we want to have `p_worse` and `diag_diff` for all measures?
-  + I moved the column `diag_elpd` out from the elpd-specific measure block and treat it as an "overall" information (see printed output below).
-  + Furthermore, I renamed `diag_elpd` to `diag_psis` as it seems not be specific to elpd or do I misunderstand this?
-+ General: Is the current design of `model_compare()` okay?
-+ Which warnings/messages do we want to provide and which should only be part of the function documentation?
+  + I moved the column `diag_elpd` out from the elpd-specific measure block and treat it as an "overall" (and not measure-specific) information (see printed output below).
++ Currently, there are a lot of warnings/messages. Which ones do we want to provide in output and which ones in function documentation?
 :::
 
 ```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
 ```
-
-::: {.callout .callout-note}
-**Acknowledgements**
-
-We thank Seth Axen, Frank Weber, and Aki Vehtari for deriving the formulas of
-the standard errors for LOO-CV estimators and differences.
-:::
 
 ## Introduction
 In the following, our goal is to compare performance between two or more
@@ -131,10 +122,6 @@ Note that `rps` is the only one of these that needs the posterior *predictive*
 draws `ypred`; the error measures are computed from the posterior expectation
 `mupred` (see the input requirements table in `?loo_pred_measure`).
 
-<!--
-Provide a section where we use kfold_pred_measure, test_pred_measure, etc.
--->
-
 ```{r load-libraries}
 library(loo)
 ```
@@ -183,14 +170,20 @@ Passing these `loo` objects to the classical `loo_compare()` reproduces the
 familiar ELPD-only comparison, and warns once per session that `model_compare()`
 is now the preferred function:
 
-```{r loo_compare, warning=TRUE}
+```{r loo_compare}
 loo_compare(loos)
 ```
 
 When we use `model_compare` instead, we get the same output for `loo` objects:
 
-```{r model_compare_wloo, warning=TRUE}
+```{r model_compare_wloo}
 model_compare(loos)
+```
+
+It also supports the `simplify` argument in the print method:
+
+```{r model_compare_wloo_simplify}
+print(model_compare(loos), simplify = FALSE)
 ```
 
 ## Preview: Glimpse into the model comparison results
@@ -225,6 +218,13 @@ information to the `print` method:
 
 ```{r pred-measure-r2}
 print(comp, measures = "r2")
+```
+
+Or if you want to see all columns related to the measures specified in
+`measures` use `simplify = FALSE`:
+
+```{r pred-measure-r2-simplify}
+print(comp, measures = "r2", simplify = FALSE)
 ```
 
 Or in order to see all measures we can use `measures = "all"`:
@@ -906,6 +906,98 @@ print(
   measures = "all"
 )
 ```
+
+## Comparing other predictive sources
+
+`model_compare()` treats every `*_pred_measure()` result the same way. Only the
+constructor changes. All models in one call must share one source. A mixed call
+is an error.
+
+### K-fold cross-validation
+
+`brms::kfold()` refits each model `K` times, so this is the most expensive step
+in this article.
+
+```{r kfold-compare, message=FALSE}
+kfold_measure <- function(fit, measure) {
+  kf <- brms::kfold(fit, K = 5, save_fits = TRUE)
+  kfold_pred_measure(
+    y = fit$data$y,
+    ypred = brms::kfold_predict(kf, method = "predict")$yrep,
+    mupred = brms::kfold_predict(kf, method = "fitted")$yrep,
+    kfold = kf,
+    measure = measure
+  )
+}
+
+set.seed(SEED)
+k1 <- kfold_measure(fit_m1, measures)
+k2 <- kfold_measure(fit_m2, measures)
+k3 <- kfold_measure(fit_m3, measures)
+
+model_compare(list(m1 = k1, m2 = k2, m3 = k3))
+```
+
+The measure names now carry a `_kfold` suffix. `print()` names the source above
+the table. The PSIS-LOO block is gone, because Pareto $\hat{k}$ describes the
+LOO approximation only.
+
+### Held-out test data
+
+Here we hold out 60 buildings, refit each model on the rest, and score the
+held-out ones. `ylp_test` supplies `elpd_test`; `ylp` stays the training
+log-likelihood.
+
+```{r test-compare}
+set.seed(SEED)
+test_id <- sample(nrow(roaches), 60)
+roaches_train <- roaches[-test_id, ]
+roaches_test <- roaches[test_id, ]
+
+test_measure <- function(fit, measure) {
+  fit_train <- update(fit, newdata = roaches_train, refresh = 0)
+  test_pred_measure(
+    y = roaches_test$y,
+    ypred = brms::posterior_predict(fit_train, newdata = roaches_test),
+    mupred = brms::posterior_epred(fit_train, newdata = roaches_test),
+    ylp = brms::log_lik(fit_train),
+    ylp_test = brms::log_lik(fit_train, newdata = roaches_test),
+    measure = measure
+  )
+}
+
+t1 <- test_measure(fit_m1, measures)
+t2 <- test_measure(fit_m2, measures)
+t3 <- test_measure(fit_m3, measures)
+
+model_compare(list(m1 = t1, m2 = t2, m3 = t3))
+```
+
+### In-sample
+
+In-sample scores need no refit. They are optimistically biased and favor the
+more complex model, so `model_compare()` warns:
+
+```{r insample-compare}
+insample_measure <- function(fit, measure) {
+  insample_pred_measure(
+    y = fit$data$y,
+    ypred = brms::posterior_predict(fit),
+    mupred = brms::posterior_epred(fit),
+    ylp = brms::log_lik(fit),
+    measure = measure
+  )
+}
+
+i1 <- insample_measure(fit_m1, measures)
+i2 <- insample_measure(fit_m2, measures)
+i3 <- insample_measure(fit_m3, measures)
+
+model_compare(list(m1 = i1, m2 = i2, m3 = i3))
+```
+
+Everything else in this article, `rank_by`, `custom_se_fn`, the `print`
+arguments `measures` and `simplify`, works unchanged for all four sources.
 
 ## Summary
 
