@@ -42,7 +42,7 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
     print(as.data.frame(x))
     return(x)
   }
-  base_cols <- c("model", "elpd_diff", "se_diff")
+  base_cols <- c("model", "elpd_diff", "se_diff", "subsampling_se_diff")
   diag_cols <- c("p_worse", "diag_diff", "diag_elpd")
   show_diag <- p_worse && "p_worse" %in% colnames(x)
 

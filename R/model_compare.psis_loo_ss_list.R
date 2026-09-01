@@ -5,7 +5,8 @@
 #' @param custom_se_fn Not supported here; subsampled objects are compared on
 #'   elpd only. Explicit argument here such that a caller does not absorb it
 #'   into ... and silently ignore.
-#' @return A `compare.loo_ss` object.
+#' @return A `compare.loo` data frame, as `model_compare.default()` returns,
+#'   with an extra `subsampling_se_diff` column.
 #' @export
 model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
   if (!missing(custom_se_fn)) {
@@ -35,10 +36,14 @@ model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
   for(i in 2:length(ord)){
     elpd_diff_mat[i,] <- model_compare_ss(ref_loo = x[ord[1]], compare_loo = x[ord[i]])
   }
-  comp <- cbind(elpd_diff_mat, comp)
-  rownames(comp) <- rnms
+  comp <- cbind(
+    data.frame(model = rnms, stringsAsFactors = FALSE),
+    as.data.frame(elpd_diff_mat),
+    as.data.frame(comp)
+  )
+  rownames(comp) <- NULL
 
-  class(comp) <- c("compare.loo_ss", "compare.loo", class(comp))
+  class(comp) <- c("compare.loo", "data.frame")
   return(comp)
 }
 
@@ -97,13 +102,14 @@ model_compare_ss_naive <- function(ref_loo, compare_loo){
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
   checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
 
-  elpd_loo_diff <- ref_loo[[1]]$estimates["elpd_loo","Estimate"] - compare_loo[[1]]$estimates["elpd_loo","Estimate"]
+  elpd_loo_diff <- compare_loo[[1]]$estimates["elpd_loo", "Estimate"] -
+    ref_loo[[1]]$estimates["elpd_loo", "Estimate"]
   elpd_loo_diff_se <- sqrt(
-    (ref_loo[[1]]$estimates["elpd_loo","SE"])^2 +
-    (compare_loo[[1]]$estimates["elpd_loo","SE"])^2)
+    (ref_loo[[1]]$estimates["elpd_loo", "SE"])^2 +
+    (compare_loo[[1]]$estimates["elpd_loo", "SE"])^2)
   elpd_loo_diff_subsampling_se <- sqrt(
-      (ref_loo[[1]]$estimates["elpd_loo","subsampling SE"])^2 +
-      (compare_loo[[1]]$estimates["elpd_loo","subsampling SE"])^2)
+      (ref_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2 +
+      (compare_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2)
 
   c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
 }
@@ -123,8 +129,8 @@ model_compare_ss_diff <- function(ref_loo, compare_loo){
   checkmate::assert_true(ref_loo[[1]]$loo_subsampling$loo_approximation != "none")
   checkmate::assert_true(compare_loo[[1]]$loo_subsampling$loo_approximation != "none")
 
-  diff_approx <- ref_loo[[1]]$loo_subsampling$elpd_loo_approx - compare_loo[[1]]$loo_subsampling$elpd_loo_approx
-  diff_sample <- ref_loo[[1]]$pointwise[,"elpd_loo"] - compare_loo[[1]]$pointwise[,"elpd_loo"]
+  diff_approx <- compare_loo[[1]]$loo_subsampling$elpd_loo_approx - ref_loo[[1]]$loo_subsampling$elpd_loo_approx
+  diff_sample <- compare_loo[[1]]$pointwise[,"elpd_loo"] - ref_loo[[1]]$pointwise[,"elpd_loo"]
   est <- srs_diff_est(diff_approx, y = diff_sample, y_idx = ref_loo[[1]]$pointwise[,"idx"])
 
   elpd_loo_diff <- est$y_hat
@@ -132,17 +138,4 @@ model_compare_ss_diff <- function(ref_loo, compare_loo){
   elpd_loo_diff_subsampling_se <- sqrt(est$v_y_hat)
 
   c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
-}
-
-
-
-#' @rdname model_compare
-#' @export
-print.compare.loo_ss <- function(x, ..., digits = 1) {
-  xcopy <- x
-  if (NCOL(xcopy) >= 2) {
-    xcopy <- xcopy[, c("elpd_diff", "se_diff", "subsampling_se_diff")]
-  }
-  print(.fr(xcopy, digits), quote = FALSE)
-  invisible(x)
 }
