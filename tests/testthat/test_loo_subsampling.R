@@ -1047,23 +1047,26 @@ test_that("loo_compare_subsample", {
     )
   )
 
-  expect_equal(lcss[, 1], lcsso[, 1], tolerance = 1)
-  expect_equal(lcss2[, 1], lcsso[, 1], tolerance = 1)
-  expect_equal(lcssohh[, 1], lcsso[, 1], tolerance = 1)
-  expect_equal(lcssf1[, 1], lcsso[, 1], tolerance = 1)
-  expect_equal(lcssf2[, 1], lcsso[, 1], tolerance = 1)
+  expect_equal(lcss$elpd_diff, lcsso$elpd_diff, tolerance = 1)
+  expect_equal(lcss2$elpd_diff, lcsso$elpd_diff, tolerance = 1)
+  expect_equal(lcssohh$elpd_diff, lcsso$elpd_diff, tolerance = 1)
+  expect_equal(lcssf1$elpd_diff, lcsso$elpd_diff, tolerance = 1)
+  expect_equal(lcssf2$elpd_diff, lcsso$elpd_diff, tolerance = 1)
 
-  expect_gt(lcss[, 2][2], lcsso[, 2][2])
-  expect_gt(lcss[, 2][3], lcsso[, 2][3])
-  expect_gt(lcss2[, 2][2], lcsso[, 2][2])
-  expect_equal(lcss2[, 2][3], lcsso[, 2][3])
-  expect_gt(lcssohh[, 2][2], lcsso[, 2][2])
-  expect_equal(lcssohh[, 2][3], lcsso[, 2][3])
+  expect_gt(lcss$se_diff[2], lcsso$se_diff[2])
+  expect_gt(lcss$se_diff[3], lcsso$se_diff[3])
+  expect_gt(lcss2$se_diff[2], lcsso$se_diff[2])
+  expect_equal(lcss2$se_diff[3], lcsso$se_diff[3])
+  expect_gt(lcssohh$se_diff[2], lcsso$se_diff[2])
+  expect_equal(lcssohh$se_diff[3], lcsso$se_diff[3])
 
   expect_silent(
     lcss2m <- loo:::loo_compare.psis_loo_ss_list(x = list(lss2o1, lss3o1))
   )
-  expect_equal(unname(lcss2m[,]), unname(lcsso[1:2, ]))
+  expect_equal(
+    lcss2m[, setdiff(colnames(lcss2m), "model")],
+    lcsso[1:2, setdiff(colnames(lcsso), "model")]
+  )
 
   expect_snapshot(lcssapi <- loo_compare(lss1, lss2, lss3))
   expect_equal(lcssapi, lcss)

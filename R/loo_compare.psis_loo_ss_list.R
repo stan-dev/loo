@@ -174,7 +174,7 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 #' @rdname loo_compare
 #' @export
 print.compare.loo_ss <- function(x, ..., digits = 1) {
-   xcopy <- x
+  xcopy <- x
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff", "subsampling_se_diff")]
   }
