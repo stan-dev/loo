@@ -1,5 +1,7 @@
 # loo (development version)
 
+* Fix `loo_compare()` when used with subsampling: compute model comparison by comparison-model minus reference-model and change output structure from matrix
+to data.frame by @florence-bockting in #TODO
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
 
