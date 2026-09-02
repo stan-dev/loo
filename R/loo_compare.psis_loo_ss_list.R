@@ -86,13 +86,13 @@ loo_compare_ss_naive <- function(ref_loo, compare_loo){
   checkmate::assert_class(ref_loo[[1]], "psis_loo_ss")
   checkmate::assert_class(compare_loo[[1]], "psis_loo_ss")
 
-  elpd_loo_diff <- ref_loo[[1]]$estimates["elpd_loo","Estimate"] - compare_loo[[1]]$estimates["elpd_loo","Estimate"]
+  elpd_loo_diff <- compare_loo[[1]]$estimates["elpd_loo", "Estimate"] - ref_loo[[1]]$estimates["elpd_loo", "Estimate"]
   elpd_loo_diff_se <- sqrt(
-    (ref_loo[[1]]$estimates["elpd_loo","SE"])^2 +
-    (compare_loo[[1]]$estimates["elpd_loo","SE"])^2)
+    (ref_loo[[1]]$estimates["elpd_loo", "SE"])^2 +
+    (compare_loo[[1]]$estimates["elpd_loo", "SE"])^2)
   elpd_loo_diff_subsampling_se <- sqrt(
-      (ref_loo[[1]]$estimates["elpd_loo","subsampling SE"])^2 +
-      (compare_loo[[1]]$estimates["elpd_loo","subsampling SE"])^2)
+      (ref_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2 +
+      (compare_loo[[1]]$estimates["elpd_loo", "subsampling SE"])^2)
 
   c(elpd_loo_diff, elpd_loo_diff_se, elpd_loo_diff_subsampling_se)
 }
@@ -112,8 +112,8 @@ loo_compare_ss_diff <- function(ref_loo, compare_loo){
   checkmate::assert_true(ref_loo[[1]]$loo_subsampling$loo_approximation != "none")
   checkmate::assert_true(compare_loo[[1]]$loo_subsampling$loo_approximation != "none")
 
-  diff_approx <- ref_loo[[1]]$loo_subsampling$elpd_loo_approx - compare_loo[[1]]$loo_subsampling$elpd_loo_approx
-  diff_sample <- ref_loo[[1]]$pointwise[,"elpd_loo"] - compare_loo[[1]]$pointwise[,"elpd_loo"]
+  diff_approx <- compare_loo[[1]]$loo_subsampling$elpd_loo_approx - ref_loo[[1]]$loo_subsampling$elpd_loo_approx
+  diff_sample <- compare_loo[[1]]$pointwise[,"elpd_loo"] - ref_loo[[1]]$pointwise[,"elpd_loo"]
   est <- srs_diff_est(diff_approx, y = diff_sample, y_idx = ref_loo[[1]]$pointwise[,"idx"])
 
   elpd_loo_diff <- est$y_hat
@@ -174,14 +174,13 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 #' @rdname loo_compare
 #' @export
 print.compare.loo_ss <- function(x, ..., digits = 1) {
-  xcopy <- x
+   xcopy <- x
   if (NCOL(xcopy) >= 2) {
     xcopy <- xcopy[, c("elpd_diff", "se_diff", "subsampling_se_diff")]
   }
   print(.fr(xcopy, digits), quote = FALSE)
   invisible(x)
 }
-
 
 #' Compute comparison matrix for `psis_loo_ss` objects
 #' @noRd

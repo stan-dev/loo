@@ -1071,6 +1071,11 @@ test_that("loo_compare_subsample", {
   expect_equal(lcssohhapi, lcssohh)
   expect_silent(lcss2mapi <- loo_compare(lss2o1, lss3o1))
   expect_equal(lcss2mapi, lcss2m)
+  # check that comparison is comp - ref model (i.e., elpd_diff is neg.)
+  for (m in list(lcss, lcss2, lcssohh)) {
+    expect_lt(m[2, "elpd_diff"], 0)
+    expect_lt(m[3, "elpd_diff"], 0)
+  }
 })
 
 test_that("Test 'tis' and 'sis'", {
