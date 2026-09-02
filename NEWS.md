@@ -1,7 +1,6 @@
 # loo (development version)
 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by comparison-model minus reference-model by @florence-bockting in #391
-
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
 
