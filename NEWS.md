@@ -1,6 +1,6 @@
 # loo (development version)
 
-* * Change the output of `loo_compare()` for subsampled loo objects from a matrix to a data.frame by @florence-bockting in #TODO
+* Change the output of `loo_compare()` for subsampled loo objects from a matrix to a data.frame by @florence-bockting in #393
 * Fix `loo_compare()` when used with subsampling: compute model comparison by comparison-model minus reference-model by @florence-bockting in #391
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
