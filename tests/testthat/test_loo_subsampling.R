@@ -1254,3 +1254,17 @@ test_that("Test 'tis' and 'sis'", {
     loo_ss_full$estimates["elpd_loo", "Estimate"]
   )
 })
+
+# subsampling should agree with non-subsampling when nothing
+# is actually subsampled (pins the direction *and* the magnitude)
+LL <- example_loglik_array()
+l1 <- loo(LL)
+l2 <- loo(LL + 1)
+l3 <- loo(LL + 2)
+l1ss <- loo:::as.psis_loo_ss.psis_loo(l1)
+l2ss <- loo:::as.psis_loo_ss.psis_loo(l2)
+l3ss <- loo:::as.psis_loo_ss.psis_loo(l3)
+expect_equal(
+  unname(loo_compare(l1ss, l2ss, l3ss)[, "elpd_diff"]),
+  loo_compare(l1, l2, l3)$elpd_diff
+)
