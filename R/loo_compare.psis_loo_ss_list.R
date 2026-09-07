@@ -16,7 +16,7 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
 
   comp <- loo_compare_matrix.psis_loo_ss_list(x)
   ord <- loo_compare_order(x)
-  names(x) <- rownames(comp)[ord]
+  names(x) <- rownames(comp)[order(ord)]
 
   rnms <- rownames(comp)
   elpd_diff_mat <- matrix(0, nrow = nrow(comp), ncol = 3,
