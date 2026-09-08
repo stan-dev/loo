@@ -24,8 +24,12 @@ loo_compare.psis_loo_ss_list <- function(x, ...) {
   for(i in 2:length(ord)){
     elpd_diff_mat[i,] <- loo_compare_ss(ref_loo = x[ord[1]], compare_loo = x[ord[i]])
   }
-  comp <- cbind(elpd_diff_mat, comp)
-  rownames(comp) <- rnms
+  comp <- cbind(
+    data.frame(model = rnms, stringsAsFactors = FALSE),
+    as.data.frame(elpd_diff_mat),
+    as.data.frame(comp)
+  )
+  rownames(comp) <- NULL
 
   class(comp) <- c("compare.loo_ss", "compare.loo", class(comp))
   return(comp)
@@ -174,11 +178,13 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
 #' @rdname loo_compare
 #' @export
 print.compare.loo_ss <- function(x, ..., digits = 1) {
-  xcopy <- x
-  if (NCOL(xcopy) >= 2) {
-    xcopy <- xcopy[, c("elpd_diff", "se_diff", "subsampling_se_diff")]
-  }
-  print(.fr(xcopy, digits), quote = FALSE)
+  cols <- c("model", "elpd_diff", "se_diff", "subsampling_se_diff")
+  cols <- intersect(cols, colnames(x))
+
+  x_sub <- x[, cols, drop = FALSE]
+  x_sub[setdiff(cols, "model")] <- .fr(x_sub[setdiff(cols, "model")], digits)
+  print(as.data.frame(x_sub), quote = FALSE, row.names = FALSE)
+
   invisible(x)
 }
 

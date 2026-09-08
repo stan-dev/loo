@@ -481,7 +481,7 @@ print(comp)
 ```
 Warning: Different subsamples in 'model2' and 'model1'. Naive diff SE is used.
 
-        elpd_diff se_diff subsampling_se_diff
+model   elpd_diff se_diff subsampling_se_diff
 model2    0.0      0.0     0.0               
 model1  -16.5     22.5     0.4               
 ```
@@ -542,7 +542,7 @@ print(comp)
 ```
 
 ```
-        elpd_diff se_diff subsampling_se_diff
+model   elpd_diff se_diff subsampling_se_diff
 model2    0.0      0.0     0.0               
 model1  -16.1      4.4     0.1               
 ```
@@ -580,7 +580,7 @@ the loo calculations for both `model1` and `model2` are included in the
 computations for the comparison.
 
 ```
-        elpd_diff se_diff subsampling_se_diff
+model   elpd_diff se_diff subsampling_se_diff
 model2    0.0     0.0     0.0               
 model1  -16.3     4.4     0.3   
 ```
