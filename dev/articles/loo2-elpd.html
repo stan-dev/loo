@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
+      <img src="../logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-08-10</h4>
+            <h4 data-toc-skip class="date">2026-09-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
@@ -224,13 +224,10 @@ then is evaluated on the held-out “test” data.</p>
 <pre><code>Running /opt/R/4.6.1/lib/R/bin/R CMD SHLIB foo.c
 using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
 gcc -std=gnu2x -I"/opt/R/4.6.1/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
-In file included from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Core:19,
-                 from /home/runner/work/_temp/Library/RcppEigen/include/Eigen/Dense:1,
-                 from /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22,
-                 from &lt;command-line&gt;:
-/home/runner/work/_temp/Library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: cmath: No such file or directory
-  679 | #include &lt;cmath&gt;
-      |          ^~~~~~~
+In file included from &lt;command-line&gt;:
+/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:3:10: fatal error: stdexcept: No such file or directory
+    3 | #include &lt;stdexcept&gt;
+      |          ^~~~~~~~~~~
 compilation terminated.
 make: *** [/opt/R/4.6.1/lib/R/etc/Makeconf:190: foo.o] Error 1</code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -242,15 +239,18 @@ to get the log predictive densities for the test data. Because we are
 using independent data, the log predictive density coincides with the
 log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
-<span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+ Elapsed Time: 0.014 seconds (Generated Quantities)</code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="computing-holdout-elpd">Computing holdout elpd:<a class="anchor" aria-label="anchor" href="#computing-holdout-elpd"></a>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the test
 data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
@@ -274,7 +274,7 @@ Vehtari et al., 2017).</p>
 </h3>
 <p>We use the data that is already pre-processed and we divide it in 10
 random folds using <code>kfold_split_random</code></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare data</span></span>
 <span><span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kfold-helpers.html">kfold_split_random</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">10</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -289,7 +289,7 @@ predictive densities for the left-out fold. Last, we store the
 predictive density for the observations of the left-out fold in a
 matrix. The output of this loop is a matrix of the log pointwise
 predictive densities of all the observations.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare a matrix with the number of post-warmup iterations by number of observations:</span></span>
 <span><span class="va">log_pd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">4000</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roaches</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Loop over the folds</span></span>
@@ -316,13 +316,42 @@ predictive densities of all the observations.</p>
 <span>  <span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
 <span>  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<pre><code>
+ Elapsed Time: 0.007 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.007 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.007 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)</code></pre>
 </div>
 <div class="section level3">
 <h3 id="computing-k-fold-elpd">Computing K-fold elpd:<a class="anchor" aria-label="anchor" href="#computing-k-fold-elpd"></a>
 </h3>
 <p>Now we evaluate the predictive performance of the model on the 10
 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
 Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.

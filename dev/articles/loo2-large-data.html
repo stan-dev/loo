@@ -33,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">
       <!-- Add Stan logo -->
-      <img src="../reference/figures/logo.svg" class="stan-logo" alt="Stan blue hex logo">
+      <img src="../logo.svg" class="stan-logo" alt="Stan blue hex logo">
       loo
     </a>
 
@@ -96,7 +96,7 @@
                         <h4 data-toc-skip class="author">Mans Magnusson,
 Paul Bürkner, Aki Vehtari and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-08-10</h4>
+            <h4 data-toc-skip class="date">2026-09-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-large-data.Rmd" class="external-link"><code>vignettes/loo2-large-data.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-large-data.Rmd</code></div>
@@ -535,9 +535,9 @@ See help('pareto-k-diagnostic') for details.</code></pre>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></code></pre></div>
 <pre><code>Warning: Different subsamples in 'model2' and 'model1'. Naive diff SE is used.
 
-       elpd_diff se_diff subsampling_se_diff
-model2  0.0       0.0     0.0               
-model1 16.5      22.5     0.4               </code></pre>
+        elpd_diff se_diff subsampling_se_diff
+model2    0.0      0.0     0.0               
+model1  -16.5     22.5     0.4               </code></pre>
 <p>This new object <code>comp</code> contains the estimated difference
 of expected leave-one-out prediction errors between the two models,
 along with the standard error. As the warning indicates, because
@@ -581,19 +581,20 @@ for <code>loo_ss_1</code>.</p>
 the same subsampled observations.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loo_ss_1</span>, <span class="va">loo_ss_2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span> </span></code></pre></div>
-<pre><code>       elpd_diff se_diff subsampling_se_diff
-model2  0.0       0.0     0.0               
-model1 16.1       4.4     0.1               </code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></code></pre></div>
+<pre><code>        elpd_diff se_diff subsampling_se_diff
+model2    0.0      0.0     0.0               
+model1  -16.1      4.4     0.1               </code></pre>
 <p>First, notice that now the <code>se_diff</code> is now around 4 (as
-opposed to 20 when using different subsamples). The first column shows
-the difference in ELPD relative to the model with the largest ELPD. In
-this case, the difference in <code>elpd</code> and its scale relative to
-the approximate standard error of the difference) indicates a preference
-for the second model (<code>model2</code>). Since the subsampling
-uncertainty is so small in this case it can effectively be ignored. If
-we need larger subsamples we can simply add samples using the
-<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> method demonstrated earlier.</p>
+opposed to 20 when using different subsamples). The
+<code>elpd_diff</code> column shows the difference in ELPD relative to
+the model with the largest ELPD. In this case, the difference in
+<code>elpd</code> and its scale relative to the approximate standard
+error of the difference) indicates a preference for the second model
+(<code>model2</code>). Since the subsampling uncertainty is so small in
+this case it can effectively be ignored. If we need larger subsamples we
+can simply add samples using the <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> method
+demonstrated earlier.</p>
 <p>It is also possible to compare a subsampled loo computation with a
 full loo object.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
@@ -612,9 +613,9 @@ subsampled calculation we get the message that only the observations
 that are included in the loo calculations for both <code>model1</code>
 and <code>model2</code> are included in the computations for the
 comparison.</p>
-<pre><code>       elpd_diff se_diff subsampling_se_diff
-model2  0.0       0.0     0.0               
-model1 16.3       4.4     0.3   </code></pre>
+<pre><code>        elpd_diff se_diff subsampling_se_diff
+model2    0.0     0.0     0.0               
+model1  -16.3     4.4     0.3   </code></pre>
 <p>Here we actually see an increase in <code>subsampling_se_diff</code>,
 but this is due to a technical detail not elaborated here. In general,
 the difference should be better or negligible.</p>

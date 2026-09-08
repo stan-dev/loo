@@ -2,6 +2,12 @@
 
 ## loo (development version)
 
+- Fix
+  [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
+  when used with subsampling: compute model comparison by
+  comparison-model minus reference-model by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#391](https://github.com/stan-dev/loo/issues/391)
 - Update user messages in [`print()`](https://rdrr.io/r/base/print.html)
   by [@ishaan-arora-1](https://github.com/ishaan-arora-1),
   [@florence-bockting](https://github.com/florence-bockting) in

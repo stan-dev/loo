@@ -487,9 +487,9 @@ print(comp)
 
     Warning: Different subsamples in 'model2' and 'model1'. Naive diff SE is used.
 
-           elpd_diff se_diff subsampling_se_diff
-    model2  0.0       0.0     0.0               
-    model1 16.5      22.5     0.4               
+            elpd_diff se_diff subsampling_se_diff
+    model2    0.0      0.0     0.0               
+    model1  -16.5     22.5     0.4               
 
 This new object `comp` contains the estimated difference of expected
 leave-one-out prediction errors between the two models, along with the
@@ -545,20 +545,20 @@ same subsampled observations.
 ``` r
 
 comp <- loo_compare(loo_ss_1, loo_ss_2)
-print(comp) 
+print(comp)
 ```
 
-           elpd_diff se_diff subsampling_se_diff
-    model2  0.0       0.0     0.0               
-    model1 16.1       4.4     0.1               
+            elpd_diff se_diff subsampling_se_diff
+    model2    0.0      0.0     0.0               
+    model1  -16.1      4.4     0.1               
 
 First, notice that now the `se_diff` is now around 4 (as opposed to 20
-when using different subsamples). The first column shows the difference
-in ELPD relative to the model with the largest ELPD. In this case, the
-difference in `elpd` and its scale relative to the approximate standard
-error of the difference) indicates a preference for the second model
-(`model2`). Since the subsampling uncertainty is so small in this case
-it can effectively be ignored. If we need larger subsamples we can
+when using different subsamples). The `elpd_diff` column shows the
+difference in ELPD relative to the model with the largest ELPD. In this
+case, the difference in `elpd` and its scale relative to the approximate
+standard error of the difference) indicates a preference for the second
+model (`model2`). Since the subsampling uncertainty is so small in this
+case it can effectively be ignored. If we need larger subsamples we can
 simply add samples using the
 [`update()`](https://rdrr.io/r/stats/update.html) method demonstrated
 earlier.
@@ -586,9 +586,9 @@ subsampled calculation we get the message that only the observations
 that are included in the loo calculations for both `model1` and `model2`
 are included in the computations for the comparison.
 
-           elpd_diff se_diff subsampling_se_diff
-    model2  0.0       0.0     0.0               
-    model1 16.3       4.4     0.3   
+            elpd_diff se_diff subsampling_se_diff
+    model2    0.0     0.0     0.0               
+    model1  -16.3     4.4     0.3   
 
 Here we actually see an increase in `subsampling_se_diff`, but this is
 due to a technical detail not elaborated here. In general, the
