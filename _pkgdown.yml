@@ -95,6 +95,7 @@ reference:
       - loo_model_weights
       - stacking_weights
       - pseudobma_weights
+      - plot_loo_difference
   - title: Helper functions for K-fold CV
     contents:
       - kfold_split_random
