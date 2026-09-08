@@ -106,6 +106,17 @@ test_that("plot_loo_difference checks observation-level arguments", {
       y,
       loo_1,
       loo_2,
+      labels = y
+    ),
+    "`label_threshold` must be supplied when `labels` is supplied.",
+    fixed = TRUE
+  )
+
+  expect_error(
+    plot_loo_difference(
+      y,
+      loo_1,
+      loo_2,
       sort_by_group = TRUE
     ),
     "`group` must be supplied",

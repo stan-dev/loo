@@ -104,18 +104,25 @@ plot_loo_difference <-
       )
     }
 
+    if (!is.null(labels)) {
+      checkmate::assert_atomic_vector(
+        labels,
+        len = length(y)
+      )
+
+      if (is.null(label_threshold)) {
+        stop(
+          "`label_threshold` must be supplied when `labels` is supplied.",
+          call. = FALSE
+        )
+      }
+    }
+
     if (!is.null(label_threshold)) {
       checkmate::assert_number(
         label_threshold,
         lower = 0,
         finite = TRUE
-      )
-    }
-
-    if (!is.null(labels)) {
-      checkmate::assert_atomic_vector(
-        labels,
-        len = length(y)
       )
     }
 
