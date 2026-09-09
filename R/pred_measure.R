@@ -61,9 +61,12 @@
 #' `attr(my_fun, "measure_loss") <- TRUE` so that [model_compare()] converts and
 #' ranks it in the right direction.
 #'
-#' A custom measure declares nothing about the standard error of a difference
-#' between two models. Supply it when comparing, through the `custom_se_fn`
-#' argument of [model_compare()].
+#' A custom measure can also declare how the standard error of a difference
+#' between two models is computed, with `attr(my_fun, "measure_se_diff")`. It
+#' accepts the same values as the `custom_se_fn` argument of [model_compare()]:
+#' a function, `"sum"`, or `"mean"`. A measure that declares nothing needs
+#' `custom_se_fn` at comparison time, and `custom_se_fn` always overrides the
+#' declaration.
 #'
 #' @examples
 #' \donttest{
@@ -93,6 +96,8 @@
 #'   )
 #' }
 #' attr(my_abs_err, "measure_name") <- "my_abs_err"
+#' # the estimate is the mean of the pointwise values, so declare "mean"
+#' attr(my_abs_err, "measure_se_diff") <- "mean"
 #' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
 #' }
 #'

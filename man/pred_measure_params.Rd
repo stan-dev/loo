@@ -63,9 +63,11 @@ measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} 
 put all measures on a common utility scale and to rank models, so an
 undeclared loss is compared and ranked in the wrong direction.
 
-A custom measure declares nothing about the standard error of a difference
-between two models. That is supplied at comparison time through the
-\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which accepts a function
+A custom measure can declare how the standard error of a difference
+between two models is computed, with \code{attr(my_fun, "measure_se_diff")}.
+Otherwise it is supplied at comparison time through the
+\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which overrides any
+declaration. Both accept a function
 \code{function(ref, cmp) ...}, the shorthands \code{"sum"} and \code{"mean"} for the
 paired pointwise formulas, or \code{NULL} to report the difference with an \code{NA}
 standard error. A function receives one list per model with elements

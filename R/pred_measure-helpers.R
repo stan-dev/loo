@@ -112,7 +112,18 @@
     )
   }
 
-  list(name = name, type = "custom", key = fun, loss = loss)
+  # A measure that knows how to compute the standard error of its own
+  # difference declares it here, so a comparison needs no extra argument.
+  # `model_compare(custom_se_fn = )` overrides this declaration.
+  se_diff <- attr(fun, "measure_se_diff", exact = TRUE)
+  if (!is.null(se_diff)) {
+    se_diff <- .check_custom_se_fn_value(
+      se_diff, name, origin = "`measure_se_diff` attribute"
+    )
+  }
+
+  list(name = name, type = "custom", key = fun, loss = loss,
+       se_diff = se_diff)
 }
 
 #' Check duplicate measure names

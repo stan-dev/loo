@@ -76,10 +76,18 @@
   function called as `custom_se_fn(ref, cmp)`, the shorthands `"sum"` and
   `"mean"` for the paired pointwise formulas, or `NULL` to report the difference
   with an `NA` standard error; with two or more custom measures, pass a list
-  named by measure. It is required whenever a custom measure is compared ---
-  nothing is inferred from a measure's values any more, and custom measures now
-  carry `diff_method = "custom"` instead of `"auto"`. The previous
-  `attr(my_fun, "se_diff_fun")` route has been removed.
+  named by measure, which may name only some of them. It is required when a
+  compared custom measure declares no `measure_se_diff` attribute (see below),
+  and it overrides that declaration --- nothing is inferred from a measure's
+  values any more, and custom measures now carry `diff_method = "custom"`
+  instead of `"auto"`. The previous `attr(my_fun, "se_diff_fun")` route is
+  replaced by `attr(my_fun, "measure_se_diff")`.
+* A custom measure can declare how the standard error of its difference is
+  computed with `attr(my_fun, "measure_se_diff")`, which accepts a function,
+  `"sum"`, or `"mean"`. A measure that declares it is self contained, so a
+  package can ship a custom measure that needs no argument at comparison time.
+  The declaration is recorded as `se_diff_fun` in the `measure_info` attribute,
+  and models that disagree on it cannot be compared.
 * A custom measure can declare that it is a loss with
   `attr(my_fun, "measure_loss") <- TRUE`, alongside `attr(my_fun,
   "measure_name")`. `model_compare()` then flips its differences onto the

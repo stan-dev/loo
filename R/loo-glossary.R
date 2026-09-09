@@ -340,9 +340,11 @@
 #'   errors and is therefore not a paired pointwise standard deviation. For
 #'   `r2` it is the trivariate analogue, which additionally propagates the
 #'   uncertainty in the baseline `MSE(y)` shared by both models.
-#' * For custom measures it comes from the `custom_se_fn` argument of
-#'   [model_compare()], which must be supplied whenever a custom measure is
-#'   compared. It is `NA` when `custom_se_fn` is `NULL` for that measure.
+#' * For custom measures it comes from the measure's own
+#'   `attr(my_fun, "measure_se_diff")` declaration, or from the `custom_se_fn`
+#'   argument of [model_compare()], which overrides that declaration. One of the
+#'   two must give a value. It is `NA` when `custom_se_fn` is `NULL` for that
+#'   measure.
 #'
 #' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
 #' Which measures are losses is recorded in the `loss` element of the
@@ -366,14 +368,16 @@
 #' * `diff_method`: how the standard error of the difference is obtained:
 #'   `"sum"` or `"mean"` (paired pointwise differences),
 #'   `"measure_specific"` (the built-in measure's own `se_diff_fun`), or
-#'   `"custom"`. Nothing is inferred from a measure's values. Under `"custom"` the standard error is resolved at
-#'   comparison time from the `custom_se_fn` argument of [model_compare()],
-#'   which supplies either a function, the `"sum"`/`"mean"` pointwise formulas,
-#'   or `NULL` for an `NA` standard error. A missing standard error is not an
+#'   `"custom"`. Nothing is inferred from a measure's values. Under `"custom"`
+#'   the standard error comes from the measure's `se_diff_fun` declaration, or
+#'   from the `custom_se_fn` argument of [model_compare()], which overrides it.
+#'   Both supply either a function, the `"sum"`/`"mean"` pointwise formulas, or
+#'   `NULL` for an `NA` standard error. A missing standard error is not an
 #'   error state as the difference itself is still reported.
 #' * `se_diff_fun`: for built-in measures with
 #'   `diff_method = "measure_specific"`, the name of the built-in implementation
-#'   used. Custom measures never store a function here.
+#'   used. For custom measures, whatever the measure declared in
+#'   `attr(my_fun, "measure_se_diff")`; absent when it declared nothing.
 #' * `extra`: optional list of auxiliary data the measure stored for the
 #'   standard error of its difference, present only for measures that need it
 #'   (`r2` stores the pointwise baseline `(y_i - mean(y))^2`, which `y` no
@@ -387,10 +391,11 @@
 #' package measure registry. Custom measures always get `diff_method = "custom"`
 #' and take `loss` from `attr(my_fun, "measure_loss") <- TRUE`, which declares
 #' that lower values are better; without it they are treated as utilities (see
-#' [insample_pred_measure()]).
+#' [insample_pred_measure()]). They take `se_diff_fun` from
+#' `attr(my_fun, "measure_se_diff")`.
 #' [model_compare()] requires all models to provide matching `measure_info` for
-#' each shared measure; a mismatched `measure_loss` declaration, or missing
-#' `measure_info` on some models, produces an error.
+#' each shared measure; a mismatched `measure_loss` or `measure_se_diff`
+#' declaration, or missing `measure_info` on some models, produces an error.
 #'
 #' ### `rank_by`, `compare_measures`, and related attributes
 #'

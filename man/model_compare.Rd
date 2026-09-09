@@ -67,8 +67,11 @@ different reference than \code{elpd_diff}. Each \verb{\{measure\}_diff} column t
 exactly one \code{0} entry, at that measure's best model.}
 
 \item{custom_se_fn}{How to compute the standard error of the difference
-between two models for a \strong{custom} measure. Required whenever a custom
-measure is compared; nothing is inferred from the measure's values. One of:
+between two models for a \strong{custom} measure. Nothing is inferred from the
+measure's values. A measure that declares
+\code{attr(my_fun, "measure_se_diff")} needs no argument here, and this argument
+overrides that declaration. A measure that declares nothing must have a
+value here. One of:
 \itemize{
 \item a \strong{function} called as \code{custom_se_fn(ref, cmp)} (see
 \strong{Custom measure standard errors} below);
@@ -79,7 +82,8 @@ values, giving \code{sd(d_i) / sqrt(N)} as for \code{mae};
 \item \code{NULL}, to report the difference with an \code{NA} standard error.
 }
 For two or more custom measures, pass a list named by bare measure name,
-e.g. \code{list(huber = "mean", nrmse = my_se_fn)}. Ignored, with a warning,
+e.g. \code{list(huber = "mean", nrmse = my_se_fn)}. The list may name only some
+of them; the rest use their own declaration. Ignored, with a warning,
 when no custom measure is present.}
 }
 \value{
@@ -238,9 +242,11 @@ pointwise differences (the same formula as \code{se_diff}).
 \item \code{"measure_specific"}: the overall estimate is not a sum or mean of
 pointwise contributions (\code{r2}, \code{rmse}, \code{bacc}), so the measure supplies
 its own standard error of the difference.
-\item \code{"custom"}: a custom measure declares nothing, so \code{custom_se_fn} must be
-supplied. \verb{\{measure\}_se_diff} is \code{NA} only when \code{custom_se_fn} is an
-explicit \code{NULL} for that measure.
+\item \code{"custom"}: the standard error comes from the measure's own
+\code{attr(my_fun, "measure_se_diff")} declaration, or from \code{custom_se_fn},
+which overrides it. One of the two must give a value.
+\verb{\{measure\}_se_diff} is \code{NA} only when \code{custom_se_fn} is an explicit
+\code{NULL} for that measure.
 }
 }
 

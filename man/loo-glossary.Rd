@@ -355,9 +355,11 @@ which requires the covariance between the two models' pointwise squared
 errors and is therefore not a paired pointwise standard deviation. For
 \code{r2} it is the trivariate analogue, which additionally propagates the
 uncertainty in the baseline \code{MSE(y)} shared by both models.
-\item For custom measures it comes from the \code{custom_se_fn} argument of
-\code{\link[=model_compare]{model_compare()}}, which must be supplied whenever a custom measure is
-compared. It is \code{NA} when \code{custom_se_fn} is \code{NULL} for that measure.
+\item For custom measures it comes from the measure's own
+\code{attr(my_fun, "measure_se_diff")} declaration, or from the \code{custom_se_fn}
+argument of \code{\link[=model_compare]{model_compare()}}, which overrides that declaration. One of the
+two must give a value. It is \code{NA} when \code{custom_se_fn} is \code{NULL} for that
+measure.
 }
 
 The reference model has \code{m_se_diff = 0} whenever an \code{m_se_diff} is available.
@@ -383,14 +385,16 @@ measure and the values recorded for it
 \item \code{diff_method}: how the standard error of the difference is obtained:
 \code{"sum"} or \code{"mean"} (paired pointwise differences),
 \code{"measure_specific"} (the built-in measure's own \code{se_diff_fun}), or
-\code{"custom"}. Nothing is inferred from a measure's values. Under \code{"custom"} the standard error is resolved at
-comparison time from the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}},
-which supplies either a function, the \code{"sum"}/\code{"mean"} pointwise formulas,
-or \code{NULL} for an \code{NA} standard error. A missing standard error is not an
+\code{"custom"}. Nothing is inferred from a measure's values. Under \code{"custom"}
+the standard error comes from the measure's \code{se_diff_fun} declaration, or
+from the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which overrides it.
+Both supply either a function, the \code{"sum"}/\code{"mean"} pointwise formulas, or
+\code{NULL} for an \code{NA} standard error. A missing standard error is not an
 error state as the difference itself is still reported.
 \item \code{se_diff_fun}: for built-in measures with
 \code{diff_method = "measure_specific"}, the name of the built-in implementation
-used. Custom measures never store a function here.
+used. For custom measures, whatever the measure declared in
+\code{attr(my_fun, "measure_se_diff")}; absent when it declared nothing.
 \item \code{extra}: optional list of auxiliary data the measure stored for the
 standard error of its difference, present only for measures that need it
 (\code{r2} stores the pointwise baseline \code{(y_i - mean(y))^2}, which \code{y} no
@@ -405,10 +409,11 @@ Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} f
 package measure registry. Custom measures always get \code{diff_method = "custom"}
 and take \code{loss} from \code{attr(my_fun, "measure_loss") <- TRUE}, which declares
 that lower values are better; without it they are treated as utilities (see
-\code{\link[=insample_pred_measure]{insample_pred_measure()}}).
+\code{\link[=insample_pred_measure]{insample_pred_measure()}}). They take \code{se_diff_fun} from
+\code{attr(my_fun, "measure_se_diff")}.
 \code{\link[=model_compare]{model_compare()}} requires all models to provide matching \code{measure_info} for
-each shared measure; a mismatched \code{measure_loss} declaration, or missing
-\code{measure_info} on some models, produces an error.
+each shared measure; a mismatched \code{measure_loss} or \code{measure_se_diff}
+declaration, or missing \code{measure_info} on some models, produces an error.
 }
 
 \subsection{\code{rank_by}, \code{compare_measures}, and related attributes}{

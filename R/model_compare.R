@@ -47,8 +47,11 @@
 #'   different reference than `elpd_diff`. Each `{measure}_diff` column then has
 #'   exactly one `0` entry, at that measure's best model.
 #' @param custom_se_fn How to compute the standard error of the difference
-#'   between two models for a **custom** measure. Required whenever a custom
-#'   measure is compared; nothing is inferred from the measure's values. One of:
+#'   between two models for a **custom** measure. Nothing is inferred from the
+#'   measure's values. A measure that declares
+#'   `attr(my_fun, "measure_se_diff")` needs no argument here, and this argument
+#'   overrides that declaration. A measure that declares nothing must have a
+#'   value here. One of:
 #'   \itemize{
 #'     \item a **function** called as `custom_se_fn(ref, cmp)` (see
 #'       **Custom measure standard errors** below);
@@ -59,7 +62,8 @@
 #'     \item `NULL`, to report the difference with an `NA` standard error.
 #'   }
 #'   For two or more custom measures, pass a list named by bare measure name,
-#'   e.g. `list(huber = "mean", nrmse = my_se_fn)`. Ignored, with a warning,
+#'   e.g. `list(huber = "mean", nrmse = my_se_fn)`. The list may name only some
+#'   of them; the rest use their own declaration. Ignored, with a warning,
 #'   when no custom measure is present.
 #'
 #' @section Custom measure standard errors:
@@ -204,9 +208,11 @@
 #'   * `"measure_specific"`: the overall estimate is not a sum or mean of
 #'     pointwise contributions (`r2`, `rmse`, `bacc`), so the measure supplies
 #'     its own standard error of the difference.
-#'   * `"custom"`: a custom measure declares nothing, so `custom_se_fn` must be
-#'     supplied. `{measure}_se_diff` is `NA` only when `custom_se_fn` is an
-#'     explicit `NULL` for that measure.
+#'   * `"custom"`: the standard error comes from the measure's own
+#'     `attr(my_fun, "measure_se_diff")` declaration, or from `custom_se_fn`,
+#'     which overrides it. One of the two must give a value.
+#'     `{measure}_se_diff` is `NA` only when `custom_se_fn` is an explicit
+#'     `NULL` for that measure.
 #'
 #' ## Source-specific behavior
 #'   Comparisons behave the same way across sources, with three exceptions:

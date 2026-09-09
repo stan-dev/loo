@@ -51,9 +51,11 @@ measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} 
 put all measures on a common utility scale and to rank models, so an
 undeclared loss is compared and ranked in the wrong direction.
 
-A custom measure declares nothing about the standard error of a difference
-between two models. That is supplied at comparison time through the
-\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which accepts a function
+A custom measure can declare how the standard error of a difference
+between two models is computed, with \code{attr(my_fun, "measure_se_diff")}.
+Otherwise it is supplied at comparison time through the
+\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which overrides any
+declaration. Both accept a function
 \code{function(ref, cmp) ...}, the shorthands \code{"sum"} and \code{"mean"} for the
 paired pointwise formulas, or \code{NULL} to report the difference with an \code{NA}
 standard error. A function receives one list per model with elements
@@ -135,9 +137,12 @@ Custom measures are assumed to be on a utility scale (higher is better) in
 \code{attr(my_fun, "measure_loss") <- TRUE} so that \code{\link[=model_compare]{model_compare()}} converts and
 ranks it in the right direction.
 
-A custom measure declares nothing about the standard error of a difference
-between two models. Supply it when comparing, through the \code{custom_se_fn}
-argument of \code{\link[=model_compare]{model_compare()}}.
+A custom measure can also declare how the standard error of a difference
+between two models is computed, with \code{attr(my_fun, "measure_se_diff")}. It
+accepts the same values as the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}:
+a function, \code{"sum"}, or \code{"mean"}. A measure that declares nothing needs
+\code{custom_se_fn} at comparison time, and \code{custom_se_fn} always overrides the
+declaration.
 }
 \section{\code{measure_info} attribute}{
 
@@ -187,6 +192,8 @@ my_abs_err <- function(y, mupred, log_weights = NULL) {
   )
 }
 attr(my_abs_err, "measure_name") <- "my_abs_err"
+# the estimate is the mean of the pointwise values, so declare "mean"
+attr(my_abs_err, "measure_se_diff") <- "mean"
 # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
 }
 

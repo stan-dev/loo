@@ -763,10 +763,11 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
     "custom"
   )
 
-  # omitting `custom_se_fn` is an error that names the measure
+  # the measure declares nothing, so omitting `custom_se_fn` is an error
+  # that names the measure
   expect_error(
     suppressMessages(model_compare(pms)),
-    "my_rmse.*custom measure.*must be supplied"
+    "my_rmse.*custom measure with no .measure_se_diff. attribute"
   )
 
   # an explicit NULL reports the difference with an NA standard error
@@ -1091,10 +1092,11 @@ test_that("`custom_se_fn` validates its per-measure form", {
   expect_false(any(is.na(comp$m_a_se_diff)))
   expect_true(all(is.na(comp$m_b_se_diff)))
 
-  # an entry must exist for every custom measure
+  # neither measure declares a `measure_se_diff` attribute, so an entry must
+  # exist for every custom measure
   expect_error(
     suppressMessages(model_compare(two, custom_se_fn = list(m_a = "mean"))),
-    "no entry for custom measure"
+    "m_b.*custom measure with no .measure_se_diff. attribute"
   )
   # unknown names are typos
   expect_error(
@@ -1145,7 +1147,74 @@ test_that("`custom_se_fn` validates its per-measure form", {
   )
   expect_error(
     suppressMessages(model_compare(one)),
-    "must be supplied"
+    "m_a.*custom measure with no .measure_se_diff. attribute"
+  )
+})
+
+test_that("a custom measure can declare `measure_se_diff` itself", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+
+  make_fun <- function(name, se_diff = NULL) {
+    f <- function(y, mupred) {
+      ae_i <- abs(y - colMeans(mupred))
+      list(estimate = mean(ae_i), se = sqrt(var(ae_i) / length(ae_i)),
+           pointwise = ae_i)
+    }
+    attr(f, "measure_name") <- name
+    if (!is.null(se_diff)) attr(f, "measure_se_diff") <- se_diff
+    f
+  }
+  make <- function(loo, mupred, ylp, measure) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = measure
+    )
+  }
+  pms <- function(measure) {
+    list(
+      make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, measure),
+      make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, measure)
+    )
+  }
+
+  declared <- pms(make_fun("m_a", se_diff = "mean"))
+  plain <- pms(make_fun("m_a"))
+
+  # the declaration is recorded on the result object
+  expect_equal(attr(declared[[1L]], "measure_info")$m_a$se_diff_fun, "mean")
+
+  # so the comparison needs no argument, and matches the supplied form
+  comp <- suppressMessages(model_compare(declared))
+  expect_false(any(is.na(comp$m_a_se_diff)))
+  expect_equal(
+    comp$m_a_se_diff,
+    suppressMessages(model_compare(plain, custom_se_fn = "mean"))$m_a_se_diff
+  )
+
+  # `custom_se_fn` overrides the declaration, including an explicit NULL
+  expect_true(all(is.na(
+    suppressMessages(model_compare(declared, custom_se_fn = NULL))$m_a_se_diff
+  )))
+
+  # a named list may name only the measures that declare nothing
+  mixed <- pms(list(m_a = make_fun("m_a", se_diff = "mean"),
+                    m_b = make_fun("m_b")))
+  comp_mixed <- suppressMessages(
+    model_compare(mixed, custom_se_fn = list(m_b = "mean"))
+  )
+  expect_false(any(is.na(comp_mixed$m_a_se_diff)))
+  expect_false(any(is.na(comp_mixed$m_b_se_diff)))
+
+  # an invalid declaration names the attribute, not the argument
+  expect_error(
+    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1,
+         make_fun("m_a", se_diff = "median")),
+    "measure_se_diff. attribute"
+  )
+
+  # the models must agree on the declaration
+  expect_error(
+    suppressMessages(model_compare(list(declared[[1L]], plain[[2L]]))),
+    "disagree on .measure_info"
   )
 })
 

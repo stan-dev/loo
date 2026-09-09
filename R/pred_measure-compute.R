@@ -42,9 +42,11 @@
 #'   put all measures on a common utility scale and to rank models, so an
 #'   undeclared loss is compared and ranked in the wrong direction.
 #'
-#'   A custom measure declares nothing about the standard error of a difference
-#'   between two models. That is supplied at comparison time through the
-#'   `custom_se_fn` argument of [model_compare()], which accepts a function
+#'   A custom measure can declare how the standard error of a difference
+#'   between two models is computed, with `attr(my_fun, "measure_se_diff")`.
+#'   Otherwise it is supplied at comparison time through the
+#'   `custom_se_fn` argument of [model_compare()], which overrides any
+#'   declaration. Both accept a function
 #'   `function(ref, cmp) ...`, the shorthands `"sum"` and `"mean"` for the
 #'   paired pointwise formulas, or `NULL` to report the difference with an `NA`
 #'   standard error. A function receives one list per model with elements
