@@ -398,7 +398,7 @@ The object created is of class `psis_loo_ss`, which inherits from the
 ## Comparing models
 
 To compare this model to an alternative model for the same data we can use the
-`loo_compare()` function just as we would if using `loo()` instead of
+`model_compare()` function just as we would if using `loo()` instead of
 `loo_subsample()` or `loo_approximate_posterior()`. First we'll fit a second
 model to the well-switching data, using `log(arsenic)` instead of `arsenic` as a
 predictor:
@@ -470,11 +470,11 @@ All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
-We can now compare the models on LOO using the `loo_compare` function:
+We can now compare the models on LOO using the `model_compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-comp <- loo_compare(loo_ss_1, loo_ss_2)
+comp <- model_compare(loo_ss_1, loo_ss_2)
 print(comp)
 ```
 
@@ -537,7 +537,7 @@ We can now compare the models and estimate the difference based on the same
 subsampled observations.
 
 ```{r, eval=FALSE}
-comp <- loo_compare(loo_ss_1, loo_ss_2)
+comp <- model_compare(loo_ss_1, loo_ss_2)
 print(comp) 
 ```
 
@@ -567,7 +567,7 @@ loo_full_2 <- loo(
   data = stan_df_2,
   cores = 2
 )
-loo_compare(loo_ss_1, loo_full_2)
+model_compare(loo_ss_1, loo_full_2)
 ```
 
 ```

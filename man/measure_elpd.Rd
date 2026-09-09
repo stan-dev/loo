@@ -4,12 +4,7 @@
 \alias{measure_elpd}
 \title{Expected log pointwise predictive density (\code{elpd})}
 \usage{
-measure_elpd(
-  ylp,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_elpd(ylp, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{ylp}{A numeric matrix or three-dimensional array of log predictive
@@ -28,19 +23,12 @@ before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed \eqn{\mathrm{lppd}_i}
 values. When supplied, \code{ylp} and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes the expected log pointwise predictive density (ELPD) as the sum of
 pointwise log predictive density contributions (\eqn{\mathrm{lppd}_i}), using
 \code{\link[=ptw_log_pred_density]{ptw_log_pred_density()}}. ELPD is returned on the utility scale (higher is
 better), consistent with the sign convention used throughout this package.
-Manual change of sign convention is possible via \code{higher_is_better}.
 }
 \details{
 \deqn{\mathrm{elpd} = \sum_{i=1}^{n} \mathrm{lppd}_i,}

@@ -430,7 +430,7 @@ test_that("Test the vignette", {
   expect_snapshot(print(looss_2))
 
   expect_warning(
-    comp <- loo_compare(looss_1, looss_2),
+    comp <- model_compare(looss_1, looss_2),
     "Different subsamples in 'model2' and 'model1'. Naive diff SE is used."
   )
   expect_snapshot(print(comp))
@@ -454,7 +454,7 @@ test_that("Test the vignette", {
     "Simple random sampling with replacement assumed."
   )
 
-  expect_silent(comp <- loo_compare(looss_1, looss_2_m))
+  expect_silent(comp <- model_compare(looss_1, looss_2_m))
   expect_snapshot(print(comp))
 
   set.seed(4712)
@@ -474,7 +474,7 @@ test_that("Test the vignette", {
       observations = looss_1
     )
   )
-  expect_silent(comp2 <- loo_compare(looss_1, looss_2_m))
+  expect_silent(comp2 <- model_compare(looss_1, looss_2_m))
   expect_snapshot(print(comp2))
 
   expect_no_warning(
@@ -485,7 +485,7 @@ test_that("Test the vignette", {
     )
   )
   expect_message(
-    comp3 <- loo_compare(x = list(looss_1, looss_2_full)),
+    comp3 <- model_compare(x = list(looss_1, looss_2_full)),
     "Estimated elpd_diff using observations included in loo calculations for all models."
   )
   expect_snapshot(print(comp3))

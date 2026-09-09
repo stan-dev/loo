@@ -29,7 +29,7 @@ test_that(".compute_measure() with r2 works as expected", {
     log_weights = NULL
   )
 
-  expect_equal(names(measure_res), c("estimates", "pointwise"))
+  expect_equal(names(measure_res), c("estimates", "pointwise", "extra"))
 })
 
 test_that(".compute_measure() with rps works as expected", {
@@ -535,4 +535,75 @@ test_that("insample_pred_measure() accepts mixed built-in and custom measures", 
   )
 
   expect_true(all(c("r2", "custom_rmse") %in% rownames(res$estimates)))
+})
+
+test_that("a custom measure can declare itself a loss", {
+  set.seed(11)
+  S <- 20L
+  n <- 12L
+  y <- rnorm(n)
+  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
+  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
+
+  custom_mse <- function(y, mupred) {
+    sqe <- (y - colMeans(mupred))^2
+    list(
+      estimate = mean(sqe),
+      se = sqrt(var(sqe) / length(sqe)),
+      pointwise = sqe
+    )
+  }
+  attr(custom_mse, "measure_name") <- "custom_mse"
+
+  utility <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  expect_false(attr(utility, "measure_info")$custom_mse$loss)
+
+  attr(custom_mse, "measure_loss") <- TRUE
+  loss <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  info <- attr(loss, "measure_info")$custom_mse
+  expect_true(info$loss)
+  # the declaration says what the measure is, not how it is stored
+  expect_equal(loss$estimates, utility$estimates)
+  expect_true(all(loss$pointwise[, "custom_mse"] >= 0))
+})
+
+test_that("`higher_is_better` in `control` is no longer recognised", {
+  set.seed(12)
+  S <- 20L
+  n <- 12L
+  y <- rnorm(n)
+  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
+  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
+
+  custom_mse <- function(y, mupred) {
+    sqe <- (y - colMeans(mupred))^2
+    list(
+      estimate = mean(sqe),
+      se = sqrt(var(sqe) / length(sqe)),
+      pointwise = sqe
+    )
+  }
+  attr(custom_mse, "measure_name") <- "custom_mse"
+  attr(custom_mse, "measure_loss") <- TRUE
+
+  natural <- insample_pred_measure(
+    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  )
+  expect_warning(
+    ignored <- insample_pred_measure(
+      y = y, mupred = mupred, ylp = ylp, measure = custom_mse,
+      control = list(custom_mse = list(higher_is_better = TRUE))
+    ),
+    "not a valid argument"
+  )
+
+  # values are always stored on the measure's own scale
+  expect_equal(ignored$estimates, natural$estimates)
+  expect_equal(ignored$pointwise, natural$pointwise)
+  expect_null(attr(ignored, "measure_higher_is_better"))
+  expect_null(attr(ignored, "measure_info")$custom_mse$higher_is_better)
 })

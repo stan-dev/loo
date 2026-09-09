@@ -10,7 +10,8 @@
           was reached.
       Increasing the value may improve accuracy.
       Warning:
-      Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.
+      Some Pareto k diagnostic values are too high.
+      See help('pareto-k-diagnostic') for details.
     Output
       
       Computed from 4000 posterior draws and 30 log-likelihood terms.

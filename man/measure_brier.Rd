@@ -4,13 +4,7 @@
 \alias{measure_brier}
 \title{Brier score (\code{brier})}
 \usage{
-measure_brier(
-  y,
-  ypred,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_brier(y, ypred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{y}{A numeric vector of binary outcomes coded as 0 or 1.}
@@ -24,12 +18,6 @@ before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise Brier
 scores. If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes the Brier score for binary outcomes as squared error between the

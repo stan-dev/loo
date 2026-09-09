@@ -182,18 +182,34 @@ loo_cores <- function(cores) {
   return(cores)
 }
 
-
-# nocov start
-# release reminders (for devtools)
-release_questions <- function() {
-  c(
-    "Have you updated references?",
-    "Have you updated inst/CITATION?",
-    "Have you updated the vignettes?"
-  )
-}
-# nocov end
-
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
 }
+
+#' Issue a deprecation warning the first time it is triggered in a session
+#'
+#' Repeated calls with the same `id` are silent, so a script calling a
+#' deprecated function in a loop is not flooded with warnings. `old` is passed
+#' on explicitly so the message does not depend on which method called this.
+#' Which `id`s have already warned is kept in `state`, an environment created
+#' once when the package is built and private to this function.
+#'
+#' @noRd
+#' @param id Identifier for the deprecation; one warning per `id` per session.
+#' @param new,old Name of the replacement and deprecated function.
+#' @return `TRUE` if a warning was issued, `FALSE` otherwise, invisibly.
+#'
+.deprecate_once <- local({
+  state <- new.env(parent = emptyenv())
+  function(id, new, old = id) {
+    if (isTRUE(state[[id]])) {
+      return(invisible(FALSE))
+    }
+    state[[id]] <- TRUE
+    warning(
+      "\n'", old, "' is deprecated. Use '", new, "' instead.\n",
+      call. = TRUE, immediate. = TRUE
+    )
+    invisible(TRUE)
+  }
+})

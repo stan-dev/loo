@@ -7,7 +7,7 @@
 #'
 #'   The **Value** section below describes the objects that `kfold()`
 #'   methods should return in order to be compatible with
-#'   [loo_compare()] and the **loo** package print methods.
+#'   [model_compare()] and the **loo** package print methods.
 #'
 #'
 #' @name kfold-generic
@@ -25,7 +25,7 @@
 #'
 #'   It is important for the object to have at least these classes and
 #'   components so that it is compatible with other functions like
-#'   [loo_compare()] and `print()` methods.
+#'   [model_compare()] and `print()` methods.
 #'
 NULL
 
