@@ -494,3 +494,122 @@ replications</figcaption>
 **ELPD/IC takeaway:** In-sample estimates match between deprecated and
 new APIs. Migration is about return type and `*_pred_measure()` workflow
 integration, not numerical differences.
+
+## Discussion points (`model_compare`)
+
+### Design of the `rank_by` argument
+
+**Scope**
+
+- accepting both **model name** and **measure name** might be confusing
+- `rank_by` might be most reasonable for **measure name**
+- perhaps we want to have two arguments:
+  - `rank_by` = measure name
+  - `reference` = model name
+
+**Behavior**
+
+- Currently: 
+  - Best model is always in the first row; followed by second-best, etc.
+  - If reference model is not the "best" model then this will look as follows (reference = m3):
+  ```r
+  #> -- rmse (vs m3) --
+  #>  model rmse_diff rmse_se_diff
+  #>     m2       0.6          2.1
+  #>     m3       0.0          0.0
+  #>     m1      -5.5          4.0
+  ```
+- Question:
+  - Shall the order of rows follow "best model first" or rather "reference model / selected measure first"
+
+### Sign flipping of losses
+
+> I think it would be helpful to include the sign flipping message a bit more prominently e.g. (-- mse (vs m2) — utility scale, higher is better --) . Right now only model_compare() prints the explanation so I think printing a saved comparison object later loses that info.
+
+Sounds like a good idea. However, providing this information only for losses might look confusing as also utilities are on a "utility scale" but there we would not show the information. Might be obvious for users that know the difference between utility and loss but less clear otherwise. How about somthing like (requires a bit more explanation but is perhaps more explicit?):
+
+```r
+#> -- mse (vs m2) [u] --
+#>  model mse_diff mse_se_diff
+#>     m2      0.0         0.0
+#>     m3    -48.9       183.1
+#>     m1   -570.2       292.0
+#> 
+#> -- rmse (vs m2) [u] --
+#>  model rmse_diff rmse_se_diff
+#>     m2       0.0          0.0
+#>     m3      -0.6          2.1
+#>     m1      -6.1          2.9
+#> 
+#> -- r2 (vs m2) --
+#>  model r2_diff r2_se_diff
+#>     m2     0.0        0.0
+#>     m3     0.0        0.1
+#>     m1    -0.2        0.1
+#>
+#> [u]: loo measure converted to utility scale; interpret it as higher is better
+
+```
+
+### Custom measures (incl. difference SE estimate)
+
+> measure_name and measure_loss are attributes of the measure function, but the SE method is an argument to model_compare(). I think (although I could be wrong), that means that if a package author wants to include a custom measure in their package, users would have to remember to set custom_se_fn themselves. In other words, it can’t be fully self contained the way it’s currently designed. Is that right, or am I wrong about this? Should we instead use attr(fn, "measure_se_diff") and allow the custom_se_fn to override it?
+
+Thank you for pointing this out. This is indeed a flaw in the design.
+I refactored the design such that a custom measure can have now the attribute
+`measure_se_diff`.
+
+```r
+huber_fn <- function(y, mupred) {
+  delta <- 10
+  r <- y - colMeans(mupred)
+  l <- ifelse(abs(r) <= delta, 0.5 * r^2, delta * (abs(r) - 0.5 * delta))
+  list(estimate = mean(l), se = sd(l) / sqrt(length(l)), pointwise = l)
+}
+
+huber_se_fn <- function(ref, cmp) {
+  d <- cmp$pointwise - ref$pointwise
+  sd(d) / sqrt(length(d))
+}
+
+attr(huber_fn, "measure_name") <- "huber"
+attr(huber_fn, "measure_loss") <- TRUE
+attr(huber_fn, "measure_se_diff") <- huber_se_fn
+
+h1 <- fit_measure(fit_m1, measure = list("rmse", "huber" = huber_fn))
+h3 <- fit_measure(fit_m3, measure = list("rmse", "huber" = huber_fn))
+
+comp_h <- model_compare(list(m3 = h3, m1 = h1))
+```
+
+### Using `model_compare` with `kfold`
+
+> I think the brms kfold example has a mistake. It uses brms::kfold(fit, K = 5) separately for each model but I think that means they’re using different folds, which means se_diff is wrong? I think we need to do something like this: folds <- loo::kfold_split_random(K = 5, N = nrow(roaches)) and then pass that to kfold.
+
+TODO
+
+### The helper `add_loo()`
+
+> The add_loo() helper is using moment_match = TRUE and r_eff (since brms does). But loo_pred_measure doesn’t. So the displayed loo_compare and model_compare results don’t actually match for loo objects. 
+
+TODO
+
+### Printing
+#### Diagnostic flags
+
+> Some of the print output says Diagnostic flags present but doesn’t actually show any diagnostic flags in the output 
+
+TODO
+
+#### Number of digits per measure
+
+> I think the default number of digits to display is tricky. We might need different defaults per measure or use significant digits or something? I’m not sure, but I think it’s going to be annoying/confusing for users. Especially for constrained measures like R2, acc, brier, etc.
+
+TODO
+
+### Improving vignette
+
+> There’s a ton of explanation about the computation but not really very much explanation about how to interpret the results 
+> We already have this problem in the pre-existing loo vignette I think, but it occurs to me that the example has many bad K values, which means we don’t even recommend trusting it! I wonder how big of a problem it is for a tutorial vignette? Not sure
+
+TODO
