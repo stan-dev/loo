@@ -34,6 +34,18 @@ test_that("loo with cores=1 and cores=2 gives same results", {
   expect_equal(loo1$estimates, loo2$estimates)
 })
 
+test_that("mcse_elpd is stable for extreme log likelihoods", {
+  ll <- cbind(c(-1000, -1001), c(1000, 999))
+  lw <- matrix(log(0.5), nrow = 2, ncol = 2)
+  E_elpd <- matrixStats::colLogSumExps(ll + lw)
+  shift <- apply(ll, 2, max)
+  lik <- exp(sweep(ll, 2, shift))
+  E_epd <- exp(E_elpd - shift)
+  expected <- sqrt(log1p(colSums(exp(lw)^2 * (lik - E_epd)^2) / E_epd^2))
+
+  expect_equal(mcse_elpd(ll, lw, E_elpd, r_eff = 1), expected)
+})
+
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))
   expect_true(is.loo(waic1))

@@ -488,24 +488,31 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
 #' @return Vector of standard error estimates.
 #'
 mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
-  lik <- exp(ll)
-  w2 <- exp(lw)^2
-  E_epd <- exp(E_elpd)
   if (length(r_eff) == 1 && !is.null(ncol(ll))) {
     r_eff <- rep(r_eff, ncol(ll))
   }
   var_elpd <-
     vapply(
-      seq_len(ncol(w2)),
+      seq_len(ncol(lw)),
       FUN.VALUE = numeric(1),
       FUN = function(i) {
-        # Variance in linear scale
-        # Equation (6) in Vehtari et al. (2024)
-        var_epd_i <- sum(w2[, i] * (lik[, i] - E_epd[i]) ^ 2) / r_eff[i]
-        # Compute variance in log scale by match the variance of a
-        # log-normal approximation
+        # Numerically stable way to compute
+        # 1) variance in linear scale. Equation (6) in Vehtari et al. (2024)
+        # 2) variance in log scale by matching the variance of a log-normal
         # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
-        log(1 + var_epd_i / E_epd[i]^2)
+        log_lik_ratio <- ll[, i] - E_elpd[i]
+        positive <- log_lik_ratio > 0
+        log_abs_diff <- numeric(length(log_lik_ratio))
+        log_abs_diff[positive] <-
+          log_lik_ratio[positive] + log1p(-exp(-log_lik_ratio[positive]))
+        log_abs_diff[!positive] <- log(-expm1(log_lik_ratio[!positive]))
+        log_var_epd_ratio <-
+          matrixStats::logSumExp(2 * lw[, i] + 2 * log_abs_diff) - log(r_eff[i])
+        if (log_var_epd_ratio > 0) {
+          log_var_epd_ratio + log1p(exp(-log_var_epd_ratio))
+        } else {
+          log1p(exp(log_var_epd_ratio))
+        }
       }
     )
   sqrt(var_elpd)
