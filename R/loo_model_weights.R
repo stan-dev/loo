@@ -234,6 +234,19 @@ loo_model_weights.default <-
   }
 
 
+exp_diff_over_exp <- function(a, b, denominator_log) {
+  a_is_larger <- a >= b
+  out <- numeric(length(a))
+  out[a_is_larger] <-
+    exp(a[a_is_larger] - denominator_log[a_is_larger]) *
+      -expm1(b[a_is_larger] - a[a_is_larger])
+  out[!a_is_larger] <-
+    exp(b[!a_is_larger] - denominator_log[!a_is_larger]) *
+      expm1(a[!a_is_larger] - b[!a_is_larger])
+  out
+}
+
+
 #' @rdname loo_model_weights
 #' @export
 #' @param lpd_point If calling `stacking_weights()` or `pseudobma_weights()`
@@ -272,11 +285,15 @@ stacking_weights <-
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       grad <- rep(0, K - 1)
-      # avoid over- and underflows using log weights, rowLogSumExps,
-      # and by subtracting the row maximum of lpd_point
-      mlpd <- matrixStats::rowMaxs(lpd_point)
+      mixture_lpd <- matrixStats::rowLogSumExps(
+        sweep(lpd_point, 2, log(w_full), "+")
+      )
       for (k in 1:(K - 1)) {
-        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
+        grad[k] <- sum(exp_diff_over_exp(
+          lpd_point[, k],
+          lpd_point[, K],
+          mixture_lpd
+        ))
       }
       return(-grad)
     }

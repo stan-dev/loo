@@ -20,6 +20,14 @@ loo_list <- lapply(1:length(ll_list), function(j) {
 
 tol <- 0.01 # absolute tolerance of weights
 
+test_that("stacking gradient is stable for similar model predictions", {
+  a <- -30 + 1e-14
+  b <- -30
+
+  expect_equal(exp_diff_over_exp(a, b, b), 1.065814103640156e-14)
+  expect_equal(exp_diff_over_exp(b, a, b), -1.065814103640156e-14)
+})
+
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(
     loo_model_weights(log_lik1),
