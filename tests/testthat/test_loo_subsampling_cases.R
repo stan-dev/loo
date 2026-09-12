@@ -171,17 +171,17 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   ))
   expect_failure(expect_output(
     print(full_loo),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood terms"
   ))
 
   expect_failure(expect_output(
     print(loo_ss),
     "Posterior approximation correction used\\."
   ))
-  expect_output(print(loo_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ss), "Subsampling loo uses 1) faster,")
 
   expect_output(print(loo_ap_ss), "Posterior approximation correction used\\.")
-  expect_output(print(loo_ap_ss), "subsampled log-likelihood\nvalues")
+  expect_output(print(loo_ap_ss), "Subsampling loo uses 1) faster,")
 
   expect_output(
     print(loo_ap_ss_full),
@@ -189,7 +189,7 @@ test_that("Test loo_subsampling and loo_approx with radon data", {
   )
   expect_failure(expect_output(
     print(loo_ap_ss_full),
-    "subsampled log-likelihood\nvalues"
+    "subsampled log-likelihood terms"
   ))
 
   # Test conversion of objects
@@ -369,11 +369,8 @@ test_that("Test the vignette", {
       loo_approximation_draws = 100
     )
   )
-  expect_output(
-    print(looss_2),
-    "Computed from 4000 by 100 subsampled log-likelihood"
-  )
-  expect_output(print(looss_2), "values from 3020 total observations.")
+  expect_output(print(looss_2), "Subsampling loo uses 1) faster,")
+  expect_output(print(looss_2), "Subsampling loo uses 1) faster,")
   expect_output(
     print(looss_2),
     "MCSE and ESS estimates assume independent draws"

@@ -1,16 +1,29 @@
 # loo (development version)
 
-## Breaking changes
+* Fix `loo_compare()` when used with subsampling: compute model comparison by comparison-model minus reference-model by @florence-bockting in #391
+* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
+#328.
 
-* `loo_compare()` now returns a data frame instead of a matrix and has 
-  additional columns. Code that relies on matrix-specific behaviour will need to
-  be updated accordingly by @jgabry, @avehtari, @florence-bockting in #300
+# loo 2.10.1
 
-## New features
+* Revert behavior of internal `psis_smooth_tail()` function that led to several
+failing tests not caught by CRAN reverse dependency checks. This change should
+not directly affect individual users. by @VisruthSK in #381
+* `print.compare.loo()` regains a `simplify` argument for showing the full
+comparison table with `simplify = FALSE` by @florence-bockting in #383.
 
-* `loo_compare()` output now includes additional columns: `p_worse`,
-  `diag_diff`, and `diag_elpd`, providing richer diagnostics for model
-  comparison by @florence-bockting in #300
+# loo 2.10.0
+
+* Updates to `loo_compare` output by @jgabry, @avehtari, @florence-bockting in #300: 
+  - new output columns `p_worse`, `diag_diff`, `diag_elpd`
+  - returned object is now a `data.frame` instead of a `matrix`
+* Add new `kfold.print` method by @florence-bockting in #342
+* Add touchstone performance benchmarks by @VisruthSK in #352
+* Use `posterior::gpdfit` and `posterior::qgeneralized_pareto` by @avehtari in #305
+* Fix bug in IS method error message + documentation typos by @ishaan-arora-1 in #326
+* Shortened `?loo_subsample` title and improved description by @vinniott in #339
+* Add AI contribution policy by @florence-bockting in #361
+
 
 # loo 2.9.0
 

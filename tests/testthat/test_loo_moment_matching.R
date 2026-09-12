@@ -407,6 +407,9 @@ test_that("variance and covariance transformations work", {
 })
 
 test_that("loo_moment_match.default works with multiple cores", {
+  # forked processes can segfault on CRAN's macOS machines if R is linked to
+  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+  skip_on_cran()
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
 

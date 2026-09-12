@@ -27,6 +27,9 @@ test_that("loo, waic and elpd results haven't changed", {
 })
 
 test_that("loo with cores=1 and cores=2 gives same results", {
+  # forked processes can segfault on CRAN's macOS machines if R is linked to
+  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+  skip_on_cran()
   loo2 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr, cores = 2))
   expect_equal(loo1$estimates, loo2$estimates)
 })
@@ -124,6 +127,9 @@ test_that("loo.array and loo.matrix give same result", {
 })
 
 test_that("loo.array runs with multiple cores", {
+  # forked processes can segfault on CRAN's macOS machines if R is linked to
+  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+  skip_on_cran()
   loo_with_arr1 <- loo(LLarr, cores = 1, r_eff = NA)
   loo_with_arr2 <- loo(LLarr, cores = 2, r_eff = NA)
   expect_identical(loo_with_arr1$estimates, loo_with_arr2$estimates)
@@ -206,6 +212,9 @@ test_that("function and matrix methods return same result", {
 })
 
 test_that("loo.function runs with multiple cores", {
+  # forked processes can segfault on CRAN's macOS machines if R is linked to
+  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+  skip_on_cran()
   loo_with_fn1 <- loo(
     llfun,
     data = data,
