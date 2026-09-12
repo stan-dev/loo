@@ -240,6 +240,11 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   list(log_weights = lw_i, pareto_k = khat)
 }
 
+exp_x_minus_exp_y <- function(x, y) {
+  -exp(x) * expm1(y - x)
+}
+
+
 #' PSIS tail smoothing for a single vector
 #'
 #' @noRd
@@ -254,7 +259,7 @@ psis_smooth_tail <- function(x, cutoff) {
   exp_cutoff <- exp(cutoff)
 
   # save time not sorting since x already sorted
-  fit <- posterior::gpdfit(exp(x) - exp_cutoff, sort_x = FALSE)
+  fit <- posterior::gpdfit(exp_x_minus_exp_y(x, cutoff), sort_x = FALSE)
   k <- fit$k
   sigma <- fit$sigma
   if (is.na(k)) {

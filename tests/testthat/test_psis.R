@@ -152,6 +152,15 @@ test_that("do_psis_i throws warning if all tail values the same", {
   expect_equal(val$pareto_k, Inf)
 })
 
+test_that("exp_x_minus_exp_y is stable for nearby values", {
+  cutoff <- -30
+  x <- cutoff + 1e-14
+
+  expect_equal(exp_x_minus_exp_y(x, cutoff), 9.973486536736925e-28)
+  expect_equal(exp_x_minus_exp_y(0, -1000), 1)
+})
+
+
 test_that("psis_smooth_tail returns original tail values if k is infinite", {
   xx <- log(c(2, 2, 2, 2, 3, 4, 5, 6))
   val <- suppressWarnings(psis_smooth_tail(xx, 0))
