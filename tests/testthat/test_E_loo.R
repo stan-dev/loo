@@ -232,4 +232,7 @@ test_that("weighted variance works", {
 
   w <- c(rep(0.1, 10), rep(0, 90))
   expect_equal(.wvar(x, w), var(x[w > 0]))
+
+  x <- 1e8 + c(-1, 0, 1)
+  expect_equal(.wvar(x, rep(1 / 3, 3)), 1)
 })

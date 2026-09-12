@@ -219,7 +219,8 @@ E_loo.matrix <-
   # sample size ESS is estimated with the generic target quantity invariant
   # estimate 1/sum(w^2), see e.g. "Monte Carlo theory, methods and examples"
   # by Owen (2013).
-  (sum(.wmean(x^2, w)) - sum(.wmean(x, w)^2)) / (1 - sum(w^2))
+  weighted_mean <- .wmean(x, w)
+  sum(w * (x - weighted_mean)^2) / (1 - sum(w^2))
 }
 .wsd <- function(x, w, ...) {
   sqrt(.wvar(x, w))

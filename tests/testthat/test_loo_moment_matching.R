@@ -515,6 +515,14 @@ test_that("loo_moment_match_split works", {
   expect_snapshot_value(split2, style = "serialize")
 })
 
+test_that("shift_and_scale is stable for large parameter values", {
+  upars <- matrix(1e8 + c(-1, 0, 1), ncol = 1)
+  result <- shift_and_scale(NULL, upars, rep(-log(3), 3))
+
+  expect_equal(result$scaling, 1)
+  expect_equal(result$upars, upars)
+})
+
 test_that("passing arguments works", {
   log_lik_i_upars_test_additional_argument <- function(
     x,
