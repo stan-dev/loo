@@ -100,20 +100,53 @@ waic.function <-
   function(x,
            ...,
            data = NULL,
-           draws = NULL) {
+           draws = NULL,
+           cores = getOption("mc.cores", 1)) {
+    cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
 
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
     S <- length(as.vector(.llfun(data_i = data[1,, drop=FALSE], draws = draws, ...)))
-    waic_list <- lapply(seq_len(N), FUN = function(i) {
-      ll_i <- .llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
-      ll_i <- as.vector(ll_i)
-      lpd_i <- logMeanExp(ll_i)
-      p_waic_i <- var(ll_i)
-      elpd_waic_i <- lpd_i - p_waic_i
-      c(elpd_waic = elpd_waic_i, p_waic = p_waic_i)
-    })
+    if (cores == 1) {
+      waic_list <-
+        lapply(
+          X = seq_len(N),
+          FUN = .waic_i,
+          llfun = .llfun,
+          data = data,
+          draws = draws,
+          ...
+        )
+    } else {
+      if (!os_is_windows()) {
+        # On Mac or Linux use mclapply() for multiple cores
+        waic_list <-
+          parallel::mclapply(
+            mc.cores = cores,
+            X = seq_len(N),
+            FUN = .waic_i,
+            llfun = .llfun,
+            data = data,
+            draws = draws,
+            ...
+          )
+      } else {
+        # On Windows use makePSOCKcluster() and parLapply() for multiple cores
+        cl <- parallel::makePSOCKcluster(cores)
+        on.exit(parallel::stopCluster(cl))
+        waic_list <-
+          parallel::parLapply(
+            cl = cl,
+            X = seq_len(N),
+            fun = .waic_i,
+            llfun = .llfun,
+            data = data,
+            draws = draws,
+            ...
+          )
+      }
+    }
     pointwise <- do.call(rbind, waic_list)
     pointwise <- cbind(pointwise, waic = -2 * pointwise[, "elpd_waic"])
 
@@ -121,6 +154,14 @@ waic.function <-
     waic_object(pointwise, dims = c(S, N))
   }
 
+.waic_i <- function(i, llfun, data, draws, ...) {
+  ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
+  ll_i <- as.vector(ll_i)
+  lpd_i <- logMeanExp(ll_i)
+  p_waic_i <- var(ll_i)
+  elpd_waic_i <- lpd_i - p_waic_i
+  c(elpd_waic = elpd_waic_i, p_waic = p_waic_i)
+}
 
 #' @export
 dim.waic <- function(x) {
@@ -164,4 +205,3 @@ throw_pwaic_warnings <- function(p, digits = 1, warn = TRUE) {
   }
   invisible(NULL)
 }
-

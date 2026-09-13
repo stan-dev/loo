@@ -536,7 +536,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
   if (loo_approximation %in% c("tis", "sis")) {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation))
+    is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation, cores = cores))
     return(is_values$pointwise[, "elpd_loo"])
   }
 

@@ -97,11 +97,10 @@ ap_psis.array <-
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
 
-    r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     ap_psis.matrix(log_ratios = log_ratios,
                    log_p = log_p,
                    log_g = log_g,
-                   cores = 1)
+                   cores = cores)
   }
 
 #' @export
@@ -131,5 +130,4 @@ ap_psis.default <- function(log_ratios, log_p, log_g, ...) {
     warning("llfun values do not return a matrix, coerce to matrix")
     ap_psis.matrix(as.matrix(log_ratios), log_p, log_g, cores = 1)
   }
-
 
