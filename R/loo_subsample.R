@@ -1166,11 +1166,6 @@ loo_subsample_estimation_diff_srs <- function(x) {
   update_psis_loo_ss_estimates(x)
 }
 
-difference_of_squares <- function(x, y) {
-  (x - y) * (x + y)
-}
-
-
 #' Difference estimation using SRS-WOR sampling (Magnusson et al., 2020)
 #' @noRd
 #' @param y_approx Approximated values of all observations.

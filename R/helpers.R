@@ -26,6 +26,46 @@ colLogMeanExps <- function(x) {
   matrixStats::colLogSumExps(x) - logS
 }
 
+#' More stable version of `exp(x) - exp(y)`
+#'
+#' @noRd
+#' @param x A numeric vector.
+#' @param y A numeric scalar or vector recycled to the length of `x`.
+#'   Must satisfy `x >= y` elementwise.
+#' @return A numeric vector equal to `exp(x) - exp(y)`.
+#'
+exp_x_minus_exp_y <- function(x, y) {
+  -exp(x) * expm1(y - x)
+}
+
+#' More stable version of `x^2 - y^2`
+#'
+#' @noRd
+#' @param x,y Numeric vectors of the same length.
+#' @return A numeric vector equal to `x^2 - y^2`.
+#'
+difference_of_squares <- function(x, y) {
+  (x - y) * (x + y)
+}
+
+#' More stable version of `(exp(a) - exp(b)) / exp(c)`
+#'
+#' @noRd
+#' @param a,b,c Numeric vectors of the same length.
+#' @return A numeric vector equal to `(exp(a) - exp(b)) / exp(c)`.
+#'
+exp_diff_over_exp <- function(a, b, c) {
+  a_is_larger <- a >= b
+  out <- numeric(length(a))
+  out[a_is_larger] <-
+    exp(a[a_is_larger] - c[a_is_larger]) *
+      -expm1(b[a_is_larger] - a[a_is_larger])
+  out[!a_is_larger] <-
+    exp(b[!a_is_larger] - c[!a_is_larger]) *
+      expm1(a[!a_is_larger] - b[!a_is_larger])
+  out
+}
+
 #' Compute point estimates and standard errors from pointwise vectors
 #'
 #' @noRd

@@ -240,11 +240,6 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   list(log_weights = lw_i, pareto_k = khat)
 }
 
-exp_x_minus_exp_y <- function(x, y) {
-  -exp(x) * expm1(y - x)
-}
-
-
 #' PSIS tail smoothing for a single vector
 #'
 #' @noRd
