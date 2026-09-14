@@ -42,3 +42,7 @@
       model2 1.000 
       model3 0.000 
 
+# Bayesian bootstrap gives expected result
+
+    c(0.188359351057998, 0.309962881543203, 0.501677767398798)
+
