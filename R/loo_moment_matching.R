@@ -408,7 +408,7 @@ loo_moment_match_i <- function(i,
   elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
   mcse_elpd_loo <- mcse_elpd(
     ll = as.matrix(log_liki), lw = as.matrix(lwi),
-    E_elpd = exp(elpd_loo_i), r_eff = r_eff_i
+    E_elpd = elpd_loo_i, r_eff = r_eff_i
   )
 
   list(elpd_loo_i = elpd_loo_i,

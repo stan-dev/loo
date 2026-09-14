@@ -286,6 +286,11 @@ test_that("loo_moment_match.default works", {
     loo_moment_match_object$pointwise[, "influence_pareto_k"],
     loo_manual$diagnostics$pareto_k
   )
+  expect_equal(
+    unname(loo_moment_match_object$pointwise[1, "mcse_elpd_loo"]),
+    0.1904162,
+    tolerance = 1e-6
+  )
 
   expect_snapshot_value(loo_moment_match_object, style = "serialize")
 
