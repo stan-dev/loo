@@ -137,29 +137,37 @@ test_that("tis throws correct errors and warnings", {
 })
 
 
-test_that("importance sampling methods handle negative infinite log ratios", {
-  log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
-  methods <- list(psis = psis, tis = tis, sis = sis)
+# One test_that() per method, so that a failure names the method that failed
+for (method_name in c("psis", "tis", "sis")) {
+  test_that(paste0(method_name, "() handles negative infinite log ratios"), {
+    method <- match.fun(method_name)
+    zero <- c(TRUE, FALSE, TRUE, rep(FALSE, 97))
+    log_ratios <- seq(-9, 0, length.out = 100)
+    log_ratios[zero] <- -Inf
 
-  lapply(methods, function(method) {
     out <- suppressWarnings(method(log_ratios, r_eff = NA))
-    expect_identical(weights(out, normalize = FALSE, log = TRUE)[1], -Inf)
-    expect_identical(weights(out, normalize = TRUE, log = TRUE)[1], -Inf)
-    expect_identical(weights(out, normalize = TRUE, log = FALSE)[1], 0)
-    expect_equal(sum(weights(out, normalize = TRUE, log = FALSE)), 1)
+    w_log <- weights(out, normalize = TRUE, log = TRUE)
+    w <- weights(out, normalize = TRUE, log = FALSE)
+
+    expect_identical(weights(out, normalize = FALSE, log = TRUE)[zero], c(-Inf, -Inf))
+    expect_identical(w_log[zero], c(-Inf, -Inf))
+    expect_identical(w[zero], c(0, 0))
+    expect_true(all(w[!zero] > 0))
+    expect_equal(sum(w), 1)
   })
-})
 
-test_that("importance sampling methods reject all negative infinite columns", {
-  methods <- list(psis = psis, tis = tis, sis = sis)
-  log_ratios <- cbind(seq(-9, 0, length.out = 10), rep(-Inf, 10))
-  error <- "Each column of log ratios must contain at least one finite value."
+  test_that(paste0(method_name, "() rejects all negative infinite columns"), {
+    method <- match.fun(method_name)
+    error <- "Each column of log ratios must contain at least one finite value."
 
-  lapply(methods, function(method) {
     expect_error(method(rep(-Inf, 10), r_eff = NA), error, fixed = TRUE)
-    expect_error(method(log_ratios, r_eff = NA), error, fixed = TRUE)
+    expect_error(
+      method(cbind(seq(-9, 0, length.out = 10), rep(-Inf, 10)), r_eff = NA),
+      error,
+      fixed = TRUE
+    )
   })
-})
+}
 
 
 test_that("explict test of values for 'sis' and 'tis'", {
