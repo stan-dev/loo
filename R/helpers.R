@@ -55,19 +55,20 @@ difference_of_squares <- function(x, y) {
 #'
 #' @noRd
 #' @param a,b,c Numeric vectors of the same length.
-#' @return A numeric vector equal to `(exp(a) - exp(b)) / exp(c)`.
+#' @return A numeric vector equal to `(exp(a) - exp(b)) / exp(c)`. Elements
+#'   with `a == b` are returned as an exact zero regardless of `c`; elsewhere
+#'   `NA` and `NaN` inputs propagate.
 #'
 exp_diff_over_exp <- function(a, b, c) {
-  a_is_larger <- a >= b
-  out <- numeric(length(a))
-  out[a_is_larger] <-
-    exp(a[a_is_larger] - c[a_is_larger]) *
-      -expm1(b[a_is_larger] - a[a_is_larger])
-  out[!a_is_larger] <-
-    exp(b[!a_is_larger] - c[!a_is_larger]) *
-      expm1(a[!a_is_larger] - b[!a_is_larger])
-  equal <- a == b
-  out[!is.na(equal) & equal] <- 0
+  # `a >= b` is NA if `a` or `b` is NA or NaN, and R silently ignores NA
+  # indices in `[<-`. Seed the result from the inputs and index with which()
+  # so that missing values propagate instead of leaving a zero behind.
+  out <- a + b + c
+  larger <- which(a >= b)
+  smaller <- which(a < b)
+  out[larger] <- exp(a[larger] - c[larger]) * -expm1(b[larger] - a[larger])
+  out[smaller] <- exp(b[smaller] - c[smaller]) * expm1(a[smaller] - b[smaller])
+  out[which(a == b)] <- 0
   out
 }
 

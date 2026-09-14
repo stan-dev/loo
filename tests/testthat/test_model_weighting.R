@@ -32,6 +32,19 @@ test_that("stacking gradient is stable for similar model predictions", {
   )
 })
 
+test_that("exp_diff_over_exp propagates missing values", {
+  expect_equal(exp_diff_over_exp(NaN, 0, 0), NaN)
+  expect_equal(exp_diff_over_exp(0, NaN, 0), NaN)
+  expect_equal(exp_diff_over_exp(0, -1, NaN), NaN)
+  expect_equal(exp_diff_over_exp(NA_real_, 0, 0), NA_real_)
+  # equal numerators short-circuit to an exact zero, whatever the denominator
+  expect_equal(exp_diff_over_exp(0, 0, NaN), 0)
+  expect_equal(
+    exp_diff_over_exp(c(NaN, 0), c(0, -1), c(0, 0)),
+    c(NaN, exp_diff_over_exp(0, -1, 0))
+  )
+})
+
 test_that("stacking handles equal infinite log predictive densities", {
   lpd <- matrix(
     c(-Inf, 0, -Inf, -1, -1, -1),
