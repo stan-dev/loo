@@ -257,6 +257,9 @@ stacking_weights <-
     if (K < 2) {
       stop("At least two models are required for stacking weights.")
     }
+    if (any(rowSums(is.finite(lpd_point)) == 0)) {
+      stop("Each observation must have a finite predictive density for at least one model.")
+    }
 
     negative_log_score_loo <- function(w) {
       # objective function: log score
@@ -321,9 +324,12 @@ pseudobma_weights <-
     if (K < 2) {
       stop("At least two models are required for pseudo-BMA weights.")
     }
+    elpd <- colSums2(lpd_point)
+    if (!any(is.finite(elpd))) {
+      stop("At least one model must have a finite total predictive density.")
+    }
 
     if (!BB) {
-      elpd <- colSums2(lpd_point)
       uwts <- exp(elpd - max(elpd))
       wts <- structure(
         uwts / sum(uwts),

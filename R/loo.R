@@ -496,6 +496,9 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
       seq_len(ncol(lw)),
       FUN.VALUE = numeric(1),
       FUN = function(i) {
+        if (is.infinite(E_elpd[i]) && E_elpd[i] < 0) {
+          return(NA_real_)
+        }
         # Numerically stable way to compute
         # 1) variance in linear scale. Equation (6) in Vehtari et al. (2024)
         # 2) variance in log scale by matching the variance of a log-normal

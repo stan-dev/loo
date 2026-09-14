@@ -12,6 +12,14 @@ importance_sampling <- function(log_ratios, method, ...) {
   UseMethod("importance_sampling")
 }
 
+validate_log_ratios <- function(x) {
+  validate_ll(x)
+  if (any(colSums(is.finite(x)) == 0)) {
+    stop("Each column of log ratios must contain at least one finite value.")
+  }
+  invisible(x)
+}
+
 
 #' @rdname importance_sampling
 #' @inheritParams psis
@@ -24,8 +32,8 @@ importance_sampling.array <-
     cores <- loo_cores(cores)
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
-    log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
+    log_ratios <- validate_log_ratios(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }
@@ -40,7 +48,7 @@ importance_sampling.matrix <-
            cores = getOption("mc.cores", 1)) {
     cores <- loo_cores(cores)
     assert_importance_sampling_method_is_implemented(method)
-    log_ratios <- validate_ll(log_ratios)
+    log_ratios <- validate_log_ratios(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
     do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
   }

@@ -46,6 +46,41 @@ test_that("mcse_elpd is stable for extreme log likelihoods", {
   expect_equal(mcse_elpd(ll, lw, E_elpd, r_eff = 1), expected)
 })
 
+test_that("mcse_elpd returns NA for an all-zero likelihood column", {
+  ll <- cbind(c(-Inf, -Inf), c(-1, -2))
+  lw <- matrix(log(0.5), nrow = 2, ncol = 2)
+  E_elpd <- matrixStats::colLogSumExps(ll + lw)
+
+  out <- mcse_elpd(ll, lw, E_elpd, r_eff = 1)
+  expect_true(is.na(out[1]))
+  expect_true(is.finite(out[2]))
+})
+
+test_that("elpd handles negative infinite log likelihoods", {
+  log_lik <- cbind(c(-Inf, 0), c(-Inf, -Inf))
+  out <- elpd(log_lik)
+
+  expect_equal(out$pointwise[, "elpd"], c(-log(2), -Inf))
+})
+
+
+test_that("waic rejects negative infinite log likelihoods", {
+  log_lik <- matrix(-1, nrow = 10, ncol = 2)
+  log_lik[1, 1] <- -Inf
+  error <- "All log-likelihood values must be finite for WAIC."
+
+  expect_error(waic(log_lik), error, fixed = TRUE)
+  expect_error(waic(array(log_lik, dim = c(5, 2, 2))), error, fixed = TRUE)
+
+  llfun <- function(data_i, draws) log_lik[, data_i$i]
+  expect_error(
+    waic(llfun, data = data.frame(i = 1:2), draws = matrix(0, 10, 1)),
+    error,
+    fixed = TRUE
+  )
+})
+
+
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))
   expect_true(is.loo(waic1))

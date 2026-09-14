@@ -133,6 +133,28 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_identical(w3, w3_b)
 })
 
+test_that("pseudo-BMA gives zero weight to an impossible model", {
+  lpd <- cbind(rep(-Inf, 3), c(-2, -1, 0))
+
+  expect_equal(as.numeric(pseudobma_weights(lpd, BB = FALSE)), c(0, 1))
+})
+
+
+test_that("model weighting rejects inputs with no finite predictive density", {
+  stacking_lpd <- rbind(c(-Inf, -Inf), c(-1, -1))
+  expect_error(
+    stacking_weights(stacking_lpd),
+    "Each observation must have a finite predictive density for at least one model.",
+    fixed = TRUE
+  )
+
+  pseudobma_lpd <- matrix(-Inf, nrow = 2, ncol = 2)
+  error <- "At least one model must have a finite total predictive density."
+  expect_error(pseudobma_weights(pseudobma_lpd, BB = FALSE), error, fixed = TRUE)
+  expect_error(pseudobma_weights(pseudobma_lpd, BB = TRUE), error, fixed = TRUE)
+})
+
+
 test_that("stacking_weights and pseudobma_weights throw correct errors", {
   xx <- cbind(rnorm(10))
   expect_error(stacking_weights(xx), "two models are required")
