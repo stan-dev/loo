@@ -36,8 +36,8 @@ colLogMeanExps <- function(x) {
 #'
 exp_x_minus_exp_y <- function(x, y) {
   out <- -exp(x) * expm1(y - x)
-  equal <- x == y
-  out[!is.na(equal) & equal] <- 0
+  # which() drops the NA comparisons that NA or NaN inputs would produce
+  out[which(x == y)] <- 0
   out
 }
 

@@ -14,7 +14,9 @@ importance_sampling <- function(log_ratios, method, ...) {
 
 validate_log_ratios <- function(x) {
   validate_ll(x)
-  if (any(colSums(is.finite(x)) == 0)) {
+  # validate_ll() has already ruled out NA and +Inf, so a column without a
+  # finite value is exactly a column whose maximum is -Inf
+  if (any(matrixStats::colMaxs(x) == -Inf)) {
     stop("Each column of log ratios must contain at least one finite value.")
   }
   invisible(x)

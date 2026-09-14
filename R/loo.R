@@ -488,37 +488,62 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
 #' @return Vector of standard error estimates.
 #'
 mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
-  if (length(r_eff) == 1 && !is.null(ncol(ll))) {
+  if (!is.matrix(ll)) {
+    ll <- as.matrix(ll)
+  }
+  if (!is.matrix(lw)) {
+    lw <- as.matrix(lw)
+  }
+  S <- nrow(ll)
+  if (length(r_eff) == 1) {
     r_eff <- rep(r_eff, ncol(ll))
   }
-  var_elpd <-
-    vapply(
-      seq_len(ncol(lw)),
-      FUN.VALUE = numeric(1),
-      FUN = function(i) {
-        if (is.infinite(E_elpd[i]) && E_elpd[i] < 0) {
-          return(NA_real_)
-        }
-        # Numerically stable way to compute
-        # 1) variance in linear scale. Equation (6) in Vehtari et al. (2024)
-        # 2) variance in log scale by matching the variance of a log-normal
-        # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
-        log_lik_ratio <- ll[, i] - E_elpd[i]
-        positive <- log_lik_ratio > 0
-        log_abs_diff <- numeric(length(log_lik_ratio))
-        log_abs_diff[positive] <-
-          log_lik_ratio[positive] + log(-expm1(-log_lik_ratio[positive]))
-        log_abs_diff[!positive] <- log(-expm1(log_lik_ratio[!positive]))
-        log_var_epd_ratio <-
-          matrixStats::logSumExp(2 * lw[, i] + 2 * log_abs_diff) - log(r_eff[i])
-        if (log_var_epd_ratio > 0) {
-          log_var_epd_ratio + log1p(exp(-log_var_epd_ratio))
-        } else {
-          log1p(exp(log_var_epd_ratio))
-        }
-      }
+  # Everything is computed relative to the loo predictive density, so that
+  # 1) exp() of the log likelihood never over- or underflows, and
+  # 2) expm1() avoids the cancellation in `exp(ll) - exp(E_elpd)`.
+  # `ll - E_elpd` is bounded above by `-lw`, so the product below cannot
+  # overflow for consistent (ll, lw, E_elpd); the fallback covers the rest.
+  #
+  # Variance in linear scale, relative to E_epd^2.
+  # Equation (6) in Vehtari et al. (2024)
+  var_epd_ratio <-
+    matrixStats::colSums2((exp(lw) * expm1(ll - rep(E_elpd, each = S)))^2) /
+      r_eff
+  # Variance in log scale by matching the variance of a log-normal
+  # https://en.wikipedia.org/wiki/Log-normal_distribution#Arithmetic_moments
+  var_elpd <- log1p(var_epd_ratio)
+  undefined <- is.infinite(E_elpd) & E_elpd < 0
+  overflow <- !is.finite(var_epd_ratio) & !undefined
+  if (any(overflow)) {
+    lvr <- log_var_epd_ratio(
+      ll[, overflow, drop = FALSE] - rep(E_elpd[overflow], each = S),
+      lw[, overflow, drop = FALSE],
+      r_eff[overflow]
     )
+    var_elpd[overflow] <-
+      ifelse(lvr > 0, lvr + log1p(exp(-lvr)), log1p(exp(lvr)))
+  }
+  var_elpd[undefined] <- NA_real_
   sqrt(var_elpd)
+}
+
+#' Log of the relative linear-scale ELPD variance, for the rare case where
+#' `exp(lw) * expm1(log_lik_ratio)` over- or underflows
+#'
+#' @noRd
+#' @param log_lik_ratio Matrix of `ll - E_elpd` values.
+#' @param lw Matrix of normalized log weights.
+#' @param r_eff Vector of relative effective sample sizes.
+#' @return Vector of `log(var_epd / E_epd^2)` values.
+#'
+log_var_epd_ratio <- function(log_lik_ratio, lw, r_eff) {
+  log_abs_diff <- log(abs(expm1(log_lik_ratio)))
+  big <- which(log_lik_ratio > 700)
+  if (length(big)) {
+    log_abs_diff[big] <-
+      log_lik_ratio[big] + log(-expm1(-log_lik_ratio[big]))
+  }
+  matrixStats::colLogSumExps(2 * (lw + log_abs_diff)) - log(r_eff)
 }
 
 
