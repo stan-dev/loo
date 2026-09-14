@@ -104,9 +104,35 @@ validate_ll <- function(x) {
   } else if (anyNA(x)) {
     stop("NAs not allowed in input.")
   } else if (any(x == Inf)) {
-    stop("All input values must be finite or -Inf.")
+    # classed so that callers which negate a log-likelihood matrix can report
+    # the error in terms of the input the user actually supplied
+    stop(errorCondition(
+      "All input values must be finite or -Inf.",
+      class = "loo_positive_infinity_error"
+    ))
   }
   invisible(x)
+}
+
+#' Report `+Inf` log ratios in terms of the log likelihood that produced them
+#'
+#' `loo()` negates the log-likelihood before importance sampling, so a `-Inf`
+#' log-likelihood value reaches [validate_ll()] as `+Inf`. Wrap the importance
+#' sampling call so the user sees a message about their own input. The wrapped
+#' expression is only forced inside the handler, so there is no cost unless an
+#' error is raised.
+#'
+#' @noRd
+#' @param expr Expression that negates a log-likelihood and importance samples it.
+#' @return The value of `expr`.
+#'
+with_log_lik_error_message <- function(expr) {
+  withCallingHandlers(
+    expr,
+    loo_positive_infinity_error = function(cnd) {
+      stop("-Inf log-likelihood values are not allowed.", call. = FALSE)
+    }
+  )
 }
 
 #' Convert iter by chain by obs array to (iter * chain) by obs matrix

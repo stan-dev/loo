@@ -74,6 +74,27 @@ test_that("elpd handles negative infinite log likelihoods", {
 })
 
 
+test_that("loo rejects negative infinite log likelihoods", {
+  log_lik <- matrix(-1, nrow = 10, ncol = 2)
+  log_lik[1, 1] <- -Inf
+  error <- "-Inf log-likelihood values are not allowed."
+
+  expect_error(loo(log_lik, r_eff = NA), error, fixed = TRUE)
+  expect_error(
+    loo(array(log_lik, dim = c(5, 2, 2)), r_eff = NA),
+    error,
+    fixed = TRUE
+  )
+
+  llfun <- function(data_i, draws) log_lik[, data_i$i]
+  expect_error(
+    loo(llfun, data = data.frame(i = 1:2), draws = matrix(0, 10, 1),
+        r_eff = NA, cores = 1),
+    error,
+    fixed = TRUE
+  )
+})
+
 test_that("waic rejects negative infinite log likelihoods", {
   log_lik <- matrix(-1, nrow = 10, ncol = 2)
   log_lik[1, 1] <- -Inf
