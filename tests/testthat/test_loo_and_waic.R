@@ -73,7 +73,6 @@ test_that("elpd handles negative infinite log likelihoods", {
   expect_equal(out$pointwise[, "elpd"], c(-log(2), -Inf))
 })
 
-
 test_that("loo rejects negative infinite log likelihoods", {
   log_lik <- matrix(-1, nrow = 10, ncol = 2)
   log_lik[1, 1] <- -Inf
@@ -110,7 +109,6 @@ test_that("waic rejects negative infinite log likelihoods", {
     fixed = TRUE
   )
 })
-
 
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))

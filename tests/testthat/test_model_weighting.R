@@ -152,7 +152,6 @@ test_that("pseudo-BMA gives zero weight to an impossible model", {
   expect_equal(as.numeric(pseudobma_weights(lpd, BB = FALSE)), c(0, 1))
 })
 
-
 test_that("model weighting rejects inputs with no finite predictive density", {
   stacking_lpd <- rbind(c(-Inf, -Inf), c(-1, -1))
   expect_error(
@@ -166,7 +165,6 @@ test_that("model weighting rejects inputs with no finite predictive density", {
   expect_error(pseudobma_weights(pseudobma_lpd, BB = FALSE), error, fixed = TRUE)
   expect_error(pseudobma_weights(pseudobma_lpd, BB = TRUE), error, fixed = TRUE)
 })
-
 
 test_that("stacking_weights and pseudobma_weights throw correct errors", {
   xx <- cbind(rnorm(10))

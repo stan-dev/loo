@@ -171,7 +171,6 @@ test_that("exp_x_minus_exp_y is stable for nearby values", {
   )
 })
 
-
 test_that("psis_smooth_tail returns original tail values if k is infinite", {
   xx <- log(c(2, 2, 2, 2, 3, 4, 5, 6))
   val <- suppressWarnings(psis_smooth_tail(xx, 0))

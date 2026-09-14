@@ -233,7 +233,6 @@ test_that("E_loo handles negative infinite log ratios", {
   expect_equal(out$value, sum(weights(psis_object, log = FALSE) * x))
 })
 
-
 test_that("weighted variance works", {
   x <- rnorm(100)
   w <- rep(0.01, 100)
