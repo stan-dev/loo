@@ -534,6 +534,8 @@ shift_and_scale <- function(x, upars, lwi) {
   weights <- exp(lwi)
   mean_weighted <- colSums(weights * upars)
   shift <- mean_weighted - mean_original
+  # The two-pass form avoids the cancellation in E[x^2] - E[x]^2 and is
+  # equivalent to it only because `weights` sums to one.
   centered <- sweep(upars, 2, mean_weighted)
   mii <- colSums(weights * centered^2)
   mii <- mii * S / (S - 1)

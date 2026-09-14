@@ -219,6 +219,8 @@ E_loo.matrix <-
   # sample size ESS is estimated with the generic target quantity invariant
   # estimate 1/sum(w^2), see e.g. "Monte Carlo theory, methods and examples"
   # by Owen (2013).
+  # The two-pass form avoids the cancellation in E[x^2] - E[x]^2 and is
+  # equivalent to it only because `w` sums to one.
   weighted_mean <- .wmean(x, w)
   sum(w * (x - weighted_mean)^2) / (1 - sum(w^2))
 }
