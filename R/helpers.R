@@ -66,6 +66,8 @@ exp_diff_over_exp <- function(a, b, c) {
   out[!a_is_larger] <-
     exp(b[!a_is_larger] - c[!a_is_larger]) *
       expm1(a[!a_is_larger] - b[!a_is_larger])
+  equal <- a == b
+  out[!is.na(equal) & equal] <- 0
   out
 }
 

@@ -26,6 +26,20 @@ test_that("stacking gradient is stable for similar model predictions", {
 
   expect_equal(exp_diff_over_exp(a, b, b), 1.065814103640156e-14)
   expect_equal(exp_diff_over_exp(b, a, b), -1.065814103640156e-14)
+  expect_equal(
+    exp_diff_over_exp(c(-Inf, 0, Inf), c(-Inf, 0, Inf), c(0, 0, 0)),
+    c(0, 0, 0)
+  )
+})
+
+test_that("stacking handles equal infinite log predictive densities", {
+  lpd <- matrix(
+    c(-Inf, 0, -Inf, -1, -1, -1),
+    nrow = 2,
+    byrow = TRUE
+  )
+
+  expect_equal(as.numeric(stacking_weights(lpd)), c(0, 1, 0), tolerance = 1e-6)
 })
 
 test_that("loo_model_weights throws correct errors and warnings", {
