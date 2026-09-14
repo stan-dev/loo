@@ -46,6 +46,16 @@ test_that("mcse_elpd is stable for extreme log likelihoods", {
   expect_equal(mcse_elpd(ll, lw, E_elpd, r_eff = 1), expected)
 })
 
+test_that("mcse_elpd retains tiny positive deviations", {
+  z <- 5e-17
+  ll <- matrix(c(-z, z), ncol = 1)
+  lw <- matrix(log(0.5), nrow = 2, ncol = 1)
+  expected <- sqrt(log1p(sum(exp(lw)^2 * expm1(ll)^2)))
+  out <- mcse_elpd(ll, lw, E_elpd = 0, r_eff = 1)
+
+  expect_equal(out / expected, 1, tolerance = 1e-12)
+})
+
 test_that("mcse_elpd returns NA for an all-zero likelihood column", {
   ll <- cbind(c(-Inf, -Inf), c(-1, -2))
   lw <- matrix(log(0.5), nrow = 2, ncol = 2)

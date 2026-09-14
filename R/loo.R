@@ -507,7 +507,7 @@ mcse_elpd <- function(ll, lw, E_elpd, r_eff, n_samples = NULL) {
         positive <- log_lik_ratio > 0
         log_abs_diff <- numeric(length(log_lik_ratio))
         log_abs_diff[positive] <-
-          log_lik_ratio[positive] + log1p(-exp(-log_lik_ratio[positive]))
+          log_lik_ratio[positive] + log(-expm1(-log_lik_ratio[positive]))
         log_abs_diff[!positive] <- log(-expm1(log_lik_ratio[!positive]))
         log_var_epd_ratio <-
           matrixStats::logSumExp(2 * lw[, i] + 2 * log_abs_diff) - log(r_eff[i])
