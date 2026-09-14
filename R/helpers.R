@@ -35,7 +35,10 @@ colLogMeanExps <- function(x) {
 #' @return A numeric vector equal to `exp(x) - exp(y)`.
 #'
 exp_x_minus_exp_y <- function(x, y) {
-  -exp(x) * expm1(y - x)
+  out <- -exp(x) * expm1(y - x)
+  equal <- x == y
+  out[!is.na(equal) & equal] <- 0
+  out
 }
 
 #' More stable version of `x^2 - y^2`

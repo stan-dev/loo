@@ -152,12 +152,23 @@ test_that("do_psis_i throws warning if all tail values the same", {
   expect_equal(val$pareto_k, Inf)
 })
 
+test_that("psis handles negative infinite log ratios", {
+  log_ratios <- c(rep(-Inf, 90), seq(-9, 0, length.out = 10))
+
+  expect_no_error(out <- suppressWarnings(psis(log_ratios)))
+  expect_s3_class(out, "psis")
+})
+
 test_that("exp_x_minus_exp_y is stable for nearby values", {
   cutoff <- -30
   x <- cutoff + 1e-14
 
   expect_equal(exp_x_minus_exp_y(x, cutoff), 9.973486536736925e-28)
   expect_equal(exp_x_minus_exp_y(0, -1000), 1)
+  expect_equal(
+    exp_x_minus_exp_y(c(-Inf, 0, Inf), c(-Inf, 0, Inf)),
+    c(0, 0, 0)
+  )
 })
 
 
