@@ -234,6 +234,15 @@ loo_model_weights.default <-
   }
 
 
+# `-Inf` is a valid zero predictive density; `NA`, `NaN` and `+Inf` make
+# stacking fail in the optimizer and pseudo-BMA return invalid weights.
+validate_lpd_point <- function(lpd_point) {
+  if (anyNA(lpd_point) || any(lpd_point == Inf)) {
+    stop("All values in 'lpd_point' must be finite or -Inf.")
+  }
+  invisible(lpd_point)
+}
+
 #' @rdname loo_model_weights
 #' @export
 #' @param lpd_point If calling `stacking_weights()` or `pseudobma_weights()`
@@ -246,25 +255,6 @@ loo_model_weights.default <-
 #'
 #' @importFrom stats constrOptim
 #'
-#' Check that pointwise log predictive densities are usable
-#'
-#' `-Inf` is a valid value, meaning a model gives an observation zero
-#' predictive density, and the callers have their own checks for inputs that
-#' are degenerate in that way. `NA`, `NaN` and `+Inf` are not: they make
-#' `stacking_weights()` fail inside the optimizer with a message about `vmmin`,
-#' and make `pseudobma_weights()` return `NA` or `NaN` weights with no warning.
-#'
-#' @noRd
-#' @param lpd_point Matrix of pointwise log predictive densities.
-#' @return `lpd_point`, invisibly, if no error is thrown.
-#'
-validate_lpd_point <- function(lpd_point) {
-  if (anyNA(lpd_point) || any(lpd_point == Inf)) {
-    stop("All values in 'lpd_point' must be finite or -Inf.")
-  }
-  invisible(lpd_point)
-}
-
 stacking_weights <-
   function(lpd_point,
            optim_method = "BFGS",
