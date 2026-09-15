@@ -198,9 +198,8 @@ loo.array <-
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    psis_out <- with_log_lik_error_message(
-      importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
-    )
+    validate_log_lik(x)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     importance_sampling_loo_object(
@@ -224,14 +223,14 @@ loo.matrix <-
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    psis_out <- with_log_lik_error_message(
+    validate_log_lik(x)
+    psis_out <-
       importance_sampling.matrix(
         log_ratios = -x,
         r_eff = r_eff,
         cores = cores,
         method = is_method
       )
-    )
     pointwise <- pointwise_loo_calcs(x, psis_out)
     importance_sampling_loo_object(
       pointwise = pointwise,
@@ -374,14 +373,14 @@ loo_i <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- with_log_lik_error_message(
+    validate_log_lik(ll_i)
+    psis_out <-
       importance_sampling.matrix(
         log_ratios = -ll_i,
         r_eff = r_eff,
         cores = 1,
         method = is_method
       )
-    )
     structure(
       list(
         pointwise = pointwise_loo_calcs(ll_i, psis_out),

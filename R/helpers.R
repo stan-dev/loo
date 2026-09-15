@@ -104,35 +104,38 @@ validate_ll <- function(x) {
   } else if (anyNA(x)) {
     stop("NAs not allowed in input.")
   } else if (any(x == Inf)) {
-    # classed so that callers which negate a log-likelihood matrix can report
-    # the error in terms of the input the user actually supplied
-    stop(errorCondition(
-      "All input values must be finite or -Inf.",
-      class = "loo_positive_infinity_error"
-    ))
+    stop("All input values must be finite or -Inf.")
   }
   invisible(x)
 }
 
-#' Report `+Inf` log ratios in terms of the log likelihood that produced them
+#' Check that a log-likelihood array/matrix/vector is finite
 #'
-#' `loo()` negates the log-likelihood before importance sampling, so a `-Inf`
-#' log-likelihood value reaches [validate_ll()] as `+Inf`. Wrap the importance
-#' sampling call so the user sees a message about their own input. The wrapped
-#' expression is only forced inside the handler, so there is no cost unless an
-#' error is raised.
+#' `loo()` negates the log likelihood before importance sampling, so `-Inf`
+#' arrives at [validate_ll()] as `+Inf` and is reported with the polarity
+#' reversed, while `+Inf` passes as a `-Inf` log ratio and silently produces
+#' `NA` estimates. Both are degenerate as a log likelihood, so `loo()` requires
+#' finite values and says so directly. This is deliberately stricter than
+#' [validate_ll()], which is also used for log ratios, where `-Inf` is a valid
+#' zero importance weight.
 #'
 #' @noRd
-#' @param expr Expression that negates a log-likelihood and importance samples it.
-#' @return The value of `expr`.
+#' @param x Array/matrix/vector of log-likelihood values.
+#' @return `x`, invisibly, if no error is thrown.
 #'
-with_log_lik_error_message <- function(expr) {
-  withCallingHandlers(
-    expr,
-    loo_positive_infinity_error = function(cnd) {
-      stop("-Inf log-likelihood values are not allowed.", call. = FALSE)
+validate_log_lik <- function(x) {
+  if (is.list(x)) {
+    stop("List not allowed as input.")
+  }
+  # single pass covering NA, NaN and both infinities; the more specific checks
+  # below only run when something is already known to be wrong
+  if (!all(is.finite(x))) {
+    if (anyNA(x)) {
+      stop("NAs not allowed in input.")
     }
-  )
+    stop("All log-likelihood values must be finite.")
+  }
+  invisible(x)
 }
 
 #' Convert iter by chain by obs array to (iter * chain) by obs matrix

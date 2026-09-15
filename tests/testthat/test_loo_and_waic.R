@@ -73,25 +73,49 @@ test_that("elpd handles negative infinite log likelihoods", {
   expect_equal(out$pointwise[, "elpd"], c(-log(2), -Inf))
 })
 
-test_that("loo rejects negative infinite log likelihoods", {
+# One test_that() per sign, so a failure names which one broke
+for (bad_value in c("-Inf", "Inf")) {
+  test_that(paste("loo rejects", bad_value, "log likelihoods"), {
+    log_lik <- matrix(-1, nrow = 10, ncol = 2)
+    log_lik[1, 1] <- as.numeric(bad_value)
+    error <- "All log-likelihood values must be finite."
+    llfun <- function(data_i, draws) log_lik[, data_i$i]
+    data <- data.frame(i = 1:2)
+    draws <- matrix(0, 10, 1)
+
+    expect_error(loo(log_lik, r_eff = NA), error, fixed = TRUE)
+    expect_error(
+      loo(array(log_lik, dim = c(5, 2, 2)), r_eff = NA),
+      error,
+      fixed = TRUE
+    )
+    expect_error(
+      loo(llfun, data = data, draws = draws, r_eff = NA, cores = 1),
+      error,
+      fixed = TRUE
+    )
+    expect_error(
+      loo_i(1, llfun, data = data, draws = draws),
+      error,
+      fixed = TRUE
+    )
+  })
+}
+
+test_that("loo keeps the existing message for NA log likelihoods", {
   log_lik <- matrix(-1, nrow = 10, ncol = 2)
-  log_lik[1, 1] <- -Inf
-  error <- "-Inf log-likelihood values are not allowed."
+  log_lik[1, 1] <- NA
 
-  expect_error(loo(log_lik, r_eff = NA), error, fixed = TRUE)
-  expect_error(
-    loo(array(log_lik, dim = c(5, 2, 2)), r_eff = NA),
-    error,
-    fixed = TRUE
-  )
+  expect_error(loo(log_lik, r_eff = NA), "NAs not allowed in input", fixed = TRUE)
+})
 
-  llfun <- function(data_i, draws) log_lik[, data_i$i]
-  expect_error(
-    loo(llfun, data = data.frame(i = 1:2), draws = matrix(0, 10, 1),
-        r_eff = NA, cores = 1),
-    error,
-    fixed = TRUE
-  )
+test_that("rejecting non-finite log likelihoods leaves psis() permissive", {
+  # loo() takes a log likelihood, where an infinite value is degenerate; psis()
+  # takes log ratios, where -Inf is a valid zero weight
+  log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
+
+  expect_no_error(out <- suppressWarnings(psis(log_ratios, r_eff = NA)))
+  expect_identical(weights(out, normalize = TRUE, log = FALSE)[1], 0)
 })
 
 test_that("waic rejects negative infinite log likelihoods", {
