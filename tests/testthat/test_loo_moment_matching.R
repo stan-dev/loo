@@ -249,7 +249,7 @@ test_that("loo_moment_match.default works", {
   lwi_x <- lwi_1
   lwi_x[which.min(lwi_1)] <- -Inf
   expect_no_error(suppressWarnings(importance_sampling.default(
-    lwi_1,
+    lwi_x,
     method = "psis",
     r_eff = 1,
     cores = 1
@@ -285,6 +285,11 @@ test_that("loo_moment_match.default works", {
   expect_equal(
     loo_moment_match_object$pointwise[, "influence_pareto_k"],
     loo_manual$diagnostics$pareto_k
+  )
+  expect_equal(
+    unname(loo_moment_match_object$pointwise[1, "mcse_elpd_loo"]),
+    0.1904162,
+    tolerance = 1e-6
   )
 
   expect_snapshot_value(loo_moment_match_object, style = "serialize")
@@ -513,6 +518,35 @@ test_that("loo_moment_match_split works", {
   )
 
   expect_snapshot_value(split2, style = "serialize")
+
+  log_prob_with_inf <- function(x, upars, ...) {
+    out <- log_prob_upars_test(x, upars, ...)
+    out[1] <- -Inf
+    out
+  }
+  expect_no_error(split3 <- loo_moment_match_split(
+    x,
+    upars,
+    cov = FALSE,
+    total_shift = c(0, 0),
+    total_scaling = c(1, 1),
+    total_mapping = diag(c(1, 1)),
+    i = 1,
+    log_prob_upars = log_prob_with_inf,
+    log_lik_i_upars = log_lik_i_upars_test,
+    cores = 1,
+    r_eff_i = 1,
+    is_method = "psis"
+  ))
+  expect_false(anyNA(split3$lwi))
+})
+
+test_that("shift_and_scale is stable for large parameter values", {
+  upars <- matrix(1e8 + c(-1, 0, 1), ncol = 1)
+  result <- shift_and_scale(NULL, upars, rep(-log(3), 3))
+
+  expect_equal(result$scaling, 1)
+  expect_equal(result$upars, upars)
 })
 
 test_that("passing arguments works", {

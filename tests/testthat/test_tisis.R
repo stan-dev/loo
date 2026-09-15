@@ -137,6 +137,39 @@ test_that("tis throws correct errors and warnings", {
 })
 
 
+# One test_that() per method, so that a failure names the method that failed
+for (method_name in c("psis", "tis", "sis")) {
+  test_that(paste0(method_name, "() handles negative infinite log ratios"), {
+    method <- match.fun(method_name)
+    zero <- c(TRUE, FALSE, TRUE, rep(FALSE, 97))
+    log_ratios <- seq(-9, 0, length.out = 100)
+    log_ratios[zero] <- -Inf
+
+    out <- suppressWarnings(method(log_ratios, r_eff = NA))
+    w_log <- weights(out, normalize = TRUE, log = TRUE)
+    w <- weights(out, normalize = TRUE, log = FALSE)
+
+    expect_identical(weights(out, normalize = FALSE, log = TRUE)[zero], c(-Inf, -Inf))
+    expect_identical(w_log[zero], c(-Inf, -Inf))
+    expect_identical(w[zero], c(0, 0))
+    expect_true(all(w[!zero] > 0))
+    expect_equal(sum(w), 1)
+  })
+
+  test_that(paste0(method_name, "() rejects all negative infinite columns"), {
+    method <- match.fun(method_name)
+    error <- "Each column of log ratios must contain at least one finite value."
+
+    expect_error(method(rep(-Inf, 10), r_eff = NA), error, fixed = TRUE)
+    expect_error(
+      method(cbind(seq(-9, 0, length.out = 10), rep(-Inf, 10)), r_eff = NA),
+      error,
+      fixed = TRUE
+    )
+  })
+}
+
+
 test_that("explict test of values for 'sis' and 'tis'", {
   lw <- 1:16
   expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))

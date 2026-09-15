@@ -224,6 +224,15 @@ test_that("weighted quantiles work", {
   )
 })
 
+test_that("E_loo handles negative infinite log ratios", {
+  log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
+  psis_object <- suppressWarnings(psis(log_ratios))
+  x <- seq_along(log_ratios)
+
+  expect_no_error(out <- E_loo(x, psis_object, log_ratios = log_ratios))
+  expect_equal(out$value, sum(weights(psis_object, log = FALSE) * x))
+})
+
 test_that("weighted variance works", {
   x <- rnorm(100)
   w <- rep(0.01, 100)
@@ -232,4 +241,7 @@ test_that("weighted variance works", {
 
   w <- c(rep(0.1, 10), rep(0, 90))
   expect_equal(.wvar(x, w), var(x[w > 0]))
+
+  x <- 1e8 + c(-1, 0, 1)
+  expect_equal(.wvar(x, rep(1 / 3, 3)), 1)
 })
