@@ -111,13 +111,21 @@ validate_ll <- function(x) {
 
 #' Check that a log-likelihood array/matrix/vector is finite
 #'
-#' `loo()` negates the log likelihood before importance sampling, so `-Inf`
-#' arrives at [validate_ll()] as `+Inf` and is reported with the polarity
-#' reversed, while `+Inf` passes as a `-Inf` log ratio and silently produces
-#' `NA` estimates. Both are degenerate as a log likelihood, so `loo()` requires
-#' finite values and says so directly. This is deliberately stricter than
-#' [validate_ll()], which is also used for log ratios, where `-Inf` is a valid
-#' zero importance weight.
+#' `loo()` requires finite log-likelihood values, for two unrelated reasons.
+#'
+#' A `-Inf` log likelihood is meaningful on its own — the observation has zero
+#' likelihood under that draw — but the leave-one-out importance ratio is
+#' `1 / p(y_i | theta)`, which is then infinite, so the PSIS estimate does not
+#' exist. Because `loo()` negates the log likelihood before importance
+#' sampling, this used to surface as [validate_ll()]'s `+Inf` message, with the
+#' polarity reversed.
+#'
+#' A `+Inf` log likelihood is not meaningful, and it passes the log-ratio check
+#' as a `-Inf` ratio. `ll + lw` is then `Inf + -Inf`, so a single such value
+#' made every estimate for the model `NA`.
+#'
+#' This is deliberately stricter than [validate_ll()], which is also used for
+#' log ratios, where `-Inf` is a valid zero importance weight.
 #'
 #' @noRd
 #' @param x Array/matrix/vector of log-likelihood values.

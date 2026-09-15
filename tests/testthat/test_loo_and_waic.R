@@ -110,8 +110,9 @@ test_that("loo keeps the existing message for NA log likelihoods", {
 })
 
 test_that("rejecting non-finite log likelihoods leaves psis() permissive", {
-  # loo() takes a log likelihood, where an infinite value is degenerate; psis()
-  # takes log ratios, where -Inf is a valid zero weight
+  # a -Inf log likelihood is valid in itself, but inverts to an infinite
+  # leave-one-out importance ratio, so loo() cannot use it; a -Inf log ratio
+  # passed straight to psis() is just a zero weight
   log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
 
   expect_no_error(out <- suppressWarnings(psis(log_ratios, r_eff = NA)))
