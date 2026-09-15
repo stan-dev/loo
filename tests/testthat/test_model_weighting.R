@@ -152,6 +152,39 @@ test_that("pseudo-BMA gives zero weight to an impossible model", {
   expect_equal(as.numeric(pseudobma_weights(lpd, BB = FALSE)), c(0, 1))
 })
 
+lpd_bad_values <- list(`NA` = NA_real_, `NaN` = NaN, `Inf` = Inf)
+
+# One test_that() per value, so a failure names which one broke
+for (lpd_bad_name in names(lpd_bad_values)) {
+  test_that(paste("model weighting rejects", lpd_bad_name, "predictive densities"), {
+    bad <- lpd_bad_values[[lpd_bad_name]]
+    set.seed(1)
+    lpd <- cbind(rnorm(20, -2), rnorm(20, -2.2))
+    error <- "All values in 'lpd_point' must be finite or -Inf."
+
+    single <- lpd
+    single[3, 2] <- bad
+    expect_error(stacking_weights(single), error, fixed = TRUE)
+    expect_error(pseudobma_weights(single, BB = FALSE), error, fixed = TRUE)
+    expect_error(pseudobma_weights(single, BB = TRUE), error, fixed = TRUE)
+
+    whole_column <- lpd
+    whole_column[, 2] <- bad
+    expect_error(stacking_weights(whole_column), error, fixed = TRUE)
+    expect_error(pseudobma_weights(whole_column, BB = FALSE), error, fixed = TRUE)
+  })
+}
+
+test_that("model weighting still accepts -Inf predictive densities", {
+  set.seed(1)
+  lpd <- cbind(rnorm(20, -2), rnorm(20, -2.2))
+  lpd[3, 2] <- -Inf
+
+  expect_no_error(stacking_weights(lpd))
+  expect_no_error(pseudobma_weights(lpd, BB = FALSE))
+  expect_no_error(pseudobma_weights(lpd, BB = TRUE))
+})
+
 test_that("model weighting rejects inputs with no finite predictive density", {
   stacking_lpd <- rbind(c(-Inf, -Inf), c(-1, -1))
   expect_error(
