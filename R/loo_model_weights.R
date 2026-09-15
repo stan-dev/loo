@@ -234,15 +234,6 @@ loo_model_weights.default <-
   }
 
 
-# `-Inf` is a valid zero predictive density; `NA`, `NaN` and `+Inf` make
-# stacking fail in the optimizer and pseudo-BMA return invalid weights.
-validate_lpd_point <- function(lpd_point) {
-  if (anyNA(lpd_point) || any(lpd_point == Inf)) {
-    stop("All values in 'lpd_point' must be finite or -Inf.")
-  }
-  invisible(lpd_point)
-}
-
 #' @rdname loo_model_weights
 #' @export
 #' @param lpd_point If calling `stacking_weights()` or `pseudobma_weights()`
@@ -366,15 +357,6 @@ pseudobma_weights <-
   }
 
 
-#' Generate dirichlet simulations, rewritten version
-#' @importFrom stats rgamma
-#' @noRd
-dirichlet_rng <- function(n, alpha) {
-  K <- length(alpha)
-  gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
-  gamma_sim / rowSums(gamma_sim)
-}
-
 #' @export
 print.stacking_weights <- function(x, digits = 3, ...) {
   cat("Method: stacking\n------\n")
@@ -391,6 +373,27 @@ print.pseudobma_weights <- function(x, digits = 3, ...) {
 print.pseudobma_bb_weights <- function(x, digits = 3, ...) {
   cat("Method: pseudo-BMA+ with Bayesian bootstrap\n------\n")
   print_weight_vector(x, digits = digits)
+}
+
+
+
+# internal ----------------------------------------------------------------
+# `-Inf` is a valid zero predictive density; `NA`, `NaN` and `+Inf` make
+# stacking fail in the optimizer and pseudo-BMA return invalid weights.
+validate_lpd_point <- function(lpd_point) {
+  if (anyNA(lpd_point) || any(lpd_point == Inf)) {
+    stop("All values in 'lpd_point' must be finite or -Inf.")
+  }
+  invisible(lpd_point)
+}
+
+#' Generate dirichlet simulations, rewritten version
+#' @importFrom stats rgamma
+#' @noRd
+dirichlet_rng <- function(n, alpha) {
+  K <- length(alpha)
+  gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
+  gamma_sim / rowSums(gamma_sim)
 }
 
 print_weight_vector <- function(x, digits) {
