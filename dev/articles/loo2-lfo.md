@@ -723,7 +723,7 @@ sessionInfo()
 
     R version 4.6.1 (2026-06-24)
     Platform: x86_64-pc-linux-gnu
-    Running under: Ubuntu 24.04.4 LTS
+    Running under: Ubuntu 24.04.5 LTS
 
     Matrix products: default
     BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -753,10 +753,10 @@ sessionInfo()
     [13] tools_4.6.1          generics_0.1.4       stats4_4.6.1        
     [16] parallel_4.6.1       tibble_3.3.1         pkgconfig_2.0.3     
     [19] Matrix_1.7-5         checkmate_2.3.4      RColorBrewer_1.1-3  
-    [22] S7_0.2.2             desc_1.4.3           distributional_0.8.1
+    [22] S7_0.2.2             desc_1.4.3           distributional_0.9.0
     [25] RcppParallel_6.2.1   lifecycle_1.0.5      compiler_4.6.1      
     [28] farver_2.1.2         stringr_1.6.0        textshaping_1.0.5   
-    [31] Brobdingnag_1.2-9    codetools_0.2-20     htmltools_0.5.9     
+    [31] Brobdingnag_1.3-1    codetools_0.2-20     htmltools_0.5.9     
     [34] sass_0.4.10          yaml_2.3.12          pillar_1.11.1       
     [37] pkgdown_2.2.1        jquerylib_0.1.4      cachem_1.1.0        
     [40] StanHeaders_2.39.1   bridgesampling_1.2-1 abind_1.4-8         

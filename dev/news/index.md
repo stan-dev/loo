@@ -2,6 +2,11 @@
 
 ## loo (development version)
 
+- Improve numerical stability in
+  [`loo()`](https://mc-stan.org/loo/dev/reference/loo.md),
+  [`psis()`](https://mc-stan.org/loo/dev/reference/psis.md), model
+  weighting, subsampling, and moment matching in
+  [\#395](https://github.com/stan-dev/loo/issues/395)
 - Fix
   [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
   when used with subsampling: compute model comparison by

@@ -47,7 +47,6 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Vignettes</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item dropdown">
@@ -96,7 +95,7 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-09-08</h4>
+            <h4 data-toc-skip class="date">2026-09-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
@@ -241,7 +240,7 @@ log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.014 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.013 seconds (Generated Quantities)</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -320,31 +319,31 @@ predictive densities of all the observations.</p>
  Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)
-
-
- Elapsed Time: 0.008 seconds (Generated Quantities)
+ Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)
+ Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)
+ Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)
+ Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)
+ Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.008 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.007 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.007 seconds (Generated Quantities)</code></pre>
 </div>
 <div class="section level3">
 <h3 id="computing-k-fold-elpd">Computing K-fold elpd:<a class="anchor" aria-label="anchor" href="#computing-k-fold-elpd"></a>
