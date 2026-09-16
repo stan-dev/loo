@@ -46,43 +46,6 @@
 #'   measure is compared against *its own* best model, so `mse_diff` may use a
 #'   different reference than `elpd_diff`. Each `{measure}_diff` column then has
 #'   exactly one `0` entry, at that measure's best model.
-#' @param custom_se_fn How to compute the standard error of the difference
-#'   between two models for a **custom** measure. Nothing is inferred from the
-#'   measure's values. A measure that declares
-#'   `attr(my_fun, "measure_se_diff")` needs no argument here, and this argument
-#'   overrides that declaration. A measure that declares nothing must have a
-#'   value here. One of:
-#'   \itemize{
-#'     \item a **function** called as `custom_se_fn(ref, cmp)` (see
-#'       **Custom measure standard errors** below);
-#'     \item `"sum"`, for a measure whose estimate is the sum of its pointwise
-#'       values, giving `sqrt(N) * sd(d_i)` as for `elpd`;
-#'     \item `"mean"`, for a measure whose estimate is the mean of its pointwise
-#'       values, giving `sd(d_i) / sqrt(N)` as for `mae`;
-#'     \item `NULL`, to report the difference with an `NA` standard error.
-#'   }
-#'   For two or more custom measures, pass a list named by bare measure name,
-#'   e.g. `list(huber = "mean", nrmse = my_se_fn)`. The list may name only some
-#'   of them; the rest use their own declaration. Ignored, with a warning,
-#'   when no custom measure is present.
-#'
-#' @section Custom measure standard errors:
-#'   A function passed as `custom_se_fn` is called once per comparison as
-#'   `custom_se_fn(ref = <list>, cmp = <list>)`, with **named** arguments. Each
-#'   argument describes one model and has elements `estimate` (scalar), `se`
-#'   (that model's own standard error), `pointwise` (a plain numeric vector, not
-#'   a matrix), and `extra` (whatever the measure returned as `extra`, or
-#'   `NULL`). All values are on the measure's natural scale, so the function
-#'   does not need to account for the utility-scale conversion applied to the
-#'   reported differences. It must return the standard error of the difference
-#'   as a numeric scalar. For example:
-#'
-#'   ```
-#'   my_se_fn <- function(ref, cmp) {
-#'     d <- cmp$pointwise - ref$pointwise
-#'     sd(d) / sqrt(length(d))
-#'   }
-#'   ```
 #'
 #' @return A data frame of class `"compare.loo"` with one row per model and its
 #'   own print method.
@@ -209,10 +172,9 @@
 #'     pointwise contributions (`r2`, `rmse`, `bacc`), so the measure supplies
 #'     its own standard error of the difference.
 #'   * `"custom"`: the standard error comes from the measure's own
-#'     `attr(my_fun, "measure_se_diff")` declaration, or from `custom_se_fn`,
-#'     which overrides it. One of the two must give a value.
-#'     `{measure}_se_diff` is `NA` only when `custom_se_fn` is an explicit
-#'     `NULL` for that measure.
+#'     `attr(my_fun, "measure_se_diff")` declaration, set with
+#'     [custom_measure()]. `{measure}_se_diff` is `NA` when the measure
+#'     declares nothing.
 #'
 #' ## Source-specific behavior
 #'   Comparisons behave the same way across sources, with three exceptions:
@@ -319,44 +281,24 @@
 #' }
 #' }
 #'
-model_compare <- function(x, ..., rank_by = NULL, custom_se_fn) {
+model_compare <- function(x, ..., rank_by = NULL) {
   if (missing(x)) {
     dots <- list(...)
     if (!length(dots)) {
       stop("No models supplied.", call. = FALSE)
     }
-    # `custom_se_fn` has no default: omitted and explicit `NULL` differ, so it
-    # is forwarded only when the caller supplied it.
-    args <- list(dots, rank_by = rank_by)
-    if (!missing(custom_se_fn)) {
-      args$custom_se_fn <- custom_se_fn
-    }
-    return(do.call(model_compare, args))
+    return(model_compare(dots, rank_by = rank_by))
   }
   UseMethod("model_compare")
 }
 
 #' @rdname model_compare
 #' @export
-model_compare.default <- function(x, ..., rank_by = NULL, custom_se_fn) {
-  # `custom_se_fn` is deliberately given no default: an omitted argument and an
-  # explicit `NULL` mean different things (error vs. "report an NA se_diff").
-  custom_se_fn_supplied <- !missing(custom_se_fn)
-  if (!custom_se_fn_supplied) {
-    custom_se_fn <- NULL
-  }
-
+model_compare.default <- function(x, ..., rank_by = NULL) {
   loos <- .model_compare_inputs(x, ...)
 
   # if subsampling is used
   if (any(sapply(loos, inherits, "psis_loo_ss"))) {
-    if (custom_se_fn_supplied) {
-      stop(
-        "`custom_se_fn` is not supported for subsampled loo objects, which ",
-        "are compared on elpd only.",
-        call. = FALSE
-      )
-    }
     return(model_compare.psis_loo_ss_list(loos))
   }
 
@@ -366,12 +308,7 @@ model_compare.default <- function(x, ..., rank_by = NULL, custom_se_fn) {
   is_pm <- vapply(loos, is.pred_measure, logical(1))
 
   if (all(is_pm)) {
-    return(compare_pred_measure(
-      loos,
-      rank_by = rank_by,
-      custom_se_fn = custom_se_fn,
-      custom_se_fn_supplied = custom_se_fn_supplied
-    ))
+    return(compare_pred_measure(loos, rank_by = rank_by))
   }
 
   if (any(is_pm)) {
@@ -396,12 +333,6 @@ model_compare.default <- function(x, ..., rank_by = NULL, custom_se_fn) {
         call. = FALSE
       )
     }
-  }
-  if (custom_se_fn_supplied) {
-    warning(
-      "`custom_se_fn` is only used for `pred_measure` comparisons and will be ignored.",
-      call. = FALSE
-    )
   }
 
   # run pre-comparison checks

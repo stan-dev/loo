@@ -727,7 +727,7 @@ test_that("bacc reports the difference without an se when the strata are gone", 
   expect_false(is.na(mixed_stale_first$bacc_se_diff[2L]))
 })
 
-test_that("custom measures take their se_diff from `custom_se_fn`", {
+test_that("custom measures take their se_diff from their declaration", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
 
   # a custom rmse, whose estimate is neither a sum nor a mean of `pointwise`
@@ -763,25 +763,28 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
     "custom"
   )
 
-  # the measure declares nothing, so omitting `custom_se_fn` is an error
-  # that names the measure
-  expect_error(
-    suppressMessages(model_compare(pms)),
-    "my_rmse.*custom measure with no .measure_se_diff. attribute"
+  # the measure declares nothing, so the difference is reported with an NA
+  # standard error and a message that names the measure
+  expect_message(
+    comp_null <- model_compare(pms),
+    "my_rmse declares no `se_diff_fun`"
   )
-
-  # an explicit NULL reports the difference with an NA standard error
-  comp_null <- suppressMessages(model_compare(pms, custom_se_fn = NULL))
   expect_false(is.na(comp_null$my_rmse_diff[[2L]]))
   expect_true(all(is.na(comp_null$my_rmse_se_diff)))
   expect_true(is.na(
     loo:::.pair_measure_stats(pms[[2L]], pms[[1L]], "my_rmse_loo", loos = pms)["se"]
   ))
 
-  # a function gets the delta-method standard error
-  comp_fn <- suppressMessages(
-    model_compare(pms, custom_se_fn = loo:::.se_diff_rmse)
+  # a declared function gets the delta-method standard error
+  pms_fn <- list(
+    m1 = make(res$loo_p_m1, res$mupred_m1, res$ylp_m1,
+              custom_measure(my_rmse, name = "my_rmse",
+                             se_diff_fun = loo:::.se_diff_rmse)),
+    m2 = make(res$loo_p_m2, res$mupred_m2, res$ylp_m2,
+              custom_measure(my_rmse, name = "my_rmse",
+                             se_diff_fun = loo:::.se_diff_rmse))
   )
+  comp_fn <- suppressMessages(model_compare(pms_fn))
   expect_false(any(is.na(comp_fn$my_rmse_se_diff)))
   # without `rank_by`, `my_rmse` is compared against its own best model, which
   # is the row with a zero difference and a zero standard error
@@ -805,7 +808,8 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
     loos = pms, se_fn = loo:::.se_diff_rmse
   )
 
-  # a custom measure can carry its own auxiliary data through to `custom_se_fn`,
+  # a custom measure can carry its own auxiliary data through to its
+  # `se_diff_fun`,
   # and each model receives its own copy
   my_scaled <- function(y, mupred) {
     sqe_i <- (y - colMeans(mupred))^2
@@ -857,11 +861,15 @@ test_that("custom measures take their se_diff from `custom_se_fn`", {
     "must be a list"
   )
 
-  # a `custom_se_fn` that returns nonsense is caught
+  # a declared `se_diff_fun` that returns nonsense is caught
+  bad_rmse <- custom_measure(my_rmse, name = "my_rmse",
+                             se_diff_fun = function(ref, cmp) c(1, 2))
+  pms_bad <- list(
+    m1 = make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, bad_rmse),
+    m2 = make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, bad_rmse)
+  )
   expect_error(
-    suppressMessages(
-      model_compare(pms, custom_se_fn = function(ref, cmp) c(1, 2))
-    ),
+    suppressMessages(model_compare(pms_bad)),
     "must return a numeric scalar"
   )
 })
@@ -880,6 +888,7 @@ test_that("a declared custom loss is compared and ranked as a loss", {
       )
     }
     attr(f, "measure_name") <- "my_mse"
+    attr(f, "measure_se_diff") <- "mean"
     if (declare_loss) attr(f, "measure_loss") <- TRUE
     f
   }
@@ -903,10 +912,10 @@ test_that("a declared custom loss is compared and ranked as a loss", {
 
   # the sign conversion is announced, as it is for built-in loss measures
   expect_message(
-    comp <- model_compare(declared, custom_se_fn = "mean"),
+    comp <- model_compare(declared),
     "my_mse.*utility scale"
   )
-  comp_plain <- suppressMessages(model_compare(plain, custom_se_fn = "mean"))
+  comp_plain <- suppressMessages(model_compare(plain))
 
   expect_equal(attr(comp, "sign_converted_measures"), "my_mse")
   expect_length(attr(comp_plain, "sign_converted_measures"), 0L)
@@ -920,10 +929,10 @@ test_that("a declared custom loss is compared and ranked as a loss", {
   # against a single pinned reference, only the orientation of the difference
   # changes
   comp_ref <- suppressMessages(
-    model_compare(declared, rank_by = "elpd", custom_se_fn = "mean")
+    model_compare(declared, rank_by = "elpd")
   )
   comp_plain_ref <- suppressMessages(
-    model_compare(plain, rank_by = "elpd", custom_se_fn = "mean")
+    model_compare(plain, rank_by = "elpd")
   )
   expect_equal(comp_ref$my_mse_diff, -comp_plain_ref$my_mse_diff)
   expect_equal(comp_ref$my_mse_se_diff, comp_plain_ref$my_mse_se_diff)
@@ -936,10 +945,10 @@ test_that("a declared custom loss is compared and ranked as a loss", {
 
   # `rank_by` puts the lowest loss first
   ranked <- suppressMessages(
-    model_compare(declared, rank_by = "my_mse", custom_se_fn = NULL)
+    model_compare(declared, rank_by = "my_mse")
   )
   ranked_plain <- suppressMessages(
-    model_compare(plain, rank_by = "my_mse", custom_se_fn = NULL)
+    model_compare(plain, rank_by = "my_mse")
   )
   est <- vapply(
     ranked$model,
@@ -952,13 +961,13 @@ test_that("a declared custom loss is compared and ranked as a loss", {
   # models must agree on the declaration
   expect_error(
     suppressMessages(
-      model_compare(list(declared$m1, plain$m2), custom_se_fn = "mean")
+      model_compare(list(declared$m1, plain$m2))
     ),
     "disagree on `measure_info`"
   )
 })
 
-test_that("`custom_se_fn` accepts the \"sum\" and \"mean\" shorthands", {
+test_that("`measure_se_diff` accepts the \"sum\" and \"mean\" shorthands", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
 
   # a custom measure reproducing the built-in `mae` on the utility scale. It
@@ -979,6 +988,7 @@ test_that("`custom_se_fn` accepts the \"sum\" and \"mean\" shorthands", {
     )
   }
   attr(my_mae, "measure_name") <- "my_mae"
+  attr(my_mae, "measure_se_diff") <- "mean"
 
   make <- function(loo, mupred, ylp, measure) {
     loo_pred_measure(
@@ -995,9 +1005,7 @@ test_that("`custom_se_fn` accepts the \"sum\" and \"mean\" shorthands", {
     make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, "mae")
   )
 
-  comp_custom <- suppressMessages(
-    model_compare(custom, custom_se_fn = "mean")
-  )
+  comp_custom <- suppressMessages(model_compare(custom))
   comp_builtin <- suppressMessages(model_compare(builtin))
 
   # "mean" reuses the built-in branch, so results must match `mae` exactly
@@ -1011,12 +1019,13 @@ test_that("`custom_se_fn` accepts the \"sum\" and \"mean\" shorthands", {
          pointwise = ae_i)
   }
   attr(my_sum, "measure_name") <- "my_sum"
+  attr(my_sum, "measure_se_diff") <- "sum"
   # named so that the comparison's row order can be mapped back to the inputs
   summed <- list(
     a = make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, my_sum),
     b = make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, my_sum)
   )
-  comp_sum <- suppressMessages(model_compare(summed, custom_se_fn = "sum"))
+  comp_sum <- suppressMessages(model_compare(summed))
   expect_false(any(is.na(comp_sum$my_sum_se_diff)))
 
   # matches `sqrt(N) * sd(d_i)` computed by hand from the pointwise columns
@@ -1036,118 +1045,20 @@ test_that("`custom_se_fn` accepts the \"sum\" and \"mean\" shorthands", {
     )
   }
   attr(my_rmse, "measure_name") <- "my_rmse"
+  attr(my_rmse, "measure_se_diff") <- "mean"
   mismatched <- list(
     make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, my_rmse),
     make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, my_rmse)
   )
   expect_warning(
-    suppressMessages(model_compare(mismatched, custom_se_fn = "mean")),
+    suppressMessages(model_compare(mismatched)),
     "does not reproduce its estimate"
   )
 
-  # any other string is rejected
+  # any other string is rejected when the measure is defined
   expect_error(
-    suppressMessages(model_compare(custom, custom_se_fn = "median")),
+    custom_measure(my_mae, name = "my_mae", se_diff_fun = "median"),
     "must be a function"
-  )
-})
-
-test_that("`custom_se_fn` validates its per-measure form", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-
-  make_fun <- function(name, offset) {
-    f <- function(y, mupred) {
-      ae_i <- abs(y - colMeans(mupred)) + offset
-      list(estimate = mean(ae_i), se = sqrt(var(ae_i) / length(ae_i)),
-           pointwise = ae_i)
-    }
-    attr(f, "measure_name") <- name
-    f
-  }
-  a <- make_fun("m_a", 0)
-  b <- make_fun("m_b", 1)
-
-  make <- function(loo, mupred, ylp, measure) {
-    loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = measure
-    )
-  }
-
-  two <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, list(m_a = a, m_b = b)),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, list(m_a = a, m_b = b))
-  )
-
-  # a bare value is ambiguous with more than one custom measure
-  expect_error(
-    suppressMessages(model_compare(two, custom_se_fn = "mean")),
-    "must be a named list"
-  )
-
-  # a named list may mix the accepted forms
-  comp <- suppressMessages(model_compare(
-    two,
-    custom_se_fn = list(m_a = "mean", m_b = NULL)
-  ))
-  expect_false(any(is.na(comp$m_a_se_diff)))
-  expect_true(all(is.na(comp$m_b_se_diff)))
-
-  # neither measure declares a `measure_se_diff` attribute, so an entry must
-  # exist for every custom measure
-  expect_error(
-    suppressMessages(model_compare(two, custom_se_fn = list(m_a = "mean"))),
-    "m_b.*custom measure with no .measure_se_diff. attribute"
-  )
-  # unknown names are typos
-  expect_error(
-    suppressMessages(model_compare(
-      two,
-      custom_se_fn = list(m_a = "mean", m_b = NULL, nope = "mean")
-    )),
-    "Unknown measure"
-  )
-  # unnamed lists cannot be matched to measures
-  expect_error(
-    suppressMessages(model_compare(two, custom_se_fn = list("mean", NULL))),
-    "must be named after a custom measure"
-  )
-  # elements must be one of the accepted forms
-  expect_error(
-    suppressMessages(model_compare(
-      two,
-      custom_se_fn = list(m_a = 1, m_b = NULL)
-    )),
-    "must be a function"
-  )
-
-  # supplying it when no custom measure is present warns and changes nothing
-  builtin <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, "mae"),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, "mae")
-  )
-  expect_warning(
-    comp_builtin <- suppressMessages(
-      model_compare(builtin, custom_se_fn = "mean")
-    ),
-    "only used for custom measures"
-  )
-  expect_equal(
-    comp_builtin$mae_se_diff,
-    suppressMessages(model_compare(builtin))$mae_se_diff
-  )
-
-  # the model_compare() alias forwards the argument
-  one <- list(
-    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, a),
-    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, a)
-  )
-  expect_equal(
-    suppressMessages(model_compare(one, custom_se_fn = "mean"))$m_a_se_diff,
-    suppressMessages(model_compare(one, custom_se_fn = "mean"))$m_a_se_diff
-  )
-  expect_error(
-    suppressMessages(model_compare(one)),
-    "m_a.*custom measure with no .measure_se_diff. attribute"
   )
 })
 
@@ -1182,27 +1093,44 @@ test_that("a custom measure can declare `measure_se_diff` itself", {
   # the declaration is recorded on the result object
   expect_equal(attr(declared[[1L]], "measure_info")$m_a$se_diff_fun, "mean")
 
-  # so the comparison needs no argument, and matches the supplied form
+  # so the comparison needs no argument
   comp <- suppressMessages(model_compare(declared))
   expect_false(any(is.na(comp$m_a_se_diff)))
-  expect_equal(
-    comp$m_a_se_diff,
-    suppressMessages(model_compare(plain, custom_se_fn = "mean"))$m_a_se_diff
+
+  # a measure that declares nothing gets an NA standard error and a message,
+  # but its difference is still reported
+  expect_message(
+    comp_plain <- model_compare(plain),
+    "m_a declares no `se_diff_fun`"
   )
+  expect_true(all(is.na(comp_plain$m_a_se_diff)))
+  expect_equal(comp_plain$m_a_diff, comp$m_a_diff)
 
-  # `custom_se_fn` overrides the declaration, including an explicit NULL
-  expect_true(all(is.na(
-    suppressMessages(model_compare(declared, custom_se_fn = NULL))$m_a_se_diff
-  )))
-
-  # a named list may name only the measures that declare nothing
+  # declared and undeclared measures can be compared together; the message
+  # names only the undeclared one
   mixed <- pms(list(m_a = make_fun("m_a", se_diff = "mean"),
                     m_b = make_fun("m_b")))
-  comp_mixed <- suppressMessages(
-    model_compare(mixed, custom_se_fn = list(m_b = "mean"))
+  expect_message(
+    comp_mixed <- model_compare(mixed),
+    "Custom measure m_b declares"
   )
   expect_false(any(is.na(comp_mixed$m_a_se_diff)))
-  expect_false(any(is.na(comp_mixed$m_b_se_diff)))
+  expect_true(all(is.na(comp_mixed$m_b_se_diff)))
+
+  # `custom_measure()` records the same declaration as the attribute
+  wrapped <- pms(custom_measure(
+    function(y, mupred) {
+      ae_i <- abs(y - colMeans(mupred))
+      list(estimate = mean(ae_i), se = sqrt(var(ae_i) / length(ae_i)),
+           pointwise = ae_i)
+    },
+    name = "m_a",
+    se_diff_fun = "mean"
+  ))
+  expect_equal(
+    suppressMessages(model_compare(wrapped))$m_a_se_diff,
+    comp$m_a_se_diff
+  )
 
   # an invalid declaration names the attribute, not the argument
   expect_error(
@@ -1242,7 +1170,7 @@ test_that("model_compare errors on inconsistent measure metadata", {
   pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, make_fun(FALSE))
 
   expect_error(
-    suppressMessages(model_compare(pm1, pm2, custom_se_fn = list(my_mse = "mean"))),
+    suppressMessages(model_compare(pm1, pm2)),
     "disagree on `measure_info` for measure 'my_mse'"
   )
 })
@@ -1894,11 +1822,6 @@ test_that("loo_compare is frozen to classic elpd comparison", {
   expect_error(
     suppressWarnings(loo_compare(w1, w2, rank_by = "model1")),
     "`rank_by` is not supported by the deprecated `loo_compare()`",
-    fixed = TRUE
-  )
-  expect_error(
-    suppressWarnings(loo_compare(w1, w2, custom_se_fn = "mean")),
-    "`custom_se_fn` is not supported by the deprecated `loo_compare()`",
     fixed = TRUE
   )
 })

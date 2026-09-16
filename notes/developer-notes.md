@@ -48,7 +48,8 @@ For the merge summary, see the PR description
 ### Added (did not exist on `loo-v3.0.0`)
 
 - `R/pred_measure.R` — `insample_pred_measure()`, `loo_pred_measure()`,
-  `kfold_pred_measure()`, `test_pred_measure()`, `pred_measure()`
+  `kfold_pred_measure()`, `test_pred_measure()`, `pred_measure()`,
+  `custom_measure()`
 - `R/pred_measure-compute.R`, `R/pred_measure-helpers.R`,
   `R/pred_measure-builtin.R` — orchestration and `measure_*()`
   implementations
@@ -174,7 +175,8 @@ with fixture `test_data_roaches_compare.Rds`.
   paired differences.
 - **Decision:** Values are always stored on the measure's own scale. A single
   `loss` flag records the orientation --- `.measure_spec` for built-ins,
-  `attr(fun, "measure_loss")` for custom measures --- and is recorded per
+  `attr(fun, "measure_loss")` for custom measures, set by
+  `custom_measure(loss = )` --- and is recorded per
   measure in the `measure_info` attribute of each `*_pred_measure()` result.
   `model_compare()` sign-flips measures with `loss = TRUE` for utility-scale
   `{measure}_diff`. The per-call `higher_is_better` control has been removed:
@@ -559,6 +561,17 @@ Thank you for pointing this out. This is indeed a flaw in the design.
 I refactored the design such that a custom measure can have now the attribute
 `measure_se_diff`.
 
+The exported wrapper `custom_measure(fun, name, se_diff_fun = NULL, loss = FALSE)`
+sets the three attributes `measure_name`, `measure_loss`, and
+`measure_se_diff`. An unnamed
+function in a `measure` list now takes its name from `measure_name`.
+
+With the declaration in place, the `custom_se_fn` argument of `model_compare()`
+was redundant, so it is removed. For a custom measure that declares
+nothing, `model_compare()` reports the difference with an `NA` standard error
+and a message. To change the standard error, redefine the measure and
+recompute the `*_pred_measure()` results.
+
 ```r
 huber_fn <- function(y, mupred) {
   delta <- 10
@@ -572,12 +585,15 @@ huber_se_fn <- function(ref, cmp) {
   sd(d) / sqrt(length(d))
 }
 
-attr(huber_fn, "measure_name") <- "huber"
-attr(huber_fn, "measure_loss") <- TRUE
-attr(huber_fn, "measure_se_diff") <- huber_se_fn
+huber_measure <- custom_measure(
+  fun = huber_fn,
+  name = "huber",
+  se_diff_fun = huber_se_fn,
+  loss = TRUE
+)
 
-h1 <- fit_measure(fit_m1, measure = list("rmse", "huber" = huber_fn))
-h3 <- fit_measure(fit_m3, measure = list("rmse", "huber" = huber_fn))
+h1 <- fit_measure(fit_m1, measure = list("rmse", huber_measure))
+h3 <- fit_measure(fit_m3, measure = list("rmse", huber_measure))
 
 comp_h <- model_compare(list(m3 = h3, m1 = h1))
 ```

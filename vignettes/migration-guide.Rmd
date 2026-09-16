@@ -196,7 +196,7 @@ generic, so `loo_compare` methods registered by other packages (for example
 keep dispatching. It is frozen at its previous behavior: it compares `"loo"`,
 `"waic"`, and `"kfold"` objects on ELPD only, and returns exactly what
 `model_compare()` returns for those inputs. Everything added in 3.0.0 --- the
-`pred_measure` sources, `rank_by`, and `custom_se_fn` --- is available only
+`pred_measure` sources, `rank_by`, and `custom_measure()` --- is available only
 through `model_compare()`.
 
 ```r

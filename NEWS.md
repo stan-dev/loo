@@ -13,8 +13,8 @@
   `loo_compare.stanreg` in **rstanarm**) keep dispatching, but it now warns
   (once per session) and is frozen at its previous behaviour: `"loo"`, `"waic"`, and `"kfold"` objects
   compared on ELPD only, returning exactly what `model_compare()` returns for
-  those inputs. Comparing `pred_measure` results, or using `rank_by` or
-  `custom_se_fn`, requires `model_compare()`.
+  those inputs. Comparing `pred_measure` results, or using `rank_by`, requires
+  `model_compare()`.
 * `model_compare()` supports every `pred_measure` result --- from
   `loo_pred_measure()`, `kfold_pred_measure()`, `test_pred_measure()`, and
   `insample_pred_measure()` --- with paired differences for all measures common
@@ -64,30 +64,30 @@
   built from paired pointwise differences, so the old name described the one
   category that is *not* a paired pointwise standard deviation. `diff_method` is
   read-only metadata in `measure_info`, so no user code that passes
-  arguments is affected; `custom_se_fn` still accepts only `"sum"` and `"mean"`.
+  arguments is affected; `measure_se_diff` still accepts only `"sum"` and
+  `"mean"` as shorthands.
 * Bug fix: in `model_compare()`, `mlpd` was registered with
   `diff_method = "sum"` although its estimate is the *mean* of the pointwise log
   predictive densities. `mlpd_diff` was therefore reported as the sum of the
   pointwise differences (a factor of `N` too large, and inconsistent with the
   difference of the reported `mlpd` estimates), with a matching `mlpd_se_diff`.
   `mlpd` now uses `diff_method = "mean"`.
-* `model_compare()` gains a `custom_se_fn` argument controlling how the standard
-  error of a difference is computed for a **custom** measure. It accepts a
-  function called as `custom_se_fn(ref, cmp)`, the shorthands `"sum"` and
-  `"mean"` for the paired pointwise formulas, or `NULL` to report the difference
-  with an `NA` standard error; with two or more custom measures, pass a list
-  named by measure, which may name only some of them. It is required when a
-  compared custom measure declares no `measure_se_diff` attribute (see below),
-  and it overrides that declaration --- nothing is inferred from a measure's
-  values any more, and custom measures now carry `diff_method = "custom"`
-  instead of `"auto"`. The previous `attr(my_fun, "se_diff_fun")` route is
-  replaced by `attr(my_fun, "measure_se_diff")`.
+* New `custom_measure(fun, name, se_diff_fun = NULL, loss = FALSE)` defines a
+  custom measure. It sets the attributes `measure_name`, `measure_loss`, and
+  `measure_se_diff`, and validates them when the measure is defined. An unnamed
+  function in a `measure` list now takes its name from `measure_name`.
 * A custom measure can declare how the standard error of its difference is
-  computed with `attr(my_fun, "measure_se_diff")`, which accepts a function,
-  `"sum"`, or `"mean"`. A measure that declares it is self contained, so a
-  package can ship a custom measure that needs no argument at comparison time.
-  The declaration is recorded as `se_diff_fun` in the `measure_info` attribute,
-  and models that disagree on it cannot be compared.
+  computed with `attr(my_fun, "measure_se_diff")`, which accepts a function
+  called as `fn(ref, cmp)`, `"sum"`, or `"mean"`. A measure that declares it is
+  self contained, so a package can ship a custom measure that needs no argument
+  at comparison time. The declaration is recorded as `se_diff_fun` in the
+  `measure_info` attribute, and models that disagree on it cannot be compared.
+  For a custom measure that declares nothing, `model_compare()` reports the
+  difference with an `NA` standard error and a message. Nothing is inferred
+  from a measure's values any more, and custom measures now carry
+  `diff_method = "custom"` instead of `"auto"`. The previous
+  `attr(my_fun, "se_diff_fun")` route is replaced by
+  `attr(my_fun, "measure_se_diff")`.
 * A custom measure can declare that it is a loss with
   `attr(my_fun, "measure_loss") <- TRUE`, alongside `attr(my_fun,
   "measure_name")`. `model_compare()` then flips its differences onto the

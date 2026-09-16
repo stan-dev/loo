@@ -70,12 +70,7 @@ throw_insample_compare_warning <- function(source) {
 #' @param loos List of `pred_measure` objects, all sharing one evaluation
 #'   source.
 #' @param rank_by Bare measure name used to order models.
-#' @param custom_se_fn How to compute the standard error of the difference for
-#'   custom measures, see `.resolve_custom_se_fns()`.
-#' @param custom_se_fn_supplied Whether `custom_se_fn` was given at all, as
-#'   opposed to being an explicit `NULL`.
-compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
-                                 custom_se_fn_supplied = FALSE) {
+compare_pred_measure <- function(loos, rank_by = NULL) {
   # Resolve the source before the generic checks: mixed sources usually also
   # differ in their number of observations, and "you mixed LOO with k-fold" is
   # far more actionable than "your models have different N".
@@ -96,12 +91,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
   rank_spec <- .resolve_rank_by(loos, rank_by)
   rank_measure <- rank_spec$measure
   compare_cols <- .compare_pointwise_cols(loos)
-  custom_se_fns <- .resolve_custom_se_fns(
-    loos,
-    compare_cols,
-    custom_se_fn,
-    custom_se_fn_supplied
-  )
+  custom_se_diffs <- .resolve_custom_se_diffs(loos, compare_cols)
   inform_compare_sign_conversion(compare_cols, loos)
   ord <- model_compare_order(loos, rank_measure$internal)
   loos_ord <- loos[ord]
@@ -137,7 +127,7 @@ compare_pred_measure <- function(loos, rank_by = NULL, custom_se_fn = NULL,
     ref_loo <- loos_ord[[ref_idx]]
     ref_models[[bare]] <- rnms[[ref_idx]]
     method <- .measure_pointwise_diff_method(loos_ord, col)
-    se_fn <- if (identical(method, "custom")) custom_se_fns[[bare]] else NULL
+    se_fn <- if (identical(method, "custom")) custom_se_diffs[[bare]] else NULL
     if (is.character(se_fn)) {
       .check_declared_aggregation(loos_ord, col, se_fn)
     }
@@ -537,8 +527,8 @@ inform_compare_sign_conversion <- function(cols, loos) {
 #' Taken from the measure's stored `measure_info`: `"sum"` or `"mean"` when
 #' the overall estimate is the sum or the mean of its pointwise contributions,
 #' `"measure_specific"` when the built-in measure supplies its own
-#' `se_diff_fun`, and `"custom"` for custom measures, whose standard error is
-#' supplied at comparison time through `model_compare(custom_se_fn = )`.
+#' `se_diff_fun`, and `"custom"` for custom measures, whose standard error
+#' comes from their `measure_se_diff` declaration.
 #' Nothing is inferred. Every compared measure carries a `diff_method`;
 #' `.compare_metadata_check()` has already rejected the inputs otherwise, so the
 #' `elpd`/`ic` branch below only covers direct internal calls.
@@ -564,8 +554,8 @@ inform_compare_sign_conversion <- function(cols, loos) {
 
 #' Check that a declared `"sum"`/`"mean"` aggregation matches the estimate
 #'
-#' Only called when the user declares `custom_se_fn = "sum"` or `"mean"` for a
-#' custom measure. This is the computation `.measure_pointwise_diff_method()`
+#' Only called when a custom measure declares `measure_se_diff = "sum"` or
+#' `"mean"`. This is the computation `.measure_pointwise_diff_method()`
 #' used to run as autodetection, inverted: rather than guessing the aggregation,
 #' it verifies the one the user asserted.
 #' @noRd
@@ -582,7 +572,7 @@ inform_compare_sign_conversion <- function(cols, loos) {
   }
   if (!ok) {
     warning(
-      "`custom_se_fn = \"", method, "\"` was declared for measure '",
+      "`measure_se_diff = \"", method, "\"` was declared for measure '",
       .display_name(col, loos), "', but ", method,
       "(pointwise) does not reproduce its estimate.\n",
       "The reported standard error may be wrong.",
@@ -596,7 +586,7 @@ inform_compare_sign_conversion <- function(cols, loos) {
 #'
 #' Built-in measures with `diff_method = "measure_specific"` name an entry of
 #' `.se_diff_funs`. Custom measures never reach this; their standard error comes
-#' from `model_compare(custom_se_fn = )`, see `.resolve_custom_se_fns()`.
+#' from their `measure_se_diff` declaration, see `.resolve_custom_se_diffs()`.
 #' @noRd
 .measure_se_diff_fun <- function(loos, col) {
   bare <- .display_name(col, loos)
@@ -620,81 +610,59 @@ inform_compare_sign_conversion <- function(cols, loos) {
   fun
 }
 
-#' Accepted string shorthands for `custom_se_fn`
+#' Accepted string shorthands for `measure_se_diff`
 #' @noRd
-.custom_se_fn_keywords <- c("sum", "mean")
+.se_diff_keywords <- c("sum", "mean")
 
-#' Validate one `custom_se_fn` value
+#' Validate one `measure_se_diff` value
 #' @noRd
-#' @param origin Where the value came from, in the words the user knows it by:
-#'   the `custom_se_fn` argument in `model_compare`, or the
-#'   `measure_se_diff` attribute of the custom measure.
+#' @param origin Where the value came from, in the words the user knows it by.
 #' @return The value itself, or `NULL`.
-.check_custom_se_fn_value <- function(value, bare, origin = "`custom_se_fn`") {
+.check_se_diff_value <- function(value, bare,
+                                      origin = "`measure_se_diff` attribute") {
   if (is.null(value) || is.function(value)) {
     return(value)
   }
   if (is.character(value) && length(value) == 1L &&
-      value %in% .custom_se_fn_keywords) {
+      value %in% .se_diff_keywords) {
     return(value)
   }
   stop(
     "Invalid ", origin, " for measure '", bare,
     "'. It must be a function, ",
-    paste0("\"", .custom_se_fn_keywords, "\"", collapse = " or "),
+    paste0("\"", .se_diff_keywords, "\"", collapse = " or "),
     ", or NULL.",
     call. = FALSE
   )
 }
 
-#' Message listing what `custom_se_fn` accepts
-#' @noRd
-.custom_se_fn_help <- function() {
-  paste0(
-    "Pass a function computing the standard error of the difference, ",
-    paste0("\"", .custom_se_fn_keywords, "\"", collapse = " or "),
-    "\nto use the paired pointwise formula, or NULL to report the difference ",
-    "with an NA standard error.",
-    "\nThe measure can also declare it once, with ",
-    "attr(fun, \"measure_se_diff\") <- ."
-  )
-}
-
-#' Report custom measures that declare no standard error of the difference
+#' Inform about custom measures that declare no standard error of the difference
 #'
-#' Reached only when the measure declares nothing and the comparison supplies
-#' nothing. Both routes are named, so the reader picks the one they control.
+#' The difference is still reported; only its standard error is `NA`.
 #' @noRd
-.stop_missing_custom_se_fn <- function(bare) {
-  stop(
-    if (length(bare) == 1L) "Measure '" else "Measures '",
-    paste(bare, collapse = "', '"),
-    if (length(bare) == 1L) {
-      "' is a custom measure with no `measure_se_diff` attribute.\n"
-    } else {
-      "' are custom measures with no `measure_se_diff` attribute.\n"
-    },
-    .custom_se_fn_help(),
-    call. = FALSE
+inform_missing_custom_se_diff <- function(bare) {
+  message(
+    if (length(bare) == 1L) "Custom measure " else "Custom measures ",
+    paste(bare, collapse = ", "),
+    if (length(bare) == 1L) " declares" else " declare",
+    " no `se_diff_fun`, so ",
+    paste0(bare, "_se_diff", collapse = ", "),
+    if (length(bare) == 1L) " is" else " are",
+    " NA.\nDeclare it with `custom_measure(se_diff_fun = )`."
   )
+  invisible(NULL)
 }
 
-#' Resolve `custom_se_fn` to a per-measure lookup
+#' Look up the declared standard error of the difference for custom measures
 #'
 #' Custom measures carry `diff_method = "custom"`. A measure declares the
-#' standard error of its difference with `attr(fun, "measure_se_diff")`, and
-#' `custom_se_fn` overrides that declaration. A measure that declares nothing
-#' needs an entry in `custom_se_fn`. A bare value is only unambiguous when
-#' exactly one custom measure is compared; otherwise a list keyed by bare
-#' measure name is required.
+#' standard error of its difference with `custom_measure(se_diff_fun = )`, stored
+#' in `measure_info` as `se_diff_fun`. A measure that declares nothing gets an
+#' `NA` standard error.
 #' @noRd
-#' @param custom_se_fn The user's `custom_se_fn` argument, already normalised to
-#'   `NULL` when it was not supplied.
-#' @param supplied Whether the argument was given at all, as opposed to being
-#'   an explicit `NULL`.
 #' @return Named list keyed by bare measure name; each element is a function,
 #'   `"sum"`, `"mean"`, or `NULL`.
-.resolve_custom_se_fns <- function(loos, compare_cols, custom_se_fn, supplied) {
+.resolve_custom_se_diffs <- function(loos, compare_cols) {
   is_custom <- vapply(
     compare_cols,
     function(col) {
@@ -710,95 +678,22 @@ inform_compare_sign_conversion <- function(cols, loos) {
   ))
 
   if (!length(custom_bare)) {
-    if (supplied) {
-      warning(
-        "`custom_se_fn` is only used for custom measures and will be ignored.",
-        call. = FALSE
-      )
-    }
     return(list())
   }
 
-  # What each measure declared for itself. `.compare_metadata_check()` has
-  # already established that the models agree, so the first one answers for all.
+  # `.compare_metadata_check()` has already established that the models agree,
+  # so the first one answers for all.
   declared <- stats::setNames(
     lapply(custom_bare, function(bare) {
       .get_measure_info(loos, bare)$se_diff_fun
     }),
     custom_bare
   )
-  undeclared <- function(bare) {
-    bare[vapply(declared[bare], is.null, logical(1))]
-  }
-
-  # Nothing supplied: each measure answers for itself, or the comparison stops.
-  if (!supplied) {
-    missing_decl <- undeclared(custom_bare)
-    if (length(missing_decl)) {
-      .stop_missing_custom_se_fn(missing_decl)
-    }
-    return(declared)
-  }
-
-  # A bare function or keyword: unambiguous only for a single custom measure.
-  if (is.null(custom_se_fn) || is.function(custom_se_fn) ||
-      is.character(custom_se_fn)) {
-    if (!is.null(custom_se_fn) && length(custom_bare) > 1L) {
-      stop(
-        "`custom_se_fn` must be a named list when more than one custom measure ",
-        "is compared.\nName an entry for each of: ",
-        paste(custom_bare, collapse = ", "), ".",
-        call. = FALSE
-      )
-    }
-    value <- .check_custom_se_fn_value(custom_se_fn, custom_bare[[1L]])
-    return(stats::setNames(rep(list(value), length(custom_bare)), custom_bare))
-  }
-
-  if (!is.list(custom_se_fn)) {
-    stop(
-      "`custom_se_fn` must be a function, ",
-      paste0("\"", .custom_se_fn_keywords, "\"", collapse = " or "),
-      ", NULL, or a named list of those.",
-      call. = FALSE
-    )
-  }
-
-  nms <- names(custom_se_fn)
-  if (length(custom_se_fn) && (is.null(nms) || any(!nzchar(nms)))) {
-    stop(
-      "Every element of `custom_se_fn` must be named after a custom measure. ",
-      "Expected name(s): ",
-      paste(custom_bare, collapse = ", "), ".",
-      call. = FALSE
-    )
-  }
-  unknown <- setdiff(nms, custom_bare)
-  if (length(unknown)) {
-    stop(
-      "Unknown measure(s) in `custom_se_fn`: ",
-      paste(unknown, collapse = ", "),
-      ". Custom measure(s) compared: ",
-      paste(custom_bare, collapse = ", "), ".",
-      call. = FALSE
-    )
-  }
-  # A named entry overrides the declaration. A measure with neither stops here.
-  missing_decl <- undeclared(setdiff(custom_bare, nms))
+  missing_decl <- custom_bare[vapply(declared, is.null, logical(1))]
   if (length(missing_decl)) {
-    .stop_missing_custom_se_fn(missing_decl)
+    inform_missing_custom_se_diff(missing_decl)
   }
-
-  stats::setNames(
-    lapply(custom_bare, function(bare) {
-      if (bare %in% nms) {
-        .check_custom_se_fn_value(custom_se_fn[[bare]], bare)
-      } else {
-        declared[[bare]]
-      }
-    }),
-    custom_bare
-  )
+  declared
 }
 
 #' Assemble one model's inputs for an `se_diff_fun`
@@ -816,7 +711,7 @@ inform_compare_sign_conversion <- function(cols, loos) {
   )
 }
 
-#' Validate the value returned by an `se_diff_fun` or `custom_se_fn`
+#' Validate the value returned by an `se_diff_fun`
 #' @noRd
 #' @param what Name of the argument or attribute the function came from, used
 #'   only to make the error point at what the user can change.
@@ -835,8 +730,8 @@ inform_compare_sign_conversion <- function(cols, loos) {
 
 #' Paired measure difference and SE for one model vs a reference
 #' @noRd
-#' @param se_fn For `method = "custom"` only: the value resolved from
-#'   `model_compare(custom_se_fn = )` for this measure. A function, the string
+#' @param se_fn For `method = "custom"` only: the measure's declared
+#'   `measure_se_diff`. A function, the string
 #'   `"sum"` or `"mean"`, or `NULL` for an `NA` standard error.
 .pair_measure_stats <- function(cmp, ref, col, method = NULL, loos = list(ref),
                                 se_fn = NULL) {
@@ -866,7 +761,7 @@ inform_compare_sign_conversion <- function(cols, loos) {
       )
       return(c(
         diff = diff,
-        se = .validate_se_diff(se, col, loos, what = "custom_se_fn")
+        se = .validate_se_diff(se, col, loos)
       ))
     }
   }

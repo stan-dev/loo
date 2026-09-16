@@ -149,15 +149,15 @@
 #'
 #' * [model_compare()] is the current interface. It compares `"loo"`, `"waic"`,
 #'   and `"kfold"` objects on ELPD, and [`pred_measure`][pred_measure] results
-#'   on every predictive measure the models share. The `rank_by` and
-#'   `custom_se_fn` arguments are available here only.
+#'   on every predictive measure the models share. The `rank_by` argument is
+#'   available here only.
 #'
 #' * [loo_compare()] is **deprecated** in favor of `model_compare()`, but it
 #'   still works and is still an exported generic, so `loo_compare` methods
 #'   registered by other packages keep dispatching. It keeps its previous
 #'   behavior: it accepts only `"loo"`, `"waic"`, and `"kfold"` objects and
-#'   compares them on ELPD. Passing [`pred_measure`][pred_measure] results,
-#'   `rank_by`, or `custom_se_fn` arguments produces an error. The deprecation
+#'   compares them on ELPD. Passing [`pred_measure`][pred_measure] results or
+#'   the `rank_by` argument produces an error. The deprecation
 #'   warning is issued once per session.
 #'
 #' `loo_compare()` and `model_compare()` return the same object: a data frame
@@ -305,8 +305,7 @@
 #'
 #' The remaining sections describe comparisons that only [model_compare()] can
 #' produce; the deprecated `loo_compare()` rejects
-#' [`pred_measure`][pred_measure] inputs and the `rank_by` and `custom_se_fn`
-#' arguments.
+#' [`pred_measure`][pred_measure] inputs and the `rank_by` argument.
 #'
 #' When comparing [`loo_pred_measure()`][loo_pred_measure] objects with
 #' `model_compare()`, paired differences are computed for every predictive
@@ -341,10 +340,8 @@
 #'   `r2` it is the trivariate analogue, which additionally propagates the
 #'   uncertainty in the baseline `MSE(y)` shared by both models.
 #' * For custom measures it comes from the measure's own
-#'   `attr(my_fun, "measure_se_diff")` declaration, or from the `custom_se_fn`
-#'   argument of [model_compare()], which overrides that declaration. One of the
-#'   two must give a value. It is `NA` when `custom_se_fn` is `NULL` for that
-#'   measure.
+#'   `attr(my_fun, "measure_se_diff")` declaration, set with
+#'   [custom_measure()]. It is `NA` when the measure declares nothing.
 #'
 #' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
 #' Which measures are losses is recorded in the `loss` element of the
@@ -369,10 +366,9 @@
 #'   `"sum"` or `"mean"` (paired pointwise differences),
 #'   `"measure_specific"` (the built-in measure's own `se_diff_fun`), or
 #'   `"custom"`. Nothing is inferred from a measure's values. Under `"custom"`
-#'   the standard error comes from the measure's `se_diff_fun` declaration, or
-#'   from the `custom_se_fn` argument of [model_compare()], which overrides it.
-#'   Both supply either a function, the `"sum"`/`"mean"` pointwise formulas, or
-#'   `NULL` for an `NA` standard error. A missing standard error is not an
+#'   the standard error comes from the measure's `se_diff_fun` declaration:
+#'   a function, the `"sum"`/`"mean"` pointwise formulas, or nothing for an
+#'   `NA` standard error. A missing standard error is not an
 #'   error state as the difference itself is still reported.
 #' * `se_diff_fun`: for built-in measures with
 #'   `diff_method = "measure_specific"`, the name of the built-in implementation
@@ -384,7 +380,7 @@
 #'   longer supplies by the time [model_compare()] runs; `bacc` stores the class
 #'   index of each observation, which its pointwise values do not determine).
 #'   Custom measures return it as an `extra` element, and it is passed on to
-#'   `custom_se_fn`. It is excluded from the consistency check below, since it
+#'   their `se_diff_fun`. It is excluded from the consistency check below, since it
 #'   varies with the data rather than with the measure itself.
 #'
 #' Built-in measures take `loss`, `diff_method`, and `se_diff_fun` from the

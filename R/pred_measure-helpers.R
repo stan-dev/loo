@@ -41,13 +41,8 @@
       if (is.character(el) && length(el) == 1L) {
         list(name = el, type = "builtin", key = el)
       } else if (is.function(el)) {
-        if (is.null(nm) || !nzchar(nm)) {
-          cli::cli_abort(c(
-            "Each custom function in {.arg measure} must be named.",
-            "i" = "Use {.code measure = list(my_metric = my_fun)}."
-          ))
-        }
-        .measure_entry_custom(el, name = nm)
+        name <- if (is.null(nm) || !nzchar(nm)) NULL else nm
+        .measure_entry_custom(el, name = name)
       } else {
         cli::cli_abort(c(
           "Each element of {.arg measure} must be a character scalar (built-in",
@@ -114,10 +109,9 @@
 
   # A measure that knows how to compute the standard error of its own
   # difference declares it here, so a comparison needs no extra argument.
-  # `model_compare(custom_se_fn = )` overrides this declaration.
   se_diff <- attr(fun, "measure_se_diff", exact = TRUE)
   if (!is.null(se_diff)) {
-    se_diff <- .check_custom_se_fn_value(
+    se_diff <- .check_se_diff_value(
       se_diff, name, origin = "`measure_se_diff` attribute"
     )
   }
@@ -289,7 +283,7 @@
   if (!is.null(res$extra) && !is.list(res$extra)) {
     cli::cli_abort(c(
       "{.field extra} from custom measure {.val {measure_name}} must be a list.",
-      "i" = "It is handed to {.code custom_se_fn(ref, cmp)} as
+      "i" = "It is handed to its {.code se_diff_fun(ref, cmp)} as
              {.code ref$extra} and {.code cmp$extra}."
     ))
   }

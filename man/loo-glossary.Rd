@@ -152,14 +152,14 @@ Two functions perform model comparison, and both are available to users:
 \itemize{
 \item \code{\link[=model_compare]{model_compare()}} is the current interface. It compares \code{"loo"}, \code{"waic"},
 and \code{"kfold"} objects on ELPD, and \code{\link{pred_measure}} results
-on every predictive measure the models share. The \code{rank_by} and
-\code{custom_se_fn} arguments are available here only.
+on every predictive measure the models share. The \code{rank_by} argument is
+available here only.
 \item \code{\link[=loo_compare]{loo_compare()}} is \strong{deprecated} in favor of \code{model_compare()}, but it
 still works and is still an exported generic, so \code{loo_compare} methods
 registered by other packages keep dispatching. It keeps its previous
 behavior: it accepts only \code{"loo"}, \code{"waic"}, and \code{"kfold"} objects and
-compares them on ELPD. Passing \code{\link{pred_measure}} results,
-\code{rank_by}, or \code{custom_se_fn} arguments produces an error. The deprecation
+compares them on ELPD. Passing \code{\link{pred_measure}} results or
+the \code{rank_by} argument produces an error. The deprecation
 warning is issued once per session.
 }
 
@@ -321,8 +321,7 @@ section.
 
 The remaining sections describe comparisons that only \code{\link[=model_compare]{model_compare()}} can
 produce; the deprecated \code{loo_compare()} rejects
-\code{\link{pred_measure}} inputs and the \code{rank_by} and \code{custom_se_fn}
-arguments.
+\code{\link{pred_measure}} inputs and the \code{rank_by} argument.
 
 When comparing \code{\link[=loo_pred_measure]{loo_pred_measure()}} objects with
 \code{model_compare()}, paired differences are computed for every predictive
@@ -356,10 +355,8 @@ errors and is therefore not a paired pointwise standard deviation. For
 \code{r2} it is the trivariate analogue, which additionally propagates the
 uncertainty in the baseline \code{MSE(y)} shared by both models.
 \item For custom measures it comes from the measure's own
-\code{attr(my_fun, "measure_se_diff")} declaration, or from the \code{custom_se_fn}
-argument of \code{\link[=model_compare]{model_compare()}}, which overrides that declaration. One of the
-two must give a value. It is \code{NA} when \code{custom_se_fn} is \code{NULL} for that
-measure.
+\code{attr(my_fun, "measure_se_diff")} declaration, set with
+\code{\link[=custom_measure]{custom_measure()}}. It is \code{NA} when the measure declares nothing.
 }
 
 The reference model has \code{m_se_diff = 0} whenever an \code{m_se_diff} is available.
@@ -386,10 +383,9 @@ measure and the values recorded for it
 \code{"sum"} or \code{"mean"} (paired pointwise differences),
 \code{"measure_specific"} (the built-in measure's own \code{se_diff_fun}), or
 \code{"custom"}. Nothing is inferred from a measure's values. Under \code{"custom"}
-the standard error comes from the measure's \code{se_diff_fun} declaration, or
-from the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which overrides it.
-Both supply either a function, the \code{"sum"}/\code{"mean"} pointwise formulas, or
-\code{NULL} for an \code{NA} standard error. A missing standard error is not an
+the standard error comes from the measure's \code{se_diff_fun} declaration:
+a function, the \code{"sum"}/\code{"mean"} pointwise formulas, or nothing for an
+\code{NA} standard error. A missing standard error is not an
 error state as the difference itself is still reported.
 \item \code{se_diff_fun}: for built-in measures with
 \code{diff_method = "measure_specific"}, the name of the built-in implementation
@@ -401,7 +397,7 @@ standard error of its difference, present only for measures that need it
 longer supplies by the time \code{\link[=model_compare]{model_compare()}} runs; \code{bacc} stores the class
 index of each observation, which its pointwise values do not determine).
 Custom measures return it as an \code{extra} element, and it is passed on to
-\code{custom_se_fn}. It is excluded from the consistency check below, since it
+their \code{se_diff_fun}. It is excluded from the consistency check below, since it
 varies with the data rather than with the measure itself.
 }
 

@@ -875,8 +875,8 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
 # Measures whose overall estimate is not a sum or mean of pointwise
 # contributions cannot use the paired pointwise standard error. They register a
 # `se_diff_fun` in `.measure_spec`, naming an entry of `.se_diff_funs` below.
-# Custom measures take theirs from `attr(fun, "measure_se_diff")`, or from
-# `model_compare(custom_se_fn = )`, under the same calling contract.
+# Custom measures take theirs from `attr(fun, "measure_se_diff")`, under the
+# same calling contract.
 #
 # Such a function receives `ref` and `cmp`, each a list with the elements
 # `estimate`, `se`, `pointwise`, and `extra` for one model, always on the
@@ -1060,8 +1060,8 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   # A custom measure may declare how the standard error of its difference is
   # computed, through `attr(fun, "measure_se_diff")`. The declaration is
   # recorded here, so a later `model_compare()` finds it without an argument.
-  # `model_compare(custom_se_fn = )` overrides it. When neither declares one,
-  # `se_diff_fun` is absent and `model_compare()` asks for it.
+  # When the measure declares nothing, `se_diff_fun` is absent and
+  # `model_compare()` reports an `NA` standard error.
   # Whether the measure is a loss is declared the same way, through
   # `attr(fun, "measure_loss")`.
   list(

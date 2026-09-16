@@ -43,13 +43,11 @@
 #'   undeclared loss is compared and ranked in the wrong direction.
 #'
 #'   A custom measure can declare how the standard error of a difference
-#'   between two models is computed, with `attr(my_fun, "measure_se_diff")`.
-#'   Otherwise it is supplied at comparison time through the
-#'   `custom_se_fn` argument of [model_compare()], which overrides any
-#'   declaration. Both accept a function
-#'   `function(ref, cmp) ...`, the shorthands `"sum"` and `"mean"` for the
-#'   paired pointwise formulas, or `NULL` to report the difference with an `NA`
-#'   standard error. A function receives one list per model with elements
+#'   between two models is computed, with `attr(my_fun, "measure_se_diff")`
+#'   or [custom_measure()]. It accepts a function
+#'   `function(ref, cmp) ...` or the shorthands `"sum"` and `"mean"` for the
+#'   paired pointwise formulas. Without a declaration, [model_compare()]
+#'   reports the difference with an `NA` standard error. A function receives one list per model with elements
 #'   `estimate`, `se`, `pointwise`, and `extra`, always on the measure's natural
 #'   scale, and must return the standard error of the difference as a numeric
 #'   scalar.
@@ -57,7 +55,7 @@
 #'   `extra` is for anything the standard error needs that the pointwise values
 #'   do not carry. Return it as an additional list element `extra` from the
 #'   measure function and it is stored alongside the estimates and passed on to
-#'   `custom_se_fn`; the built-in `r2` uses it for the baseline
+#'   its `measure_se_diff` function; the built-in `r2` uses it for the baseline
 #'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
 #' @param measure_name Only needed when `measure` is a single custom function
 #'   passed directly (not inside a list) — it sets the name that function is

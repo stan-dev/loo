@@ -8,8 +8,8 @@
 #' registered by other packages keep dispatching as before, but it is frozen at
 #' its previous behavior: it compares `"loo"`, `"waic"`, and `"kfold"` objects on
 #' [ELPD][loo-glossary] only. Comparing
-#' [`pred_measure`][pred_measure] results, or using the `rank_by` and
-#' `custom_se_fn` arguments, requires [model_compare()].
+#' [`pred_measure`][pred_measure] results, or using the `rank_by` argument,
+#' requires [model_compare()].
 #'
 #' The deprecation warning is issued once per session, so a script that calls
 #' `loo_compare()` repeatedly is not flooded with warnings.
@@ -46,7 +46,7 @@ loo_compare.default <- function(x, ...) {
 
   # `loo_compare()` keeps its old signature, so the arguments added to
   # `model_compare()` would arrive through `...` and be mistaken for models.
-  new_args <- intersect(names(list(...)), c("rank_by", "custom_se_fn"))
+  new_args <- intersect(names(list(...)), "rank_by")
   if (length(new_args)) {
     stop(
       "`", new_args[1L], "` is not supported by the deprecated `loo_compare()`. ",

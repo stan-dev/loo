@@ -52,13 +52,11 @@ put all measures on a common utility scale and to rank models, so an
 undeclared loss is compared and ranked in the wrong direction.
 
 A custom measure can declare how the standard error of a difference
-between two models is computed, with \code{attr(my_fun, "measure_se_diff")}.
-Otherwise it is supplied at comparison time through the
-\code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}, which overrides any
-declaration. Both accept a function
-\code{function(ref, cmp) ...}, the shorthands \code{"sum"} and \code{"mean"} for the
-paired pointwise formulas, or \code{NULL} to report the difference with an \code{NA}
-standard error. A function receives one list per model with elements
+between two models is computed, with \code{attr(my_fun, "measure_se_diff")}
+or \code{\link[=custom_measure]{custom_measure()}}. It accepts a function
+\code{function(ref, cmp) ...} or the shorthands \code{"sum"} and \code{"mean"} for the
+paired pointwise formulas. Without a declaration, \code{\link[=model_compare]{model_compare()}}
+reports the difference with an \code{NA} standard error. A function receives one list per model with elements
 \code{estimate}, \code{se}, \code{pointwise}, and \code{extra}, always on the measure's natural
 scale, and must return the standard error of the difference as a numeric
 scalar.
@@ -66,7 +64,7 @@ scalar.
 \code{extra} is for anything the standard error needs that the pointwise values
 do not carry. Return it as an additional list element \code{extra} from the
 measure function and it is stored alongside the estimates and passed on to
-\code{custom_se_fn}; the built-in \code{r2} uses it for the baseline
+its \code{measure_se_diff} function; the built-in \code{r2} uses it for the baseline
 \code{(y_i - mean(y))^2}, which cannot be recovered once \code{y} is out of scope.}
 
 \item{group_ids}{Optional vector of group identifiers for grouped summaries
@@ -139,10 +137,9 @@ ranks it in the right direction.
 
 A custom measure can also declare how the standard error of a difference
 between two models is computed, with \code{attr(my_fun, "measure_se_diff")}. It
-accepts the same values as the \code{custom_se_fn} argument of \code{\link[=model_compare]{model_compare()}}:
-a function, \code{"sum"}, or \code{"mean"}. A measure that declares nothing needs
-\code{custom_se_fn} at comparison time, and \code{custom_se_fn} always overrides the
-declaration.
+accepts a function, \code{"sum"}, or \code{"mean"}. For a measure that declares
+nothing, \code{\link[=model_compare]{model_compare()}} reports an \code{NA} standard error. \code{\link[=custom_measure]{custom_measure()}}
+sets all three attributes.
 }
 \section{\code{measure_info} attribute}{
 

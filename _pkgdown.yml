@@ -126,6 +126,7 @@ reference:
       - kfold_pred_measure
       - test_pred_measure
       - pred_measure
+      - custom_measure
       - supported_measures_list
       - starts_with("measure_")
       - ptw_log_pred_density

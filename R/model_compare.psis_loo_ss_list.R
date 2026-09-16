@@ -2,21 +2,10 @@
 #' @noRd
 #' @param x A list with `psis_loo` objects.
 #' @param ... Currently ignored.
-#' @param custom_se_fn Not supported here; subsampled objects are compared on
-#'   elpd only. Explicit argument here such that a caller does not absorb it
-#'   into ... and silently ignore.
 #' @return A `compare.loo` data frame, as `model_compare.default()` returns,
 #'   with an extra `subsampling_se_diff` column.
 #' @export
-model_compare.psis_loo_ss_list <- function(x, ..., custom_se_fn) {
-  if (!missing(custom_se_fn)) {
-    stop(
-      "`custom_se_fn` is not supported for subsampled loo objects, which are ",
-      "compared on elpd only.",
-      call. = FALSE
-    )
-  }
-
+model_compare.psis_loo_ss_list <- function(x, ...) {
   checkmate::assert_list(x, any.missing = FALSE, min.len = 1)
   for(i in seq_along(x)){
     if (!inherits(x[[i]], "psis_loo_ss")) x[[i]] <- as.psis_loo_ss.psis_loo(x[[i]])

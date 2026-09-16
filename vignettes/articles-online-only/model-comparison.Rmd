@@ -88,7 +88,7 @@ the `pred_measure` family.
 `loo_compare` still works and is still a generic, so methods registered by other
 packages keep dispatching, but it now warns and is frozen at its previous
 behavior: `loo` objects compared on ELPD only. The `pred_measure` sources,
-`rank_by`, and `custom_se_fn` described in this article require `model_compare`.
+`rank_by`, and custom measures described in this article require `model_compare`.
 `loo_compare` will be removed in a future release. For more details, see
 `vignette("migration-guide", package = "loo")`.
 :::
@@ -284,7 +284,7 @@ The information is stored in different *slots*:
 | `loss` | Whether the measure is a *loss* (`TRUE`; lower values of the measure are better) or a *utility* (`FALSE`, higher values are better) | During model comparison, loss measures have their sign flipped so that all differences are reported on a utility scale (higher is better) |
 | `diff_method` | How paired pointwise differences are aggregated within model comparison: `"sum"`, `"mean"`, `"measure_specific"`, or `"custom"` | Selects the formula for `<measure>_se_diff` (see the table in Section [Computation of the standard error](#computation-of-the-standard-error-measure_se_diff)) |
 | `se_diff_fun` | Name of the measure's own standard-error function for computing `<measure>_se_diff`, only set when `diff_method = "measure_specific"` (`"rmse"`, `"r2"`, `"bacc"`) | Points to the built-in function that computes `<measure>_se_diff` for measures whose estimate is not a plain sum or mean of pointwise values |
-| `extra` | Optional auxiliary data the measure stored for its `se_diff_fun`, on the measure's natural scale (e.g., `mse_y_i` for `r2`, `class_id` for `bacc`); `NULL` for measures that need none | Carries the quantities the standard error needs but the pointwise values do not contain; passed to `se_diff_fun()` (and to `custom_se_fn()`) as part of each model's input |
+| `extra` | Optional auxiliary data the measure stored for its `se_diff_fun`, on the measure's natural scale (e.g., `mse_y_i` for `r2`, `class_id` for `bacc`); `NULL` for measures that need none | Carries the quantities the standard error needs but the pointwise values do not contain; passed to `se_diff_fun()` as part of each model's input |
 
 ## Background: Computation underlying `model_compare` output
 
@@ -393,7 +393,7 @@ are used. We summarize them in four different categories:
 | `"sum"` | `sqrt(N) * sd(d_i)` | `elpd`, `ic` |
 | `"mean"` | `sd(d_i) / sqrt(N)` | `mlpd`, `mae`, `mse`, `acc`, `brier`, `rps`, `srps` |
 | `"measure_specific"` | the measure's own `se_diff_fun` | `rmse`, `r2`, `bacc` |
-| `"custom"` | supplied via `model_compare(custom_se_fn = )` | custom measures |
+| `"custom"` | declared via `custom_measure(se_diff_fun = )` | custom measures |
 
 where `N` is the number of observations and `d_i` the paired difference of
 the pointwise estimates of the two models (`comparison - reference`).
@@ -708,11 +708,19 @@ c(by_hand  = sqrt(sum(var_c)) / K,
 ## Custom measures
 
 A custom measure is any function returning a list with `estimate`, `se`, and
-`pointwise`. It carries up to three attributes: `measure_name`, its name,
-`measure_loss`, which declares whether lower values are better, and
-`measure_se_diff`. It always gets `diff_method = "custom"`.
+`pointwise`. Define it with `custom_measure()`, which attaches three
+declarations to the function:
 
-The attribute `measure_se_diff` accepts one of three things:
+| argument of `custom_measure()` | attribute | meaning |
+| :--- | :--- | :--- |
+| `name` | `measure_name` | the name under which the measure is reported |
+| `loss` | `measure_loss` | `TRUE` if lower values are better (default `FALSE`) |
+| `se_diff_fun` | `measure_se_diff` | how `model_compare()` computes the SE of a difference |
+
+A custom measure always gets `diff_method = "custom"`. Setting the attributes
+directly with `attr()` gives the same result.
+
+The argument `se_diff_fun` accepts one of three things:
 
 | value | meaning |
 | :--- | :--- |
@@ -720,17 +728,9 @@ The attribute `measure_se_diff` accepts one of three things:
 | `"sum"` | estimate is the sum of the pointwise values. SE is computed as `sqrt(N) * sd(d_i)` |
 | a function | custom function for computing the SE, called as `fn(ref, cmp)` |
 
-The argument `custom_se_fn` of `model_compare()` accepts the same three values,
-and `NULL` in addition. `NULL` reports the difference with an `NA` standard
-error. An attribute cannot hold `NULL`, because
-`attr(fn, "measure_se_diff") <- NULL` deletes the attribute.
-
-When a custom measure is used with `model_compare()`:
-
-+ the measure declares `measure_se_diff`, and no further argument is needed
-+ the measure declares nothing, and `custom_se_fn` must define the SE of the
-  difference
-+ both are present, and `custom_se_fn` wins
+With `se_diff_fun = NULL` (the default), the measure declares nothing.
+`model_compare()` then reports the difference with an `NA` standard error and
+a message. `model_compare()` needs no further argument in either case.
 
 We elaborate on these points in the following examples.
 
@@ -747,22 +747,24 @@ huber_fn <- function(y, mupred) {
   l <- ifelse(abs(r) <= delta, 0.5 * r^2, delta * (abs(r) - 0.5 * delta))
   list(estimate = mean(l), se = sd(l) / sqrt(length(l)), pointwise = l)
 }
-
 huber_se_fn <- function(ref, cmp) {
   d <- cmp$pointwise - ref$pointwise
   sd(d) / sqrt(length(d))
 }
 
-attr(huber_fn, "measure_name") <- "huber"
-attr(huber_fn, "measure_loss") <- TRUE
-attr(huber_fn, "measure_se_diff") <- huber_se_fn
+huber_measure <- custom_measure(
+  fun = huber_fn,
+  name = "huber",
+  se_diff_fun = huber_se_fn,
+  loss = TRUE
+)
 ```
 
-Furthermore, we provide the name of the measure (i.e., "huber") as an
-attribute, and declare that it is a loss rather than a utility (i.e., lower
-values are better). Note that a custom measure is by default considered to be a
-utility. The third attribute, `measure_se_diff`, declares the standard error of
-the difference. It is called as `huber_se_fn(ref, cmp)`, where each argument is
+With `name`, we report the measure as "huber". With `loss = TRUE`, we declare
+that it is a loss rather than a utility (i.e., lower values are better). Note
+that a custom measure is by default considered to be a utility. The argument
+`se_diff_fun` declares the standard error of the difference. It is called as
+`huber_se_fn(ref, cmp)`, where each argument is
 a list describing **one** model with elements `estimate`, `se`, `pointwise`, and
 `extra`. This is the general form. The shorthands `"mean"` and `"sum"` cover
 the two common cases.
@@ -771,16 +773,15 @@ the two common cases.
 A custom measure is by default considered to be a utility (i.e., higher values
 are better).
 
-This can be changed by setting the `measure_loss` attribute of the
-custom-measure function to `TRUE` (see example above).
+This can be changed with `custom_measure(loss = TRUE)` (see example above).
 :::
 
 First, we compute the predictive performance measures for two different models
 using `"rmse"` and the custom Huber loss as performance criteria.
 
 ```{r custom-measure}
-h1 <- fit_measure(fit_m1, measure = list("rmse", "huber" = huber_fn))
-h3 <- fit_measure(fit_m3, measure = list("rmse", "huber" = huber_fn))
+h1 <- fit_measure(fit_m1, measure = list("rmse", huber_measure))
+h3 <- fit_measure(fit_m3, measure = list("rmse", huber_measure))
 ```
 
 (Remember that we have created the `fit_measure` helper at the [beginning of
@@ -802,15 +803,6 @@ comp_h <- model_compare(list(m3 = h3, m1 = h1))
 print(comp_h, measures = "huber")
 ```
 
-The Huber estimate *is* the mean of its pointwise values, so the shorthand
-`"mean"` computes the same standard error. Passed to `model_compare()`, it
-overrides the declaration:
-
-```{r custom-mean-se}
-comp_h_mean <- model_compare(list(m3 = h3, m1 = h1), custom_se_fn = "mean")
-print(comp_h_mean, measures = "huber")
-```
-
 As discussed above, the difference estimates are always reported on the utility
 scale. Therefore `huber_diff` for `m1` is negative.
 
@@ -824,10 +816,10 @@ use RMSE normalized by the standard deviation of the outcome:
 nrmse_fn <- function(y, mupred) {
   sqe <- (y - colMeans(mupred))^2
   list(
-    estimate  = sqrt(mean(sqe)) / sd(y),
-    se        = sqrt(var(sqe) / length(sqe)) / (2 * sqrt(mean(sqe))) / sd(y),
+    estimate = sqrt(mean(sqe)) / sd(y),
+    se = sqrt(var(sqe) / length(sqe)) / (2 * sqrt(mean(sqe))) / sd(y),
     pointwise = sqe,
-    extra     = list(sd_y = sd(y))
+    extra = list(sd_y = sd(y))
   )
 }
 
@@ -835,14 +827,14 @@ nrmse_se_fn <- function(ref, cmp) {
   n <- length(ref$pointwise)
   mse_ref <- mean(ref$pointwise)
   mse_cmp <- mean(cmp$pointwise)
-  se_ref  <- sqrt(var(ref$pointwise) / n)
-  se_cmp  <- sqrt(var(cmp$pointwise) / n)
-  cov_rc  <- sum((cmp$pointwise - mse_cmp) * (ref$pointwise - mse_ref)) /
+  se_ref <- sqrt(var(ref$pointwise) / n)
+  se_cmp <- sqrt(var(cmp$pointwise) / n)
+  cov_rc <- sum((cmp$pointwise - mse_cmp) * (ref$pointwise - mse_ref)) /
     (n * (n - 1))
 
   rel_ref <- se_ref / sqrt(mse_ref)
   rel_cmp <- se_cmp / sqrt(mse_cmp)
-  rho     <- cov_rc / (se_ref * se_cmp)
+  rho <- cov_rc / (se_ref * se_cmp)
 
   # algebraically the same as the RMSE formula shown earlier, but written so
   # that a model compared against itself cancels to exactly zero
@@ -853,9 +845,12 @@ nrmse_se_fn <- function(ref, cmp) {
   se_rmse / ref$extra$sd_y
 }
 
-attr(nrmse_fn, "measure_name") <- "nrmse"
-attr(nrmse_fn, "measure_loss") <- TRUE
-attr(nrmse_fn, "measure_se_diff") <- nrmse_se_fn
+nrmse_measure <- custom_measure(
+  fun = nrmse_fn,
+  name = "nrmse",
+  se_diff_fun = nrmse_se_fn,
+  loss = TRUE
+)
 ```
 
 Subsequently, we compute the predictive performance measures for two different
@@ -863,27 +858,16 @@ models using `"rmse"`, the custom Huber loss, and the custom normalized RMSE
 (`"nrmse"`) as performance criteria.
 
 ```{r extended-example-fit}
-n1 <- fit_measure(fit_m1, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
-n3 <- fit_measure(fit_m3, c("rmse", "huber" = huber_fn, "nrmse" = nrmse_fn))
+n1 <- fit_measure(fit_m1, list("rmse", huber_measure, nrmse_measure))
+n3 <- fit_measure(fit_m3, list("rmse", huber_measure, nrmse_measure))
 ```
 
 Finally, we perform model comparison with multiple custom measures. Both
-measures declare their own `measure_se_diff`, so no argument is needed:
+measures declare their own `se_diff_fun`, so no argument is needed:
 
 ```{r extend-example-fit}
 comp_n <- model_compare(list(m3 = n3, m1 = n1))
 print(comp_n, measures = "all")
-```
-
-To override one measure only, pass a list named by measure. Every measure not
-named keeps its own declaration:
-
-```{r extend-example-override}
-comp_n_mean <- model_compare(
-  list(m3 = n3, m1 = n1),
-  custom_se_fn = list("huber" = "mean")
-)
-print(comp_n_mean, measures = "all")
 ```
 
 ## Selecting the reference model
@@ -1017,7 +1001,7 @@ i3 <- insample_measure(fit_m3, measures)
 model_compare(list(m1 = i1, m2 = i2, m3 = i3))
 ```
 
-Everything else in this article, `rank_by`, `custom_se_fn`, the `print`
+Everything else in this article, `rank_by`, custom measures, the `print`
 arguments `measures` and `simplify`, works unchanged for all four sources.
 
 ## Summary
@@ -1036,7 +1020,7 @@ knitr::kable(
       "delta method on the MSE scale",
       "delta method, including baseline uncertainty",
       "stratified by class, paired within class",
-      "from custom_se_fn: your function, \"sum\", \"mean\", or NA"
+      "from se_diff_fun: your function, \"sum\", \"mean\", or NA"
     ),
     check.names = FALSE
   )
@@ -1052,7 +1036,7 @@ The things worth remembering:
 3. `NA` in a standard error column means "not available", not "zero" and not
    "an error occurred".
 4. A custom measure is assumed to be a utility. If yours is a loss, say so with
-   `attr(my_fun, "measure_loss") <- TRUE`, or its differences and its `rank_by`
+   `custom_measure(loss = TRUE)`, or its differences and its `rank_by`
    ordering will come out reversed.
 
 ## References

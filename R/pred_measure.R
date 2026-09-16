@@ -63,10 +63,9 @@
 #'
 #' A custom measure can also declare how the standard error of a difference
 #' between two models is computed, with `attr(my_fun, "measure_se_diff")`. It
-#' accepts the same values as the `custom_se_fn` argument of [model_compare()]:
-#' a function, `"sum"`, or `"mean"`. A measure that declares nothing needs
-#' `custom_se_fn` at comparison time, and `custom_se_fn` always overrides the
-#' declaration.
+#' accepts a function, `"sum"`, or `"mean"`. For a measure that declares
+#' nothing, [model_compare()] reports an `NA` standard error. [custom_measure()]
+#' sets all three attributes.
 #'
 #' @examples
 #' \donttest{
@@ -508,4 +507,48 @@ pred_measure <- function(
 #' @export
 dim.pred_measure <- function(x) {
   attr(x, "dims")
+}
+
+
+#' Define a custom predictive measure
+#'
+#' Attaches the name, the orientation, and the standard error of the
+#' difference to a measure function. Pass the result to the `measure`
+#' argument of the `*_pred_measure()` functions.
+#'
+#' @param fun A function that returns `estimate`, `se`, and `pointwise`. Only
+#'   the arguments `y`, `ypred`, `mupred`, `ylp`, and `log_weights` that are
+#'   in its signature are supplied.
+#' @param name A character string. The measure is reported under this name.
+#' @param se_diff_fun How [model_compare()] computes the standard error of a
+#'   difference: a function `(ref, cmp)`, `"sum"`, `"mean"`, or `NULL`. With
+#'   `NULL` (the default), the standard error of the difference is `NA`.
+#' @param loss `TRUE` if lower values are better. The default `FALSE` treats
+#'   the measure as a utility.
+#'
+#' @return `fun` with the attributes `measure_name`, `measure_loss`, and
+#'   `measure_se_diff`.
+#'
+#' @examples
+#' my_abs_err <- custom_measure(
+#'   function(y, mupred) {
+#'     pw <- abs(y - colMeans(mupred))
+#'     list(estimate = mean(pw), se = sd(pw) / sqrt(length(pw)), pointwise = pw)
+#'   },
+#'   name = "my_abs_err", se_diff_fun = "mean", loss = TRUE
+#' )
+#'
+#' @seealso [pred_measure()], [model_compare()]
+#' @export
+custom_measure <- function(
+  fun, name, se_diff_fun = NULL, loss = FALSE
+) {
+  if (!is.function(fun)) {
+    stop("'fun' must be a function.", call. = FALSE)
+  }
+  attr(fun, "measure_name") <- name
+  attr(fun, "measure_loss") <- loss
+  attr(fun, "measure_se_diff") <- se_diff_fun
+  .measure_entry_custom(fun)
+  fun
 }
