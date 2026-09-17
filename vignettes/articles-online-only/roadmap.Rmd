@@ -1,0 +1,290 @@
+---
+title: "Development roadmap"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+vignette: >
+  %\VignetteIndexEntry{Development roadmap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{css, echo=FALSE}
+.rm {
+  --rm-fg: var(--bs-body-color, #212529);
+  --rm-muted: var(--bs-secondary-color, #6c757d);
+  --rm-line: var(--bs-border-color, #dee2e6);
+  --rm-card: var(--bs-tertiary-bg, #f8f9fa);
+  --rm-accent: var(--bs-primary, #b2001d);
+  --rm-done: #2e7d32;
+  --rm-now: #1565c0;
+  --rm-planned: #6d4c41;
+  --rm-open: #7b1fa2;
+}
+.rm-updated { color: var(--rm-muted); font-size: 0.9em; }
+
+/* timeline */
+.rm-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 2rem 0 2.5rem;
+  position: relative;
+}
+.rm-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem; left: 12.5%; right: 12.5%;
+  border-top: 3px solid var(--rm-line);
+}
+.rm-station { text-align: center; position: relative; padding: 0 0.5rem; }
+.rm-station::before {
+  content: "";
+  display: block;
+  width: 1.4rem; height: 1.4rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 50%;
+  border: 3px solid var(--rm-accent);
+  background: var(--bs-body-bg, #fff);
+  position: relative;
+}
+.rm-station.rm-past::before { background: var(--rm-accent); }
+.rm-station.rm-current::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--rm-accent) 25%, transparent); }
+.rm-station p { margin: 0; }
+.rm-station-title { font-weight: 700; font-size: 1.1em; }
+.rm-station-sub { color: var(--rm-muted); font-size: 0.9em; }
+.rm-station a { text-decoration: none; }
+
+/* status badges */
+.rm-badge {
+  display: inline-block;
+  padding: 0.1em 0.6em;
+  border-radius: 1em;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+.rm-badge.done { background: var(--rm-done); }
+.rm-badge.now { background: var(--rm-now); }
+.rm-badge.planned { background: var(--rm-planned); }
+.rm-badge.open { background: var(--rm-open); }
+
+/* cards */
+.rm-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+.rm-card {
+  background: var(--rm-card);
+  border: 1px solid var(--rm-line);
+  border-left: 4px solid var(--rm-accent);
+  border-radius: 0.4rem;
+  padding: 0.9rem 1rem 0.6rem;
+}
+.rm-card h4 { margin: 0.4rem 0 0.4rem; font-size: 1.05em; }
+.rm-card p { margin: 0 0 0.5rem; font-size: 0.95em; }
+.rm-links { color: var(--rm-muted); font-size: 0.85em; }
+
+.rm-note {
+  border: 1px solid var(--rm-line);
+  border-radius: 0.4rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 600px) {
+  .rm-timeline { grid-template-columns: 1fr; gap: 1.25rem; }
+  .rm-timeline::before { top: 0.7rem; bottom: 0.7rem; left: 0.7rem; right: auto; border-top: 0; border-left: 3px solid var(--rm-line); }
+  .rm-station { text-align: left; padding-left: 2.5rem; }
+  .rm-station::before { position: absolute; left: 0; top: 0; margin: 0; }
+}
+```
+
+:::::: {.rm}
+
+[Last updated: September 2026]{.rm-updated}
+
+This page shows what the **loo** developers work on now and what we plan
+next. It helps you prepare for changes and find places where you can help.
+
+::: {.rm-note}
+**This roadmap is not a promise.** loo is developed by a small team, mostly in
+volunteer time. Plans and their order can change. Releases have no fixed dates.
+:::
+
+::::: {.rm-timeline}
+
+:::: {.rm-station .rm-past}
+[v2.10.1]{.rm-station-title}
+
+[Released July 2026]{.rm-station-sub}
+
+[NEWS](../news/index.html){.rm-station-sub}
+::::
+
+:::: {.rm-station}
+[v2.11.0]{.rm-station-title}
+
+[Next minor release]{.rm-station-sub}
+
+[Milestone](https://github.com/stan-dev/loo/milestone/2){.rm-station-sub}
+::::
+
+:::: {.rm-station .rm-current}
+[v3.0.0]{.rm-station-title}
+
+[Next major release, in development]{.rm-station-sub}
+
+[Milestone](https://github.com/stan-dev/loo/milestone/1){.rm-station-sub}
+::::
+
+:::: {.rm-station}
+[Beyond 3.0.0]{.rm-station-title}
+
+[Ideas and exploration]{.rm-station-sub}
+::::
+
+:::::
+
+**Status:**
+[In progress]{.rm-badge .now}
+[Planned]{.rm-badge .planned}
+[Open for ideas]{.rm-badge .open}
+
+## v2.11.0
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Comparison output for subsampling
+
+Update the output structure of `loo_compare()` for subsampled LOO.
+
+[[#392](https://github.com/stan-dev/loo/issues/392)]{.rm-links}
+::::
+
+:::::
+
+## v3.0.0: predictive measures and model comparison
+
+The next major release extends loo from the ELPD to many predictive measures.
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+[In progress]{.rm-badge .now}
+
+#### Predictive performance measures
+
+The `*_pred_measure()` functions compute twelve measures, for example the
+ELPD, RMSE, $R^2$, CRPS, and accuracy. They work for in-sample, PSIS-LOO,
+K-fold, and test-data predictions. You can also define your own measure.
+
+[[#281](https://github.com/stan-dev/loo/issues/281)]{.rm-links}
+::::
+
+:::: {.rm-card}
+[In progress]{.rm-badge .now}
+
+#### Model comparison with `model_compare()`
+
+`model_compare()` compares models on any of these measures and reports the
+standard error of each difference. It replaces `loo_compare()`, which keeps
+working but warns.
+::::
+
+:::: {.rm-card}
+[In progress]{.rm-badge .now}
+
+#### Formula reference
+
+A paper states every formula that loo implements, in one notation. The
+documentation will cite it. We plan to publish it on arXiv.
+::::
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Clearer warnings and messages
+
+Fewer and more specific warnings and messages, with the details moved to the
+documentation.
+
+[[#353](https://github.com/stan-dev/loo/issues/353)]{.rm-links}
+::::
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Closer integration with posterior
+
+Use more functions from the **posterior** package. Rename `n_eff` to ESS, as
+in posterior.
+
+[[#249](https://github.com/stan-dev/loo/issues/249) · [#192](https://github.com/stan-dev/loo/issues/192)]{.rm-links}
+::::
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Parallel computation
+
+Run loo computations in parallel with the **mirai** package.
+
+[[#308](https://github.com/stan-dev/loo/issues/308)]{.rm-links}
+::::
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Plots of model differences
+
+Extend `loo_plot_difference()`.
+
+[[#394](https://github.com/stan-dev/loo/issues/394)]{.rm-links}
+::::
+
+:::: {.rm-card}
+[Planned]{.rm-badge .planned}
+
+#### Code quality
+
+Mutation testing of the test suite, and a clean-up of old issues.
+
+[[#385](https://github.com/stan-dev/loo/issues/385) · [#388](https://github.com/stan-dev/loo/issues/388)]{.rm-links}
+::::
+
+:::::
+
+## Beyond 3.0.0
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+[Open for ideas]{.rm-badge .open}
+
+#### Your suggestion
+
+Is a measure, a diagnostic, or a workflow missing? Tell us.
+
+[[Open an issue](https://github.com/stan-dev/loo/issues/new) · [Stan Forums](https://discourse.mc-stan.org/)]{.rm-links}
+::::
+
+:::::
+
+## How to help
+
++ Try the development version and report problems:
+  `remotes::install_github("stan-dev/loo")`.
++ Pick an issue labelled
+  [good first issue](https://github.com/stan-dev/loo/labels/good%20first%20issue)
+  or [help wanted](https://github.com/stan-dev/loo/labels/help%20wanted).
++ Read the
+  [contributing guide](https://github.com/stan-dev/loo/blob/master/.github/CONTRIBUTING.md).
+
+::::::
