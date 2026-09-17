@@ -34,9 +34,11 @@ scale (lower is better).}
 }
 \description{
 Computes pointwise and average classification accuracy for binary or
-multiclass outcomes from posterior predictive class assignments. For binary
-outcomes, each draw is thresholded at 0.5. For multiclass outcomes, each
-draw is mapped to the most likely category via \code{which.max()}.
+multiclass outcomes. The class probabilities are first averaged over the
+draws, using \code{log_weights} if given. For binary outcomes, the averaged
+probability is thresholded at 0.5. For multiclass outcomes, the predicted
+class is the most likely category of the averaged probabilities, via
+\code{which.max()}.
 }
 \examples{
 y <- c(1L, 0L, 1L)
