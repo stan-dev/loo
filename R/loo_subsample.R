@@ -1183,7 +1183,7 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #'
 #' @param y_approx (numeric) `n` approximated values.
 #' @param y (numeric) `m<n` subsampled values.
-#' @param y_idx (integerish) The index of `y` in `y_approx`.
+#' @param y_idx (integerish) The positions in `y_approx` corresponding to the subsampled values in `y`.
 #'
 #' @return A named list containing numeric values:
 #' * `y_hat`: estimated mean of \eqn{y} (Eq 7),
