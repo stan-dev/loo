@@ -1,7 +1,9 @@
 LL <- example_loglik_matrix()
 chain_id <- rep(1:2, each = dim(LL)[1] / 2)
 r_eff <- relative_eff(exp(LL), chain_id)
-psis_obj <- psis(-LL, r_eff = r_eff, cores = 2)
+# cores = 1 because forked processes can segfault on CRAN's macOS machines if
+# R is linked to Apple's Accelerate/vecLib BLAS, which is not fork-safe
+psis_obj <- psis(-LL, r_eff = r_eff, cores = 1)
 
 set.seed(123)
 x <- matrix(rnorm(length(LL)), nrow = nrow(LL), ncol = ncol(LL))

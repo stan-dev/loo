@@ -4,7 +4,9 @@ LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
 r_eff_mat <- relative_eff(exp(LLmat), chain_id)
 r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
-psis_mat <- psis(-LLmat, r_eff = r_eff_mat, cores = 2)
+# cores = 1 because forked processes can segfault on CRAN's macOS machines if
+# R is linked to Apple's Accelerate/vecLib BLAS, which is not fork-safe
+psis_mat <- psis(-LLmat, r_eff = r_eff_mat, cores = 1)
 psis_vec <- psis(-LLvec, r_eff = r_eff_vec)
 
 set.seed(123)
@@ -222,6 +224,15 @@ test_that("weighted quantiles work", {
   )
 })
 
+test_that("E_loo handles negative infinite log ratios", {
+  log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
+  psis_object <- suppressWarnings(psis(log_ratios))
+  x <- seq_along(log_ratios)
+
+  expect_no_error(out <- E_loo(x, psis_object, log_ratios = log_ratios))
+  expect_equal(out$value, sum(weights(psis_object, log = FALSE) * x))
+})
+
 test_that("weighted variance works", {
   x <- rnorm(100)
   w <- rep(0.01, 100)
@@ -230,4 +241,7 @@ test_that("weighted variance works", {
 
   w <- c(rep(0.1, 10), rep(0, 90))
   expect_equal(.wvar(x, w), var(x[w > 0]))
+
+  x <- 1e8 + c(-1, 0, 1)
+  expect_equal(.wvar(x, rep(1 / 3, 3)), 1)
 })

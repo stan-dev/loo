@@ -4,7 +4,7 @@
       print(waic1)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix.
+      Computed from 1000 posterior draws and 32 log-likelihood terms.
       
                 Estimate  SE
       elpd_waic    -83.5 4.3
@@ -18,7 +18,7 @@
     Code
       print(psis1)
     Output
-      Computed from 1000 by 32 log-weights matrix.
+      Computed from 1000 posterior draws and 32 log-weight terms.
       MCSE and ESS estimates assume independent draws (r_eff=1).
       
       All Pareto k estimates are good (k < 0.67).
@@ -30,7 +30,7 @@
       print(loo1)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix.
+      Computed from 1000 posterior draws and 32 log-likelihood terms.
       
                Estimate  SE
       elpd_loo    -83.6 4.3
@@ -49,7 +49,7 @@
       print(loo1_r_eff)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix.
+      Computed from 1000 posterior draws and 32 log-likelihood terms.
       
                Estimate  SE
       elpd_loo    -83.6 4.3

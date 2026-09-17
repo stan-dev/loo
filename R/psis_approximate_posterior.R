@@ -34,10 +34,11 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   checkmate::assert_flag(save_psis)
 
   if (is.null(log_liks)) {
-    approx_correction <- log_p - log_g
-    # Handle underflow/overflow
-    approx_correction <- approx_correction - max(approx_correction)
+    approx_correction <- validate_approx_correction(log_p, log_g)
     log_ratios <- matrix(approx_correction, ncol = 1)
+    log_ratios <- validate_log_ratios(log_ratios)
+    # Handle underflow/overflow
+    log_ratios <- log_ratios - max(log_ratios)
   } else {
     log_ratios <- correct_log_ratios(log_ratios = -log_liks, log_p = log_p, log_g = log_g)
   }
@@ -65,9 +66,18 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
 #' @inheritParams ap_psis
 #' @noRd
 #' @keywords internal
-correct_log_ratios <- function(log_ratios, log_p, log_g) {
+validate_approx_correction <- function(log_p, log_g) {
   approx_correction <- log_p - log_g
+  if (any(is.nan(approx_correction))) {
+    stop("The log density ratio is undefined for one or more draws.")
+  }
+  approx_correction
+}
+
+correct_log_ratios <- function(log_ratios, log_p, log_g) {
+  approx_correction <- validate_approx_correction(log_p, log_g)
   log_ratios <- log_ratios + approx_correction
+  log_ratios <- validate_log_ratios(log_ratios)
   # Handle underflow/overflow
   log_ratio_max <- apply(log_ratios, 2, max)
   log_ratios <- sweep(log_ratios, MARGIN = 2, STATS = log_ratio_max)

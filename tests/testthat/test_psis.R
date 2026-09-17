@@ -152,12 +152,29 @@ test_that("do_psis_i throws warning if all tail values the same", {
   expect_equal(val$pareto_k, Inf)
 })
 
-test_that("psis_smooth_tail returns original tail values if k is infinite", {
-  # skip on M1 Mac until we figure out why this test fails only on M1 Mac
-  skip_if(Sys.info()[["sysname"]] == "Darwin" && R.version$arch == "aarch64")
+test_that("psis handles negative infinite log ratios", {
+  log_ratios <- c(rep(-Inf, 90), seq(-9, 0, length.out = 10))
 
-  xx <- c(1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4)
-  val <- suppressWarnings(psis_smooth_tail(xx, 3))
+  expect_no_error(out <- suppressWarnings(psis(log_ratios)))
+  expect_s3_class(out, "psis")
+})
+
+test_that("exp_x_minus_exp_y is stable for nearby values", {
+  cutoff <- -30
+  x <- cutoff + 1e-14
+
+  expect_equal(exp_x_minus_exp_y(x, cutoff), 9.973486536736925e-28)
+  expect_equal(exp_x_minus_exp_y(0, -1000), 1)
+  expect_equal(
+    exp_x_minus_exp_y(c(-Inf, 0, Inf), c(-Inf, 0, Inf)),
+    c(0, 0, 0)
+  )
+})
+
+test_that("psis_smooth_tail returns original tail values if k is infinite", {
+  xx <- log(c(2, 2, 2, 2, 3, 4, 5, 6))
+  val <- suppressWarnings(psis_smooth_tail(xx, 0))
   expect_equal(val$tail, xx)
   expect_equal(val$k, Inf)
 })
+
