@@ -26,6 +26,52 @@ colLogMeanExps <- function(x) {
   matrixStats::colLogSumExps(x) - logS
 }
 
+#' More stable version of `exp(x) - exp(y)`
+#'
+#' @noRd
+#' @param x A numeric vector.
+#' @param y A numeric scalar or vector recycled to the length of `x`.
+#'   Must satisfy `x >= y` elementwise.
+#' @return A numeric vector equal to `exp(x) - exp(y)`.
+#'
+exp_x_minus_exp_y <- function(x, y) {
+  out <- -exp(x) * expm1(y - x)
+  # which() drops the NA comparisons that NA or NaN inputs would produce
+  out[which(x == y)] <- 0
+  out
+}
+
+#' More stable version of `x^2 - y^2`
+#'
+#' @noRd
+#' @param x,y Numeric vectors of the same length.
+#' @return A numeric vector equal to `x^2 - y^2`.
+#'
+difference_of_squares <- function(x, y) {
+  (x - y) * (x + y)
+}
+
+#' More stable version of `(exp(a) - exp(b)) / exp(c)`
+#'
+#' @noRd
+#' @param a,b,c Numeric vectors of the same length.
+#' @return A numeric vector equal to `(exp(a) - exp(b)) / exp(c)`. Elements
+#'   with `a == b` are returned as an exact zero regardless of `c`; elsewhere
+#'   `NA` and `NaN` inputs propagate.
+#'
+exp_diff_over_exp <- function(a, b, c) {
+  # `a >= b` is NA if `a` or `b` is NA or NaN, and R silently ignores NA
+  # indices in `[<-`. Seed the result from the inputs and index with which()
+  # so that missing values propagate instead of leaving a zero behind.
+  out <- a + b + c
+  larger <- which(a >= b)
+  smaller <- which(a < b)
+  out[larger] <- exp(a[larger] - c[larger]) * -expm1(b[larger] - a[larger])
+  out[smaller] <- exp(b[smaller] - c[smaller]) * expm1(a[smaller] - b[smaller])
+  out[which(a == b)] <- 0
+  out
+}
+
 #' Compute point estimates and standard errors from pointwise vectors
 #'
 #' @noRd
@@ -59,6 +105,43 @@ validate_ll <- function(x) {
     stop("NAs not allowed in input.")
   } else if (any(x == Inf)) {
     stop("All input values must be finite or -Inf.")
+  }
+  invisible(x)
+}
+
+#' Check that a log-likelihood array/matrix/vector is finite
+#'
+#' `loo()` requires finite log-likelihood values, for two unrelated reasons.
+#'
+#' A `-Inf` log likelihood is meaningful on its own — the observation has zero
+#' likelihood under that draw — but the leave-one-out importance ratio is
+#' `1 / p(y_i | theta)`, which is then infinite, so the PSIS estimate does not
+#' exist. Because `loo()` negates the log likelihood before importance
+#' sampling, this used to surface as [validate_ll()]'s `+Inf` message, with the
+#' polarity reversed.
+#'
+#' A `+Inf` log likelihood is not meaningful, and it passes the log-ratio check
+#' as a `-Inf` ratio. `ll + lw` is then `Inf + -Inf`, so a single such value
+#' made every estimate for the model `NA`.
+#'
+#' This is deliberately stricter than [validate_ll()], which is also used for
+#' log ratios, where `-Inf` is a valid zero importance weight.
+#'
+#' @noRd
+#' @param x Array/matrix/vector of log-likelihood values.
+#' @return `x`, invisibly, if no error is thrown.
+#'
+validate_log_lik <- function(x) {
+  if (is.list(x)) {
+    stop("List not allowed as input.")
+  }
+  # single pass covering NA, NaN and both infinities; the more specific checks
+  # below only run when something is already known to be wrong
+  if (!all(is.finite(x))) {
+    if (anyNA(x)) {
+      stop("NAs not allowed in input.")
+    }
+    stop("All log-likelihood values must be finite.")
   }
   invisible(x)
 }

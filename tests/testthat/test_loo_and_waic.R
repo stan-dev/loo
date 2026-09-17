@@ -34,6 +34,107 @@ test_that("loo with cores=1 and cores=2 gives same results", {
   expect_equal(loo1$estimates, loo2$estimates)
 })
 
+test_that("mcse_elpd is stable for extreme log likelihoods", {
+  ll <- cbind(c(-1000, -1001), c(1000, 999))
+  lw <- matrix(log(0.5), nrow = 2, ncol = 2)
+  E_elpd <- matrixStats::colLogSumExps(ll + lw)
+  shift <- apply(ll, 2, max)
+  lik <- exp(sweep(ll, 2, shift))
+  E_epd <- exp(E_elpd - shift)
+  expected <- sqrt(log1p(colSums(exp(lw)^2 * (lik - E_epd)^2) / E_epd^2))
+
+  expect_equal(mcse_elpd(ll, lw, E_elpd, r_eff = 1), expected)
+})
+
+test_that("mcse_elpd retains tiny positive deviations", {
+  z <- 5e-17
+  ll <- matrix(c(-z, z), ncol = 1)
+  lw <- matrix(log(0.5), nrow = 2, ncol = 1)
+  expected <- sqrt(log1p(sum(exp(lw)^2 * expm1(ll)^2)))
+  out <- mcse_elpd(ll, lw, E_elpd = 0, r_eff = 1)
+
+  expect_equal(out / expected, 1, tolerance = 1e-12)
+})
+
+test_that("mcse_elpd returns NA for an all-zero likelihood column", {
+  ll <- cbind(c(-Inf, -Inf), c(-1, -2))
+  lw <- matrix(log(0.5), nrow = 2, ncol = 2)
+  E_elpd <- matrixStats::colLogSumExps(ll + lw)
+
+  out <- mcse_elpd(ll, lw, E_elpd, r_eff = 1)
+  expect_true(is.na(out[1]))
+  expect_true(is.finite(out[2]))
+})
+
+test_that("elpd handles negative infinite log likelihoods", {
+  log_lik <- cbind(c(-Inf, 0), c(-Inf, -Inf))
+  out <- elpd(log_lik)
+
+  expect_equal(out$pointwise[, "elpd"], c(-log(2), -Inf))
+})
+
+# One test_that() per sign, so a failure names which one broke
+for (bad_value in c("-Inf", "Inf")) {
+  test_that(paste("loo rejects", bad_value, "log likelihoods"), {
+    log_lik <- matrix(-1, nrow = 10, ncol = 2)
+    log_lik[1, 1] <- as.numeric(bad_value)
+    error <- "All log-likelihood values must be finite."
+    llfun <- function(data_i, draws) log_lik[, data_i$i]
+    data <- data.frame(i = 1:2)
+    draws <- matrix(0, 10, 1)
+
+    expect_error(loo(log_lik, r_eff = NA), error, fixed = TRUE)
+    expect_error(
+      loo(array(log_lik, dim = c(5, 2, 2)), r_eff = NA),
+      error,
+      fixed = TRUE
+    )
+    expect_error(
+      loo(llfun, data = data, draws = draws, r_eff = NA, cores = 1),
+      error,
+      fixed = TRUE
+    )
+    expect_error(
+      loo_i(1, llfun, data = data, draws = draws),
+      error,
+      fixed = TRUE
+    )
+  })
+}
+
+test_that("loo keeps the existing message for NA log likelihoods", {
+  log_lik <- matrix(-1, nrow = 10, ncol = 2)
+  log_lik[1, 1] <- NA
+
+  expect_error(loo(log_lik, r_eff = NA), "NAs not allowed in input", fixed = TRUE)
+})
+
+test_that("rejecting non-finite log likelihoods leaves psis() permissive", {
+  # a -Inf log likelihood is valid in itself, but inverts to an infinite
+  # leave-one-out importance ratio, so loo() cannot use it; a -Inf log ratio
+  # passed straight to psis() is just a zero weight
+  log_ratios <- c(-Inf, seq(-9, 0, length.out = 99))
+
+  expect_no_error(out <- suppressWarnings(psis(log_ratios, r_eff = NA)))
+  expect_identical(weights(out, normalize = TRUE, log = FALSE)[1], 0)
+})
+
+test_that("waic rejects negative infinite log likelihoods", {
+  log_lik <- matrix(-1, nrow = 10, ncol = 2)
+  log_lik[1, 1] <- -Inf
+  error <- "All log-likelihood values must be finite for WAIC."
+
+  expect_error(waic(log_lik), error, fixed = TRUE)
+  expect_error(waic(array(log_lik, dim = c(5, 2, 2))), error, fixed = TRUE)
+
+  llfun <- function(data_i, draws) log_lik[, data_i$i]
+  expect_error(
+    waic(llfun, data = data.frame(i = 1:2), draws = matrix(0, 10, 1)),
+    error,
+    fixed = TRUE
+  )
+})
+
 test_that("waic returns object with correct structure", {
   expect_true(is.waic(waic1))
   expect_true(is.loo(waic1))

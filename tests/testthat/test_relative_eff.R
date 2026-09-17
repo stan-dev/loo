@@ -8,6 +8,34 @@ test_that("relative_eff results haven't changed", {
   expect_snapshot_value(relative_eff(exp(LLarr)), style = "serialize")
 })
 
+test_that("relative_eff handles zero likelihood values", {
+  likelihood <- c(0, exp(seq(-9, 0, length.out = 99)))
+
+  expect_equal(
+    relative_eff(likelihood, chain_id = rep(1, length(likelihood))),
+    posterior::ess_mean(likelihood) / length(likelihood)
+  )
+})
+
+test_that("relative_eff returns NA for all-zero likelihoods", {
+  likelihood <- rep(0, 100)
+  chain_id <- rep(1, length(likelihood))
+  expect_true(is.na(relative_eff(likelihood, chain_id = chain_id)))
+
+  likelihood_matrix <- cbind(likelihood, likelihood)
+  expect_true(all(is.na(relative_eff(likelihood_matrix, chain_id = chain_id))))
+
+  zero_likelihood <- function(data_i, draws) rep(0, nrow(draws))
+  out <- relative_eff(
+    zero_likelihood,
+    chain_id = chain_id,
+    data = data.frame(i = 1:2),
+    draws = matrix(0, nrow = length(likelihood), ncol = 1),
+    cores = 1
+  )
+  expect_true(all(is.na(out)))
+})
+
 test_that("relative_eff is equal to ESS / S", {
   dims <- dim(LLarr)
   ess <- r_eff <- rep(NA, dims[3])
