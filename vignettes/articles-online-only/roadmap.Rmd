@@ -107,12 +107,27 @@ vignette: >
 
 [Last updated: September 2026]{.rm-updated}
 
-This page shows what the **loo** developers work on now and what we plan
-next. It helps you prepare for changes and find places where you can help.
+Welcome! This page shows what the core developers of **loo** are working on
+right now and what we have planned for the coming releases. It highlights a
+selection of our main goals, not a complete list of everything we work on.
+
+We hope the roadmap is useful to you in a few ways:
+
++ **If you use loo**, it shows what we currently prioritize and what changes
+  are on their way, so you can plan ahead.
++ **If you would like to contribute**, it shows the topics we are actively
+  thinking about. If one of them interests you, we would love to hear from you.
+  Leave a comment on the linked issue, or reach out on the
+  [Stan Forums](https://discourse.mc-stan.org/).
++ **If you think something important is missing**, or should get more
+  attention, please tell us. Your input helps us decide what to work on next.
 
 ::: {.rm-note}
-**This roadmap is not a promise.** loo is developed by a small team, mostly in
-volunteer time. Plans and their order can change. Releases have no fixed dates.
+**A note on plans.** This roadmap shows our strategic plans for the medium and
+long term. Alongside this work, we continue to respond to bug reports,
+questions, and requests as they come in. The roadmap describes our current
+intentions, not fixed commitments. Priorities can shift, and releases
+have no fixed dates. We update this page as our plans change.
 :::
 
 ::::: {.rm-timeline}
@@ -122,7 +137,7 @@ volunteer time. Plans and their order can change. Releases have no fixed dates.
 
 [Released July 2026]{.rm-station-sub}
 
-[NEWS](../news/index.html){.rm-station-sub}
+[What's new](../news/index.html){.rm-station-sub}
 ::::
 
 :::: {.rm-station}
@@ -144,7 +159,7 @@ volunteer time. Plans and their order can change. Releases have no fixed dates.
 :::: {.rm-station}
 [Beyond 3.0.0]{.rm-station-title}
 
-[Ideas and exploration]{.rm-station-sub}
+[Your ideas are welcome]{.rm-station-sub}
 ::::
 
 :::::
@@ -156,23 +171,24 @@ volunteer time. Plans and their order can change. Releases have no fixed dates.
 
 ## v2.11.0
 
+A smaller release with improvements to the current interface.
+
 ::::: {.rm-cards}
 
 :::: {.rm-card}
 [Planned]{.rm-badge .planned}
 
-#### Comparison output for subsampling
+#### Any topic here?
 
-Update the output structure of `loo_compare()` for subsampled LOO.
-
-[[#392](https://github.com/stan-dev/loo/issues/392)]{.rm-links}
+Do we want to make some further changes?
 ::::
 
 :::::
 
-## v3.0.0: predictive measures and model comparison
+## v3.0.0
 
-The next major release extends loo from the ELPD to many predictive measures.
+Our next major release is a big step for loo. Beyond the ELPD, you will be able
+to evaluate and compare models with many other predictive measures.
 
 ::::: {.rm-cards}
 
@@ -181,11 +197,11 @@ The next major release extends loo from the ELPD to many predictive measures.
 
 #### Predictive performance measures
 
-The `*_pred_measure()` functions compute twelve measures, for example the
-ELPD, RMSE, $R^2$, CRPS, and accuracy. They work for in-sample, PSIS-LOO,
-K-fold, and test-data predictions. You can also define your own measure.
+The new `*_pred_measure()` functions provide predictive performance measures
+beyond the ELPD, including RMSE, MAE, MSE, $R^2$, (C)RPS, the Brier score, and
+classification accuracy. They work with in-sample, PSIS-LOO, K-fold, and
+test-data predictions, and you can add your own measures.
 
-[[#281](https://github.com/stan-dev/loo/issues/281)]{.rm-links}
 ::::
 
 :::: {.rm-card}
@@ -193,40 +209,41 @@ K-fold, and test-data predictions. You can also define your own measure.
 
 #### Model comparison with `model_compare()`
 
-`model_compare()` compares models on any of these measures and reports the
-standard error of each difference. It replaces `loo_compare()`, which keeps
-working but warns.
+`model_compare()` succeeds `loo_compare()` and lets you compare models on all
+built-in and custom measures. No worries: `loo_compare()` will keep working,
+with a warning that points you to the new function.
 ::::
 
 :::: {.rm-card}
 [In progress]{.rm-badge .now}
 
-#### Formula reference
+#### Improved documentation and tutorials
 
-A paper states every formula that loo implements, in one notation. The
-documentation will cite it. We plan to publish it on arXiv.
+We are actively working on several tutorials that introduce all new features
+from three angles: the *implementation*, the *workflow*, and the *formal,
+mathematical* background.
 ::::
 
 :::: {.rm-card}
 [Planned]{.rm-badge .planned}
 
-#### Clearer warnings and messages
+#### Better control of warnings and messages
 
-Fewer and more specific warnings and messages, with the details moved to the
-documentation.
+We will make it easier to control warnings and messages at the package level,
+for example to silence them in simulations or to see more detail when
+debugging.
 
-[[#353](https://github.com/stan-dev/loo/issues/353)]{.rm-links}
 ::::
 
 :::: {.rm-card}
-[Planned]{.rm-badge .planned}
+[In progress]{.rm-badge .planned}
 
-#### Closer integration with posterior
+#### Improved diagnostics
 
-Use more functions from the **posterior** package. Rename `n_eff` to ESS, as
-in posterior.
-
-[[#249](https://github.com/stan-dev/loo/issues/249) · [#192](https://github.com/stan-dev/loo/issues/192)]{.rm-links}
+We will add more reliable Monte Carlo standard errors for PSIS-LOO, and
+diagnostics that show when K-fold and other refit-based results are unreliable.
+We also want to guide you step by step to a more robust computation when the
+diagnostics warn.
 ::::
 
 :::: {.rm-card}
@@ -234,57 +251,47 @@ in posterior.
 
 #### Parallel computation
 
-Run loo computations in parallel with the **mirai** package.
-
-[[#308](https://github.com/stan-dev/loo/issues/308)]{.rm-links}
-::::
-
-:::: {.rm-card}
-[Planned]{.rm-badge .planned}
-
-#### Plots of model differences
-
-Extend `loo_plot_difference()`.
-
-[[#394](https://github.com/stan-dev/loo/issues/394)]{.rm-links}
-::::
-
-:::: {.rm-card}
-[Planned]{.rm-badge .planned}
-
-#### Code quality
-
-Mutation testing of the test suite, and a clean-up of old issues.
-
-[[#385](https://github.com/stan-dev/loo/issues/385) · [#388](https://github.com/stan-dev/loo/issues/388)]{.rm-links}
+We will update how loo runs computations in parallel, so that it works better
+in settings such as computing clusters.
 ::::
 
 :::::
 
 ## Beyond 3.0.0
 
+This part of the roadmap is still open, and we would like to shape it together
+with you.
+
 ::::: {.rm-cards}
 
 :::: {.rm-card}
 [Open for ideas]{.rm-badge .open}
 
-#### Your suggestion
+#### Your ideas
 
-Is a measure, a diagnostic, or a workflow missing? Tell us.
+Is there a measure, a diagnostic, or a workflow you miss in loo? Or a topic
+you think deserves a higher priority? We would love to hear about it.
 
-[[Open an issue](https://github.com/stan-dev/loo/issues/new) · [Stan Forums](https://discourse.mc-stan.org/)]{.rm-links}
+[[Open an issue](https://github.com/stan-dev/loo/issues/new) · [Start a thread on the Stan Forums](https://discourse.mc-stan.org/)]{.rm-links}
 ::::
 
 :::::
 
-## How to help
+## Get involved
 
-+ Try the development version and report problems:
-  `remotes::install_github("stan-dev/loo")`.
-+ Pick an issue labelled
-  [good first issue](https://github.com/stan-dev/loo/labels/good%20first%20issue)
-  or [help wanted](https://github.com/stan-dev/loo/labels/help%20wanted).
-+ Read the
-  [contributing guide](https://github.com/stan-dev/loo/blob/master/.github/CONTRIBUTING.md).
+Contributions are welcome! Here are a few ways to join in:
+
++ **Try the development version** with
+  `remotes::install_github("stan-dev/loo")`, and let us know what works well
+  and what does not.
++ **Share your view on priorities.** Comment on an issue that matters to you,
+  or let us know about features you are missing.
++ **Interested in contributing?** Browse our
+  [open issues](https://github.com/stan-dev/loo/issues) and leave a comment
+  on the one you would like to work on, or reach out on the
+  [Stan Forums](https://discourse.mc-stan.org/).
++ **Read the
+  [contributing guide](https://github.com/stan-dev/loo/blob/master/.github/CONTRIBUTING.md)**
+  for how we work.
 
 ::::::
