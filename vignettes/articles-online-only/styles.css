@@ -1,0 +1,41 @@
+/* Base Callout Styling */
+.callout {
+  padding: 1rem 1rem 1rem 1.2rem;
+  margin: 1.5rem 0;
+  border-left: 5px solid #ccc;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
+/* Callout Variations */
+.callout-note {
+  border-left-color: #0d6efd; /* Blue */
+  background-color: #cfe2ff22;
+}
+
+.callout-warning {
+  border-left-color: #ffc107; /* Yellow/Amber */
+  background-color: #fff3cd22;
+}
+
+.callout-tip {
+  border-left-color: #198754; /* Green */
+  background-color: #d1e7dd22;
+}
+
+.callout-message {
+  border-left-color: #bec0bf; /* Grey */
+  background-color: #d1e7dd22;
+}
+
+/* Optional: Style headings inside callouts to match */
+.callout p:first-child {
+  font-weight: bold;
+  margin-top: 0;
+}
+
+/* Make output scrollable
+.scroll-output {
+  max-height: 300px;
+  overflow-y: auto;
+}

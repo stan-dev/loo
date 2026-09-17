@@ -59,8 +59,9 @@ are:
 - **Point metrics:** `mae`, `mse`, `rmse`, `r2`
 - **Classification metrics:** `acc`, `bacc`
 
-Base measure `elpd` is always included automatically when `ylp` is supplied;
-request `ic`, `mlpd`, or other density scores via `measure`. Pass any
+`elpd` is the default measure. It is reported when `measure` is `NULL` or
+names `"elpd"`. `mlpd` and `ic` use `elpd`, but do not add an `elpd` row.
+Request `ic`, `mlpd`, or other density scores via `measure`. Pass any
 additional names from the list above through the `measure` argument. You can 
 also obtain a list of supported measures via `supported_measures_list`:
 
@@ -181,13 +182,13 @@ sleep_measure <- insample_pred_measure(
   ylp = brms::log_lik(fit_sleep),
   y = fit_sleep$data$y,
   ypred = brms::posterior_predict(fit_sleep),
-  measure = c("rps", "srps")
+  measure = c("elpd", "rps", "srps")
 )
 
 print(sleep_measure)
 ```
 
-Base measure `elpd` is always computed when `ylp` is supplied; request `ic`
+`elpd` is reported by default or when `measure` names `"elpd"`; request `ic`
 or other density scores via `measure`. The rest of this tutorial explains how inputs map to measures and
 how to switch evaluation modes.
 
@@ -231,7 +232,7 @@ fold-wise log predictive density, because k-fold uses no importance weights.
 Supply the inputs each measure needs in a single entry-point call (see the
 [workflow overview](#workflow-overview) below). When adding measures
 incrementally, pass an existing object as `predperf` to `pred_measure()` so
-base estimates and weights are reused.
+stored rows and weights are reused.
 
 | Measure | `ylp` | `y` | `ypred` | `mupred` |
 | :---: | :---: | :---: | :---: | :---: |
@@ -283,12 +284,12 @@ sleep_measure <- insample_pred_measure(
   y = fit_sleep$data$y,
   ypred = ypred_sleep,
   mupred = mupred_sleep,
-  measure = c("rps", "srps", "r2")
+  measure = c("elpd", "rps", "srps", "r2")
 )
 print(sleep_measure)
 ```
 
-`elpd` is always computed when `ylp` is supplied; it sums the expected log
+`elpd` is reported because `measure` names `"elpd"`; it sums the expected log
 pointwise predictive density across observations. Request `ic` via `measure`
 (`ic` equals `-2 × elpd`). Additional rows in the table correspond to the measures
 passed in `measure`.
@@ -406,13 +407,13 @@ loo_measure <- loo_pred_measure(
   y = fit_sleep$data$y,
   ypred = ypred_sleep,
   mupred = mupred_sleep,
-  measure = c("rps", "srps", "r2")
+  measure = c("elpd", "rps", "srps", "r2")
 )
 print(loo_measure)
 ```
 
-The estimates carry a `_loo` suffix (e.g. `elpd_loo`). Base LOO summaries
-include `elpd_loo` and `p_loo` (effective number of parameters: the
+The estimates carry a `_loo` suffix (e.g. `elpd_loo`). Requesting `"elpd"`
+adds `elpd_loo` and `p_loo` (effective number of parameters: the
 non-cross-validated log posterior predictive density minus `elpd_loo`).
 Request `ic_loo` via `measure = "ic"`.
 Furthermore, we get an additional entry with PSIS diagnostics in `$diagnostics`.
@@ -431,7 +432,7 @@ str(loo_measure)
 | `ylp` + `psis_object` | `loo_pred_measure(ylp = ylp, psis_object = psis_obj, measure = ...)` |
 | `ylp` only (PSIS computed internally) | `loo_pred_measure(ylp = ylp, measure = ...)` |
 
-To add measures incrementally after a base-only LOO call, pass the existing
+To add measures incrementally after an `elpd`-only LOO call, pass the existing
 object as `predperf` to `pred_measure()`. When
 accumulating after computing only `elpd`, use `save_psis = TRUE` in
 `loo_pred_measure()` so PSIS weights are stored for subsequent measures.
@@ -499,7 +500,7 @@ print(test_measure)
 ```
 
 Holdout measures use a `_test` suffix and reflect performance on the held-out
-subjects only. The base summary `elpd_test` comes from `ylp_test`.
+subjects only. `elpd_test` comes from `ylp_test`.
 
 ## Other outcome types
 
