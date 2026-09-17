@@ -91,6 +91,27 @@ test_that(".prepare_measures() filters measures already in predperf", {
   expect_equal(vapply(entries, `[[`, "", "name"), "mse")
 })
 
+test_that(".prepare_measures() defaults to elpd for a new result only", {
+  entries <- .prepare_measures(NULL, NULL, supported_measures_list, "insample")
+  expect_equal(vapply(entries, `[[`, "", "key"), "elpd")
+  expect_length(
+    .prepare_measures(NULL, res$predperf, supported_measures_list, "insample"),
+    0L
+  )
+})
+
+# .any_needs_elpd() -------------------------------------------------
+
+test_that(".any_needs_elpd() detects measures derived from elpd", {
+  entry <- function(k) list(name = k, type = "builtin", key = k)
+  custom <- list(name = "my_fun", type = "custom", key = function(...) NULL)
+
+  expect_true(.any_needs_elpd(list(entry("rmse"), entry("mlpd"))))
+  expect_true(.any_needs_elpd(list(entry("elpd"))))
+  expect_false(.any_needs_elpd(list(entry("rmse"), custom)))
+  expect_false(.any_needs_elpd(list()))
+})
+
 # .validate_measure_result() ----------------------------------------
 
 test_that(".validate_measure_result() accepts standard and CRPS-style output", {

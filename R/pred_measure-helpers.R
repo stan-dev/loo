@@ -102,7 +102,8 @@
 #'
 #' @description
 #' Converts `measure` via `.normalize_measure()`, validates built-in names and
-#' custom functions, and drops entries already present in `predperf`.
+#' custom functions, and drops entries already present in `predperf`. An empty
+#' measure gives `"elpd"` for a new result.
 #'
 #' @param measure User-supplied `measure` argument (see `.normalize_measure()`).
 #' @param predperf Existing pred_measure object used when accumulating measures.
@@ -116,10 +117,11 @@
 .prepare_measures <- function(
   measure, predperf, supported_measures_list, source
 ) {
-  entries <- .normalize_measure(measure)
-  if (length(entries) == 0L) {
-    return(entries)
+  if (length(measure) == 0L) {
+    if (!is.null(predperf)) return(list())
+    measure <- "elpd"
   }
+  entries <- .normalize_measure(measure)
 
   is_builtin <- vapply(entries, function(e) e$type == "builtin", logical(1L))
   builtin_keys <- vapply(entries[is_builtin], function(e) e$key, character(1L))
@@ -158,6 +160,23 @@
   }
 
   entries
+}
+
+#' Check whether any measure needs the pointwise `elpd`
+#'
+#' @description
+#' Returns `TRUE` if a built-in entry sets `needs_elpd` in `.measure_spec`
+#' (`elpd`, `mlpd`, `ic`). Custom entries never need it.
+#'
+#' @param entries Normalized measure entries from `.prepare_measures()`.
+#'
+#' @return A single logical.
+#'
+#' @noRd
+.any_needs_elpd <- function(entries) {
+  any(vapply(entries, function(e) {
+    e$type == "builtin" && isTRUE(.measure_spec[[e$key]]$needs_elpd)
+  }, logical(1L)))
 }
 
 #' Infer number of observations from measure inputs

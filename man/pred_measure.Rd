@@ -33,8 +33,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -47,7 +47,7 @@ Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \
 They must return a list with  \code{estimates} and \code{pointwise}.}
 
 \item{predperf}{An existing predictive measure object (class
-\code{"pred_measure"}) to update. When supplied, base density summaries and
+\code{"pred_measure"}) to update. When supplied, stored rows and
 (for LOO) PSIS weights are reused instead of recomputed.}
 
 \item{group_ids}{Optional vector of group identifiers for grouped summaries
@@ -67,14 +67,15 @@ measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
 }
 \value{
 An updated object of the same class as \code{predperf}, with new rows in
-\code{estimates} and columns in \code{pointwise} for each requested measure. Base
-summaries (\code{elpd} and LOO/k-fold complexity terms such as \code{p_loo}) are not
-recomputed.
+\code{estimates} and columns in \code{pointwise} for each requested measure. Rows
+already in \code{predperf} are not recomputed. If \code{mlpd} or \code{ic} needs \code{elpd} and
+\code{predperf} has no \code{elpd} column, \code{elpd} is recomputed from \code{ylp} for
+insample and LOO results. For k-fold and test results this is an error.
 }
 \description{
 Extend a \code{"pred_measure"} object with additional measures \strong{without
 recomputing} what is already stored. Use this for interactive exploration
-or when you first compute base density summaries and later add distributional
+or when you first compute \code{elpd} and later add distributional
 or point-prediction metrics.
 
 Pass the existing object as \code{predperf} and supply any inputs newly required

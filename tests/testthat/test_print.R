@@ -74,6 +74,16 @@ test_that("loo_pred_measure print snapshots", {
   )
 })
 
+test_that("loo_pred_measure print output with elpd", {
+  x <- loo_pred_measure(
+    loo = temp$loo,
+    y = temp$y,
+    mupred = temp$mupred,
+    measure = c("elpd", "r2")
+  )
+  expect_snapshot_output(print(x))
+})
+
 test_that("test_pred_measure print output", {
   res <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
   x <- test_pred_measure(

@@ -31,8 +31,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -60,8 +60,8 @@ An object of class \code{"insample_pred_measure"} and \code{"pred_measure"}: a l
 with:
 \describe{
 \item{\code{estimates}}{Matrix of summary estimates and standard errors (rows
-are measures, columns are \code{Estimate} and \code{SE}). The base row \code{elpd} is
-always present when \code{ylp} is supplied.}
+are measures, columns are \code{Estimate} and \code{SE}). The row \code{elpd} is
+present when \code{measure} is \code{NULL} (default) or names "elpd".}
 \item{\code{pointwise}}{Matrix of observation-level contributions (one column
 per measure).}
 }
@@ -94,8 +94,9 @@ needs:\tabular{lcccc}{
 }
 
 
-Base measure \code{elpd} is always computed when \code{ylp} is provided. Request
-\code{ic}, \code{mlpd}, or other density scores via \code{measure}, or supply a custom function;
+"elpd" is the default measure. \code{mlpd} and \code{ic} are derived from \code{elpd}, but
+requesting them does not add an \code{elpd} row. Request \code{ic}, \code{mlpd}, or other
+density scores via \code{measure}, or supply a custom function;
 see \link{supported_measures_list} and the
 \href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{overview of scores and metrics}
 article for definitions and orientation (higher vs lower is better).

@@ -781,11 +781,12 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 # @param measure The measure used.
 # @return The measure specification.
 #
-# `needs_elpd = TRUE` marks a measure that is derived from the pointwise ELPD of
-# the base measure block rather than from the raw inputs. `.compute_measure()`
-# then supplies `pointwise`, optionally passed through `elpd_transform` first.
+# `needs_elpd = TRUE` marks a measure derived from the pointwise ELPD (`elpd`,
+# `mlpd`, `ic`). `.elpd_pointwise()` gives that vector for the source.
+# `.compute_measure()` passes it as `pointwise`, optionally through
+# `elpd_transform` first.
 .measure_spec <- list(
-  elpd = list(fun = measure_elpd, loss = FALSE),
+  elpd = list(fun = measure_elpd, loss = FALSE, needs_elpd = TRUE),
   ic = list(
     fun = measure_ic, loss = TRUE,
     needs_elpd = TRUE, elpd_transform = function(x) -2 * x

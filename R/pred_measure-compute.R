@@ -20,10 +20,10 @@
 #'   `brms::log_lik(fit, newdata = test_data)`. Used with `ylp` (from the
 #'   training fit) in [test_pred_measure()] to score genuinely new data.
 #' @param predperf An existing predictive measure object (class
-#'   `"pred_measure"`) to update. When supplied, base density summaries and
+#'   `"pred_measure"`) to update. When supplied, stored rows and
 #'   (for LOO) PSIS weights are reused instead of recomputed.
-#' @param measure Additional measures beyond the base summary `elpd` (always
-#'   included when `ylp` is available). Can be:
+#' @param measure Measures to compute. `NULL` (default) gives `elpd` (with
+#'   `p_loo` / `p_kfold` for LOO and k-fold). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
 #'       [supported_measures_list].
@@ -88,17 +88,13 @@ do_pred_measure <- function(
   measures <- .prepare_measures(
     measure, predperf, supported_measures_list, source
   )
+  needs_elpd <- .any_needs_elpd(measures)
 
   if (source == "loo") {
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {
         cli::cli_abort(c(
           "No `psis_object` found in `loo` object. Did you run loo(..., save_psis = 'TRUE')."
-        ))
-      }
-      if (is.null(ylp) && !is.null(psis_object)) {
-        cli::cli_abort(c(
-          "For computation of `elpd` it is required to pass `ylp` besides `psis_object`."
         ))
       }
     } else {
@@ -133,21 +129,26 @@ do_pred_measure <- function(
       r_eff = 1
     )
   }
-  
-  base_measure <- .compute_base_measure(
-    ylp = ylp,
-    ylp_test = ylp_test,
-    loo = loo,
-    kfold = kfold,
-    predperf = predperf,
-    psis_object = psis_object,
-    source = source
-  )
-
-  estimates <- base_measure$estimates
-  pointwise <- base_measure$pointwise
 
   log_weights <- if (!is.null(psis_object)) psis_object$log_weights else NULL
+
+  lppd_i <- if (needs_elpd) {
+    .elpd_pointwise(
+      source = source, ylp = ylp, ylp_test = ylp_test,
+      log_weights = log_weights, loo = loo, kfold = kfold, predperf = predperf
+    )
+  } else NULL
+
+  # an update adds rows to predperf; a new result starts empty
+  estimates <- predperf$estimates
+  pointwise <- predperf$pointwise
+  diagnostics <- if (!is.null(predperf)) {
+    predperf$diagnostics
+  } else if (source == "kfold") {
+    kfold$diagnostics
+  } else {
+    psis_object$diagnostics
+  }
 
   for (entry in measures) {
     sel_measure <- .compute_measure(
@@ -158,7 +159,7 @@ do_pred_measure <- function(
       measure_entry = entry,
       log_weights = log_weights,
       control = control,
-      base_measure = base_measure
+      lppd_i = lppd_i
     )
     result_name <- attr(sel_measure, "measure")
     if (is.null(result_name)) {
@@ -186,30 +187,44 @@ do_pred_measure <- function(
       values = sel_measure$pointwise,
       margin = 2
     )
+
+    if (identical(entry$key, "elpd")) {
+      p_eff <- .effective_param(source, ylp, lppd_i, loo, kfold, predperf)
+      if (!is.null(p_eff)) {
+        estimates <- .merge_matrix(
+          source = source, mat = estimates, name = "p",
+          values = .measure_estimate_se(p_eff), margin = 1
+        )
+        pointwise <- .merge_matrix(
+          source = source, mat = pointwise, name = "p",
+          values = p_eff$pointwise, margin = 2
+        )
+      }
+    }
   }
 
   predperf_res <- .build_pred_measure(
     estimates = estimates,
     pointwise = pointwise,
-    diagnostics = base_measure$diagnostics,
+    diagnostics = diagnostics,
     psis_object = psis_object,
     save_psis = save_psis
   )
-  
+
   .add_attributes(
     save_psis,
-    predperf_res, 
-    y, 
-    ypred, 
-    mupred, 
+    predperf_res,
+    y,
+    ypred,
+    mupred,
     ylp,
     ylp_test,
-    kfold, 
-    loo, 
-    predperf, 
+    kfold,
+    loo,
+    predperf,
     source
   )
-  }
+}
 
 # internal helper functions ---------------------------------------------------
 
@@ -301,26 +316,50 @@ do_pred_measure <- function(
   c(res$estimate, res$se)
 }
 
-#' Pointwise ELPD from the base measure block
+#' Pointwise ELPD for the evaluation source
 #'
-#' `.compute_base_measure()` appends the source suffix to the base column names,
-#' so the column is one of `elpd`, `elpd_loo`, `elpd_kfold`, `elpd_test`.
-#' Measures that declare `needs_elpd` in `.measure_spec` read the log predictive
-#' density here instead of recomputing it from `ylp`. `ylp` is absent when only
-#' a `loo` or `kfold` object is supplied, and on the `test` source it holds the
-#' training data while the base block holds the holdout data.
+#' @description
+#' Gives the pointwise ELPD that `elpd`, `mlpd` and `ic` use. Resolution order:
+#' \enumerate{
+#'   \item Reuse the `elpd<suffix>` column of `predperf`.
+#'   \item `kfold`: take `elpd_kfold` from the `kfold` object.
+#'   \item `loo` with a `loo` object: take `elpd_loo` from it.
+#'   \item Otherwise compute from `ylp` (`insample`, `loo` with `log_weights`)
+#'     or from `ylp_test` (`test`).
+#' }
+#'
+#' @return Numeric vector of length `n`.
 #'
 #' @noRd
-.base_elpd_pointwise <- function(base_measure) {
-  known <- c("elpd", "elpd_loo", "elpd_kfold", "elpd_test")
-  hit <- intersect(known, colnames(base_measure$pointwise))
-  if (length(hit) == 0L) {
+.elpd_pointwise <- function(
+  source, ylp, ylp_test, log_weights, loo, kfold, predperf
+) {
+  col <- .measure_result_name(source, "elpd")
+  if (!is.null(predperf) && col %in% colnames(predperf$pointwise)) {
+    return(predperf$pointwise[, col])
+  }
+  if (source == "kfold") {
+    if (is.null(kfold)) {
+      cli::cli_abort(c(
+        "{.field {col}} is not stored in {.arg predperf}.",
+        "i" = "Call {.fn kfold_pred_measure} with the {.cls kfold} object."
+      ))
+    }
+    return(kfold$pointwise[, col])
+  }
+  if (source == "loo" && !is.null(loo)) {
+    return(loo$pointwise[, col])
+  }
+  arg <- if (source == "test") "ylp_test" else "ylp"
+  input <- if (source == "test") ylp_test else ylp
+  if (is.null(input)) {
     cli::cli_abort(c(
-      "No {.field elpd} column found in the base measure.",
-      "i" = "{.val mlpd} and {.val ic} are derived from {.val elpd}."
+      "{.arg {arg}} is required to compute {.field {col}}.",
+      "i" = "{.val elpd}, {.val mlpd} and {.val ic} are derived from {.field {col}}."
     ))
   }
-  base_measure$pointwise[, hit[1L]]
+  weights <- if (source == "loo") log_weights else NULL
+  .lppd_from_inputs(input, weights, NULL, ".elpd_pointwise")$lppd_i
 }
 
 #' Compute a single predictive measure
@@ -335,7 +374,7 @@ do_pred_measure <- function(
 #' The pool holds `y`, `ypred`, `mupred`, `ylp` and `log_weights`, plus the
 #' measure's slice of `control`. A measure that sets `needs_elpd` in
 #' `.measure_spec` gets a different pool: `pointwise` holds the ELPD column
-#' taken from `base_measure`, and `ylp` and `log_weights` are `NULL`.
+#' taken from `lppd_i`, and `ylp` and `log_weights` are `NULL`.
 #'
 #' @param y Vector of observed values (n).
 #' @param ypred Matrix of posterior predictive draws (S × n).
@@ -347,8 +386,8 @@ do_pred_measure <- function(
 #'   `.compute_log_weights()`.
 #' @param control Named list of per-measure settings passed from
 #'   [pred_measure()]; the active slice is `control[[measure_entry$name]]`.
-#' @param base_measure The base measure block from `.compute_base_measure()`.
-#'   Read only when the measure sets `needs_elpd` in `.measure_spec`.
+#' @param `lppd_i` Numeric vector from `elpd_pointwise()`; read only when the
+#'   measure sets `needs_elpd`.
 #'
 #' @return The result of the measure function, in one of two shapes.
 #'   \describe{
@@ -362,14 +401,14 @@ do_pred_measure <- function(
 #'
 #' @noRd
 .compute_measure <- function(
-    y,
-    ypred,
-    mupred,
-    ylp,
-    measure_entry,
-    log_weights,
-    control = list(),
-    base_measure
+  y,
+  ypred,
+  mupred,
+  ylp,
+  measure_entry,
+  log_weights,
+  control = list(),
+  lppd_i
 ) {
   if (measure_entry$type == "builtin") {
     spec <- .measure_spec[[measure_entry$key]]
@@ -388,7 +427,6 @@ do_pred_measure <- function(
   }
 
   pool <- if (isTRUE(spec$needs_elpd)) {
-    lppd_i <- .base_elpd_pointwise(base_measure)
     if (is.function(spec$elpd_transform)) {
       lppd_i <- spec$elpd_transform(lppd_i)
     }
@@ -415,123 +453,36 @@ do_pred_measure <- function(
   res
 }
 
-#' Compute base density summaries for a predictive measure object
+#' Effective number of parameters for the evaluation source
 #'
 #' @description
-#' Forms the default block of log-density summaries (`elpd` and for loo and kfold
-#' the effective number of parameters `p_loo`\`p_kfold`) that underlie every 
-#' [pred_measure()] result. Additional measures
-#' requested via `measure` are merged into the returned matrices later.
+#' Gives `p_loo` or `p_kfold`, which follow the `elpd` row. It reuses a stored
+#' row from `predperf`, `loo` or `kfold`. Otherwise, for `loo`, it computes
+#' from `ylp` with `.compute_effective_param()`.
 #'
-#' When `predperf` is provided (incremental update), returns `predperf` unchanged.
-#' For `source = "kfold"` or `"loo"` with a precomputed object, extracts existing
-#' summaries from `kfold` or `loo`.
-#'
-#' Otherwise ELPD is computed from:
-#' \itemize{
-#'   \item `insample`: `ylp` directly (in-sample log predictive density).
-#'   \item `loo`: `ylp` reweighted with PSIS log weights from `psis_object`.
-#'   \item `test`: `ylp_test` on holdout observations.
-#' }
-#'
-#' Effective number of parameters is computed by \code{.compute_effective_param()} 
-#' as the difference between in-sample and LOO log predictive density; see 
-#' `p_loo` in [loo::loo()] and the [CV-FAQ on p_loo](https://users.aalto.fi/~ave/CV-FAQ.html#p_loo).
-#'
-#' @param ylp Matrix of pointwise log predictive densities for training data
-#'   (`S` × `n`).
-#' @param ylp_test Matrix of pointwise log predictive densities for holdout
-#'   data (`S` × `n_test`; `test` source only).
-#' @param loo Optional [loo::loo()] result. When supplied for `source = "loo"`,
-#'   base summaries are taken from the `loo` object.
-#' @param kfold Optional `kfold` object. When supplied for `source = "kfold"`,
-#'   base summaries are taken from the `kfold` object.
-#' @param predperf Existing [pred_measure()] object. When not `NULL`, returned
-#'   unchanged so base summaries are not recomputed.
-#' @param psis_object PSIS object with LOO log weights and diagnostics.
-#' @param source Character string; one of `"insample"`, `"loo"`, `"kfold"`, or
-#'   `"test"`.
-#'
-#' @return A named list with:
-#' \describe{
-#'   \item{`estimates`}{Matrix with rows `elpd` and optionally `p` (number of 
-#'   effective parameters, for LOO and kfold), plus a source suffix when 
-#'   applicable (`_loo`, `_kfold`, `_test`).}
-#'   \item{`pointwise`}{Matrix of observation-level contributions.}
-#'   \item{`diagnostics`}{From `psis_object$diagnostics` when LOO weights are
-#'     used; otherwise `NULL` or taken from the input `loo`/`kfold` object.}
-#' }
+#' @return A list with `estimate`, `se` and `pointwise`, or `NULL` for
+#'   `insample` and `test`, or when nothing is available.
 #'
 #' @noRd
-.compute_base_measure <- function(
-  ylp,
-  ylp_test,
-  loo,
-  kfold,
-  predperf,
-  psis_object,
-  source
-) {
-  if (!is.null(predperf)) return(predperf)
-  
-  if (source == "kfold") {
-    components <- if ("diagnostics" %in% names(kfold)) {
-      c("estimates", "pointwise", "diagnostics")
-    } else {
-      c("estimates", "pointwise")
-    }
-    return(subset_measures(
-      kfold, 
-      measures = c("elpd_kfold", "p_kfold"),
-      components = components
+.effective_param <- function(source, ylp, lppd_i, loo, kfold, predperf) {
+  if (!source %in% c("loo", "kfold")) {
+    return(NULL)
+  }
+  col <- .measure_result_name(source, "p")
+  stored <- if (!is.null(predperf)) predperf else if (source == "kfold") kfold else loo
+  if (col %in% rownames(stored$estimates)) {
+    return(list(
+      estimate = unname(stored$estimates[col, "Estimate"]),
+      se = unname(stored$estimates[col, "SE"]),
+      pointwise = stored$pointwise[, col]
     ))
   }
-  
-  if (source == "loo" && !is.null(loo)) {
-    return(subset_measures(
-      loo, 
-      measures = c("elpd_loo", "p_loo"),
-      components = c("estimates", "pointwise", "diagnostics")
-    ))
+  if (source == "loo" && !is.null(ylp)) {
+    return(.compute_effective_param(ylp, lppd_i))
   }
-  
-  elpd_res <- switch(source,
-    insample = measure_elpd(ylp = ylp),
-    loo = measure_elpd(ylp = ylp, log_weights = psis_object$log_weights),
-    test = measure_elpd(ylp_test)
-  )
-  
-  est_se <- .measure_estimate_se(elpd_res)
-  elpd_res <- list(
-    estimate = unname(est_se[1]),
-    se = unname(est_se[2]),
-    pointwise = elpd_res$pointwise
-  )
-  
-  suffix <- if (source == "insample") "" else paste0("_", source)
-  add_p_eff <- source == "loo"
-  
-  estimates <- rbind(elpd = c(elpd_res$estimate, elpd_res$se))
-  pointwise <- cbind(elpd = elpd_res$pointwise)
-  
-  if (add_p_eff) {
-    p_loo <- .compute_effective_param(ylp, elpd_res$pointwise)
-    estimates <- rbind(estimates, p = c(p_loo$estimate, p_loo$se))
-    pointwise <- cbind(pointwise, p = p_loo$pointwise)
-  }
-  
-  rownames(estimates) <- paste0(rownames(estimates), suffix)
-  colnames(estimates) <- c("Estimate", "SE")
-  colnames(pointwise) <- paste0(colnames(pointwise), suffix)
-  
-  list(
-    estimates = estimates, 
-    pointwise = pointwise,
-    diagnostics = psis_object$diagnostics
-  )
+  NULL
 }
 
-# compute the effective number of parameters
 #' Compute effective number of parameters (`p_loo`)
 #'
 #' @description
@@ -554,13 +505,13 @@ do_pred_measure <- function(
 #' @noRd
 .compute_effective_param <- function(ylp, elpd_cv_i) {
   lpd_i <- matrixStats::colLogSumExps(ylp) - log(nrow(ylp))
-  p_eff_i <- lpd_i - elpd_cv_i[ ,"elpd"]
-  
+  p_eff_i <- lpd_i - elpd_cv_i
+
   list(
-      estimate = sum(p_eff_i),
-      se = sqrt(ncol(ylp) * var(p_eff_i)),
-      pointwise = p_eff_i
-    )
+    estimate = sum(p_eff_i),
+    se = sqrt(ncol(ylp) * var(p_eff_i)),
+    pointwise = p_eff_i
+  )
 }
 
 #' Add or update a row or column in a summary matrix
@@ -658,7 +609,7 @@ do_pred_measure <- function(
   if (!is.null(psis_object)) {
     output_list$log_weights <- psis_object$log_weights
   }
-  
+
   structure(output_list)
 }
 
