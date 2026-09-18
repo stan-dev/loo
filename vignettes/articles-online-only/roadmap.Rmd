@@ -55,21 +55,6 @@ vignette: >
 .rm-station-sub { color: var(--rm-muted); font-size: 0.9em; }
 .rm-station a { text-decoration: none; }
 
-/* status badges */
-.rm-badge {
-  display: inline-block;
-  padding: 0.1em 0.6em;
-  border-radius: 1em;
-  font-size: 0.8em;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-}
-.rm-badge.done { background: var(--rm-done); }
-.rm-badge.now { background: var(--rm-now); }
-.rm-badge.planned { background: var(--rm-planned); }
-.rm-badge.open { background: var(--rm-open); }
-
 /* cards */
 .rm-cards {
   display: grid;
@@ -159,15 +144,11 @@ have no fixed dates. We update this page as our plans change.
 :::: {.rm-station}
 [Beyond 3.0.0]{.rm-station-title}
 
-[Your ideas are welcome]{.rm-station-sub}
+[Planned improvements & Your ideas are welcome]{.rm-station-sub}
 ::::
 
 :::::
 
-**Status:**
-[In progress]{.rm-badge .now}
-[Planned]{.rm-badge .planned}
-[Open for ideas]{.rm-badge .open}
 
 ## v2.11.0
 
@@ -176,7 +157,6 @@ A smaller release with improvements to the current interface.
 ::::: {.rm-cards}
 
 :::: {.rm-card}
-[Planned]{.rm-badge .planned}
 
 #### Any topic here?
 
@@ -193,7 +173,6 @@ to evaluate and compare models with many other predictive measures.
 ::::: {.rm-cards}
 
 :::: {.rm-card}
-[In progress]{.rm-badge .now}
 
 #### Predictive performance measures
 
@@ -205,7 +184,6 @@ test-data predictions, and you can add your own measures.
 ::::
 
 :::: {.rm-card}
-[In progress]{.rm-badge .now}
 
 #### Model comparison with `model_compare()`
 
@@ -215,7 +193,6 @@ with a warning that points you to the new function.
 ::::
 
 :::: {.rm-card}
-[In progress]{.rm-badge .now}
 
 #### Improved documentation and tutorials
 
@@ -225,7 +202,6 @@ mathematical* background.
 ::::
 
 :::: {.rm-card}
-[Planned]{.rm-badge .planned}
 
 #### Better control of warnings and messages
 
@@ -235,8 +211,13 @@ debugging.
 
 ::::
 
+:::::
+
+## v3.X.X
+
+::::: {.rm-cards}
+
 :::: {.rm-card}
-[In progress]{.rm-badge .planned}
 
 #### Improved diagnostics
 
@@ -247,7 +228,6 @@ diagnostics warn.
 ::::
 
 :::: {.rm-card}
-[Planned]{.rm-badge .planned}
 
 #### Parallel computation
 
@@ -257,7 +237,7 @@ in settings such as computing clusters.
 
 :::::
 
-## Beyond 3.0.0
+## Beyond v3.X.X
 
 This part of the roadmap is still open, and we would like to shape it together
 with you.
@@ -265,7 +245,6 @@ with you.
 ::::: {.rm-cards}
 
 :::: {.rm-card}
-[Open for ideas]{.rm-badge .open}
 
 #### Your ideas
 
