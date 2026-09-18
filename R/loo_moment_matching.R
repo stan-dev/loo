@@ -408,7 +408,7 @@ loo_moment_match_i <- function(i,
   elpd_loo_i <- matrixStats::logSumExp(log_liki + lwi)
   mcse_elpd_loo <- mcse_elpd(
     ll = as.matrix(log_liki), lw = as.matrix(lwi),
-    E_elpd = exp(elpd_loo_i), r_eff = r_eff_i
+    E_elpd = elpd_loo_i, r_eff = r_eff_i
   )
 
   list(elpd_loo_i = elpd_loo_i,
@@ -531,11 +531,14 @@ shift_and_scale <- function(x, upars, lwi) {
   # compute moments using log weights
   S <- dim(upars)[1]
   mean_original <- colMeans(upars)
-  mean_weighted <- colSums(exp(lwi) * upars)
+  weights <- exp(lwi)
+  mean_weighted <- colSums(weights * upars)
   shift <- mean_weighted - mean_original
-  mii <- exp(lwi)* upars^2
-  mii <- colSums(mii) - mean_weighted^2
-  mii <- mii*S/(S-1)
+  # The two-pass form avoids the cancellation in E[x^2] - E[x]^2 and is
+  # equivalent to it only because `weights` sums to one.
+  centered <- sweep(upars, 2, mean_weighted)
+  mii <- colSums(weights * centered^2)
+  mii <- mii * S / (S - 1)
   scaling <- sqrt(mii / matrixStats::colVars(upars))
   # transform posterior draws
   upars_new <- sweep(upars, 2, mean_original, "-")
