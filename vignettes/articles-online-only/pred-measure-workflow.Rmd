@@ -1,0 +1,890 @@
+---
+title: "Predictive schemes with pred_measure()"
+author: "Florence Bockting"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    css:
+      - !expr system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown")
+      - styles.css
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+vignette: >
+  %\VignetteIndexEntry{Predictive schemes with pred_measure()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, child="../children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  eval = params$EVAL,
+  fig.width = 7,
+  fig.height = 4,
+  fig.align = "center"
+)
+```
+
+```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
+```
+
+## Introduction
+
+How well does a fitted model predict data that were not used to fit it? The
+formula reference (Vehtari et al., 2026, Sec. 1) divides this question into
+three questions:
+
+1. **What counts as a good prediction?** This is the *predictive measure*, for
+   example the log score or the RMSE.
+2. **Which predictions are evaluated?** This is the *predictive scheme*. It
+   sets the observations that train the model before observation $i$ is
+   evaluated.
+3. **How are the predictions computed?** From posterior draws, from refits, or
+   with importance weights.
+
+The [overview of predictive measures](overview-measures.html) answers the first
+question. This article answers the second and the third. It shows how the
+`pred_measure()` family computes any measure under four predictive schemes:
+in-sample, PSIS-LOO, K-fold, and test data.
+
+::: {.callout .callout-note}
+**What this article does not cover**
+
++ **Measure definitions.** See the
+  [overview of predictive measures](overview-measures.html).
++ **Model comparison.** See the [model comparison](model-comparison.html)
+  article.
++ **Leave-one-group-out and leave-future-out schemes.** The `pred_measure()`
+  family has no entry point for them yet.
+:::
+
+## Training data and evaluation data {#data-sets}
+
+A predictive scheme is a rule that splits the observed data. Let
+$y = (y_1, \ldots, y_n)$ be the observed data. In the example of this article,
+$y_i$ is the reaction time of one subject on one day, and $n = 144$.
+
+A predictive measure compares a prediction for $y_i$ with the observed $y_i$.
+Before **loo** can compute it, two questions need an answer:
+
+1. **Which observations are scored?** These observations are the *evaluation
+   data*. The formula reference writes their indices as the evaluation set
+   $\mathcal{E}$.
+2. **Which observations fit the model that predicts $y_i$?** These
+   observations are the *training data* of observation $i$. Their indices are
+   the training set $\mathcal{T}(i)$.
+
+Both sets hold indices of observations. They do not hold parameters or draws.
+Two examples:
+
++ **Leave-one-out.** Every observation is scored, so
+  $\mathcal{E} = \{1, \ldots, n\}$. All observations except $y_i$ fit the
+  model that predicts $y_i$, so $\mathcal{T}(i) = \{1, \ldots, n\} \setminus \{i\}$.
+  The training data change with $i$.
++ **Test data.** Only the 40 observations of five held-out subjects are scored,
+  so $\mathcal{E} = \mathcal{S}$. The other 104 observations fit the model, so
+  $\mathcal{T}(i) = \mathcal{R}$ for every $i$.
+
+With the two sets, the estimator of an additive measure is
+(Vehtari et al., 2026, Eq. 1.7)
+
+$$
+\hat U = \sum_{i \in \mathcal{E}} u_i\!\left(p(y_i \mid y_{\mathcal{T}(i)}), y_i\right).
+$$
+
+$\mathcal{T}(i)$ sets the predictive distribution of $y_i$. $\mathcal{E}$ sets
+the observations in the sum. Other sets answer other predictive questions
+(Vehtari et al., 2026, Sec. 1.2).
+
+## Overview of the schemes
+
+**loo** has one entry point for each scheme
+(Vehtari et al., 2026, Table 1, Eqs. 2.1–2.4):
+
+| Scheme | Training data $\mathcal{T}(i)$ | Evaluation data $\mathcal{E}$ | Predictive distribution $p^q(y_i)$ | Weights $w_i^s$ | Entry point |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [in-sample](#in-sample) | $\{1, \ldots, n\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y)$ | $1/S$ | `insample_pred_measure()` |
+| [PSIS-LOO](#psis-loo) | $\{1, \ldots, n\} \setminus \{i\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-i})$ | PSIS weights | `loo_pred_measure()` |
+| [K-fold](#k-fold) | $\{1, \ldots, n\} \setminus \mathcal{I}_{k(i)}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-\mathcal{I}_{k(i)}})$ | $1/S$ | `kfold_pred_measure()` |
+| [test data](#test-data) | $\mathcal{R}$ | $\mathcal{S}$ | $p(y_i \mid y_{\mathcal{R}})$ | $1/S$ | `test_pred_measure()` |
+A fifth function, `pred_measure()`, [adds measures](#add-measures) to an
+existing result of any scheme.
+
+::: {.callout .callout-note}
+**One formula, four schemes**
+
+A measure uses the same formula in every scheme. Only the draws and the
+weights change (Vehtari et al., 2026, Eq. 2.5):
+
+$$
+\hat p^q(y_i) = \sum_{s=1}^S w_i^s\, p(y_i \mid \theta^s) .
+$$
+
+Thus `measure = "rps"` gives $\widehat{\text{rps}}^{\text{in}}$ in
+`insample_pred_measure()` and $\widehat{\text{rps}}^{\text{LOO}}$ in
+`loo_pred_measure()`.
+:::
+
+## Notation
+
+The article uses the notation of the formula reference. The table maps each
+symbol to an argument of the entry points or to a field of their result.
+
+| Symbol | Meaning | In **loo** |
+| :--- | :--- | :--- |
+| $q$ | predictive scheme | the entry point; `attr(x, "source")` |
+| $\mathcal{E}$ | indices of the evaluation data | the observations in `y` and in the columns of the input matrices |
+| $\mathcal{T}(i)$ | indices of the training data for observation $i$ | the data of the fit that gave the draws |
+| $\mathcal{R}$, $\mathcal{S}$ | training set and test set of a single split | `train_data`, `test_data` |
+| $\mathcal{I}_k$ | observations in fold $k$ | `attr(x, "folds")` |
+| $\theta^s$ | posterior draw $s$, $s = 1, \ldots, S$ | rows of the input matrices |
+| $w_i^s$ | normalized weight of draw $s$ | `log_weights` of the PSIS object for PSIS-LOO; $1/S$ otherwise |
+| $\ell_i^s = \log p(y_i \mid \theta^s)$ | log density of $y_i$ under draw $s$ | `ylp`; `ylp_test` for test data |
+| $\tilde y_i^s$ | posterior predictive draw | `ypred` |
+| $\mathbb{E}[\tilde y_i \mid \theta^s]$ | predictive mean under draw $s$ | `mupred` |
+| $u_i^q$ | pointwise term of a measure under scheme $q$ | `$pointwise` |
+| $\hat U^q$, $\hat u^q$ | estimate on the sum scale and the mean scale | `$estimates[, "Estimate"]` |
+| $\widehat{\text{SE}}$ | standard error of the estimate | `$estimates[, "SE"]` |
+
+**Inputs by measure.** Each measure needs one kind of draw. Pass only the inputs
+that the requested measures need:
+
+| Measure | `ylp` | `ypred` | `mupred` |
+| :--- | :---: | :---: | :---: |
+| `elpd`, `mlpd`, `ic` | ✓ | | |
+| `rps`, `srps`, `brier` | | ✓ | |
+| `mae`, `mse`, `rmse`, `r2`, `acc`, `bacc` | | | ✓ |
+
+All measures except the log score also need the observations `y`. The list of
+built-in names is in `supported_measures_list`:
+
+```{r load-libraries}
+library(loo)
+library(ggplot2)
+theme_set(theme_minimal())
+
+supported_measures_list
+```
+
+**Inputs by scheme.** The schemes differ in the fit that gives the draws:
+
+| Scheme | `ylp` | `ypred`, `mupred` | Extra input |
+| :--- | :--- | :--- | :--- |
+| in-sample | `log_lik(fit)` | `posterior_predict(fit)`, `posterior_epred(fit)` | |
+| PSIS-LOO | as in-sample | as in-sample | `loo`, or `psis_object` |
+| K-fold | from `kfold` | `kfold_predict(kfold)$yrep` | `kfold` |
+| test data | `ylp_test = log_lik(fit_train, newdata = test_data)` | `posterior_predict(fit_train, newdata = test_data)`, … | |
+
+## Data and model
+
+**Prediction task.** The `sleepstudy` data (**lme4**) come from a study of sleep
+restriction (Belenky et al., 2003). Eighteen subjects slept at most three hours
+each night. The outcome `y` is the average reaction time (ms) of a subject on
+one day. Days 0 and 1 were adaptation and training, so the article keeps days
+2 to 9. The predictor `Days` counts the days of sleep restriction, from 0 to 7.
+This gives 144 observations.
+
+The model is a normal regression of `y` on `Days`. It has no subject effects.
+Fitting is not the topic of this article. The model code is in the
+[appendix](#appendix-model-code).
+
+| Object | Data | Used for |
+| :--- | :--- | :--- |
+| `fit_sleep` | all 18 subjects, 144 observations | in-sample, PSIS-LOO, K-fold |
+| `fit_sleep_train` | 13 subjects, 104 observations ($\mathcal{R}$) | test data |
+| `test_data` | the other 5 subjects, 40 observations ($\mathcal{S}$) | test data |
+
+Each fit uses 2 chains with 200 draws after warmup, so $S = 400$.
+
+```{r fit-models, echo=FALSE, results="hide"}
+SEED <- 42
+set.seed(SEED)
+
+data("sleepstudy", package = "lme4")
+sleepstudy <- subset(sleepstudy, Days >= 2)
+sleepstudy$Days <- sleepstudy$Days - 2
+sleepstudy$y <- sleepstudy$Reaction
+
+prior_sleep <- brms::prior(normal(200, 100), class = b, coef = "Intercept") +
+  brms::prior(normal(0, 20), class = b, coef = "Days") +
+  brms::prior(exponential(0.02), class = sigma)
+
+# all subjects
+fit_sleep <- brms::brm(
+  y ~ 0 + Intercept + Days,
+  data = sleepstudy,
+  family = gaussian(),
+  prior = prior_sleep,
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+
+# five subjects held out as test data
+test_subjects <- sample(unique(sleepstudy$Subject), size = 5)
+train_data <- subset(sleepstudy, !Subject %in% test_subjects)
+test_data <- subset(sleepstudy, Subject %in% test_subjects)
+
+fit_sleep_train <- update(fit_sleep, newdata = train_data, seed = SEED, refresh = 0)
+```
+The draws of `fit_sleep` are the input for the in-sample and the PSIS-LOO
+scheme. All schemes request the same measures:
+
+```{r inputs}
+y_sleep <- fit_sleep$data$y
+ylp_sleep <- brms::log_lik(fit_sleep)
+ypred_sleep <- brms::posterior_predict(fit_sleep)
+mupred_sleep <- brms::posterior_epred(fit_sleep)
+
+measures <- c("elpd", "mlpd", "rps", "rmse", "r2")
+```
+
+## In-sample {#in-sample}
+
+**Predictive question.** How well does the fitted model describe the data used
+to fit it?
+
+**Predictive distribution.** The draws come from the posterior of all data. All
+draws get the same weight, and $\mathcal{E} = \{1, \ldots, n\}$
+(Vehtari et al., 2026, Eqs. 2.1, 2.5):
+
+$$
+\hat p^{\text{in}}(y_i) = \frac{1}{S}\sum_{s=1}^S p(y_i \mid \theta^s),
+\qquad \theta^s \sim p(\theta \mid y) .
+$$
+
+**Inputs.** `ylp`, `ypred`, and `mupred` from `fit_sleep`, and the
+observations `y`.
+
+**Implementation.**
+
+```{r insample}
+insample_sleep <- insample_pred_measure(
+  y = y_sleep,
+  ypred = ypred_sleep,
+  mupred = mupred_sleep,
+  ylp = ylp_sleep,
+  measure = measures
+)
+insample_sleep
+```
+
+**Result.** The rows have no suffix. The result holds `$estimates` and
+`$pointwise`. `elpd` is on the sum scale, and the other measures are on the
+mean scale (Vehtari et al., 2026, Eq. 2.7). Two attributes identify the result:
+
+```{r insample-attributes}
+attributes(insample_sleep)[c("source", "dims")]
+```
+
+**Interpretation.** The model has already seen each $y_i$ that it predicts.
+Thus the in-sample estimates are optimistic for new data. They are not an
+estimate of out-of-sample performance. Use them as a reference point: the
+difference to a cross-validation estimate shows how optimistic they are
+(Vehtari et al., 2026, Sec. 1.2).
+
+## PSIS-LOO {#psis-loo}
+
+**Predictive question.** How well does the model predict a new observation that
+is exchangeable with the observed data?
+
+**Predictive distribution.** Exact leave-one-out cross-validation needs one
+refit for each observation, here 144. PSIS-LOO uses the draws of the full-data
+fit instead. It gives them Pareto-smoothed importance weights, so that each
+$y_i$ is scored as if it was left out (Vehtari et al., 2026, Eqs. 2.2, 2.5;
+Vehtari et al., 2024):
+
+$$
+\hat p^{\text{LOO}}(y_i) = \sum_{s=1}^S w_i^s\, p(y_i \mid \theta^s),
+\qquad \theta^s \sim p(\theta \mid y) .
+$$
+
+**Inputs.** The same draws as in-sample. Add the PSIS weights in one of three
+ways:
+
+| Input | Call |
+| :--- | :--- |
+| a `loo` object | `loo_pred_measure(loo = loo_sleep, ...)` |
+| `ylp` and a `psis` object | `loo_pred_measure(ylp = ylp_sleep, psis_object = psis_sleep, ...)` |
+| `ylp` only | `loo_pred_measure(ylp = ylp_sleep, ...)` |
+
+With `ylp` only, `loo_pred_measure()` computes the weights with `r_eff = 1`.
+
+**Implementation.** Set `save_psis = TRUE` in `loo()`. Without it,
+`loo_pred_measure()` stops with an error.
+
+```{r loo}
+loo_sleep <- brms::loo(fit_sleep, save_psis = TRUE)
+
+loo_sleep_measure <- loo_pred_measure(
+  loo = loo_sleep,
+  y = y_sleep,
+  ypred = ypred_sleep,
+  mupred = mupred_sleep,
+  measure = measures
+)
+loo_sleep_measure
+```
+
+**Result.** The rows have the suffix `_loo`. The measure `elpd` also adds
+`p_loo`, the difference between the in-sample and the LOO log score
+(Vehtari et al., 2026, Eq. 2.19). The result has two more fields:
+
++ `$diagnostics$pareto_k`: one Pareto $\hat k$ for each observation. A value
+  above $\min(1 - 1/\log_{10} S,\, 0.7)$ shows an unreliable weight. For
+  $S = 400$ this threshold is 0.62. `print()` shows a table of the $\hat k$
+  values when at least one value is above the threshold. Otherwise it prints
+  one line.
++ `$log_weights`: the log PSIS weights.
+
+**Plot.** Each point is one observation. The x-axis shows its in-sample log
+score, and the y-axis its LOO log score. The vertical distance to the dashed
+diagonal is the pointwise $p_{\text{loo}}$. The color shows the Pareto
+$\hat k$.
+
+```{r loo-plot}
+df_loo <- data.frame(
+  insample = insample_sleep$pointwise[, "elpd"],
+  loo = loo_sleep_measure$pointwise[, "elpd_loo"],
+  pareto_k = loo_sleep_measure$diagnostics$pareto_k
+)
+
+ggplot(df_loo, aes(insample, loo, color = pareto_k)) +
+  geom_abline(linetype = "dashed") +
+  geom_point() +
+  scale_color_viridis_c() +
+  labs(x = "pointwise in-sample log score",
+       y = "pointwise LOO log score",
+       color = "Pareto k")
+```
+
+**Interpretation.** Points below the diagonal are observations that are harder
+to predict when they are left out. The farther a point lies from the diagonal,
+the more the observation influences the posterior. Such observations often have
+a high Pareto $\hat k$. The model has three parameters. A `p_loo` much larger
+than three can show that the model is misspecified (see `?loo-glossary`).
+
+## K-fold {#k-fold}
+
+**Predictive question.** How well does the model predict held-out folds?
+
+**Predictive distribution.** The data are split into $K$ folds
+$\mathcal{I}_1, \ldots, \mathcal{I}_K$. The model is fit once for each fold,
+without the observations in that fold. This needs $K$ fits, not $n$
+(Vehtari et al., 2026, Eqs. 2.3, 2.5):
+
+$$
+\hat p^{K\text{-fold}}(y_i) = \frac{1}{S}\sum_{s=1}^S p(y_i \mid \theta^s),
+\qquad \theta^s \sim p(\theta \mid y_{-\mathcal{I}_{k(i)}}) .
+$$
+
+**Inputs.** **loo** does not refit the model. `kfold_pred_measure()` takes
+`elpd_kfold` and `p_kfold` from a `kfold` object, for example from
+`brms::kfold()`. For the other measures, pass the draws of the held-out fits
+from `brms::kfold_predict()`: `method = "predict"` gives `ypred`, and
+`method = "fitted"` gives `mupred`.
+
+**Implementation.** Set `save_fits = TRUE` in `brms::kfold()`. Without the
+fits, `brms::kfold_predict()` cannot compute the held-out draws.
+
+```{r kfold, results="hide"}
+set.seed(SEED)
+kfold_sleep <- brms::kfold(fit_sleep, K = 10, save_fits = TRUE)
+ypred_kfold <- brms::kfold_predict(kfold_sleep, method = "predict")$yrep
+mupred_kfold <- brms::kfold_predict(kfold_sleep, method = "fitted")$yrep
+```
+
+```{r kfold-measures}
+kfold_sleep_measure <- kfold_pred_measure(
+  y = y_sleep,
+  ypred = ypred_kfold,
+  mupred = mupred_kfold,
+  kfold = kfold_sleep,
+  measure = measures
+)
+kfold_sleep_measure
+```
+
+**Result.** The rows have the suffix `_kfold`. The result takes the attributes
+`K`, `folds`, `fold_type`, `joint`, `yhash`, and `model_name` from the `kfold`
+object. It has `$diagnostics` only when the `kfold` object has them; recent
+versions of `brms::kfold()` do. Their Pareto $\hat k$ describes the Monte Carlo
+estimate of the log predictive density in each fold. K-fold uses no importance
+weights.
+
+**Interpretation.** With $K = 10$, each fit uses 90% of the data. Thus K-fold
+and PSIS-LOO answer almost the same question, and their estimates are usually
+close. Use K-fold when PSIS-LOO shows many high Pareto $\hat k$ values.
+
+`brms::kfold()` also accepts `folds = "grouped"` with `group = "Subject"`. Then
+each fold holds out whole subjects, and the predictive question changes to new
+subjects.
+
+## Test data {#test-data}
+
+**Predictive question.** How well does the model predict data that were
+withheld from the start?
+
+**Predictive distribution.** The data are split once into a training set
+$\mathcal{R}$ and a test set $\mathcal{S}$. The model is fit to $\mathcal{R}$,
+and $\mathcal{E} = \mathcal{S}$ (Vehtari et al., 2026, Eqs. 2.4, 2.5):
+
+$$
+\hat p^{\text{test}}(y_i) = \frac{1}{S}\sum_{s=1}^S p(y_i \mid \theta^s),
+\qquad \theta^s \sim p(\theta \mid y_{\mathcal{R}}),
+\qquad i \in \mathcal{S} .
+$$
+
+**Inputs.** The draws of `fit_sleep_train`, evaluated at `test_data` with
+`newdata`. Pass the log densities of the test observations as `ylp_test`, not
+as `ylp`. The log-score measures `elpd`, `mlpd`, and `ic` need `ylp_test`.
+
+**Implementation.**
+
+```{r test}
+test_sleep_measure <- test_pred_measure(
+  y = test_data$y,
+  ypred = brms::posterior_predict(fit_sleep_train, newdata = test_data),
+  mupred = brms::posterior_epred(fit_sleep_train, newdata = test_data),
+  ylp_test = brms::log_lik(fit_sleep_train, newdata = test_data),
+  measure = measures
+)
+test_sleep_measure
+```
+
+**Result.** The rows have the suffix `_test`. The attribute `dims` gives the
+size of the test set, 40 observations, not the size of the training set.
+
+**Interpretation.** The test set holds five subjects that the model did not
+see. Thus the predictive question is about new subjects, not about new
+observations of known subjects. The test set is small, so the standard errors
+are larger than in the other schemes (Vehtari et al., 2026, Eq. 2.8). One split
+also depends on which subjects are in the test set. A different split can give
+a different estimate.
+
+## Computing leave-one-out predictions {#computing-loo}
+
+The scheme sets the predictive distribution $p(y_i \mid y_{-i})$. The
+computation of that distribution is a separate choice
+(Vehtari et al., 2026, Sec. 1.3). Exact LOO fits the model once for each
+observation, here 144 times. The approximations in the table need fewer fits.
+
+::: {.callout .callout-warning}
+**Moment matching and reloo give correct `elpd` only**
+
+Both methods update `elpd_loo` for the observations with a high Pareto
+$\hat k$. The other measures do not get this update:
+
++ `loo_moment_match()` computes new weights for *transformed* draws. It stores
+  the weights in the `psis` object, but not the transformed draws. `ypred` and
+  `mupred` still hold the original draws, so they do not match the weights.
++ `reloo` refits the model and replaces `elpd_loo`. It keeps the old PSIS
+  weights and sets the Pareto $\hat k$ of these observations to 0. The other
+  measures then use unreliable weights, and the diagnostics do not show it.
+
+For `elpd`, `mlpd`, and `ic`, pass the updated `loo` object to
+`loo_pred_measure()`. For the other measures, use exact LOO, mixture importance
+sampling, or K-fold.
+:::
+
+| Method | Fits | Use when | Call | Entry point |
+| :--- | :--- | :--- | :--- | :--- |
+| exact LOO | $n$ | the model is fast, or $n$ is small | `brms::kfold(fit, folds = "loo", save_fits = TRUE)` | `kfold_pred_measure()`, all measures |
+| PSIS-LOO | 1 | all Pareto $\hat k$ are below the threshold | `loo(fit, save_psis = TRUE)` | `loo_pred_measure()`, all measures |
+| PSIS-LOO with moment matching | 1 | some $\hat k$ are high; the fit keeps all draws (`save_pars(all = TRUE)` in **brms**) | `loo(fit, moment_match = TRUE, save_psis = TRUE)` | `loo_pred_measure()`, log score only |
+| PSIS-LOO with reloo | 1, plus one for each high $\hat k$ | few $\hat k$ are high | `loo(fit, reloo = TRUE, save_psis = TRUE)` | `loo_pred_measure()`, log score only |
+| mixture importance sampling | 1, of a mixture posterior | many $\hat k$ are high | a fit with one extra term, weights by hand | `loo_pred_measure()` with `ylp` and `psis_object`, all measures |
+| subsampling | 1 | $n$ is large | `loo_subsample(fit, observations = m)` | not supported |
+| K-fold | $K$ | many $\hat k$ are high, or LOO is too slow | `brms::kfold(fit, K = 10, save_fits = TRUE)` | `kfold_pred_measure()`, all measures |
+
+The **loo** articles describe the methods in detail:
+[moment matching](../loo2-moment-matching.html),
+[mixture importance sampling](../loo2-mixis.html), and
+[subsampling for large data](../loo2-large-data.html).
+
+The subsections below run each method on `fit_sleep`. The
+[comparison](#compare-schemes) at the end of the article plots all results.
+PSIS-LOO and K-fold are in the sections above.
+
+### Exact LOO {#exact-loo}
+
+`brms::kfold()` with `folds = "loo"` fits the model 144 times, once without
+each observation. The result is a `kfold` object. Thus its rows have the suffix
+`_kfold`, although the scheme is leave-one-out. Exact LOO is the reference for
+all approximations in this section.
+
+```{r exact-loo, results="hide"}
+exact_loo <- brms::kfold(fit_sleep, folds = "loo", save_fits = TRUE)
+ypred_exact <- brms::kfold_predict(exact_loo, method = "predict")$yrep
+mupred_exact <- brms::kfold_predict(exact_loo, method = "fitted")$yrep
+```
+
+```{r exact-loo-measures}
+exact_measure <- kfold_pred_measure(
+  y = y_sleep,
+  ypred = ypred_exact,
+  mupred = mupred_exact,
+  kfold = exact_loo,
+  measure = measures
+)
+exact_measure
+```
+
+### Moment matching {#moment-matching}
+
+Moment matching transforms the draws for each observation with a high Pareto
+$\hat k$, until the importance weights are reliable
+(Paananen et al., 2021). **brms** needs all draws of the fit, so refit the
+model with `save_pars(all = TRUE)`.
+
+```{r moment-matching, results="hide"}
+fit_sleep_mm <- update(fit_sleep, save_pars = brms::save_pars(all = TRUE),
+                       seed = SEED, refresh = 0)
+loo_mm <- brms::loo(fit_sleep_mm, moment_match = TRUE, save_psis = TRUE)
+```
+
+Request only the log score, see the warning above:
+
+```{r moment-matching-measures}
+mm_measure <- loo_pred_measure(loo = loo_mm, measure = c("elpd", "mlpd"))
+mm_measure
+```
+
+All Pareto $\hat k$ of this model are below the threshold. Thus moment matching
+transforms no draws, and the result equals PSIS-LOO of `fit_sleep_mm`.
+
+### Reloo {#reloo}
+
+`reloo` refits the model once for each observation with a high Pareto $\hat k$.
+
+```{r reloo, results="hide"}
+loo_reloo <- brms::loo(fit_sleep, reloo = TRUE, save_psis = TRUE)
+```
+
+```{r reloo-measures}
+reloo_measure <- loo_pred_measure(loo = loo_reloo, measure = c("elpd", "mlpd"))
+reloo_measure
+```
+
+No Pareto $\hat k$ is above the threshold, so `reloo` runs no refits. The
+result equals PSIS-LOO.
+
+### Mixture importance sampling {#mixture-is}
+
+PSIS-LOO takes its draws from the full-data posterior. When many observations
+have a high Pareto $\hat k$, these draws cover the leave-one-out posteriors
+badly. Mixture importance sampling takes its draws from a mixture of all
+leave-one-out posteriors instead (Silva and Zanella, 2022):
+
+$$
+q_{\text{mix}}(\theta) \propto p(\theta \mid y)
+  \sum_{i=1}^n p(y_i \mid \theta)^{-1} .
+$$
+
+**Fit.** The mixture adds one term to the log density of the model. Add it to
+the Stan code of **brms** with a `stanvar`. `Y`, `X`, `b`, and `sigma` are the
+names in the code that **brms** writes for this model; check them with
+`brms::stancode()` for other models.
+
+```{r mixis-fit, results="hide"}
+mixis_term <- brms::stanvar(
+  scode = "
+    {
+      vector[N] log_lik_mix;
+      for (n in 1:N) {
+        log_lik_mix[n] = normal_lpdf(Y[n] | X[n] * b, sigma);
+      }
+      target += log_sum_exp(-log_lik_mix);
+    }",
+  block = "likelihood"
+)
+
+fit_sleep_mix <- brms::brm(
+  y ~ 0 + Intercept + Days,
+  data = sleepstudy,
+  family = gaussian(),
+  prior = prior_sleep,
+  stanvars = mixis_term,
+  chains = 2, iter = 400, seed = SEED, refresh = 0
+)
+```
+
+**Weights.** For observation $i$, the importance weight of the mixture draw
+$\theta^s$ is
+
+$$
+\log w_i^s = -\ell_i^s - \log \sum_{j=1}^n \exp(-\ell_j^s) + \text{const} .
+$$
+
+`loo_pred_measure()` normalizes the weights. Pass them in a list as
+`psis_object`, together with the log densities and the predictive draws of the
+mixture fit:
+
+```{r mixis-measures}
+ylp_mix <- brms::log_lik(fit_sleep_mix)
+log_weights_mix <- -ylp_mix - matrixStats::rowLogSumExps(-ylp_mix)
+
+mixis_measure <- loo_pred_measure(
+  ylp = ylp_mix,
+  psis_object = list(log_weights = log_weights_mix),
+  y = y_sleep,
+  ypred = brms::posterior_predict(fit_sleep_mix),
+  mupred = brms::posterior_epred(fit_sleep_mix),
+  measure = c("mlpd", "rps", "rmse", "r2")
+)
+mixis_measure
+```
+
+The draws come from the mixture, not from the posterior. Thus the result has
+no Pareto $\hat k$. It has no `elpd` row either: `p_loo` compares the LOO log
+score with the in-sample log score of the posterior draws, and those draws are
+missing.
+
+### Subsampling {#subsampling}
+
+For large $n$, even PSIS-LOO is slow. `loo_subsample()` computes the LOO log
+score for a random subsample of $m$ observations. It estimates `elpd_loo` for
+all $n$ observations from this subsample.
+
+```{r subsampling}
+set.seed(SEED)
+loo_ss <- brms::loo_subsample(fit_sleep, observations = 50)
+loo_ss
+```
+
+`loo_pred_measure()` does not accept this result. Its PSIS object holds weights
+for the 50 subsampled observations only. Thus subsampling gives the log score
+only, with an additional subsampling standard error.
+
+## Add measures to an existing result {#add-measures}
+
+`pred_measure()` adds measures to a result of any entry point. It takes the
+scheme from the result. It does not recompute the rows that are already
+stored. If a requested measure is already stored, `pred_measure()` warns and
+skips it.
+
+| Approach | When to use | Call |
+| :--- | :--- | :--- |
+| **one call** | you know all measures beforehand | `loo_pred_measure(..., measure = c("rps", "r2"))` |
+| **step by step** | you explore, or you add measures later | `pred_measure(..., predperf = result, measure = "r2")` |
+
+**Implementation.** For PSIS-LOO, set `save_psis = TRUE` in the first call.
+`pred_measure()` then reuses the stored PSIS object and its diagnostics.
+
+```{r add-measures}
+loo_elpd <- loo_pred_measure(loo = loo_sleep, save_psis = TRUE)
+loo_elpd
+
+pred_measure(
+  y = y_sleep,
+  mupred = mupred_sleep,
+  predperf = loo_elpd,
+  measure = c("mae", "rmse")
+)
+```
+
+The first call uses the default `measure = NULL`, which gives `elpd`. The
+second call adds `mae_loo` and `rmse_loo` with the stored PSIS weights.
+
+## Custom measures {#custom-measures}
+
+`measure` also accepts functions. A custom function must follow three rules:
+
++ **Arguments.** Name the arguments from `y`, `ypred`, `mupred`, `ylp`, and
+  `log_weights`. **loo** supplies each of these names that appears in the
+  function.
++ **Weights.** `log_weights` holds the PSIS weights for PSIS-LOO. In the other
+  schemes it is `NULL`. A function that ignores `log_weights` gives in-sample
+  values under PSIS-LOO.
++ **Return value.** Return a list with `estimate`, `se`, and `pointwise`.
+
+Pass the function in a named list. The name becomes the row name, for example
+`list("rps", cover90 = coverage)`.
+
+**Example.** The coverage of the central 90% predictive interval is the
+proportion of observations inside that interval. For a calibrated model it is
+close to 0.9. Observation $i$ is inside the interval when its probability
+integral transform lies between 0.05 and 0.95:
+
+$$
+\text{pit}_i = \sum_{s=1}^S w_i^s\, \mathbb{1}\{\tilde y_i^s \le y_i\},
+\qquad
+\text{cover}_i = \mathbb{1}\{0.05 < \text{pit}_i \le 0.95\} .
+$$
+
+```{r custom-function}
+coverage <- function(y, ypred, log_weights = NULL, prob = 0.9) {
+  if (is.null(log_weights)) {
+    log_weights <- matrix(-log(nrow(ypred)), nrow(ypred), ncol(ypred))
+  }
+  w <- exp(sweep(log_weights, 2, matrixStats::colLogSumExps(log_weights)))
+  pit <- colSums(w * sweep(ypred, 2, y, "<="))
+  alpha <- 1 - prob
+  cover_i <- as.numeric(pit > alpha / 2 & pit <= 1 - alpha / 2)
+  list(
+    estimate = mean(cover_i),
+    se = sqrt(var(cover_i) / length(cover_i)),
+    pointwise = cover_i
+  )
+}
+```
+
+**Implementation.** The same function works in every scheme:
+
+```{r custom-measures}
+insample_pred_measure(
+  y = y_sleep,
+  ypred = ypred_sleep,
+  measure = list("rps", cover90 = coverage)
+)
+
+loo_pred_measure(
+  loo = loo_sleep,
+  y = y_sleep,
+  ypred = ypred_sleep,
+  measure = list("rps", cover90 = coverage)
+)
+```
+
+## Compare the schemes and methods {#compare-schemes}
+
+The results use the same model and the same measures. They differ in the
+scheme, which sets the predictive question, and in the method, which computes
+the predictions.
+
+Compare the results on the mean scale. `elpd` is a sum over $\mathcal{E}$
+(Vehtari et al., 2026, Eq. 2.7). The test set has 40 observations and the other
+schemes have 144, so their `elpd` values are not comparable. `mlpd` removes
+this dependence. The subsampling result has only `elpd_loo`. Divide its
+estimate and its standard error by $n$ to get `mlpd`.
+
+```{r compare-table}
+results <- list(
+  "in-sample" = insample_sleep,
+  "exact LOO" = exact_measure,
+  "PSIS-LOO" = loo_sleep_measure,
+  "PSIS-LOO, moment matching" = mm_measure,
+  "PSIS-LOO, reloo" = reloo_measure,
+  "mixture IS" = mixis_measure,
+  "K-fold" = kfold_sleep_measure,
+  "test data" = test_sleep_measure
+)
+
+df_methods <- do.call(rbind, lapply(names(results), function(method) {
+  est <- results[[method]]$estimates
+  measure <- sub("_(loo|kfold|test)$", "", rownames(est))
+  keep <- measure %in% c("mlpd", "rps", "rmse", "r2")
+  data.frame(
+    method = method,
+    measure = measure[keep],
+    estimate = est[keep, "Estimate"],
+    se = est[keep, "SE"],
+    row.names = NULL
+  )
+}))
+
+n_sleep <- length(y_sleep)
+df_methods <- rbind(df_methods, data.frame(
+  method = "subsampling",
+  measure = "mlpd",
+  estimate = loo_ss$estimates["elpd_loo", "Estimate"] / n_sleep,
+  se = loo_ss$estimates["elpd_loo", "SE"] / n_sleep
+))
+
+method_levels <- c("in-sample", "exact LOO", "PSIS-LOO",
+                   "PSIS-LOO, moment matching", "PSIS-LOO, reloo",
+                   "mixture IS", "subsampling", "K-fold", "test data")
+df_methods$method <- factor(df_methods$method, levels = rev(method_levels))
+df_methods$scheme <- factor(
+  ifelse(df_methods$method %in% c("in-sample", "K-fold", "test data"),
+         as.character(df_methods$method), "leave-one-out"),
+  levels = c("in-sample", "leave-one-out", "K-fold", "test data")
+)
+df_methods[order(df_methods$measure, df_methods$method, decreasing = TRUE), ]
+```
+
+**Plot.** Each panel shows one measure. Each row is one method, and the color
+shows its scheme. The point is the estimate, and the bar is $\pm 1$ standard
+error. `mlpd` and `r2` are utilities: higher is better. `rps` and `rmse` are
+losses: lower is better. Moment matching, reloo, and subsampling have a point
+in the `mlpd` panel only.
+
+```{r compare-plot, fig.height=6}
+ggplot(df_methods, aes(estimate, method, color = scheme)) +
+  geom_pointrange(aes(xmin = estimate - se, xmax = estimate + se)) +
+  facet_wrap(~measure, scales = "free_x") +
+  scale_color_manual(values = c("in-sample" = "grey50",
+                                "leave-one-out" = "#0072B2",
+                                "K-fold" = "#009E73",
+                                "test data" = "#D55E00")) +
+  labs(x = "estimate ± SE", y = NULL, color = "scheme") +
+  theme(legend.position = "bottom")
+```
+
+**Interpretation.** In-sample, leave-one-out, and K-fold score the same 144
+observations. The in-sample estimates are the most optimistic for every
+measure, because the model has seen each $y_i$. K-fold answers almost the same
+question as leave-one-out, so its estimates are close.
+
+All leave-one-out methods agree with exact LOO. The largest difference is in
+`rps`: PSIS-LOO gives 28.47 and exact LOO 28.76. This difference is much
+smaller than the standard error of 1.8. Mixture importance sampling gives 28.76.
+All Pareto $\hat k$ are good, so moment matching and reloo change nothing, and
+their `mlpd` equals that of PSIS-LOO. For a model with many high $\hat k$, the
+methods differ more. Then exact LOO, mixture importance sampling, or K-fold
+give the reliable values for all measures.
+
+The test data score better than all other schemes here. One split gives a noisy
+estimate: the five test subjects are easier to predict than the average
+subject. The standard errors show this. The `rmse` of the test data has a
+standard error more than twice as large as in the other schemes, because the
+test set has 40 observations, not 144.
+
+The standard errors describe the uncertainty from the finite
+evaluation set. They do not include the Monte Carlo error from the finite
+number of draws (Vehtari et al., 2026, Sec. 2.2).
+
+## References
+
+Belenky, G., Wesensten, N. J., Thorne, D. R., et al. (2003). Patterns of
+performance degradation and restoration during sleep restriction and subsequent
+recovery: A sleep dose-response study. *Journal of Sleep Research*,
+12(1):1–12.
+
+Paananen, T., Piironen, J., Bürkner, P.-C., and Vehtari, A. (2021). Implicitly
+adaptive importance sampling. *Statistics and Computing*, 31(2):16.
+
+Silva, L. and Zanella, G. (2022). Robust leave-one-out cross-validation for
+high-dimensional Bayesian models. Preprint at
+[arXiv:2209.09190](https://arxiv.org/abs/2209.09190).
+
+Vehtari, A., Axen, S., Weber, F., and Bockting, F. (2026). Predictive measures
+and model comparison in the loo package: A formula reference. [TODO: arXiv ID]
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. *Statistics and
+Computing*, 27(5):1413–1432. doi:10.1007/s11222-016-9696-4
+
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024). Pareto
+smoothed importance sampling. *Journal of Machine Learning Research*,
+25(72):1–58.
+
+## See also
+
+- [Overview of predictive measures](overview-measures.html) — definitions,
+  formulas, and standard errors of the measures.
+- [Model comparison](model-comparison.html) — differences between models and
+  their standard errors.
+- [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html) — when to use
+  which cross-validation scheme.
+
+## Appendix: model code {#appendix-model-code}
+
+```{r fit-models-code, ref.label="fit-models", eval=FALSE}
+```
