@@ -1,0 +1,276 @@
+---
+title: "Development roadmap"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+vignette: >
+  %\VignetteIndexEntry{Development roadmap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{css, echo=FALSE}
+.rm {
+  --rm-fg: var(--bs-body-color, #212529);
+  --rm-muted: var(--bs-secondary-color, #6c757d);
+  --rm-line: var(--bs-border-color, #dee2e6);
+  --rm-card: var(--bs-tertiary-bg, #f8f9fa);
+  --rm-accent: var(--bs-primary, #b2001d);
+  --rm-done: #2e7d32;
+  --rm-now: #1565c0;
+  --rm-planned: #6d4c41;
+  --rm-open: #7b1fa2;
+}
+.rm-updated { color: var(--rm-muted); font-size: 0.9em; }
+
+/* timeline */
+.rm-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 2rem 0 2.5rem;
+  position: relative;
+}
+.rm-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem; left: 12.5%; right: 12.5%;
+  border-top: 3px solid var(--rm-line);
+}
+.rm-station { text-align: center; position: relative; padding: 0 0.5rem; }
+.rm-station::before {
+  content: "";
+  display: block;
+  width: 1.4rem; height: 1.4rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 50%;
+  border: 3px solid var(--rm-accent);
+  background: var(--bs-body-bg, #fff);
+  position: relative;
+}
+.rm-station.rm-past::before { background: var(--rm-accent); }
+.rm-station.rm-current::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--rm-accent) 25%, transparent); }
+.rm-station p { margin: 0; }
+.rm-station-title { font-weight: 700; font-size: 1.1em; }
+.rm-station-sub { color: var(--rm-muted); font-size: 0.9em; }
+.rm-station a { text-decoration: none; }
+
+/* cards */
+.rm-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+.rm-card {
+  background: var(--rm-card);
+  border: 1px solid var(--rm-line);
+  border-left: 4px solid var(--rm-accent);
+  border-radius: 0.4rem;
+  padding: 0.9rem 1rem 0.6rem;
+}
+.rm-card h4 { margin: 0.4rem 0 0.4rem; font-size: 1.05em; }
+.rm-card p { margin: 0 0 0.5rem; font-size: 0.95em; }
+.rm-links { color: var(--rm-muted); font-size: 0.85em; }
+
+.rm-note {
+  border: 1px solid var(--rm-line);
+  border-radius: 0.4rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 600px) {
+  .rm-timeline { grid-template-columns: 1fr; gap: 1.25rem; }
+  .rm-timeline::before { top: 0.7rem; bottom: 0.7rem; left: 0.7rem; right: auto; border-top: 0; border-left: 3px solid var(--rm-line); }
+  .rm-station { text-align: left; padding-left: 2.5rem; }
+  .rm-station::before { position: absolute; left: 0; top: 0; margin: 0; }
+}
+```
+
+:::::: {.rm}
+
+[Last updated: September 2026]{.rm-updated}
+
+Welcome! This page shows what the core developers of **loo** are working on
+right now and what we have planned for the coming releases. It highlights a
+selection of our main goals, not a complete list of everything we work on.
+
+We hope the roadmap is useful to you in a few ways:
+
++ **If you use loo**, it shows what we currently prioritize and what changes
+  are on their way, so you can plan ahead.
++ **If you would like to contribute**, it shows the topics we are actively
+  thinking about. If one of them interests you, we would love to hear from you.
+  Leave a comment on the linked issue, or reach out on the
+  [Stan Forums](https://discourse.mc-stan.org/).
++ **If you think something important is missing**, or should get more
+  attention, please tell us. Your input helps us decide what to work on next.
+
+::: {.rm-note}
+**A note on plans.** This roadmap shows our strategic plans for the medium and
+long term. Alongside this work, we continue to respond to bug reports,
+questions, and requests as they come in. The roadmap describes our current
+intentions, not fixed commitments. Priorities can shift, and releases
+have no fixed dates. We update this page as our plans change.
+:::
+
+::::: {.rm-timeline}
+
+:::: {.rm-station .rm-past}
+[v2.10.1]{.rm-station-title}
+
+[Released July 2026]{.rm-station-sub}
+
+[What's new](../news/index.html){.rm-station-sub}
+::::
+
+:::: {.rm-station}
+[v2.11.0]{.rm-station-title}
+
+[Next minor release]{.rm-station-sub}
+
+[Milestone](https://github.com/stan-dev/loo/milestone/2){.rm-station-sub}
+::::
+
+:::: {.rm-station .rm-current}
+[v3.0.0]{.rm-station-title}
+
+[Next major release, in development]{.rm-station-sub}
+
+[Milestone](https://github.com/stan-dev/loo/milestone/1){.rm-station-sub}
+::::
+
+:::: {.rm-station}
+[Beyond 3.0.0]{.rm-station-title}
+
+[Planned improvements & Your ideas are welcome]{.rm-station-sub}
+::::
+
+:::::
+
+
+## v2.11.0
+
+A smaller release with improvements to the current interface.
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+
+#### Any topic here?
+
+Do we want to make some further changes?
+::::
+
+:::::
+
+## v3.0.0
+
+Our next major release is a big step for loo. Beyond the ELPD, you will be able
+to evaluate and compare models with many other predictive measures.
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+
+#### Predictive performance measures
+
+The new `*_pred_measure()` functions provide predictive performance measures
+beyond the ELPD, including RMSE, MAE, MSE, $R^2$, (C)RPS, the Brier score, and
+classification accuracy. They work with in-sample, PSIS-LOO, K-fold, and
+test-data predictions, and you can add your own measures.
+
+::::
+
+:::: {.rm-card}
+
+#### Model comparison with `model_compare()`
+
+`model_compare()` succeeds `loo_compare()` and lets you compare models on all
+built-in and custom measures. No worries: `loo_compare()` will keep working,
+with a warning that points you to the new function.
+::::
+
+:::: {.rm-card}
+
+#### Improved documentation and tutorials
+
+We are actively working on several tutorials that introduce all new features
+from three angles: the *implementation*, the *workflow*, and the *formal,
+mathematical* background.
+::::
+
+:::: {.rm-card}
+
+#### Better control of warnings and messages
+
+We will make it easier to control warnings and messages at the package level,
+for example to silence them in simulations or to see more detail when
+debugging.
+
+::::
+
+:::::
+
+## v3.X.X
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+
+#### Improved diagnostics
+
+We will add more reliable Monte Carlo standard errors for PSIS-LOO, and
+diagnostics that show when K-fold and other refit-based results are unreliable.
+We also want to guide you step by step to a more robust computation when the
+diagnostics warn.
+::::
+
+:::: {.rm-card}
+
+#### Parallel computation
+
+We will update how loo runs computations in parallel, so that it works better
+in settings such as computing clusters.
+::::
+
+:::::
+
+## Beyond v3.X.X
+
+This part of the roadmap is still open, and we would like to shape it together
+with you.
+
+::::: {.rm-cards}
+
+:::: {.rm-card}
+
+#### Your ideas
+
+Is there a measure, a diagnostic, or a workflow you miss in loo? Or a topic
+you think deserves a higher priority? We would love to hear about it.
+
+[[Open an issue](https://github.com/stan-dev/loo/issues/new) · [Start a thread on the Stan Forums](https://discourse.mc-stan.org/)]{.rm-links}
+::::
+
+:::::
+
+## Get involved
+
+Contributions are welcome! Here are a few ways to join in:
+
++ **Try the development version** with
+  `remotes::install_github("stan-dev/loo")`, and let us know what works well
+  and what does not.
++ **Share your view on priorities.** Comment on an issue that matters to you,
+  or let us know about features you are missing.
++ **Interested in contributing?** Browse our
+  [open issues](https://github.com/stan-dev/loo/issues) and leave a comment
+  on the one you would like to work on, or reach out on the
+  [Stan Forums](https://discourse.mc-stan.org/).
++ **Read the
+  [contributing guide](https://github.com/stan-dev/loo/blob/master/.github/CONTRIBUTING.md)**
+  for how we work.
+
+::::::

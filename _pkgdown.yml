@@ -12,10 +12,13 @@ navbar:
   title: "loo"
 
   structure:
-    left: [home, vignettes, functions, news, pkgs, stan]
+    left: [home, vignettes, functions, news, roadmap, pkgs, stan]
     right: [search, bluesky, forum, github, lightswitch]
 
   components:
+    roadmap:
+      text: Roadmap
+      href: articles/articles-online-only/roadmap.html
     pkgs:
       text: Other Packages
       menu:
@@ -54,6 +57,9 @@ articles:
       - loo2-large-data
       - loo2-moment-matching
       - loo2-mixis
+  - title: Project
+    contents:
+      - articles-online-only/roadmap
   - title: Frequently asked questions
     contents:
       - faq
