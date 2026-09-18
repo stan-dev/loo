@@ -7,6 +7,10 @@
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].
+* Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
+and moment matching in #395 
+* Fix `loo_compare()` when used with subsampling: compute model comparison by 
+comparison-model minus reference-model by @florence-bockting in #391
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
 
