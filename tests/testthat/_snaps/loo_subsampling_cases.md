@@ -104,34 +104,34 @@
     Code
       print(comp)
     Output
-             elpd_diff se_diff subsampling_se_diff
-      model2   0.0       0.0     0.0              
-      model1 -16.5      22.5     0.4              
+        model elpd_diff se_diff subsampling_se_diff
+       model2       0.0     0.0                 0.0
+       model1     -16.5    22.5                 0.4
 
 ---
 
     Code
       print(comp)
     Output
-             elpd_diff se_diff subsampling_se_diff
-      model2   0.0       0.0     0.0              
-      model1 -16.1       4.4     0.1              
+        model elpd_diff se_diff subsampling_se_diff
+       model2       0.0     0.0                 0.0
+       model1     -16.1     4.4                 0.1
 
 ---
 
     Code
       print(comp2)
     Output
-             elpd_diff se_diff subsampling_se_diff
-      model2   0.0       0.0     0.0              
-      model1 -16.3       4.4     0.1              
+        model elpd_diff se_diff subsampling_se_diff
+       model2       0.0     0.0                 0.0
+       model1     -16.3     4.4                 0.1
 
 ---
 
     Code
       print(comp3)
     Output
-             elpd_diff se_diff subsampling_se_diff
-      model2   0.0       0.0     0.0              
-      model1 -16.5       4.4     0.3              
+        model elpd_diff se_diff subsampling_se_diff
+       model2       0.0     0.0                 0.0
+       model1     -16.5     4.4                 0.3
 

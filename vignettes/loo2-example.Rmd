@@ -263,11 +263,11 @@ the data.
 
 ## Comparing the models on expected log predictive density
 
-We can use the `loo_compare` function to compare our two models on 
+We can use the `model_compare` function to compare our two models on 
 expected log predictive density (ELPD) for new data:
 
-```{r loo_compare}
-loo_compare(loo1, loo2)
+```{r model_compare}
+model_compare(loo1, loo2)
 ```
 
 The difference in ELPD is much larger than several times the estimated standard

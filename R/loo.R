@@ -95,7 +95,7 @@
 #'  * [psis()] for the underlying Pareto Smoothed Importance Sampling (PSIS)
 #'    procedure used in the LOO-CV approximation.
 #'  * [pareto-k-diagnostic] for convenience functions for looking at diagnostics.
-#'  * [loo_compare()] for model comparison.
+#'  * [model_compare()] for model comparison.
 #'
 #' @template loo-and-psis-references
 #'
@@ -547,18 +547,6 @@ log_var_epd_ratio <- function(log_lik_ratio, lw, r_eff) {
       log_lik_ratio[big] + log(-expm1(-log_lik_ratio[big]))
   }
   matrixStats::colLogSumExps(2 * (lw + log_abs_diff)) - log(r_eff)
-}
-
-
-#' Warning message if r_eff not specified
-#' @noRd
-throw_loo_r_eff_warning <- function() {
-  warning(
-    "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-    "For models fit with MCMC, the reported PSIS ESS and \n",
-    "MCSE estimates can be over-optimistic.",
-    call. = FALSE
-  )
 }
 
 #' Combine many psis objects into a single psis object
