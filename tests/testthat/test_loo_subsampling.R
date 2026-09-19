@@ -1074,6 +1074,11 @@ test_that("model_compare_subsample", {
   expect_equal(lcssohhapi, lcssohh)
   expect_silent(lcss2mapi <- model_compare(lss2o1, lss3o1))
   expect_equal(lcss2mapi, lcss2m)
+  # check that comparison is comp - ref model (i.e., elpd_diff is neg.)
+  for (m in list(lcss, lcss2, lcssohh)) {
+    expect_lt(m[2, "elpd_diff"], 0)
+    expect_lt(m[3, "elpd_diff"], 0)
+  }
 })
 
 test_that("Test 'tis' and 'sis'", {
@@ -1252,3 +1257,17 @@ test_that("Test 'tis' and 'sis'", {
     loo_ss_full$estimates["elpd_loo", "Estimate"]
   )
 })
+
+# subsampling should agree with non-subsampling when nothing
+# is actually subsampled (pins the direction *and* the magnitude)
+LL <- example_loglik_array()
+l1 <- loo(LL)
+l2 <- loo(LL + 1)
+l3 <- loo(LL + 2)
+l1ss <- loo:::as.psis_loo_ss.psis_loo(l1)
+l2ss <- loo:::as.psis_loo_ss.psis_loo(l2)
+l3ss <- loo:::as.psis_loo_ss.psis_loo(l3)
+expect_equal(
+  unname(loo_compare(l1ss, l2ss, l3ss)[, "elpd_diff"]),
+  loo_compare(l1, l2, l3)$elpd_diff
+)

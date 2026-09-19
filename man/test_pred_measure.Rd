@@ -36,8 +36,8 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -92,14 +92,14 @@ assessing how well a model predicts unseen observations, but with an
 explicit train/test split rather than LOO or k-fold reweighting.
 
 Supply \code{ylp_test} from log predictive densities evaluated on the holdout set
-(e.g. \code{brms::log_lik(fit, newdata = test_data)}). This is required for the
-base summary \code{elpd_test}. Optional distributional and point-prediction
-measures use observed and predicted values on the test set only. Pass training
-\code{ylp} only when an additional measure needs log predictive densities from the
-training fit.
+(e.g. \code{brms::log_lik(fit, newdata = test_data)}). This is required for
+\code{elpd_test}, \code{mlpd_test} and \code{ic_test}. Optional distributional and
+point-prediction measures use observed and predicted values on the test set
+only. Pass training \code{ylp} only when an additional measure needs log
+predictive densities from the training fit.
 }
 \details{
-The base summary \code{elpd_test} is computed from \code{ylp_test} on the holdout
+\code{elpd_test} is computed from \code{ylp_test} on the holdout
 observations only.
 }
 \section{\code{measure_info} attribute}{

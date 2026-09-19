@@ -51,14 +51,14 @@ test_that("model_compare dispatches loo_pred_measure inputs", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mse")
+    measure = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m1,
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mse")
+    measure = c("elpd", "r2", "mse")
   )
 
   comp <- suppressMessages(model_compare(pm1, pm2))
@@ -97,14 +97,14 @@ test_that("model_compare warns when predictive measures differ across models", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mse")
+    measure = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
 
   expect_warning(
@@ -123,21 +123,21 @@ test_that("model_compare works with three loo_pred_measure models", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
   pm3 <- loo_pred_measure(
     loo = res$loo_p_m3,
     y = res$y,
     mupred = res$mupred_m3,
     ylp = res$ylp_m3,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
 
   comp <- model_compare(
@@ -198,14 +198,14 @@ test_that("model_compare rank_by changes order for loo_pred_measure", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
 
   comp_elpd <- model_compare(pm1, pm2, rank_by = "elpd")
@@ -230,7 +230,7 @@ test_that("without `rank_by` each measure uses its own best model as reference",
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("r2", "mse", "mae")
+      measure = c("elpd", "r2", "mse", "mae")
     )
   }
   pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
@@ -270,7 +270,7 @@ test_that("each printed measure table is sorted best model first", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("r2", "mse", "mae")
+      measure = c("elpd", "r2", "mse", "mae")
     )
   }
   pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
@@ -309,21 +309,21 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
   pm3 <- loo_pred_measure(
     loo = res$loo_p_m3,
     y = res$y,
     mupred = res$mupred_m3,
     ylp = res$ylp_m3,
-    measure = c("r2", "mae")
+    measure = c("elpd", "r2", "mae")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2, m3 = pm3)))
@@ -344,6 +344,38 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   )
 })
 
+test_that("without `elpd` the default ranking measure is the first shared one", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  mk <- function(sfx) {
+    loo_pred_measure(
+      loo = res[[paste0("loo_p_", sfx)]],
+      y = res$y,
+      mupred = res[[paste0("mupred_", sfx)]],
+      ylp = res[[paste0("ylp_", sfx)]],
+      measure = c("r2", "mse")
+    )
+  }
+  pms <- list(m1 = mk("m1"), m2 = mk("m2"))
+
+  comp <- suppressMessages(model_compare(pms))
+  expect_false("elpd" %in% attr(comp, "compare_measures"))
+  expect_false("elpd_diff" %in% colnames(comp))
+  # `r2` is the first measure the models share, so it ranks them
+  expect_equal(
+    attr(comp, "rank_by"),
+    list(kind = "default", measure = "r2", model = NULL)
+  )
+  expect_equal(sum(comp$r2_diff == 0), 1L)
+
+  # naming a measure still overrides the default
+  comp_mse <- suppressMessages(model_compare(pms, rank_by = "mse"))
+  expect_equal(
+    attr(comp_mse, "rank_by"),
+    list(kind = "measure", measure = "mse", model = NULL)
+  )
+  expect_equal(comp_mse$mse_diff[[1L]], 0)
+})
+
 test_that("model_compare measure helpers work as expected", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
@@ -351,14 +383,14 @@ test_that("model_compare measure helpers work as expected", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mse")
+    measure = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mse")
+    measure = c("elpd", "r2", "mse")
   )
   loos <- list(pm1, pm2)
   cols <- loo:::.compare_pointwise_cols(loos)
@@ -899,7 +931,7 @@ test_that("a declared custom loss is compared and ranked as a loss", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = fun
+      measure = list("elpd", fun)
     )
   }
 
@@ -1216,7 +1248,7 @@ test_that("model_compare warns when rank_by is ignored for classic loo objects",
       y = res$y,
       mupred = res[[paste0("mupred_m", suffix)]],
       ylp = res[[paste0("ylp_m", suffix)]],
-      measure = measure
+      measure = c("elpd", measure)
     ),
     extra_args
   )
@@ -1234,7 +1266,7 @@ test_that("model_compare warns when rank_by is ignored for classic loo objects",
       ylp = ylp,
       y = res_binary$y,
       ypred = res_binary$ypred,
-      measure = measure
+      measure = c("elpd", measure)
     ))
   }
   if (measure %in% c("acc", "bacc")) {
@@ -1247,7 +1279,7 @@ test_that("model_compare warns when rank_by is ignored for classic loo objects",
       ylp = ylp,
       y = as.integer(res_cat$y),
       mupred = res_cat$mupred,
-      measure = measure
+      measure = c("elpd", measure)
     ))
   }
   stop("Unsupported synthetic measure: ", measure)
@@ -1272,14 +1304,14 @@ test_that("model_compare works for all built-in measures", {
       y = res$y,
       ypred = res$ypred_m1,
       ylp = res$ylp_m1,
-      measure = measure
+      measure = c("elpd", measure)
     )
     pm2 <- loo_pred_measure(
       loo = res$loo_p_m2,
       y = res$y,
       ypred = res$ypred_m2,
       ylp = res$ylp_m2,
-      measure = measure
+      measure = c("elpd", measure)
     )
     comp <- suppressMessages(model_compare(pm1, pm2))
     expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
@@ -1302,7 +1334,7 @@ test_that("model_compare works for all built-in measures", {
       y = res$y,
       mupred = res$mupred_m1 + rnorm(length(res$y), 0, noise_scale * i),
       ylp = res$ylp_m1,
-      measure = "mae"
+      measure = c("elpd", "mae")
     )
   })
 }
@@ -1524,11 +1556,11 @@ test_that("model_compare compares kfold_pred_measure objects", {
   set.seed(4321)
   k1 <- kfold_pred_measure(
     y = res$y, mupred = res$mupred, kfold = res$kfold,
-    measure = c("rmse", "mse")
+    measure = c("elpd", "rmse", "mse")
   )
   k2 <- kfold_pred_measure(
     y = res$y, mupred = .jitter_mupred(res$mupred, 3), kfold = res$kfold,
-    measure = c("rmse", "mse")
+    measure = c("elpd", "rmse", "mse")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
@@ -1554,11 +1586,11 @@ test_that("model_compare compares test_pred_measure objects", {
   set.seed(4321)
   t1 <- test_pred_measure(
     y = res_cv$y_test, mupred = res_cv$mupred_test,
-    ylp_test = res_cv$ylp_test, measure = "rmse"
+    ylp_test = res_cv$ylp_test, measure = c("elpd", "rmse")
   )
   t2 <- test_pred_measure(
     y = res_cv$y_test, mupred = .jitter_mupred(res_cv$mupred_test, 5),
-    ylp_test = res_cv$ylp_test, measure = "rmse"
+    ylp_test = res_cv$ylp_test, measure = c("elpd", "rmse")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = t1, m2 = t2)))
@@ -1572,11 +1604,11 @@ test_that("model_compare warns that insample_pred_measure comparisons are biased
   res <- .compare_src_res()
   set.seed(4321)
   i1 <- insample_pred_measure(
-    y = res$y, mupred = res$mupred, ylp = res$ylp, measure = "rmse"
+    y = res$y, mupred = res$mupred, ylp = res$ylp, measure = c("elpd", "rmse")
   )
   i2 <- insample_pred_measure(
     y = res$y, mupred = .jitter_mupred(res$mupred, 3), ylp = res$ylp,
-    measure = "rmse"
+    measure = c("elpd", "rmse")
   )
 
   expect_warning(
@@ -1659,7 +1691,7 @@ test_that("model_compare rank_by accepts a model name as the reference model", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("r2", "mse", "mae")
+      measure = c("elpd", "r2", "mse", "mae")
     )
   }
   pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
@@ -1933,7 +1965,7 @@ test_that("control scaled = TRUE does not invert the srps ranking", {
       y = res$y,
       ypred = res[[paste0("ypred_", sfx)]],
       ylp = res[[paste0("ylp_", sfx)]],
-      measure = measure,
+      measure = c("elpd", measure),
       control = control
     )
   }

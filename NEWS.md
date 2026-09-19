@@ -119,7 +119,12 @@
 * `print()` on a `pred_measure` comparison now accepts `simplify`. With 
   `simplify = FALSE` each measure table also shows that measure's per-model estimate and standard error, and an ELPD table also shows `p` and `se_p`.
 * `model_compare(A = m1, B = m2)` now works.
-* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in #328.
+* Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
+and moment matching in #395 
+* Fix `loo_compare()` when used with subsampling: compute model comparison by 
+comparison-model minus reference-model by @florence-bockting in #391
+* Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
+#328.
 
 # loo 2.10.1
 

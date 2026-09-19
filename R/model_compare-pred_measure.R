@@ -353,8 +353,18 @@ throw_omitted_compare_measures_warning <- function(loos) {
 #' @noRd
 .resolve_rank_measure <- function(loos, rank_by = NULL) {
   cols <- .compare_pointwise_cols(loos)
-  bare <- if (is.null(rank_by)) "elpd" else rank_by
-  internal <- .pointwise_col(bare, cols, loos)
+  # Without `rank_by`, rank by the first measure that all models share. `elpd`
+  # is no longer part of every `pred_measure` result, so it cannot serve as the
+  # default. `.compare_pointwise_cols()` keeps the column order of the results,
+  # so `elpd` still ranks the models whenever it is present.
+  internal <- if (is.null(rank_by)) {
+    if (!length(cols)) {
+      stop("No measure is shared by all models.", call. = FALSE)
+    }
+    cols[1L]
+  } else {
+    .pointwise_col(rank_by, cols, loos)
+  }
   list(
     bare = .display_name(internal, loos),
     internal = internal
@@ -380,7 +390,7 @@ throw_omitted_compare_measures_warning <- function(loos) {
 #' Resolve `rank_by` to either a measure or a reference model
 #'
 #' `rank_by` accepts a bare measure name (rank models by that measure and use
-#' the top-ranked model as reference) or a model name (keep the default `elpd`
+#' the top-ranked model as reference) or a model name (keep the default
 #' ordering but pin that model as the reference for every measure).
 #' @noRd
 #' @return A list with `kind` (`"default"`, `"measure"`, or `"model"`),

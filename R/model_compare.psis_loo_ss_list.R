@@ -17,7 +17,7 @@ model_compare.psis_loo_ss_list <- function(x, ...) {
 
   comp <- model_compare_matrix(x, subsampling = TRUE)
   ord <- model_compare_order(x)
-  names(x) <- rownames(comp)[ord]
+  names(x) <- rownames(comp)[order(ord)]
 
   rnms <- rownames(comp)
   elpd_diff_mat <- matrix(0, nrow = nrow(comp), ncol = 3,

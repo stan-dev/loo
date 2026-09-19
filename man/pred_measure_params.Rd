@@ -43,8 +43,8 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -80,7 +80,7 @@ its \code{measure_se_diff} function; the built-in \code{r2} uses it for the base
 \code{(y_i - mean(y))^2}, which cannot be recovered once \code{y} is out of scope.}
 
 \item{predperf}{An existing predictive measure object (class
-\code{"pred_measure"}) to update. When supplied, base density summaries and
+\code{"pred_measure"}) to update. When supplied, stored rows and
 (for LOO) PSIS weights are reused instead of recomputed.}
 
 \item{loo}{A \code{\link[=loo]{loo()}} result, computed with

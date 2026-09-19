@@ -48,6 +48,15 @@ test_that("colLogMeanExps(x) = log(colMeans(exp(x))) ", {
   expect_equal(colLogMeanExps(LLmat), log(colMeans(exp(LLmat))))
 })
 
+test_that("log-mean-exp helpers handle negative infinity", {
+  x <- c(-Inf, log(2), log(3))
+  expect_equal(logMeanExp(x), log(5 / 3))
+  expect_equal(logMeanExp(rep(-Inf, 3)), -Inf)
+
+  x <- cbind(x, rep(-Inf, 3))
+  expect_equal(unname(colLogMeanExps(x)), c(log(5 / 3), -Inf))
+})
+
 test_that("validating log-lik objects and functions works", {
   f_ok <- function(data_i, draws) return(NULL)
   f_bad1 <- function(data_i) return(NULL)

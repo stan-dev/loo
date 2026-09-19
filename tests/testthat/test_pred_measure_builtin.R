@@ -635,7 +635,7 @@ testthat::test_that("mlpd and ic keep the sign of a positive pointwise lppd", {
   expect_true(any(lppd > 0))
   expect_true(any(lppd < 0))
 
-  res <- insample_pred_measure(ylp = ylp, measure = c("mlpd", "ic"))
+  res <- insample_pred_measure(ylp = ylp, measure = c("elpd", "mlpd", "ic"))
 
   expect_equal(unname(res$estimates["mlpd", 1]), mean(lppd))
   expect_equal(unname(res$estimates["ic", 1]), sum(-2 * lppd))

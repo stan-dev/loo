@@ -19,17 +19,23 @@ test_that("group_ids errors as not yet implemented", {
   list(name = name, type = "builtin", key = name)
 }
 
-test_that(".compute_measure() with r2 works as expected", {
+test_that(".compute_measure() with elpd works as expected", {
+  lppd_i <- .elpd_pointwise(
+    source = "insample", ylp = res$ylp, ylp_test = NULL,
+    log_weights = NULL, loo = NULL, kfold = NULL, predperf = NULL
+  )
   measure_res <- .compute_measure(
-    y = res$y,
+    y = NULL,
     ypred = NULL,
-    mupred = res$mupred,
+    mupred = NULL,
     ylp = res$ylp,
-    measure_entry = .builtin_entry("r2"),
-    log_weights = NULL
+    measure_entry = .builtin_entry("elpd"),
+    log_weights = NULL,
+    lppd_i = lppd_i
   )
 
-  expect_equal(names(measure_res), c("estimates", "pointwise", "extra"))
+  expect_equal(names(measure_res), c("estimates", "pointwise"))
+  expect_equal(measure_res$estimates, measure_elpd(res$ylp)$estimates)
 })
 
 test_that(".compute_measure() with rps works as expected", {
@@ -46,19 +52,6 @@ test_that(".compute_measure() with rps works as expected", {
   expect_equal(colnames(measure_res$estimates), c("Estimate", "SE"))
 })
 
-test_that(".compute_measure() with elpd works as expected", {
-  measure_res <- .compute_measure(
-    y = NULL,
-    ypred = NULL,
-    mupred = NULL,
-    ylp = res$ylp,
-    measure_entry = .builtin_entry("elpd"),
-    log_weights = NULL
-  )
-
-  expect_equal(names(measure_res), c("estimates", "pointwise"))
-})
-
 test_that(".compute_measure() fails if insufficient input is provided", {
   expect_error(
     .compute_measure(
@@ -73,94 +66,45 @@ test_that(".compute_measure() fails if insufficient input is provided", {
   )
 })
 
-## .compute_base_measure() -------------------------
+## .elpd_pointwise() -------------------------
 
-test_that(".compute_base_measure() returns predperf if already existent", {
-  base_measure <- .compute_base_measure(
-    ylp = NULL,
-    ylp_test = NULL,
-    loo = NULL,
-    kfold = NULL,
-    predperf = res$predperf,
-    psis_object = NULL,
-    source = "insample"
-  )
-  expect_equal(base_measure, res$predperf)
-})
+.elpd_pw <- function(source, ylp = NULL, ylp_test = NULL, log_weights = NULL,
+                     loo = NULL, kfold = NULL, predperf = NULL) {
+  .elpd_pointwise(source, ylp, ylp_test, log_weights, loo, kfold, predperf)
+}
 
-test_that(".compute_base_measure() errors if missing input", {
-  expect_error(
-    .compute_base_measure(
-      ylp = NULL,
-      ylp_test = NULL,
-      loo = NULL,
-      kfold = NULL,
-      predperf = NULL,
-      psis_object = NULL,
-      source = "insample"
-    ),
-    regexp = "`ylp` must be a numeric matrix."
+test_that(".elpd_pointwise() reuses the elpd column of predperf", {
+  expect_equal(
+    .elpd_pw("insample", predperf = res$predperf),
+    res$predperf$pointwise[, "elpd"]
   )
 })
 
-test_that(".compute_base_measure() computes elpd as expected", {
-  base_measure <- .compute_base_measure(
-    ylp = res$ylp,
-    ylp_test = NULL,
-    loo = NULL,
-    kfold = NULL,
-    predperf = NULL,
-    psis_object = NULL,
-    source = "insample"
-  )
-
-  expect_equal(names(base_measure), c("estimates", "pointwise", "diagnostics"))
-  expect_null(base_measure$diagnostics)
-  expect_equal(rownames(base_measure$estimates), "elpd")
-  expect_equal(colnames(base_measure$estimates), c("Estimate", "SE"))
-  expect_equal(dimnames(base_measure$pointwise)[[2]], "elpd")
-})
-
-test_that(".compute_base_measure() computes elpd_loo as expected", {
-  base_measure <- .compute_base_measure(
-    ylp = res$ylp,
-    ylp_test = NULL,
-    loo = NULL,
-    kfold = NULL,
-    predperf = NULL,
-    psis_object = res$loo$psis_object,
-    source = "loo"
-  )
-
+test_that(".elpd_pointwise() takes elpd from loo and kfold objects", {
   expect_equal(
-    rownames(base_measure$estimates),
-    c("elpd_loo", "p_loo")
+    .elpd_pw("loo", loo = res$loo), res$loo$pointwise[, "elpd_loo"]
   )
   expect_equal(
-    dimnames(base_measure$pointwise)[[2]],
-    c("elpd_loo", "p_loo")
+    .elpd_pw("kfold", kfold = res$kfold), res$kfold$pointwise[, "elpd_kfold"]
   )
 })
 
-test_that(".compute_base_measure() computes elpd_kfold as expected", {
-  base_measure <- .compute_base_measure(
-    ylp = res$ylp,
-    ylp_test = NULL,
-    loo = NULL,
-    kfold = res$kfold,
-    predperf = NULL,
-    psis_object = NULL,
-    source = "kfold"
+test_that(".elpd_pointwise() computes elpd from ylp and ylp_test", {
+  expect_equal(
+    .elpd_pw("loo", ylp = res$ylp,
+             log_weights = res$loo$psis_object$log_weights),
+    res$loo$pointwise[, "elpd_loo"],
+    ignore_attr = TRUE
   )
+  expect_length(
+    .elpd_pw("test", ylp_test = res_sleep_test$ylp_test), n_test
+  )
+})
 
-  expect_equal(
-    rownames(base_measure$estimates),
-    c("elpd_kfold", "p_kfold")
-  )
-  expect_equal(
-    dimnames(base_measure$pointwise)[[2]],
-    c("elpd_kfold", "p_kfold")
-  )
+test_that(".elpd_pointwise() errors if the input is missing", {
+  expect_error(.elpd_pw("insample"), regexp = "`ylp` is required")
+  expect_error(.elpd_pw("test"), regexp = "`ylp_test` is required")
+  expect_error(.elpd_pw("kfold"), regexp = "not stored in")
 })
 
 ## .get_psis_object() -------------------------
@@ -235,10 +179,13 @@ test_that(".merge_matrix() with kfold showes correct names", {
   expect_equal(dim(res), c(1, 2))
 })
 
-test_that("duplicate measure warns once and skips estimates and pointwise", {
+test_that("duplicate measure on update warns once and keeps the results", {
+  predperf <- insample_pred_measure(ylp = res$ylp)
   warnings <- character()
   withCallingHandlers(
-    res <- insample_pred_measure(ylp = res$ylp, measure = "elpd"),
+    updated <- pred_measure(
+      ylp = res$ylp, predperf = predperf, measure = "elpd"
+    ),
     warning = function(w) {
       warnings <<- c(warnings, conditionMessage(w))
       invokeRestart("muffleWarning")
@@ -246,9 +193,9 @@ test_that("duplicate measure warns once and skips estimates and pointwise", {
   )
 
   expect_length(warnings, 1L)
-  expect_match(warnings[[1]], "already present in results")
-  expect_equal(rownames(res$estimates), "elpd")
-  expect_equal(colnames(res$pointwise), "elpd")
+  expect_match(warnings[[1]], "already present in")
+  expect_equal(rownames(updated$estimates), "elpd")
+  expect_equal(colnames(updated$pointwise), "elpd")
 })
 
 # integration tests ------------------------------
@@ -274,7 +221,7 @@ test_that("pred_measure() updates loo results as expected", {
     y = res$y,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = c("r2", "mse"),
+    measure = c("elpd", "r2", "mse"),
     save_psis = TRUE
   )
 
@@ -295,7 +242,7 @@ test_that("pred_measure() updates loo results as expected", {
 test_that("pred_measure() keeps dims when the update has no matrix input", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,
-    measure = "r2", save_psis = TRUE
+    measure = c("elpd", "r2"), save_psis = TRUE
   )
   updated <- pred_measure(predperf = predperf_loo, measure = "mlpd")
 
@@ -360,9 +307,9 @@ test_that("loo_pred_measure() computes expected measures", {
 
   expect_equal(
     rownames(predperf1$estimates),
-    c("elpd_loo", "p_loo", "r2_loo", "mse_loo")
+    c("r2_loo", "mse_loo")
   )
-  expect_equal(dim(predperf1$estimates), c(4, 2))
+  expect_equal(dim(predperf1$estimates), c(2, 2))
   expect_true(is.loo(predperf1))
 })
 
@@ -420,13 +367,13 @@ test_that("kfold_pred_measure() works with rps as expected", {
     ypred = res$ypred,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = c("mlpd", "ic" ,"rps", "srps"),
+    measure = c("mlpd", "ic", "rps", "srps"),
     kfold = res$kfold
   )
 
   expect_equal(
     rownames(kfold_res$estimates),
-    c("elpd_kfold", "p_kfold", "mlpd_kfold", "ic_kfold", "rps_kfold", "srps_kfold")
+    c("mlpd_kfold", "ic_kfold", "rps_kfold", "srps_kfold")
   )
 })
 
@@ -438,7 +385,7 @@ test_that("test_pred_measure() computes holdout measures as expected", {
     ypred = res_sleep_test$ypred_test,
     mupred = res_sleep_test$mupred_test,
     ylp_test = res_sleep_test$ylp_test,
-    measure = c("rmse", "r2")
+    measure = c("elpd", "rmse", "r2")
   )
 
   expect_s3_class(test_res, "test_pred_measure")
@@ -458,7 +405,7 @@ test_that("test_pred_measure() works with ylp_test only for base summary", {
     y = res_sleep_test$y_test,
     mupred = res_sleep_test$mupred_test,
     ylp_test = res_sleep_test$ylp_test,
-    measure = "mae"
+    measure = c("elpd", "mae")
   )
 
   expect_equal(rownames(test_res$estimates), c("elpd_test", "mae_test"))
@@ -481,12 +428,9 @@ test_that("pred_measure() updates test_pred_measure results as expected", {
     measure = "mae"
   )
 
-  expect_equal(
-    rownames(updated$estimates),
-    c("elpd_test", "rmse_test", "mae_test")
-  )
+  expect_equal(rownames(updated$estimates), c("rmse_test", "mae_test"))
   expect_equal(attr(updated, "source"), "test")
-  expect_equal(dim(updated$pointwise), c(n_test, 3L))
+  expect_equal(dim(updated$pointwise), c(n_test, 2L))
 })
 
 # pred_measure() with custom function ------------------------------
@@ -537,73 +481,68 @@ test_that("insample_pred_measure() accepts mixed built-in and custom measures", 
   expect_true(all(c("r2", "custom_rmse") %in% rownames(res$estimates)))
 })
 
-test_that("a custom measure can declare itself a loss", {
-  set.seed(11)
-  S <- 20L
-  n <- 12L
-  y <- rnorm(n)
-  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
-  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
+## elpd on demand -------------------------------------------------------
 
-  custom_mse <- function(y, mupred) {
-    sqe <- (y - colMeans(mupred))^2
-    list(
-      estimate = mean(sqe),
-      se = sqrt(var(sqe) / length(sqe)),
-      pointwise = sqe
-    )
-  }
-  attr(custom_mse, "measure_name") <- "custom_mse"
-
-  utility <- insample_pred_measure(
-    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+test_that("measure = NULL reports elpd and p for every source", {
+  expect_equal(rownames(insample_pred_measure(ylp = res$ylp)$estimates), "elpd")
+  expect_equal(
+    rownames(loo_pred_measure(loo = res$loo)$estimates), c("elpd_loo", "p_loo")
   )
-  expect_false(attr(utility, "measure_info")$custom_mse$loss)
-
-  attr(custom_mse, "measure_loss") <- TRUE
-  loss <- insample_pred_measure(
-    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+  expect_equal(
+    rownames(kfold_pred_measure(kfold = res$kfold)$estimates),
+    c("elpd_kfold", "p_kfold")
   )
-  info <- attr(loss, "measure_info")$custom_mse
-  expect_true(info$loss)
-  # the declaration says what the measure is, not how it is stored
-  expect_equal(loss$estimates, utility$estimates)
-  expect_true(all(loss$pointwise[, "custom_mse"] >= 0))
+  expect_equal(
+    rownames(test_pred_measure(ylp_test = res_sleep_test$ylp_test)$estimates),
+    "elpd_test"
+  )
 })
 
-test_that("`higher_is_better` in `control` is no longer recognised", {
-  set.seed(12)
-  S <- 20L
-  n <- 12L
-  y <- rnorm(n)
-  mupred <- matrix(rnorm(S * n), nrow = S, ncol = n)
-  ylp <- matrix(rnorm(S * n), nrow = S, ncol = n)
-
-  custom_mse <- function(y, mupred) {
-    sqe <- (y - colMeans(mupred))^2
-    list(
-      estimate = mean(sqe),
-      se = sqrt(var(sqe) / length(sqe)),
-      pointwise = sqe
-    )
-  }
-  attr(custom_mse, "measure_name") <- "custom_mse"
-  attr(custom_mse, "measure_loss") <- TRUE
-
-  natural <- insample_pred_measure(
-    y = y, mupred = mupred, ylp = ylp, measure = custom_mse
+test_that("elpd and p from loo and kfold objects equal the object estimates", {
+  expect_equal(
+    loo_pred_measure(loo = res$loo)$estimates,
+    res$loo$estimates[c("elpd_loo", "p_loo"), ],
+    ignore_attr = TRUE
   )
-  expect_warning(
-    ignored <- insample_pred_measure(
-      y = y, mupred = mupred, ylp = ylp, measure = custom_mse,
-      control = list(custom_mse = list(higher_is_better = TRUE))
-    ),
-    "not a valid argument"
+  expect_equal(
+    kfold_pred_measure(kfold = res$kfold)$estimates,
+    res$kfold$estimates[c("elpd_kfold", "p_kfold"), ],
+    ignore_attr = TRUE
+  )
+})
+
+test_that("insample_pred_measure() does not need ylp without elpd", {
+  x <- insample_pred_measure(y = res$y, mupred = res$mupred, measure = "rmse")
+  expect_equal(rownames(x$estimates), "rmse")
+})
+
+test_that("loo_pred_measure() keeps diagnostics without elpd", {
+  x <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measure = "rmse"
+  )
+  expect_equal(x$diagnostics$pareto_k, res$loo$diagnostics$pareto_k)
+})
+
+test_that("pred_measure() recomputes elpd for loo but aborts for kfold", {
+  loo_res <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measure = "r2",
+    save_psis = TRUE
+  )
+  updated <- suppressMessages(
+    pred_measure(ylp = res$ylp, predperf = loo_res, measure = "ic")
+  )
+  expect_equal(rownames(updated$estimates), c("r2_loo", "ic_loo"))
+  expect_equal(
+    updated$estimates["ic_loo", "Estimate"],
+    -2 * res$loo$estimates["elpd_loo", "Estimate"],
+    ignore_attr = TRUE
   )
 
-  # values are always stored on the measure's own scale
-  expect_equal(ignored$estimates, natural$estimates)
-  expect_equal(ignored$pointwise, natural$pointwise)
-  expect_null(attr(ignored, "measure_higher_is_better"))
-  expect_null(attr(ignored, "measure_info")$custom_mse$higher_is_better)
+  kfold_res <- kfold_pred_measure(
+    y = res$y, mupred = res$mupred, kfold = res$kfold, measure = "r2"
+  )
+  expect_error(
+    pred_measure(ylp = res$ylp, predperf = kfold_res, measure = "ic"),
+    regexp = "not stored in"
+  )
 })

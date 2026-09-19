@@ -233,9 +233,11 @@ measure_ic <- function(
 #' Classification accuracy (`acc`)
 #'
 #' Computes pointwise and average classification accuracy for binary or
-#' multiclass outcomes from posterior predictive class assignments. For binary
-#' outcomes, each draw is thresholded at 0.5. For multiclass outcomes, each
-#' draw is mapped to the most likely category via `which.max()`.
+#' multiclass outcomes. The class probabilities are first averaged over the
+#' draws, using `log_weights` if given. For binary outcomes, the averaged
+#' probability is thresholded at 0.5. For multiclass outcomes, the predicted
+#' class is the most likely category of the averaged probabilities, via
+#' `which.max()`.
 #' 
 #' @inheritParams measure_score_params
 #' @inheritParams measure_params
@@ -824,11 +826,14 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
 # @param measure The measure used.
 # @return The measure specification.
 #
-# `needs_elpd = TRUE` marks a measure that is derived from the pointwise ELPD of
-# the base measure block rather than from the raw inputs. `.compute_measure()`
-# then supplies `pointwise`, optionally passed through `elpd_transform` first.
+# `needs_elpd = TRUE` marks a measure derived from the pointwise ELPD (`elpd`,
+# `mlpd`, `ic`). `.elpd_pointwise()` gives that vector for the source.
+# `.compute_measure()` passes it as `pointwise`, optionally through
+# `elpd_transform` first.
 .measure_spec <- list(
-  elpd = list(fun = measure_elpd, loss = FALSE, diff_method = "sum"),
+  elpd = list(
+    fun = measure_elpd, loss = FALSE, diff_method = "sum", needs_elpd = TRUE
+  ),
   ic = list(
     fun = measure_ic,
     loss = TRUE,

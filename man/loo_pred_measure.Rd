@@ -33,8 +33,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -114,10 +114,11 @@ PSIS-LOO approximates exact LOO-CV without refitting the model once per
 observation: each held-out point is scored by reweighting the full-data
 posterior draws.
 
-The primary summary is \code{elpd_loo}, the LOO estimate of expected log
-pointwise predictive density (ELPD). The base result also includes \code{p_loo}
+With the default \code{measure = NULL}, the result holds \code{elpd_loo}, the LOO
+estimate of expected log pointwise predictive density (ELPD), and \code{p_loo}
 (effective number of parameters, the difference between in-sample and LOO
-log predictive density). See \code{\link[=loo]{loo()}} and the
+log predictive density). \code{p_loo} is reported together with \code{elpd_loo}.
+See \code{\link[=loo]{loo()}} and the
 \href{https://users.aalto.fi/~ave/CV-FAQ.html}{Cross-validation FAQ} for
 interpretation.
 }

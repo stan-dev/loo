@@ -21,8 +21,8 @@
 #' with:
 #' \describe{
 #'   \item{`estimates`}{Matrix of summary estimates and standard errors (rows
-#'     are measures, columns are `Estimate` and `SE`). The base row `elpd` is
-#'     always present when `ylp` is supplied.}
+#'     are measures, columns are `Estimate` and `SE`). The row `elpd` is
+#'     present when `measure` is `NULL` (default) or names "elpd".}
 #'   \item{`pointwise`}{Matrix of observation-level contributions (one column
 #'     per measure).}
 #' }
@@ -45,8 +45,9 @@
 #' | `acc`, `bacc` | | ✓ | | ✓ |
 #' | `mae`, `mse`, `rmse`, `r2` | | ✓ | | ✓ |
 #'
-#' Base measure `elpd` is always computed when `ylp` is provided. Request
-#' `ic`, `mlpd`, or other density scores via `measure`, or supply a custom function;
+#' "elpd" is the default measure. `mlpd` and `ic` are derived from `elpd`, but
+#' requesting them does not add an `elpd` row. Request `ic`, `mlpd`, or other
+#' density scores via `measure`, or supply a custom function;
 #' see [supported_measures_list] and the
 #' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
@@ -142,10 +143,11 @@ insample_pred_measure <- function(
 #' observation: each held-out point is scored by reweighting the full-data
 #' posterior draws.
 #'
-#' The primary summary is `elpd_loo`, the LOO estimate of expected log
-#' pointwise predictive density (ELPD). The base result also includes `p_loo`
+#' With the default `measure = NULL`, the result holds `elpd_loo`, the LOO
+#' estimate of expected log pointwise predictive density (ELPD), and `p_loo`
 #' (effective number of parameters, the difference between in-sample and LOO
-#' log predictive density). See [loo::loo()] and the
+#' log predictive density). `p_loo` is reported together with `elpd_loo`.
+#' See [loo::loo()] and the
 #' [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html) for
 #' interpretation.
 #'
@@ -249,8 +251,9 @@ loo_pred_measure <- function(
 #' and scores the held-out folds.
 #'
 #' Pass a `kfold` object from [brms::kfold()] (with `save_fits = TRUE` when
-#' you need posterior predictions on held-out folds). Base density summaries
-#' (`elpd_kfold`, `ic_kfold`, `p_kfold`) come from the `kfold` object;
+#' you need posterior predictions on held-out folds). `elpd_kfold` and
+#' `p_kfold` come from the `kfold` object and are reported by default or when
+#' `measure` names "elpd";
 #' additional measures require the same optional inputs as
 #' [insample_pred_measure()].
 #'
@@ -332,11 +335,11 @@ kfold_pred_measure <- function(
 #' explicit train/test split rather than LOO or k-fold reweighting.
 #'
 #' Supply `ylp_test` from log predictive densities evaluated on the holdout set
-#' (e.g. `brms::log_lik(fit, newdata = test_data)`). This is required for the
-#' base summary `elpd_test`. Optional distributional and point-prediction
-#' measures use observed and predicted values on the test set only. Pass training
-#' `ylp` only when an additional measure needs log predictive densities from the
-#' training fit.
+#' (e.g. `brms::log_lik(fit, newdata = test_data)`). This is required for
+#' `elpd_test`, `mlpd_test` and `ic_test`. Optional distributional and
+#' point-prediction measures use observed and predicted values on the test set
+#' only. Pass training `ylp` only when an additional measure needs log
+#' predictive densities from the training fit.
 #'
 #' @inheritParams pred_measure_params
 #'
@@ -349,7 +352,7 @@ kfold_pred_measure <- function(
 #' @template measure-info-attribute
 #'
 #' @details
-#' The base summary `elpd_test` is computed from `ylp_test` on the holdout
+#' `elpd_test` is computed from `ylp_test` on the holdout
 #' observations only.
 #'
 #' @examples
@@ -411,7 +414,7 @@ test_pred_measure <- function(
 #' @description
 #' Extend a `"pred_measure"` object with additional measures **without
 #' recomputing** what is already stored. Use this for interactive exploration
-#' or when you first compute base density summaries and later add distributional
+#' or when you first compute `elpd` and later add distributional
 #' or point-prediction metrics.
 #'
 #' Pass the existing object as `predperf` and supply any inputs newly required
@@ -424,12 +427,10 @@ test_pred_measure <- function(
 #'
 #' @return
 #' An updated object of the same class as `predperf`, with new rows in
-#' `estimates` and columns in `pointwise` for each requested measure. Base
-#' summaries (`elpd` and LOO/k-fold complexity terms such as `p_loo`) are not
-#' recomputed. Attribute `measure_info` is extended for any newly added
-#' measures.
-#'
-#' @template measure-info-attribute
+#' `estimates` and columns in `pointwise` for each requested measure. Rows
+#' already in `predperf` are not recomputed. If `mlpd` or `ic` needs `elpd` and
+#' `predperf` has no `elpd` column, `elpd` is recomputed from `ylp` for
+#' insample and LOO results. For k-fold and test results this is an error.
 #'
 #' @details
 #' **Typical workflow:**

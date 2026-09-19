@@ -31,8 +31,8 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Additional measures beyond the base summary \code{elpd} (always
-included when \code{ylp} is available). Can be:
+\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
@@ -90,8 +90,9 @@ K-fold CV holds out groups of observations, refits (or reuses stored fits),
 and scores the held-out folds.
 
 Pass a \code{kfold} object from \code{\link[brms:kfold]{brms::kfold()}} (with \code{save_fits = TRUE} when
-you need posterior predictions on held-out folds). Base density summaries
-(\code{elpd_kfold}, \code{ic_kfold}, \code{p_kfold}) come from the \code{kfold} object;
+you need posterior predictions on held-out folds). \code{elpd_kfold} and
+\code{p_kfold} come from the \code{kfold} object and are reported by default or when
+\code{measure} names "elpd";
 additional measures require the same optional inputs as
 \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
 }
