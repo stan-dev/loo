@@ -559,18 +559,12 @@ Sounds like a good idea. However, providing this information only for losses mig
 
 Thank you for pointing this out. This is indeed a flaw in the design.
 I refactored the design such that a custom measure can have now the attribute
-`measure_se_diff`.
-
-The exported wrapper `custom_measure(fun, name, se_diff_fun = NULL, loss = FALSE)`
-sets the three attributes `measure_name`, `measure_loss`, and
-`measure_se_diff`. An unnamed
-function in a `measure` list now takes its name from `measure_name`.
+`measure_se_diff`. Furthermore, I added an exported wrapper `custom_measure(fun, name, se_diff_fun = NULL, loss = FALSE)` which sets the three attributes `measure_name`, `measure_loss`, and `measure_se_diff`. 
 
 With the declaration in place, the `custom_se_fn` argument of `model_compare()`
 was redundant, so it is removed. For a custom measure that declares
 nothing, `model_compare()` reports the difference with an `NA` standard error
-and a message. To change the standard error, redefine the measure and
-recompute the `*_pred_measure()` results.
+and a message.
 
 ```r
 huber_fn <- function(y, mupred) {
