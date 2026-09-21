@@ -1660,6 +1660,23 @@ test_that("model_compare warns when kfold results use different K", {
   )
 })
 
+test_that("model_compare warns when kfold results use different folds", {
+  res <- .compare_src_res()
+  set.seed(4321)
+  kf2 <- res$kfold
+  attr(kf2, "folds") <- sample(attr(res$kfold, "folds"))
+
+  k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
+                           measure = "rmse")
+  k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
+                           kfold = kf2, measure = "rmse")
+
+  expect_warning(
+    suppressMessages(model_compare(list(m1 = k1, m2 = k2))),
+    "Not all kfold objects use the same fold assignment"
+  )
+})
+
 test_that("model_compare rank_by resolves bare names for suffixed measures", {
   res <- .compare_src_res()
   set.seed(4321)

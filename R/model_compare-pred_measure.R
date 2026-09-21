@@ -84,6 +84,7 @@ compare_pred_measure <- function(loos, rank_by = NULL) {
   throw_insample_compare_warning(source)
   if (identical(source, "kfold")) {
     throw_kfold_K_mismatch_warning(loos)
+    throw_kfold_folds_mismatch_warning(loos)
   }
   .compare_metadata_check(loos)
   throw_omitted_compare_measures_warning(loos)

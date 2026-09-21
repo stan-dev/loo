@@ -596,7 +596,7 @@ comp_h <- model_compare(list(m3 = h3, m1 = h1))
 
 > I think the brms kfold example has a mistake. It uses brms::kfold(fit, K = 5) separately for each model but I think that means they’re using different folds, which means se_diff is wrong? I think we need to do something like this: folds <- loo::kfold_split_random(K = 5, N = nrow(roaches)) and then pass that to kfold.
 
-TODO
+Yes, indeed. I changed the corresponding cell in the notebook and added a warning (`throw_kfold_folds_mismatch_warning`) when folds are not equal.
 
 ### The helper `add_loo()`
 

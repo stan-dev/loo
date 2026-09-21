@@ -31,6 +31,9 @@ knitr::opts_chunk$set(
   fig.height = 4,
   fig.align = "center"
 )
+
+# brms::kfold() exports the fits to future.apply, which caps globals at 500 MiB
+options(future.globals.maxSize = 4 * 1024^3)
 ```
 
 ::: {.callout .callout-warning}
@@ -127,7 +130,7 @@ library(loo)
 ```
 
 ```{r setup-example}
-measures <- c("mae", "mse", "rmse", "r2", "rps") # elpd is computed by default
+measures <- c("elpd", "mae", "mse", "rmse", "r2", "rps")
 ```
 
 ## The classical `loo_compare` output
@@ -924,8 +927,12 @@ is an error.
 in this article.
 
 ```{r kfold-compare, message=FALSE}
+set.seed(SEED)
+folds <- kfold_split_random(K = 5, N = nrow(roaches))
+
 kfold_measure <- function(fit, measure) {
-  kf <- brms::kfold(fit, K = 5, save_fits = TRUE)
+  kf <- brms::kfold(fit, folds = folds, save_fits = TRUE)
+
   kfold_pred_measure(
     y = fit$data$y,
     ypred = brms::kfold_predict(kf, method = "predict")$yrep,
@@ -935,7 +942,6 @@ kfold_measure <- function(fit, measure) {
   )
 }
 
-set.seed(SEED)
 k1 <- kfold_measure(fit_m1, measures)
 k2 <- kfold_measure(fit_m2, measures)
 k3 <- kfold_measure(fit_m3, measures)

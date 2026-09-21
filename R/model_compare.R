@@ -260,8 +260,8 @@
 #'
 #'   # the same works for k-fold CV; `rank_by` still takes the bare name
 #'   # even though the measures are stored as `elpd_kfold`, `rmse_kfold`, ...
-#'   kf1 <- brms::kfold(fit1, K = 5, save_fits = TRUE)
-#'   kf2 <- brms::kfold(fit2, K = 5, save_fits = TRUE)
+#'   kf1 <- brms::kfold(fit1, folds = folds, save_fits = TRUE)
+#'   kf2 <- brms::kfold(fit2, folds = folds, save_fits = TRUE)
 #'   kpm1 <- kfold_pred_measure(
 #'     y = fit1$data$Reaction,
 #'     mupred = brms::kfold_predict(kf1, method = "fitted")$yrep,
@@ -452,6 +452,34 @@ throw_kfold_K_mismatch_warning <- function(loos) {
   invisible(NULL)
 }
 
+#' Warn when k-fold results do not share the same fold assignment
+#' @noRd
+#' @param loos List of `"kfold"` or `"kfold_pred_measure"` objects.
+#' @details The fold labels are arbitrary. The check therefore relabels each
+#'   vector by first appearance. Two runs that split the data in the same way
+#'   then agree, whatever the labels are. A `NULL` `folds` attribute means the
+#'   object does not record the split. The check is then not possible.
+throw_kfold_folds_mismatch_warning <- function(loos) {
+  folds <- lapply(loos, attr, which = "folds")
+  if (any(vapply(folds, is.null, logical(1)))) {
+    return(invisible(NULL))
+  }
+  canonical <- lapply(folds, function(f) {
+    as.integer(factor(f, levels = unique(f)))
+  })
+  same <- vapply(
+    canonical,
+    function(f) identical(f, canonical[[1L]]),
+    logical(1)
+  )
+  if (!all(same)) {
+    warning(
+      "Not all kfold objects use the same fold assignment.", call. = FALSE
+    )
+  }
+  invisible(NULL)
+}
+
 #' Perform checks on `"loo"` objects before comparison
 #' @noRd
 #' @param loos List of `"loo"` objects.
@@ -507,6 +535,7 @@ model_compare_checks <- function(
 
   if (all(vapply(loos, is.kfold, logical(1)))) {
     throw_kfold_K_mismatch_warning(loos)
+    throw_kfold_folds_mismatch_warning(loos)
   } else if (any(vapply(loos, is.kfold, logical(1))) &&
       any(vapply(loos, is.psis_loo, logical(1)))) {
     warning(
