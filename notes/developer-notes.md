@@ -602,7 +602,14 @@ Yes, indeed. I changed the corresponding cell in the notebook and added a warnin
 
 > The add_loo() helper is using moment_match = TRUE and r_eff (since brms does). But loo_pred_measure doesn’t. So the displayed loo_compare and model_compare results don’t actually match for loo objects. 
 
-TODO
+Yes, that's actually a tricky one.
+Currently, we accept for `loo_pred_measure` three input schemes:
+
++ `loo`: able to reproduce loo_moment_match results
++ `ylp` + `psis_object`: the weights are the moment-matched, so it would work for measures where we only use the weights; but for `elpd` is does not work, as it is recomputed from `ylp`
++ `ylp`: nothing from the moment-matching reaches the computation of measures
+
+So, the question is how we want to handle this and pass the diagnostic information to pred_measure
 
 ### Printing
 #### Diagnostic flags
