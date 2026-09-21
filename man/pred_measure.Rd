@@ -124,26 +124,6 @@ When extending a LOO result, ensure the initial call used \code{save_psis = TRUE
 (or that \code{predperf} already contains a \code{psis_object}) so LOO weights are
 available for additional measures.
 }
-\section{\code{measure_info} attribute}{
-
-All \verb{*_pred_measure()} and \code{\link[=pred_measure]{pred_measure()}} results include attribute
-\code{measure_info}: a named list, keyed by bare measure name, recording what
-\code{\link[=model_compare]{model_compare()}} needs to know about each measure — \code{loss} (whether lower
-values are better), \code{diff_method} (how the standard error of a difference is
-obtained), and, where applicable, \code{se_diff_fun} and \code{extra}. When measures
-are added incrementally with \code{\link[=pred_measure]{pred_measure()}}, the attribute is extended for
-the newly computed measures.
-
-Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} from the
-package measure registry. Custom measures always get \code{diff_method = "custom"}
-and take the standard error of their difference from the \code{custom_se_fn}
-argument of \code{\link[=model_compare]{model_compare()}}; their \code{loss} comes from
-\code{attr(my_fun, "measure_loss") <- TRUE}, which declares that lower values are
-better. Without that declaration a custom measure is treated as a utility, so
-an undeclared loss is compared and ranked in the wrong direction. See
-\link{loo-glossary}.
-}
-
 \examples{
 \donttest{
 if (requireNamespace("brms", quietly = TRUE)) {

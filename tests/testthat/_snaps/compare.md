@@ -92,6 +92,41 @@
 ---
 
     Code
+      print(comp, measures = "all", digits = c(r2 = 1))
+    Output
+      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m3     1
+          m1     1
+      
+      -- elpd (vs m2) --
+       model elpd_diff se_diff p_worse diag_diff
+          m2       0.0     0.0      NA          
+          m3     -25.5   129.1    0.58          
+          m1    -850.3   372.3    0.99          
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2     0.0        0.0
+          m3    -0.1        0.2
+          m1    -0.1        0.2
+      
+      -- mae (vs m3) --
+       model mae_diff mae_se_diff
+          m3      0.0         0.0
+          m2     -0.1         1.2
+          m1     -6.3         3.1
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+
+---
+
+    Code
       print(comp, measures = c("r2", "mae"))
     Output
       Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
@@ -103,9 +138,9 @@
       
       -- r2 (vs m2) --
        model r2_diff r2_se_diff
-          m2     0.0        0.0
-          m3    -0.1        0.2
-          m1    -0.1        0.2
+          m2   0.000      0.000
+          m3  -0.093      0.178
+          m1  -0.105      0.217
       
       -- mae (vs m3) --
        model mae_diff mae_se_diff
@@ -130,14 +165,14 @@
           m3     1
           m1     1
       
-       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p  r2 se_r2
-          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7 0.2   0.2
-          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2 0.1   0.3
-          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1 0.0   0.0
-        mae se_mae
-       22.0    3.4
-       21.9    3.6
-       28.2    3.2
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p    r2
+          m2       0.0     0.0      NA           -2071.4   468.9 61.6 20.7 0.153
+          m3     -25.5   129.1    0.58           -2096.8   438.7 96.4 46.2 0.060
+          m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1 0.048
+       se_r2  mae se_mae
+       0.214 22.0    3.4
+       0.300 21.9    3.6
+       0.040 28.2    3.2
     Message
       
       Diagnostic flags present.
@@ -165,10 +200,10 @@
           m1    -850.3   372.3    0.99           -2921.7   449.8 75.8 21.1
       
       -- r2 (vs m2) --
-       model r2_diff r2_se_diff  r2 se_r2
-          m2     0.0        0.0 0.2   0.2
-          m3    -0.1        0.2 0.1   0.3
-          m1    -0.1        0.2 0.0   0.0
+       model r2_diff r2_se_diff    r2 se_r2
+          m2   0.000      0.000 0.153 0.214
+          m3  -0.093      0.178 0.060 0.300
+          m1  -0.105      0.217 0.048 0.040
       
       -- mae (vs m3) --
        model mae_diff mae_se_diff  mae se_mae
@@ -194,10 +229,10 @@
           m1     1
       
       -- r2 (vs m2) --
-       model r2_diff r2_se_diff  r2 se_r2
-          m2     0.0        0.0 0.2   0.2
-          m3    -0.1        0.2 0.1   0.3
-          m1    -0.1        0.2 0.0   0.0
+       model r2_diff r2_se_diff    r2 se_r2
+          m2   0.000      0.000 0.153 0.214
+          m3  -0.093      0.178 0.060 0.300
+          m1  -0.105      0.217 0.048 0.040
     Message
       
       Diagnostic flags present.

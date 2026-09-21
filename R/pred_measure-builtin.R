@@ -830,29 +830,40 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
 # `mlpd`, `ic`). `.elpd_pointwise()` gives that vector for the source.
 # `.compute_measure()` passes it as `pointwise`, optionally through
 # `elpd_transform` first.
+# `digits` is the default number of decimal places `print()` uses for the
+# measure. A measure on the scale of the data
+# (`mae`, `rmse`, `mse`, `rps`, `srps`) sets no value. `.measure_digits()`
+# then takes the places from the standard error.
 .measure_spec <- list(
   elpd = list(
-    fun = measure_elpd, loss = FALSE, diff_method = "sum", needs_elpd = TRUE
+    fun = measure_elpd,
+    loss = FALSE,
+    diff_method = "sum",
+    needs_elpd = TRUE,
+    digits = 1
   ),
   ic = list(
     fun = measure_ic,
     loss = TRUE,
     diff_method = "sum",
     needs_elpd = TRUE,
-    elpd_transform = function(x) -2 * x
+    elpd_transform = function(x) -2 * x,
+    digits = 1
   ),
   mlpd = list(
     fun = measure_mlpd,
     loss = FALSE,
     diff_method = "mean",
-    needs_elpd = TRUE
+    needs_elpd = TRUE,
+    digits = 3
   ),
   mae = list(fun = measure_mae, loss = TRUE, diff_method = "mean"),
   r2 = list(
     fun = measure_r2,
     loss = FALSE,
     diff_method = "measure_specific",
-    se_diff_fun = "r2"
+    se_diff_fun = "r2",
+    digits = 3
   ),
   rmse = list(
     fun = measure_rmse,
@@ -861,18 +872,24 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
     se_diff_fun = "rmse"
   ),
   mse = list(fun = measure_mse, loss = TRUE, diff_method = "mean"),
-  acc = list(fun = measure_acc, loss = FALSE, diff_method = "mean"),
+  acc = list(fun = measure_acc, loss = FALSE, diff_method = "mean", digits = 3),
   bacc = list(
     fun = measure_bacc,
     loss = FALSE,
     diff_method = "measure_specific",
-    se_diff_fun = "bacc"
+    se_diff_fun = "bacc",
+    digits = 3
   ),
   # unscaled RPS/CRPS is the Gneiting & Raftery (2007) loss; the scaled variant
   # follows Bolin & Wallin (2023), where larger is better
   rps = list(fun = measure_rps, loss = TRUE, diff_method = "mean"),
   srps = list(fun = measure_srps, loss = FALSE, diff_method = "mean"),
-  brier = list(fun = measure_brier, loss = TRUE, diff_method = "mean")
+  brier = list(
+    fun = measure_brier,
+    loss = TRUE,
+    diff_method = "mean",
+    digits = 3
+  )
 )
 
 # measure-specific standard errors -----------------------------

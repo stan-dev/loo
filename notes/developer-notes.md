@@ -616,13 +616,26 @@ So, the question is how we want to handle this and pass the diagnostic informati
 
 > Some of the print output says Diagnostic flags present but doesn’t actually show any diagnostic flags in the output 
 
-TODO
+I assume you refer here to the missing p_worse and diag_diff column for measures that are not elpd.
+The reason is that I was not sure where the normal approximation is reasonable for these measures as well. We want indeed to include the diagnostic columns here as well but we have to check first whether the normal approximation and thus the diagnostics are valid for all other measures.
 
 #### Number of digits per measure
 
 > I think the default number of digits to display is tricky. We might need different defaults per measure or use significant digits or something? I’m not sure, but I think it’s going to be annoying/confusing for users. Especially for constrained measures like R2, acc, brier, etc.
 
-TODO
+Yes, I agree. I updated the digits rule and set different default formatting for the measures:
+
++ 1 digit: elpd, ic
++ 3 digits: mlpd, r2, acc, bacc, brier
++ dependent on SE: mae, rmse, mse, rps, srps, custom_measure
+
+```
+before            after
+ model r2_diff    model r2_diff r2_se_diff
+    m2     0.0       m2   0.000      0.000
+    m3    -0.1       m3  -0.093      0.178
+    m1    -0.1       m1  -0.105      0.217
+```
 
 ### Improving vignette
 

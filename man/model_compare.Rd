@@ -6,7 +6,7 @@
 \alias{model_compare.default}
 \title{Model comparison}
 \usage{
-\method{print}{compare.loo}(x, ..., digits = 1, p_worse = TRUE, simplify = TRUE, measures = NULL)
+\method{print}{compare.loo}(x, ..., digits = NULL, p_worse = TRUE, simplify = TRUE, measures = NULL)
 
 model_compare(x, ..., rank_by = NULL)
 
@@ -22,8 +22,15 @@ passed in as a single list. Naming every model here, as in
 \code{model_compare(A = m1, B = m2)}, names the models in the output, exactly as
 the list form does.}
 
-\item{digits}{For the print method only, the number of digits to use when
-printing.}
+\item{digits}{For the print method only, the number of decimal places to
+print. The default \code{NULL} gives each measure its own: 1 for \code{elpd} and
+\code{ic}, and 3 for \code{mlpd} and for the bounded measures (\code{r2}, \code{acc}, \code{bacc},
+\code{brier}). A measure on the scale of the data (\code{mae}, \code{rmse}, \code{mse}, \code{rps},
+\code{srps}, and any custom measure) takes the places that show two significant
+digits of its own standard error, at most 4.
+Pass a single number for one format in every column, or a named vector
+such as \code{c(r2 = 2, rmse = 3)} to override single measures. \code{p_worse}
+always prints with 2 places.}
 
 \item{p_worse}{For the print method only, should we include the normal
 approximation based probability of each model having worse performance than
@@ -308,8 +315,8 @@ if (requireNamespace("brms", quietly = TRUE)) {
 
   # the same works for k-fold CV; `rank_by` still takes the bare name
   # even though the measures are stored as `elpd_kfold`, `rmse_kfold`, ...
-  kf1 <- brms::kfold(fit1, K = 5, save_fits = TRUE)
-  kf2 <- brms::kfold(fit2, K = 5, save_fits = TRUE)
+  kf1 <- brms::kfold(fit1, folds = folds, save_fits = TRUE)
+  kf2 <- brms::kfold(fit2, folds = folds, save_fits = TRUE)
   kpm1 <- kfold_pred_measure(
     y = fit1$data$Reaction,
     mupred = brms::kfold_predict(kf1, method = "fitted")$yrep,

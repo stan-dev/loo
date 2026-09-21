@@ -1,7 +1,14 @@
 #' @rdname model_compare
 #' @export
-#' @param digits For the print method only, the number of digits to use when
-#'   printing.
+#' @param digits For the print method only, the number of decimal places to
+#'   print. The default `NULL` gives each measure its own: 1 for `elpd` and
+#'   `ic`, and 3 for `mlpd` and for the bounded measures (`r2`, `acc`, `bacc`,
+#'   `brier`). A measure on the scale of the data (`mae`, `rmse`, `mse`, `rps`,
+#'   `srps`, and any custom measure) takes the places that show two significant
+#'   digits of its own standard error, at most 4.
+#'   Pass a single number for one format in every column, or a named vector
+#'   such as `c(r2 = 2, rmse = 3)` to override single measures. `p_worse`
+#'   always prints with 2 places.
 #' @param p_worse For the print method only, should we include the normal
 #'   approximation based probability of each model having worse performance than
 #'   the reference model? The default is `TRUE`.
@@ -20,7 +27,7 @@
 #'   `"all"` prints all compared measures; or a character vector of measure
 #'   names (e.g. `c("elpd", "mse")`). Each table is sorted by its own measure,
 #'   best model first, so the same model need not lead every table.
-print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
+print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
                               simplify = TRUE, measures = NULL) {
   if (inherits(x, "old_compare.loo")) {
     return(unclass(x))
@@ -62,12 +69,13 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
 
   fmt_cols <- setdiff(cols, c("model", "diag_diff", "diag_elpd"))
   if (length(fmt_cols)) {
+    d <- .resolve_digits(digits, "elpd", x$se_diff)
     if ("p_worse" %in% fmt_cols) {
       x2$p_worse <- .fr(x2$p_worse, digits = 2)
       fmt_cols <- setdiff(fmt_cols, "p_worse")
     }
     if (length(fmt_cols)) {
-      x2[fmt_cols] <- .fr(x2[fmt_cols], digits)
+      x2[fmt_cols] <- .fr(x2[fmt_cols], d)
     }
   }
   # Use `as.data.frame(x2)` here to drop "compare.loo"
@@ -399,11 +407,11 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
   # its own difference so the best model is always the first row and the
   # differences run in decreasing order.
   ord <- order(x[[diff_col]], decreasing = TRUE, na.last = TRUE)
-
+  d <- .resolve_digits(digits, measure, x[[se_col]])
   x2 <- data.frame(
     model = x$model[ord],
-    diff = unname(.fr(x[[diff_col]][ord], digits)),
-    se_diff = unname(.fr(x[[se_col]][ord], digits)),
+    diff = unname(.fr(x[[diff_col]][ord], d)),
+    se_diff = unname(.fr(x[[se_col]][ord], d)),
     check.names = FALSE,
     stringsAsFactors = FALSE
   )
@@ -452,7 +460,12 @@ print.compare.loo <- function(x, ..., digits = 1, p_worse = TRUE,
       est_cols <- intersect(est_cols, colnames(x))
     }
     for (col in est_cols) {
-      x2[[col]] <- unname(.fr(x[[col]][ord], digits))
+      m <- sub("^se_", "", col)
+      if (identical(m, "p")) {
+        m <- measure
+      }
+      se_vals <- x[[if (startsWith(col, "se_")) col else paste0("se_", col)]]
+      x2[[col]] <- unname(.fr(x[[col]][ord], .resolve_digits(digits, m, se_vals)))
     }
   }
 

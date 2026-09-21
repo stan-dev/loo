@@ -329,6 +329,7 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2, m3 = pm3)))
   expect_snapshot(print(comp))
   expect_snapshot(print(comp, measures = "all", digits = 2))
+  expect_snapshot(print(comp, measures = "all", digits = c(r2 = 1)))
   expect_snapshot(print(comp, measures = c("r2", "mae")))
   expect_snapshot(print(comp, simplify = FALSE))
   expect_snapshot(print(comp, measures = "all", simplify = FALSE))
