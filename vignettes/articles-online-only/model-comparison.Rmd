@@ -90,8 +90,8 @@ the `pred_measure` family.
 
 `loo_compare` still works and is still a generic, so methods registered by other
 packages keep dispatching, but it now warns and is frozen at its previous
-behavior: `loo` objects compared on ELPD only. The `pred_measure` sources,
-`rank_by`, and custom measures described in this article require `model_compare`.
+behavior: `loo` objects compared on ELPD only. The `pred_measure` sources and
+custom measures described in this article require `model_compare`.
 `loo_compare` will be removed in a future release. For more details, see
 `vignette("migration-guide", package = "loo")`.
 :::
@@ -873,7 +873,7 @@ comp_n <- model_compare(list(m3 = n3, m1 = n1))
 print(comp_n, measures = "all")
 ```
 
-## Selecting the reference model
+## The reference model
 
 Different measures do not have to agree on which model is best, and in the
 [roaches comparison example](#running-example-count-data) they do not.
@@ -889,31 +889,6 @@ print(
 
 We see that for `elpd` and `mae` the third model (`m3`) is best, while for
 the other measures the second model (`m2`) is best.
-
-We can change the reference model using the `rank_by` argument of
-`model_compare()`. For example, if we want `m3` to be the reference model for
-every measure, we use `rank_by = "m3"`.
-
-```{r diff-ref-model}
-print(
-  model_compare(list(m1 = m1, m2 = m2, m3 = m3), rank_by = "m3"),
-  measures = "all"
-)
-```
-
-Note that the ordering remains the same: the estimates are displayed in
-decreasing order (best model first).
-
-It is also possible to select as reference model the best model according to a
-specific measure. For example, suppose we want to use for all measures the same
-reference model as the one used for `r2`:
-
-```{r diff-ref-measure}
-print(
-  model_compare(list(m1 = m1, m2 = m2, m3 = m3), rank_by = "r2"),
-  measures = "all"
-)
-```
 
 ## Comparing other predictive sources
 
@@ -1007,7 +982,7 @@ i3 <- insample_measure(fit_m3, measures)
 model_compare(list(m1 = i1, m2 = i2, m3 = i3))
 ```
 
-Everything else in this article, `rank_by`, custom measures, the `print`
+Everything else in this article, custom measures, the `print`
 arguments `measures` and `simplify`, works unchanged for all four sources.
 
 ## Summary
@@ -1042,8 +1017,8 @@ The things worth remembering:
 3. `NA` in a standard error column means "not available", not "zero" and not
    "an error occurred".
 4. A custom measure is assumed to be a utility. If yours is a loss, say so with
-   `custom_measure(loss = TRUE)`, or its differences and its `rank_by`
-   ordering will come out reversed.
+   `custom_measure(loss = TRUE)`, or its differences and its ranking will
+   come out reversed.
 
 ## References
 

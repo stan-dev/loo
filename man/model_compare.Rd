@@ -8,9 +8,9 @@
 \usage{
 \method{print}{compare.loo}(x, ..., digits = NULL, p_worse = TRUE, simplify = TRUE, measures = NULL)
 
-model_compare(x, ..., rank_by = NULL)
+model_compare(x, ...)
 
-\method{model_compare}{default}(x, ..., rank_by = NULL)
+\method{model_compare}{default}(x, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"loo"} or \code{"pred_measure"}, or a list of such
@@ -48,30 +48,10 @@ of every compared measure. The difference columns are never added.}
 
 \item{measures}{For \code{loo_pred_measure} comparisons only, which measures to
 print diff tables for. \code{NULL} (default) prints only the ranking measure
-(\code{"elpd"} when \code{rank_by} was not set, otherwise \code{rank_by});
+(the first compared measure, \code{"elpd"} when present);
 \code{"all"} prints all compared measures; or a character vector of measure
 names (e.g. \code{c("elpd", "mse")}). Each table is sorted by its own measure,
 best model first, so the same model need not lead every table.}
-
-\item{rank_by}{A single string naming either a \strong{measure} or a \strong{model},
-used to pin one reference model for all pairwise differences.
-
-A \strong{measure name} (\code{\link{pred_measure}} comparisons only) orders
-models by that measure and makes the top-ranked model the reference. Bare
-names are matched regardless of source, so \code{rank_by = "rmse"} selects
-\code{rmse_loo}, \code{rmse_kfold}, or \code{rmse_test} as appropriate.
-
-A \strong{model name} (one of the names in the \code{model} column, i.e. the list
-names or \code{model1}, \code{model2}, ...) pins that model as the reference,
-whichever model performs best, and leaves rows ordered by \code{"elpd"}. This
-form also works for classic comparisons, where \code{elpd_diff} is then relative
-to the named model rather than to the best one. A name matching both a
-measure and a model is treated as the measure, with a warning.
-
-With \code{rank_by = NULL} (the default) rows are ordered by \code{"elpd"} and each
-measure is compared against \emph{its own} best model, so \code{mse_diff} may use a
-different reference than \code{elpd_diff}. Each \verb{\{measure\}_diff} column then has
-exactly one \code{0} entry, at that measure's best model.}
 }
 \value{
 A data frame of class \code{"compare.loo"} with one row per model and its
@@ -92,17 +72,10 @@ only source with Pareto \eqn{\hat{k}} values.
 
 The object also carries the following attributes:
 \describe{
-\item{\code{rank_by}}{
-How the reference model was chosen, as a list with elements \code{kind}
-(\code{"default"}, \code{"measure"}, or \code{"model"}, for the three cases described
-under \code{rank_by} above), \code{measure} (bare name of the measure the rows
-are ordered by, always set, \code{"elpd"} by default) and \code{model} (the
-pinned reference model, or \code{NULL} unless \code{kind} is \code{"model"}).
-}
 \item{\code{compare_reference}}{
 A named character vector giving, for each measure, the model its
-differences were computed against. All entries name the same model
-unless \code{kind} is \code{"default"}.
+differences were computed against, which is that measure's own best
+model.
 }
 \item{\code{compare_measures}}{
 Bare names of all measures that were compared.
@@ -116,8 +89,8 @@ The shared evaluation source: \code{"loo"}, \code{"kfold"}, \code{"test"}, or
 \code{"insample"}.
 }
 }
-\code{rank_by} and \code{compare_reference} are set for every comparison; the last
-three are set for \code{\link{pred_measure}} comparisons only.
+\code{compare_reference} is set for every comparison; the last three are set
+for \code{\link{pred_measure}} comparisons only.
 }
 \description{
 Compare fitted models on \link[=loo-glossary]{ELPD} or, for
@@ -144,9 +117,11 @@ models, so mixed inputs are an error.
 \subsection{Differences and their standard errors}{
 
 Differences are pairwise: every model is compared with one reference model,
-whose own \verb{\{measure\}_diff} is therefore \code{0}. See \code{rank_by} for how that
-reference is chosen. When it is the best model on a measure, as in classic
-comparisons, the remaining differences for that measure are all negative.
+whose own \verb{\{measure\}_diff} is therefore \code{0}. The reference is the best
+model on that measure, so \code{mse_diff} may use a different reference than
+\code{elpd_diff}, and the remaining differences for a measure are all negative.
+Rows are ordered by the first measure shared by all models (\code{"elpd"} when
+present).
 
 The standard error of a difference is a paired estimate, which uses the
 fact that the same \eqn{N} data points were used for both models. It should
@@ -213,8 +188,8 @@ each measure's entry in the \code{measure_info} attribute of an
 
 A custom measure is treated as a utility unless it declares otherwise with
 \code{attr(my_fun, "measure_loss") <- TRUE}. The declaration also determines the
-direction of \code{rank_by}, so an undeclared loss is both flipped and ranked in
-the wrong direction; see \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
+ranking direction, so an undeclared loss is both flipped and ranked in the
+wrong direction; see \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
 }
 
 \subsection{Standard error of a measure difference}{
@@ -255,8 +230,8 @@ selection.
 \subsection{Warnings for many model comparisons}{
 
 If more than \eqn{11} models are compared, we internally recompute the model
-differences using the median model (by ELPD, or by \code{rank_by} for
-\code{pred_measure} comparisons) as the baseline, and estimate whether the
+differences using the median model (by ELPD, or by the first shared measure
+for \code{pred_measure} comparisons) as the baseline, and estimate whether the
 differences in predictive performance are potentially due to chance as
 described by McLatchie and Vehtari (2023). This flags a warning if there is
 a risk of over-fitting due to the selection process. In that case users are
@@ -307,14 +282,8 @@ if (requireNamespace("brms", quietly = TRUE)) {
   comp <- model_compare(pm1, pm2)
   print(comp)                      # ranked by elpd (default)
   print(comp, measures = "all")    # all measure diff tables
-  model_compare(pm1, pm2, rank_by = "rmse")
 
-  # `rank_by` also takes a model name: every measure is then compared
-  # against that model, whether or not it is the best one
-  model_compare(list(m1 = pm1, m2 = pm2), rank_by = "m1")
-
-  # the same works for k-fold CV; `rank_by` still takes the bare name
-  # even though the measures are stored as `elpd_kfold`, `rmse_kfold`, ...
+  # the same works for k-fold CV
   kf1 <- brms::kfold(fit1, folds = folds, save_fits = TRUE)
   kf2 <- brms::kfold(fit2, folds = folds, save_fits = TRUE)
   kpm1 <- kfold_pred_measure(
@@ -329,7 +298,7 @@ if (requireNamespace("brms", quietly = TRUE)) {
     kfold = kf2,
     measure = "rmse"
   )
-  model_compare(kpm1, kpm2, rank_by = "rmse")
+  model_compare(kpm1, kpm2)
 
   # mixing evaluation sources is an error
   try(model_compare(pm1, kpm2))

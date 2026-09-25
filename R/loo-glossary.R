@@ -149,16 +149,14 @@
 #'
 #' * [model_compare()] is the current interface. It compares `"loo"`, `"waic"`,
 #'   and `"kfold"` objects on ELPD, and [`pred_measure`][pred_measure] results
-#'   on every predictive measure the models share. The `rank_by` argument is
-#'   available here only.
+#'   on every predictive measure the models share.
 #'
 #' * [loo_compare()] is **deprecated** in favor of `model_compare()`, but it
 #'   still works and is still an exported generic, so `loo_compare` methods
 #'   registered by other packages keep dispatching. It keeps its previous
 #'   behavior: it accepts only `"loo"`, `"waic"`, and `"kfold"` objects and
-#'   compares them on ELPD. Passing [`pred_measure`][pred_measure] results or
-#'   the `rank_by` argument produces an error. The deprecation
-#'   warning is issued once per session.
+#'   compares them on ELPD. Passing [`pred_measure`][pred_measure] results
+#'   produces an error. The deprecation warning is issued once per session.
 #'
 #' `loo_compare()` and `model_compare()` return the same object: a data frame
 #' including the `p_worse`, `diag_diff`, and `diag_elpd` columns. The terms
@@ -170,15 +168,14 @@
 #'
 #' Below, "the comparison output" refers to the object returned by either
 #' function, and "the reference model" to the model each difference is computed
-#' against, which is by default the best model on the measure unless
-#' `model_compare()` was given `rank_by`.
+#' against, which is the best model on the measure.
 #'
 #' @section elpd_diff:
 #' `elpd_diff` is the difference in `elpd_loo` for two models. If more
 #' than two models are compared, the difference is computed relative to the
 #' reference model, which is the model with the highest `elpd_loo` in
-#' `loo_compare()` and in `model_compare()` by default the model with the best
-#' performance per measure unless stated otherwise via `rank_by`.
+#' `loo_compare()` and in `model_compare()` the model with the best
+#' performance on each measure.
 #'
 #' @section se_diff:
 #'
@@ -200,13 +197,10 @@
 #' relative to that model.
 #'
 #' Because models are ordered by `elpd_loo` before computing `p_worse`, all
-#' reported values are at least 0.5 by construction. This always holds for
-#' `loo_compare()`, and for `model_compare()` unless `rank_by` pins a reference
-#' model that is not the best one; models better than a pinned reference then
-#' have `p_worse < 0.5`. A value close to 0.5 indicates that the models are
-#' nearly indistinguishable in predictive performance and that the ranking could
-#' easily be reversed with different data. A value close to 1 indicates that the
-#' lower-ranked model is almost
+#' reported values are at least 0.5 by construction. A value close to 0.5
+#' indicates that the models are nearly indistinguishable in predictive
+#' performance and that the ranking could easily be reversed with different
+#' data. A value close to 1 indicates that the lower-ranked model is almost
 #' certainly worse. `p_worse` inherits all the limitations of `se_diff` and the
 #' normal approximation on which it is based. In particular, when `se_diff` is
 #' underestimated, `p_worse` will be estimated too close to 1, making a model
@@ -305,15 +299,14 @@
 #'
 #' The remaining sections describe comparisons that only [model_compare()] can
 #' produce; the deprecated `loo_compare()` rejects
-#' [`pred_measure`][pred_measure] inputs and the `rank_by` argument.
+#' [`pred_measure`][pred_measure] inputs.
 #'
 #' When comparing [`loo_pred_measure()`][loo_pred_measure] objects with
 #' `model_compare()`, paired differences are computed for every predictive
-#' measure common to all models. Rows are ordered by the `rank_by` argument
-#' (default `"elpd"`). By default each measure is compared against the model
-#' that is best on that measure, so different difference columns may use
-#' different reference models. Supplying `rank_by` pins the top-ranked model as
-#' the single reference for all difference columns.
+#' measure common to all models. Rows are ordered by the first measure common
+#' to all models (`"elpd"` when present). Each measure is compared against the
+#' model that is best on that measure, so different difference columns may use
+#' different reference models.
 #'
 #' ### `{measure}_diff` and `{measure}_se_diff`
 #'
@@ -393,25 +386,14 @@
 #' each shared measure; a mismatched `measure_loss` or `measure_se_diff`
 #' declaration, or missing `measure_info` on some models, produces an error.
 #'
-#' ### `rank_by`, `compare_measures`, and related attributes
+#' ### `compare_measures` and related attributes
 #'
-#' The `rank_by` argument takes either a measure name or a model name. A
-#' measure name selects which measure determines model ordering, and pins the
-#' top-ranked model as the single reference model for all pairwise differences.
-#' A model name keeps the `"elpd"` ordering but pins that model as the single
-#' reference model, whether or not it is the best one. When `rank_by` is
-#' omitted, models are ordered by `"elpd"` and each measure is compared against
-#' its own best model. Attribute `rank_by` records which of these three cases
-#' applied, as a list with elements `kind` (`"default"`, `"measure"`, or
-#' `"model"`), `measure` (the measure the rows are ordered by, always set) and
-#' `model` (the pinned reference model, or `NULL`). Attribute
-#' `compare_reference` is a named character vector recording the reference model
-#' used for each measure. Attribute `compare_measures` lists all measures that
-#' were compared, and `sign_converted_measures` lists loss measures whose sign
-#' was flipped onto the utility scale. The print method shows the ranking
-#' measure by default
-#' (`"elpd"` when `rank_by` was not set); use `print(x, measures = "all")` or
-#' `print(x, measures = c("rmse", "r2"))` to display additional measure tables.
-#' Each printed table is sorted by its own measure, best model first, so the
-#' same model need not lead every table.
+#' Attribute `compare_reference` is a named character vector recording the
+#' reference model used for each measure. Attribute `compare_measures` lists all
+#' measures that were compared, and `sign_converted_measures` lists loss
+#' measures whose sign was flipped onto the utility scale. The print method
+#' shows the ranking measure by default (the first compared measure); use
+#' `print(x, measures = "all")` or `print(x, measures = c("rmse", "r2"))` to
+#' display additional measure tables. Each printed table is sorted by its own
+#' measure, best model first, so the same model need not lead every table.
 NULL

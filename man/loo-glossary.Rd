@@ -152,15 +152,13 @@ Two functions perform model comparison, and both are available to users:
 \itemize{
 \item \code{\link[=model_compare]{model_compare()}} is the current interface. It compares \code{"loo"}, \code{"waic"},
 and \code{"kfold"} objects on ELPD, and \code{\link{pred_measure}} results
-on every predictive measure the models share. The \code{rank_by} argument is
-available here only.
+on every predictive measure the models share.
 \item \code{\link[=loo_compare]{loo_compare()}} is \strong{deprecated} in favor of \code{model_compare()}, but it
 still works and is still an exported generic, so \code{loo_compare} methods
 registered by other packages keep dispatching. It keeps its previous
 behavior: it accepts only \code{"loo"}, \code{"waic"}, and \code{"kfold"} objects and
-compares them on ELPD. Passing \code{\link{pred_measure}} results or
-the \code{rank_by} argument produces an error. The deprecation
-warning is issued once per session.
+compares them on ELPD. Passing \code{\link{pred_measure}} results
+produces an error. The deprecation warning is issued once per session.
 }
 
 \code{loo_compare()} and \code{model_compare()} return the same object: a data frame
@@ -173,8 +171,7 @@ cannot produce such a comparison. See
 
 Below, "the comparison output" refers to the object returned by either
 function, and "the reference model" to the model each difference is computed
-against, which is by default the best model on the measure unless
-\code{model_compare()} was given \code{rank_by}.
+against, which is the best model on the measure.
 }
 
 \section{elpd_diff}{
@@ -182,8 +179,8 @@ against, which is by default the best model on the measure unless
 \code{elpd_diff} is the difference in \code{elpd_loo} for two models. If more
 than two models are compared, the difference is computed relative to the
 reference model, which is the model with the highest \code{elpd_loo} in
-\code{loo_compare()} and in \code{model_compare()} by default the model with the best
-performance per measure unless stated otherwise via \code{rank_by}.
+\code{loo_compare()} and in \code{model_compare()} the model with the best
+performance on each measure.
 }
 
 \section{se_diff}{
@@ -210,13 +207,10 @@ The reference model (the row of the comparison output where
 relative to that model.
 
 Because models are ordered by \code{elpd_loo} before computing \code{p_worse}, all
-reported values are at least 0.5 by construction. This always holds for
-\code{loo_compare()}, and for \code{model_compare()} unless \code{rank_by} pins a reference
-model that is not the best one; models better than a pinned reference then
-have \code{p_worse < 0.5}. A value close to 0.5 indicates that the models are
-nearly indistinguishable in predictive performance and that the ranking could
-easily be reversed with different data. A value close to 1 indicates that the
-lower-ranked model is almost
+reported values are at least 0.5 by construction. A value close to 0.5
+indicates that the models are nearly indistinguishable in predictive
+performance and that the ranking could easily be reversed with different
+data. A value close to 1 indicates that the lower-ranked model is almost
 certainly worse. \code{p_worse} inherits all the limitations of \code{se_diff} and the
 normal approximation on which it is based. In particular, when \code{se_diff} is
 underestimated, \code{p_worse} will be estimated too close to 1, making a model
@@ -321,15 +315,14 @@ section.
 
 The remaining sections describe comparisons that only \code{\link[=model_compare]{model_compare()}} can
 produce; the deprecated \code{loo_compare()} rejects
-\code{\link{pred_measure}} inputs and the \code{rank_by} argument.
+\code{\link{pred_measure}} inputs.
 
 When comparing \code{\link[=loo_pred_measure]{loo_pred_measure()}} objects with
 \code{model_compare()}, paired differences are computed for every predictive
-measure common to all models. Rows are ordered by the \code{rank_by} argument
-(default \code{"elpd"}). By default each measure is compared against the model
-that is best on that measure, so different difference columns may use
-different reference models. Supplying \code{rank_by} pins the top-ranked model as
-the single reference for all difference columns.
+measure common to all models. Rows are ordered by the first measure common
+to all models (\code{"elpd"} when present). Each measure is compared against the
+model that is best on that measure, so different difference columns may use
+different reference models.
 \subsection{\verb{\{measure\}_diff} and \verb{\{measure\}_se_diff}}{
 
 For each non-ELPD measure \code{m}, \code{model_compare()} adds columns \code{m_diff} and
@@ -412,27 +405,16 @@ each shared measure; a mismatched \code{measure_loss} or \code{measure_se_diff}
 declaration, or missing \code{measure_info} on some models, produces an error.
 }
 
-\subsection{\code{rank_by}, \code{compare_measures}, and related attributes}{
+\subsection{\code{compare_measures} and related attributes}{
 
-The \code{rank_by} argument takes either a measure name or a model name. A
-measure name selects which measure determines model ordering, and pins the
-top-ranked model as the single reference model for all pairwise differences.
-A model name keeps the \code{"elpd"} ordering but pins that model as the single
-reference model, whether or not it is the best one. When \code{rank_by} is
-omitted, models are ordered by \code{"elpd"} and each measure is compared against
-its own best model. Attribute \code{rank_by} records which of these three cases
-applied, as a list with elements \code{kind} (\code{"default"}, \code{"measure"}, or
-\code{"model"}), \code{measure} (the measure the rows are ordered by, always set) and
-\code{model} (the pinned reference model, or \code{NULL}). Attribute
-\code{compare_reference} is a named character vector recording the reference model
-used for each measure. Attribute \code{compare_measures} lists all measures that
-were compared, and \code{sign_converted_measures} lists loss measures whose sign
-was flipped onto the utility scale. The print method shows the ranking
-measure by default
-(\code{"elpd"} when \code{rank_by} was not set); use \code{print(x, measures = "all")} or
-\code{print(x, measures = c("rmse", "r2"))} to display additional measure tables.
-Each printed table is sorted by its own measure, best model first, so the
-same model need not lead every table.
+Attribute \code{compare_reference} is a named character vector recording the
+reference model used for each measure. Attribute \code{compare_measures} lists all
+measures that were compared, and \code{sign_converted_measures} lists loss
+measures whose sign was flipped onto the utility scale. The print method
+shows the ranking measure by default (the first compared measure); use
+\code{print(x, measures = "all")} or \code{print(x, measures = c("rmse", "r2"))} to
+display additional measure tables. Each printed table is sorted by its own
+measure, best model first, so the same model need not lead every table.
 }
 }
 

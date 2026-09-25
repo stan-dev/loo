@@ -23,7 +23,7 @@
 #'   of every compared measure. The difference columns are never added.
 #' @param measures For `loo_pred_measure` comparisons only, which measures to
 #'   print diff tables for. `NULL` (default) prints only the ranking measure
-#'   (`"elpd"` when `rank_by` was not set, otherwise `rank_by`);
+#'   (the first compared measure, `"elpd"` when present);
 #'   `"all"` prints all compared measures; or a character vector of measure
 #'   names (e.g. `c("elpd", "mse")`). Each table is sorted by its own measure,
 #'   best model first, so the same model need not lead every table.
@@ -82,10 +82,6 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
   # so print() uses print.data.frame.
   print(as.data.frame(x2), quote = FALSE, row.names = FALSE)
 
-  rank_spec <- attr(x, "rank_by")
-  if (identical(rank_spec$kind, "model")) {
-    message("Differences computed against model ", rank_spec$model, ".")
-  }
   .print_compare_diag_message(x, p_worse = p_worse)
   invisible(x)
 }
@@ -94,10 +90,9 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
 #' @noRd
 .print_compare_pred_measure <- function(x, digits, p_worse, simplify,
                                        measures) {
-  rank_spec <- attr(x, "rank_by")
   compare_measures <- attr(x, "compare_measures")
   compare_source <- attr(x, "compare_source")
-  primary_measure <- if (is.null(rank_spec)) "elpd" else rank_spec$measure
+  primary_measure <- compare_measures[[1L]]
 
   measures_to_print <- if (is.null(measures)) {
     primary_measure
@@ -127,13 +122,12 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
     )
   }
 
-  # The reference is always named, whichever way it was chosen: without
-  # `rank_by` each measure keeps its own best model, which is the case most in
-  # need of saying so and the only one that used to say nothing.
+  # The reference is always named: each measure keeps its own best model, so
+  # the reference can differ between measures.
   # Printed rather than messaged: it labels the tables below, and `message()`
   # output is suppressed wholesale by knitr chunks and `suppressMessages()`.
   .cat_wrapped(
-    .compare_reference_line(x, rank_spec, compare_measures)
+    .compare_reference_line(x, compare_measures)
   )
 
   # LOO is the familiar default, so only name the source when it is not LOO.
@@ -222,26 +216,13 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
 
 #' Header line naming the reference each difference is computed against
 #'
-#' Always printed, so the reference is never left implicit. `rank_by` pins one
-#' reference for every measure; without it each measure keeps its own best
-#' model, which is the case most in need of being spelled out.
+#' Always printed, so the reference is never left implicit. Each measure keeps
+#' its own best model as reference.
 #' @noRd
 #' @param x A `"compare.loo"` data frame.
-#' @param rank_spec Attribute `rank_by`, or `NULL` for an object created before
-#'   it was set.
 #' @param compare_measures Bare names of all compared measures.
 #' @return A single string.
-.compare_reference_line <- function(x, rank_spec, compare_measures) {
-  if (identical(rank_spec$kind, "measure")) {
-    return(paste0(
-      "Models ranked by ", rank_spec$measure,
-      " (reference: ", .measure_ref_model(x, rank_spec$measure), ")."
-    ))
-  }
-  if (identical(rank_spec$kind, "model")) {
-    return(paste0("All measures compared against model ", rank_spec$model, "."))
-  }
-
+.compare_reference_line <- function(x, compare_measures) {
   refs <- vapply(compare_measures, .measure_ref_model, character(1), x = x)
   if (length(compare_measures) == 1L) {
     return(paste0(
@@ -402,7 +383,7 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
     )
   }
 
-  # The data frame carries one row order for all measures (by `rank_by`), but a
+  # The data frame carries one row order for all measures (by the first), but a
   # measure's own best model need not be first in it. Sort each printed table by
   # its own difference so the best model is always the first row and the
   # differences run in decreasing order.

@@ -3,17 +3,17 @@
     Code
       print(comp)
     Output
-      Models ranked by mae (reference: C).
+      Each measure compared against its own best model (elpd: B, r2: B, mae: C).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
        model bad_k
            B     2
            C     1
            A     1
       
-       model mae_diff mae_se_diff
-           C      0.0         0.0
-           B     -0.1         1.2
-           A     -6.3         3.1
+       model elpd_diff se_diff p_worse diag_diff
+           B       0.0     0.0      NA          
+           C     -25.5   129.1    0.58          
+           A    -850.3   372.3    0.99          
     Message
       
       Diagnostic flags present.
@@ -239,28 +239,6 @@
       See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
       or https://mc-stan.org/loo/reference/loo-glossary.html.
 
----
-
-    Code
-      print(comp_mae)
-    Output
-      Models ranked by mae (reference: m2).
-      PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
-       model bad_k
-          m2     2
-          m1     1
-      
-       model mae_diff mae_se_diff
-          m2      0.0         0.0
-          m1     -6.3         2.8
-    Message
-      
-      Diagnostic flags present.
-      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
-      or https://mc-stan.org/loo/reference/loo-glossary.html.
-      
-      Use print(x, measures = "all") to see all measures.
-
 # model_compare returns expected results (2 models)
 
     WAoAAAACAAQGAQACAwAAAAMTAAAADAAAABAAAAACAAQACQAAAAZtb2RlbDEABAAJAAAABm1v
@@ -275,11 +253,8 @@
     AAAABnBfd2FpYwAEAAkAAAAJc2VfcF93YWljAAQACQAAAAR3YWljAAQACQAAAAdzZV93YWlj
     AAAEAgAAAAEABAAJAAAABWNsYXNzAAAAEAAAAAIABAAJAAAAC2NvbXBhcmUubG9vAAQACQAA
     AApkYXRhLmZyYW1lAAAEAgAAAAEABAAJAAAACXJvdy5uYW1lcwAAAA0AAAACgAAAAP////4A
-    AAQCAAAAAQAEAAkAAAAHcmFua19ieQAAAhMAAAADAAAAEAAAAAEABAAJAAAAB2RlZmF1bHQA
-    AAAQAAAAAQAEAAkAAAAEZWxwZAAAAP4AAAQCAAAB/wAAABAAAAADAAQACQAAAARraW5kAAQA
-    CQAAAAdtZWFzdXJlAAQACQAAAAVtb2RlbAAAAP4AAAQCAAAAAQAEAAkAAAARY29tcGFyZV9y
-    ZWZlcmVuY2UAAAIQAAAAAQAEAAkAAAAGbW9kZWwxAAAEAgAAAf8AAAAQAAAAAQAEAAkAAAAE
-    ZWxwZAAAAP4AAAD+
+    AAQCAAAAAQAEAAkAAAARY29tcGFyZV9yZWZlcmVuY2UAAAIQAAAAAQAEAAkAAAAGbW9kZWwx
+    AAAEAgAAAf8AAAAQAAAAAQAEAAkAAAAEZWxwZAAAAP4AAAD+
 
 ---
 
@@ -304,11 +279,8 @@
     YWljAAQACQAAAAZwX3dhaWMABAAJAAAACXNlX3Bfd2FpYwAEAAkAAAAEd2FpYwAEAAkAAAAH
     c2Vfd2FpYwAABAIAAAABAAQACQAAAAVjbGFzcwAAABAAAAACAAQACQAAAAtjb21wYXJlLmxv
     bwAEAAkAAAAKZGF0YS5mcmFtZQAABAIAAAABAAQACQAAAAlyb3cubmFtZXMAAAANAAAAAoAA
-    AAD////+AAAEAgAAAAEABAAJAAAAB3JhbmtfYnkAAAITAAAAAwAAABAAAAABAAQACQAAAAdk
-    ZWZhdWx0AAAAEAAAAAEABAAJAAAABGVscGQAAAD+AAAEAgAAAf8AAAAQAAAAAwAEAAkAAAAE
-    a2luZAAEAAkAAAAHbWVhc3VyZQAEAAkAAAAFbW9kZWwAAAD+AAAEAgAAAAEABAAJAAAAEWNv
-    bXBhcmVfcmVmZXJlbmNlAAACEAAAAAEABAAJAAAABm1vZGVsMQAABAIAAAH/AAAAEAAAAAEA
-    BAAJAAAABGVscGQAAAD+AAAA/g==
+    AAD////+AAAEAgAAAAEABAAJAAAAEWNvbXBhcmVfcmVmZXJlbmNlAAACEAAAAAEABAAJAAAA
+    Bm1vZGVsMQAABAIAAAH/AAAAEAAAAAEABAAJAAAABGVscGQAAAD+AAAA/g==
 
 ---
 
@@ -375,11 +347,8 @@
     d2FpYwAEAAkAAAAGcF93YWljAAQACQAAAAlzZV9wX3dhaWMABAAJAAAABHdhaWMABAAJAAAA
     B3NlX3dhaWMAAAQCAAAAAQAEAAkAAAAFY2xhc3MAAAAQAAAAAgAEAAkAAAALY29tcGFyZS5s
     b28ABAAJAAAACmRhdGEuZnJhbWUAAAQCAAAAAQAEAAkAAAAJcm93Lm5hbWVzAAAADQAAAAKA
-    AAAA/////QAABAIAAAABAAQACQAAAAdyYW5rX2J5AAACEwAAAAMAAAAQAAAAAQAEAAkAAAAH
-    ZGVmYXVsdAAAABAAAAABAAQACQAAAARlbHBkAAAA/gAABAIAAAH/AAAAEAAAAAMABAAJAAAA
-    BGtpbmQABAAJAAAAB21lYXN1cmUABAAJAAAABW1vZGVsAAAA/gAABAIAAAABAAQACQAAABFj
-    b21wYXJlX3JlZmVyZW5jZQAAAhAAAAABAAQACQAAAAZtb2RlbDEAAAQCAAAB/wAAABAAAAAB
-    AAQACQAAAARlbHBkAAAA/gAAAP4=
+    AAAA/////QAABAIAAAABAAQACQAAABFjb21wYXJlX3JlZmVyZW5jZQAAAhAAAAABAAQACQAA
+    AAZtb2RlbDEAAAQCAAAB/wAAABAAAAABAAQACQAAAARlbHBkAAAA/gAAAP4=
 
 ---
 

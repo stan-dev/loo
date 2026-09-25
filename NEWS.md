@@ -13,13 +13,11 @@
   `loo_compare.stanreg` in **rstanarm**) keep dispatching, but it now warns
   (once per session) and is frozen at its previous behaviour: `"loo"`, `"waic"`, and `"kfold"` objects
   compared on ELPD only, returning exactly what `model_compare()` returns for
-  those inputs. Comparing `pred_measure` results, or using `rank_by`, requires
-  `model_compare()`.
+  those inputs. Comparing `pred_measure` results requires `model_compare()`.
 * `model_compare()` supports every `pred_measure` result --- from
   `loo_pred_measure()`, `kfold_pred_measure()`, `test_pred_measure()`, and
   `insample_pred_measure()` --- with paired differences for all measures common
-  to the compared models, optional `rank_by` ranking, utility-scale sign
-  conversion for loss measures, and `print(compare, measures = ...)` for
+  to the compared models, utility-scale sign conversion for loss measures, and `print(compare, measures = ...)` for
   multi-measure tables by @florence-bockting in #380.
   Measures are matched on bare names, so the source suffix (`_loo`, `_kfold`,
   `_test`, or none for in-sample) is handled transparently. All models in one
@@ -27,12 +25,11 @@
   reported only for `loo_pred_measure()` comparisons, k-fold comparisons warn on
   differing `K`, and in-sample comparisons warn that they are optimistically
   biased.
-* In `model_compare()`, when `rank_by` is not supplied each measure is now
-  compared against *its own* best model, so e.g. `mse_diff` can be relative to a
-  different model than `elpd_diff`. Rows are still ordered by `"elpd"`, and each
-  `{measure}_diff` column has exactly one `0` entry, at that measure's best
-  model. Supplying `rank_by` keeps the previous behaviour of pinning the
-  top-ranked model as the single reference for every measure. The reference used
+* In `model_compare()`, each measure is compared against *its own* best model,
+  so e.g. `mse_diff` can be relative to a different model than `elpd_diff`.
+  Rows are ordered by the first measure common to all models (`"elpd"` when
+  present), and each `{measure}_diff` column has exactly one `0` entry, at that
+  measure's best model. The reference used
   per measure is recorded in the `compare_reference` attribute and shown by
   `print(x, measures = "all")`. Each printed measure table is now sorted by its
   own difference, so the best model on that measure is always the first row and
@@ -48,17 +45,6 @@
   `diag_elpd` column on the returned object is unchanged, and `print()` for
   plain `"loo"` comparisons is unchanged. Printed sentences are wrapped so that
   no line of output exceeds 80 characters.
-* Bug fix: the `diag_diff` column tested `elpd_diff > -4` rather than
-  `|elpd_diff| < 4`, so every positive difference was flagged as a small one.
-  This was only reachable with `rank_by` set to a model that is not the best
-  model, where differences against the reference can be positive.
-* In `model_compare()`, `rank_by` now also accepts a **model name** (as shown in
-  the `model` column). The named model then becomes the single reference model
-  for every measure, whether or not it is the best one, while rows stay ordered
-  by `"elpd"`. This form also works for plain `"loo"` comparisons, where
-  `elpd_diff` is then relative to the named model. The pinned model is recorded
-  in the `rank_by` attribute; a name matching both a measure and a model is
-  treated as the measure, with a warning.
 * The `diff_method` value `"pairwise"` is now called `"measure_specific"`. Every
   model comparison is pairwise, and the `"sum"`/`"mean"` methods are the ones
   built from paired pointwise differences, so the old name described the one
@@ -91,7 +77,7 @@
 * A custom measure can declare that it is a loss with
   `attr(my_fun, "measure_loss") <- TRUE`, alongside `attr(my_fun,
   "measure_name")`. `model_compare()` then flips its differences onto the
-  utility scale and orders `rank_by` by the lowest loss, as it does for built-in
+  utility scale and orders models by the lowest loss, as it does for built-in
   loss measures; without the declaration a custom measure is still treated as a
   utility. The declaration is recorded as `loss` in the `measure_info`
   attribute, and models that disagree on it cannot be compared.
@@ -106,7 +92,7 @@
   `measure_rps()` returns the Gneiting & Raftery (2007) unscaled score, where
   lower is better, and `measure_srps()` the Bolin & Wallin (2023) scaled score,
   where higher is better. `model_compare()` therefore flipped `srps_diff` and
-  left `rps_diff` unflipped, and `rank_by = "rps"` ordered models backwards.
+  left `rps_diff` unflipped, and models were ranked backwards on `rps`.
   The registry now records `rps` as a loss and `srps` as a utility.
 * The per-measure metadata attribute `measure_compare_meta` is now called
   `measure_info`.

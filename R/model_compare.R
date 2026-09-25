@@ -27,26 +27,6 @@
 #'   passed in as a single list. Naming every model here, as in
 #'   `model_compare(A = m1, B = m2)`, names the models in the output, exactly as
 #'   the list form does.
-#' @param rank_by A single string naming either a **measure** or a **model**,
-#'   used to pin one reference model for all pairwise differences.
-#'
-#'   A **measure name** ([`pred_measure`][pred_measure] comparisons only) orders
-#'   models by that measure and makes the top-ranked model the reference. Bare
-#'   names are matched regardless of source, so `rank_by = "rmse"` selects
-#'   `rmse_loo`, `rmse_kfold`, or `rmse_test` as appropriate.
-#'
-#'   A **model name** (one of the names in the `model` column, i.e. the list
-#'   names or `model1`, `model2`, ...) pins that model as the reference,
-#'   whichever model performs best, and leaves rows ordered by `"elpd"`. This
-#'   form also works for classic comparisons, where `elpd_diff` is then relative
-#'   to the named model rather than to the best one. A name matching both a
-#'   measure and a model is treated as the measure, with a warning.
-#'
-#'   With `rank_by = NULL` (the default) rows are ordered by `"elpd"` and each
-#'   measure is compared against *its own* best model, so `mse_diff` may use a
-#'   different reference than `elpd_diff`. Each `{measure}_diff` column then has
-#'   exactly one `0` entry, at that measure's best model.
-#'
 #' @return A data frame of class `"compare.loo"` with one row per model and its
 #'   own print method.
 #'
@@ -65,17 +45,10 @@
 #'
 #'   The object also carries the following attributes:
 #'   \describe{
-#'     \item{`rank_by`}{
-#'       How the reference model was chosen, as a list with elements `kind`
-#'       (`"default"`, `"measure"`, or `"model"`, for the three cases described
-#'       under `rank_by` above), `measure` (bare name of the measure the rows
-#'       are ordered by, always set, `"elpd"` by default) and `model` (the
-#'       pinned reference model, or `NULL` unless `kind` is `"model"`).
-#'     }
 #'     \item{`compare_reference`}{
 #'       A named character vector giving, for each measure, the model its
-#'       differences were computed against. All entries name the same model
-#'       unless `kind` is `"default"`.
+#'       differences were computed against, which is that measure's own best
+#'       model.
 #'     }
 #'     \item{`compare_measures`}{
 #'       Bare names of all measures that were compared.
@@ -89,15 +62,17 @@
 #'       `"insample"`.
 #'     }
 #'   }
-#'   `rank_by` and `compare_reference` are set for every comparison; the last
-#'   three are set for [`pred_measure`][pred_measure] comparisons only.
+#'   `compare_reference` is set for every comparison; the last three are set
+#'   for [`pred_measure`][pred_measure] comparisons only.
 #'
 #' @details
 #' ## Differences and their standard errors
 #'   Differences are pairwise: every model is compared with one reference model,
-#'   whose own `{measure}_diff` is therefore `0`. See `rank_by` for how that
-#'   reference is chosen. When it is the best model on a measure, as in classic
-#'   comparisons, the remaining differences for that measure are all negative.
+#'   whose own `{measure}_diff` is therefore `0`. The reference is the best
+#'   model on that measure, so `mse_diff` may use a different reference than
+#'   `elpd_diff`, and the remaining differences for a measure are all negative.
+#'   Rows are ordered by the first measure shared by all models (`"elpd"` when
+#'   present).
 #'
 #'   The standard error of a difference is a paired estimate, which uses the
 #'   fact that the same \eqn{N} data points were used for both models. It should
@@ -157,8 +132,8 @@
 #'
 #'   A custom measure is treated as a utility unless it declares otherwise with
 #'   `attr(my_fun, "measure_loss") <- TRUE`. The declaration also determines the
-#'   direction of `rank_by`, so an undeclared loss is both flipped and ranked in
-#'   the wrong direction; see [insample_pred_measure()].
+#'   ranking direction, so an undeclared loss is both flipped and ranked in the
+#'   wrong direction; see [insample_pred_measure()].
 #'
 #' ## Standard error of a measure difference
 #'   How `{measure}_se_diff` is obtained is recorded in the `diff_method`
@@ -191,8 +166,8 @@
 #'
 #' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
-#'   differences using the median model (by ELPD, or by `rank_by` for
-#'   `pred_measure` comparisons) as the baseline, and estimate whether the
+#'   differences using the median model (by ELPD, or by the first shared measure
+#'   for `pred_measure` comparisons) as the baseline, and estimate whether the
 #'   differences in predictive performance are potentially due to chance as
 #'   described by McLatchie and Vehtari (2023). This flags a warning if there is
 #'   a risk of over-fitting due to the selection process. In that case users are
@@ -252,14 +227,8 @@
 #'   comp <- model_compare(pm1, pm2)
 #'   print(comp)                      # ranked by elpd (default)
 #'   print(comp, measures = "all")    # all measure diff tables
-#'   model_compare(pm1, pm2, rank_by = "rmse")
 #'
-#'   # `rank_by` also takes a model name: every measure is then compared
-#'   # against that model, whether or not it is the best one
-#'   model_compare(list(m1 = pm1, m2 = pm2), rank_by = "m1")
-#'
-#'   # the same works for k-fold CV; `rank_by` still takes the bare name
-#'   # even though the measures are stored as `elpd_kfold`, `rmse_kfold`, ...
+#'   # the same works for k-fold CV
 #'   kf1 <- brms::kfold(fit1, folds = folds, save_fits = TRUE)
 #'   kf2 <- brms::kfold(fit2, folds = folds, save_fits = TRUE)
 #'   kpm1 <- kfold_pred_measure(
@@ -274,27 +243,27 @@
 #'     kfold = kf2,
 #'     measure = "rmse"
 #'   )
-#'   model_compare(kpm1, kpm2, rank_by = "rmse")
+#'   model_compare(kpm1, kpm2)
 #'
 #'   # mixing evaluation sources is an error
 #'   try(model_compare(pm1, kpm2))
 #' }
 #' }
 #'
-model_compare <- function(x, ..., rank_by = NULL) {
+model_compare <- function(x, ...) {
   if (missing(x)) {
     dots <- list(...)
     if (!length(dots)) {
       stop("No models supplied.", call. = FALSE)
     }
-    return(model_compare(dots, rank_by = rank_by))
+    return(model_compare(dots))
   }
   UseMethod("model_compare")
 }
 
 #' @rdname model_compare
 #' @export
-model_compare.default <- function(x, ..., rank_by = NULL) {
+model_compare.default <- function(x, ...) {
   loos <- .model_compare_inputs(x, ...)
 
   # if subsampling is used
@@ -308,7 +277,7 @@ model_compare.default <- function(x, ..., rank_by = NULL) {
   is_pm <- vapply(loos, is.pred_measure, logical(1))
 
   if (all(is_pm)) {
-    return(compare_pred_measure(loos, rank_by = rank_by))
+    return(compare_pred_measure(loos))
   }
 
   if (any(is_pm)) {
@@ -319,22 +288,6 @@ model_compare.default <- function(x, ..., rank_by = NULL) {
     )
   }
 
-  # For plain `loo` objects only the model-name form of `rank_by` applies:
-  # there is a single measure (elpd), so there is nothing to rank by.
-  ref_model <- NULL
-  if (!is.null(rank_by)) {
-    if (is.character(rank_by) && length(rank_by) == 1L &&
-        !is.na(rank_by) && rank_by %in% find_model_names(loos)) {
-      ref_model <- rank_by
-    } else {
-      warning(
-        "`rank_by` is only used for `pred_measure` comparisons, or to name the ",
-        "reference model, and will be ignored.",
-        call. = FALSE
-      )
-    }
-  }
-
   # run pre-comparison checks
   model_compare_checks(loos)
 
@@ -342,14 +295,13 @@ model_compare.default <- function(x, ..., rank_by = NULL) {
   ord <- model_compare_order(loos)
   comp <- model_compare_matrix(loos, ord = ord)
   rnms <- rownames(comp)
-  ref_idx <- if (is.null(ref_model)) 1L else match(ref_model, rnms)
-  diffs <- mapply(FUN = elpd_diffs, loos[ord[ref_idx]], loos[ord])
+  diffs <- mapply(FUN = elpd_diffs, loos[ord[1L]], loos[ord])
   colnames(diffs) <- rnms
   elpd_diff <- apply(diffs, 2, sum)
   se_diff <- apply(diffs, 2, se_elpd_diff)
 
-  # compute probabilities that a model has worse elpd than the reference model
-  # (the best model unless `rank_by` named one) using a normal approximation
+  # compute probabilities that a model has worse elpd than the best model
+  # using a normal approximation
   # (Sivula et al., 2025)
   p_worse <- stats::pnorm(0, elpd_diff, se_diff)
   p_worse[elpd_diff == 0] <- NA
@@ -371,22 +323,15 @@ model_compare.default <- function(x, ..., rank_by = NULL) {
   model_order_stat_check(loos, ord)
 
   # Same attribute contract as the `pred_measure` path, with the single
-  # measure `"elpd"`: `rank_by` records how the reference was chosen and
-  # `compare_reference` names the model it resolved to.
-  attr(comp, "rank_by") <- list(
-    kind = if (is.null(ref_model)) "default" else "model",
-    measure = "elpd",
-    model = ref_model
-  )
-  attr(comp, "compare_reference") <- c(elpd = rnms[[ref_idx]])
+  # measure `"elpd"`.
+  attr(comp, "compare_reference") <- c(elpd = rnms[[1L]])
   class(comp) <- c("compare.loo", class(comp))
   comp
 }
 
 #' Reference model a measure's differences were computed against
 #'
-#' Without `rank_by` each measure has its own best model as reference, recorded
-#' in attribute `compare_reference`. Falls back to the first row for objects
+#' Each measure has its own best model as reference, recorded in attribute `compare_reference`. Falls back to the first row for objects
 #' created before that attribute existed.
 #' @noRd
 .measure_ref_model <- function(x, measure) {

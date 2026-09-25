@@ -69,8 +69,7 @@ throw_insample_compare_warning <- function(source) {
 #' @noRd
 #' @param loos List of `pred_measure` objects, all sharing one evaluation
 #'   source.
-#' @param rank_by Bare measure name used to order models.
-compare_pred_measure <- function(loos, rank_by = NULL) {
+compare_pred_measure <- function(loos) {
   # Resolve the source before the generic checks: mixed sources usually also
   # differ in their number of observations, and "you mixed LOO with k-fold" is
   # far more actionable than "your models have different N".
@@ -89,19 +88,14 @@ compare_pred_measure <- function(loos, rank_by = NULL) {
   .compare_metadata_check(loos)
   throw_omitted_compare_measures_warning(loos)
 
-  rank_spec <- .resolve_rank_by(loos, rank_by)
-  rank_measure <- rank_spec$measure
+  rank_measure <- .resolve_rank_measure(loos)
   compare_cols <- .compare_pointwise_cols(loos)
   custom_se_diffs <- .resolve_custom_se_diffs(loos, compare_cols)
   inform_compare_sign_conversion(compare_cols, loos)
   ord <- model_compare_order(loos, rank_measure$internal)
   loos_ord <- loos[ord]
-  # With an explicit `rank_by` a single model is the reference for every
-  # measure: the top-ranked one when `rank_by` names a measure, the named one
-  # when it names a model. Without `rank_by`, each measure gets its own best
-  # model as reference, so e.g. `mse_diff` may be relative to a different model
-  # than `elpd_diff`.
-  per_measure_ref <- identical(rank_spec$kind, "default")
+  # Each measure gets its own best model as reference, so e.g. `mse_diff` may
+  # be relative to a different model than `elpd_diff`.
 
   comp <- model_compare_matrix(
     loos_ord,
@@ -110,21 +104,12 @@ compare_pred_measure <- function(loos, rank_by = NULL) {
   )
   rnms <- rownames(comp)
   n_obs <- nrow(loos_ord[[1L]]$pointwise)
-  pinned_ref_idx <- if (identical(rank_spec$kind, "model")) {
-    match(rank_spec$model, rnms)
-  } else {
-    1L
-  }
 
   diff_cols <- list()
   ref_models <- character(0)
   for (col in compare_cols) {
     bare <- .display_name(col, loos_ord)
-    ref_idx <- if (per_measure_ref) {
-      model_compare_order(loos_ord, col)[[1L]]
-    } else {
-      pinned_ref_idx
-    }
+    ref_idx <- model_compare_order(loos_ord, col)[[1L]]
     ref_loo <- loos_ord[[ref_idx]]
     ref_models[[bare]] <- rnms[[ref_idx]]
     method <- .measure_pointwise_diff_method(loos_ord, col)
@@ -178,15 +163,6 @@ compare_pred_measure <- function(loos, rank_by = NULL) {
     rank_col = rank_measure$internal
   )
 
-  # `rank_by` records how the reference was chosen, as a tagged record: `kind`
-  # is the branch taken, `measure` is the measure rows are ordered by (always
-  # set), and `model` is the pinned reference model, or `NULL`. `kind` is kept
-  # because a name can match both a measure and a model.
-  attr(comp, "rank_by") <- list(
-    kind = rank_spec$kind,
-    measure = rank_measure$bare,
-    model = rank_spec$model
-  )
   attr(comp, "compare_reference") <- ref_models
   attr(comp, "compare_source") <- source
   # Both numbers qualify the source in the printed header. `model_compare()`
@@ -207,26 +183,6 @@ compare_pred_measure <- function(loos, rank_by = NULL) {
   )
   class(comp) <- c("compare.loo", class(comp))
   comp
-}
-
-#' Map bare measure name to `pointwise` column name
-#' @noRd
-.pointwise_col <- function(name, cols, loos = NULL) {
-  if (name %in% cols) {
-    return(name)
-  }
-  internal <- paste0(name, .compare_suffix(loos))
-  if (internal %in% cols) {
-    return(internal)
-  }
-  stop(
-    paste0(
-      "Measure '", name, "' not found in all models. ",
-      "Available measures: ",
-      paste(vapply(cols, .display_name, character(1), loos = loos), collapse = ", ")
-    ),
-    call. = FALSE
-  )
 }
 
 #' Common `pointwise` columns across models, excluding complexity terms
@@ -350,110 +306,21 @@ throw_omitted_compare_measures_warning <- function(loos) {
   unname(vapply(cols, .display_name, character(1), loos = loos))
 }
 
-#' Resolve `rank_by` to bare and internal `pointwise` column names
+#' Bare and internal `pointwise` column names of the ranking measure
 #' @noRd
-.resolve_rank_measure <- function(loos, rank_by = NULL) {
+.resolve_rank_measure <- function(loos) {
   cols <- .compare_pointwise_cols(loos)
-  # Without `rank_by`, rank by the first measure that all models share. `elpd`
-  # is no longer part of every `pred_measure` result, so it cannot serve as the
-  # default. `.compare_pointwise_cols()` keeps the column order of the results,
-  # so `elpd` still ranks the models whenever it is present.
-  internal <- if (is.null(rank_by)) {
-    if (!length(cols)) {
-      stop("No measure is shared by all models.", call. = FALSE)
-    }
-    cols[1L]
-  } else {
-    .pointwise_col(rank_by, cols, loos)
+  # Rank by the first measure that all models share. `elpd` is no longer part
+  # of every `pred_measure` result, so it cannot serve as the default.
+  # `.compare_pointwise_cols()` keeps the column order of the results, so
+  # `elpd` still ranks the models whenever it is present.
+  if (!length(cols)) {
+    stop("No measure is shared by all models.", call. = FALSE)
   }
+  internal <- cols[1L]
   list(
     bare = .display_name(internal, loos),
     internal = internal
-  )
-}
-
-#' Match `rank_by` against the measures shared by all models
-#'
-#' Like `.pointwise_col()` but returns `NULL` instead of erroring, so callers
-#' can fall back to interpreting `rank_by` as a model name.
-#' @noRd
-.match_rank_measure <- function(loos, rank_by, cols) {
-  if (rank_by %in% cols) {
-    return(rank_by)
-  }
-  internal <- paste0(rank_by, .compare_suffix(loos))
-  if (internal %in% cols) {
-    return(internal)
-  }
-  NULL
-}
-
-#' Resolve `rank_by` to either a measure or a reference model
-#'
-#' `rank_by` accepts a bare measure name (rank models by that measure and use
-#' the top-ranked model as reference) or a model name (keep the default
-#' ordering but pin that model as the reference for every measure).
-#' @noRd
-#' @return A list with `kind` (`"default"`, `"measure"`, or `"model"`),
-#'   `measure` (the resolved ranking measure, as `.resolve_rank_measure()`
-#'   returns it) and `model` (the pinned reference model name, or `NULL`).
-.resolve_rank_by <- function(loos, rank_by = NULL) {
-  if (is.null(rank_by)) {
-    return(list(
-      kind = "default",
-      measure = .resolve_rank_measure(loos),
-      model = NULL
-    ))
-  }
-
-  if (!is.character(rank_by) || length(rank_by) != 1L || is.na(rank_by)) {
-    stop(
-      "`rank_by` must be a single measure name or model name.",
-      call. = FALSE
-    )
-  }
-
-  cols <- .compare_pointwise_cols(loos)
-  internal <- .match_rank_measure(loos, rank_by, cols)
-  model_names <- find_model_names(loos)
-
-  if (!is.null(internal) && rank_by %in% model_names) {
-    warning(
-      "`rank_by = \"", rank_by, "\"` matches both a measure and a model name; ",
-      "ranking by the measure. Rename the model to rank by the model instead.",
-      call. = FALSE
-    )
-  }
-
-  if (!is.null(internal)) {
-    return(list(
-      kind = "measure",
-      measure = list(
-        bare = .display_name(internal, loos),
-        internal = internal
-      ),
-      model = NULL
-    ))
-  }
-
-  if (rank_by %in% model_names) {
-    return(list(
-      kind = "model",
-      measure = .resolve_rank_measure(loos),
-      model = rank_by
-    ))
-  }
-
-  stop(
-    paste0(
-      "`rank_by` value '", rank_by, "' is neither a measure nor a model name. ",
-      "Available measures: ",
-      paste(vapply(cols, .display_name, character(1), loos = loos), collapse = ", "),
-      ". Available models: ",
-      paste(model_names, collapse = ", "),
-      "."
-    ),
-    call. = FALSE
   )
 }
 

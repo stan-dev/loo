@@ -521,8 +521,12 @@ integration, not numerical differences.
   #>     m3       0.0          0.0
   #>     m1      -5.5          4.0
   ```
-- Question:
-  - Shall the order of rows follow "best model first" or rather "reference model / selected measure first"
+
+After discussing this aspect, we realized that it makes a lot of things very complex (what should be the rule for ordering the rows? What does it mean to rank by a measure?, etc.)
+We were also not sure in how far users might really have use cases where they want to
+order according to a specific model or measure. Therefore we decided to remove
+the `rank_by` argument initially. If users say they would like to have such an
+argument we can add it later.
 
 ### Sign flipping of losses
 

@@ -63,10 +63,7 @@ test_that("model_compare dispatches loo_pred_measure inputs", {
 
   comp <- suppressMessages(model_compare(pm1, pm2))
   expect_s3_class(comp, "compare.loo")
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "default", measure = "elpd", model = NULL)
-  )
+  expect_equal(attr(comp, "compare_measures")[[1L]], "elpd")
   expect_true(all(c("elpd_diff", "se_diff", "p_worse", "diag_diff") %in% colnames(comp)))
   expect_true(all(c("r2_diff", "r2_se_diff", "mse_diff", "mse_se_diff") %in% colnames(comp)))
   expect_false(anyNA(comp$r2_se_diff))
@@ -84,10 +81,8 @@ test_that("model_compare dispatches loo_pred_measure inputs", {
     "At least two models are required for comparison",
     fixed = TRUE
   )
-  expect_equal(
-    attr(model_compare(w1, w2), "rank_by"),
-    list(kind = "default", measure = "elpd", model = NULL)
-  )
+  comp_loo <- model_compare(w1, w2)
+  expect_equal(attr(comp_loo, "compare_reference"), c(elpd = comp_loo$model[[1L]]))
 })
 
 test_that("model_compare warns when predictive measures differ across models", {
@@ -140,25 +135,20 @@ test_that("model_compare works with three loo_pred_measure models", {
     measure = c("elpd", "r2", "mae")
   )
 
-  comp <- model_compare(
-    list("A" = pm1, "B" = pm2, "C" = pm3),
-    rank_by = "mae"
-  )
+  comp <- model_compare(list("A" = pm1, "B" = pm2, "C" = pm3))
   expect_snapshot(print(comp))
   expect_equal(nrow(comp), 3L)
-  expect_equal(comp$model, c("C", "B", "A"))
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "measure", measure = "mae", model = NULL)
-  )
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2", "mae"))
-  expect_equal(comp$mae_diff[1L], 0)
-  expect_true(all(comp$mae_diff[-1L] < 0))
-  # `rank_by` pins the mae-best model as the reference for *every* measure, so
-  # only the reference row is zero. Which model wins on `elpd` depends on the
-  # data, so this test does not assert it.
+  # rows are ordered by elpd, so the elpd reference is the first row
   expect_equal(comp$elpd_diff[1L], 0)
-  expect_true(all(comp$elpd_diff[-1L] != 0))
+  expect_true(all(comp$elpd_diff[-1L] < 0))
+  # every other measure is compared against its own best model
+  refs <- attr(comp, "compare_reference")
+  for (measure in c("r2", "mae")) {
+    diff_col <- comp[[paste0(measure, "_diff")]]
+    expect_equal(comp$model[[which.max(diff_col)]], refs[[measure]])
+    expect_true(all(diff_col <= 0))
+  }
   expect_equal(attr(comp, "sign_converted_measures"), c("mae"))
 })
 
@@ -191,38 +181,7 @@ test_that("model_compare informs when measure signs are converted", {
   expect_no_message(model_compare(pm_elpd, pm_elpd))
 })
 
-test_that("model_compare rank_by changes order for loo_pred_measure", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  pm1 <- loo_pred_measure(
-    loo = res$loo_p_m1,
-    y = res$y,
-    mupred = res$mupred_m1,
-    ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mae")
-  )
-  pm2 <- loo_pred_measure(
-    loo = res$loo_p_m2,
-    y = res$y,
-    mupred = res$mupred_m2,
-    ylp = res$ylp_m2,
-    measure = c("elpd", "r2", "mae")
-  )
-
-  comp_elpd <- model_compare(pm1, pm2, rank_by = "elpd")
-  comp_mse <- model_compare(pm1, pm2, rank_by = "mae")
-  expect_equal(
-    attr(comp_elpd, "rank_by"),
-    list(kind = "measure", measure = "elpd", model = NULL)
-  )
-  expect_equal(
-    attr(comp_mse, "rank_by"),
-    list(kind = "measure", measure = "mae", model = NULL)
-  )
-  expect_equal(comp_elpd$elpd_diff[1L], 0)
-  expect_equal(comp_mse$mae_diff[1L], 0)
-})
-
-test_that("without `rank_by` each measure uses its own best model as reference", {
+test_that("each measure uses its own best model as reference", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   mk <- function(m) {
     loo_pred_measure(
@@ -239,7 +198,7 @@ test_that("without `rank_by` each measure uses its own best model as reference",
   refs <- attr(comp, "compare_reference")
   expect_named(refs, c("elpd", "r2", "mse", "mae"), ignore.order = TRUE)
 
-  # rows are still ordered by elpd, so the elpd reference is the first row
+  # rows are ordered by elpd, so the elpd reference is the first row
   expect_equal(refs[["elpd"]], comp$model[[1L]])
   expect_equal(comp$elpd_diff[[1L]], 0)
 
@@ -250,16 +209,6 @@ test_that("without `rank_by` each measure uses its own best model as reference",
     expect_equal(comp$model[[which(diff_col == 0)]], refs[[measure]])
     expect_true(all(diff_col <= 0))
   }
-
-  # Whether `mse` and `elpd` pick the same model depends on the data. The loop
-  # above already checks that each measure takes its own best model as the
-  # reference; the `rank_by` block below checks the contrasting case.
-
-  # `rank_by` instead pins a single reference for every measure
-  ranked <- suppressMessages(model_compare(pms, rank_by = "mse"))
-  ranked_refs <- attr(ranked, "compare_reference")
-  expect_true(all(ranked_refs == ranked$model[[1L]]))
-  expect_equal(ranked$mse_diff[[1L]], 0)
 })
 
 test_that("each printed measure table is sorted best model first", {
@@ -287,18 +236,14 @@ test_that("each printed measure table is sorted best model first", {
     sub("^\\s*(\\S+).*$", "\\1", rows)
   }
 
-  for (comp in list(
-    suppressMessages(model_compare(pms)),
-    suppressMessages(model_compare(pms, rank_by = "mse"))
-  )) {
-    for (measure in c("elpd", "r2", "mse", "mae")) {
-      diff_col <- if (measure == "elpd") "elpd_diff" else paste0(measure, "_diff")
-      ord <- order(comp[[diff_col]], decreasing = TRUE)
-      expect_equal(printed_order(comp, measure), comp$model[ord])
-      # the best model on the measure leads, and the table runs downhill
-      expect_equal(ord[[1L]], which.max(comp[[diff_col]]))
-      expect_false(is.unsorted(rev(comp[[diff_col]][ord])))
-    }
+  comp <- suppressMessages(model_compare(pms))
+  for (measure in c("elpd", "r2", "mse", "mae")) {
+    diff_col <- if (measure == "elpd") "elpd_diff" else paste0(measure, "_diff")
+    ord <- order(comp[[diff_col]], decreasing = TRUE)
+    expect_equal(printed_order(comp, measure), comp$model[ord])
+    # the best model on the measure leads, and the table runs downhill
+    expect_equal(ord[[1L]], which.max(comp[[diff_col]]))
+    expect_false(is.unsorted(rev(comp[[diff_col]][ord])))
   }
 })
 
@@ -336,9 +281,6 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   # A named measure restricts the estimates to that measure alone.
   expect_snapshot(print(comp, measures = "r2", simplify = FALSE))
 
-  comp_mae <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2), rank_by = "mae"))
-  expect_snapshot(print(comp_mae))
-
   expect_error(
     print(comp, measures = "foo"),
     "Unknown measure\\(s\\) in `measures`"
@@ -362,19 +304,9 @@ test_that("without `elpd` the default ranking measure is the first shared one", 
   expect_false("elpd" %in% attr(comp, "compare_measures"))
   expect_false("elpd_diff" %in% colnames(comp))
   # `r2` is the first measure the models share, so it ranks them
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "default", measure = "r2", model = NULL)
-  )
+  expect_equal(attr(comp, "compare_measures")[[1L]], "r2")
+  expect_equal(comp$r2_diff[[1L]], 0)
   expect_equal(sum(comp$r2_diff == 0), 1L)
-
-  # naming a measure still overrides the default
-  comp_mse <- suppressMessages(model_compare(pms, rank_by = "mse"))
-  expect_equal(
-    attr(comp_mse, "rank_by"),
-    list(kind = "measure", measure = "mse", model = NULL)
-  )
-  expect_equal(comp_mse$mse_diff[[1L]], 0)
 })
 
 test_that("model_compare measure helpers work as expected", {
@@ -398,11 +330,9 @@ test_that("model_compare measure helpers work as expected", {
 
   expect_equal(cols, c("elpd_loo", "r2_loo", "mse_loo"))
   expect_equal(loo:::.compare_measures(loos), c("elpd", "r2", "mse"))
-  expect_equal(loo:::.pointwise_col("mse", cols), "mse_loo")
-  expect_equal(loo:::.pointwise_col("elpd", cols), "elpd_loo")
   expect_equal(loo:::.display_name("rmse_loo"), "rmse")
-  expect_equal(loo:::.resolve_rank_measure(loos, NULL)$bare, "elpd")
-  expect_equal(loo:::.resolve_rank_measure(loos, "mse")$internal, "mse_loo")
+  expect_equal(loo:::.resolve_rank_measure(loos)$bare, "elpd")
+  expect_equal(loo:::.resolve_rank_measure(loos)$internal, "elpd_loo")
   expect_true(loo:::.is_elpd_measure("elpd_loo"))
   expect_false(loo:::.is_elpd_measure("mse_loo"))
   expect_equal(attr(pm1, "measure_info")$elpd$diff_method, "sum")
@@ -819,7 +749,7 @@ test_that("custom measures take their se_diff from their declaration", {
   )
   comp_fn <- suppressMessages(model_compare(pms_fn))
   expect_false(any(is.na(comp_fn$my_rmse_se_diff)))
-  # without `rank_by`, `my_rmse` is compared against its own best model, which
+  # `my_rmse` is compared against its own best model, which
   # is the row with a zero difference and a zero standard error
   ref_name <- attr(comp_fn, "compare_reference")[["my_rmse"]]
   cmp_name <- setdiff(names(pms), ref_name)
@@ -959,16 +889,6 @@ test_that("a declared custom loss is compared and ranked as a loss", {
     attr(comp, "compare_reference")[["my_mse"]],
     attr(comp_plain, "compare_reference")[["my_mse"]]
   ))
-  # against a single pinned reference, only the orientation of the difference
-  # changes
-  comp_ref <- suppressMessages(
-    model_compare(declared, rank_by = "elpd")
-  )
-  comp_plain_ref <- suppressMessages(
-    model_compare(plain, rank_by = "elpd")
-  )
-  expect_equal(comp_ref$my_mse_diff, -comp_plain_ref$my_mse_diff)
-  expect_equal(comp_ref$my_mse_se_diff, comp_plain_ref$my_mse_se_diff)
   # ... and the declared version agrees with the built-in `mse` on which model
   # is worse
   builtin <- list(m1 = make(1, "mse"), m2 = make(2, "mse"))
@@ -976,20 +896,16 @@ test_that("a declared custom loss is compared and ranked as a loss", {
   expect_equal(comp$model, comp_builtin$model)
   expect_equal(sign(comp$my_mse_diff), sign(comp_builtin$mse_diff))
 
-  # `rank_by` puts the lowest loss first
-  ranked <- suppressMessages(
-    model_compare(declared, rank_by = "my_mse")
-  )
-  ranked_plain <- suppressMessages(
-    model_compare(plain, rank_by = "my_mse")
-  )
+  # the declared loss takes the lowest loss as its reference
   est <- vapply(
-    ranked$model,
-    function(m) declared[[m]]$estimates["my_mse_loo", "Estimate"],
+    declared,
+    function(x) x$estimates["my_mse_loo", "Estimate"],
     numeric(1)
   )
-  expect_false(is.unsorted(est))
-  expect_equal(rev(ranked$model), ranked_plain$model)
+  expect_equal(
+    attr(comp, "compare_reference")[["my_mse"]],
+    names(which.min(est))
+  )
 
   # models must agree on the declaration
   expect_error(
@@ -1231,13 +1147,6 @@ test_that("model_compare errors when compare metadata is missing on some models"
   expect_error(
     suppressMessages(model_compare(pm1, pm2)),
     "Not all models provide `measure_info` for measure 'mse'"
-  )
-})
-
-test_that("model_compare warns when rank_by is ignored for classic loo objects", {
-  expect_warning(
-    model_compare(w1, w2, rank_by = "mse"),
-    "`rank_by` is only used for `pred_measure` comparisons"
   )
 })
 
@@ -1678,74 +1587,6 @@ test_that("model_compare warns when kfold results use different folds", {
   )
 })
 
-test_that("model_compare rank_by resolves bare names for suffixed measures", {
-  res <- .compare_src_res()
-  set.seed(4321)
-  k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = c("rmse", "mae"))
-  k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
-                           kfold = res$kfold, measure = c("rmse", "mae"))
-
-  comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2), rank_by = "mae"))
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "measure", measure = "mae", model = NULL)
-  )
-  expect_equal(comp$mae_diff[1L], 0)
-  expect_true(all(comp$mae_diff[-1L] <= 0))
-
-  expect_error(
-    suppressMessages(model_compare(list(m1 = k1, m2 = k2), rank_by = "nope")),
-    "`rank_by` value 'nope' is neither a measure nor a model name",
-    fixed = TRUE
-  )
-})
-
-test_that("model_compare rank_by accepts a model name as the reference model", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  mk <- function(m) {
-    loo_pred_measure(
-      loo = res[[paste0("loo_p_m", m)]],
-      y = res$y,
-      mupred = res[[paste0("mupred_m", m)]],
-      ylp = res[[paste0("ylp_m", m)]],
-      measure = c("elpd", "r2", "mse", "mae")
-    )
-  }
-  pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
-
-  default <- suppressMessages(model_compare(pms))
-  pinned <- suppressMessages(model_compare(pms, rank_by = "m1"))
-
-  # the named model is the reference for every measure, whether or not it is
-  # the best model
-  expect_equal(
-    attr(pinned, "rank_by"),
-    list(kind = "model", measure = "elpd", model = "m1")
-  )
-  expect_true(all(attr(pinned, "compare_reference") == "m1"))
-  for (col in c("elpd_diff", "r2_diff", "mse_diff", "mae_diff")) {
-    expect_equal(pinned[[col]][pinned$model == "m1"], 0)
-  }
-
-  # rows stay ordered by elpd, as without `rank_by`
-  expect_equal(pinned$model, default$model)
-
-  # differences are the same comparisons, just re-referenced
-  expect_equal(
-    pinned$elpd_diff - pinned$elpd_diff[pinned$model == default$model[[1L]]],
-    default$elpd_diff
-  )
-
-  expect_output(print(pinned), "All measures compared against model m1")
-
-  # `diag_diff` flags a *small* difference, so a large positive one --- which
-  # only arises when the reference is not the best model --- stays unflagged
-  large_positive <- pinned$elpd_diff[pinned$elpd_diff > 4]
-  expect_true(length(large_positive) > 0)
-  expect_equal(pinned$diag_diff[pinned$elpd_diff > 4], rep("", length(large_positive)))
-})
-
 test_that("diag_diff flags the magnitude of elpd_diff, not its sign", {
   expect_equal(diag_diff(500, c(0, -2, 2, -10, 10)),
                c("", "|elpd_diff| < 4", "|elpd_diff| < 4", "", ""))
@@ -1779,54 +1620,6 @@ test_that("printed comparison output stays within 80 columns", {
     )
     expect_true(all(nchar(out) <= 80))
   }
-})
-
-test_that("model_compare rank_by model name works for plain loo objects", {
-  comp <- model_compare(list(a = w1, b = w2), rank_by = "b")
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "model", measure = "elpd", model = "b")
-  )
-  expect_equal(attr(comp, "compare_reference"), c(elpd = "b"))
-  expect_equal(comp$elpd_diff[comp$model == "b"], 0)
-  expect_true(is.na(comp$p_worse[comp$model == "b"]))
-
-  default <- model_compare(list(a = w1, b = w2))
-  expect_equal(comp$model, default$model)
-  expect_equal(
-    comp$elpd_diff - comp$elpd_diff[comp$model == default$model[[1L]]],
-    default$elpd_diff
-  )
-  expect_message(print(comp), "Differences computed against model b")
-})
-
-test_that("model_compare rank_by prefers the measure when a model shares its name", {
-  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
-  mk <- function(m) {
-    loo_pred_measure(
-      loo = res[[paste0("loo_p_m", m)]],
-      y = res$y,
-      mupred = res[[paste0("mupred_m", m)]],
-      ylp = res[[paste0("ylp_m", m)]],
-      measure = c("mse")
-    )
-  }
-  pms <- list(mse = mk(1), m2 = mk(2))
-
-  expect_warning(
-    comp <- suppressMessages(model_compare(pms, rank_by = "mse")),
-    "matches both a measure and a model name"
-  )
-  expect_equal(
-    attr(comp, "rank_by"),
-    list(kind = "measure", measure = "mse", model = NULL)
-  )
-
-  expect_error(
-    suppressMessages(model_compare(pms, rank_by = 1)),
-    "`rank_by` must be a single measure name or model name",
-    fixed = TRUE
-  )
 })
 
 # Tests for deprecated loo_compare() --------------------------------------
@@ -1867,11 +1660,6 @@ test_that("loo_compare is frozen to classic elpd comparison", {
   expect_error(
     suppressWarnings(loo_compare(k1, k2)),
     "Use `model_compare()` to compare 'pred_measure' results",
-    fixed = TRUE
-  )
-  expect_error(
-    suppressWarnings(loo_compare(w1, w2, rank_by = "model1")),
-    "`rank_by` is not supported by the deprecated `loo_compare()`",
     fixed = TRUE
   )
 })
@@ -1959,19 +1747,11 @@ test_that("rps is sign-converted for comparison but srps is not", {
   expect_true(all(comp$rps_diff <= 0))
   expect_true(all(comp$srps_diff <= 0))
 
-  # `rank_by` follows the same orientation: the well-specified model must rank
-  # first under both scores
+  # the reference follows the same orientation: the well-specified model must
+  # be the reference under both scores
   expect_equal(
-    suppressMessages(
-      model_compare(list(m1 = pm1, m2 = pm2), rank_by = "rps")
-    )$model[1L],
-    "m1"
-  )
-  expect_equal(
-    suppressMessages(
-      model_compare(list(m1 = pm1, m2 = pm2), rank_by = "srps")
-    )$model[1L],
-    "m1"
+    unname(attr(comp, "compare_reference")[c("rps", "srps")]),
+    c("m1", "m1")
   )
 })
 
