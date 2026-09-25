@@ -4,6 +4,9 @@
   `loo_predictive_metric()` are deprecated in favour of the `measure_*()`
   functions and the `*_pred_measure()` workflow. See `vignette("migration-guide")`
   for a full mapping table.
+* `loo_pred_measure()` warns when the `loo` object was corrected with
+  `loo_moment_match()` or `brms::reloo()` and a measure other than `elpd`,
+  `mlpd` or `ic` is requested. These measures do not include the correction.
 * New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
   `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
   built-in measures via `measure_*()` and [supported_measures_list()].

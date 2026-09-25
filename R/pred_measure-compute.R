@@ -128,6 +128,7 @@ do_pred_measure <- function(
           "No `psis_object` found in `loo` object. Did you run loo(..., save_psis = 'TRUE')."
         ))
       }
+      .warn_posthoc(loo, measures)
     } else {
       if (is.null(psis_object) && !is.null(predperf$psis_object)) {
         cli::cli_inform("Using psis_object for LOO CV from `predperf`")
@@ -267,6 +268,56 @@ do_pred_measure <- function(
 }
 
 # internal helper functions ---------------------------------------------------
+
+#' Detect a post-hoc correction of a loo object
+#'
+#' `loo_moment_match()` sets the `posthoc` attribute. `brms::reloo()` sets
+#' `diagnostics$pareto_k` to 0 for the refitted observations but does not
+#' change `psis_object`, so the two sets of Pareto k values differ.
+#'
+#' @param loo A [loo::loo()] result with a `psis_object`.
+#'
+#' @return A character vector of method names, or `NULL`.
+#' @noRd
+.detect_posthoc <- function(loo) {
+  method <- attr(loo, "posthoc")
+  k_loo <- loo$diagnostics$pareto_k
+  k_psis <- loo$psis_object$diagnostics$pareto_k
+  if (!is.null(k_loo) && !is.null(k_psis) && !isTRUE(all.equal(k_loo, k_psis))) {
+    method <- union(method, "reloo")
+  }
+  method
+}
+
+#' Warn if measures other than elpd use a post-hoc corrected loo object
+#'
+#' A post-hoc method corrects `pointwise[, "elpd_loo"]` only. The other
+#' measures use `psis_object$log_weights` with the original draws in `ypred`
+#' and `mupred`, so their values are not corrected.
+#'
+#' @param loo A [loo::loo()] result with a `psis_object`.
+#' @param measures Measure entries from `.prepare_measures()`.
+#'
+#' @return `NULL`, invisibly. Called for the warning.
+#' @noRd
+.warn_posthoc <- function(loo, measures) {
+  method <- .detect_posthoc(loo)
+  if (is.null(method)) {
+    return(invisible(NULL))
+  }
+  not_elpd <- vapply(measures, function(e) {
+    !(e$type == "builtin" && isTRUE(.measure_spec[[e$key]]$needs_elpd))
+  }, logical(1L))
+  if (any(not_elpd)) {
+    keys <- vapply(measures[not_elpd], function(e) e$name, character(1L))
+    cli::cli_warn(c(
+      "The {.arg loo} object was corrected with {.val {method}}.",
+      "!" = "Only {.val elpd}, {.val mlpd} and {.val ic} include this correction.",
+      "i" = "{.val {keys}} use{?s/} the uncorrected PSIS weights."
+    ))
+  }
+  invisible(NULL)
+}
 
 #' Resolve or compute the PSIS object for LOO scoring
 #'
