@@ -47,6 +47,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Go to homepage"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item dropdown">
@@ -54,7 +55,9 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-other-packages">
 <li><a class="external-link dropdown-item" href="https://mc-stan.org/bayesplot">bayesplot</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/cmdstanr">cmdstanr</a></li>
+    <li><a class="dropdown-item" href="https://mc-stan.org/loo">loo</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/posterior">posterior</a></li>
+    <li><a class="external-link dropdown-item" href="https://mc-stan.org/priorsense/">priorsense</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/projpred">projpred</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstan">rstan</a></li>
     <li><a class="external-link dropdown-item" href="https://mc-stan.org/rstanarm">rstanarm</a></li>
@@ -95,9 +98,9 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-09-15</h4>
+            <h4 data-toc-skip class="date">2026-09-26</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/update-pkgdown-navbar/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
     </div>
 
@@ -240,7 +243,7 @@ log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.013 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.014 seconds (Generated Quantities)</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -316,7 +319,7 @@ predictive densities of all the observations.</p>
 <span>  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.007 seconds (Generated Quantities)
+ Elapsed Time: 0.008 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.007 seconds (Generated Quantities)
