@@ -98,9 +98,9 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-09-26</h4>
+            <h4 data-toc-skip class="date">2026-09-28</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/update-pkgdown-navbar/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
     </div>
 
@@ -243,7 +243,7 @@ log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.014 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.013 seconds (Generated Quantities)</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -319,9 +319,6 @@ predictive densities of all the observations.</p>
 <span>  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.008 seconds (Generated Quantities)
-
-
  Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
@@ -346,7 +343,10 @@ predictive densities of all the observations.</p>
  Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.007 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.007 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.008 seconds (Generated Quantities)</code></pre>
 </div>
 <div class="section level3">
 <h3 id="computing-k-fold-elpd">Computing K-fold elpd:<a class="anchor" aria-label="anchor" href="#computing-k-fold-elpd"></a>
