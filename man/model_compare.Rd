@@ -182,9 +182,8 @@ negative \verb{\{measure\}_diff} always means worse performance than the
 reference. Which measures are losses is recorded in the \code{loss} element of
 each measure's entry in the \code{measure_info} attribute of an
 \verb{*_pred_measure()} result. The flipped measures are named in the
-\code{sign_converted_measures} attribute and in a message, for example:
-"For model comparison, differences for mse are reported on a utility scale
-(higher is better)."
+\code{sign_converted_measures} attribute. \code{print()} marks them with
+"sign flipped" in the table header and names them below the tables.
 
 A custom measure is treated as a utility unless it declares otherwise with
 \code{attr(my_fun, "measure_loss") <- TRUE}. The declaration also determines the

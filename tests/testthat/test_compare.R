@@ -152,7 +152,7 @@ test_that("model_compare works with three loo_pred_measure models", {
   expect_equal(attr(comp, "sign_converted_measures"), c("mae"))
 })
 
-test_that("model_compare informs when measure signs are converted", {
+test_that("print marks and explains flipped measure signs", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   pm1 <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -169,8 +169,9 @@ test_that("model_compare informs when measure signs are converted", {
     measure = c("r2", "mse")
   )
 
-  expect_snapshot(comp <- model_compare(pm1, pm2))
+  comp <- model_compare(list(m1 = pm1, m2 = pm2))
   expect_equal(attr(comp, "sign_converted_measures"), "mse")
+  expect_snapshot(print(comp, measures = "all"))
 
   pm_elpd <- loo_pred_measure(
     loo = res$loo_p_m1,
@@ -873,12 +874,12 @@ test_that("a declared custom loss is compared and ranked as a loss", {
   expect_true(loo:::.measure_is_loss("my_mse_loo", declared))
   expect_false(loo:::.measure_is_loss("my_mse_loo", plain))
 
-  # the sign conversion is announced, as it is for built-in loss measures
-  expect_message(
-    comp <- model_compare(declared),
-    "my_mse.*utility scale"
-  )
+  comp <- suppressMessages(model_compare(declared))
   comp_plain <- suppressMessages(model_compare(plain))
+  expect_output(
+    print(comp, measures = "all"),
+    "my_mse \\(vs m[12], sign flipped\\)"
+  )
 
   expect_equal(attr(comp, "sign_converted_measures"), "my_mse")
   expect_length(attr(comp_plain, "sign_converted_measures"), 0L)

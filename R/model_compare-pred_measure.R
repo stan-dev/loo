@@ -44,8 +44,6 @@ is.loo_pred_measure <- function(x) {
       call. = FALSE
     )
   }
-  # `loos` may be a named list, which would make `vapply()` return a named
-  # vector and break the `identical()` checks against a bare string.
   unname(sources[1L])
 }
 
@@ -70,9 +68,6 @@ throw_insample_compare_warning <- function(source) {
 #' @param loos List of `pred_measure` objects, all sharing one evaluation
 #'   source.
 compare_pred_measure <- function(loos) {
-  # Resolve the source before the generic checks: mixed sources usually also
-  # differ in their number of observations, and "you mixed LOO with k-fold" is
-  # far more actionable than "your models have different N".
   source <- .compare_source(loos)
   model_compare_checks(
     loos,
@@ -91,11 +86,8 @@ compare_pred_measure <- function(loos) {
   rank_measure <- .resolve_rank_measure(loos)
   compare_cols <- .compare_pointwise_cols(loos)
   custom_se_diffs <- .resolve_custom_se_diffs(loos, compare_cols)
-  inform_compare_sign_conversion(compare_cols, loos)
   ord <- model_compare_order(loos, rank_measure$internal)
   loos_ord <- loos[ord]
-  # Each measure gets its own best model as reference, so e.g. `mse_diff` may
-  # be relative to a different model than `elpd_diff`.
 
   comp <- model_compare_matrix(
     loos_ord,
@@ -143,8 +135,6 @@ compare_pred_measure <- function(loos) {
     }
   }
 
-  # `diag_elpd` reports PSIS Pareto k, which only exists for the LOO source;
-  # for the others it would be an all-blank column.
   model_cols <- data.frame(
     model = rnms,
     diff_cols,
@@ -165,12 +155,6 @@ compare_pred_measure <- function(loos) {
 
   attr(comp, "compare_reference") <- ref_models
   attr(comp, "compare_source") <- source
-  # Both numbers qualify the source in the printed header. `model_compare()`
-  # already rejects models that differ in `n_obs`, so one number describes the
-  # whole comparison.
-  # `NULL` for any other source, and for folds that disagree, which
-  # `throw_kfold_K_mismatch_warning()` already reported: no single number then
-  # describes the comparison.
   attr(comp, "compare_K") <- if (identical(source, "kfold")) {
     Ks <- unlist(lapply(loos, attr, which = "K"))
     if (length(Ks) == length(loos) && all(Ks == Ks[[1L]])) unname(Ks[[1L]])
@@ -221,11 +205,6 @@ compare_pred_measure <- function(loos) {
         call. = FALSE
       )
     }
-    # `extra` holds per-measure auxiliary data (for `r2`, the pointwise
-    # baseline derived from `y`), which legitimately differs when models are
-    # fitted to different data. That case is already reported by the `yhash`
-    # warning, so comparing `extra` here would only mislabel it as a
-    # disagreement about the measure itself.
     non_null <- lapply(infos[has_info], function(info) {
       info$extra <- NULL
       info
@@ -310,10 +289,6 @@ throw_omitted_compare_measures_warning <- function(loos) {
 #' @noRd
 .resolve_rank_measure <- function(loos) {
   cols <- .compare_pointwise_cols(loos)
-  # Rank by the first measure that all models share. `elpd` is no longer part
-  # of every `pred_measure` result, so it cannot serve as the default.
-  # `.compare_pointwise_cols()` keeps the column order of the results, so
-  # `elpd` still ranks the models whenever it is present.
   if (!length(cols)) {
     stop("No measure is shared by all models.", call. = FALSE)
   }
@@ -381,23 +356,6 @@ throw_omitted_compare_measures_warning <- function(loos) {
     function(col) .measure_is_loss(col, loos),
     logical(1)
   )])
-}
-
-#' Inform when measure signs are flipped for comparison
-#' @noRd
-inform_compare_sign_conversion <- function(cols, loos) {
-  converted <- .compare_sign_converted_measures(cols, loos)
-  if (!length(converted)) {
-    return(invisible(NULL))
-  }
-  message(
-    "For model comparison, differences for ",
-    paste(converted, collapse = ", "),
-    " ",
-    if (length(converted) == 1L) "is" else "are",
-    "\nreported on a utility scale (higher is better)."
-  )
-  invisible(NULL)
 }
 
 #' How to aggregate paired pointwise differences for a measure
@@ -559,8 +517,6 @@ inform_missing_custom_se_diff <- function(bare) {
     return(list())
   }
 
-  # `.compare_metadata_check()` has already established that the models agree,
-  # so the first one answers for all.
   declared <- stats::setNames(
     lapply(custom_bare, function(bare) {
       .get_measure_info(loos, bare)$se_diff_fun
@@ -625,8 +581,6 @@ inform_missing_custom_se_diff <- function(bare) {
 
   if (method == "custom") {
     if (is.character(se_fn)) {
-      # "sum"/"mean" reuse the paired pointwise branch below, so a custom
-      # measure declaring "mean" behaves exactly like the built-in `mae`.
       method <- se_fn
     } else {
       diff <- est_utility(cmp$estimates) - est_utility(ref$estimates)

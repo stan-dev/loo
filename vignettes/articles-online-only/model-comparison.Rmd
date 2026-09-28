@@ -36,18 +36,6 @@ knitr::opts_chunk$set(
 options(future.globals.maxSize = 4 * 1024^3)
 ```
 
-::: {.callout .callout-warning}
-**Questions**
-
-+ ~How detailed should the math for the computation be and how to attribute properly the work from the overleaf document? Are you considering to publish it?~ -> Answered: we target for a preprint that we can cite.
-+ Currently, `elpd` is computed by default in `pred_measure`. This is helpful, when we want to have it by default in `model_compare`. Do we want this default behavior?
-+ Related question: The default print method of `model_compare` shows `elpd` output only. Using `print(..., measures = "all")` allows to see all measures. See below for example. Do we want this?
-+ For `elpd`, we provide in the `model_compare` output the additional columns `p_worse`, `diag_diff`, `diag_elpd`.
-  + Do we want to have `p_worse` and `diag_diff` for all measures?
-  + I moved the column `diag_elpd` out from the elpd-specific measure block and treat it as an "overall" (and not measure-specific) information (see printed output below).
-+ Currently, there are a lot of warnings/messages. Which ones do we want to provide in output and which ones in function documentation?
-:::
-
 ```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
 ```
 
@@ -358,11 +346,12 @@ Consequently, the best model has the highest value, and in the default case in
 which the best model is also the reference model, the estimated difference
 `<measure>_diff` (computed as comp - reference) is always non-positive.
 
-When a measure is converted to the utility scale, `model_compare()` informs the
-user about this change:
+When a measure is converted to the utility scale, `print()` marks it with
+"sign flipped" in the table header. It also names it below the tables:
 
-```{r sign-message, warning=TRUE, message=TRUE}
+```{r sign-note}
 comp <- model_compare(list(m1 = m1, m2 = m2, m3 = m3))
+print(comp, measures = "all")
 ```
 
 ::: {.callout .callout-note}

@@ -22,13 +22,29 @@
       
       Use print(x, measures = "all") to see all measures.
 
-# model_compare informs when measure signs are converted
+# print marks and explains flipped measure signs
 
     Code
-      comp <- model_compare(pm1, pm2)
-    Message
-      For model comparison, differences for mse is
-      reported on a utility scale (higher is better).
+      print(comp, measures = "all")
+    Output
+      Each measure compared against its own best model (r2: m2, mse: m2).
+      PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
+       model bad_k
+          m2     2
+          m1     1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2   0.000      0.000
+          m1  -0.105      0.217
+      
+      -- mse (vs m2, sign flipped) --
+       model mse_diff mse_se_diff
+          m2      0.0         0.0
+          m1   -212.5       448.0
+      
+      All differences: 0 = best model, negative = worse.
+      Signs flipped for loss measures: mse.
 
 # print.compare.loo works for loo_pred_measure comparisons
 
@@ -78,11 +94,14 @@
           m3   -0.09       0.18
           m1   -0.10       0.22
       
-      -- mae (vs m3) --
+      -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff
           m3     0.00        0.00
           m2    -0.07        1.24
           m1    -6.34        3.08
+      
+      All differences: 0 = best model, negative = worse.
+      Signs flipped for loss measures: mae.
     Message
       
       Diagnostic flags present.
@@ -113,11 +132,14 @@
           m3    -0.1        0.2
           m1    -0.1        0.2
       
-      -- mae (vs m3) --
+      -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff
           m3      0.0         0.0
           m2     -0.1         1.2
           m1     -6.3         3.1
+      
+      All differences: 0 = best model, negative = worse.
+      Signs flipped for loss measures: mae.
     Message
       
       Diagnostic flags present.
@@ -142,11 +164,14 @@
           m3  -0.093      0.178
           m1  -0.105      0.217
       
-      -- mae (vs m3) --
+      -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff
           m3      0.0         0.0
           m2     -0.1         1.2
           m1     -6.3         3.1
+      
+      All differences: 0 = best model, negative = worse.
+      Signs flipped for loss measures: mae.
 
 ---
 
@@ -200,11 +225,14 @@
           m3  -0.093      0.178 0.060 0.300
           m1  -0.105      0.217 0.048 0.040
       
-      -- mae (vs m3) --
+      -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff  mae se_mae
           m3      0.0         0.0 21.9    3.6
           m2     -0.1         1.2 22.0    3.4
           m1     -6.3         3.1 28.2    3.2
+      
+      All differences: 0 = best model, negative = worse.
+      Signs flipped for loss measures: mae.
     Message
       
       Diagnostic flags present.

@@ -354,9 +354,8 @@ uncertainty in the baseline \code{MSE(y)} shared by both models.
 
 The reference model has \code{m_se_diff = 0} whenever an \code{m_se_diff} is available.
 Which measures are losses is recorded in the \code{loss} element of the
-\code{measure_info} attribute on each \verb{*_pred_measure()} result; when a loss is
-compared on a utility scale, \code{model_compare()} emits a short message naming
-those measures (see \code{\link[=model_compare]{model_compare()}}).
+\code{measure_info} attribute on each \verb{*_pred_measure()} result. \code{print()} marks
+each flipped loss with "sign flipped" (see \code{\link[=model_compare]{model_compare()}}).
 
 ELPD-family measures use the column names \code{elpd_diff} and \code{se_diff} rather
 than a prefixed form. Only ELPD comparisons include \code{p_worse} and \code{diag_diff};

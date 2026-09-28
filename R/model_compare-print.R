@@ -122,17 +122,10 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
     )
   }
 
-  # The reference is always named: each measure keeps its own best model, so
-  # the reference can differ between measures.
-  # Printed rather than messaged: it labels the tables below, and `message()`
-  # output is suppressed wholesale by knitr chunks and `suppressMessages()`.
   .cat_wrapped(
     .compare_reference_line(x, compare_measures)
   )
 
-  # LOO is the familiar default, so only name the source when it is not LOO.
-  # Spelled out for a full sentence, unlike the short per-object tag from
-  # `.pred_measure_source_label()`.
   if (!is.null(compare_source) && !identical(compare_source, "loo")) {
     .cat_wrapped(
       "Predictive measures evaluated on ",
@@ -141,20 +134,17 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
     )
   }
 
-  # Pareto k is a property of a model's PSIS-LOO approximation, not of any one
-  # measure or of the comparison, so it is reported once for all models rather
-  # than as a column inside a per-measure difference table.
   psis_shown <- .print_psis_diag_block(x)
-  # A per-measure header already opens with a blank line; only the single-table
-  # form needs one inserted here.
   if (psis_shown && is.null(measures)) {
     cat("\n")
   }
 
+  flipped <- attr(x, "sign_converted_measures")
   for (measure in measures_to_print) {
     if (!is.null(measures)) {
       cat(
-        "\n-- ", measure, " (vs ", .measure_ref_model(x, measure), ") --\n",
+        "\n-- ", measure, " (vs ", .measure_ref_model(x, measure),
+        if (measure %in% flipped) ", sign flipped", ") --\n",
         sep = ""
       )
     }
@@ -167,6 +157,8 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
       all_estimates = is.null(measures)
     )
   }
+
+  .print_sign_flip_note(intersect(measures_to_print, flipped))
 
   has_diag_msg <- .print_compare_diag_message(
     x,
@@ -269,6 +261,21 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
 .cat_wrapped <- function(...) {
   width <- min(getOption("width", 80L), 80L)
   cat(paste(strwrap(paste0(...), width = width), collapse = "\n"), "\n", sep = "")
+}
+
+#' Explain the sign of the differences when a printed measure is a loss
+#' @noRd
+#' @param flipped Bare names of the printed measures with a flipped sign.
+.print_sign_flip_note <- function(flipped) {
+  if (!length(flipped)) {
+    return(invisible(FALSE))
+  }
+  cat("\n")
+  .cat_wrapped("All differences: 0 = best model, negative = worse.")
+  .cat_wrapped(
+    "Signs flipped for loss measures: ", paste(flipped, collapse = ", "), "."
+  )
+  invisible(TRUE)
 }
 
 #' Describe how many of the compared models a flag applies to

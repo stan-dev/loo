@@ -338,9 +338,8 @@
 #'
 #' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
 #' Which measures are losses is recorded in the `loss` element of the
-#' `measure_info` attribute on each `*_pred_measure()` result; when a loss is
-#' compared on a utility scale, `model_compare()` emits a short message naming
-#' those measures (see [model_compare()]).
+#' `measure_info` attribute on each `*_pred_measure()` result. `print()` marks
+#' each flipped loss with "sign flipped" (see [model_compare()]).
 #'
 #' ELPD-family measures use the column names `elpd_diff` and `se_diff` rather
 #' than a prefixed form. Only ELPD comparisons include `p_worse` and `diag_diff`;

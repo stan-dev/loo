@@ -107,6 +107,11 @@
   data frame, instead of relabelling it `se_diff`. ELPD tables are unchanged.
 * `print()` on a `pred_measure` comparison now accepts `simplify`. With 
   `simplify = FALSE` each measure table also shows that measure's per-model estimate and standard error, and an ELPD table also shows `p` and `se_p`.
+* `print()` on a `pred_measure` comparison now explains the sign of loss
+  measures. The table header marks each loss with `sign flipped`. A note below
+  the tables names the flipped measures. `model_compare()` no longer shows a
+  message about the sign conversion, so a saved comparison keeps the
+  explanation.
 * `model_compare(A = m1, B = m2)` now works.
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
