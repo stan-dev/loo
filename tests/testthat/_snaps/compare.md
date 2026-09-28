@@ -147,11 +147,6 @@
           m3      0.0         0.0
           m2     -0.1         1.2
           m1     -6.3         3.1
-    Message
-      
-      Diagnostic flags present.
-      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
-      or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 ---
 
@@ -233,11 +228,6 @@
           m2   0.000      0.000 0.153 0.214
           m3  -0.093      0.178 0.060 0.300
           m1  -0.105      0.217 0.048 0.040
-    Message
-      
-      Diagnostic flags present.
-      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
-      or https://mc-stan.org/loo/reference/loo-glossary.html.
 
 # model_compare returns expected results (2 models)
 

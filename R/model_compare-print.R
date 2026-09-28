@@ -456,16 +456,10 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
 #' Print diagnostic glossary message for compare output
 #' @noRd
 .print_compare_diag_message <- function(x, p_worse, measures = NULL) {
-  diag_cols <- c("diag_elpd")
-  if (is.null(measures) || "elpd" %in% measures) {
-    diag_cols <- c("diag_diff", diag_cols)
-  } else if (!is.null(measures)) {
-    elpd_measures <- measures[vapply(measures, .is_elpd_measure, logical(1))]
-    if (length(elpd_measures)) {
-      diag_cols <- c("diag_diff", diag_cols)
-    }
+  if (!is.null(measures) && !any(.is_elpd_measure(measures))) {
+    return(invisible(FALSE))
   }
-
+  diag_cols <- c("diag_diff", "diag_elpd")
   has_diag <- any(
     vapply(
       intersect(diag_cols, colnames(x)),
