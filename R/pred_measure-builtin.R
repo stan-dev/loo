@@ -774,7 +774,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 # measure overview -----------------------------
 #
 # Built-in measures are registered in `.measure_spec`. Users can also pass
-# custom functions to `measure` in the pred_measure family; those functions
+# custom functions to `measures` in the pred_measure family; those functions
 # must set `attr(fun, "measure_name")` and return `estimate`, `se`, and
 # `pointwise` (see `?insample_pred_measure`).
 
@@ -807,7 +807,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 
 #' Supported predictive measure names
 #'
-#' A character vector of measure names that can be passed to the `measure`
+#' A character vector of measure names that can be passed to the `measures`
 #' argument of [insample_pred_measure()], [loo_pred_measure()],
 #' [kfold_pred_measure()], [test_pred_measure()], and [pred_measure()].
 #'

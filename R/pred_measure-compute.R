@@ -22,7 +22,7 @@
 #' @param predperf An existing predictive measure object (class
 #'   `"pred_measure"`) to update. When supplied, stored rows and
 #'   (for LOO) PSIS weights are reused instead of recomputed.
-#' @param measure Measures to compute. `NULL` (default) gives `elpd` (with
+#' @param measures Measures to compute. `NULL` (default) gives `elpd` (with
 #'   `p_loo` / `p_kfold` for LOO and k-fold). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
@@ -36,7 +36,7 @@
 #'   They must return a list with  `estimates` and `pointwise`.
 #' @param measure_name For a single custom function, set
 #'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
-#'   `measure`.
+#'   `measures`.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with
@@ -52,7 +52,7 @@
 #'   so that additional measures can be added later with [pred_measure()] without
 #'   recomputing PSIS weights.
 #' @param control Named list of per-measure settings. Each name must match an
-#'   element of `measure`; the value is a list of arguments passed to that
+#'   element of `measures`; the value is a list of arguments passed to that
 #'   measure's summary function (e.g. `list(new_measure = list(add_arg = 10))`).
 #' @param source Character string indicating the evaluation mode: `"insample"`,
 #'   `"loo"`, `"kfold"`, or `"test"`. Set automatically by the wrapper
@@ -66,7 +66,7 @@ do_pred_measure <- function(
   mupred = NULL,
   ylp = NULL,
   ylp_test = NULL,
-  measure = NULL,
+  measures = NULL,
   predperf = NULL,
   loo = NULL,
   kfold = NULL,
@@ -86,7 +86,7 @@ do_pred_measure <- function(
   }
 
   measures <- .prepare_measures(
-    measure, predperf, supported_measures_list, source
+    measures, predperf, supported_measures_list, source
   )
   needs_elpd <- .any_needs_elpd(measures)
 

@@ -86,8 +86,8 @@ measure_elpd(log_lik_matrix)
 |------------|-------------|-------|-----------------|
 | `crps(x, x2, y)` | `measure_rps(y, ypred = x)` | 3.0.0 | |
 | `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | 3.0.0 | |
-| `loo_crps(...)` | `loo_pred_measure(..., measure = "rps")` | 3.0.0 | |
-| `loo_scrps(...)` | `loo_pred_measure(..., measure = "srps")` | 3.0.0 | |
+| `loo_crps(...)` | `loo_pred_measure(..., measures = "rps")` | 3.0.0 | |
+| `loo_scrps(...)` | `loo_pred_measure(..., measures = "srps")` | 3.0.0 | |
 
 **API change:** deprecated functions require **two** draw matrices (`x`, `x2`)
 and use a permutation-based estimator. The replacement uses **one** draw
@@ -113,8 +113,8 @@ measure_rps(y = y, ypred = ypred1)
 |-------------------------------|--------------------------|
 | `x` (predictions) | `mupred` |
 | `log_lik` | via `loo(..., save_psis = TRUE)` or `ylp` + `psis_object` |
-| `metric = "mae"` | `measure = "mae"` |
-| `metric = "balanced_acc"` | `measure = "bacc"` |
+| `metric = "mae"` | `measures = "mae"` |
+| `metric = "balanced_acc"` | `measures = "bacc"` |
 
 ```r
 # Deprecated
@@ -122,7 +122,7 @@ loo_predictive_metric(x = mupred, y = y, log_lik = ll, metric = "mae")
 
 # Current
 loo_fit <- loo(ll, save_psis = TRUE)
-loo_pred_measure(loo = loo_fit, y = y, mupred = mupred, measure = "mae")
+loo_pred_measure(loo = loo_fit, y = y, mupred = mupred, measures = "mae")
 ```
 
 ---
@@ -141,9 +141,9 @@ loo_pred_measure(loo = loo_fit, y = y, mupred = mupred, measure = "mae")
 
 ## Built-in measures
 
-Pass short names to the `measure` argument, or call standalone functions:
+Pass short names to the `measures` argument, or call standalone functions:
 
-| `measure =` | Function | Source file |
+| `measures =` | Function | Source file |
 |-------------|----------|-------------|
 | `"elpd"` | `measure_elpd()` | `pred_measure-builtin.R` |
 | `"mlpd"` | `measure_mlpd()` | `pred_measure-builtin.R` |

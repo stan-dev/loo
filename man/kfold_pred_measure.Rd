@@ -9,7 +9,7 @@ kfold_pred_measure(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   kfold = NULL,
   group_ids = NULL,
   control = list()
@@ -31,7 +31,7 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\item{measures}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
 \code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
@@ -52,7 +52,7 @@ and fold structure for \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}; 
 (reserved; not yet implemented).}
 
 \item{control}{Named list of per-measure settings. Each name must match an
-element of \code{measure}; the value is a list of arguments passed to that
+element of \code{measures}; the value is a list of arguments passed to that
 measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 }
 \value{
@@ -69,7 +69,7 @@ and scores the held-out folds.
 Pass a \code{kfold} object from \code{\link[brms:kfold]{brms::kfold()}} (with \code{save_fits = TRUE} when
 you need posterior predictions on held-out folds). \code{elpd_kfold} and
 \code{p_kfold} come from the \code{kfold} object and are reported by default or when
-\code{measure} names "elpd";
+\code{measures} names "elpd";
 additional measures require the same optional inputs as
 \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
 }
@@ -94,7 +94,7 @@ if (requireNamespace("brms", quietly = TRUE)) {
     ypred = ypred_kf,
     mupred = mupred_kf,
     kfold = kf,
-    measure = "rmse"
+    measures = "rmse"
   )
 }
 }

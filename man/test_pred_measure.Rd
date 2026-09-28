@@ -10,7 +10,7 @@ test_pred_measure(
   mupred = NULL,
   ylp = NULL,
   ylp_test = NULL,
-  measure = NULL,
+  measures = NULL,
   group_ids = NULL,
   control = list()
 )
@@ -36,7 +36,7 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\item{measures}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
 \code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
@@ -53,7 +53,7 @@ They must return a list with  \code{estimates} and \code{pointwise}.}
 (reserved; not yet implemented).}
 
 \item{control}{Named list of per-measure settings. Each name must match an
-element of \code{measure}; the value is a list of arguments passed to that
+element of \code{measures}; the value is a list of arguments passed to that
 measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 }
 \value{
@@ -95,7 +95,7 @@ if (requireNamespace("brms", quietly = TRUE)) {
     mupred = brms::posterior_epred(fit, newdata = test),
     ylp = brms::log_lik(fit),
     ylp_test = brms::log_lik(fit, newdata = test),
-    measure = c("rmse", "r2")
+    measures = c("rmse", "r2")
   )
 }
 }

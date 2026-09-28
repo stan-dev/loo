@@ -43,7 +43,7 @@
         if (is.null(nm) || !nzchar(nm)) {
           cli::cli_abort(c(
             "Each custom function in {.arg measure} must be named.",
-            "i" = "Use {.code measure = list(my_metric = my_fun)}."
+            "i" = "Use {.code measures = list(my_metric = my_fun)}."
           ))
         }
         list(name = nm, type = "custom", key = el)
@@ -137,7 +137,7 @@
   is_custom <- !is_builtin
   if (any(is_custom)) {
     for (entry in entries[is_custom]) {
-      checkmate::assert_function(entry$key, .var.name = "measure")
+      checkmate::assert_function(entry$key, .var.name = "measures")
     }
   }
 

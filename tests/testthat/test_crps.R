@@ -159,7 +159,7 @@ test_that("PWM and permutation EXX estimates converge with more draws", {
   expect_lt(results[3], results[1])
 })
 
-test_that("loo_crps() and loo_pred_measure(..., measure = 'rps') differ like in-sample APIs", {
+test_that("loo_crps() and loo_pred_measure(..., measures = 'rps') differ like in-sample APIs", {
   set.seed(1)
   d <- .crps_draws(seed = 1L, n = 10L, S = 100L)
   ll <- matrix(rnorm(10 * 100) * 0.1 - 1, nrow = 100)
@@ -170,7 +170,7 @@ test_that("loo_crps() and loo_pred_measure(..., measure = 'rps') differ like in-
     y = d$y,
     ypred = d$x1,
     ylp = ll,
-    measure = "rps",
+    measures = "rps",
     psis_object = psis_obj
   )
 
@@ -185,7 +185,7 @@ test_that("loo_crps() and loo_pred_measure(..., measure = 'rps') differ like in-
   )))
 })
 
-test_that("loo_scrps() and loo_pred_measure(..., measure = 'srps') differ like in-sample APIs", {
+test_that("loo_scrps() and loo_pred_measure(..., measures = 'srps') differ like in-sample APIs", {
   set.seed(1)
   d <- .crps_draws(seed = 1L, n = 10L, S = 100L)
   ll <- matrix(rnorm(10 * 100) * 0.1 - 1, nrow = 100)
@@ -196,7 +196,7 @@ test_that("loo_scrps() and loo_pred_measure(..., measure = 'srps') differ like i
     y = d$y,
     ypred = d$x1,
     ylp = ll,
-    measure = "srps",
+    measures = "srps",
     psis_object = psis_obj
   )
 

@@ -22,7 +22,7 @@
 #' \describe{
 #'   \item{`estimates`}{Matrix of summary estimates and standard errors (rows
 #'     are measures, columns are `Estimate` and `SE`). The row `elpd` is
-#'     present when `measure` is `NULL` (default) or names "elpd".}
+#'     present when `measures` is `NULL` (default) or names "elpd".}
 #'   \item{`pointwise`}{Matrix of observation-level contributions (one column
 #'     per measure).}
 #' }
@@ -43,12 +43,12 @@
 #'
 #' "elpd" is the default measure. `mlpd` and `ic` are derived from `elpd`, but
 #' requesting them does not add an `elpd` row. Request `ic`, `mlpd`, or other
-#' density scores via `measure`, or supply a custom function;
+#' density scores via `measures`, or supply a custom function;
 #' see [supported_measures_list] and the
 #' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
 #'
-#' **Custom measures.** A function passed to `measure` must have attribute
+#' **Custom measures.** A function passed to `measures` must have attribute
 #' `measure_name` and return `estimate`, `se`, and `pointwise`. Only arguments
 #' declared in the function signature among `y`, `ypred`, `mupred`, `ylp`, and
 #' `log_weights` are supplied automatically.
@@ -65,7 +65,7 @@
 #'     y = fit$data$Reaction,
 #'     ypred = brms::posterior_predict(fit),
 #'     mupred = brms::posterior_epred(fit),
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #' }
 #' }
@@ -81,7 +81,7 @@
 #'   )
 #' }
 #' attr(my_abs_err, "measure_name") <- "my_abs_err"
-#' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
+#' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measures = my_abs_err)
 #' }
 #'
 #' @seealso [pred_measure()] to add measures incrementally,
@@ -95,7 +95,7 @@ insample_pred_measure <- function(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   group_ids = NULL,
   save_psis = FALSE,
   control = list()
@@ -105,7 +105,7 @@ insample_pred_measure <- function(
     ypred = ypred,
     mupred = mupred,
     ylp = ylp,
-    measure = measure, 
+    measures = measures,
     predperf = NULL,
     loo = NULL, 
     kfold = NULL,
@@ -126,7 +126,7 @@ insample_pred_measure <- function(
 #' observation: each held-out point is scored by reweighting the full-data
 #' posterior draws.
 #'
-#' With the default `measure = NULL`, the result holds `elpd_loo`, the LOO
+#' With the default `measures = NULL`, the result holds `elpd_loo`, the LOO
 #' estimate of expected log pointwise predictive density (ELPD), and `p_loo`
 #' (effective number of parameters, the difference between in-sample and LOO
 #' log predictive density). `p_loo` is reported together with `elpd_loo`.
@@ -184,7 +184,7 @@ insample_pred_measure <- function(
 #'     loo = loo_fit,
 #'     y = fit$data$Reaction,
 #'     ypred = brms::posterior_predict(fit),
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #' }
 #' }
@@ -199,7 +199,7 @@ loo_pred_measure <- function(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   loo = NULL,
   group_ids = NULL,
   psis_object = NULL,
@@ -212,7 +212,7 @@ loo_pred_measure <- function(
     mupred = mupred,
     ylp = ylp,
     ylp_test = NULL,
-    measure = measure, 
+    measures = measures, 
     predperf = NULL,
     loo = loo, 
     kfold = NULL,
@@ -234,7 +234,7 @@ loo_pred_measure <- function(
 #' Pass a `kfold` object from [brms::kfold()] (with `save_fits = TRUE` when
 #' you need posterior predictions on held-out folds). `elpd_kfold` and
 #' `p_kfold` come from the `kfold` object and are reported by default or when
-#' `measure` names "elpd";
+#' `measures` names "elpd";
 #' additional measures require the same optional inputs as
 #' [insample_pred_measure()].
 #'
@@ -267,7 +267,7 @@ loo_pred_measure <- function(
 #'     ypred = ypred_kf,
 #'     mupred = mupred_kf,
 #'     kfold = kf,
-#'     measure = "rmse"
+#'     measures = "rmse"
 #'   )
 #' }
 #' }
@@ -282,7 +282,7 @@ kfold_pred_measure <- function(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   kfold = NULL,
   group_ids = NULL,
   control = list()
@@ -293,7 +293,7 @@ kfold_pred_measure <- function(
     mupred = mupred,
     ylp = ylp,
     ylp_test = NULL,
-    measure = measure, 
+    measures = measures,
     predperf = NULL,
     loo = NULL, 
     kfold = kfold,
@@ -348,7 +348,7 @@ kfold_pred_measure <- function(
 #'     mupred = brms::posterior_epred(fit, newdata = test),
 #'     ylp = brms::log_lik(fit),
 #'     ylp_test = brms::log_lik(fit, newdata = test),
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #' }
 #' }
@@ -364,7 +364,7 @@ test_pred_measure <- function(
   mupred = NULL,
   ylp = NULL,
   ylp_test = NULL,
-  measure = NULL,
+  measures = NULL,
   group_ids = NULL,
   control = list()
 ) {
@@ -374,7 +374,7 @@ test_pred_measure <- function(
     mupred = mupred,
     ylp = ylp,
     ylp_test = ylp_test,
-    measure = measure, 
+    measures = measures,
     predperf = NULL,
     loo = NULL, 
     kfold = NULL,
@@ -418,7 +418,7 @@ test_pred_measure <- function(
 #'   y = y,
 #'   mupred = mupred,
 #'   predperf = result,
-#'   measure = c("rmse", "r2")
+#'   measures = c("rmse", "r2")
 #' )
 #' }
 #'
@@ -442,7 +442,7 @@ test_pred_measure <- function(
 #'     y = fit$data$Reaction,
 #'     mupred = brms::posterior_epred(fit),
 #'     predperf = result,
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #' }
 #' }
@@ -457,7 +457,7 @@ pred_measure <- function(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   predperf,
   group_ids = NULL,
   psis_object = NULL,
@@ -470,7 +470,7 @@ pred_measure <- function(
     mupred = mupred,
     ylp = ylp,
     ylp_test = NULL,
-    measure = measure, 
+    measures = measures,
     predperf = predperf,
     loo = NULL,
     kfold = NULL,

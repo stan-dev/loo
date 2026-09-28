@@ -508,7 +508,7 @@ testthat::test_that("mlpd and ic keep the sign of a positive pointwise lppd", {
   expect_true(any(lppd > 0))
   expect_true(any(lppd < 0))
 
-  res <- insample_pred_measure(ylp = ylp, measure = c("elpd", "mlpd", "ic"))
+  res <- insample_pred_measure(ylp = ylp, measures = c("elpd", "mlpd", "ic"))
 
   expect_equal(unname(res$estimates["mlpd", 1]), mean(lppd))
   expect_equal(unname(res$estimates["ic", 1]), sum(-2 * lppd))
@@ -524,7 +524,7 @@ testthat::test_that("mlpd on the test source uses ylp_test, not ylp", {
   ylp_test <- matrix(rnorm(S * 8, -5, 0.1), S, 8)
   lppd_test <- matrixStats::colLogSumExps(ylp_test) - log(S)
 
-  res <- test_pred_measure(ylp = ylp, ylp_test = ylp_test, measure = "mlpd")
+  res <- test_pred_measure(ylp = ylp, ylp_test = ylp_test, measures = "mlpd")
 
   expect_equal(unname(res$estimates["mlpd_test", 1]), mean(lppd_test))
   expect_equal(unname(res$pointwise[, "mlpd_test"]), unname(lppd_test))
@@ -536,7 +536,7 @@ testthat::test_that("mlpd and ic work when only a loo object is given", {
     loo(LL, save_psis = TRUE, r_eff = rep(1, ncol(LL)))
   )
 
-  res <- loo_pred_measure(loo = lo, measure = c("mlpd", "ic"))
+  res <- loo_pred_measure(loo = lo, measures = c("mlpd", "ic"))
 
   elpd_loo_i <- lo$pointwise[, "elpd_loo"]
   expect_equal(unname(res$estimates["mlpd_loo", 1]), mean(elpd_loo_i))
