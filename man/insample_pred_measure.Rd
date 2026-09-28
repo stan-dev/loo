@@ -9,7 +9,7 @@ insample_pred_measure(
   ypred = NULL,
   mupred = NULL,
   ylp = NULL,
-  measure = NULL,
+  measures = NULL,
   group_ids = NULL,
   save_psis = FALSE,
   control = list()
@@ -31,7 +31,7 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
 summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
-\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\item{measures}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
 \code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
@@ -75,7 +75,7 @@ so that additional measures can be added later with \code{\link[=pred_measure]{p
 recomputing PSIS weights.}
 
 \item{control}{Named list of per-measure settings. Each name must match an
-element of \code{measure}; the value is a list of arguments passed to that
+element of \code{measures}; the value is a list of arguments passed to that
 measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 }
 \value{
@@ -84,7 +84,7 @@ with:
 \describe{
 \item{\code{estimates}}{Matrix of summary estimates and standard errors (rows
 are measures, columns are \code{Estimate} and \code{SE}). The row \code{elpd} is
-present when \code{measure} is \code{NULL} (default) or names "elpd".}
+present when \code{measures} is \code{NULL} (default) or names "elpd".}
 \item{\code{pointwise}}{Matrix of observation-level contributions (one column
 per measure).}
 }
@@ -121,12 +121,12 @@ needs:\tabular{lcccc}{
 
 "elpd" is the default measure. \code{mlpd} and \code{ic} are derived from \code{elpd}, but
 requesting them does not add an \code{elpd} row. Request \code{ic}, \code{mlpd}, or other
-density scores via \code{measure}, or supply a custom function;
+density scores via \code{measures}, or supply a custom function;
 see \link{supported_measures_list} and the
 \href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{overview of scores and metrics}
 article for definitions and orientation (higher vs lower is better).
 
-\strong{Custom measures.} A function passed to \code{measure} must have attribute
+\strong{Custom measures.} A function passed to \code{measures} must have attribute
 \code{measure_name} and return \code{estimate}, \code{se}, and \code{pointwise}. Only arguments
 declared in the function signature among \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} are supplied automatically.
@@ -174,7 +174,7 @@ if (requireNamespace("brms", quietly = TRUE)) {
     y = fit$data$Reaction,
     ypred = brms::posterior_predict(fit),
     mupred = brms::posterior_epred(fit),
-    measure = c("rmse", "r2")
+    measures = c("rmse", "r2")
   )
 }
 }
@@ -192,7 +192,7 @@ my_abs_err <- function(y, mupred, log_weights = NULL) {
 attr(my_abs_err, "measure_name") <- "my_abs_err"
 # the estimate is the mean of the pointwise values, so declare "mean"
 attr(my_abs_err, "measure_se_diff") <- "mean"
-# insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measure = my_abs_err)
+# insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measures = my_abs_err)
 }
 
 }

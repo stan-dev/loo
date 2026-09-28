@@ -215,13 +215,13 @@
 #'     loo = loo(fit1, save_psis = TRUE),
 #'     y = fit1$data$Reaction,
 #'     mupred = brms::posterior_epred(fit1),
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #'   pm2 <- loo_pred_measure(
 #'     loo = loo(fit2, save_psis = TRUE),
 #'     y = fit2$data$Reaction,
 #'     mupred = brms::posterior_epred(fit2),
-#'     measure = c("rmse", "r2")
+#'     measures = c("rmse", "r2")
 #'   )
 #'   comp <- model_compare(pm1, pm2)
 #'   print(comp)                      # ranked by elpd (default)
@@ -234,13 +234,13 @@
 #'     y = fit1$data$Reaction,
 #'     mupred = brms::kfold_predict(kf1, method = "fitted")$yrep,
 #'     kfold = kf1,
-#'     measure = "rmse"
+#'     measures = "rmse"
 #'   )
 #'   kpm2 <- kfold_pred_measure(
 #'     y = fit2$data$Reaction,
 #'     mupred = brms::kfold_predict(kf2, method = "fitted")$yrep,
 #'     kfold = kf2,
-#'     measure = "rmse"
+#'     measures = "rmse"
 #'   )
 #'   model_compare(kpm1, kpm2)
 #'

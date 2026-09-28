@@ -22,7 +22,7 @@
 #' @param predperf An existing predictive measure object (class
 #'   `"pred_measure"`) to update. When supplied, stored rows and
 #'   (for LOO) PSIS weights are reused instead of recomputed.
-#' @param measure Measures to compute. `NULL` (default) gives `elpd` (with
+#' @param measures Measures to compute. `NULL` (default) gives `elpd` (with
 #'   `p_loo` / `p_kfold` for LOO and k-fold). Can be:
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
@@ -57,15 +57,9 @@
 #'   measure function and it is stored alongside the estimates and passed on to
 #'   its `measure_se_diff` function; the built-in `r2` uses it for the baseline
 #'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
-#' @param measure_name Only needed when `measure` is a single custom function
-#'   passed directly (not inside a list) — it sets the name that function is
-#'   reported under. Set it with `attr(my_fun, "measure_name") <- "my_metric"`
-#'   before passing `my_fun` to `measure`. If you pass the same function inside
-#'   a list instead (e.g. `list(my_metric = my_fun)`), it takes its name from
-#'   the list element and `measure_name` isn't needed — this also lets the
-#'   same function be reused under several names. If both are set and disagree,
-#'   the list name wins and a warning is issued. Either way,
-#'   `attr(my_fun, "measure_loss")` is still read from the function itself.
+#' @param measure_name For a single custom function, set
+#'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
+#'   `measures`.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with
@@ -81,7 +75,7 @@
 #'   so that additional measures can be added later with [pred_measure()] without
 #'   recomputing PSIS weights.
 #' @param control Named list of per-measure settings. Each name must match an
-#'   element of `measure`; the value is a list of arguments passed to that
+#'   element of `measures`; the value is a list of arguments passed to that
 #'   measure's summary function (e.g. `list(new_measure = list(add_arg = 10))`).
 #' @param source Character string indicating the evaluation mode: `"insample"`,
 #'   `"loo"`, `"kfold"`, or `"test"`. Set automatically by the wrapper
@@ -95,7 +89,7 @@ do_pred_measure <- function(
   mupred = NULL,
   ylp = NULL,
   ylp_test = NULL,
-  measure = NULL,
+  measures = NULL,
   predperf = NULL,
   loo = NULL,
   kfold = NULL,
@@ -112,15 +106,11 @@ do_pred_measure <- function(
     )
   }
 
+  .validate_control(control, .normalize_measure(measures))
   measures <- .prepare_measures(
-    measure, predperf, supported_measures_list, source
+    measures, predperf, supported_measures_list, source
   )
   needs_elpd <- .any_needs_elpd(measures)
-  # validated against every requested measure, including the ones
-  # `.prepare_measures()` dropped as already present: those are reported by their
-  # own warning, and a control entry for them is not a mistake
-  .validate_control(control, .normalize_measure(measure))
-
   if (source == "loo") {
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {

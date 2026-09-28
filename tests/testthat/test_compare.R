@@ -51,14 +51,14 @@ test_that("model_compare dispatches loo_pred_measure inputs", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mse")
+    measures = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m1,
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mse")
+    measures = c("elpd", "r2", "mse")
   )
 
   comp <- suppressMessages(model_compare(pm1, pm2))
@@ -92,14 +92,14 @@ test_that("model_compare warns when predictive measures differ across models", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mse")
+    measures = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
 
   expect_warning(
@@ -118,21 +118,21 @@ test_that("model_compare works with three loo_pred_measure models", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
   pm3 <- loo_pred_measure(
     loo = res$loo_p_m3,
     y = res$y,
     mupred = res$mupred_m3,
     ylp = res$ylp_m3,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
 
   comp <- model_compare(list("A" = pm1, "B" = pm2, "C" = pm3))
@@ -159,14 +159,14 @@ test_that("print marks and explains flipped measure signs", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("r2", "mse")
+    measures = c("r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("r2", "mse")
+    measures = c("r2", "mse")
   )
 
   comp <- model_compare(list(m1 = pm1, m2 = pm2))
@@ -190,7 +190,7 @@ test_that("each measure uses its own best model as reference", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("elpd", "r2", "mse", "mae")
+      measures = c("elpd", "r2", "mse", "mae")
     )
   }
   pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
@@ -220,7 +220,7 @@ test_that("each printed measure table is sorted best model first", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("elpd", "r2", "mse", "mae")
+      measures = c("elpd", "r2", "mse", "mae")
     )
   }
   pms <- list(m1 = mk(1), m2 = mk(2), m3 = mk(3))
@@ -255,21 +255,21 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
   pm3 <- loo_pred_measure(
     loo = res$loo_p_m3,
     y = res$y,
     mupred = res$mupred_m3,
     ylp = res$ylp_m3,
-    measure = c("elpd", "r2", "mae")
+    measures = c("elpd", "r2", "mae")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2, m3 = pm3)))
@@ -296,7 +296,7 @@ test_that("without `elpd` the default ranking measure is the first shared one", 
       y = res$y,
       mupred = res[[paste0("mupred_", sfx)]],
       ylp = res[[paste0("ylp_", sfx)]],
-      measure = c("r2", "mse")
+      measures = c("r2", "mse")
     )
   }
   pms <- list(m1 = mk("m1"), m2 = mk("m2"))
@@ -317,14 +317,14 @@ test_that("model_compare measure helpers work as expected", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = c("elpd", "r2", "mse")
+    measures = c("elpd", "r2", "mse")
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = c("elpd", "r2", "mse")
+    measures = c("elpd", "r2", "mse")
   )
   loos <- list(pm1, pm2)
   cols <- loo:::.compare_pointwise_cols(loos)
@@ -401,14 +401,14 @@ test_that("rmse differences use the delta-method standard error", {
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = "rmse"
+    measures = "rmse"
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = "rmse"
+    measures = "rmse"
   )
   loos <- list(pm1, pm2)
 
@@ -458,7 +458,7 @@ test_that("r2 differences use the delta-method standard error", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   make <- function(loo, mupred, ylp) {
     loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = "r2"
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = "r2"
     )
   }
   pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1)
@@ -525,7 +525,7 @@ test_that("r2 reports the difference without an se when the baseline is gone", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   make <- function(loo, mupred, ylp) {
     loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = "r2"
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = "r2"
     )
   }
   pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1)
@@ -582,7 +582,7 @@ test_that("r2 reports the difference without an se when the baseline is gone", {
       ylp = ylp,
       y = y,
       mupred = mupred,
-      measure = "bacc"
+      measures = "bacc"
     ))
   }
   list(pm1 = make(res$mupred), pm2 = make(biased), y = y)
@@ -707,7 +707,7 @@ test_that("custom measures take their se_diff from their declaration", {
 
   make <- function(loo, mupred, ylp, fun) {
     loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = fun
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = fun
     )
   }
 
@@ -863,7 +863,7 @@ test_that("a declared custom loss is compared and ranked as a loss", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = list("elpd", fun)
+      measures = list("elpd", fun)
     )
   }
 
@@ -942,7 +942,7 @@ test_that("`measure_se_diff` accepts the \"sum\" and \"mean\" shorthands", {
 
   make <- function(loo, mupred, ylp, measure) {
     loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = measure
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
     )
   }
 
@@ -1027,7 +1027,7 @@ test_that("a custom measure can declare `measure_se_diff` itself", {
   }
   make <- function(loo, mupred, ylp, measure) {
     loo_pred_measure(
-      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measure = measure
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
     )
   }
   pms <- function(measure) {
@@ -1113,7 +1113,7 @@ test_that("model_compare errors on inconsistent measure metadata", {
       y = res$y,
       mupred = mupred,
       ylp = ylp,
-      measure = list(my_mse = fun)
+      measures = list(my_mse = fun)
     )
   }
   pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, make_fun(TRUE))
@@ -1132,14 +1132,14 @@ test_that("model_compare errors when compare metadata is missing on some models"
     y = res$y,
     mupred = res$mupred_m1,
     ylp = res$ylp_m1,
-    measure = "mse"
+    measures = "mse"
   )
   pm2 <- loo_pred_measure(
     loo = res$loo_p_m2,
     y = res$y,
     mupred = res$mupred_m2,
     ylp = res$ylp_m2,
-    measure = "mse"
+    measures = "mse"
   )
   measure_info <- attr(pm2, "measure_info")
   measure_info$mse <- NULL
@@ -1159,7 +1159,7 @@ test_that("model_compare errors when compare metadata is missing on some models"
       y = res$y,
       mupred = res[[paste0("mupred_m", suffix)]],
       ylp = res[[paste0("ylp_m", suffix)]],
-      measure = c("elpd", measure)
+      measures = c("elpd", measure)
     ),
     extra_args
   )
@@ -1177,7 +1177,7 @@ test_that("model_compare errors when compare metadata is missing on some models"
       ylp = ylp,
       y = res_binary$y,
       ypred = res_binary$ypred,
-      measure = c("elpd", measure)
+      measures = c("elpd", measure)
     ))
   }
   if (measure %in% c("acc", "bacc")) {
@@ -1190,7 +1190,7 @@ test_that("model_compare errors when compare metadata is missing on some models"
       ylp = ylp,
       y = as.integer(res_cat$y),
       mupred = res_cat$mupred,
-      measure = c("elpd", measure)
+      measures = c("elpd", measure)
     ))
   }
   stop("Unsupported synthetic measure: ", measure)
@@ -1215,14 +1215,14 @@ test_that("model_compare works for all built-in measures", {
       y = res$y,
       ypred = res$ypred_m1,
       ylp = res$ylp_m1,
-      measure = c("elpd", measure)
+      measures = c("elpd", measure)
     )
     pm2 <- loo_pred_measure(
       loo = res$loo_p_m2,
       y = res$y,
       ypred = res$ypred_m2,
       ylp = res$ylp_m2,
-      measure = c("elpd", measure)
+      measures = c("elpd", measure)
     )
     comp <- suppressMessages(model_compare(pm1, pm2))
     expect_true(paste0(measure, "_diff") %in% colnames(comp), info = measure)
@@ -1245,7 +1245,7 @@ test_that("model_compare works for all built-in measures", {
       y = res$y,
       mupred = res$mupred_m1 + rnorm(length(res$y), 0, noise_scale * i),
       ylp = res$ylp_m1,
-      measure = c("elpd", "mae")
+      measures = c("elpd", "mae")
     )
   })
 }
@@ -1467,11 +1467,11 @@ test_that("model_compare compares kfold_pred_measure objects", {
   set.seed(4321)
   k1 <- kfold_pred_measure(
     y = res$y, mupred = res$mupred, kfold = res$kfold,
-    measure = c("elpd", "rmse", "mse")
+    measures = c("elpd", "rmse", "mse")
   )
   k2 <- kfold_pred_measure(
     y = res$y, mupred = .jitter_mupred(res$mupred, 3), kfold = res$kfold,
-    measure = c("elpd", "rmse", "mse")
+    measures = c("elpd", "rmse", "mse")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
@@ -1497,11 +1497,11 @@ test_that("model_compare compares test_pred_measure objects", {
   set.seed(4321)
   t1 <- test_pred_measure(
     y = res_cv$y_test, mupred = res_cv$mupred_test,
-    ylp_test = res_cv$ylp_test, measure = c("elpd", "rmse")
+    ylp_test = res_cv$ylp_test, measures = c("elpd", "rmse")
   )
   t2 <- test_pred_measure(
     y = res_cv$y_test, mupred = .jitter_mupred(res_cv$mupred_test, 5),
-    ylp_test = res_cv$ylp_test, measure = c("elpd", "rmse")
+    ylp_test = res_cv$ylp_test, measures = c("elpd", "rmse")
   )
 
   comp <- suppressMessages(model_compare(list(m1 = t1, m2 = t2)))
@@ -1515,11 +1515,11 @@ test_that("model_compare warns that insample_pred_measure comparisons are biased
   res <- .compare_src_res()
   set.seed(4321)
   i1 <- insample_pred_measure(
-    y = res$y, mupred = res$mupred, ylp = res$ylp, measure = c("elpd", "rmse")
+    y = res$y, mupred = res$mupred, ylp = res$ylp, measures = c("elpd", "rmse")
   )
   i2 <- insample_pred_measure(
     y = res$y, mupred = .jitter_mupred(res$mupred, 3), ylp = res$ylp,
-    measure = c("elpd", "rmse")
+    measures = c("elpd", "rmse")
   )
 
   expect_warning(
@@ -1535,11 +1535,11 @@ test_that("model_compare warns that insample_pred_measure comparisons are biased
 test_that("model_compare errors when evaluation sources are mixed", {
   res <- .compare_src_res()
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = "rmse")
+                           measures = "rmse")
   l1 <- loo_pred_measure(loo = res$loo, y = res$y, mupred = res$mupred,
-                         measure = "rmse")
+                         measures = "rmse")
   i1 <- insample_pred_measure(y = res$y, mupred = res$mupred, ylp = res$ylp,
-                              measure = "rmse")
+                              measures = "rmse")
 
   # all three have the same number of observations, so this is genuinely the
   # source check firing rather than the observation-count check
@@ -1560,9 +1560,9 @@ test_that("model_compare warns when kfold results use different K", {
   res <- .compare_src_res()
   set.seed(4321)
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = "rmse")
+                           measures = "rmse")
   k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
-                           kfold = res$kfold, measure = "rmse")
+                           kfold = res$kfold, measures = "rmse")
   attr(k2, "K") <- 5L
 
   expect_warning(
@@ -1578,9 +1578,9 @@ test_that("model_compare warns when kfold results use different folds", {
   attr(kf2, "folds") <- sample(attr(res$kfold, "folds"))
 
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = "rmse")
+                           measures = "rmse")
   k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
-                           kfold = kf2, measure = "rmse")
+                           kfold = kf2, measures = "rmse")
 
   expect_warning(
     suppressMessages(model_compare(list(m1 = k1, m2 = k2))),
@@ -1603,7 +1603,7 @@ test_that("printed comparison output stays within 80 columns", {
       y = res$y,
       mupred = res[[paste0("mupred_m", m)]],
       ylp = res[[paste0("ylp_m", m)]],
-      measure = c("r2", "mse", "mae")
+      measures = c("r2", "mse", "mae")
     )
   }
   # long names stress both the wrapped sentences and the table layout
@@ -1654,9 +1654,9 @@ test_that("loo_compare is frozen to classic elpd comparison", {
   res <- .compare_src_res()
   set.seed(4321)
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = "rmse")
+                           measures = "rmse")
   k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
-                           kfold = res$kfold, measure = "rmse")
+                           kfold = res$kfold, measures = "rmse")
 
   expect_error(
     suppressWarnings(loo_compare(k1, k2)),
@@ -1676,9 +1676,9 @@ test_that("print.compare.loo names the source for non-loo comparisons", {
   res <- .compare_src_res()
   set.seed(4321)
   k1 <- kfold_pred_measure(y = res$y, mupred = res$mupred, kfold = res$kfold,
-                           measure = "rmse")
+                           measures = "rmse")
   k2 <- kfold_pred_measure(y = res$y, mupred = .jitter_mupred(res$mupred, 3),
-                           kfold = res$kfold, measure = "rmse")
+                           kfold = res$kfold, measures = "rmse")
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
 
   # the fold count qualifies a k-fold comparison
@@ -1689,11 +1689,11 @@ test_that("print.compare.loo names the source for non-loo comparisons", {
   res_cv <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
   t1 <- test_pred_measure(
     y = res_cv$y_test, mupred = res_cv$mupred_test,
-    ylp_test = res_cv$ylp_test, measure = "rmse"
+    ylp_test = res_cv$ylp_test, measures = "rmse"
   )
   t2 <- test_pred_measure(
     y = res_cv$y_test, mupred = .jitter_mupred(res_cv$mupred_test, 5),
-    ylp_test = res_cv$ylp_test, measure = "rmse"
+    ylp_test = res_cv$ylp_test, measures = "rmse"
   )
   comp_test <- suppressMessages(model_compare(list(m1 = t1, m2 = t2)))
   expect_output(
@@ -1704,10 +1704,10 @@ test_that("print.compare.loo names the source for non-loo comparisons", {
 
   # LOO is the default and stays unlabelled
   l1 <- loo_pred_measure(loo = res$loo, y = res$y, mupred = res$mupred,
-                         measure = "rmse")
+                         measures = "rmse")
   l2 <- loo_pred_measure(loo = res$loo, y = res$y,
                          mupred = .jitter_mupred(res$mupred, 3),
-                         measure = "rmse")
+                         measures = "rmse")
   comp_loo <- suppressMessages(model_compare(list(m1 = l1, m2 = l2)))
   expect_no_match(
     paste(capture.output(print(comp_loo)), collapse = "\n"),
@@ -1729,7 +1729,7 @@ test_that("rps is sign-converted for comparison but srps is not", {
       y = y,
       ypred = ypred,
       ylp = matrix(dnorm(rep(y, each = S), log = TRUE), nrow = S),
-      measure = c("rps", "srps")
+      measures = c("rps", "srps")
     )
   }
   pm1 <- make(good)
@@ -1764,7 +1764,7 @@ test_that("control scaled = TRUE does not invert the srps ranking", {
       y = res$y,
       ypred = res[[paste0("ypred_", sfx)]],
       ylp = res[[paste0("ylp_", sfx)]],
-      measure = c("elpd", measure),
+      measures = c("elpd", measure),
       control = control
     )
   }

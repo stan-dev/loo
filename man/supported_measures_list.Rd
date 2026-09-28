@@ -7,7 +7,7 @@
 supported_measures_list
 }
 \description{
-A character vector of measure names that can be passed to the \code{measure}
+A character vector of measure names that can be passed to the \code{measures}
 argument of \code{\link[=insample_pred_measure]{insample_pred_measure()}}, \code{\link[=loo_pred_measure]{loo_pred_measure()}},
 \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}, \code{\link[=test_pred_measure]{test_pred_measure()}}, and \code{\link[=pred_measure]{pred_measure()}}.
 }

@@ -210,7 +210,7 @@ fit_measure <- function(fit, measure) {
     y = fit$data$y,
     ypred = brms::posterior_predict(fit),
     mupred = brms::posterior_epred(fit),
-    measure = measure
+    measures = measure
   )
 }
 
@@ -594,7 +594,7 @@ kfold_measure <- function(fit, measure) {
     ypred = brms::kfold_predict(kf, method = "predict")$yrep,
     mupred = brms::kfold_predict(kf, method = "fitted")$yrep,
     kfold = kf,
-    measure = measure
+    measures = measure
   )
 }
 
@@ -629,7 +629,7 @@ test_measure <- function(fit, measure) {
     mupred = brms::posterior_epred(fit_train, newdata = roaches_test),
     ylp = brms::log_lik(fit_train),
     ylp_test = brms::log_lik(fit_train, newdata = roaches_test),
-    measure = measure
+    measures = measure
   )
 }
 
@@ -652,7 +652,7 @@ insample_measure <- function(fit, measure) {
     ypred = brms::posterior_predict(fit),
     mupred = brms::posterior_epred(fit),
     ylp = brms::log_lik(fit),
-    measure = measure
+    measures = measure
   )
 }
 

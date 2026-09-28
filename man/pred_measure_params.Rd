@@ -11,7 +11,7 @@ do_pred_measure(
   mupred = NULL,
   ylp = NULL,
   ylp_test = NULL,
-  measure = NULL,
+  measures = NULL,
   predperf = NULL,
   loo = NULL,
   kfold = NULL,
@@ -43,7 +43,7 @@ observations (\code{S} × \code{n_test}), typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 
-\item{measure}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
+\item{measures}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
 \code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:
 \itemize{
 \item A \strong{character vector} of built-in names; see
@@ -107,18 +107,12 @@ recomputing PSIS weights.}
 functions; required when calling \code{\link[=do_pred_measure]{do_pred_measure()}} directly.}
 
 \item{control}{Named list of per-measure settings. Each name must match an
-element of \code{measure}; the value is a list of arguments passed to that
+element of \code{measures}; the value is a list of arguments passed to that
 measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).}
 
-\item{measure_name}{Only needed when \code{measure} is a single custom function
-passed directly (not inside a list) — it sets the name that function is
-reported under. Set it with \code{attr(my_fun, "measure_name") <- "my_metric"}
-before passing \code{my_fun} to \code{measure}. If you pass the same function inside
-a list instead (e.g. \code{list(my_metric = my_fun)}), it takes its name from
-the list element and \code{measure_name} isn't needed — this also lets the
-same function be reused under several names. If both are set and disagree,
-the list name wins and a warning is issued. Either way,
-\code{attr(my_fun, "measure_loss")} is still read from the function itself.}
+\item{measure_name}{For a single custom function, set
+\code{attr(my_fun, "measure_name") <- "my_metric"} before passing \code{my_fun} to
+\code{measures}.}
 }
 \description{
 Parameter definitions shared by the user-facing entry points and the

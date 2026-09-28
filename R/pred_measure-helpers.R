@@ -175,7 +175,7 @@
   is_custom <- !is_builtin
   if (any(is_custom)) {
     for (entry in entries[is_custom]) {
-      checkmate::assert_function(entry$key, .var.name = "measure")
+      checkmate::assert_function(entry$key, .var.name = "measures")
     }
   }
 

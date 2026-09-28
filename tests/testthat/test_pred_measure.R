@@ -7,7 +7,7 @@ n_test <- length(res_sleep_test$y_test)
 test_that("group_ids errors as not yet implemented", {
   expect_error(
     insample_pred_measure(
-      ylp = res$ylp, measure = "elpd", group_ids = rep(1:2, 131)
+      ylp = res$ylp, measures = "elpd", group_ids = rep(1:2, 131)
     ),
     "not yet implemented"
   )
@@ -184,7 +184,7 @@ test_that("duplicate measure on update warns once and keeps the results", {
   warnings <- character()
   withCallingHandlers(
     updated <- pred_measure(
-      ylp = res$ylp, predperf = predperf, measure = "elpd"
+      ylp = res$ylp, predperf = predperf, measures = "elpd"
     ),
     warning = function(w) {
       warnings <<- c(warnings, conditionMessage(w))
@@ -206,7 +206,7 @@ test_that("control scaled = TRUE stores the result as srps, not rps", {
     y = res$y,
     ypred = res$ypred,
     ylp = res$ylp,
-    measure = "rps",
+    measures = "rps",
     control = list(rps = list(scaled = TRUE))
   )
 
@@ -221,7 +221,7 @@ test_that("pred_measure() updates loo results as expected", {
     y = res$y,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = c("elpd", "r2", "mse"),
+    measures = c("elpd", "r2", "mse"),
     save_psis = TRUE
   )
 
@@ -229,7 +229,7 @@ test_that("pred_measure() updates loo results as expected", {
     y = res$y,
     mupred = res$mupred,
     predperf = predperf_loo,
-    measure = "mae"
+    measures = "mae"
   )
 
   expect_equal(
@@ -245,12 +245,12 @@ test_that("loo_pred_measure() warns for non-elpd measures after moment matching"
   expect_warning(
     loo_pred_measure(
       loo = loo_mm, y = res$y, mupred = res$mupred, ylp = res$ylp,
-      measure = c("elpd", "r2")
+      measures = c("elpd", "r2")
     ),
     regexp = "moment_match"
   )
   expect_no_warning(
-    loo_pred_measure(loo = loo_mm, ylp = res$ylp, measure = c("elpd", "mlpd"))
+    loo_pred_measure(loo = loo_mm, ylp = res$ylp, measures = c("elpd", "mlpd"))
   )
 })
 
@@ -260,13 +260,13 @@ test_that("loo_pred_measure() warns for non-elpd measures after reloo", {
   loo_reloo$diagnostics$pareto_k[obs] <- 0
   expect_warning(
     loo_pred_measure(
-      loo = loo_reloo, y = res$y, mupred = res$mupred, measure = "r2"
+      loo = loo_reloo, y = res$y, mupred = res$mupred, measures = "r2"
     ),
     regexp = "reloo"
   )
   expect_no_warning(
     loo_pred_measure(
-      loo = res$loo, y = res$y, mupred = res$mupred, measure = "r2"
+      loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2"
     )
   )
 })
@@ -274,9 +274,9 @@ test_that("loo_pred_measure() warns for non-elpd measures after reloo", {
 test_that("pred_measure() keeps dims when the update has no matrix input", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,
-    measure = c("elpd", "r2"), save_psis = TRUE
+    measures = c("elpd", "r2"), save_psis = TRUE
   )
-  updated <- pred_measure(predperf = predperf_loo, measure = "mlpd")
+  updated <- pred_measure(predperf = predperf_loo, measures = "mlpd")
 
   expect_false(is.null(attr(updated, "dims")))
   expect_equal(attr(updated, "dims"), attr(predperf_loo, "dims"))
@@ -285,13 +285,13 @@ test_that("pred_measure() keeps dims when the update has no matrix input", {
 test_that("pred_measure() reuses stored log_weights when save_psis = FALSE", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,
-    measure = "r2"
+    measures = "r2"
   )
   expect_null(predperf_loo$psis_object)
   expect_false(is.null(predperf_loo$log_weights))
 
   updated <- pred_measure(
-    y = res$y, mupred = res$mupred, predperf = predperf_loo, measure = "mae"
+    y = res$y, mupred = res$mupred, predperf = predperf_loo, measures = "mae"
   )
   expect_true("mae_loo" %in% rownames(updated$estimates))
 })
@@ -302,7 +302,7 @@ test_that("pred_measure() provides warning for duplicate measure", {
     y = res$y,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = "r2",
+    measures = "r2",
     save_psis = TRUE
   )
 
@@ -311,7 +311,7 @@ test_that("pred_measure() provides warning for duplicate measure", {
       y = res$y,
       mupred = res$mupred,
       predperf = predperf_loo,
-      measure = "r2"
+      measures = "r2"
     ),
     regexp = "already present in .* and will be skipped"
   )
@@ -322,7 +322,7 @@ test_that("pred_measure() provides warning for duplicate measure", {
       mupred = res$mupred,
       ylp = res$ylp,
       loo = res$loo,
-      measure = c("mse", "r2", "r2")
+      measures = c("mse", "r2", "r2")
     ),
     regexp = "Duplicate measure"
   )
@@ -334,7 +334,7 @@ test_that("loo_pred_measure() computes expected measures", {
     y = res$y,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = c("r2", "mse")
+    measures = c("r2", "mse")
   )
 
   expect_equal(
@@ -372,7 +372,7 @@ test_that("do_pred_measure() warns if control args are invalid", {
       ypred = res$ypred,
       mupred = res$mupred,
       ylp = res$ylp,
-      measure = c("rps", "srps"),
+      measures = c("rps", "srps"),
       kfold = res$kfold,
       control = list(
         rps = list(size = 10)
@@ -387,7 +387,7 @@ test_that("kfold_pred_measure() requires kfold argument", {
     kfold_pred_measure(
       y = res$y,
       mupred = res$mupred,
-      measure = "rmse"
+      measures = "rmse"
     ),
     regexp = "`kfold` is required"
   )
@@ -399,7 +399,7 @@ test_that("kfold_pred_measure() works with rps as expected", {
     ypred = res$ypred,
     mupred = res$mupred,
     ylp = res$ylp,
-    measure = c("mlpd", "ic", "rps", "srps"),
+    measures = c("mlpd", "ic", "rps", "srps"),
     kfold = res$kfold
   )
 
@@ -417,7 +417,7 @@ test_that("test_pred_measure() computes holdout measures as expected", {
     ypred = res_sleep_test$ypred_test,
     mupred = res_sleep_test$mupred_test,
     ylp_test = res_sleep_test$ylp_test,
-    measure = c("elpd", "rmse", "r2")
+    measures = c("elpd", "rmse", "r2")
   )
 
   expect_s3_class(test_res, "test_pred_measure")
@@ -437,7 +437,7 @@ test_that("test_pred_measure() works with ylp_test only for base summary", {
     y = res_sleep_test$y_test,
     mupred = res_sleep_test$mupred_test,
     ylp_test = res_sleep_test$ylp_test,
-    measure = c("elpd", "mae")
+    measures = c("elpd", "mae")
   )
 
   expect_equal(rownames(test_res$estimates), c("elpd_test", "mae_test"))
@@ -450,14 +450,14 @@ test_that("pred_measure() updates test_pred_measure results as expected", {
     ypred = res_sleep_test$ypred_test,
     mupred = res_sleep_test$mupred_test,
     ylp_test = res_sleep_test$ylp_test,
-    measure = "rmse"
+    measures = "rmse"
   )
 
   updated <- pred_measure(
     y = res_sleep_test$y_test,
     mupred = res_sleep_test$mupred_test,
     predperf = test_res,
-    measure = "mae"
+    measures = "mae"
   )
 
   expect_equal(rownames(updated$estimates), c("rmse_test", "mae_test"))
@@ -483,7 +483,7 @@ test_that("insample_pred_measure() accepts a custom measure function", {
     y = y,
     mupred = mupred,
     ylp = ylp,
-    measure = custom_rmse
+    measures = custom_rmse
   )
 
   expect_true("custom_rmse" %in% rownames(res$estimates))
@@ -507,7 +507,7 @@ test_that("insample_pred_measure() accepts mixed built-in and custom measures", 
     y = y,
     mupred = mupred,
     ylp = ylp,
-    measure = list("r2", custom_rmse = custom_rmse)
+    measures = list("r2", custom_rmse = custom_rmse)
   )
 
   expect_true(all(c("r2", "custom_rmse") %in% rownames(res$estimates)))
@@ -515,7 +515,7 @@ test_that("insample_pred_measure() accepts mixed built-in and custom measures", 
 
 ## elpd on demand -------------------------------------------------------
 
-test_that("measure = NULL reports elpd and p for every source", {
+test_that("measures = NULL reports elpd and p for every source", {
   expect_equal(rownames(insample_pred_measure(ylp = res$ylp)$estimates), "elpd")
   expect_equal(
     rownames(loo_pred_measure(loo = res$loo)$estimates), c("elpd_loo", "p_loo")
@@ -544,24 +544,24 @@ test_that("elpd and p from loo and kfold objects equal the object estimates", {
 })
 
 test_that("insample_pred_measure() does not need ylp without elpd", {
-  x <- insample_pred_measure(y = res$y, mupred = res$mupred, measure = "rmse")
+  x <- insample_pred_measure(y = res$y, mupred = res$mupred, measures = "rmse")
   expect_equal(rownames(x$estimates), "rmse")
 })
 
 test_that("loo_pred_measure() keeps diagnostics without elpd", {
   x <- loo_pred_measure(
-    loo = res$loo, y = res$y, mupred = res$mupred, measure = "rmse"
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "rmse"
   )
   expect_equal(x$diagnostics$pareto_k, res$loo$diagnostics$pareto_k)
 })
 
 test_that("pred_measure() recomputes elpd for loo but aborts for kfold", {
   loo_res <- loo_pred_measure(
-    loo = res$loo, y = res$y, mupred = res$mupred, measure = "r2",
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2",
     save_psis = TRUE
   )
   updated <- suppressMessages(
-    pred_measure(ylp = res$ylp, predperf = loo_res, measure = "ic")
+    pred_measure(ylp = res$ylp, predperf = loo_res, measures = "ic")
   )
   expect_equal(rownames(updated$estimates), c("r2_loo", "ic_loo"))
   expect_equal(
@@ -571,10 +571,10 @@ test_that("pred_measure() recomputes elpd for loo but aborts for kfold", {
   )
 
   kfold_res <- kfold_pred_measure(
-    y = res$y, mupred = res$mupred, kfold = res$kfold, measure = "r2"
+    y = res$y, mupred = res$mupred, kfold = res$kfold, measures = "r2"
   )
   expect_error(
-    pred_measure(ylp = res$ylp, predperf = kfold_res, measure = "ic"),
+    pred_measure(ylp = res$ylp, predperf = kfold_res, measures = "ic"),
     regexp = "not stored in"
   )
 })

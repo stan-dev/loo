@@ -128,7 +128,7 @@ $$
 \hat p^q(y_i) = \sum_{s=1}^S w_i^s\, p(y_i \mid \theta^s) .
 $$
 
-Thus `measure = "rps"` gives $\widehat{\text{rps}}^{\text{in}}$ in
+Thus `measures = "rps"` gives $\widehat{\text{rps}}^{\text{in}}$ in
 `insample_pred_measure()` and $\widehat{\text{rps}}^{\text{LOO}}$ in
 `loo_pred_measure()`.
 :::
@@ -270,7 +270,7 @@ insample_sleep <- insample_pred_measure(
   ypred = ypred_sleep,
   mupred = mupred_sleep,
   ylp = ylp_sleep,
-  measure = measures
+  measures = measures
 )
 insample_sleep
 ```
@@ -327,7 +327,7 @@ loo_sleep_measure <- loo_pred_measure(
   y = y_sleep,
   ypred = ypred_sleep,
   mupred = mupred_sleep,
-  measure = measures
+  measures = measures
 )
 loo_sleep_measure
 ```
@@ -406,7 +406,7 @@ kfold_sleep_measure <- kfold_pred_measure(
   ypred = ypred_kfold,
   mupred = mupred_kfold,
   kfold = kfold_sleep,
-  measure = measures
+  measures = measures
 )
 kfold_sleep_measure
 ```
@@ -453,7 +453,7 @@ test_sleep_measure <- test_pred_measure(
   ypred = brms::posterior_predict(fit_sleep_train, newdata = test_data),
   mupred = brms::posterior_epred(fit_sleep_train, newdata = test_data),
   ylp_test = brms::log_lik(fit_sleep_train, newdata = test_data),
-  measure = measures
+  measures = measures
 )
 test_sleep_measure
 ```
@@ -531,7 +531,7 @@ exact_measure <- kfold_pred_measure(
   ypred = ypred_exact,
   mupred = mupred_exact,
   kfold = exact_loo,
-  measure = measures
+  measures = measures
 )
 exact_measure
 ```
@@ -552,7 +552,7 @@ loo_mm <- brms::loo(fit_sleep_mm, moment_match = TRUE, save_psis = TRUE)
 Request only the log score, see the warning above:
 
 ```{r moment-matching-measures}
-mm_measure <- loo_pred_measure(loo = loo_mm, measure = c("elpd", "mlpd"))
+mm_measure <- loo_pred_measure(loo = loo_mm, measures = c("elpd", "mlpd"))
 mm_measure
 ```
 
@@ -568,7 +568,7 @@ loo_reloo <- brms::loo(fit_sleep, reloo = TRUE, save_psis = TRUE)
 ```
 
 ```{r reloo-measures}
-reloo_measure <- loo_pred_measure(loo = loo_reloo, measure = c("elpd", "mlpd"))
+reloo_measure <- loo_pred_measure(loo = loo_reloo, measures = c("elpd", "mlpd"))
 reloo_measure
 ```
 
@@ -636,7 +636,7 @@ mixis_measure <- loo_pred_measure(
   y = y_sleep,
   ypred = brms::posterior_predict(fit_sleep_mix),
   mupred = brms::posterior_epred(fit_sleep_mix),
-  measure = c("mlpd", "rps", "rmse", "r2")
+  measures = c("mlpd", "rps", "rmse", "r2")
 )
 mixis_measure
 ```
@@ -671,8 +671,8 @@ skips it.
 
 | Approach | When to use | Call |
 | :--- | :--- | :--- |
-| **one call** | you know all measures beforehand | `loo_pred_measure(..., measure = c("rps", "r2"))` |
-| **step by step** | you explore, or you add measures later | `pred_measure(..., predperf = result, measure = "r2")` |
+| **one call** | you know all measures beforehand | `loo_pred_measure(..., measures = c("rps", "r2"))` |
+| **step by step** | you explore, or you add measures later | `pred_measure(..., predperf = result, measures = "r2")` |
 
 **Implementation.** For PSIS-LOO, set `save_psis = TRUE` in the first call.
 `pred_measure()` then reuses the stored PSIS object and its diagnostics.
@@ -685,16 +685,16 @@ pred_measure(
   y = y_sleep,
   mupred = mupred_sleep,
   predperf = loo_elpd,
-  measure = c("mae", "rmse")
+  measures = c("mae", "rmse")
 )
 ```
 
-The first call uses the default `measure = NULL`, which gives `elpd`. The
+The first call uses the default `measures = NULL`, which gives `elpd`. The
 second call adds `mae_loo` and `rmse_loo` with the stored PSIS weights.
 
 ## Custom measures {#custom-measures}
 
-`measure` also accepts functions. A custom function must follow three rules:
+`measures` also accepts functions. A custom function must follow three rules:
 
 + **Arguments.** Name the arguments from `y`, `ypred`, `mupred`, `ylp`, and
   `log_weights`. **loo** supplies each of these names that appears in the
@@ -741,14 +741,14 @@ coverage <- function(y, ypred, log_weights = NULL, prob = 0.9) {
 insample_pred_measure(
   y = y_sleep,
   ypred = ypred_sleep,
-  measure = list("rps", cover90 = coverage)
+  measures = list("rps", cover90 = coverage)
 )
 
 loo_pred_measure(
   loo = loo_sleep,
   y = y_sleep,
   ypred = ypred_sleep,
-  measure = list("rps", cover90 = coverage)
+  measures = list("rps", cover90 = coverage)
 )
 ```
 
@@ -782,7 +782,7 @@ df_methods <- do.call(rbind, lapply(names(results), function(method) {
   keep <- measure %in% c("mlpd", "rps", "rmse", "r2")
   data.frame(
     method = method,
-    measure = measure[keep],
+    measures = measure[keep],
     estimate = est[keep, "Estimate"],
     se = est[keep, "SE"],
     row.names = NULL
@@ -792,7 +792,7 @@ df_methods <- do.call(rbind, lapply(names(results), function(method) {
 n_sleep <- length(y_sleep)
 df_methods <- rbind(df_methods, data.frame(
   method = "subsampling",
-  measure = "mlpd",
+  measures = "mlpd",
   estimate = loo_ss$estimates["elpd_loo", "Estimate"] / n_sleep,
   se = loo_ss$estimates["elpd_loo", "SE"] / n_sleep
 ))

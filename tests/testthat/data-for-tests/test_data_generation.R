@@ -36,7 +36,7 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
     ypred_kfold <- brms::kfold_predict(kfold, method = "predict")$yrep
     loo <- brms::loo(fit, save_psis = TRUE)
     predperf <- insample_pred_measure(y = fit$data$y, mupred = mupred, 
-      measure = "r2", ylp = ylp)
+      measures = "r2", ylp = ylp)
   }
   
   if (model == "roaches") {
@@ -186,7 +186,7 @@ shrink_res <- function(model, res) {
   }
   if (!is.null(res$predperf)) {
     res$predperf <- insample_pred_measure(
-      y = res$y, mupred = res$mupred, measure = "r2", ylp = res$ylp
+      y = res$y, mupred = res$mupred, measures = "r2", ylp = res$ylp
     )
   }
   res

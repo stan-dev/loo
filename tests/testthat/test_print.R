@@ -21,7 +21,7 @@ run_measure_snapshots <- function(loo_start, measures) {
     call_args <- c(
       measure$args,
       list(
-        measure = measure$measure,
+        measures = measure$measure,
         save_psis = TRUE
       )
     )
@@ -79,7 +79,7 @@ test_that("loo_pred_measure print output with elpd", {
     loo = temp$loo,
     y = temp$y,
     mupred = temp$mupred,
-    measure = c("elpd", "r2")
+    measures = c("elpd", "r2")
   )
   expect_snapshot_output(print(x))
 })
@@ -91,7 +91,7 @@ test_that("test_pred_measure print output", {
     ypred = res$ypred_test,
     mupred = res$mupred_test,
     ylp_test = res$ylp_test,
-    measure = c("rmse", "r2")
+    measures = c("rmse", "r2")
   )
   expect_s3_class(x, "test_pred_measure")
   expect_snapshot_output(print(x))
