@@ -123,7 +123,7 @@ See \code{\link[=loo]{loo()}} and the
 interpretation.
 }
 \details{
-\strong{Three equivalent input patterns:}
+\strong{Three input patterns:}
 
 \describe{
 \item{Precomputed \code{loo} object}{\code{loo_pred_measure(loo = loo_fit, ...)}.
@@ -132,6 +132,9 @@ Run \code{\link[=loo]{loo()}} with \code{save_psis = TRUE}.}
 PSIS weights separately.}
 \item{\code{ylp} only}{PSIS weights are computed internally from \code{ylp}.}
 }
+
+If you corrected the \code{loo} object after PSIS, pass it as \code{loo}.
+For example, \code{loo_moment_match()} or \code{brms::reloo()}.
 
 For distributional and point-prediction measures (\code{crps}, \code{r2}, etc.),
 supply \code{y}, \code{ypred}, and/or \code{mupred} as for \code{\link[=insample_pred_measure]{insample_pred_measure()}}. When

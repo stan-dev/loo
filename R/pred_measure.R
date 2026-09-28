@@ -185,8 +185,8 @@ insample_pred_measure <- function(
 #'   \item{`ylp` only}{PSIS weights are computed internally from `ylp`.}
 #' }
 #'
-#' If you corrected the loo object after PSIS, pass it as loo.
-#' For example, loo_moment_match() or brms::reloo().
+#' If you corrected the `loo` object after PSIS, pass it as `loo`.
+#' For example, `loo_moment_match()` or `brms::reloo()`.
 #'
 #' For distributional and point-prediction measures (`crps`, `r2`, etc.),
 #' supply `y`, `ypred`, and/or `mupred` as for [insample_pred_measure()]. When
