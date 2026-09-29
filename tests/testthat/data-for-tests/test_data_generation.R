@@ -85,7 +85,9 @@ postprocess_res <- function(model, fit, chains = 2, draws = 200) {
 # ---- fixture shrinking ------------------------------------------------------
 # These fixtures ship in the source tarball, which CRAN limits to 5 MB. Keep
 # only a subset of the observations. The draws stay at 400, so the Pareto k
-# threshold ps_khat_threshold(400) does not move.
+# threshold ps_khat_threshold(400) does not move. The exception is
+# `test_data_roaches_compare.Rds`: its fit uses `thin = 4`, so it holds only
+# 100 draws.
 N_KEEP <- c(
   roaches = 53, roaches_compare = 110, categorical = 67, sleep = 29,
   sleep_test = 20
@@ -257,6 +259,7 @@ get_roaches_compare_res <- function() {
     prior = prior(normal(0, 1), class = b),
     chains = 2,
     iter = 400,
+    thin = 4,
     refresh = 0,
     seed = SEED
   )
@@ -423,13 +426,13 @@ generate_test_data <- function() {
   full_roaches_compare <- get_roaches_compare_res()
 
   test_path <- "tests/testthat/data-for-tests/"
-  saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"))
-  saveRDS(shrink_roaches_compare(full_roaches_compare), paste0(test_path, "test_data_roaches_compare.Rds"))
-  saveRDS(shrink_res("binary", full_binary$res), paste0(test_path, "test_data_binary.Rds"))
-  saveRDS(shrink_res("categorical", full_penguins$res), paste0(test_path, "test_data_penguins.Rds"))
-  saveRDS(shrink_res("binomial", full_binomial$res), paste0(test_path, "test_data_binomial.Rds"))
-  saveRDS(shrink_res("sleep", full_sleep$res), paste0(test_path, "test_data_sleep.Rds"))
-  saveRDS(shrink_res("sleep_test", full_sleep_test$res), paste0(test_path, "test_data_sleep_cv.Rds"))
+  saveRDS(shrink_res("roaches", full_roaches$res), paste0(test_path, "test_data_roaches.Rds"), compress = "xz")
+  saveRDS(shrink_roaches_compare(full_roaches_compare), paste0(test_path, "test_data_roaches_compare.Rds"), compress = "xz")
+  saveRDS(shrink_res("binary", full_binary$res), paste0(test_path, "test_data_binary.Rds"), compress = "xz")
+  saveRDS(shrink_res("categorical", full_penguins$res), paste0(test_path, "test_data_penguins.Rds"), compress = "xz")
+  saveRDS(shrink_res("binomial", full_binomial$res), paste0(test_path, "test_data_binomial.Rds"), compress = "xz")
+  saveRDS(shrink_res("sleep", full_sleep$res), paste0(test_path, "test_data_sleep.Rds"), compress = "xz")
+  saveRDS(shrink_res("sleep_test", full_sleep_test$res), paste0(test_path, "test_data_sleep_cv.Rds"), compress = "xz")
   message("Saved test fixtures to ", test_path)
 
   elapsed_min <- round((proc.time() - t0)[3] / 60, 1)
