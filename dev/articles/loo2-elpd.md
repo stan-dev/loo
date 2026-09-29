@@ -262,7 +262,7 @@ for(k in 1:10){
      Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.007 seconds (Generated Quantities)
 
 ### Computing K-fold elpd:
 

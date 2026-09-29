@@ -17,6 +17,11 @@
   by [@ishaan-arora-1](https://github.com/ishaan-arora-1),
   [@florence-bockting](https://github.com/florence-bockting) in
   [\#328](https://github.com/stan-dev/loo/issues/328).
+- Fix [`crps()`](https://mc-stan.org/loo/dev/reference/crps.md) and
+  [`scrps()`](https://mc-stan.org/loo/dev/reference/crps.md) ignoring
+  the `permutations` argument for numeric input by
+  [@thanasibakis](https://github.com/thanasibakis) in
+  [\#398](https://github.com/stan-dev/loo/issues/398)
 
 ## loo 2.10.1
 
