@@ -249,3 +249,86 @@ convert_old_object <- function(x, digits = 1, ...) {
   ses <- grepl("se", nms)
   list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
 }
+
+# print.R: S3 print methods for predictive measure objects and source
+# labeling helpers.
+
+
+#' @export
+print.pred_measure <- function(x, digits = 1, ...) {
+  dims <- attr(x, "dims")
+  if (is.null(dims) && !is.null(x$log_weights)) {
+    dims <- dim(x$log_weights)
+  }
+  source <- .pred_measure_source_label(x)
+
+  cat("\n")
+  if (!is.null(dims) && length(dims) == 2) {
+    cat(
+      sprintf(
+        "Computed from %s posterior draws and %s observations.\n",
+        dims[1],
+        dims[2]
+      )
+    )
+  }
+  cat(sprintf("Data source: %s\n\n", source))
+  print(
+    format(round(as.data.frame(x$estimates), digits), nsmall = digits),
+    quote = FALSE
+  )
+  invisible(x)
+}
+
+#' @export
+print.loo_pred_measure <- function(x, digits = 1, plot_k = FALSE, ...) {
+  print.pred_measure(x, digits = digits, ...)
+  cat("------\n")
+  pareto_k <- x$diagnostics$pareto_k
+  if (is.null(pareto_k)) {
+    cat("No Pareto-k diagnostics available.\n")
+    return(invisible(x))
+  }
+
+  print(pareto_k_table(x), digits = digits)
+
+  if (plot_k) {
+    graphics::plot(
+      pareto_k,
+      ylab = "Pareto-k",
+      xlab = "Observation",
+      main = "Pareto-k diagnostics",
+      pch = 16
+    )
+  }
+  invisible(x)
+}
+
+.pred_measure_source_label <- function(x) {
+  labels <- c(loo = "loo", insample = "in-sample", kfold = "k-fold", test = "test")
+  source <- attr(x, "source")
+  if (!is.null(source) && source %in% names(labels)) {
+    return(unname(labels[source]))
+  }
+  # fall back to the class, for objects that lost their attributes
+  cls <- class(x)
+  hit <- names(labels)[paste0(names(labels), "_pred_measure") %in% cls]
+  if (length(hit)) unname(labels[hit[1]]) else "unknown"
+}
+
+#' @export
+print.measure <- function(x, digits = 2, ...) {
+  dims <- attr(x, "dims")
+  name <- attr(x, "measure")
+
+  if (length(dims) < 2) {
+    # number of draws are NULL
+    cat("\nComputed from", dims[1], "pointwise terms.\n\n")
+  } else {
+    cat("\nComputed from", dims[1], "draws by", dims[2], "observations.\n\n")
+  }
+
+  print(.fr(x$estimates, digits), quote = FALSE)
+
+  invisible(x)
+}
