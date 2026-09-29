@@ -6,6 +6,8 @@ and moment matching in #395
 comparison-model minus reference-model by @florence-bockting in #391
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
+* Fix `crps()` and `scrps()` ignoring the `permutations` argument for numeric
+input by @thanasibakis in #398
 
 # loo 2.10.1
 
