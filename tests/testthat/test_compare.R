@@ -1115,6 +1115,33 @@ test_that("a custom measure can declare `measure_se_diff` itself", {
   )
 })
 
+test_that("a custom measure whose name starts with `p_` is compared", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+
+  p_hit <- custom_measure(
+    function(y, mupred) {
+      ae_i <- abs(y - colMeans(mupred))
+      list(estimate = mean(ae_i), se = sqrt(var(ae_i) / length(ae_i)),
+           pointwise = ae_i)
+    },
+    name = "p_hit",
+    se_diff_fun = "mean"
+  )
+  make <- function(loo, mupred, ylp) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = p_hit
+    )
+  }
+  pms <- list(
+    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1),
+    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2)
+  )
+
+  comp <- suppressMessages(model_compare(pms))
+  expect_true("p_hit_diff" %in% colnames(comp))
+  expect_false(any(grepl("^p_loo", colnames(comp))))
+})
+
 test_that("model_compare errors on inconsistent measure metadata", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   # the same custom measure, but only one model declares it a loss

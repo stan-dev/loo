@@ -176,7 +176,7 @@ compare_pred_measure <- function(loos) {
     intersect,
     lapply(loos, function(x) colnames(x$pointwise))
   )
-  cols <- cols[!grepl("^p_", cols)]
+  cols <- cols[!cols %in% c("p_loo", "p_waic", "p_kfold")]
   bare <- vapply(cols, .display_name, character(1), loos = loos)
   cols[order(bare != "elpd", bare, method = "radix")]
 }
@@ -243,7 +243,7 @@ throw_omitted_compare_measures_warning <- function(loos) {
   by_model <- stats::setNames(
     lapply(loos, function(x) {
       cols <- colnames(x$pointwise)
-      cols <- cols[!grepl("^p_", cols)]
+      cols <- cols[!cols %in% c("p_loo", "p_waic", "p_kfold")]
       unname(vapply(cols, .display_name, character(1), loos = loos))
     }),
     model_names
