@@ -283,6 +283,7 @@ if (requireNamespace("brms", quietly = TRUE)) {
   print(comp, measures = "all")    # all measure diff tables
 
   # the same works for k-fold CV
+  folds <- kfold_split_random(K = 5, N = nrow(lme4::sleepstudy))
   kf1 <- brms::kfold(fit1, folds = folds, save_fits = TRUE)
   kf2 <- brms::kfold(fit2, folds = folds, save_fits = TRUE)
   kpm1 <- kfold_pred_measure(
