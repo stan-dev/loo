@@ -319,8 +319,8 @@ produce; the deprecated \code{loo_compare()} rejects
 
 When comparing \code{\link[=loo_pred_measure]{loo_pred_measure()}} objects with
 \code{model_compare()}, paired differences are computed for every predictive
-measure common to all models. Rows are ordered by the first measure common
-to all models (\code{"elpd"} when present). Each measure is compared against the
+measure common to all models. Rows are ordered by \code{"elpd"} when all models
+share it, and otherwise by the first shared measure in alphabetical order. Each measure is compared against the
 model that is best on that measure, so different difference columns may use
 different reference models.
 \subsection{\verb{\{measure\}_diff} and \verb{\{measure\}_se_diff}}{

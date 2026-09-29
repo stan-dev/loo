@@ -3,7 +3,7 @@
     Code
       print(comp)
     Output
-      Each measure compared against its own best model (elpd: B, r2: B, mae: C).
+      Each measure compared against its own best model (elpd: B, mae: C, r2: B).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
            B     6
@@ -27,21 +27,21 @@
     Code
       print(comp, measures = "all")
     Output
-      Each measure compared against its own best model (r2: m2, mse: m2).
+      Each measure compared against its own best model (mse: m2, r2: m2).
       PSIS-LOO unreliable for both models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
           m1     4
       
-      -- r2 (vs m2) --
-       model r2_diff r2_se_diff
-          m2   0.000      0.000
-          m1  -0.098      0.223
-      
       -- mse (vs m2, sign flipped) --
        model mse_diff mse_se_diff
           m2      0.0         0.0
           m1   -199.6       460.2
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2   0.000      0.000
+          m1  -0.098      0.223
       
       All differences: 0 = best model, negative = worse.
       Signs flipped for loss measures: mse.
@@ -51,7 +51,7 @@
     Code
       print(comp)
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
@@ -75,7 +75,7 @@
     Code
       print(comp, measures = "all", digits = 2)
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
@@ -88,17 +88,17 @@
           m3    -22.44  129.62    0.57          
           m1   -841.47  373.24    0.99          
       
-      -- r2 (vs m2) --
-       model r2_diff r2_se_diff
-          m2    0.00       0.00
-          m3   -0.07       0.16
-          m1   -0.10       0.22
-      
       -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff
           m3     0.00        0.00
           m2    -0.15        1.17
           m1    -6.35        3.07
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2    0.00       0.00
+          m3   -0.07       0.16
+          m1   -0.10       0.22
       
       All differences: 0 = best model, negative = worse.
       Signs flipped for loss measures: mae.
@@ -113,7 +113,7 @@
     Code
       print(comp, measures = "all", digits = c(r2 = 1))
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
@@ -126,17 +126,17 @@
           m3     -22.4   129.6    0.57          
           m1    -841.5   373.2    0.99          
       
-      -- r2 (vs m2) --
-       model r2_diff r2_se_diff
-          m2     0.0        0.0
-          m3    -0.1        0.2
-          m1    -0.1        0.2
-      
       -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff
           m3      0.0         0.0
           m2     -0.2         1.2
           m1     -6.3         3.1
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff
+          m2     0.0        0.0
+          m3    -0.1        0.2
+          m1    -0.1        0.2
       
       All differences: 0 = best model, negative = worse.
       Signs flipped for loss measures: mae.
@@ -151,7 +151,7 @@
     Code
       print(comp, measures = c("r2", "mae"))
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
@@ -178,21 +178,21 @@
     Code
       print(comp, simplify = FALSE)
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
           m3     4
           m1     4
       
-       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p    r2
-          m2       0.0     0.0      NA           -2074.2   469.5 67.9 22.5 0.144
-          m3     -22.4   129.6    0.57           -2096.7   438.5 89.9 41.0 0.071
-          m1    -841.5   373.2    0.99           -2915.7   448.1 68.8 19.5 0.046
-       se_r2  mae se_mae
-       0.221 22.0    3.4
-       0.290 21.9    3.6
-       0.040 28.2    3.2
+       model elpd_diff se_diff p_worse diag_diff    elpd se_elpd    p se_p  mae
+          m2       0.0     0.0      NA           -2074.2   469.5 67.9 22.5 22.0
+          m3     -22.4   129.6    0.57           -2096.7   438.5 89.9 41.0 21.9
+          m1    -841.5   373.2    0.99           -2915.7   448.1 68.8 19.5 28.2
+       se_mae    r2 se_r2
+          3.4 0.144 0.221
+          3.6 0.071 0.290
+          3.2 0.046 0.040
     Message
       
       Diagnostic flags present.
@@ -206,7 +206,7 @@
     Code
       print(comp, measures = "all", simplify = FALSE)
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6
@@ -219,17 +219,17 @@
           m3     -22.4   129.6    0.57           -2096.7   438.5 89.9 41.0
           m1    -841.5   373.2    0.99           -2915.7   448.1 68.8 19.5
       
-      -- r2 (vs m2) --
-       model r2_diff r2_se_diff    r2 se_r2
-          m2   0.000      0.000 0.144 0.221
-          m3  -0.073      0.160 0.071 0.290
-          m1  -0.098      0.223 0.046 0.040
-      
       -- mae (vs m3, sign flipped) --
        model mae_diff mae_se_diff  mae se_mae
           m3      0.0         0.0 21.9    3.6
           m2     -0.2         1.2 22.0    3.4
           m1     -6.3         3.1 28.2    3.2
+      
+      -- r2 (vs m2) --
+       model r2_diff r2_se_diff    r2 se_r2
+          m2   0.000      0.000 0.144 0.221
+          m3  -0.073      0.160 0.071 0.290
+          m1  -0.098      0.223 0.046 0.040
       
       All differences: 0 = best model, negative = worse.
       Signs flipped for loss measures: mae.
@@ -244,7 +244,7 @@
     Code
       print(comp, measures = "r2", simplify = FALSE)
     Output
-      Each measure compared against its own best model (elpd: m2, r2: m2, mae: m3).
+      Each measure compared against its own best model (elpd: m2, mae: m3, r2: m2).
       PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
        model bad_k
           m2     6

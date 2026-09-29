@@ -138,7 +138,7 @@ test_that("model_compare works with three loo_pred_measure models", {
   comp <- model_compare(list("A" = pm1, "B" = pm2, "C" = pm3))
   expect_snapshot(print(comp))
   expect_equal(nrow(comp), 3L)
-  expect_equal(attr(comp, "compare_measures"), c("elpd", "r2", "mae"))
+  expect_equal(attr(comp, "compare_measures"), c("elpd", "mae", "r2"))
   # rows are ordered by elpd, so the elpd reference is the first row
   expect_equal(comp$elpd_diff[1L], 0)
   expect_true(all(comp$elpd_diff[-1L] < 0))
@@ -288,7 +288,7 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   )
 })
 
-test_that("without `elpd` the default ranking measure is the first shared one", {
+test_that("without `elpd` the default ranking measure is the first alphabetical one", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   mk <- function(sfx) {
     loo_pred_measure(
@@ -304,10 +304,29 @@ test_that("without `elpd` the default ranking measure is the first shared one", 
   comp <- suppressMessages(model_compare(pms))
   expect_false("elpd" %in% attr(comp, "compare_measures"))
   expect_false("elpd_diff" %in% colnames(comp))
-  # `r2` is the first measure the models share, so it ranks them
-  expect_equal(attr(comp, "compare_measures")[[1L]], "r2")
-  expect_equal(comp$r2_diff[[1L]], 0)
-  expect_equal(sum(comp$r2_diff == 0), 1L)
+  expect_equal(attr(comp, "compare_measures")[[1L]], "mse")
+  expect_equal(comp$mse_diff[[1L]], 0)
+  expect_equal(sum(comp$mse_diff == 0), 1L)
+})
+
+test_that("the ranking measure does not depend on the model order", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  mk <- function(sfx, measures) {
+    loo_pred_measure(
+      loo = res[[paste0("loo_p_", sfx)]],
+      y = res$y,
+      mupred = res[[paste0("mupred_", sfx)]],
+      ylp = res[[paste0("ylp_", sfx)]],
+      measures = measures
+    )
+  }
+  m1 <- mk("m1", c("r2", "mse"))
+  m2 <- mk("m2", c("mse", "r2"))
+
+  comp12 <- suppressMessages(model_compare(list(m1 = m1, m2 = m2)))
+  comp21 <- suppressMessages(model_compare(list(m2 = m2, m1 = m1)))
+  expect_equal(attr(comp12, "compare_measures"), c("mse", "r2"))
+  expect_equal(attr(comp21, "compare_measures"), c("mse", "r2"))
 })
 
 test_that("model_compare measure helpers work as expected", {
@@ -329,8 +348,8 @@ test_that("model_compare measure helpers work as expected", {
   loos <- list(pm1, pm2)
   cols <- loo:::.compare_pointwise_cols(loos)
 
-  expect_equal(cols, c("elpd_loo", "r2_loo", "mse_loo"))
-  expect_equal(loo:::.compare_measures(loos), c("elpd", "r2", "mse"))
+  expect_equal(cols, c("elpd_loo", "mse_loo", "r2_loo"))
+  expect_equal(loo:::.compare_measures(loos), c("elpd", "mse", "r2"))
   expect_equal(loo:::.display_name("rmse_loo"), "rmse")
   expect_equal(loo:::.resolve_rank_measure(loos)$bare, "elpd")
   expect_equal(loo:::.resolve_rank_measure(loos)$internal, "elpd_loo")
@@ -1477,7 +1496,7 @@ test_that("model_compare compares kfold_pred_measure objects", {
   comp <- suppressMessages(model_compare(list(m1 = k1, m2 = k2)))
   expect_s3_class(comp, "compare.loo")
   expect_equal(attr(comp, "compare_source"), "kfold")
-  expect_equal(attr(comp, "compare_measures"), c("elpd", "rmse", "mse"))
+  expect_equal(attr(comp, "compare_measures"), c("elpd", "mse", "rmse"))
 
   # measures are matched on bare names, with the `_kfold` suffix stripped
   expect_true(all(c("rmse_diff", "rmse_se_diff", "mse_diff", "mse_se_diff") %in%

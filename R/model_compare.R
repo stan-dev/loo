@@ -71,8 +71,8 @@
 #'   whose own `{measure}_diff` is therefore `0`. The reference is the best
 #'   model on that measure, so `mse_diff` may use a different reference than
 #'   `elpd_diff`, and the remaining differences for a measure are all negative.
-#'   Rows are ordered by the first measure shared by all models (`"elpd"` when
-#'   present).
+#'   Rows are ordered by `"elpd"` when all models share it. Otherwise, rows are
+#'   ordered by the first shared measure in alphabetical order.
 #'
 #'   The standard error of a difference is a paired estimate, which uses the
 #'   fact that the same \eqn{N} data points were used for both models. It should
@@ -165,7 +165,7 @@
 #'
 #' ## Warnings for many model comparisons
 #'   If more than \eqn{11} models are compared, we internally recompute the model
-#'   differences using the median model (by ELPD, or by the first shared measure
+#'   differences using the median model (by ELPD, or by the ranking measure
 #'   for `pred_measure` comparisons) as the baseline, and estimate whether the
 #'   differences in predictive performance are potentially due to chance as
 #'   described by McLatchie and Vehtari (2023). This flags a warning if there is

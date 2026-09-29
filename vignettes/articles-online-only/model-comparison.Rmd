@@ -199,8 +199,9 @@ print(model_compare(loos), simplify = FALSE)
 We now use `loo_pred_measure()` to compute the predictive performance for
 each model (`m1, m2, m3`) and measure (see list above).
 Finally, we compare the performance of the three models using `model_compare()`.
-By default, only the first measure in the provided vector (here `measures`) is
-shown. In this case the first measure is `elpd`.
+By default, only the ranking measure is shown. The ranking measure is `elpd`
+when all models share it. Otherwise, it is the first shared measure in
+alphabetical order.
 
 <a id="example"></a>
 ```{r pred-measure}

@@ -13,6 +13,8 @@
   packages (e.g. **brms**) still dispatch.
 * `model_compare()` compares each measure against its own best model. It shows
   loss measures on the utility scale.
+* `model_compare()` ranks models by `elpd` when all models share it. Otherwise,
+  it ranks them by the first shared measure in alphabetical order.
 * New `custom_measure()` sets the name, the loss flag, and the SE of the
   difference for a custom measure.
 * `print()` on a comparison has the new argument `measures`. It marks each

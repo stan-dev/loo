@@ -176,7 +176,9 @@ compare_pred_measure <- function(loos) {
     intersect,
     lapply(loos, function(x) colnames(x$pointwise))
   )
-  cols[!grepl("^p_", cols)]
+  cols <- cols[!grepl("^p_", cols)]
+  bare <- vapply(cols, .display_name, character(1), loos = loos)
+  cols[order(bare != "elpd", bare, method = "radix")]
 }
 
 #' Check that `measure_info` is consistent across models
