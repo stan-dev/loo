@@ -224,8 +224,8 @@
 #'     measures = c("rmse", "r2")
 #'   )
 #'   comp <- model_compare(pm1, pm2)
-#'   print(comp)                      # ranked by elpd (default)
-#'   print(comp, measures = "all")    # all measure diff tables
+#'   print(comp)
+#'   print(comp, measures = "all")
 #'
 #'   # the same works for k-fold CV
 #'   folds <- kfold_split_random(K = 5, N = nrow(lme4::sleepstudy))
