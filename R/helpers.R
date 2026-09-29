@@ -290,8 +290,8 @@ is_constant <- function(x, tol = .Machine$double.eps) {
     }
     state[[id]] <- TRUE
     warning(
-      "\n'", old, "' is deprecated. Use '", new, "' instead.\n",
-      call. = TRUE, immediate. = TRUE
+      "'", old, "' is deprecated. Use '", new, "' instead.\n",
+      call. = FALSE, immediate. = TRUE
     )
     invisible(TRUE)
   }
