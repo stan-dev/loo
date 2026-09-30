@@ -395,10 +395,9 @@ varies with the data rather than with the measure itself.
 
 Built-in measures take \code{loss}, \code{diff_method}, and \code{se_diff_fun} from the
 package measure registry. Custom measures always get \code{diff_method = "custom"}
-and take \code{loss} from \code{attr(my_fun, "measure_loss") <- TRUE}, which declares
-that lower values are better; without it they are treated as utilities (see
-\code{\link[=insample_pred_measure]{insample_pred_measure()}}). They take \code{se_diff_fun} from
-\code{attr(my_fun, "measure_se_diff")}.
+and take \code{loss} and \code{se_diff_fun} from the arguments of the same name in
+\code{\link[=custom_measure]{custom_measure()}}. With \code{loss = TRUE} lower values are better; without it
+they are treated as utilities (see \code{\link[=insample_pred_measure]{insample_pred_measure()}}).
 \code{\link[=model_compare]{model_compare()}} requires all models to provide matching \code{measure_info} for
 each shared measure; a mismatched \code{measure_loss} or \code{measure_se_diff}
 declaration, or missing \code{measure_info} on some models, produces an error.

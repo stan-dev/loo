@@ -186,7 +186,7 @@ each measure's entry in the \code{measure_info} attribute of an
 "sign flipped" in the table header and names them below the tables.
 
 A custom measure is treated as a utility unless it declares otherwise with
-\code{attr(my_fun, "measure_loss") <- TRUE}. The declaration also determines the
+\code{loss = TRUE} in \code{\link[=custom_measure]{custom_measure()}}. The declaration also determines the
 ranking direction, so an undeclared loss is both flipped and ranked in the
 wrong direction; see \code{\link[=insample_pred_measure]{insample_pred_measure()}}.
 }

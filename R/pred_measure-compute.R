@@ -27,7 +27,8 @@
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
 #'       [supported_measures_list].
-#'     \item A **function** with attribute `"measure_name"` for one custom measure.
+#'     \item A **function** built with [custom_measure()] for one custom
+#'       measure.
 #'     \item A **list** mixing character scalars (built-in names) and named
 #'       functions (custom measures), e.g. `list("rps", my_metric = my_fun)`.
 #'   }
@@ -36,15 +37,14 @@
 #'   They must return a list with  `estimates` and `pointwise`.
 #'
 #'   A custom measure declares whether it is a loss (lower is better) or a
-#'   utility (higher is better) with attribute `"measure_loss"`:
-#'   `attr(my_fun, "measure_loss") <- TRUE` for a loss. Without it a custom
-#'   measure is taken to be a utility. [model_compare()] uses the declaration to
+#'   utility (higher is better) with `loss` in [custom_measure()]. Without it a
+#'   custom measure is taken to be a utility. [model_compare()] uses the declaration to
 #'   put all measures on a common utility scale and to rank models, so an
 #'   undeclared loss is compared and ranked in the wrong direction.
 #'
 #'   A custom measure can declare how the standard error of a difference
-#'   between two models is computed, with `attr(my_fun, "measure_se_diff")`
-#'   or [custom_measure()]. It accepts a function
+#'   between two models is computed, with `se_diff_fun` in [custom_measure()].
+#'   It accepts a function
 #'   `function(ref, cmp) ...` or the shorthands `"sum"` and `"mean"` for the
 #'   paired pointwise formulas. Without a declaration, [model_compare()]
 #'   reports the difference with an `NA` standard error. A function receives one list per model with elements
@@ -57,9 +57,6 @@
 #'   measure function and it is stored alongside the estimates and passed on to
 #'   its `measure_se_diff` function; the built-in `r2` uses it for the baseline
 #'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
-#' @param measure_name For a single custom function, set
-#'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
-#'   `measures`.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with

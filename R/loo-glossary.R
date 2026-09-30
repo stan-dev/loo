@@ -377,10 +377,9 @@
 #'
 #' Built-in measures take `loss`, `diff_method`, and `se_diff_fun` from the
 #' package measure registry. Custom measures always get `diff_method = "custom"`
-#' and take `loss` from `attr(my_fun, "measure_loss") <- TRUE`, which declares
-#' that lower values are better; without it they are treated as utilities (see
-#' [insample_pred_measure()]). They take `se_diff_fun` from
-#' `attr(my_fun, "measure_se_diff")`.
+#' and take `loss` and `se_diff_fun` from the arguments of the same name in
+#' [custom_measure()]. With `loss = TRUE` lower values are better; without it
+#' they are treated as utilities (see [insample_pred_measure()]).
 #' [model_compare()] requires all models to provide matching `measure_info` for
 #' each shared measure; a mismatched `measure_loss` or `measure_se_diff`
 #' declaration, or missing `measure_info` on some models, produces an error.

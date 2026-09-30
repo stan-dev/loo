@@ -52,21 +52,20 @@
 #' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
 #'
-#' **Custom measures.** A function passed to `measures` must have attribute
-#' `measure_name` and return `estimate`, `se`, and `pointwise`. Only arguments
+#' **Custom measures.** Build a custom measure with [custom_measure()]. The
+#' function must return `estimate`, `se`, and `pointwise`. Only arguments
 #' declared in the function signature among `y`, `ypred`, `mupred`, `ylp`, and
 #' `log_weights` are supplied automatically.
 #'
 #' Custom measures are assumed to be on a utility scale (higher is better) in
-#' [model_compare()]. Declare a custom loss with
-#' `attr(my_fun, "measure_loss") <- TRUE` so that [model_compare()] converts and
-#' ranks it in the right direction.
+#' [model_compare()]. Declare a custom loss with `loss = TRUE` in
+#' [custom_measure()] so that [model_compare()] converts and ranks it in the
+#' right direction.
 #'
-#' A custom measure can also declare how the standard error of a difference
-#' between two models is computed, with `attr(my_fun, "measure_se_diff")`. It
-#' accepts a function, `"sum"`, or `"mean"`. For a measure that declares
-#' nothing, [model_compare()] reports an `NA` standard error. [custom_measure()]
-#' sets all three attributes.
+#' Declare how the standard error of a difference between two models is
+#' computed with `se_diff_fun` in [custom_measure()]. It accepts a function,
+#' `"sum"`, or `"mean"`. For a measure that declares nothing,
+#' [model_compare()] reports an `NA` standard error.
 #'
 #' @examples
 #' \donttest{

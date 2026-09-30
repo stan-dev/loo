@@ -130,7 +130,7 @@
 #'   "sign flipped" in the table header and names them below the tables.
 #'
 #'   A custom measure is treated as a utility unless it declares otherwise with
-#'   `attr(my_fun, "measure_loss") <- TRUE`. The declaration also determines the
+#'   `loss = TRUE` in [custom_measure()]. The declaration also determines the
 #'   ranking direction, so an undeclared loss is both flipped and ranked in the
 #'   wrong direction; see [insample_pred_measure()].
 #'

@@ -38,7 +38,8 @@ summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 \itemize{
 \item A \strong{character vector} of built-in names; see
 \link{supported_measures_list}.
-\item A \strong{function} with attribute \code{"measure_name"} for one custom measure.
+\item A \strong{function} built with \code{\link[=custom_measure]{custom_measure()}} for one custom
+measure.
 \item A \strong{list} mixing character scalars (built-in names) and named
 functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
 }
@@ -47,15 +48,14 @@ Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \
 They must return a list with  \code{estimates} and \code{pointwise}.
 
 A custom measure declares whether it is a loss (lower is better) or a
-utility (higher is better) with attribute \code{"measure_loss"}:
-\code{attr(my_fun, "measure_loss") <- TRUE} for a loss. Without it a custom
-measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} uses the declaration to
+utility (higher is better) with \code{loss} in \code{\link[=custom_measure]{custom_measure()}}. Without it a
+custom measure is taken to be a utility. \code{\link[=model_compare]{model_compare()}} uses the declaration to
 put all measures on a common utility scale and to rank models, so an
 undeclared loss is compared and ranked in the wrong direction.
 
 A custom measure can declare how the standard error of a difference
-between two models is computed, with \code{attr(my_fun, "measure_se_diff")}
-or \code{\link[=custom_measure]{custom_measure()}}. It accepts a function
+between two models is computed, with \code{se_diff_fun} in \code{\link[=custom_measure]{custom_measure()}}.
+It accepts a function
 \code{function(ref, cmp) ...} or the shorthands \code{"sum"} and \code{"mean"} for the
 paired pointwise formulas. Without a declaration, \code{\link[=model_compare]{model_compare()}}
 reports the difference with an \code{NA} standard error. A function receives one list per model with elements
