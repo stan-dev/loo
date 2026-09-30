@@ -179,8 +179,7 @@
 #' * The article
 #'   [Model comparison: Explanation of `model_compare()`](https://mc-stan.org/loo/articles/articles-online-only/model-comparison.html)
 #'   on the __loo__ website, for how the differences and their standard errors
-#'   are computed for each measure and when the normal approximation behind
-#'   `p_worse` can be trusted.
+#'   are computed for each measure.
 #' @template loo-and-compare-references
 #'
 #' @examples

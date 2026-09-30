@@ -333,7 +333,6 @@ the \strong{loo} website for answers to frequently asked questions.
 \item The article
 \href{https://mc-stan.org/loo/articles/articles-online-only/model-comparison.html}{Model comparison: Explanation of \code{model_compare()}}
 on the \strong{loo} website, for how the differences and their standard errors
-are computed for each measure and when the normal approximation behind
-\code{p_worse} can be trusted.
+are computed for each measure.
 }
 }
