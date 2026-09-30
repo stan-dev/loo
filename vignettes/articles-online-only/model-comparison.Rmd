@@ -10,7 +10,7 @@ output:
     toc: true
     toc_depth: 3
 params:
-  EVAL: TRUE #!r identical(Sys.getenv("NOT_CRAN"), "true")
+  EVAL: TRUE
 vignette: >
   %\VignetteIndexEntry{Model comparison: Explanation of `model_compare()`}
   %\VignetteEngine{knitr::rmarkdown}
