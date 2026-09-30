@@ -148,7 +148,7 @@ Now we evaluate the predictive performance of the model on the test data using `
 (elpd_holdout <- elpd(log_pd))
 ```
 
-When one wants to compare different models, the function `loo_compare()` can be used to assess the difference in performance.
+When one wants to compare different models, the function `model_compare()` can be used to assess the difference in performance.
 
 # K-fold cross validation
 
@@ -205,7 +205,7 @@ Now we evaluate the predictive performance of the model on the 10 folds using `e
 (elpd_kfold <- elpd(log_pd_kfold))
 ```
 
-If one wants to compare several models (with `loo_compare`), one should use the same folds for all the different models. 
+If one wants to compare several models (with `model_compare`), one should use the same folds for all the different models. 
 
 # References
 

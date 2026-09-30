@@ -239,6 +239,38 @@ test_that("pred_measure() updates loo results as expected", {
   expect_equal(dim(updated_predperf$estimates), c(5, 2))
 })
 
+test_that("loo_pred_measure() warns for non-elpd measures after moment matching", {
+  loo_mm <- res$loo
+  attr(loo_mm, "posthoc") <- "moment_match"
+  expect_warning(
+    loo_pred_measure(
+      loo = loo_mm, y = res$y, mupred = res$mupred, ylp = res$ylp,
+      measures = c("elpd", "r2")
+    ),
+    regexp = "moment_match"
+  )
+  expect_no_warning(
+    loo_pred_measure(loo = loo_mm, ylp = res$ylp, measures = c("elpd", "mlpd"))
+  )
+})
+
+test_that("loo_pred_measure() warns for non-elpd measures after reloo", {
+  loo_reloo <- res$loo
+  obs <- which.max(loo_reloo$diagnostics$pareto_k)
+  loo_reloo$diagnostics$pareto_k[obs] <- 0
+  expect_warning(
+    loo_pred_measure(
+      loo = loo_reloo, y = res$y, mupred = res$mupred, measures = "r2"
+    ),
+    regexp = "reloo"
+  )
+  expect_no_warning(
+    loo_pred_measure(
+      loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2"
+    )
+  )
+})
+
 test_that("pred_measure() keeps dims when the update has no matrix input", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo, y = res$y, mupred = res$mupred, ylp = res$ylp,

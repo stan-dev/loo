@@ -27,16 +27,36 @@
 #'   \itemize{
 #'     \item A **character vector** of built-in names; see
 #'       [supported_measures_list].
-#'     \item A **function** with attribute `"measure_name"` for one custom measure.
+#'     \item A **function** built with [custom_measure()] for one custom
+#'       measure.
 #'     \item A **list** mixing character scalars (built-in names) and named
 #'       functions (custom measures), e.g. `list("rps", my_metric = my_fun)`.
 #'   }
 #'   Custom functions are called with any of `y`, `ypred`, `mupred`, `ylp`, and
 #'   `log_weights` that appear in their formals, plus arguments from `control`.
 #'   They must return a list with  `estimates` and `pointwise`.
-#' @param measure_name For a single custom function, set
-#'   `attr(my_fun, "measure_name") <- "my_metric"` before passing `my_fun` to
-#'   `measures`.
+#'
+#'   A custom measure declares whether it is a loss (lower is better) or a
+#'   utility (higher is better) with `loss` in [custom_measure()]. Without it a
+#'   custom measure is taken to be a utility. [model_compare()] uses the declaration to
+#'   put all measures on a common utility scale and to rank models, so an
+#'   undeclared loss is compared and ranked in the wrong direction.
+#'
+#'   A custom measure can declare how the standard error of a difference
+#'   between two models is computed, with `se_diff_fun` in [custom_measure()].
+#'   It accepts a function
+#'   `function(ref, cmp) ...` or the shorthands `"sum"` and `"mean"` for the
+#'   paired pointwise formulas. Without a declaration, [model_compare()]
+#'   reports the difference with an `NA` standard error. A function receives one list per model with elements
+#'   `estimate`, `se`, `pointwise`, and `extra`, always on the measure's natural
+#'   scale, and must return the standard error of the difference as a numeric
+#'   scalar.
+#'
+#'   `extra` is for anything the standard error needs that the pointwise values
+#'   do not carry. Return it as an additional list element `extra` from the
+#'   measure function and it is stored alongside the estimates and passed on to
+#'   its `measure_se_diff` function; the built-in `r2` uses it for the baseline
+#'   `(y_i - mean(y))^2`, which cannot be recovered once `y` is out of scope.
 #' @param group_ids Optional vector of group identifiers for grouped summaries
 #'   (reserved; not yet implemented).
 #' @param loo A [loo::loo()] result, computed with
@@ -77,19 +97,17 @@ do_pred_measure <- function(
   control = list()
 ) {
   # input validation ---------------------------------------------------
-  .validate_control(control)
-
   if (!is.null(group_ids)) {
     cli::cli_abort(
       "`group_ids` is reserved for future feature but is not yet implemented."
     )
   }
 
+  .validate_control(control, .normalize_measure(measures))
   measures <- .prepare_measures(
     measures, predperf, supported_measures_list, source
   )
   needs_elpd <- .any_needs_elpd(measures)
-
   if (source == "loo") {
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {
@@ -97,6 +115,7 @@ do_pred_measure <- function(
           "No `psis_object` found in `loo` object. Did you run loo(..., save_psis = 'TRUE')."
         ))
       }
+      .warn_posthoc(loo, measures)
     } else {
       if (is.null(psis_object) && !is.null(predperf$psis_object)) {
         cli::cli_inform("Using psis_object for LOO CV from `predperf`")
@@ -165,6 +184,13 @@ do_pred_measure <- function(
     if (is.null(result_name)) {
       result_name <- entry$name
     }
+    # A measure may rename its own result: `rps` with `scaled = TRUE` returns
+    # `srps`. Read the spec under that name, or the requested measure's
+    # orientation leaks into the renamed row and inverts the ranking.
+    info_entry <- entry
+    if (entry$type == "builtin" && !is.null(.measure_spec[[result_name]])) {
+      info_entry$key <- result_name
+    }
     # add new measures to existing pred_measure results
     name_updated <- .measure_result_name(source, result_name)
     if (!is.null(estimates) && name_updated %in% rownames(estimates)) {
@@ -178,7 +204,9 @@ do_pred_measure <- function(
       mat = estimates,
       name = result_name,
       values = .measure_estimate_se(sel_measure),
-      margin = 1
+      margin = 1,
+      measure_entry = info_entry,
+      extra = sel_measure$extra
     )
     pointwise <- .merge_matrix(
       source = source,
@@ -227,6 +255,56 @@ do_pred_measure <- function(
 }
 
 # internal helper functions ---------------------------------------------------
+
+#' Detect a post-hoc correction of a loo object
+#'
+#' `loo_moment_match()` sets the `posthoc` attribute. `brms::reloo()` sets
+#' `diagnostics$pareto_k` to 0 for the refitted observations but does not
+#' change `psis_object`, so the two sets of Pareto k values differ.
+#'
+#' @param loo A [loo::loo()] result with a `psis_object`.
+#'
+#' @return A character vector of method names, or `NULL`.
+#' @noRd
+.detect_posthoc <- function(loo) {
+  method <- attr(loo, "posthoc")
+  k_loo <- loo$diagnostics$pareto_k
+  k_psis <- loo$psis_object$diagnostics$pareto_k
+  if (!is.null(k_loo) && !is.null(k_psis) && !isTRUE(all.equal(k_loo, k_psis))) {
+    method <- union(method, "reloo")
+  }
+  method
+}
+
+#' Warn if measures other than elpd use a post-hoc corrected loo object
+#'
+#' A post-hoc method corrects `pointwise[, "elpd_loo"]` only. The other
+#' measures use `psis_object$log_weights` with the original draws in `ypred`
+#' and `mupred`, so their values are not corrected.
+#'
+#' @param loo A [loo::loo()] result with a `psis_object`.
+#' @param measures Measure entries from `.prepare_measures()`.
+#'
+#' @return `NULL`, invisibly. Called for the warning.
+#' @noRd
+.warn_posthoc <- function(loo, measures) {
+  method <- .detect_posthoc(loo)
+  if (is.null(method)) {
+    return(invisible(NULL))
+  }
+  not_elpd <- vapply(measures, function(e) {
+    !(e$type == "builtin" && isTRUE(.measure_spec[[e$key]]$needs_elpd))
+  }, logical(1L))
+  if (any(not_elpd)) {
+    keys <- vapply(measures[not_elpd], function(e) e$name, character(1L))
+    cli::cli_warn(c(
+      "The {.arg loo} object was corrected with {.val {method}}.",
+      "!" = "Only {.val elpd}, {.val mlpd} and {.val ic} include this correction.",
+      "i" = "{.val {keys}} use{?s/} the uncorrected PSIS weights."
+    ))
+  }
+  invisible(NULL)
+}
 
 #' Resolve or compute the PSIS object for LOO scoring
 #'
@@ -412,10 +490,10 @@ do_pred_measure <- function(
 ) {
   if (measure_entry$type == "builtin") {
     spec <- .measure_spec[[measure_entry$key]]
-    measure_fun <- spec$fun
-    if (is.null(measure_fun)) {
+    if (is.null(spec)) {
       cli::cli_abort("Unknown built-in measure {.val {measure_entry$key}}.")
     }
+    measure_fun <- spec$fun
   } else {
     spec <- NULL
     measure_fun <- measure_entry$key
@@ -535,6 +613,12 @@ do_pred_measure <- function(
 #'   `(estimate, se)`; for `margin = 2`, length-`n` pointwise vector.
 #' @param margin `1` to merge along rows (estimates table), `2` along columns
 #'   (pointwise table).
+#' @param measure_entry Optional normalized measure entry; when merging an
+#'   estimates row (`margin = 1`), the `measure_info` used by [model_compare()]
+#'   is recorded from this entry.
+#' @param extra Optional list of auxiliary data the measure stores for its
+#'   `se_diff_fun` (the measure result's `extra` element); recorded in `measure_info`
+#'   when merging an estimates row (`margin = 1`).
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
@@ -550,7 +634,15 @@ do_pred_measure <- function(
 }
 
 #' @noRd
-.merge_matrix <- function(source, mat, name, values, margin) {
+.merge_matrix <- function(
+  source,
+  mat,
+  name,
+  values,
+  margin,
+  measure_entry = NULL,
+  extra = NULL
+) {
   is_row <- margin == 1
   bind_fn <- if (is_row) rbind else cbind
   name_updated <- .measure_result_name(source, name)
@@ -561,8 +653,31 @@ do_pred_measure <- function(
     matrix(values, ncol = 1, dimnames = list(NULL, name_updated))
   }
 
-  if (is.null(mat)) return(new_slice)
-  bind_fn(mat, new_slice)
+  info <- if (is_row && !is.null(measure_entry)) {
+    .measure_info(measure_entry)
+  }
+  if (!is.null(info) && !is.null(extra)) {
+    info$extra <- extra
+  }
+
+  old_info <- if (is_row && !is.null(mat)) {
+    attr(mat, "measure_info")
+  }
+
+  mat <- if (is.null(mat)) new_slice else bind_fn(mat, new_slice)
+
+  if (is_row && (!is.null(info) || !is.null(old_info))) {
+    measure_info <- old_info
+    if (is.null(measure_info)) {
+      measure_info <- list()
+    }
+    if (!is.null(info)) {
+      measure_info[[name]] <- info
+    }
+    attr(mat, "measure_info") <- measure_info
+  }
+
+  mat
 }
 
 #' Construct the S3 predictive measure result object
@@ -585,8 +700,9 @@ do_pred_measure <- function(
 #' @param save_psis Logical; if `TRUE`, include `psis_object` in the result.
 #'
 #' @return A list with elements `estimates`, `pointwise`, and optionally
-#'   `diagnostics`, `psis_object`, and `log_weights`. Class attributes are added
-#'   by \code{.add_attributes()}.
+#'   `diagnostics`, `psis_object`, and `log_weights`. Attribute `measure_info`
+#'   records per-measure metadata for measures added in the current call. Class
+#'   attributes are added by \code{.add_attributes()}.
 #'
 #' @noRd
 .build_pred_measure <- function(
@@ -596,6 +712,12 @@ do_pred_measure <- function(
   psis_object,
   save_psis
 ) {
+  measure_info <- attr(estimates, "measure_info")
+  if (is.null(measure_info)) {
+    measure_info <- list()
+  }
+  attr(estimates, "measure_info") <- NULL
+
   output_list <- list(
     estimates = estimates,
     pointwise = pointwise
@@ -610,22 +732,29 @@ do_pred_measure <- function(
     output_list$log_weights <- psis_object$log_weights
   }
 
-  structure(output_list)
+  structure(
+    output_list,
+    measure_info = measure_info
+  )
 }
 
 #' Attach S3 classes and metadata attributes to a result
 #'
 #' @description
-#' Sets `class`, `source`, and `dims` attributes on a predictive measure object.
+#' Sets `class`, `source`, `dims`, and `measure_info` attributes on a predictive
+#' measure object.
 #'
 #' When updating an existing result (`predperf` is not `NULL`), copies attributes
 #' from `predperf` and refreshes `dims` from newly supplied input matrices.
+#' Merges `measure_info` from the prior result with any new entries supplied on
+#' `predperf_res` (from \code{.build_pred_measure()}).
 #' When `save_psis = FALSE`, clears any stored `psis_object` from the prior
 #' result.
 #'
 #' For new objects, copies relevant attributes from `loo` or `kfold` inputs
 #' (e.g. `yhash`, `model_name`, fold structure) and assigns a source-specific
-#' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.).
+#' subclass (`"insample_pred_measure"`, `"loo_pred_measure"`, etc.). Sets
+#' `measure_info`, seeding the `elpd` entry.
 #'
 #' @param save_psis Logical; when `FALSE` and accumulating, clears stored
 #'   `psis_object` from the prior result.
@@ -645,13 +774,30 @@ do_pred_measure <- function(
 #' @return The updated `predperf_res` with class and attributes set.
 #'
 #' @noRd
-.add_attributes <- function(save_psis, predperf_res, y, ypred, mupred, ylp, ylp_test, kfold, loo, predperf, source) {
+.add_attributes <- function(
+  save_psis,
+  predperf_res,
+  y,
+  ypred,
+  mupred,
+  ylp,
+  ylp_test,
+  kfold,
+  loo,
+  predperf,
+  source
+) {
+  new_info <- attr(predperf_res, "measure_info")
+  if (is.null(new_info)) {
+    new_info <- list()
+  }
+
   if (!is.null(predperf)) {
     if (isFALSE(save_psis)) {
       predperf$psis_object <- NULL
     }
     attributes(predperf_res) <- attributes(predperf)
-    
+
     dims <- if (!is.null(ypred)) {
       dim(ypred)
     } else if (!is.null(mupred)) {
@@ -662,10 +808,21 @@ do_pred_measure <- function(
       attr(predperf, "dims")
     }
     attr(predperf_res, "dims") <- dims
-    
+    measure_info <- attr(predperf, "measure_info")
+    if (is.null(measure_info)) {
+      measure_info <- list()
+    }
+    if (is.null(measure_info$elpd)) {
+      measure_info$elpd <- .measure_info("elpd")
+    }
+    if (length(new_info)) {
+      measure_info[names(new_info)] <- new_info
+    }
+    attr(predperf_res, "measure_info") <- measure_info
+
     return(predperf_res)
   }
-  
+
   predperf_res <- switch(
     source,
     kfold = .copy_attrs(
@@ -709,6 +866,13 @@ do_pred_measure <- function(
   }
   attr(predperf_res, "class") <- classes
   attr(predperf_res, "source") <- source
-  
-  return(predperf_res)
+  measure_info <- list(
+    elpd = .measure_info("elpd")
+  )
+  if (length(new_info)) {
+    measure_info[names(new_info)] <- new_info
+  }
+  attr(predperf_res, "measure_info") <- measure_info
+
+  predperf_res
 }

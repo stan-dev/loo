@@ -4,14 +4,7 @@
 \alias{measure_rps}
 \title{Ranked Probability Score (RPS, SRPS, CRPS, SCRPS)}
 \usage{
-measure_rps(
-  y,
-  ypred,
-  log_weights = NULL,
-  pointwise = NULL,
-  scaled = FALSE,
-  higher_is_better = NULL
-)
+measure_rps(y, ypred, log_weights = NULL, pointwise = NULL, scaled = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector of \eqn{n} observed outcomes. May be integer-valued
@@ -24,17 +17,15 @@ measure_rps(
 weights with dimensions \eqn{S \times n}. Weights are column-normalized
 before computing each per-observation contribution.}
 
-\item{pointwise}{Optional numeric vector of precomputed pointwise rps values.
-If provided, \code{y}, \code{ypred}, and \code{log_weights} are ignored.}
+\item{pointwise}{Optional numeric vector of precomputed pointwise values, on
+the scale of the measure that is returned: RPS/CRPS when \code{scaled = FALSE}
+and SRPS/SCRPS when \code{scaled = TRUE}. The values are used as they are, with
+no further transformation; in particular, unscaled values are not converted
+to the scaled variant. If provided, \code{y}, \code{ypred}, and \code{log_weights} are
+ignored.}
 
 \item{scaled}{Logical; if \code{TRUE}, computes the scaled variant (SRPS for
 discrete outcomes, SCRPS for continuous outcomes). Default is \code{FALSE}.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes proper scoring rules based on the ranked probability score family,
@@ -74,15 +65,28 @@ accurate than single-permutation estimators. The same estimator is used for
 both discrete and continuous outcomes; see Hosking (1990, 1996) for
 theoretical justification in the discrete case.
 
-If log-weights (\code{log_weights}) are provided (e.g., PSIS weights
-for LOO cross-validation), a weighted PWM estimator is used instead, which
-accounts for the importance weights when estimating expectations.
+The term \eqn{E[|X - X'|]} is computed as a weighted average over all pairs
+of draws,
+\deqn{E[|X - X'|] = \frac{\sum_i \sum_{j \neq i} w_i w_j |x_i - x_j|}{1 -
+  \sum_i w_i^2},}
+which is evaluated in \eqn{O(S \log S)} using the sorted draws and the
+cumulative sums of their weights. If log-weights (\code{log_weights}) are provided
+(e.g., PSIS weights for LOO cross-validation), the \eqn{w_i} are the
+normalized importance weights and \eqn{E[|X - y|]} is likewise a weighted
+mean. Otherwise the weights are equal, \eqn{w_i = 1/S}, and the expression
+reduces to the usual unbiased PWM estimator with the \eqn{1 / (S (S - 1))}
+normalization. Because the estimate is a convex combination of
+\eqn{|x_i - x_j|}, it is always non-negative and invariant to shifts of
+\code{ypred}.
 
 \strong{Sign convention:}
 
-Unscaled scores are returned as losses (lower is better). Scaled scores are
-returned as utilities (higher is better), after Bolin & Wallin (2023). Set
-\code{higher_is_better} to select the orientation you want.
+Unscaled scores (RPS, CRPS) are returned on the loss scale of Gneiting &
+Raftery (2007): lower is better. Scaled scores (SRPS, SCRPS) follow Bolin &
+Wallin (2023) and are returned on the utility scale: higher is better.
+\code{\link[=model_compare]{model_compare()}} reports differences for both on the utility scale, so no
+manual conversion is needed there. The deprecated \code{\link[=crps]{crps()}} returned the
+negated unscaled score; \code{-measure_rps(...)$pointwise} reproduces it.
 }
 \examples{
 # Discrete outcomes: RPS
