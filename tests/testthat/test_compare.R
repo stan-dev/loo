@@ -1101,11 +1101,11 @@ test_that("a custom measure can declare `measure_se_diff` itself", {
     comp$m_a_se_diff
   )
 
-  # an invalid declaration names the attribute, not the argument
+  # an invalid declaration points to `custom_measure()`
   expect_error(
     make(res$loo_p_m1, res$mupred_m1, res$ylp_m1,
          make_fun("m_a", se_diff = "median")),
-    "measure_se_diff. attribute"
+    "se_diff_fun.*custom_measure"
   )
 
   # the models must agree on the declaration

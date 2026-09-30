@@ -95,9 +95,8 @@
 #'     pointwise = pw
 #'   )
 #' }
-#' attr(my_abs_err, "measure_name") <- "my_abs_err"
 #' # the estimate is the mean of the pointwise values, so declare "mean"
-#' attr(my_abs_err, "measure_se_diff") <- "mean"
+#' my_abs_err <- custom_measure(my_abs_err, name = "my_abs_err", se_diff_fun = "mean")
 #' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measures = my_abs_err)
 #' }
 #'

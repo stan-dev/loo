@@ -48,13 +48,13 @@ test_that(".normalize_measure() reads the `measure_loss` declaration", {
   expect_true(.normalize_measure(list(custom_mae = f))[[1]]$loss)
 
   attr(f, "measure_loss") <- "yes"
-  expect_error(.normalize_measure(f), regexp = "measure_loss")
+  expect_error(.normalize_measure(f), regexp = "declare loss")
   attr(f, "measure_loss") <- c(TRUE, FALSE)
   expect_error(
-    .normalize_measure(list(custom_mae = f)), regexp = "measure_loss"
+    .normalize_measure(list(custom_mae = f)), regexp = "declare loss"
   )
   attr(f, "measure_loss") <- NA
-  expect_error(.normalize_measure(f), regexp = "measure_loss")
+  expect_error(.normalize_measure(f), regexp = "declare loss")
 })
 
 test_that(".normalize_measure() errors on duplicate names", {
@@ -66,7 +66,7 @@ test_that(".normalize_measure() errors on duplicate names", {
 
 test_that(".normalize_measure() errors on an unnamed list function without `measure_name`", {
   f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
-  expect_error(.normalize_measure(list(f)), regexp = "measure_name")
+  expect_error(.normalize_measure(list(f)), regexp = "needs a name")
 })
 
 test_that(".normalize_measure() takes the name of an unnamed list function from `measure_name`", {
@@ -85,8 +85,11 @@ test_that("custom_measure() sets the attributes", {
 
 test_that("custom_measure() errors on invalid input", {
   expect_error(custom_measure("x", name = "m"), regexp = "'fun' must be a function")
-  expect_error(custom_measure(function(y) NULL, name = "m", loss = NA), regexp = "measure_loss")
+  expect_error(custom_measure(function(y) NULL, name = "m", loss = NA), regexp = "declare loss")
   expect_error(custom_measure(function(y) NULL, name = "m", se_diff_fun = "median"), regexp = "Invalid")
+  for (bad in list("", NULL, c("a", "b"))) {
+    expect_error(custom_measure(function(y) NULL, name = bad), regexp = "needs a name")
+  }
 })
 
 # .prepare_measures() -----------------------------------------------

@@ -78,8 +78,8 @@
     name <- attr(fun, "measure_name", exact = TRUE)
     if (is.null(name) || length(name) != 1L || !nzchar(name)) {
       stop(
-        "A custom function passed to 'measure' must have attribute ",
-        "'measure_name', e.g. attr(my_fun, \"measure_name\") <- \"my_metric\".",
+        "A custom measure needs a name. Create it with ",
+        "custom_measure(fun, name = \"my_metric\").",
         call. = FALSE
       )
     }
@@ -100,9 +100,8 @@
     loss <- FALSE
   } else if (!is.logical(loss) || length(loss) != 1L || is.na(loss)) {
     stop(
-      "Attribute 'measure_loss' of a custom measure must be TRUE or FALSE, ",
-      "e.g. attr(my_fun, \"measure_loss\") <- TRUE for a measure where lower ",
-      "values are better.",
+      "Custom measure '", name, "' must declare loss as TRUE or FALSE; ",
+      "see custom_measure().",
       call. = FALSE
     )
   }
@@ -112,7 +111,7 @@
   se_diff <- attr(fun, "measure_se_diff", exact = TRUE)
   if (!is.null(se_diff)) {
     se_diff <- .check_se_diff_value(
-      se_diff, name, origin = "`measure_se_diff` attribute"
+      se_diff, name, origin = "`se_diff_fun`"
     )
   }
 

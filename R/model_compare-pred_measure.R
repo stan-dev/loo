@@ -456,8 +456,7 @@ throw_omitted_compare_measures_warning <- function(loos) {
 #' @noRd
 #' @param origin Where the value came from, in the words the user knows it by.
 #' @return The value itself, or `NULL`.
-.check_se_diff_value <- function(value, bare,
-                                      origin = "`measure_se_diff` attribute") {
+.check_se_diff_value <- function(value, bare, origin = "`se_diff_fun`") {
   if (is.null(value) || is.function(value)) {
     return(value)
   }
@@ -466,10 +465,10 @@ throw_omitted_compare_measures_warning <- function(loos) {
     return(value)
   }
   stop(
-    "Invalid ", origin, " for measure '", bare,
+    "Invalid ", origin, " for custom measure '", bare,
     "'. It must be a function, ",
     paste0("\"", .se_diff_keywords, "\"", collapse = " or "),
-    ", or NULL.",
+    ", or NULL; see custom_measure().",
     call. = FALSE
   )
 }
