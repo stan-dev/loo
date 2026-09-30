@@ -21,7 +21,7 @@
 #'   its own measure, and an ELPD table also gains `p` and `se_p`. With the
 #'   default `measures = NULL` one table is printed, and it gains the estimates
 #'   of every compared measure. The difference columns are never added.
-#' @param measures For `loo_pred_measure` comparisons only, which measures to
+#' @param measures For `pred_measure` comparisons only, which measures to
 #'   print diff tables for. `NULL` (default) prints only the ranking measure
 #'   (the first compared measure, `"elpd"` when present);
 #'   `"all"` prints all compared measures; or a character vector of measure

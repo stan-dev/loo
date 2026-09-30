@@ -46,7 +46,7 @@ its own measure, and an ELPD table also gains \code{p} and \code{se_p}. With the
 default \code{measures = NULL} one table is printed, and it gains the estimates
 of every compared measure. The difference columns are never added.}
 
-\item{measures}{For \code{loo_pred_measure} comparisons only, which measures to
+\item{measures}{For \code{pred_measure} comparisons only, which measures to
 print diff tables for. \code{NULL} (default) prints only the ranking measure
 (the first compared measure, \code{"elpd"} when present);
 \code{"all"} prints all compared measures; or a character vector of measure
