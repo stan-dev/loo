@@ -194,7 +194,7 @@ It also supports the `simplify` argument in the print method:
 print(model_compare(loos), simplify = FALSE)
 ```
 
-## Preview: Glimpse into the model comparison results
+## Basic usage
 
 We now use `loo_pred_measure()` to compute the predictive performance for
 each model (`m1, m2, m3`) and measure (see list above).
