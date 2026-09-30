@@ -288,6 +288,24 @@ test_that("print.compare.loo works for loo_pred_measure comparisons", {
   )
 })
 
+test_that("print names only the ranking reference with more than four measures", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  measures <- c("elpd", "mae", "mse", "rmse", "r2")
+  pms <- lapply(1:3, function(i) {
+    loo_pred_measure(
+      loo = res[[paste0("loo_p_m", i)]],
+      y = res$y,
+      mupred = res[[paste0("mupred_m", i)]],
+      ylp = res[[paste0("ylp_m", i)]],
+      measures = measures
+    )
+  })
+  names(pms) <- c("m1", "m2", "m3")
+
+  comp <- suppressMessages(model_compare(pms))
+  expect_snapshot(print(comp))
+})
+
 test_that("without `elpd` the default ranking measure is the first alphabetical one", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   mk <- function(sfx) {

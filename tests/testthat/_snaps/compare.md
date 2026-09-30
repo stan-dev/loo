@@ -416,3 +416,27 @@
     CQAAAAtjb21wYXJlLmxvbwAEAAkAAAAGbWF0cml4AAQACQAAAAVhcnJheQAEAAkAAAAPb2xk
     X2NvbXBhcmUubG9vAAAA/g==
 
+# print names only the ranking reference with more than four measures
+
+    Code
+      print(comp)
+    Output
+      Each measure compared against its own best model (elpd: m2, ...).
+      PSIS-LOO unreliable for all 3 models (k_psis > 0.5); measures may be biased.
+       model bad_k
+          m2     6
+          m3     4
+          m1     4
+      
+       model elpd_diff se_diff p_worse diag_diff
+          m2       0.0     0.0      NA          
+          m3     -22.4   129.6    0.57          
+          m1    -841.5   373.2    0.99          
+    Message
+      
+      Diagnostic flags present.
+      See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
+      or https://mc-stan.org/loo/reference/loo-glossary.html.
+      
+      Use print(x, measures = "all") to see all measures.
+

@@ -226,9 +226,11 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
       "Models ranked by ", compare_measures, " (reference: ", refs, ")."
     ))
   }
-  # Naming every reference stops being readable once there are many measures.
   if (length(compare_measures) > 4L) {
-    return("Each measure compared against its own best model.")
+    return(paste0(
+      "Each measure compared against its own best model (",
+      compare_measures[[1L]], ": ", refs[[1L]], ", ...)."
+    ))
   }
   paste0(
     "Each measure compared against its own best model (",
