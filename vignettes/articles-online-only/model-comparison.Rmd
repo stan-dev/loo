@@ -1,5 +1,5 @@
 ---
-title: "Model comparison: Using the `model_compare()` function."
+title: "Model comparison: Explanation of `model_compare()`"
 author: "Florence Bockting"
 date: "`r Sys.Date()`"
 output:
@@ -12,7 +12,7 @@ output:
 params:
   EVAL: TRUE #!r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
-  %\VignetteIndexEntry{Model comparison: Using the `model_compare()` function.}
+  %\VignetteIndexEntry{Model comparison: Explanation of `model_compare()`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
