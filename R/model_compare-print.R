@@ -47,6 +47,11 @@ print.compare.loo <- function(x, ..., digits = NULL, p_worse = TRUE,
     ))
   }
 
+  if (!is.null(measures) && !all(measures %in% c("elpd", "all"))) {
+    warning("`measures` is ignored for comparisons of 'loo' objects, ",
+            "which contain only elpd.", call. = FALSE)
+  }
+
   if (!all(c("model", "elpd_diff", "se_diff") %in% colnames(x))) {
     print(as.data.frame(x))
     return(x)

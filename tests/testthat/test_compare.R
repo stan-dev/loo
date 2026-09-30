@@ -1321,6 +1321,16 @@ test_that("model_compare throws appropriate warnings", {
     "Not all kfold objects have the same K value"
   )
 
+test_that("print warns that `measures` is ignored for 'loo' comparisons", {
+  comp <- model_compare(w1, w2)
+  expect_warning(
+    capture.output(print(comp, measures = "mse")),
+    "`measures` is ignored"
+  )
+  expect_no_warning(capture.output(print(comp, measures = "all")))
+  expect_no_warning(capture.output(print(comp, measures = "elpd")))
+})
+
   class(w4) <- c("psis_loo", "loo")
   attr(w4, "K") <- NULL
   expect_warning(model_compare(w3, w4), "Comparing LOO-CV to K-fold-CV")
