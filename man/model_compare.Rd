@@ -203,8 +203,7 @@ pointwise differences (the same formula as \code{se_diff}).
 \item \code{"measure_specific"}: the overall estimate is not a sum or mean of
 pointwise contributions (\code{r2}, \code{rmse}, \code{bacc}), so the measure supplies
 its own standard error of the difference.
-\item \code{"custom"}: the standard error comes from the measure's own
-\code{attr(my_fun, "measure_se_diff")} declaration, set with
+\item \code{"custom"}: the standard error comes from what the user passes to
 \code{\link[=custom_measure]{custom_measure()}}. \verb{\{measure\}_se_diff} is \code{NA} when the measure
 declares nothing.
 }

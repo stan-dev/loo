@@ -88,9 +88,9 @@
     if (!is.null(attr_name) && length(attr_name) == 1L && nzchar(attr_name) &&
         !identical(attr_name, name)) {
       cli::cli_warn(c(
-        "Custom measure named {.val {name}} in {.arg measure} also has",
-        "{.code attr(fun, \"measure_name\") = {.val {attr_name}}}.",
-        "i" = "Using the list name {.val {name}}; the attribute is ignored here."
+        "Custom measure {.val {name}} in {.arg measure} was named",
+        "{.val {attr_name}} in {.fn custom_measure}.",
+        "i" = "Using the list name {.val {name}}; the {.fn custom_measure} name is ignored here."
       ))
     }
   }

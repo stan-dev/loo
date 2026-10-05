@@ -332,8 +332,7 @@
 #'   errors and is therefore not a paired pointwise standard deviation. For
 #'   `r2` it is the trivariate analogue, which additionally propagates the
 #'   uncertainty in the baseline `MSE(y)` shared by both models.
-#' * For custom measures it comes from the measure's own
-#'   `attr(my_fun, "measure_se_diff")` declaration, set with
+#' * For custom measures it comes from what the user passes to
 #'   [custom_measure()]. It is `NA` when the measure declares nothing.
 #'
 #' The reference model has `m_se_diff = 0` whenever an `m_se_diff` is available.
@@ -364,8 +363,8 @@
 #'   error state as the difference itself is still reported.
 #' * `se_diff_fun`: for built-in measures with
 #'   `diff_method = "measure_specific"`, the name of the built-in implementation
-#'   used. For custom measures, whatever the measure declared in
-#'   `attr(my_fun, "measure_se_diff")`; absent when it declared nothing.
+#'   used. For custom measures, what the user passed to [custom_measure()];
+#'   absent when it declared nothing.
 #' * `extra`: optional list of auxiliary data the measure stored for the
 #'   standard error of its difference, present only for measures that need it
 #'   (`r2` stores the pointwise baseline `(y_i - mean(y))^2`, which `y` no
@@ -381,8 +380,8 @@
 #' [custom_measure()]. With `loss = TRUE` lower values are better; without it
 #' they are treated as utilities (see [insample_pred_measure()]).
 #' [model_compare()] requires all models to provide matching `measure_info` for
-#' each shared measure; a mismatched `measure_loss` or `measure_se_diff`
-#' declaration, or missing `measure_info` on some models, produces an error.
+#' each shared measure; a mismatched [custom_measure()] declaration,
+#' or missing `measure_info` on some models, produces an error.
 #'
 #' ### `compare_measures` and related attributes
 #'

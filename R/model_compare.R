@@ -145,8 +145,7 @@
 #'   * `"measure_specific"`: the overall estimate is not a sum or mean of
 #'     pointwise contributions (`r2`, `rmse`, `bacc`), so the measure supplies
 #'     its own standard error of the difference.
-#'   * `"custom"`: the standard error comes from the measure's own
-#'     `attr(my_fun, "measure_se_diff")` declaration, set with
+#'   * `"custom"`: the standard error comes from what the user passes to
 #'     [custom_measure()]. `{measure}_se_diff` is `NA` when the measure
 #'     declares nothing.
 #'

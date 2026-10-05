@@ -347,8 +347,7 @@ which requires the covariance between the two models' pointwise squared
 errors and is therefore not a paired pointwise standard deviation. For
 \code{r2} it is the trivariate analogue, which additionally propagates the
 uncertainty in the baseline \code{MSE(y)} shared by both models.
-\item For custom measures it comes from the measure's own
-\code{attr(my_fun, "measure_se_diff")} declaration, set with
+\item For custom measures it comes from what the user passes to
 \code{\link[=custom_measure]{custom_measure()}}. It is \code{NA} when the measure declares nothing.
 }
 
@@ -381,8 +380,8 @@ a function, the \code{"sum"}/\code{"mean"} pointwise formulas, or nothing for an
 error state as the difference itself is still reported.
 \item \code{se_diff_fun}: for built-in measures with
 \code{diff_method = "measure_specific"}, the name of the built-in implementation
-used. For custom measures, whatever the measure declared in
-\code{attr(my_fun, "measure_se_diff")}; absent when it declared nothing.
+used. For custom measures, what the user passed to \code{\link[=custom_measure]{custom_measure()}};
+absent when it declared nothing.
 \item \code{extra}: optional list of auxiliary data the measure stored for the
 standard error of its difference, present only for measures that need it
 (\code{r2} stores the pointwise baseline \code{(y_i - mean(y))^2}, which \code{y} no
@@ -399,8 +398,8 @@ and take \code{loss} and \code{se_diff_fun} from the arguments of the same name 
 \code{\link[=custom_measure]{custom_measure()}}. With \code{loss = TRUE} lower values are better; without it
 they are treated as utilities (see \code{\link[=insample_pred_measure]{insample_pred_measure()}}).
 \code{\link[=model_compare]{model_compare()}} requires all models to provide matching \code{measure_info} for
-each shared measure; a mismatched \code{measure_loss} or \code{measure_se_diff}
-declaration, or missing \code{measure_info} on some models, produces an error.
+each shared measure; a mismatched \code{\link[=custom_measure]{custom_measure()}} declaration,
+or missing \code{measure_info} on some models, produces an error.
 }
 
 \subsection{\code{compare_measures} and related attributes}{

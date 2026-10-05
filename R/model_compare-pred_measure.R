@@ -222,8 +222,8 @@ compare_pred_measure <- function(loos) {
         stop(
           "Models disagree on `measure_info` for measure '",
           bare,
-          "'. For a custom measure, ensure all models use the same ",
-          "`measure_loss` and `measure_se_diff` declarations.",
+          "'. For a custom measure, ensure all models pass the same ",
+          "arguments to `custom_measure()`.",
           call. = FALSE
         )
       }
@@ -392,8 +392,8 @@ throw_omitted_compare_measures_warning <- function(loos) {
 
 #' Check that a declared `"sum"`/`"mean"` aggregation matches the estimate
 #'
-#' Only called when a custom measure declares `measure_se_diff = "sum"` or
-#' `"mean"`. This is the computation `.measure_pointwise_diff_method()`
+#' Only called when a custom measure declares `"sum"` or `"mean"` in
+#' [custom_measure()]. This is the computation `.measure_pointwise_diff_method()`
 #' used to run as autodetection, inverted: rather than guessing the aggregation,
 #' it verifies the one the user asserted.
 #' @noRd
@@ -410,8 +410,8 @@ throw_omitted_compare_measures_warning <- function(loos) {
   }
   if (!ok) {
     warning(
-      "`measure_se_diff = \"", method, "\"` was declared for measure '",
-      .display_name(col, loos), "', but ", method,
+      "Measure '", .display_name(col, loos), "' was declared with \"",
+      method, "\" in `custom_measure()`, but ", method,
       "(pointwise) does not reproduce its estimate.\n",
       "The reported standard error may be wrong.",
       call. = FALSE
