@@ -28,7 +28,11 @@
 #' }
 #'
 #' The attribute `source` is `"insample"`. Attribute `dims` gives posterior
-#' draws × observations. Use [print()] for a readable summary table.
+#' draws × observations. Attribute `measure_info` records what `model_compare()`
+#' needs to know about each measure; see section below. Use [print()]
+#' for a readable summary table.
+#'
+#' @template measure-info-attribute
 #'
 #' @details
 #' **Input requirements by measure.** Supply only the inputs each measure
@@ -48,10 +52,20 @@
 #' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
 #'
-#' **Custom measures.** A function passed to `measures` must have attribute
-#' `measure_name` and return `estimate`, `se`, and `pointwise`. Only arguments
+#' **Custom measures.** Build a custom measure with [custom_measure()]. The
+#' function must return `estimate`, `se`, and `pointwise`. Only arguments
 #' declared in the function signature among `y`, `ypred`, `mupred`, `ylp`, and
 #' `log_weights` are supplied automatically.
+#'
+#' Custom measures are assumed to be on a utility scale (higher is better) in
+#' [model_compare()]. Declare a custom loss with `loss = TRUE` in
+#' [custom_measure()] so that [model_compare()] converts and ranks it in the
+#' right direction.
+#'
+#' Declare how the standard error of a difference between two models is
+#' computed with `se_diff_fun` in [custom_measure()]. It accepts a function,
+#' `"sum"`, or `"mean"`. For a measure that declares nothing,
+#' [model_compare()] reports an `NA` standard error.
 #'
 #' @examples
 #' \donttest{
@@ -80,7 +94,8 @@
 #'     pointwise = pw
 #'   )
 #' }
-#' attr(my_abs_err, "measure_name") <- "my_abs_err"
+#' # the estimate is the mean of the pointwise values, so declare "mean"
+#' my_abs_err <- custom_measure(my_abs_err, name = "my_abs_err", se_diff_fun = "mean")
 #' # insample_pred_measure(y = y, mupred = mupred, ylp = ylp, measures = my_abs_err)
 #' }
 #'
@@ -155,8 +170,10 @@ insample_pred_measure <- function(
 #'
 #' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `crps_loo`).
 #'
+#' @template measure-info-attribute
+#'
 #' @details
-#' **Three equivalent input patterns:**
+#' **Three input patterns:**
 #'
 #' \describe{
 #'   \item{Precomputed `loo` object}{`loo_pred_measure(loo = loo_fit, ...)`.
@@ -165,6 +182,9 @@ insample_pred_measure <- function(
 #'     PSIS weights separately.}
 #'   \item{`ylp` only}{PSIS weights are computed internally from `ylp`.}
 #' }
+#'
+#' If you corrected the `loo` object after PSIS, pass it as `loo`.
+#' For example, `loo_moment_match()` or `brms::reloo()`.
 #'
 #' For distributional and point-prediction measures (`crps`, `r2`, etc.),
 #' supply `y`, `ypred`, and/or `mupred` as for [insample_pred_measure()]. When
@@ -245,6 +265,8 @@ loo_pred_measure <- function(
 #' attributes from the `kfold` object (`K`, `folds`, `fold_type`, etc.). The
 #' list contains `estimates` and `pointwise`; measure names carry a `_kfold`
 #' suffix (e.g. `elpd_kfold`, `crps_kfold`).
+#'
+#' @template measure-info-attribute
 #'
 #' @details
 #' For distributional measures on held-out folds, obtain posterior predictions
@@ -327,6 +349,8 @@ kfold_pred_measure <- function(
 #' `estimates` and `pointwise`. Measure names carry a `_test` suffix (e.g.
 #' `elpd_test`, `crps_test`). Attribute `dims` reflects the test-set size
 #' (from `ylp_test`), not the training data.
+#'
+#' @template measure-info-attribute
 #'
 #' @details
 #' `elpd_test` is computed from `ylp_test` on the holdout
@@ -485,4 +509,48 @@ pred_measure <- function(
 #' @export
 dim.pred_measure <- function(x) {
   attr(x, "dims")
+}
+
+
+#' Define a custom predictive measure
+#'
+#' Attaches the name, the orientation, and the standard error of the
+#' difference to a measure function. Pass the result to the `measure`
+#' argument of the `*_pred_measure()` functions.
+#'
+#' @param fun A function that returns `estimate`, `se`, and `pointwise`. Only
+#'   the arguments `y`, `ypred`, `mupred`, `ylp`, and `log_weights` that are
+#'   in its signature are supplied.
+#' @param name A character string. The measure is reported under this name.
+#' @param se_diff_fun How [model_compare()] computes the standard error of a
+#'   difference: a function `(ref, cmp)`, `"sum"`, `"mean"`, or `NULL`. With
+#'   `NULL` (the default), the standard error of the difference is `NA`.
+#' @param loss `TRUE` if lower values are better. The default `FALSE` treats
+#'   the measure as a utility.
+#'
+#' @return `fun` with the attributes `measure_name`, `measure_loss`, and
+#'   `measure_se_diff`.
+#'
+#' @examples
+#' my_abs_err <- custom_measure(
+#'   function(y, mupred) {
+#'     pw <- abs(y - colMeans(mupred))
+#'     list(estimate = mean(pw), se = sd(pw) / sqrt(length(pw)), pointwise = pw)
+#'   },
+#'   name = "my_abs_err", se_diff_fun = "mean", loss = TRUE
+#' )
+#'
+#' @seealso [pred_measure()], [model_compare()]
+#' @export
+custom_measure <- function(
+  fun, name, se_diff_fun = NULL, loss = FALSE
+) {
+  if (!is.function(fun)) {
+    stop("'fun' must be a function.", call. = FALSE)
+  }
+  attr(fun, "measure_name") <- name
+  attr(fun, "measure_loss") <- loss
+  attr(fun, "measure_se_diff") <- se_diff_fun
+  .measure_entry_custom(fun)
+  fun
 }

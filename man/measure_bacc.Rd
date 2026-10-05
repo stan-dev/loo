@@ -4,13 +4,7 @@
 \alias{measure_bacc}
 \title{Balanced classification accuracy (\code{bacc})}
 \usage{
-measure_bacc(
-  y,
-  mupred,
-  log_weights = NULL,
-  pointwise = NULL,
-  higher_is_better = NULL
-)
+measure_bacc(y, mupred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
 \item{y}{An integer vector of observed class labels.}
@@ -25,12 +19,6 @@ before computing each per-observation contribution.}
 
 \item{pointwise}{Optional numeric vector of precomputed pointwise accuracy
 contributions. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
-
-\item{higher_is_better}{Logical or \code{NULL}; whether larger values indicate
-better predictive performance. \code{NULL} (default) keeps each measure's
-natural convention (e.g. MSE on a loss scale, ELPD on a utility scale).
-Set \code{TRUE} for a utility scale (higher is better) or \code{FALSE} for a loss
-scale (lower is better).}
 }
 \description{
 Computes balanced accuracy by averaging class-specific mean accuracy, giving

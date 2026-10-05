@@ -96,3 +96,41 @@ test_that("test_pred_measure print output", {
   expect_s3_class(x, "test_pred_measure")
   expect_snapshot_output(print(x))
 })
+
+test_that(".se_digits takes the places from the standard error", {
+  expect_equal(loo:::.se_digits(0.0003), 4)
+  expect_equal(loo:::.se_digits(0.045), 3)
+  expect_equal(loo:::.se_digits(1.4), 1)
+  # a large SE still gets `min_digits`
+  expect_equal(loo:::.se_digits(45), 1)
+  # nothing usable is left
+  expect_equal(loo:::.se_digits(c(0, NA, Inf)), 2)
+  expect_equal(loo:::.se_digits(NULL), 2)
+})
+
+test_that(".measure_digits is fixed for a measure on a fixed scale", {
+  expect_equal(loo:::.measure_digits("elpd"), 1)
+  expect_equal(loo:::.measure_digits("ic"), 1)
+  expect_equal(loo:::.measure_digits("mlpd"), 3)
+  for (m in c("r2", "acc", "bacc", "brier")) {
+    expect_equal(loo:::.measure_digits(m), 3)
+  }
+  # on the scale of the data the standard error decides
+  expect_equal(loo:::.measure_digits("rmse", 0.00031), 4)
+  expect_equal(loo:::.measure_digits("mae", 0.45), 2)
+  # a custom measure has no entry, so it follows the standard error too
+  expect_equal(loo:::.measure_digits("my_measure", 2.3), 1)
+})
+
+test_that(".resolve_digits honours the user's `digits`", {
+  expect_equal(loo:::.resolve_digits(NULL, "r2", 0.006), 3)
+  expect_equal(loo:::.resolve_digits(2, "r2", 0.006), 2)
+  expect_equal(loo:::.resolve_digits(c(r2 = 5), "r2", 0.006), 5)
+  # a measure the vector does not name keeps its default
+  expect_equal(loo:::.resolve_digits(c(r2 = 5), "elpd", 1.4), 1)
+})
+
+test_that(".fr keeps a small value out of scientific notation", {
+  expect_equal(loo:::.fr(0.00031, 4), "0.0003")
+  expect_equal(loo:::.fr(c(0.00031, 0), 4), c("0.0003", "0.0000"))
+})
