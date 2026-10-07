@@ -45,7 +45,7 @@
         .measure_entry_custom(el, name = name)
       } else {
         cli::cli_abort(c(
-          "Each element of {.arg measure} must be a character scalar (built-in",
+          "Each element of {.arg measures} must be a character scalar (built-in",
           "name) or a function (custom measure).",
           "i" = "Element {i} has type {.cls {class(el)[1]}}."
         ))
@@ -56,7 +56,7 @@
   }
 
   cli::cli_abort(c(
-    "{.arg measure} must be a character vector, a function, a list, or",
+    "{.arg measures} must be a character vector, a function, a list, or",
     "{.code NULL}.",
     "i" = "Got an object of class {.cls {class(measure)[1]}}."
   ))
@@ -88,7 +88,7 @@
     if (!is.null(attr_name) && length(attr_name) == 1L && nzchar(attr_name) &&
         !identical(attr_name, name)) {
       cli::cli_warn(c(
-        "Custom measure {.val {name}} in {.arg measure} was named",
+        "Custom measure {.val {name}} in {.arg measures} was named",
         "{.val {attr_name}} in {.fn custom_measure}.",
         "i" = "Using the list name {.val {name}}; the {.fn custom_measure} name is ignored here."
       ))
@@ -128,7 +128,7 @@
   dups <- names[duplicated(names)]
   if (length(dups) > 0L) {
     cli::cli_abort(c(
-      "Duplicate measure names in {.arg measure}: {.val {unique(dups)}}",
+      "Duplicate measure names in {.arg measures}: {.val {unique(dups)}}",
       "i" = "Each measure may appear only once."
     ))
   }

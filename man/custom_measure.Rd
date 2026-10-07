@@ -26,7 +26,7 @@ the measure as a utility.}
 }
 \description{
 Attaches the name, the orientation, and the standard error of the
-difference to a measure function. Pass the result to the \code{measure}
+difference to a measure function. Pass the result to the \code{measures}
 argument of the \verb{*_pred_measure()} functions.
 }
 \examples{

@@ -522,7 +522,7 @@ dim.pred_measure <- function(x) {
 #' Define a custom predictive measure
 #'
 #' Attaches the name, the orientation, and the standard error of the
-#' difference to a measure function. Pass the result to the `measure`
+#' difference to a measure function. Pass the result to the `measures`
 #' argument of the `*_pred_measure()` functions.
 #'
 #' @param fun A function that returns `estimate`, `se`, and `pointwise`. Only

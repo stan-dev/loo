@@ -108,7 +108,7 @@
 #'   source, paired differences are computed for every measure present in all
 #'   models. Measures are matched on their bare names, so the source suffix
 #'   (`_loo`, `_kfold`, `_test`, or none for in-sample) is handled
-#'   transparently. When the models were evaluated on different `measure` sets,
+#'   transparently. When the models were evaluated with different `measures`,
 #'   only the shared measures are compared and a warning lists the omitted ones.
 #'
 #'   The data frame carries one row order for all measures, but each *printed*
