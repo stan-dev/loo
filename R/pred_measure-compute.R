@@ -601,6 +601,18 @@ do_pred_measure <- function(
   )
 }
 
+#' Append the source suffix to a measure name
+#' @noRd
+.measure_result_name <- function(source, name) {
+  switch(
+    source,
+    kfold = paste0(name, "_kfold"),
+    loo = paste0(name, "_loo"),
+    test = paste0(name, "_test"),
+    insample = name
+  )
+}
+
 #' Add or update a row or column in a summary matrix
 #'
 #' @description
@@ -631,17 +643,6 @@ do_pred_measure <- function(
 #'
 #' @return Updated matrix with `name` as a row or column name.
 #'
-#' @noRd
-.measure_result_name <- function(source, name) {
-  switch(
-    source,
-    kfold = paste0(name, "_kfold"),
-    loo = paste0(name, "_loo"),
-    test = paste0(name, "_test"),
-    insample = name
-  )
-}
-
 #' @noRd
 .merge_matrix <- function(
   source,
