@@ -34,13 +34,6 @@ release.
 Release notes appear in `NEWS.md`. Deprecated functions are listed under
 **Deprecated functions** on the package website.
 
-## Scope of this guide (loo 3.0.0 branch)
-
-This version of the guide covers deprecations whose **replacements already exist**
-in the package. Work on a unified predictive performance API (`pred_measure`,
-`measure_*()`, and related deprecations) is developed on a separate feature
-branch and will extend this guide when merged into `loo-v3.0.0`.
-
 ---
 
 # Deprecated source files
@@ -256,82 +249,3 @@ The following are targeted for **removal** in loo 3.0.0:
 
 The deprecated option `options(loo.cores = ...)` remains for backward
 compatibility until a separate removal decision is made.
-
----
-
-# Upcoming (not yet in this branch)
-
-The following deprecations and migrations are **not** covered by this version
-of the guide. They will be added when the predictive performance feature branch
-is merged into `loo-v3.0.0`:
-
-- `elpd()` → `measure_elpd()`
-- `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()` → `measure_rps()`, `measure_srps()`, `loo_pred_measure()`
-- `loo_predictive_metric()` → `loo_pred_measure()` and `measure_*()`
-- New workflow entry points: `insample_pred_measure()`, `loo_pred_measure()`,
-  `kfold_pred_measure()`, `test_pred_measure()`, `pred_measure()`
-
-Until that merge, do **not** add `.Deprecated("measure_*")` or
-`.Deprecated("loo_pred_measure")` warnings on this branch, because those
-replacements are not yet exported here.
-
----
-
-# Maintainer checklist
-
-When deprecating or removing a function on this branch:
-
-1. Add `.Deprecated("replacement")` in each exported method (only if the
-   replacement exists in the same branch).
-2. Document deprecation in roxygen (`**deprecated**`, links to replacement).
-3. Add a bullet to `NEWS.md`.
-4. Update this migration guide.
-5. Add or update tests in `tests/testthat/test_deprecated_*.R`.
-6. List the topic under **Deprecated functions** in `_pkgdown.yml`.
-7. Keep the old implementation until the planned removal release.
-8. On removal: delete the source file, remove from `NAMESPACE`, update this guide.
-
-When merging feature branches that introduce new replacements, extend the
-**Function migration tables** and remove items from **Upcoming**.
-
----
-
-# `_pkgdown.yml` reference (this branch)
-
-Suggested `_pkgdown.yml` entries for this branch:
-
-```yaml
-articles:
-  - title: Migration
-    desc: |
-      Guides for updating code when APIs change.
-    contents:
-      - migration-guide
-
-reference:
-  - title: Predictive performance measures
-    desc: |
-      Unified API for predictive performance measures (density scores, scoring
-      rules, and point-prediction metrics) with in-sample, LOO, K-fold, and
-      holdout evaluation modes.
-    contents:
-      - insample_pred_measure
-      - loo_pred_measure
-      - kfold_pred_measure
-      - test_pred_measure
-      - pred_measure
-      - supported_measures_list
-      - starts_with("measure_")
-      - ptw_log_pred_density
-  - title: Deprecated functions
-    contents:
-      - elpd
-      - crps
-      - loo_predictive_metric
-      - compare
-      - psislw
-```
-
-After the predictive performance feature merges, add `elpd`, `crps`, and
-`loo_predictive_metric` to **Deprecated functions**, and add a **Predictive
-performance measures** reference section for the new API.

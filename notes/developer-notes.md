@@ -8,6 +8,7 @@ Developer Notes: `pred_measure` Feature
 - [Open decisions](#open-decisions)
 - [Tasks](#tasks)
 - [General questions](#general-questions)
+- [Deprecation checklist](#deprecation-checklist)
 - [References & resources](#references--resources)
 - [Appendix: Numerical comparisons (deprecated vs new
   API)](#appendix-numerical-comparisons-deprecated-vs-new-api)
@@ -355,6 +356,24 @@ with fixture `test_data_roaches_compare.Rds`.
   `loo_pred_measure()` for non-ELPD measures only?
 
 ------------------------------------------------------------------------
+
+## Deprecation checklist
+
+When deprecating or removing a function:
+
+1. Add `.Deprecated("replacement")` in each exported method (only if the
+   replacement is exported).
+2. Document deprecation in roxygen (`**deprecated**`, links to replacement).
+3. Add a bullet to `NEWS.md`.
+4. Update `vignettes/migration-guide.Rmd`.
+5. Add or update tests in `tests/testthat/test_deprecated_*.R`.
+6. List the topic under **Deprecated functions** in `_pkgdown.yml`.
+7. Keep the old implementation until the planned removal release.
+8. On removal: delete the source file, remove from `NAMESPACE`, update the
+   migration guide.
+
+When a feature adds new replacements, extend the **Function migration tables**
+in `vignettes/migration-guide.Rmd`.
 
 ## References & resources
 
