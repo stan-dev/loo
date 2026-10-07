@@ -592,9 +592,10 @@ testthat::test_that("measure_bacc() works as expected", {
 testthat::test_that("measure_bacc() accepts precomputed pointwise values", {
   y <- c(1L, 1L, 2L, 2L)
   acc_i <- c(1L, 0L, 1L, 1L)
-  res <- measure_bacc(y = y, mupred = NULL, pointwise = acc_i)
+  res <- measure_bacc(y = y, mupred = NULL, pointwise = acc_i / 4)
 
   expect_equal(unname(res$estimates[1, "Estimate"]), 0.75)
+  expect_equal(as.numeric(res$pointwise), acc_i / 4)
   expect_error(
     measure_bacc(y = y, mupred = NULL, pointwise = acc_i[-1]),
     regexp = "must have the same length"

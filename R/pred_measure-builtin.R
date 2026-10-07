@@ -285,6 +285,10 @@ measure_acc <- function(
 #' each observed class equal weight regardless of class frequency.
 #'
 #' @inheritParams measure_acc
+#' @param pointwise Optional numeric vector of precomputed pointwise
+#'   contributions \eqn{acc_i / (K n_{y_i})}, as stored by `measure_bacc()`.
+#'   If provided, `mupred` and `log_weights` are ignored. `y` is always
+#'   required, because it defines the classes.
 #'
 #' @examples
 #' y <- c(1L, 1L, 2L, 2L)
@@ -319,7 +323,7 @@ measure_bacc <- function(
       ignored_args = list(mupred = mupred, log_weights = log_weights),
       fun_name = "bacc"
     )
-    acc_i <- pointwise
+    acc_i <- pointwise * K * n_c[class_id]
     n_draws <- NULL
     n_obs <- length(pointwise)
   } else {

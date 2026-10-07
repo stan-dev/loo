@@ -17,8 +17,10 @@ draws x observations x categories array.}
 weights with dimensions \eqn{S \times n}. Weights are column-normalized
 before computing each per-observation contribution.}
 
-\item{pointwise}{Optional numeric vector of precomputed pointwise accuracy
-contributions. If provided, \code{y}, \code{mupred}, and \code{log_weights} are ignored.}
+\item{pointwise}{Optional numeric vector of precomputed pointwise
+contributions \eqn{acc_i / (K n_{y_i})}, as stored by \code{measure_bacc()}.
+If provided, \code{mupred} and \code{log_weights} are ignored. \code{y} is always
+required, because it defines the classes.}
 }
 \description{
 Computes balanced accuracy by averaging class-specific mean accuracy, giving
