@@ -793,10 +793,11 @@ do_pred_measure <- function(
   }
 
   if (!is.null(predperf)) {
-    if (isFALSE(save_psis)) {
-      predperf$psis_object <- NULL
-    }
-    attributes(predperf_res) <- attributes(predperf)
+    predperf_res <- .copy_attrs(
+      predperf_res,
+      predperf,
+      setdiff(names(attributes(predperf)), "names")
+    )
 
     dims <- if (!is.null(ypred)) {
       dim(ypred)

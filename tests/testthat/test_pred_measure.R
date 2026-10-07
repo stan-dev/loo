@@ -296,6 +296,19 @@ test_that("pred_measure() reuses stored log_weights when save_psis = FALSE", {
   expect_true("mae_loo" %in% rownames(updated$estimates))
 })
 
+test_that("pred_measure() keeps element names when save_psis changes", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2"
+  )
+  updated <- pred_measure(
+    y = res$y, mupred = res$mupred, predperf = predperf_loo,
+    measures = "mae", save_psis = TRUE
+  )
+  expect_false(anyNA(names(updated)))
+  expect_true(is.matrix(updated$log_weights))
+  expect_false(is.null(updated$psis_object))
+})
+
 test_that("pred_measure() provides warning for duplicate measure", {
   predperf_loo <- loo_pred_measure(
     loo = res$loo,
