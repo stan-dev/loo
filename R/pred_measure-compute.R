@@ -13,10 +13,12 @@
 #'   [brms::posterior_epred()]. Required for point-prediction measures such as
 #'   `mae`, `rmse`, `r2`, and `acc`.
 #' @param ylp Matrix of pointwise log predictive densities or probabilities
-#'   (`S` × `n`), typically from [brms::log_lik()]. Required for density-based
-#'   summaries (`elpd`, `mlpd`, `ic`).
+#'   (`S` × `n`), typically from [brms::log_lik()], or a 3-D array
+#'   (`I` × `C` × `n`: iterations, chains, observations). Required for
+#'   density-based summaries (`elpd`, `mlpd`, `ic`).
 #' @param ylp_test Matrix of pointwise log predictive densities for holdout
-#'   observations (`S` × `n_test`), typically from
+#'   observations (`S` × `n_test`), or a 3-D array (`I` × `C` × `n_test`),
+#'   typically from
 #'   `brms::log_lik(fit, newdata = test_data)`. Used with `ylp` (from the
 #'   training fit) in [test_pred_measure()] to score genuinely new data.
 #' @param predperf An existing predictive measure object (class
@@ -101,6 +103,12 @@ do_pred_measure <- function(
     cli::cli_abort(
       "`group_ids` is reserved for future feature but is not yet implemented."
     )
+  }
+  if (length(dim(ylp)) == 3) {
+    ylp <- llarray_to_matrix(ylp)
+  }
+  if (length(dim(ylp_test)) == 3) {
+    ylp_test <- llarray_to_matrix(ylp_test)
   }
 
   .validate_control(control, .normalize_measure(measures))

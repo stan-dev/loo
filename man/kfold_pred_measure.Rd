@@ -28,8 +28,9 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 \code{mae}, \code{rmse}, \code{r2}, and \code{acc}.}
 
 \item{ylp}{Matrix of pointwise log predictive densities or probabilities
-(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
-summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
+(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}, or a 3-D array
+(\code{I} × \code{C} × \code{n}: iterations, chains, observations). Required for
+density-based summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
 \item{measures}{Measures to compute. \code{NULL} (default) gives \code{elpd} (with
 \code{p_loo} / \code{p_kfold} for LOO and k-fold). Can be:

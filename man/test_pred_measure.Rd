@@ -28,11 +28,13 @@ distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
 \code{mae}, \code{rmse}, \code{r2}, and \code{acc}.}
 
 \item{ylp}{Matrix of pointwise log predictive densities or probabilities
-(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}. Required for density-based
-summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
+(\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}, or a 3-D array
+(\code{I} × \code{C} × \code{n}: iterations, chains, observations). Required for
+density-based summaries (\code{elpd}, \code{mlpd}, \code{ic}).}
 
 \item{ylp_test}{Matrix of pointwise log predictive densities for holdout
-observations (\code{S} × \code{n_test}), typically from
+observations (\code{S} × \code{n_test}), or a 3-D array (\code{I} × \code{C} × \code{n_test}),
+typically from
 \code{brms::log_lik(fit, newdata = test_data)}. Used with \code{ylp} (from the
 training fit) in \code{\link[=test_pred_measure]{test_pred_measure()}} to score genuinely new data.}
 

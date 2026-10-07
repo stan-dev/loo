@@ -239,6 +239,16 @@ test_that("pred_measure() updates loo results as expected", {
   expect_equal(dim(updated_predperf$estimates), c(5, 2))
 })
 
+test_that("loo_pred_measure() gives the same result for a 3-D ylp", {
+  LLarr <- example_loglik_array()
+  LLmat <- llarray_to_matrix(LLarr)
+  from_array <- suppressMessages(loo_pred_measure(ylp = LLarr, measures = "elpd"))
+  from_matrix <- suppressMessages(loo_pred_measure(ylp = LLmat, measures = "elpd"))
+
+  expect_equal(from_array$estimates, from_matrix$estimates)
+  expect_equal(attr(from_array, "dims"), dim(LLmat))
+})
+
 test_that("loo_pred_measure() warns for non-elpd measures after moment matching", {
   loo_mm <- res$loo
   attr(loo_mm, "posthoc") <- "moment_match"
