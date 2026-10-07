@@ -409,6 +409,17 @@ testthat::test_that("measure_mae() with log_weights works as expected", {
   expect_equal(length(res$pointwise), length(res_roaches$y))
 })
 
+testthat::test_that("measure_mae() checks log_weights size for vector mupred", {
+  expect_error(
+    suppressMessages(measure_mae(
+      y = res_roaches$y,
+      mupred = colMeans(res_roaches$mupred),
+      log_weights = res_roaches$log_weights
+    )),
+    "must have 1 row"
+  )
+})
+
 # measure_rmse() / measure_mse() -----------------------------------------
 testthat::test_that("measure_mse() and measure_rmse() work as expected", {
   res_mse <- measure_mse(y = res_roaches$y, mupred = res_roaches$mupred,

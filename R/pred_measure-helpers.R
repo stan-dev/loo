@@ -573,8 +573,6 @@
     return(list(err_i = pointwise, n_draws = NULL, n_obs = length(pointwise)))
   }
 
-  n_draws <- nrow(mupred)
-  n_obs <- ncol(mupred)
   .validate_numeric_vector(y, arg = "y")
   if (!is.null(mupred) && !is.matrix(mupred)) {
     .validate_numeric_vector(mupred, arg = "mupred", len = length(y))
@@ -584,6 +582,8 @@
     mupred <- matrix(mupred, nrow = 1, ncol = length(mupred))
   }
   .validate_numeric_matrix(mupred, arg = "mupred", ncol = length(y))
+  n_draws <- nrow(mupred)
+  n_obs <- ncol(mupred)
   if (is.null(log_weights)) {
     yhat <- colMeans(mupred)
   } else {
