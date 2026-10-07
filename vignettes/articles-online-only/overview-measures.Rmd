@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 ## Introduction
 
 A *predictive measure* summarizes how well a model predicts data. **loo**
-provides twelve built-in measures and the possibility to create a custom
+provides twelve built-in measures. Use `custom_measure()` to define your own
 measure. Each built-in measure has its own `measure_*()` function.
 
 This vignette introduces each built-in measure. For each measure it gives:
@@ -876,7 +876,8 @@ and model comparison in the loo package: A formula reference. [TODO: arXiv ID]
 
 - [Model comparison](model-comparison.html) — differences between models and
   their standard errors.
-- [TODO: schemes and `pred_measure()` article]
+- [Predictive schemes with `pred_measure()`](pred-measure-workflow.html) —
+  the schemes, the methods, and custom measures.
 
 ## Appendix: model code {#appendix-model-code}
 
