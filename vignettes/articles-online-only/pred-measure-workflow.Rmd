@@ -704,8 +704,10 @@ second call adds `mae_loo` and `rmse_loo` with the stored PSIS weights.
   values under PSIS-LOO.
 + **Return value.** Return a list with `estimate`, `se`, and `pointwise`.
 
-Pass the function in a named list. The name becomes the row name, for example
-`list("rps", cover90 = coverage)`.
+Wrap the function in `custom_measure()`. It sets the name, whether lower is
+better (`loss`), and how `model_compare()` computes the standard error of a
+difference (`se_diff_fun`). Without it, `model_compare()` treats the measure as
+a utility and reports an `NA` standard error.
 
 **Example.** The coverage of the central 90% predictive interval is the
 proportion of observations inside that interval. For a calibrated model it is
@@ -738,17 +740,19 @@ coverage <- function(y, ypred, log_weights = NULL, prob = 0.9) {
 **Implementation.** The same function works in every scheme:
 
 ```{r custom-measures}
+cover90 <- custom_measure(coverage, name = "cover90", se_diff_fun = "mean")
+
 insample_pred_measure(
   y = y_sleep,
   ypred = ypred_sleep,
-  measures = list("rps", cover90 = coverage)
+  measures = list("rps", cover90 = cover90)
 )
 
 loo_pred_measure(
   loo = loo_sleep,
   y = y_sleep,
   ypred = ypred_sleep,
-  measures = list("rps", cover90 = coverage)
+  measures = list("rps", cover90 = cover90)
 )
 ```
 
