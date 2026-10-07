@@ -241,7 +241,8 @@ measure_ic <- function(
 #' 
 #' @inheritParams measure_score_params
 #' @inheritParams measure_params
-#' @param y An integer vector of observed class labels.
+#' @param y An integer vector of observed class labels. Code it 0 or 1 when
+#'   `mupred` is a matrix, and 1 to K when `mupred` is a 3-D array.
 #' @param pointwise Optional numeric vector of precomputed pointwise accuracy
 #'   contributions. If provided, `y`, `mupred`, and `log_weights` are ignored.
 #'

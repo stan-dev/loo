@@ -523,6 +523,24 @@ testthat::test_that("measure_acc() rejects out-of-range mupred", {
   )
 })
 
+testthat::test_that("measure_acc() and measure_bacc() reject y coded unlike mupred", {
+  mupred <- matrix(c(0.8, 0.3, 0.7, 0.6, 0.4, 0.9), nrow = 2)
+  expect_error(
+    measure_acc(y = c(2L, 1L, 2L), mupred = mupred),
+    regexp = "does not match the coding"
+  )
+  y0 <- as.integer(res_cat$y) - 1L
+  expect_error(
+    measure_acc(y = y0, mupred = res_cat$mupred),
+    regexp = "does not match the coding"
+  )
+  expect_error(
+    measure_bacc(y = y0, mupred = res_cat$mupred),
+    regexp = "does not match the coding"
+  )
+})
+
+
 testthat::test_that("measure_acc() with log-weights works as expected", {
   res <- measure_acc(
     y = as.integer(res_cat$y),

@@ -7,7 +7,8 @@
 measure_bacc(y, mupred, log_weights = NULL, pointwise = NULL)
 }
 \arguments{
-\item{y}{An integer vector of observed class labels.}
+\item{y}{An integer vector of observed class labels. Code it 0 or 1 when
+\code{mupred} is a matrix, and 1 to K when \code{mupred} is a 3-D array.}
 
 \item{mupred}{A numeric array of posterior predictive means. For binary
 outcomes use a draws x observations matrix. For multiclass outcomes use a

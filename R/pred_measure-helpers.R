@@ -518,6 +518,15 @@
   }
   .validate_probs(mupred, arg = "mupred")
 
+  valid_y_labels <- if (length(dim(mupred)) == 3) seq_len(dim(mupred)[3]) else c(0, 1)
+  if (!all(y %in% valid_y_labels)) {
+    cli::cli_abort(c(
+      "{.arg y} does not match the coding of {.arg mupred}.",
+      "i" = "Observed values: {.val {sort(unique(y))}}",
+      "x" = "All elements of {.arg y} must be in {.val {valid_y_labels}}."
+    ))
+  }
+
   if (!is.null(log_weights)) {
     weights <- exp(.normalize_and_validate_log_weights(
       log_weights = log_weights,
