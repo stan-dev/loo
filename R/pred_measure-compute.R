@@ -469,11 +469,11 @@ do_pred_measure <- function(
 #' @param ylp Matrix of pointwise log predictive densities (S × n).
 #' @param measure_entry A normalized measure entry with elements 
 #'   `name`, `type` (`"builtin"` or `"custom"`), and `key`.
-#' @param log_weights Matrix of log-weights (S × n), as returned by 
-#'   `.compute_log_weights()`.
+#' @param log_weights Matrix of log-weights (S × n), taken from the
+#'   `psis_object` of `.get_psis_object()`; `NULL` for every source but LOO.
 #' @param control Named list of per-measure settings passed from
 #'   [pred_measure()]; the active slice is `control[[measure_entry$name]]`.
-#' @param `lppd_i` Numeric vector from `elpd_pointwise()`; read only when the
+#' @param lppd_i Numeric vector from `.elpd_pointwise()`; read only when the
 #'   measure sets `needs_elpd`.
 #'
 #' @return The result of the measure function, in one of two shapes.
