@@ -488,6 +488,13 @@ pred_measure <- function(
   save_psis = FALSE,
   control = list()
 ) {
+  if (!inherits(predperf, "pred_measure")) {
+    cli::cli_abort(c(
+      "{.arg predperf} must be a {.cls pred_measure} object.",
+      "i" = "Got an object of class {.cls {class(predperf)[1]}}."
+    ))
+  }
+
   do_pred_measure(
     y = y,
     ypred = ypred,

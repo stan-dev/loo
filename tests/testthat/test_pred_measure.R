@@ -351,6 +351,17 @@ test_that("pred_measure() provides warning for duplicate measure", {
   )
 })
 
+test_that("pred_measure() errors when predperf is not a pred_measure object", {
+  expect_error(
+    pred_measure(y = res$y, mupred = res$mupred, predperf = list()),
+    regexp = "must be a .*pred_measure.* object"
+  )
+  expect_error(
+    pred_measure(y = res$y, mupred = res$mupred, predperf = 1),
+    regexp = "must be a .*pred_measure.* object"
+  )
+})
+
 test_that("loo_pred_measure() computes expected measures", {
   predperf1 <- loo_pred_measure(
     loo = res$loo,
