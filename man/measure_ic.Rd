@@ -25,6 +25,19 @@ before computing each per-observation contribution.}
 contributions \eqn{\mathrm{ic}_i = -2 \cdot \mathrm{lppd}_i}. If provided,
 \code{ylp} and \code{log_weights} are ignored.}
 }
+\value{
+An object of class \code{"measure"}: a list with:
+\describe{
+\item{\code{estimates}}{A 1 \eqn{\times} 2 matrix. The row is named after
+the measure, the columns are \code{Estimate} and \code{SE} (standard error).}
+\item{\code{pointwise}}{An \eqn{n \times 1} matrix of per-observation values.
+The column is named after the measure.}
+\item{\code{extra}}{Optional. Auxiliary data for the standard error of a
+difference. Most measures do not set it.}
+}
+Attributes \code{measure} (i.e., measure name) and \code{dims} (draws \eqn{\times}
+observations) are also set. Use \code{\link[=print]{print()}} for a readable summary.
+}
 \description{
 Computes the information criteria as -2 x log predictive density (lppd_i)
 values. Inputs follow the same conventions as \code{\link[=measure_elpd]{measure_elpd()}} and

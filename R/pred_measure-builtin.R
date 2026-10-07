@@ -138,6 +138,7 @@ ptw_log_pred_density <- function(ylp, psis_log_weights = NULL) {
 #' # From a draws x chains x observations array
 #' LLarr <- example_loglik_array()
 #' measure_elpd(LLarr)
+#' @inherit measure_params return
 #' @export
 measure_elpd <- function(
   ylp, log_weights = NULL, pointwise = NULL
@@ -173,6 +174,7 @@ measure_elpd <- function(
 #' @examples
 #' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
 #' measure_mlpd(ylp)
+#' @inherit measure_params return
 #' @export
 measure_mlpd <- function(
   ylp, log_weights = NULL, pointwise = NULL
@@ -210,6 +212,7 @@ measure_mlpd <- function(
 #' @examples
 #' ylp <- matrix(log(c(0.2, 0.4, 0.3, 0.8)), nrow = 2)
 #' measure_ic(ylp)
+#' @inherit measure_params return
 #' @export
 measure_ic <- function(
   ylp, log_weights = NULL, pointwise = NULL
@@ -252,6 +255,7 @@ measure_ic <- function(
 #' y <- c(1L, 0L, 1L)
 #' mupred <- matrix(c(0.8, 0.3, 0.7, 0.6, 0.4, 0.9), nrow = 2)
 #' measure_acc(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_acc <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -300,6 +304,7 @@ measure_acc <- function(
 #'   dim = c(1, 4, 2)
 #' )
 #' measure_bacc(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_bacc <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -369,6 +374,7 @@ measure_bacc <- function(
 #' y <- c(1, 0, 1)
 #' ypred <- matrix(c(0.8, 0.2, 0.7, 0.9, 0.4, 0.6), nrow = 2)
 #' measure_brier(y, ypred)
+#' @inherit measure_params return
 #' @export
 measure_brier <- function(
   y, ypred, log_weights = NULL, pointwise = NULL
@@ -435,6 +441,7 @@ measure_brier <- function(
 #' y <- c(1, 2, 3)
 #' mupred <- matrix(c(0.9, 2.1, 2.8, 1.2, 1.9, 3.1), nrow = 2)
 #' measure_mae(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_mae <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -468,6 +475,7 @@ measure_mae <- function(
 #' y <- c(1, 2, 3)
 #' mupred <- matrix(c(0.9, 2.1, 2.8, 1.2, 1.9, 3.1), nrow = 2)
 #' measure_mse(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_mse <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -500,6 +508,7 @@ measure_mse <- function(
 #' y <- c(1, 2, 3)
 #' mupred <- matrix(c(0.9, 2.1, 2.8, 1.2, 1.9, 3.1), nrow = 2)
 #' measure_rmse(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_rmse <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -571,6 +580,7 @@ measure_rmse <- function(
 #' y <- c(1, 2, 3)
 #' mupred <- matrix(c(0.9, 2.1, 2.8, 1.2, 1.9, 3.1), nrow = 2)
 #' measure_r2(y, mupred)
+#' @inherit measure_params return
 #' @export
 measure_r2 <- function(
   y, mupred, log_weights = NULL, pointwise = NULL
@@ -732,6 +742,7 @@ measure_r2 <- function(
 #' probability score with limited information and applications to ensemble
 #' weather forecasts. *Mathematical Geosciences*, 50:209–234.
 #'
+#' @inherit measure_params return
 #' @export
 measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
   scaled = FALSE) {
@@ -813,6 +824,7 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
 #' ypred <- matrix(c(2, 1, 2, 3, 1, 3), nrow = 2)
 #' measure_srps(y, ypred)
 #'
+#' @inherit measure_params return
 #' @export
 measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   measure_rps(

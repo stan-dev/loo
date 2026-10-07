@@ -20,6 +20,19 @@ before computing each per-observation contribution.}
 errors. If provided, \code{mupred} and \code{log_weights} are ignored. \code{y} is always
 required, because \code{r2} needs the variance of \code{y} as its baseline.}
 }
+\value{
+An object of class \code{"measure"}: a list with:
+\describe{
+\item{\code{estimates}}{A 1 \eqn{\times} 2 matrix. The row is named after
+the measure, the columns are \code{Estimate} and \code{SE} (standard error).}
+\item{\code{pointwise}}{An \eqn{n \times 1} matrix of per-observation values.
+The column is named after the measure.}
+\item{\code{extra}}{Optional. Auxiliary data for the standard error of a
+difference. Most measures do not set it.}
+}
+Attributes \code{measure} (i.e., measure name) and \code{dims} (draws \eqn{\times}
+observations) are also set. Use \code{\link[=print]{print()}} for a readable summary.
+}
 \description{
 Computes predictive R-squared as one minus the ratio of prediction MSE to
 the empirical variance of \code{y}. The standard error is computed with a

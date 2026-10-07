@@ -27,6 +27,19 @@ ignored.}
 \item{scaled}{Logical; if \code{TRUE}, computes the scaled variant (SRPS for
 discrete outcomes, SCRPS for continuous outcomes). Default is \code{FALSE}.}
 }
+\value{
+An object of class \code{"measure"}: a list with:
+\describe{
+\item{\code{estimates}}{A 1 \eqn{\times} 2 matrix. The row is named after
+the measure, the columns are \code{Estimate} and \code{SE} (standard error).}
+\item{\code{pointwise}}{An \eqn{n \times 1} matrix of per-observation values.
+The column is named after the measure.}
+\item{\code{extra}}{Optional. Auxiliary data for the standard error of a
+difference. Most measures do not set it.}
+}
+Attributes \code{measure} (i.e., measure name) and \code{dims} (draws \eqn{\times}
+observations) are also set. Use \code{\link[=print]{print()}} for a readable summary.
+}
 \description{
 Computes proper scoring rules based on the ranked probability score family,
 covering both discrete and continuous outcomes, with optional scaling.
