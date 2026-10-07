@@ -8,10 +8,12 @@
 #'
 #' @return An object of class `"measure"`: a list with:
 #'   \describe{
-#'     \item{`estimates`}{Named numeric vector with elements `Estimate`
-#'       and `SE` (standard error).}
-#'     \item{`pointwise`}{Numeric vector of length \eqn{n} with per-observation
-#'       values.}
+#'     \item{`estimates`}{A 1 \eqn{\times} 2 matrix. The row is named after
+#'       the measure, the columns are `Estimate` and `SE` (standard error).}
+#'     \item{`pointwise`}{An \eqn{n \times 1} matrix of per-observation values.
+#'       The column is named after the measure.}
+#'     \item{`extra`}{Optional. Auxiliary data for the standard error of a
+#'       difference. Most measures do not set it.}
 #'   }
 #'   Attributes `measure` (i.e., measure name) and `dims` (draws \eqn{\times} 
 #'   observations) are also set. Use [print()] for a readable summary.
