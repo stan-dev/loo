@@ -121,7 +121,8 @@ do_pred_measure <- function(
     if (is.null(predperf)) {
       if (!is.null(loo) && is.null(loo$psis_object)) {
         cli::cli_abort(c(
-          "No `psis_object` found in `loo` object. Did you run loo(..., save_psis = 'TRUE')."
+          "No {.field psis_object} found in {.arg loo}.",
+          "i" = "Did you run {.code loo(..., save_psis = TRUE)}?"
         ))
       }
       .warn_posthoc(loo, measures)
