@@ -1,26 +1,25 @@
 # loo (development version)
 
-* `elpd()`, `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()`, and
-  `loo_predictive_metric()` are deprecated in favour of the `measure_*()`
-  functions and the `*_pred_measure()` workflow. See `vignette("migration-guide")`
-  for a full mapping table.
-* New predictive performance API: `insample_pred_measure()`, `loo_pred_measure()`,
-  `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()` with
-  built-in measures via `measure_*()` and [supported_measures_list()].
-* New `model_compare()` compares models on all measures of a `*_pred_measure()`
-  result by @florence-bockting in #380.
-* `loo_compare()` is deprecated. Use `model_compare()`. Methods in other
-  packages (e.g. **brms**) still dispatch.
-* `model_compare()` compares each measure against its own best model. It shows
-  loss measures on the utility scale.
-* `model_compare()` ranks models by `elpd` when all models share it. Otherwise,
-  it ranks them by the first shared measure in alphabetical order.
-* New `custom_measure()` sets the name, the loss flag, and the SE of the
-  difference for a custom measure.
-* `print()` on a comparison has the new argument `measures`. It marks each
-  loss measure with a flipped sign.
-* `loo_pred_measure()` warns when `loo_moment_match()` or `reloo()` corrected
-  the `loo` object and the measure is not `elpd`, `mlpd`, or `ic`.
+* Add a predictive performance API by @florence-bockting in #363:
+  - new functions `insample_pred_measure()`, `loo_pred_measure()`,
+    `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()`
+  - new built-in measures `measure_*()`, listed in `supported_measures_list`
+* Deprecate `elpd()`, `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()`, and
+  `loo_predictive_metric()`. Use `measure_*()` and `*_pred_measure()`. See
+  `vignette("migration-guide")`. By @florence-bockting in #363
+* Add `model_compare()` by @florence-bockting in #380:
+  - compares models on each measure of `*_pred_measure()` results
+  - compares each measure against its own best model
+  - shows loss measures on the utility scale
+  - ranks models by `elpd`, else by the first shared measure (alphabetical)
+  - new `print()` argument `measures`
+* Deprecate `loo_compare()`. Use `model_compare()`. Methods in other packages
+  (e.g. **brms**) still work. By @florence-bockting in #380
+* Add `custom_measure()` to set the name, loss flag, and SE of the difference
+  for a custom measure by @florence-bockting in #380
+* `loo_pred_measure()` warns when `loo_moment_match()` or `reloo()` changed the
+  `loo` object and the measure is not `elpd`, `mlpd`, or `ic`, by
+  @florence-bockting in #380
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 
