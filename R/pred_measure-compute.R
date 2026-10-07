@@ -36,7 +36,8 @@
 #'   }
 #'   Custom functions are called with any of `y`, `ypred`, `mupred`, `ylp`, and
 #'   `log_weights` that appear in their formals, plus arguments from `control`.
-#'   They must return a list with  `estimates` and `pointwise`.
+#'   They must return a list with `estimate`, `se`, and `pointwise`. A
+#'   length-2 `estimates` (estimate and SE) can replace `estimate` and `se`.
 #'
 #'   A custom measure declares whether it is a loss (lower is better) or a
 #'   utility (higher is better) with `loss` in [custom_measure()]. Without it a

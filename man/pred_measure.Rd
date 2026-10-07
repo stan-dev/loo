@@ -46,7 +46,8 @@ functions (custom measures), e.g. \code{list("rps", my_metric = my_fun)}.
 }
 Custom functions are called with any of \code{y}, \code{ypred}, \code{mupred}, \code{ylp}, and
 \code{log_weights} that appear in their formals, plus arguments from \code{control}.
-They must return a list with  \code{estimates} and \code{pointwise}.
+They must return a list with \code{estimate}, \code{se}, and \code{pointwise}. A
+length-2 \code{estimates} (estimate and SE) can replace \code{estimate} and \code{se}.
 
 A custom measure declares whether it is a loss (lower is better) or a
 utility (higher is better) with \code{loss} in \code{\link[=custom_measure]{custom_measure()}}. Without it a
