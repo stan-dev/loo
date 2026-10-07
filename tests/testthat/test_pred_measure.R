@@ -249,6 +249,17 @@ test_that("loo_pred_measure() gives the same result for a 3-D ylp", {
   expect_equal(attr(from_array, "dims"), dim(LLmat))
 })
 
+test_that("loo_pred_measure() warns once for a renamed custom measure", {
+  LLmat <- example_loglik_matrix()
+  f <- custom_measure(function(y, mupred) list(estimate = 1, se = 0, pointwise = y),
+                      name = "my_metric")
+  warns <- capture_warnings(suppressMessages(loo_pred_measure(
+    y = rep(0, ncol(LLmat)), mupred = LLmat, ylp = LLmat,
+    measures = list(other = f)
+  )))
+  expect_length(grep("was named", warns), 1)
+})
+
 test_that("loo_pred_measure() warns for non-elpd measures after moment matching", {
   loo_mm <- res$loo
   attr(loo_mm, "posthoc") <- "moment_match"

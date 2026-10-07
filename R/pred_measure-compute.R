@@ -111,10 +111,10 @@ do_pred_measure <- function(
     ylp_test <- llarray_to_matrix(ylp_test)
   }
 
-  .validate_control(control, .normalize_measure(measures))
   measures <- .prepare_measures(
     measures, predperf, supported_measures_list, source
   )
+  .validate_control(control, measures)
   needs_elpd <- .any_needs_elpd(measures)
   if (source == "loo") {
     if (is.null(predperf)) {
