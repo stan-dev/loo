@@ -38,17 +38,6 @@ NULL
 #' @name measure_density_params
 NULL
 
-#' Shared parameters for metrics
-#'
-#' @param y A vector of observed values.
-#' @param mupred A numeric array of posterior predictive means. For binary
-#'   outcomes use a draws x observations matrix. For multiclass outcomes use a
-#'   draws x observations x categories array.
-#' 
-#' @keywords internal
-#' @name measure_metric_params
-NULL
-
 #' Shared parameters for scores
 #'
 #' @param y A vector of observed values.
