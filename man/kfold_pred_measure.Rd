@@ -16,16 +16,16 @@ kfold_pred_measure(
 )
 }
 \arguments{
-\item{y}{Vector of observed values (\code{n}). Required for distributional and
-point-prediction measures such as \code{crps}, \code{mae}, and \code{acc}.}
+\item{y}{Vector of observed values (\code{n}). Required for every measure except
+\code{elpd}, \code{mlpd}, and \code{ic}.}
 
 \item{ypred}{Matrix of posterior predictive draws (\code{S} draws × \code{n}
 observations), typically from \code{\link[brms:posterior_predict]{brms::posterior_predict()}}. Required for
-distributional measures such as \code{crps}, \code{rps}, and \code{scrps}.}
+\code{rps}, \code{srps}, and \code{brier}.}
 
 \item{mupred}{Matrix of posterior expected values (\code{S} × \code{n}), typically from
-\code{\link[brms:posterior_epred]{brms::posterior_epred()}}. Required for point-prediction measures such as
-\code{mae}, \code{rmse}, \code{r2}, and \code{acc}.}
+\code{\link[brms:posterior_epred]{brms::posterior_epred()}}. Required for \code{mae}, \code{mse},
+\code{rmse}, \code{r2}, \code{acc}, and \code{bacc}.}
 
 \item{ylp}{Matrix of pointwise log predictive densities or probabilities
 (\code{S} × \code{n}), typically from \code{\link[brms:log_lik]{brms::log_lik()}}, or a 3-D array
@@ -83,7 +83,7 @@ measure's summary function (e.g. \code{list(new_measure = list(add_arg = 10))}).
 An object of class \code{"kfold_pred_measure"} and \code{"pred_measure"}, inheriting
 attributes from the \code{kfold} object (\code{K}, \code{folds}, \code{fold_type}, etc.). The
 list contains \code{estimates} and \code{pointwise}; measure names carry a \verb{_kfold}
-suffix (e.g. \code{elpd_kfold}, \code{crps_kfold}).
+suffix (e.g. \code{elpd_kfold}, \code{rps_kfold}).
 }
 \description{
 Compute predictive performance measures under \strong{k-fold cross-validation}.

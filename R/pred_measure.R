@@ -41,7 +41,7 @@
 #' | Measure | `ylp` | `y` | `ypred` | `mupred` |
 #' |:---|:---:|:---:|:---:|:---:|
 #' | `elpd`, `mlpd`, `ic` | ✓ | | | |
-#' | `crps`, `scrps`, `rps`, `srps` | | ✓ | ✓ | |
+#' | `rps`, `srps`, `brier` | | ✓ | ✓ | |
 #' | `acc`, `bacc` | | ✓ | | ✓ |
 #' | `mae`, `mse`, `rmse`, `r2` | | ✓ | | ✓ |
 #'
@@ -168,7 +168,7 @@ insample_pred_measure <- function(
 #'     further measures with [pred_measure()] without recomputing weights.}
 #' }
 #'
-#' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `crps_loo`).
+#' Measure names carry a `_loo` suffix (e.g. `elpd_loo`, `rps_loo`).
 #'
 #' @template measure-info-attribute
 #'
@@ -186,7 +186,7 @@ insample_pred_measure <- function(
 #' If you corrected the `loo` object after PSIS, pass it as `loo`.
 #' For example, `loo_moment_match()` or `brms::reloo()`.
 #'
-#' For distributional and point-prediction measures (`crps`, `r2`, etc.),
+#' For distributional and point-prediction measures (`rps`, `r2`, etc.),
 #' supply `y`, `ypred`, and/or `mupred` as for [insample_pred_measure()]. When
 #' adding measures incrementally, call [pred_measure()] with `predperf` set to
 #' an existing result; use `save_psis = TRUE` on the initial call so weights
@@ -264,7 +264,7 @@ loo_pred_measure <- function(
 #' An object of class `"kfold_pred_measure"` and `"pred_measure"`, inheriting
 #' attributes from the `kfold` object (`K`, `folds`, `fold_type`, etc.). The
 #' list contains `estimates` and `pointwise`; measure names carry a `_kfold`
-#' suffix (e.g. `elpd_kfold`, `crps_kfold`).
+#' suffix (e.g. `elpd_kfold`, `rps_kfold`).
 #'
 #' @template measure-info-attribute
 #'
@@ -347,7 +347,7 @@ kfold_pred_measure <- function(
 #' @return
 #' An object of class `"test_pred_measure"` and `"pred_measure"` with
 #' `estimates` and `pointwise`. Measure names carry a `_test` suffix (e.g.
-#' `elpd_test`, `crps_test`). Attribute `dims` reflects the test-set size
+#' `elpd_test`, `rps_test`). Attribute `dims` reflects the test-set size
 #' (from `ylp_test`), not the training data.
 #'
 #' @template measure-info-attribute

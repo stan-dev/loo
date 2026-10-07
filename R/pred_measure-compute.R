@@ -4,14 +4,14 @@
 #' Parameter definitions shared by the user-facing entry points and the
 #' internal engine [do_pred_measure()].
 #'
-#' @param y Vector of observed values (`n`). Required for distributional and
-#'   point-prediction measures such as `crps`, `mae`, and `acc`.
+#' @param y Vector of observed values (`n`). Required for every measure except
+#'   `elpd`, `mlpd`, and `ic`.
 #' @param ypred Matrix of posterior predictive draws (`S` draws × `n`
 #'   observations), typically from [brms::posterior_predict()]. Required for
-#'   distributional measures such as `crps`, `rps`, and `scrps`.
+#'   `rps`, `srps`, and `brier`.
 #' @param mupred Matrix of posterior expected values (`S` × `n`), typically from
-#'   [brms::posterior_epred()]. Required for point-prediction measures such as
-#'   `mae`, `rmse`, `r2`, and `acc`.
+#'   [brms::posterior_epred()]. Required for `mae`, `mse`,
+#'   `rmse`, `r2`, `acc`, and `bacc`.
 #' @param ylp Matrix of pointwise log predictive densities or probabilities
 #'   (`S` × `n`), typically from [brms::log_lik()], or a 3-D array
 #'   (`I` × `C` × `n`: iterations, chains, observations). Required for
