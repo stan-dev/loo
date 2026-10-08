@@ -1,0 +1,386 @@
+# load data -----------------------------
+res <- readRDS("data-for-tests/test_data_roaches.Rds")
+
+supported_measures_list <- getFromNamespace("supported_measures_list", "loo")
+
+# helpers for tests ------------------------------------------------
+.builtin_entry <- function(name) {
+  list(name = name, type = "builtin", key = name)
+}
+
+# .normalize_measure() ----------------------------------------------
+
+test_that(".normalize_measure() handles NULL and character input", {
+  expect_equal(.normalize_measure(NULL), list())
+  entries <- .normalize_measure(c("mse", "rps"))
+  expect_length(entries, 2)
+  expect_equal(entries[[1]], .builtin_entry("mse"))
+})
+
+test_that(".normalize_measure() handles a custom function", {
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  attr(f, "measure_name") <- "custom_mae"
+  entries <- .normalize_measure(f)
+  expect_length(entries, 1)
+  expect_equal(entries[[1]]$type, "custom")
+  expect_equal(entries[[1]]$name, "custom_mae")
+})
+
+test_that(".normalize_measure() handles a mixed list", {
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  attr(f, "measure_name") <- "custom_mae"
+  entries <- .normalize_measure(list("r2", custom_mae = f))
+  expect_length(entries, 2)
+  expect_equal(entries[[1]]$name, "r2")
+  expect_equal(entries[[2]]$name, "custom_mae")
+})
+
+test_that(".normalize_measure() reads the `measure_loss` declaration", {
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  attr(f, "measure_name") <- "custom_mae"
+
+  # a custom measure is a utility unless it says otherwise
+  expect_false(.normalize_measure(f)[[1]]$loss)
+
+  attr(f, "measure_loss") <- TRUE
+  expect_true(.normalize_measure(f)[[1]]$loss)
+  # the list form takes its name from the element, but the same declaration
+  expect_true(.normalize_measure(list(custom_mae = f))[[1]]$loss)
+
+  attr(f, "measure_loss") <- "yes"
+  expect_error(.normalize_measure(f), regexp = "declare loss")
+  attr(f, "measure_loss") <- c(TRUE, FALSE)
+  expect_error(
+    .normalize_measure(list(custom_mae = f)), regexp = "declare loss"
+  )
+  attr(f, "measure_loss") <- NA
+  expect_error(.normalize_measure(f), regexp = "declare loss")
+})
+
+test_that(".normalize_measure() errors on duplicate names", {
+  expect_error(
+    .normalize_measure(c("mse", "mse")),
+    regexp = "Duplicate measure"
+  )
+})
+
+test_that(".normalize_measure() errors on an unnamed list function without `measure_name`", {
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  expect_error(.normalize_measure(list(f)), regexp = "needs a name")
+})
+
+test_that(".normalize_measure() takes the name of an unnamed list function from `measure_name`", {
+  f <- custom_measure(function(y, mupred) list(estimate = 1, se = 0, pointwise = y),
+                      name = "my_metric")
+  entries <- .normalize_measure(list("rmse", f))
+  expect_identical(vapply(entries, `[[`, "", "name"), c("rmse", "my_metric"))
+})
+
+test_that("custom_measure() sets the attributes", {
+  f <- custom_measure(function(y, mupred) NULL, name = "m", se_diff_fun = "mean", loss = TRUE)
+  expect_identical(attr(f, "measure_name"), "m")
+  expect_true(attr(f, "measure_loss"))
+  expect_identical(attr(f, "measure_se_diff"), "mean")
+})
+
+test_that("custom_measure() errors on invalid input", {
+  expect_error(custom_measure("x", name = "m"), regexp = "'fun' must be a function")
+  expect_error(custom_measure(function(y) NULL, name = "m", loss = NA), regexp = "declare loss")
+  expect_error(custom_measure(function(y) NULL, name = "m", se_diff_fun = "median"), regexp = "Invalid")
+  for (bad in list("", NULL, c("a", "b"))) {
+    expect_error(custom_measure(function(y) NULL, name = bad), regexp = "needs a name")
+  }
+})
+
+# .prepare_measures() -----------------------------------------------
+
+test_that(".prepare_measures() errors on invalid built-in names", {
+  expect_error(
+    .prepare_measures(
+      "pps", res$predperf, supported_measures_list, source = "insample"
+    ),
+    regexp = "Invalid measure"
+  )
+})
+
+test_that(".prepare_measures() filters measures already in predperf", {  
+  expect_warning(
+    .prepare_measures(
+      c("mse", "elpd"), predperf = res$predperf,
+      supported_measures_list, source = "insample"
+    ),
+    regexp = "already present in"
+  )
+
+  expect_warning(
+    .prepare_measures(
+      c("mse", "elpd", "r2"), predperf = res$predperf,
+      supported_measures_list, source = "insample"
+    ),
+    regexp = "already present in"
+  )
+
+  entries <- .prepare_measures(
+    c("mse", "rps"), predperf = res$predperf,
+    supported_measures_list, source = "insample"
+  )
+  expect_equal(vapply(entries, `[[`, "", "name"), c("mse", "rps"))
+
+  entries <- .prepare_measures(
+    c("mse"), predperf = res$predperf,
+    supported_measures_list, source = "insample"
+  )
+  expect_equal(vapply(entries, `[[`, "", "name"), "mse")
+})
+
+test_that(".prepare_measures() defaults to elpd for a new result only", {
+  entries <- .prepare_measures(NULL, NULL, supported_measures_list, "insample")
+  expect_equal(vapply(entries, `[[`, "", "key"), "elpd")
+  expect_length(
+    .prepare_measures(NULL, res$predperf, supported_measures_list, "insample"),
+    0L
+  )
+})
+
+# .any_needs_elpd() -------------------------------------------------
+
+test_that(".any_needs_elpd() detects measures derived from elpd", {
+  entry <- function(k) list(name = k, type = "builtin", key = k)
+  custom <- list(name = "my_fun", type = "custom", key = function(...) NULL)
+
+  expect_true(.any_needs_elpd(list(entry("rmse"), entry("mlpd"))))
+  expect_true(.any_needs_elpd(list(entry("elpd"))))
+  expect_false(.any_needs_elpd(list(entry("rmse"), custom)))
+  expect_false(.any_needs_elpd(list()))
+})
+
+# .validate_measure_result() ----------------------------------------
+
+test_that(".validate_measure_result() accepts standard and CRPS-style output", {
+  res_std <- list(estimate = 1, se = 0.1, pointwise = c(1, 2))
+  expect_invisible(.validate_measure_result(res_std, "m", n_obs = 2))
+
+  res_crps <- list(estimates = c(1, 0.1), pointwise = c(1, 2))
+  expect_invisible(.validate_measure_result(res_crps, "m", n_obs = 2))
+})
+
+test_that(".validate_measure_result() errors on invalid output", {
+  expect_error(
+    .validate_measure_result(list(estimate = 1), "m"),
+    regexp = "Missing"
+  )
+  expect_error(
+    .validate_measure_result(
+      list(estimate = 1, se = 0.1, pointwise = c(1, 2, 3)),
+      "m",
+      n_obs = 2
+    ),
+    regexp = "length 2, not 3"
+  )
+})
+
+# .validate_control() ---------------------------------------
+
+test_that(".validate_control() accepts valid control silently", {
+  expect_invisible(.validate_control(list()))
+  expect_invisible(.validate_control(list(rps = list())))
+  expect_invisible(.validate_control(list(rps = list(scaled = TRUE))))
+  expect_invisible(.validate_control(list(
+    rps = list(scaled = TRUE),
+    srps = list(pointwise = NULL)
+  )))
+})
+
+test_that(".validate_control() warns on invalid measure args", {
+  expect_warning(
+    .validate_control(list(rps = list(size = 10))),
+    regexp = "Ignoring `size` as it is not a valid argument"
+  )
+
+  expect_warning(
+    .validate_control(list(rps = list(foo = 1, bar = 2))),
+    regexp = "Ignoring `foo` and `bar` as it is not a valid argument"
+  )
+
+  expect_warning(
+    .validate_control(list(rps = list(scaled = TRUE, bad = 1))),
+    regexp = "Ignoring `bad` as it is not a valid argument"
+  )
+
+  expect_warning(
+    expect_warning(
+      .validate_control(list(rps = list(foo = 1), mse = list(bar = 2))),
+      regexp = "Ignoring `foo` as it is not a valid argument"
+    ),
+    regexp = "Ignoring `bar` as it is not a valid argument"
+  )
+})
+
+test_that(".validate_control() errors on malformed control", {
+  expect_error(
+    .validate_control("rps"),
+    regexp = "must be a named list of named lists."
+  )
+  expect_error(
+    .validate_control(list(list(scaled = TRUE))),
+    regexp = "must be a named list of named lists."
+  )
+  expect_error(
+    .validate_control(list(rps = c(scaled = TRUE))),
+    regexp = "must be a named list of named lists."
+  )
+})
+
+test_that(".validate_control() warns on a control entry naming no measure", {
+  expect_warning(
+    .validate_control(list(not_a_measure = list(x = 1))),
+    regexp = "not_a_measure.*matches no"
+  )
+  # the same when the requested measures are known
+  expect_warning(
+    .validate_control(
+      list(mse = list(pointwise = NULL)),
+      measures = .normalize_measure("rps")
+    ),
+    regexp = "mse.*matches no"
+  )
+})
+
+test_that(".validate_control() validates custom measures against their formals", {
+  f <- function(y, mupred, delta = 1) {
+    list(estimate = 1, se = 0, pointwise = y)
+  }
+  attr(f, "measure_name") <- "custom_huber"
+  entries <- .normalize_measure(f)
+
+  # only the custom function's own formals are accepted
+  expect_silent(
+    .validate_control(list(custom_huber = list(delta = 2)), entries)
+  )
+  expect_warning(
+    .validate_control(
+      list(custom_huber = list(higher_is_better = TRUE)),
+      entries
+    ),
+    regexp = "Ignoring `higher_is_better` as it is not a valid argument"
+  )
+  expect_warning(
+    .validate_control(list(custom_huber = list(nope = 1)), entries),
+    regexp = "Ignoring `nope` as it is not a valid argument"
+  )
+})
+
+# .validate_probs() -----------------------------------------
+
+test_that(".validate_probs() accepts values in [0, 1]", {
+  expect_invisible(.validate_probs(c(0, 0.5, 1), "x"))
+  expect_invisible(.validate_probs(matrix(c(0.2, 0.8), nrow = 1), "x"))
+})
+
+test_that(".validate_probs() rejects out-of-range values", {
+  expect_error(
+    .validate_probs(c(-0.1, 0.5), "mupred"),
+    regexp = "`mupred` must contain values in \\[0, 1\\]"
+  )
+  expect_error(
+    .validate_probs(c(0.5, 1.1), "ypred"),
+    regexp = "`ypred` must contain values in \\[0, 1\\]"
+  )
+})
+
+# subset_measures() -----------------------------------------
+
+.make_measure_result <- function() {
+  list(
+    estimates = matrix(
+      1:4, 2, 2,
+      dimnames = list(c("a", "b"), c("Estimate", "SE"))
+    ),
+    pointwise = matrix(
+      1:6, 3, 2,
+      dimnames = list(NULL, c("a", "b"))
+    ),
+    diagnostics = list(pareto_k = c(0.1, 0.2, 0.3)),
+    psis_object = list(foo = 1)
+  )
+}
+
+test_that("subset_measures() subsets kfold and loo base measures", {
+  kfold_sub <- subset_measures(
+    res$kfold,
+    measures = c("elpd_kfold", "p_kfold"),
+    components = c("estimates", "pointwise")
+  )
+  expect_equal(names(kfold_sub), c("estimates", "pointwise"))
+  expect_equal(rownames(kfold_sub$estimates), c("elpd_kfold", "p_kfold"))
+  expect_equal(colnames(kfold_sub$pointwise), c("elpd_kfold", "p_kfold"))
+
+  loo_sub <- subset_measures(
+    res$loo,
+    measures = c("elpd_loo", "p_loo"),
+    components = c("estimates", "pointwise", "diagnostics")
+  )
+  expect_equal(names(loo_sub), c("estimates", "pointwise", "diagnostics"))
+  expect_equal(rownames(loo_sub$estimates), c("elpd_loo", "p_loo"))
+  expect_equal(colnames(loo_sub$pointwise), c("elpd_loo", "p_loo"))
+  expect_identical(loo_sub$diagnostics, res$loo$diagnostics)
+})
+
+test_that("subset_measures() respects components argument", {
+  x <- .make_measure_result()
+
+  estimates_only <- subset_measures(x, measures = c("a", "b"), components = "estimates")
+  expect_equal(names(estimates_only), "estimates")
+  expect_equal(rownames(estimates_only$estimates), c("a", "b"))
+
+  pointwise_only <- subset_measures(x, measures = "a", components = "pointwise")
+  expect_equal(names(pointwise_only), "pointwise")
+  expect_equal(colnames(pointwise_only$pointwise), "a")
+
+  diagnostics_only <- subset_measures(x, measures = "a", components = "diagnostics")
+  expect_equal(names(diagnostics_only), "diagnostics")
+  expect_identical(diagnostics_only$diagnostics, x$diagnostics)
+})
+
+test_that("subset_measures() drops unknown measures and components", {
+  x <- .make_measure_result()
+
+  expect_error(
+    subset_measures(
+      x,
+      measures = c("a", "missing", "b"),
+      components = c("estimates", "pointwise")
+    ),
+    regexp = "contains invalid value:"
+  )
+  
+  expect_error(
+    subset_measures(
+      x,
+      measures = c("a", "b"),
+      components = c("estimates", "pointwise", "measure")
+    ),
+    regexp = "contains invalid value:"
+  )
+
+  empty_measures <- subset_measures(
+    x,
+    measures = character(0),
+    components = c("estimates", "pointwise")
+  )
+  expect_equal(dim(empty_measures$estimates), c(0, 2))
+  expect_equal(dim(empty_measures$pointwise), c(3, 0))
+})
+
+test_that("subset_measures() preserves requested measure order", {
+  x <- .make_measure_result()
+
+  sub <- subset_measures(
+    x,
+    measures = c("b", "a"),
+    components = c("estimates", "pointwise")
+  )
+
+  expect_equal(rownames(sub$estimates), c("b", "a"))
+  expect_equal(colnames(sub$pointwise), c("b", "a"))
+})

@@ -158,6 +158,9 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(loo$psis_object$log_weights)
     loo$psis_object$diagnostics <- loo$diagnostics
   }
+  if (length(I) > 0) {
+    attr(loo, "posthoc") <- union(attr(loo, "posthoc"), "moment_match")
+  }
 
   # combined estimates
   cols_to_summarize <- !(colnames(loo$pointwise) %in% c("mcse_elpd_loo",

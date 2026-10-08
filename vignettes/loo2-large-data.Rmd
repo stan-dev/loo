@@ -56,7 +56,7 @@ set.seed(4711)
 # Example: Well water in Bangladesh
 
 We will use the same example as in the vignette [_Writing Stan programs for use
-with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html).
+with the loo package_](https://mc-stan.org/loo/articles/loo2-with-rstan.html).
 See that vignette for a description of the problem and data.
 
 The sample size in this example is only $N=3020$, which is not large enough to
@@ -88,7 +88,7 @@ model {
 ```
 
 Importantly, unlike the general approach recommended in 
-[_Writing Stan programs for use with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html), 
+[_Writing Stan programs for use with the loo package_](https://mc-stan.org/loo/articles/loo2-with-rstan.html), 
 we do _not_ compute the log-likelihood for each observation in the 
 `generated quantities` block of the Stan program. Here we are assuming we have a
 large data set (larger than the one we're actually using in this demonstration)
@@ -398,7 +398,7 @@ The object created is of class `psis_loo_ss`, which inherits from the
 ## Comparing models
 
 To compare this model to an alternative model for the same data we can use the
-`loo_compare()` function just as we would if using `loo()` instead of
+`model_compare()` function just as we would if using `loo()` instead of
 `loo_subsample()` or `loo_approximate_posterior()`. First we'll fit a second
 model to the well-switching data, using `log(arsenic)` instead of `arsenic` as a
 predictor:
@@ -470,11 +470,11 @@ All Pareto k estimates are good (k < 0.7).
 See help('pareto-k-diagnostic') for details.
 ```
 
-We can now compare the models on LOO using the `loo_compare` function:
+We can now compare the models on LOO using the `model_compare` function:
 
 ```{r, eval=FALSE}
 # Compare
-comp <- loo_compare(loo_ss_1, loo_ss_2)
+comp <- model_compare(loo_ss_1, loo_ss_2)
 print(comp)
 ```
 
@@ -567,7 +567,7 @@ loo_full_2 <- loo(
   data = stan_df_2,
   cores = 2
 )
-loo_compare(loo_ss_1, loo_full_2)
+model_compare(loo_ss_1, loo_full_2)
 ```
 
 ```

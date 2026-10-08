@@ -70,8 +70,8 @@
 #' while pseudo-BMA+ can serve as a computationally easier alternative.
 #'
 #' @seealso
-#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/), particularly
-#'   [Bayesian Stacking and Pseudo-BMA weights using the __loo__ package](https://mc-stan.org/loo/articles/loo2-weights.html).
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html), particularly
+#'   [Bayesian Stacking and Pseudo-BMA weights](https://mc-stan.org/loo/articles/loo2-weights.html).
 #' * [loo()] for details on leave-one-out ELPD estimation.
 #' * [constrOptim()] for the choice of optimization methods and control-parameters.
 #' * [relative_eff()] for computing `r_eff`.
