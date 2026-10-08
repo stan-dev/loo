@@ -60,7 +60,7 @@ This vignette does not derive the formulas behind `<measure>_diff` and
 
 `model_compare()` is new in loo v3.0.0. It compares models on several
 predictive performance measures, for example `elpd`, `mae`, `rmse`, and `acc`.
-For the full list, see the [Overview of scores and metrics](overview-measures.html)
+For the full list, see the [Predictive model performance: Overview of measures](overview-measures.html)
 vignette. You can also define custom measures.
 
 This vignette uses the output of `<type>_pred_measure()`. It also briefly
@@ -720,7 +720,7 @@ Vehtari, A., Bockting, F., Axen, S., and Weber, F. (2026).
 
 - [Computing predictive performance measures](pred-measure-workflow.html) — how
   to produce the objects compared here.
-- [Overview of scores and metrics](overview-measures.html) — definitions and
+- [Predictive model performance: Overview of measures](overview-measures.html) — definitions and
   formulas for each measure.
 - `?"loo-glossary"` — the `measure_info` attribute in full.
 - Vehtari et al. (2026), *TODO-ARXIV-TITLE*: the supplement with the formulas for every measure and standard error in this article.

@@ -49,7 +49,7 @@
 #' requesting them does not add an `elpd` row. Request `ic`, `mlpd`, or other
 #' density scores via `measures`, or supply a custom function;
 #' see [supported_measures_list] and the
-#' [overview of scores and metrics](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
+#' [Predictive model performance: Overview of measures](https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html)
 #' article for definitions and orientation (higher vs lower is better).
 #'
 #' **Custom measures.** Build a custom measure with [custom_measure()]. The

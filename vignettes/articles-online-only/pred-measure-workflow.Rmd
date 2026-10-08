@@ -50,7 +50,7 @@ three questions:
 3. **How are the predictions computed?** From posterior draws, from refits, or
    with importance weights.
 
-The [overview of predictive measures](overview-measures.html) answers the first
+The [Predictive model performance: Overview of measures](overview-measures.html) answers the first
 question. This article answers the second and the third. It shows how the
 `pred_measure()` family computes any measure under four predictive schemes:
 in-sample, PSIS-LOO, K-fold, and test data.
@@ -59,8 +59,8 @@ in-sample, PSIS-LOO, K-fold, and test data.
 **What this article does not cover**
 
 + **Measure definitions.** See the
-  [overview of predictive measures](overview-measures.html).
-+ **Model comparison.** See the [model comparison](model-comparison.html)
+  [Predictive model performance: Overview of measures](overview-measures.html).
++ **Model comparison.** See the [Model comparison: Explanation of `model_compare()`](model-comparison.html)
   article.
 + **Leave-one-group-out and leave-future-out schemes.** The `pred_measure()`
   family has no entry point for them yet.
@@ -881,12 +881,9 @@ smoothed importance sampling. *Journal of Machine Learning Research*,
 
 ## See also
 
-- [Overview of predictive measures](overview-measures.html) — definitions,
-  formulas, and standard errors of the measures.
-- [Model comparison](model-comparison.html) — differences between models and
-  their standard errors.
-- [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html) — when to use
-  which cross-validation scheme.
+- [Predictive model performance: Overview of measures](overview-measures.html)
+- [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+- [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html)
 
 ## Appendix: model code {#appendix-model-code}
 
