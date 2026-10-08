@@ -26,8 +26,8 @@ Related notes: [loo-v3-cleanup-todos.md](loo-v3-cleanup-todos.md),
 
 | Document | Name | Status | Branch / PR |
 | :-- | :-- | :-- | :-- |
-| `vignettes/articles-online-only/overview-measures.Rmd` | Model performance: Overview of predictive measures | exists; placeholders left | `pred_measure` (#363) |
-| `vignettes/articles-online-only/pred-measure-workflow.Rmd` | Model performance: Predictive schemes with `pred_measure()` | exists; placeholder left | `pred_measure` (#363) |
+| `vignettes/articles-online-only/overview-measures.Rmd` | Predictive model performance: Overview of measures | exists; placeholders left | `pred_measure` (#363) |
+| `vignettes/articles-online-only/pred-measure-workflow.Rmd` | Predictive model performance: Predictive schemes with `pred_measure()` | exists; placeholder left | `pred_measure` (#363) |
 | `vignettes/articles-online-only/model-comparison.Rmd` | Model comparison: Explanation of `model_compare()` | exists; placeholders left | `integrate-loo_compare` (#380) |
 | not yet created | Model comparison: Case Study with `model_compare()` | planned | issue #401 |
 
