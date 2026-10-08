@@ -26,7 +26,7 @@ This vignette demonstrates how to do holdout validation and K-fold cross-validat
 # Example: Eradication of Roaches using holdout validation approach
 
 This vignette uses the same example as in the vignettes
-[_Using the loo package (version >= 2.0.0)_](http://mc-stan.org/loo/articles/loo2-example.html) and [_Avoiding model refits in leave-one-out cross-validation with moment matching_](https://mc-stan.org/loo/articles/loo2-moment-matching.html).
+[_Using the loo package_](https://mc-stan.org/loo/articles/loo2-example.html) and [_Avoiding model refits with moment matching_](https://mc-stan.org/loo/articles/loo2-moment-matching.html).
 
 
 
@@ -66,7 +66,7 @@ generated quantities {
 ```
 
 Following the usual approach recommended in 
-[_Writing Stan programs for use with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html), 
+[_Writing Stan programs for use with the loo package_](https://mc-stan.org/loo/articles/loo2-with-rstan.html), 
 we compute the log-likelihood for each observation in the 
 `generated quantities` block of the Stan program.
 

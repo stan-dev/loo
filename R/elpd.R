@@ -22,8 +22,7 @@
 #' @param ... Currently ignored.
 #'
 #' @seealso [measure_elpd()], [insample_pred_measure()], [loo_pred_measure()],
-#'   and the vignette *Holdout validation and K-fold cross-validation of Stan
-#'   programs with the loo package*.
+#'   and the vignette *Holdout validation and K-fold cross-validation*.
 #'
 #' @examples
 #' \dontrun{

@@ -102,7 +102,7 @@ additional measures require the same optional inputs as
 For distributional measures on held-out folds, obtain posterior predictions
 with \code{brms::kfold_predict()} and pass the resulting \code{yrep} matrices as
 \code{ypred} and/or \code{mupred}. See the sleep-study workflow in
-\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}.
+\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{Predictive model performance: Predictive schemes with \code{pred_measure()}}.
 }
 \section{\code{measure_info} attribute}{
 
@@ -145,5 +145,5 @@ if (requireNamespace("brms", quietly = TRUE)) {
 \seealso{
 \code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=insample_pred_measure]{insample_pred_measure()}}, \code{\link[=pred_measure]{pred_measure()}},
 \code{\link[brms:kfold]{brms::kfold()}}, \link{supported_measures_list},
-\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}
+\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{Predictive model performance: Predictive schemes with \code{pred_measure()}}
 }

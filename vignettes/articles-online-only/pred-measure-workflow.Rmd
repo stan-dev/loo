@@ -1,5 +1,5 @@
 ---
-title: "Predictive schemes with pred_measure()"
+title: "Predictive model performance: Predictive schemes with `pred_measure()`"
 author: "Florence Bockting"
 date: "`r Sys.Date()`"
 output:
@@ -12,7 +12,7 @@ output:
 params:
   EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
 vignette: >
-  %\VignetteIndexEntry{Predictive schemes with pred_measure()}
+  %\VignetteIndexEntry{Predictive model performance: Predictive schemes with `pred_measure()`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -504,9 +504,9 @@ sampling, or K-fold.
 | K-fold | $K$ | many $\hat k$ are high, or LOO is too slow | `brms::kfold(fit, K = 10, save_fits = TRUE)` | `kfold_pred_measure()`, all measures |
 
 The **loo** articles describe the methods in detail:
-[moment matching](../loo2-moment-matching.html),
-[mixture importance sampling](../loo2-mixis.html), and
-[subsampling for large data](../loo2-large-data.html).
+[Avoiding model refits with moment matching](../loo2-moment-matching.html),
+[Mixture IS leave-one-out cross-validation](../loo2-mixis.html), and
+[Using leave-one-out cross-validation for large data](../loo2-large-data.html).
 
 The subsections below run each method on `fit_sleep`. The
 [comparison](#compare-schemes) at the end of the article plots all results.

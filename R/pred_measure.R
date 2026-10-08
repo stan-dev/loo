@@ -102,7 +102,7 @@
 #' @seealso [pred_measure()] to add measures incrementally,
 #'   [loo_pred_measure()], [kfold_pred_measure()], [test_pred_measure()],
 #'   [supported_measures_list],
-#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
+#'   [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 insample_pred_measure <- function(
@@ -211,7 +211,7 @@ insample_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [pred_measure()], [loo::loo()],
 #'   [supported_measures_list],
-#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
+#'   [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 loo_pred_measure <- function(
@@ -272,7 +272,7 @@ loo_pred_measure <- function(
 #' For distributional measures on held-out folds, obtain posterior predictions
 #' with `brms::kfold_predict()` and pass the resulting `yrep` matrices as
 #' `ypred` and/or `mupred`. See the sleep-study workflow in
-#' [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html).
+#' [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html).
 #'
 #' @examples
 #' \donttest{
@@ -296,7 +296,7 @@ loo_pred_measure <- function(
 #'
 #' @seealso [loo_pred_measure()], [insample_pred_measure()], [pred_measure()],
 #'   [brms::kfold()], [supported_measures_list],
-#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
+#'   [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 kfold_pred_measure <- function(
@@ -379,7 +379,7 @@ kfold_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [loo_pred_measure()],
 #'   [kfold_pred_measure()], [pred_measure()], [supported_measures_list],
-#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
+#'   [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 test_pred_measure <- function(
@@ -473,7 +473,7 @@ test_pred_measure <- function(
 #'
 #' @seealso [insample_pred_measure()], [loo_pred_measure()],
 #'   [kfold_pred_measure()], [test_pred_measure()], [supported_measures_list],
-#'   [pred-measure workflow article](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
+#'   [Predictive model performance: Predictive schemes with `pred_measure()`](https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html)
 #'
 #' @export
 pred_measure <- function(

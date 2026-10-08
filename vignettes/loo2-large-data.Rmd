@@ -56,7 +56,7 @@ set.seed(4711)
 # Example: Well water in Bangladesh
 
 We will use the same example as in the vignette [_Writing Stan programs for use
-with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html).
+with the loo package_](https://mc-stan.org/loo/articles/loo2-with-rstan.html).
 See that vignette for a description of the problem and data.
 
 The sample size in this example is only $N=3020$, which is not large enough to
@@ -88,7 +88,7 @@ model {
 ```
 
 Importantly, unlike the general approach recommended in 
-[_Writing Stan programs for use with the loo package_](http://mc-stan.org/loo/articles/loo2-with-rstan.html), 
+[_Writing Stan programs for use with the loo package_](https://mc-stan.org/loo/articles/loo2-with-rstan.html), 
 we do _not_ compute the log-likelihood for each observation in the 
 `generated quantities` block of the Stan program. Here we are assuming we have a
 large data set (larger than the one we're actually using in this demonstration)

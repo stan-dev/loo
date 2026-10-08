@@ -182,5 +182,5 @@ if (requireNamespace("brms", quietly = TRUE)) {
 \seealso{
 \code{\link[=insample_pred_measure]{insample_pred_measure()}}, \code{\link[=pred_measure]{pred_measure()}}, \code{\link[=loo]{loo()}},
 \link{supported_measures_list},
-\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}
+\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{Predictive model performance: Predictive schemes with \code{pred_measure()}}
 }

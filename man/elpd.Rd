@@ -58,6 +58,5 @@ measure_elpd(LLarr)
 }
 \seealso{
 \code{\link[=measure_elpd]{measure_elpd()}}, \code{\link[=insample_pred_measure]{insample_pred_measure()}}, \code{\link[=loo_pred_measure]{loo_pred_measure()}},
-and the vignette \emph{Holdout validation and K-fold cross-validation of Stan
-programs with the loo package}.
+and the vignette \emph{Holdout validation and K-fold cross-validation}.
 }

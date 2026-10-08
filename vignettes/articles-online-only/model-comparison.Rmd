@@ -718,9 +718,7 @@ Vehtari, A., Bockting, F., Axen, S., and Weber, F. (2026).
 
 ## See also
 
-- [Computing predictive performance measures](pred-measure-workflow.html) — how
-  to produce the objects compared here.
-- [Predictive model performance: Overview of measures](overview-measures.html) — definitions and
-  formulas for each measure.
-- `?"loo-glossary"` — the `measure_info` attribute in full.
-- Vehtari et al. (2026), *TODO-ARXIV-TITLE*: the supplement with the formulas for every measure and standard error in this article.
+- [Predictive model performance: Predictive schemes with `pred_measure()`](pred-measure-workflow.html)
+- [Predictive model performance: Overview of measures](overview-measures.html)
+- `?"loo-glossary"`
+- [Predictive measures: A formula reference]() <!-- TODO -->

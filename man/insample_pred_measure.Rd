@@ -125,7 +125,7 @@ needs:\tabular{lcccc}{
 requesting them does not add an \code{elpd} row. Request \code{ic}, \code{mlpd}, or other
 density scores via \code{measures}, or supply a custom function;
 see \link{supported_measures_list} and the
-\href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{overview of scores and metrics}
+\href{https://mc-stan.org/loo/articles/articles-online-only/overview-measures.html}{Predictive model performance: Overview of measures}
 article for definitions and orientation (higher vs lower is better).
 
 \strong{Custom measures.} Build a custom measure with \code{\link[=custom_measure]{custom_measure()}}. The
@@ -197,5 +197,5 @@ my_abs_err <- custom_measure(my_abs_err, name = "my_abs_err", se_diff_fun = "mea
 \code{\link[=pred_measure]{pred_measure()}} to add measures incrementally,
 \code{\link[=loo_pred_measure]{loo_pred_measure()}}, \code{\link[=kfold_pred_measure]{kfold_pred_measure()}}, \code{\link[=test_pred_measure]{test_pred_measure()}},
 \link{supported_measures_list},
-\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{pred-measure workflow article}
+\href{https://mc-stan.org/loo/articles/articles-online-only/pred-measure-workflow.html}{Predictive model performance: Predictive schemes with \code{pred_measure()}}
 }

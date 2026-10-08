@@ -587,7 +587,7 @@ do_pred_measure <- function(
 #' @return A named list with `estimate` (total `p_loo`), `se`, and `pointwise`
 #'   (`p_loo` per observation).
 #'
-#' @references See the **loo** package glossary (`vignette("loo2", package = "loo")`)
+#' @references See the **loo** package glossary ([loo-glossary])
 #'   and \url{https://users.aalto.fi/~ave/CV-FAQ.html#p_loo}.
 #'
 #' @noRd

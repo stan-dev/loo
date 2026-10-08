@@ -883,7 +883,7 @@ Hodson, T. O. (2022). Root-mean-square error (RMSE) or mean absolute error
 15(14):5481–5487. doi:10.5194/gmd-15-5481-2022
 
 Vehtari, A., Axen, S., Weber, F., and Bockting, F. (2026). Predictive measures
-and model comparison in the loo package: A formula reference. [TODO: arXiv ID]
+and model comparison in the loo package: A formula reference. <!-- TODO -->
 
 ## See also
 
