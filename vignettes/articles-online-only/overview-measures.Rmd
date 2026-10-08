@@ -1,5 +1,5 @@
 ---
-title: "Overview of predictive measures"
+title: "Predictive model performance: Overview of measures"
 author: "Florence Bockting"
 date: "`r Sys.Date()`"
 output:
@@ -10,9 +10,9 @@ output:
     toc: true
     toc_depth: 3
 params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+  EVAL: true
 vignette: >
-  %\VignetteIndexEntry{Overview of predictive measures}
+  %\VignetteIndexEntry{Predictive model performance: Overview of measures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -39,34 +39,34 @@ knitr::opts_chunk$set(
 ## Introduction
 
 A *predictive measure* summarizes how well a model predicts data. **loo**
-provides twelve built-in measures. Use `custom_measure()` to define your own
+provides twelve built-in measures and the possibility to create a custom
 measure. Each built-in measure has its own `measure_*()` function.
 
 This vignette introduces each built-in measure. For each measure it gives:
 
 1. the motivation,
 2. when to use it,
-3. the key formula and standard error,
-4. the call in **loo**,
-5. a plot and its interpretation, comparing a model with predictors to an intercept-only model.
+3. the key formula,
+4. the standard error,
+5. the implementation in **loo**, and
+6. a plot and its interpretation, comparing a model with predictors to an intercept-only model.
 
 This vignette states only the key formulas. The full definitions, the
-estimators, and the standard errors are in our supplement 
-(TODO-Vehtari et al., 2026).
+estimators, and the standard errors are in our supplement
+(Vehtari et al., 2026). <!-- TODO -->
 
 This vignette hides the code for the plots. The full source code is in the
 [`loo` GitHub repository](https://github.com/stan-dev/loo/blob/master/vignettes/articles-online-only/overview-measures.Rmd).
 
 ::: {.callout .callout-note}
-**What this article does not cover**
+**What this vignette does not cover**
 
 + **Predictive schemes**
   + Examples in this vignette use in-sample predictions.
-  + All measures can be used with leave-one-out, K-fold, or test-data predictions. The use of these variants is introduced in [TODO-article]
+  + All measures can be used with leave-one-out, K-fold, or test-data predictions; see [Predictive model performance: Predictive schemes with `pred_measure()`](pred-measure-workflow.html).
 + **Model comparison** 
-  + How to use the `loo::model_compare` function? See the [model comparison](model-comparison.html)
-  vignette.
-  + How to interpret the output of `model_compare`? See the tutorial [model-comparison TODO]
+  + Using the `model_compare()` function; see [Model comparison: Explanation of `model_compare()`](model-comparison.html).
+  + A tutorial on using model comparison within the Bayesian workflow; see [Model comparison: Case Study with `model_compare()`]() <!-- TODO -->
 :::
 
 ## Overview of built-in measures
@@ -84,21 +84,20 @@ This vignette hides the code for the plots. The full source code is in the
 | `rmse` | root mean squared error | [point error](#point-error) | `mupred` | continuous | loss | function of means |
 | `r2` | predictive $R^2$ | [predictive $R^2$](#predictive-r2) | `mupred` | continuous | utility | function of means |
 | `acc` | classification accuracy | [classification accuracy](#classification-accuracy) | `mupred` | binary or nominal | utility | mean |
-| `bacc` | balanced accuracy | [classification accuracy](#classification-accuracy) | `mupred` | binary or nominal | utility | function of means |
+| `bacc` | balanced accuracy | [classification accuracy](#classification-accuracy) | `mupred` | binary or nominal | utility | weighted sum |
 
 The columns mean:
 
 + **Natural scale:** A *loss* is better when it is lower. A *utility* is better
   when it is higher. `measure_*()` reports each measure on its natural scale.
-+ **Aggregation:** Most measures are a sum or a mean of pointwise terms. RMSE,
-  $R^2$, and balanced accuracy are functions of means. RMSE and $R^2$ have no
-  pointwise terms that add up to the estimate. The pointwise terms of balanced
-  accuracy are weighted by class, so that their sum is the estimate. For more
-  details see [TODO-article-suppl]
++ **Aggregation:** Most measures are a sum or a mean of pointwise terms. RMSE
+  and $R^2$ have no pointwise terms that add up to the estimate. Balanced
+  accuracy weights each pointwise term by its class, so that the terms sum to
+  the estimate. For more details see Vehtari et al. (2026). <!-- TODO -->
 
 ## Notation
 
-This article uses one notation for all measures. The table maps each symbol to an
+This vignette uses one notation for all measures. The table maps each symbol to an
 argument of `measure_*()` or to a field of its result.
 
 | Symbol | Meaning | In **loo** |
@@ -106,9 +105,9 @@ argument of `measure_*()` or to a field of its result.
 | $y_i$ | observed outcome $i$ | `y` |
 | $\theta^s$ | posterior draw $s$, $s = 1, \ldots, S$ | rows of the input matrices |
 | $\ell_i^s = \log p(y_i \mid \theta^s)$ | log density of $y_i$ under draw $s$ | `ylp`, an $S \times n$ matrix |
-| $\tilde y_i^s$ | posterior predictive draw | `ypred`, an $S \times n$ matrix; for `brier`, the event probabilities $p(\tilde y_i = 1 \mid \theta^s)$ |
+| $\tilde y_i^s$ | posterior predictive draw | `ypred`, an $S \times n$ matrix; for `brier`, the event probabilities $p(\tilde y_i = 1 \mid \theta^s)$  |
 | $\mathbb{E}[\tilde y_i \mid \theta^s]$ | predictive mean under draw $s$ | `mupred`, an $S \times n$ matrix, or $S \times n \times C$ for $C$ classes |
-| $w_i^s$ | normalized weight of draw $s$ (Vehtari et al., 2026, Eq. 2.5) | `log_weights`, unnormalized; **loo** normalizes them. `NULL` gives $w_i^s = 1/S$ |
+| $w_i^s$ | normalized weight of draw $s$ (Vehtari et al., 2026, Eq. 2.5) | `log_weights`, on the log scale and unnormalized; **loo** normalizes them. `NULL` gives $w_i^s = 1/S$ |
 | $\text{elpd}_i$, $\text{rps}_i$, $\text{ae}_i$, … | pointwise term of a measure, on its natural scale | `$pointwise` |
 | $\widehat{\text{elpd}}$, $\widehat{\text{rps}}$, $\widehat{\text{mae}}$, … | estimate of a measure | `$estimates[, "Estimate"]` |
 | $\widehat{\text{SE}}$ | standard error of the estimate | `$estimates[, "SE"]` |
@@ -117,7 +116,7 @@ argument of `measure_*()` or to a field of its result.
 ::: {.callout .callout-note}
 **Weights**
 
-Every estimator in this article uses weights $w_i^s$. With
+Every estimator in this vignette uses weights $w_i^s$. With
 `log_weights = NULL`, all draws get the weight $1/S$. This gives in-sample
 predictions. Other weights give other predictive schemes, for example PSIS-LOO.
 :::
@@ -138,19 +137,29 @@ For each outcome type we fit two `brms` models:
 
 The intercept-only model is a baseline. It shows how a measure changes when a
 model uses no information from the predictors. The model with predictors is
-better, but not necessarily good. Fitting is not the topic of this article. The
+better, but not necessarily good. Fitting is not the topic of this vignette. The
 model code is in the [appendix](#appendix-model-code).
 
 | Object | Data | Outcome | Predictors | Used for |
 | :--- | :--- | :--- | :--- | :--- |
-| `fits_count` | `roaches` (`rstanarm`) | count, Poisson | `sqrt_roach1`, `treatment`, `senior` | log score |
-| `fits_cont` | `faithful` (`datasets`) | continuous, normal | `waiting` | CRPS, point error, $R^2$ |
-| `fits_bin` | `wells` (`rstanarm`) | binary, Bernoulli | `dist100`, `arsenic` | Brier score |
-| `fits_ord` | simulated | ordered, 4 categories | `x` | RPS |
-| `fits_cat` | simulated | nominal, 3 unbalanced classes | `x` | accuracy |
+| `fits_cont` | `faithful` (`datasets`) | continuous, normal | `waiting` | log score, CRPS, point error*, $R^2$ |
+| `fits_bin` | `Pima.te` (`MASS`) | binary, Bernoulli | `glu`, `bmi`, `age` | Brier score |
+| `fits_ord` | `wine` (`ordinal`) | ordered, 5 categories | `temp`, `contact` | RPS |
+| `fits_cat` | `penguins` (`datasets`) | nominal, 3 unbalanced classes | `bill_len` | accuracy |
 
-Each object is a list with the elements `"with predictors"` and
+*point error measures include MAE, MSE, and RMSE.
+
+Each `fits_*` object is a list with the elements `"with predictors"` and
 `"intercept only"`.
+
+**Prediction tasks.** The models predict the following outcomes:
+
+| Model | Outcome | Predictors | N |
+|:--|:--|:--|:--|
+| Eruption duration (`fits_cont`) | `eruptions`: duration of the eruption, in minutes | `waiting`: waiting time to the eruption, in minutes | 272 eruptions |
+| Diabetes (`fits_bin`) | `diabetes`: 1 if the woman has diabetes (no: 223, yes: 109) | `glu`: plasma glucose concentration; `bmi`: body mass index; `age`: age in years | 332 women |
+| Wine bitterness (`fits_ord`) | `rating`: bitterness of the wine, on an ordered scale from 1 to 5 (1: 5, 2: 22, 3: 26, 4: 12, 5: 7) | `temp`: temperature during the crushing of the grapes, cold or warm; `contact`: contact between juice and skins, no or yes | 72 ratings from 9 judges |
+| Penguin species (`fits_cat`) | `species`: Adelie (151), Chinstrap (68), or Gentoo (123) | `bill_len`: bill length, in mm | 342 penguins |
 
 ```{r fit-models, echo=FALSE, results="hide"}
 SEED <- 42
@@ -164,45 +173,22 @@ fit_pair <- function(formula, data, family) {
   )
 }
 
-# count
-data(roaches, package = "rstanarm")
-roaches$sqrt_roach1 <- sqrt(roaches$roach1)
-fits_count <- fit_pair(y ~ sqrt_roach1 + treatment + senior, roaches, poisson())
-
 # continuous
 fits_cont <- fit_pair(eruptions ~ waiting, faithful, gaussian())
 
 # binary
-data(wells, package = "rstanarm")
-wells$dist100 <- wells$dist / 100
-fits_bin <- fit_pair(switch ~ dist100 + arsenic, wells, brms::bernoulli())
+data(Pima.te, package = "MASS")
+Pima.te$diabetes <- as.integer(Pima.te$type == "Yes")
+fits_bin <- fit_pair(diabetes ~ glu + bmi + age, Pima.te, brms::bernoulli())
 
-# ordered: latent logistic model with three cut points
-set.seed(SEED)
-n_sim <- 300
-x <- rnorm(n_sim)
-latent <- 1.2 * x + rlogis(n_sim)
-df_ord <- data.frame(y = 1 + rowSums(outer(latent, c(-1, 0.3, 1.5), ">")), x = x)
-fits_ord <- fit_pair(y ~ x, df_ord, brms::cumulative("logit"))
+# ordered
+data(wine, package = "ordinal")
+fits_ord <- fit_pair(rating ~ temp + contact, wine, brms::cumulative("logit"))
 
-# nominal: class 1 is the most frequent
-set.seed(SEED + 1)
-x <- rnorm(n_sim)
-prob <- cbind(1, exp(-3.5 + 5 * x), exp(-5.5 - 5 * x))
-prob <- prob / rowSums(prob)
-df_cat <- data.frame(y = apply(prob, 1, function(p) sample(3, 1, prob = p)), x = x)
-fits_cat <- fit_pair(y ~ x, df_cat, brms::categorical())
+# nominal: Adelie is the most frequent species
+penguins_cc <- datasets::penguins[!is.na(datasets::penguins$bill_len), ]
+fits_cat <- fit_pair(species ~ bill_len, penguins_cc, brms::categorical())
 ```
-
-**Prediction tasks.** The models predict the following outcomes:
-
-| Model | Outcome | Predictors | N |
-|:--|:--|:--|:--|
-| Roach counts (`fits_count`) | `y`: roaches caught in traps after the treatment | `sqrt_roach1`: square root of the count before the treatment; `treatment`: the building received the treatment; `senior`: only elderly people live in the building | 262 buildings |
-| Geyser eruptions (`fits_cont`) | `eruptions`: duration of an eruption of the Old Faithful geyser, in minutes | `waiting`: waiting time since the previous eruption, in minutes | 272 eruptions |
-| Well switching (`fits_bin`) | `switch`: 1 if the household switched to a safe well | `dist100`: distance to the nearest safe well, in 100 m; `arsenic`: arsenic level of the current well | 3020 households |
-| Ordered rating (`fits_ord`) | `y`: rating on an ordered scale from 1 to 4 | `x`: higher values make higher ratings more likely | 300 (simulated) |
-| Class membership (`fits_cat`) | `y`: one of three unordered classes (class 1: `r sum(df_cat$y == 1)`, class 2: `r sum(df_cat$y == 2)`, class 3: `r sum(df_cat$y == 3)`) | `x`: shifts the probabilities between the classes | 300 (simulated) |
 
 ## Log score {#log-score}
 
@@ -215,7 +201,7 @@ penalizes observations the model considers very unlikely.
 measure in **loo**. It needs the log-likelihood draws `ylp`.
 
 **Key formula.** The pointwise term and the estimate are
-(Vehtari et al., 2026, Eqs. 2.16–2.18)
+(Vehtari et al., 2026, Eqs. 2.16–2.18) <!-- TODO -->
 
 $$
 \text{elpd}_i = \log \sum_{s=1}^S \exp\!\left(\log w_i^s + \ell_i^s\right),
@@ -231,7 +217,7 @@ $$
 $\widehat{\text{ic}} = -2\,\widehat{\text{elpd}}$.
 
 **Standard error.** The elpd is a sum, the mlpd is a mean
-(Vehtari et al., 2026, Eqs. 2.8, 2.9):
+(Vehtari et al., 2026, Eqs. 2.8, 2.9): <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{\text{elpd}}) =
@@ -247,59 +233,68 @@ $$
 **Implementation.**
 
 ```{r log-score}
-ylp_count <- lapply(fits_count, brms::log_lik)
-
-elpd_count <- lapply(ylp_count, function(ylp) measure_elpd(ylp = ylp))
-mlpd_count <- lapply(ylp_count, function(ylp) measure_mlpd(ylp = ylp))
-ic_count <- lapply(ylp_count, function(ylp) measure_ic(ylp = ylp))
+ylp_cont <- lapply(fits_cont, brms::log_lik)
+elpd_cont <- lapply(ylp_cont, function(ylp) measure_elpd(ylp = ylp))
+mlpd_cont <- lapply(ylp_cont, function(ylp) measure_mlpd(ylp = ylp))
+ic_cont <- lapply(ylp_cont, function(ylp) measure_ic(ylp = ylp))
 
 # output structure of elpd measure for model with predictors
-str(elpd_count$`with predictors`)
+str(elpd_cont$`with predictors`)
 ```
 
-**Plot.** Each point is one building. The y-axis shows its pointwise log score
-$\text{elpd}_i$. The dashed line is the mlpd, the mean of the points. Higher is
-better.
+**Plot.** The models `fits_cont` predict `eruptions`, the duration of each of
+272 eruptions of the Old Faithful geyser (`faithful` data). Each point is one
+eruption. The x-axis shows the distance of the observed duration from the
+predictive mean. The y-axis shows the pointwise log score $\text{elpd}_i$.
+The dashed line is the mlpd, the mean of the points. Higher is better.
 
 ```{r log-score-plot, echo = FALSE}
-df_elpd <- do.call(rbind, lapply(names(ylp_count), function(m) {
-  data.frame(model = m, y = roaches$y, elpd_i = as.vector(elpd_count[[m]]$pointwise))
+mu_hat_cont <- lapply(fits_cont, function(fit) colMeans(brms::posterior_epred(fit)))
+y_cont <- fits_cont[[1]]$data$eruptions
+df_elpd <- do.call(rbind, lapply(names(ylp_cont), function(m) {
+  data.frame(
+    model = m,
+    d = y_cont - mu_hat_cont[[m]],
+    elpd_i = as.vector(elpd_cont[[m]]$pointwise)
+  )
 }))
 df_lines <- data.frame(
-  model = names(ylp_count),
-  elpd = sapply(elpd_count, function(r) r$estimates[, "Estimate"]),
-  mlpd = sapply(mlpd_count, function(r) r$estimates[, "Estimate"]),
-  ic = sapply(ic_count, function(r) r$estimates[, "Estimate"])
+  model = names(ylp_cont),
+  elpd = sapply(elpd_cont, function(r) r$estimates[, "Estimate"]),
+  mlpd = sapply(mlpd_cont, function(r) r$estimates[, "Estimate"]),
+  ic = sapply(ic_cont, function(r) r$estimates[, "Estimate"])
 )
 
-ggplot(df_elpd, aes(y, elpd_i)) +
+ggplot(df_elpd, aes(d, elpd_i)) +
   geom_point(alpha = 0.5) +
   geom_hline(data = df_lines, aes(yintercept = mlpd), linetype = "dashed") +
   geom_text(data = df_lines,
-            aes(x = 0, y = -Inf,
-                label = sprintf("elpd = %.0f\nic = %.0f\nmlpd = %.1f", elpd, ic, mlpd)),
-            hjust = 0, vjust = -0.3, size = 3) +
-  scale_x_continuous(trans = "pseudo_log", breaks = c(0, 1, 3, 10, 30, 100, 300)) +
+            aes(x = -Inf, y = -Inf,
+                label = sprintf("elpd = %.0f\nic = %.0f\nmlpd = %.2f", elpd, ic, mlpd)),
+            hjust = -0.1, vjust = -0.3, size = 3) +
   facet_wrap(~model) +
-  labs(x = "observed roach count", y = "pointwise log score")
+  labs(x = "observed duration minus predictive mean", y = "pointwise log score")
 
 ```
 
-**Interpretation.** The intercept-only model predicts the same distribution for
-every building, with a mean of about `r round(mean(roaches$y))` roaches. All
-its points lie on one curve, with its peak near that mean. Buildings with no
-roaches and buildings with many roaches both get low scores. The model with
-predictors uses the count before the treatment. Its points no longer lie on one
-curve. Most buildings, also those with no roaches, get a score near zero. In
-both models, a few buildings with large counts get very low scores. Because the
-elpd is a sum, these few buildings contribute much of the total.
+**Interpretation.** Both models predict a normal distribution, so the points
+lie on a parabola. The intercept-only model predicts the same wide
+distribution for every eruption. Its parabola is flat: no eruption gets a very
+high or a very low score. The predictor `waiting` makes the predictive
+distribution narrower. Eruptions close to the predictive mean then get a
+higher score, and eruptions far from it get a lower score. The log score
+drops with the square of the distance, so these few eruptions pull the
+estimate down. The mlpd is
+`r round(mlpd_cont[["with predictors"]]$estimates[, "Estimate"], 2)` against
+`r round(mlpd_cont[["intercept only"]]$estimates[, "Estimate"], 2)`.
 
 ## Ranked probability score {#ranked-probability-score}
 
 **Motivation.** The ranked probability score compares the predictive
 distribution with the observed value through absolute distances. Unlike the
 log score, it rewards predictions that are *close* to the observation, not only
-predictions that hit it. It is less sensitive to single outliers.
+predictions that hit it. It penalizes outlying observations less than the log
+score, but it is not robust to them (Bolin and Wallin, 2023).
 
 **When to use.** Use `rps` for ordered categorical outcomes (RPS) and for
 continuous outcomes (CRPS). It is on the scale of $y$, so a value can be
@@ -307,7 +302,7 @@ read in the units of the outcome. Use `srps` when outcomes differ strongly in
 their predictive spread. Both need the posterior predictive draws `ypred`.
 
 **Key formula.** Let $X$ and $X'$ be independent draws from the predictive
-distribution of observation $i$ (Vehtari et al., 2026, Eqs. 2.20–2.22):
+distribution of observation $i$ (Vehtari et al., 2026, Eqs. 2.20-2.22): <!-- TODO -->
 
 $$
 \text{rps}_i = \mathbb{E}|X - y_i| - \tfrac{1}{2}\,\mathbb{E}|X - X'|, \qquad
@@ -319,9 +314,16 @@ The estimates are the means $\widehat{\text{rps}} = \frac{1}{n}\sum_i
 \text{rps}_i$ and $\widehat{\text{srps}} = \frac{1}{n}\sum_i \text{srps}_i$.
 **loo** estimates both expectations from one set of draws. The estimator of
 $\mathbb{E}|X - X'|$ is a probability-weighted moment estimator
-(Vehtari et al., 2026, Eq. 2.25). `rps` is a loss, and `srps` is a utility.
+(Vehtari et al., 2026, Eq. 2.25). <!-- TODO -->
+`rps` is a loss (lower is better), and `srps` is a utility (higher is better).
 
-**Standard error.** Both are means (Vehtari et al., 2026, Eq. 2.8):
+For ordered outcomes, code the categories $1, \ldots, K$. Let $F_i$ be the
+predictive CDF of observation $i$. Then
+$\text{rps}_i = \sum_{k=1}^{K-1} \left(F_i(k) - \mathbb{1}\{y_i \le k\}\right)^2$.
+This is the RPS of Epstein (1969) without the factor $1/(K-1)$. Divide by $K-1$
+to get values between 0 and 1.
+
+**Standard error.** Both are means (Vehtari et al., 2026, Eq. 2.8): <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{\text{rps}}) =
@@ -331,7 +333,8 @@ $$
   \sqrt{\widehat{\text{Var}}(\text{srps}_i) / n} .
 $$
 
-**Implementation.** For the continuous outcome, `measure_rps()` gives the CRPS:
+**Implementation.** For the continuous outcome, `measure_rps()` gives the CRPS
+and the SCRPS:
 
 ```{r crps}
 y_cont <- fits_cont[[1]]$data$eruptions
@@ -347,7 +350,7 @@ str(crps_cont$`with predictors`)
 For the ordered outcome, the same functions give the RPS and the SRPS:
 
 ```{r rps}
-y_ord <- fits_ord[[1]]$data$y
+y_ord <- as.integer(fits_ord[[1]]$data$rating)
 ypred_ord <- lapply(fits_ord, brms::posterior_predict)
 
 rps_ord <- lapply(ypred_ord, function(yp) measure_rps(y = y_ord, ypred = yp))
@@ -357,16 +360,18 @@ srps_ord <- lapply(ypred_ord, function(yp) measure_srps(y = y_ord, ypred = yp))
 str(srps_ord$`with predictors`)
 ```
 
-**Plot.** Each point is one eruption. The x-axis shows the distance of the
-observed duration from the predictive mean. The y-axis shows the pointwise CRPS
-$\text{rps}_i$, in minutes. The dashed line is the estimate, the mean of the
-points. Lower is better.
+**Plot.** The models `fits_cont` predict `eruptions`, the duration of each of
+272 eruptions of the Old Faithful geyser (`faithful` data). Each point is one
+eruption. The x-axis shows the distance of the observed duration from the
+predictive mean, as in the log score plot.
+The y-axis shows the pointwise CRPS $\text{rps}_i$, in minutes.
+The dashed line is the estimate, the mean of the points. Lower is better.
 
 ```{r crps-plot, echo = FALSE}
 df_crps <- do.call(rbind, lapply(names(ypred_cont), function(m) {
   data.frame(
     model = m,
-    d = y_cont - colMeans(ypred_cont[[m]]),
+    d = y_cont - mu_hat_cont[[m]],
     crps_i = as.vector(crps_cont[[m]]$pointwise)
   )
 }))
@@ -379,20 +384,24 @@ ggplot(df_crps, aes(d, crps_i)) +
   geom_point(alpha = 0.5) +
   geom_hline(data = df_lines, aes(yintercept = crps), linetype = "dashed") +
   facet_wrap(~model) +
-  labs(x = "observed duration minus predictive mean (minutes)", y = "pointwise CRPS")
+  labs(x = "observed duration minus predictive mean", y = "pointwise CRPS")
 ```
 
-**Interpretation.** In both panels the CRPS is smallest at zero distance.
-Near zero the curve is round. Far from zero the CRPS grows about linearly with
-the distance, like an absolute error. The left side of the intercept-only panel
-shows this. The log score, by contrast, drops fast for an unlikely observation.
-The model with predictors has a narrower predictive distribution. Its curve is
-lower at the bottom, and more of its points lie near zero distance.
+**Interpretation.** In both panels the points form a V with a round bottom.
+Far from the predictive mean, the CRPS grows about linearly with the distance,
+like an absolute error. The log score, by contrast, drops with the square of
+the distance. The narrower distribution of the model with predictors moves the
+whole V down: even an exact hit gets a lower CRPS. Its estimate is
+`r round(crps_cont[["with predictors"]]$estimates[, "Estimate"], 2)` against
+`r round(crps_cont[["intercept only"]]$estimates[, "Estimate"], 2)`.
 
-**Plot for the ordered outcome.** Each point is one observation. The x-axis
-shows the distance of the observed rating from the predictive mean. The y-axis
-shows the pointwise RPS $\text{rps}_i$. The color shows the observed rating.
-The dashed line is the estimate. Lower is better.
+**Plot for the ordered outcome.** 
+The models `fits_ord` predict `rating`, the bitterness of a wine on a scale
+from 1 to 5. There are 72 ratings from 9 judges (`wine` data). Each point is one
+rating. The x-axis shows the distance of the observed rating from the
+predictive mean. The y-axis shows the pointwise RPS $\text{rps}_i$.
+The color shows the observed rating. The dashed line is the estimate.
+Lower is better.
 
 ```{r rps-plot, echo = FALSE}
 df_rps <- do.call(rbind, lapply(names(ypred_ord), function(m) {
@@ -417,27 +426,15 @@ ggplot(df_rps, aes(d, rps_i)) +
        color = "observed rating")
 ```
 
-**Interpretation.** The intercept-only model gives every observation the same
-predictive distribution. Its points therefore fall on four spots, one for each
-observed rating. The RPS uses the order of the categories: a rating far from
-the predictive mean gets a higher RPS than a rating close to it. The model
-with predictors shifts the predictive distribution with `x`. Its points form a
-V, as for the CRPS. Its estimate is lower:
+**Interpretation.** The intercept-only model gives every wine the same
+predictive distribution. Its points therefore form five tight clusters, one for
+each observed rating. The RPS uses the order of the categories: a rating far from
+the predictive mean gets a higher RPS. The model with predictors gives each
+combination of `temp` and `contact` its own predictive distribution. Each spot
+therefore splits into smaller groups. Most points move closer to zero
+distance, and together they form a V, as for the CRPS. Its estimate is lower:
 `r round(rps_ord[["with predictors"]]$estimates[, "Estimate"], 2)` against
 `r round(rps_ord[["intercept only"]]$estimates[, "Estimate"], 2)`.
-
-**SRPS.** The SRPS divides the expected distance to the observation by the
-predictive spread $\mathbb{E}|X - X'|$. A narrow predictive distribution
-therefore gets a large penalty when it misses the observation. The SRPS is a
-utility, so higher is better. The table gives the estimates of both models.
-
-```{r srps-table, echo = FALSE}
-est <- function(res) sapply(res, function(r) r$estimates[, "Estimate"])
-knitr::kable(
-  rbind("eruption duration (SCRPS)" = est(scrps_cont), "ordered rating (SRPS)" = est(srps_ord)),
-  digits = 2
-)
-```
 
 ## Brier score {#brier-score}
 
@@ -451,17 +448,16 @@ draws, passed as `ypred`.
 
 **Key formula.** With the predicted event probability
 $\hat p_i = \sum_s w_i^s\, p(\tilde y_i = 1 \mid \theta^s)$
-(Vehtari et al., 2026, Eqs. 2.26–2.28),
+(Vehtari et al., 2026, Eqs. 2.26–2.28), <!-- TODO -->
 
 $$
 \text{bs}_i = \left(\hat p_i - y_i\right)^2, \qquad
 \widehat{\text{bs}} = \frac{1}{n}\sum_{i=1}^n \text{bs}_i .
 $$
 
-The Brier score is a loss. It ranges from 0 to 1.
+The Brier score is a loss (lower is better). It ranges from 0 to 1.
 
-**Standard error.** The Brier score is a mean
-(Vehtari et al., 2026, Eq. 2.8):
+**Standard error.** The Brier score is a mean (Vehtari et al., 2026, Eq. 2.8): <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{\text{bs}}) =
@@ -471,18 +467,18 @@ $$
 **Implementation.**
 
 ```{r brier}
-y_bin <- fits_bin[[1]]$data$switch
+y_bin <- fits_bin[[1]]$data$diabetes
 p_bin <- lapply(fits_bin, brms::posterior_epred)
 brier_bin <- lapply(p_bin, function(p) measure_brier(y = y_bin, ypred = p))
 
 str(brier_bin$`with predictors`)
 ```
 
-**Plot.** Each point is one household. The x-axis shows the predicted
-probability $\hat p_i$ that it switches wells. Every point lies on one of two
-curves: $\hat p_i^2$ if the household did not switch, and $(1 - \hat p_i)^2$
-if it switched. The dashed line is the estimate, the mean of the points. Lower
-is better.
+**Plot.** The models `fits_bin` predict `diabetes`, 1 if the woman has
+diabetes, for 332 women (`Pima.te` data). Each point is one woman.
+The x-axis shows the predicted probability $\hat p_i$ of diabetes.
+Every point lies on one of two curves: $\hat p_i^2$ if the woman has no
+diabetes, and $(1 - \hat p_i)^2$ if she has diabetes. Lower is better.
 
 ```{r brier-plot, echo = FALSE}
 df_brier <- do.call(rbind, lapply(names(p_bin), function(m) {
@@ -490,29 +486,32 @@ df_brier <- do.call(rbind, lapply(names(p_bin), function(m) {
     model = m,
     p = colMeans(p_bin[[m]]),
     bs_i = as.vector(brier_bin[[m]]$pointwise),
-    switched = factor(y_bin, levels = 0:1, labels = c("no", "yes"))
+    diabetes = factor(y_bin, levels = 0:1, labels = c("no", "yes"))
   )
 }))
-df_lines <- data.frame(
-  model = names(brier_bin),
-  brier = sapply(brier_bin, function(r) r$estimates[, "Estimate"])
-)
 
-ggplot(df_brier, aes(p, bs_i, color = switched)) +
+max_bs_yes <- max(df_brier$bs_i[df_brier$model == "with predictors" &
+                                  df_brier$diabetes == "yes"])
+
+ggplot(df_brier, aes(p, bs_i, color = diabetes)) +
   geom_function(fun = function(p) p^2, color = "grey70", linetype = "dotted") +
   geom_function(fun = function(p) (1 - p)^2, color = "grey70", linetype = "dotted") +
   geom_point(alpha = 0.5) +
-  geom_hline(data = df_lines, aes(yintercept = brier), linetype = "dashed") +
   facet_wrap(~model) +
-  labs(x = "predicted probability of switching",
-       y = "pointwise Brier score", color = "switched")
+  labs(x = "predicted probability of diabetes",
+       y = "pointwise Brier score", color = "diabetes")
 ```
 
-**Interpretation.** The intercept-only model gives every household the same
-probability, the proportion of households that switched. All its points fall
-on two spots, one on each curve. The model with predictors spreads the
-probabilities. A household moves down its curve when the model is confident
-and right. It moves up its curve when the model is confident and wrong.
+**Interpretation.** The intercept-only model gives every woman the same
+probability, the proportion of women with diabetes. All its points fall on two
+spots, one on each curve. The model with predictors spreads the probabilities.
+A woman moves down her curve when the model is confident and right. She moves
+up her curve when the model is confident and wrong. Most women without
+diabetes get a low probability and a score near 0. A few women with diabetes
+get a low probability and a score up to `r round(max_bs_yes, 1)`.
+Its estimate is lower:
+`r round(brier_bin[["with predictors"]]$estimates[, "Estimate"], 2)` against
+`r round(brier_bin[["intercept only"]]$estimates[, "Estimate"], 2)`.
 
 ## Point error {#point-error}
 
@@ -541,7 +540,7 @@ smaller than MAE. They are equal only when all absolute errors are equal.
 **Key formula.** With the point prediction
 $\hat y_i = \sum_s w_i^s\, \mathbb{E}[\tilde y_i \mid \theta^s]$, the pointwise
 errors are $\text{ae}_i = |y_i - \hat y_i|$ and
-$\text{sqe}_i = (y_i - \hat y_i)^2$ (Vehtari et al., 2026, Eqs. 2.29–2.34):
+$\text{sqe}_i = (y_i - \hat y_i)^2$ (Vehtari et al., 2026, Eqs. 2.29-2.34): <!-- TODO -->
 
 $$
 \widehat{\text{mae}} = \frac{1}{n}\sum_{i=1}^n \text{ae}_i, \qquad
@@ -551,9 +550,9 @@ $$
 
 All three are losses.
 
-**Standard error.** MAE and MSE are means (Vehtari et al., 2026, Eq. 2.8).
+**Standard error.** MAE and MSE are means (Vehtari et al., 2026, Eq. 2.8). <!-- TODO -->
 RMSE is a function of a mean, so its standard error uses the delta method
-(Vehtari et al., 2026, Eq. 2.33):
+(Vehtari et al., 2026, Eq. 2.33): <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{\text{mae}}) =
@@ -582,10 +581,12 @@ m_rmse <- lapply(mu_cont, function(mu) measure_rmse(y = y_cont, mupred = mu))
 str(m_mse$`with predictors`)
 ```
 
-**Plot.** Each point is one eruption. The x-axis shows the error of the point
-prediction, $y_i - \hat y_i$. The y-axis shows the pointwise squared error
-$\text{sqe}_i$. The dashed line is the MSE, the mean of the points. Lower is
-better.
+**Plot.** The models `fits_cont` predict `eruptions`, the duration of each of
+272 eruptions of the Old Faithful geyser (`faithful` data).
+Each point is one eruption. The x-axis shows the error of
+the point prediction, $y_i - \hat y_i$. The y-axis shows the pointwise squared
+error $\text{sqe}_i$. The dashed line is the MSE, the mean of the points. Lower
+is better.
 
 ```{r point-error-plot, echo = FALSE}
 df_pe <- do.call(rbind, lapply(names(mu_cont), function(m) {
@@ -614,19 +615,23 @@ ggplot(df_pe, aes(e, sqe_i)) +
                 label = sprintf("MSE = %.2f\nRMSE = %.2f", mse, rmse)),
             hjust = -0.1, vjust = 1.2, size = 3) +
   facet_wrap(~model) +
-  labs(x = "observed duration minus point prediction (minutes)",
+  labs(x = "observed duration minus point prediction",
        y = "pointwise squared error")
 ```
 
-**Interpretation.** The points lie on a parabola. Compare the left side of
-the intercept-only panel with the CRPS plot: the squared error grows with the
-square of the distance, not linearly. Most
-eruptions lie below the dashed line, and a few large errors pull the MSE up.
+**Interpretation.** The points lie on a parabola. Compare this with the V of
+the CRPS: the squared error grows with the square of the distance. The
+intercept-only model predicts the mean duration for every eruption. Most
+eruptions are either short or long, so few points lie near zero error. The
+predictor `waiting` separates short and long eruptions. Its MSE is
+`r round(m_mse[["with predictors"]]$estimates[, "Estimate"], 2)` against
+`r round(m_mse[["intercept only"]]$estimates[, "Estimate"], 2)`.
 For the model with predictors, the 10% largest errors make up
 `r round(100 * top_share[["with predictors"]])`% of the MSE. The MSE is in
 squared minutes. The RMSE, its square root, is back in minutes.
 
-**Plot for MAE and RMSE.** The histogram shows the pointwise absolute errors
+**Plot for MAE and RMSE.** The data are the same as in the plot above: the
+duration of 272 eruptions. The histogram shows the pointwise absolute errors
 $\text{ae}_i$. The dashed line is the MAE. The dotted line is the RMSE. Both
 are in minutes.
 
@@ -651,26 +656,24 @@ ggplot(df_ae, aes(ae_i)) +
 ```
 
 **Interpretation.** In both models the RMSE lies to the right of the MAE. The
-squared error gives more weight to the largest errors. The
+squared error gives more weight to the large errors. The
 model with predictors moves the histogram to the left, so both measures
 decrease. Its MAE is
-`r sprintf("%.2f", m_mae[["with predictors"]]$estimates[, "Estimate"])` minutes and
-its RMSE is
-`r sprintf("%.2f", m_rmse[["with predictors"]]$estimates[, "Estimate"])` minutes.
+`r round(m_mae[["with predictors"]]$estimates[, "Estimate"], 2)` and its RMSE
+is `r round(m_rmse[["with predictors"]]$estimates[, "Estimate"], 2)`.
 
 ## Predictive $R^2$ {#predictive-r2}
 
 **Motivation.** The predictive $R^2$ compares the squared error of the model
 with the squared error of the simplest prediction, the mean of the
 observations. A value of 0 means the model predicts no better than the mean.
-A negative value means the model predicts worse than the mean.
 
 **When to use.** Use it for continuous outcomes, when a unitless summary of the
 point prediction is needed. It is a predictive version of the classical $R^2$,
 not the Bayesian $R^2$ of Gelman et al. (2019). It needs `mupred`.
 
 **Key formula.** With $\text{sqe}_i$ and $\widehat{\text{mse}}$ from the
-[point error](#point-error) section (Vehtari et al., 2026, Eqs. 2.35, 2.36),
+[point error](#point-error) section (Vehtari et al., 2026, Eqs. 2.35, 2.36), <!-- TODO -->
 
 $$
 \widehat{R^2} = 1 - \frac{\widehat{\text{mse}}}{\widehat{\text{mse}}_y},
@@ -682,7 +685,7 @@ $R^2$ is a utility.
 
 **Standard error.** $R^2$ is a function of two means, so its standard error
 uses the delta method. With $c = \widehat{\text{mse}} /
-\widehat{\text{mse}}_y$ (Vehtari et al., 2026, Eq. 2.39),
+\widehat{\text{mse}}_y$ (Vehtari et al., 2026, Eq. 2.39), <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{R^2}) = \frac{1}{\widehat{\text{mse}}_y}
@@ -701,9 +704,11 @@ m_r2 <- lapply(mu_cont, function(mu) measure_r2(y = y_cont, mupred = mu))
 str(m_r2$`with predictors`)
 ```
 
-**Plot.** Each point is one eruption. The x-axis shows the distance of the
-observed duration from the mean duration. The y-axis shows the contribution of
-the eruption to $R^2$,
+**Plot.** The models `fits_cont` predict `eruptions`, the duration of each of
+272 eruptions of the Old Faithful geyser (`faithful` data).
+Each point is one eruption. The x-axis shows the distance
+of the observed duration from the mean duration. The y-axis shows the
+contribution of the eruption to $R^2$,
 
 $$
 r_i = \frac{(y_i - \bar y)^2 - \text{sqe}_i}{\widehat{\text{mse}}_y},
@@ -718,7 +723,7 @@ better.
 ```{r r2-plot, echo = FALSE}
 mse_y <- mean((y_cont - mean(y_cont))^2)
 df_r2 <- do.call(rbind, lapply(names(m_r2), function(m) {
-data.frame(
+  data.frame(
     model = m,
     d = y_cont - mean(y_cont),
     r_i = ((y_cont - mean(y_cont))^2 - as.vector(m_mse[[m]]$pointwise)) / mse_y
@@ -737,21 +742,17 @@ ggplot(df_r2, aes(d, r_i)) +
             aes(x = -Inf, y = Inf, label = sprintf("R2 = %.2f", r2)),
             hjust = -0.1, vjust = 1.2, size = 3) +
   facet_wrap(~model) +
-  labs(x = "observed duration minus mean duration (minutes)",
+  labs(x = "observed duration minus mean duration",
        y = "contribution to R2")
 ```
 
 **Interpretation.** The intercept-only model predicts about the mean duration
 for every eruption. All its contributions are close to zero, and so is its
-$R^2$.
-For the model with predictors, the points lie on or below a parabola. The
-contribution of an
-eruption is never larger than $(y_i - \bar y)^2 / \widehat{\text{mse}}_y$. An
-eruption close to the mean duration can therefore gain little: the mean already
-predicts it well. An eruption far from the mean can gain much. Any eruption
-loses much when its point prediction is far from its duration. Most eruptions
-are either short or long, so most points lie far from the mean. The waiting
-time predicts these eruptions well. This gives the high $R^2$.
+$R^2$. For the model with predictors, the points form a U.
+An eruption close to the mean duration contributes about zero or less:
+the mean already predicts it well, and the model cannot do much better.
+Most of the $R^2$ comes from the short and the long eruptions, which `waiting`
+separates well.
 
 ## Classification accuracy {#classification-accuracy}
 
@@ -766,10 +767,13 @@ classes are unbalanced. Both need the class probabilities `mupred`: an
 $S \times n$ matrix for binary outcomes, or an $S \times n \times C$ array for
 $C$ classes.
 
-**Key formula.** The predicted class is
-$\hat c_i = \arg\max_c \sum_s w_i^s\, p(\tilde y_i = c \mid \theta^s)$, and the
-pointwise accuracy is $\text{acc}_i = \mathbb{1}\{\hat c_i = y_i\}$. With $n_c$
-observations in class $c$ (Vehtari et al., 2026, Eqs. 2.40–2.44),
+**Key formula.** 
+Let $\hat p_{ic} = \sum_s w_i^s\, p(\tilde y_i = c \mid \theta^s)$ be the
+predicted probability of class $c$. For binary outcomes, the predicted class is
+$\hat c_i = \mathbb{1}\{\hat p_{i1} > 0.5\}$. For $C$ classes, it is
+$\hat c_i = \arg\max_c \hat p_{ic}$. The pointwise accuracy is
+$\text{acc}_i = \mathbb{1}\{\hat c_i = y_i\}$.  With $n_c$ observations in
+class $c$ (Vehtari et al., 2026, Eqs. 2.40-2.44), <!-- TODO -->
 
 $$
 \widehat{\text{acc}} = \frac{1}{n}\sum_{i=1}^n \text{acc}_i,
@@ -781,13 +785,8 @@ $$
 
 Both are utilities.
 
-**Pointwise terms.** The `$pointwise` field of `measure_acc()` holds
-$\text{acc}_i$. The `$pointwise` field of `measure_bacc()` holds
-$\text{acc}_i / (C\, n_c)$, with $c$ the class of observation $i$. These terms
-sum to $\widehat{\text{bacc}}$.
-
 **Standard error.** Both use the binomial standard error, for balanced accuracy
-within each class (Vehtari et al., 2026, Eqs. 2.43, 2.45):
+within each class (Vehtari et al., 2026, Eqs. 2.43, 2.45): <!-- TODO -->
 
 $$
 \widehat{\text{SE}}(\widehat{\text{acc}}) =
@@ -800,7 +799,8 @@ $$
 **Implementation.**
 
 ```{r accuracy}
-y_cat <- fits_cat[[1]]$data$y
+species <- levels(fits_cat[[1]]$data$species)
+y_cat <- as.integer(fits_cat[[1]]$data$species)
 mu_cat <- lapply(fits_cat, brms::posterior_epred)
 
 acc_cat <- lapply(mu_cat, function(mu) measure_acc(y = y_cat, mupred = mu))
@@ -809,11 +809,12 @@ bacc_cat <- lapply(mu_cat, function(mu) measure_bacc(y = y_cat, mupred = mu))
 str(acc_cat$`with predictors`)
 ```
 
-**Plot.** The plot shows the confusion matrix of each model. Each row is an
-observed class, and each column is a predicted class. Each cell gives the
-number of observations and their percentage of the row. The cells on the
-diagonal are the correct classifications. The other cells are the false
-classifications.
+**Plot.** The models `fits_cat` predict `species`, the species of each of 342
+penguins (`penguins` data). The plot shows the confusion matrix of each model.
+Each row is an observed class, and each column is a predicted class.
+Each cell gives the number of observations and their percentage of the row.
+The cells on the diagonal are the correct classifications.
+The other cells are the false classifications.
 
 The two measures read the diagonal in different ways:
 
@@ -825,9 +826,12 @@ The two measures read the diagonal in different ways:
 ```{r accuracy-plot, echo = FALSE}
 df_cm <- do.call(rbind, lapply(names(mu_cat), function(m) {
   pred <- max.col(apply(mu_cat[[m]], c(2, 3), mean))
-  tab <- table(observed = factor(y_cat, 1:3), predicted = factor(pred, 1:3))
+  tab <- table(observed = factor(species[y_cat], species),
+               predicted = factor(species[pred], species))
   data.frame(model = m, as.data.frame(tab), prop = as.vector(prop.table(tab, 1)))
 }))
+chin_gentoo <- with(df_cm, prop[model == "with predictors" &
+                                observed == "Chinstrap" & predicted == "Gentoo"])
 est_acc <- sapply(acc_cat, function(r) r$estimates[, "Estimate"])
 est_bacc <- sapply(bacc_cat, function(r) r$estimates[, "Estimate"])
 
@@ -839,23 +843,32 @@ ggplot(df_cm, aes(predicted, observed, fill = prop)) +
   scale_y_discrete(limits = rev) +
   coord_equal() +
   facet_wrap(~model) +
-  labs(x = "predicted class", y = "observed class",
+  labs(x = "predicted species", y = "observed species",
        fill = "share of the\nobserved class")
 ```
 
-**Interpretation.** The intercept-only model predicts class 1, the most
-frequent class, for every observation. All its observations are in the first
+**Interpretation.** The intercept-only model predicts Adelie, the most
+frequent species, for every penguin. All its observations are in the first
 column. Its diagonal percentages are 100%, 0%, and 0%. Its accuracy is
-`r round(est_acc[["intercept only"]], 2)`, the share of class 1. Its balanced
+`r round(est_acc[["intercept only"]], 2)`, the share of Adelie. Its balanced
 accuracy is `r round(est_bacc[["intercept only"]], 2)`, the mean of the three
 percentages. This is the value of a random guess among three classes.
 
-The model with predictors also classifies part of classes 2 and 3 correctly.
-Its accuracy is `r round(est_acc[["with predictors"]], 2)`, and its balanced
-accuracy is `r round(est_bacc[["with predictors"]], 2)`. The balanced accuracy
-shows the improvement in the small classes more clearly than the accuracy.
+The model with predictors classifies most Adelie and Gentoo penguins
+correctly. It predicts Gentoo for `r round(100 * chin_gentoo)`% of the
+Chinstrap penguins, because their bills are about as long. Its accuracy is
+`r round(est_acc[["with predictors"]], 2)`, and its balanced accuracy is
+`r round(est_bacc[["with predictors"]], 2)`. Chinstrap has only 68 of 342
+penguins, so the accuracy hides this failure. The balanced accuracy gives
+Chinstrap the same weight as the other species, so it is lower.
 
 ## References
+
+Bolin, D., and Wallin, J. (2023). Local scale invariance and robustness of
+proper scoring rules. *Statistical Science*, 38(1):140–159.
+
+Epstein, E. S. (1969). A scoring system for probability forecasts of ranked
+categories. *Journal of Applied Meteorology*, 8, 985–987.
 
 Gelman, A., Goodrich, B., Gabry, J., and Vehtari, A. (2019). R-squared for
 Bayesian regression models. *The American Statistician*, 73(3):307–309.
@@ -874,10 +887,10 @@ and model comparison in the loo package: A formula reference. [TODO: arXiv ID]
 
 ## See also
 
-- [Model comparison](model-comparison.html) — differences between models and
-  their standard errors.
-- [Predictive schemes with `pred_measure()`](pred-measure-workflow.html) —
-  the schemes, the methods, and custom measures.
+- [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+- [Model comparison: Case Study with `model_compare()`]() <!-- TODO -->
+- [Predictive model performance: Predictive schemes with `pred_measure()`](pred-measure-workflow.html)
+- [Predictive measures and model comparison in the loo package: A formula reference]() <!-- TODO -->
 
 ## Appendix: model code {#appendix-model-code}
 
