@@ -3,6 +3,8 @@ stopifnot(require(knitr))
 opts_chunk$set(
   comment=NA,
   eval = if (isTRUE(exists("params"))) params$EVAL else FALSE,
+  # pkgdown forces ANSI colors, which it can't render with comment = NA
+  R.options = list(cli.num_colors = 1),
   dev = "png",
   dpi = 150,
   fig.asp = 0.618,
