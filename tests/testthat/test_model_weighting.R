@@ -147,25 +147,20 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
 })
 
 test_that("stacking_weights gives expected result", {
-  lpd_point <- matrix(
-    c(
-      -0.2, -0.8, -1.1,
-      -1.4, -0.3, -0.5,
-      -0.6, -0.7, -0.1,
-      -1.0, -1.2, -0.4,
-      -0.9, -0.5, -0.8
-    ),
-    ncol = 3,
-    byrow = TRUE
-  )
+  set.seed(10)
+  lpd_point <- matrix(rnorm(2000, -1), 400, 5)
 
-  set.seed(0)
   actual <- stacking_weights(lpd_point)
 
   expect_s3_class(actual, "stacking_weights")
-  expect_named(actual, paste0("model", 1:3))
+  expect_named(actual, paste0("model", 1:5))
   expect_equal(sum(actual), 1)
-  expect_snapshot_value(as.numeric(actual), style = "deparse")
+  expect_equal(
+    as.numeric(actual),
+    c(0.158382400055713, 0.176065699214342, 0.19918082992972,
+      0.264490615659226, 0.201880455141),
+    tolerance = 1e-6
+  )
 })
 
 test_that("pseudo-BMA gives zero weight to an impossible model", {
