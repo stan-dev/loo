@@ -541,6 +541,47 @@ test_that("loo_moment_match_split works", {
   expect_false(anyNA(split3$lwi))
 })
 
+test_that("loo_moment_match_split evaluates the inverse of its transformation", {
+  # The second half of the draws is untransformed. For these draws theta,
+  # the mixture proposal needs the density at T^-1(theta), where
+  # T(theta) = M diag(s) (theta - m) + m + shift.
+  shift <- c(-0.1, -0.2)
+  scaling <- c(0.7, 1.3)
+  m <- colMeans(upars)
+  second <- seq_len(S)[-seq_len(as.integer(0.5 * S))]
+  for (cov in c(FALSE, TRUE)) {
+    mapping <- if (cov) matrix(c(1, 0.1, 0.1, 1), 2, 2) else diag(2)
+    seen <- list()
+    log_prob_record <- function(x, upars, ...) {
+      seen[[length(seen) + 1]] <<- upars
+      log_prob_upars_test(x, upars, ...)
+    }
+    loo_moment_match_split(
+      x,
+      upars,
+      cov = cov,
+      total_shift = shift,
+      total_scaling = scaling,
+      total_mapping = mapping,
+      i = 1,
+      log_prob_upars = log_prob_record,
+      log_lik_i_upars = log_lik_i_upars_test,
+      cores = 1,
+      r_eff_i = 1,
+      is_method = "psis"
+    )
+    # the second call evaluates the inverse-transformed draws
+    inv <- seen[[2]][second, , drop = FALSE]
+    fwd <- sweep(inv, 2, m, "-")
+    fwd <- sweep(fwd, 2, scaling, "*")
+    if (cov) {
+      fwd <- tcrossprod(fwd, mapping)
+    }
+    fwd <- sweep(fwd, 2, shift + m, "+")
+    expect_equal(unname(fwd), unname(upars[second, , drop = FALSE]))
+  }
+})
+
 test_that("shift_and_scale is stable for large parameter values", {
   upars <- matrix(1e8 + c(-1, 0, 1), ncol = 1)
   result <- shift_and_scale(NULL, upars, rep(-log(3), 3))

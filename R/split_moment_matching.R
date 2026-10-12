@@ -56,12 +56,15 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
   attributes(upars_trans) <- attributes(upars)
 
   # inverse accumulated affine transformation
-  upars_trans_inv <- sweep(upars, 2, mean_original, "-")
+  # T(theta) = M diag(s) (theta - m) + m + shift, so
+  # T^-1(z) = diag(s)^-1 M^-1 (z - m - shift) + m:
+  # remove the shift first, then undo the mapping and the scaling.
+  upars_trans_inv <- sweep(upars, 2, mean_original + total_shift, "-")
   if (cov) {
     upars_trans_inv <- tcrossprod(upars_trans_inv, solve(total_mapping))
   }
   upars_trans_inv <- sweep(upars_trans_inv, 2, total_scaling, "/")
-  upars_trans_inv <- sweep(upars_trans_inv, 2, mean_original - total_shift, "+")
+  upars_trans_inv <- sweep(upars_trans_inv, 2, mean_original, "+")
   attributes(upars_trans_inv) <- attributes(upars)
 
   # first half of upars_trans_half are T(theta)
