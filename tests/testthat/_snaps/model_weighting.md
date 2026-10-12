@@ -40,5 +40,5 @@
              weight
       model1 0.000 
       model2 1.000 
-      model3 0.000
+      model3 0.000 
 
