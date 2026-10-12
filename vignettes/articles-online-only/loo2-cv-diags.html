@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Aki Vehtari and Florence Bockting" />
+
+<meta name="date" content="2026-10-12" />
+
+<title>Monte Carlo diagnostics of cross-validation estimates</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Monte Carlo diagnostics of cross-validation
+estimates</h1>
+<h4 class="author">Aki Vehtari and Florence Bockting</h4>
+<h4 class="date">2026-10-12</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#setup" id="toc-setup">Setup</a></li>
+<li><a href="#example-negative-binomial-model-for-the-roaches-data" id="toc-example-negative-binomial-model-for-the-roaches-data">Example:
+negative binomial model for the roaches data</a>
+<ul>
+<li><a href="#coding-the-stan-model" id="toc-coding-the-stan-model">Coding the Stan model</a></li>
+<li><a href="#fitting-the-model-with-rstan" id="toc-fitting-the-model-with-rstan">Fitting the model with
+RStan</a></li>
+</ul></li>
+<li><a href="#psis-loo-psis_diags" id="toc-psis-loo-psis_diags">PSIS-LOO:
+<code>psis_diags()</code></a></li>
+<li><a href="#mixture-importance-sampling-mixis_alpha-mixis_n_eff-mixis_diags" id="toc-mixture-importance-sampling-mixis_alpha-mixis_n_eff-mixis_diags">Mixture
+importance sampling: <code>mixis_alpha()</code>,
+<code>mixis_n_eff()</code>, <code>mixis_diags()</code></a>
+<ul>
+<li><a href="#mixture-weights-mixis_alpha" id="toc-mixture-weights-mixis_alpha">Mixture weights:
+<code>mixis_alpha()</code></a></li>
+<li><a href="#predicted-effective-sample-size-mixis_n_eff" id="toc-predicted-effective-sample-size-mixis_n_eff">Predicted effective
+sample size: <code>mixis_n_eff()</code></a></li>
+<li><a href="#diagnostics-mixis_diags" id="toc-diagnostics-mixis_diags">Diagnostics:
+<code>mixis_diags()</code></a></li>
+</ul></li>
+<li><a href="#brute-force-loo-brute_force_diags" id="toc-brute-force-loo-brute_force_diags">Brute-force LOO:
+<code>brute_force_diags()</code></a></li>
+<li><a href="#cv-bridge-cv_bridge_diags" id="toc-cv-bridge-cv_bridge_diags">CV bridge:
+<code>cv_bridge_diags()</code></a></li>
+<li><a href="#the-cv_diags-object" id="toc-the-cv_diags-object">The
+<code>cv_diags</code> object</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Monte Carlo diagnostics of cross-validation estimates}
+-->
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Every cross-validation (CV) estimate computed from MCMC draws has a
+Monte Carlo (MC) error. The expected log predictive density of fold
+<span class="math inline">\(i\)</span>,</p>
+<p><span class="math display">\[
+\mathrm{elpd}_i = \log p(y_i \mid y_{-i})
+= \log \int p(y_i \mid \theta)\, p(\theta \mid y_{-i})\, d\theta ,
+\]</span></p>
+<p>is estimated from Monte Carlo means: the log of a mean, minus the log
+of a mean, or the log of a ratio of means. The log of a noisy mean has
+both a variance and a bias (Jensen’s inequality), and the draws that
+enter the mean often have a heavy right tail.</p>
+<p>This vignette demonstrates the functions in the <strong>loo</strong>
+package that compute these MC errors for four ways of estimating <span class="math inline">\(\mathrm{elpd}_i\)</span>:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Function</th>
+<th>Draws needed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PSIS-LOO</td>
+<td><code>psis_diags()</code></td>
+<td>one fit to the full data</td>
+</tr>
+<tr class="even">
+<td>Mixture importance sampling (MixIS)</td>
+<td><code>mixis_alpha()</code>, <code>mixis_n_eff()</code>,
+<code>mixis_diags()</code></td>
+<td>one fit to a mixture of the LOO posteriors</td>
+</tr>
+<tr class="odd">
+<td>Brute-force LOO</td>
+<td><code>brute_force_diags()</code></td>
+<td>one refit for each fold</td>
+</tr>
+<tr class="even">
+<td>CV bridge</td>
+<td><code>cv_bridge_diags()</code></td>
+<td>one refit for each fold and the full-data fit</td>
+</tr>
+</tbody>
+</table>
+<p>All functions take log-likelihood matrices with one row per draw and
+one column per fold. A fold is one observation (LOO) or a group of
+observations (leave-one-group-out), in which case the column is the sum
+of the log-likelihood over the observations in the group. All functions
+return an object of class <code>&quot;cv_diags&quot;</code>, described at the end
+of this vignette.</p>
+<p>For background on the methods we refer to the following papers:</p>
+<ul>
+<li><p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian
+model evaluation using leave-one-out cross-validation and WAIC.
+<em>Statistics and Computing</em>. 27(5), 1413–1432.
+:10.1007/s11222-016-9696-4. Links: <a href="https://link.springer.com/article/10.1007/s11222-016-9696-4">published</a>
+| <a href="https://arxiv.org/abs/1507.04544">preprint
+arXiv</a>.</p></li>
+<li><p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J.
+(2024). Pareto smoothed importance sampling. <em>Journal of Machine
+Learning Research</em>, 25(72):1-58. <a href="https://jmlr.org/papers/v25/19-556.html">PDF</a></p></li>
+<li><p>Silva, L. A., and Zanella, G. (2024). Robust leave-one-out
+cross-validation for high-dimensional Bayesian models. <em>Journal of
+the American Statistical Association</em>, 119(547), 2369–2381.
+:10.1080/01621459.2023.2257893. Links: <a href="https://arxiv.org/abs/2209.09190">preprint arXiv</a></p></li>
+<li><p>Meng, X.-L., and Wong, W. H. (1996). Simulating ratios of
+normalizing constants via a simple identity: a theoretical exploration.
+<em>Statistica Sinica</em>, 6(4), 831–860.</p></li>
+</ul>
+</div>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<p>In addition to <strong>loo</strong>, we load the
+<strong>rstan</strong> package for fitting the model. The data come from
+the <strong>rstanarm</strong> package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;rstan&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;loo&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">9547</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">set.seed</span>(seed)</span></code></pre></div>
+</div>
+<div id="example-negative-binomial-model-for-the-roaches-data" class="section level1">
+<h1>Example: negative binomial model for the roaches data</h1>
+<div id="coding-the-stan-model" class="section level2">
+<h2>Coding the Stan model</h2>
+<p>We use a negative binomial regression for the number of roaches, as
+in the vignette <a href="https://mc-stan.org/loo/articles/loo2-example.html"><em>Using the
+loo package (version &gt;= 2.0.0)</em></a>. The Stan program has two
+additions, so that one program gives all the fits of this vignette:</p>
+<ul>
+<li>the data vector <code>w</code> multiplies the log-likelihood of each
+observation. With <code>w[i] = 0</code> the fit leaves out observation
+<span class="math inline">\(i\)</span>;</li>
+<li>with <code>mixis = 1</code> the program samples the mixture of the
+LOO posteriors that MixIS uses. The vector <code>mixis_alpha</code>
+weights the components of the mixture.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>stancode <span class="ot">&lt;-</span> <span class="st">&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="st">data {</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="st">  int&lt;lower=1&gt; N;</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="st">  int&lt;lower=1&gt; K;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="st">  matrix[N, K] x;</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="st">  array[N] int&lt;lower=0&gt; y;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="st">  vector[N] offset_; // offset is reserved keyword in Stan so use offset_</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="st">  vector&lt;lower=0, upper=1&gt;[N] w;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="st">  int&lt;lower=0, upper=1&gt; mixis;</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="st">  vector&lt;lower=0&gt;[N] mixis_alpha;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="st">parameters {</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="st">  real intercept;</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="st">  vector[K] beta;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="st">  real&lt;lower=0&gt; phi;</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="st">model {</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="st">  vector[N] eta = intercept + x * beta + offset_;</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="st">  vector[N] ll;</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="st">  for (n in 1:N) {</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="st">    ll[n] = neg_binomial_2_log_lpmf(y[n] | eta[n], phi);</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="st">  intercept ~ normal(0, 5);</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="st">  beta ~ normal(0, 1);</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="st">  phi ~ exponential(1);</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="st">  target += dot_product(w, ll);</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="st">  if (mixis) {</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="st">    target += log_sum_exp(log(mixis_alpha) - ll);</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="st">generated quantities {</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="st">  vector[N] log_lik;</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="st">  {</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="st">    vector[N] eta = intercept + x * beta + offset_;</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="st">    for (n in 1:N) {</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="st">      log_lik[n] = neg_binomial_2_log_lpmf(y[n] | eta[n], phi);</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="st">&quot;</span></span></code></pre></div>
+</div>
+<div id="fitting-the-model-with-rstan" class="section level2">
+<h2>Fitting the model with RStan</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(roaches, <span class="at">package =</span> <span class="st">&quot;rstanarm&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>roaches<span class="sc">$</span>roach1 <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(roaches<span class="sc">$</span>roach1)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(roaches)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>standata <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">N =</span> n,</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">K =</span> <span class="dv">3</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">as.matrix</span>(roaches[, <span class="fu">c</span>(<span class="st">&quot;roach1&quot;</span>, <span class="st">&quot;treatment&quot;</span>, <span class="st">&quot;senior&quot;</span>)]),</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">y =</span> roaches<span class="sc">$</span>y,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">offset_ =</span> <span class="fu">log</span>(roaches<span class="sc">$</span>exposure2),</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, n),</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">mixis =</span> <span class="dv">0</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">mixis_alpha =</span> <span class="fu">rep</span>(<span class="dv">1</span>, n)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>stanmodel <span class="ot">&lt;-</span> <span class="fu">stan_model</span>(<span class="at">model_code =</span> stancode)</span></code></pre></div>
+<p>All fits in this vignette use 4 chains with 1000 draws each after
+warmup. The helper <code>fit_log_lik()</code> fits the model to a
+modified data list and returns the <span class="math inline">\(S \times
+N\)</span> log-likelihood matrix. <code>extract_log_lik()</code> stacks
+the draws chain by chain, so <code>chain_id</code> gives the chain of
+each row.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>fit_log_lik <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">sampling</span>(stanmodel, <span class="at">data =</span> data, <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                  <span class="at">seed =</span> seed, <span class="at">refresh =</span> <span class="dv">0</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">extract_log_lik</span>(fit)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>}</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>chain_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">each =</span> <span class="dv">1000</span>)</span></code></pre></div>
+<p>The full-data fit:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>log_lik <span class="ot">&lt;-</span> <span class="fu">fit_log_lik</span>(standata)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">dim</span>(log_lik)</span></code></pre></div>
+<pre><code>[1] 4000  262</code></pre>
+</div>
+</div>
+<div id="psis-loo-psis_diags" class="section level1">
+<h1>PSIS-LOO: <code>psis_diags()</code></h1>
+<p>PSIS-LOO uses the draws <span class="math inline">\(\theta^s \sim
+p(\theta \mid y)\)</span> of the full-data fit for every fold. The
+estimate is the same as in <code>loo()</code>:</p>
+<p><span class="math display">\[
+\widehat{\mathrm{elpd}}_i = \log \sum_s w_i^s\, p(y_i \mid \theta^s),
+\]</span></p>
+<p>with the self-normalized Pareto smoothed importance weights <span class="math inline">\(w_i^s\)</span>. <code>psis_diags()</code> adds the
+MC error of this estimate:</p>
+<ul>
+<li>the MCSE of each fold accounts for the heavy right tail of the
+importance ratios <span class="math inline">\(1 / p(y_i \mid
+\theta^s)\)</span>;</li>
+<li>the bias of each fold is the Jensen bias of the log of the mean
+ratio;</li>
+<li>all folds use the same draws, so their errors are correlated. The
+MCSE of the total takes the correlation into account.</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>psis_fit <span class="ot">&lt;-</span> <span class="fu">psis_diags</span>(log_lik, <span class="at">chain_id =</span> chain_id)</span></code></pre></div>
+<pre><code>Warning: Some Pareto k diagnostic values are too high. See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>psis_fit</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (psis): 4000 draws, 262 folds
+  elpd total    -881.903
+  mcse_total       0.291
+  bias_total       0.061
+  rmse_pred        0.298
+  interval    [-0.632, 0.571]
+First 5 folds:
+    elpd mcse_elpd bias_elpd pareto_k
+1 -6.812     0.001     0.000    0.011
+2 -6.634     0.001     0.000   -0.017
+3 -3.755     0.001     0.000    0.114
+4 -3.736     0.001     0.000    0.092
+5 -0.896     0.001     0.000   -0.111</code></pre>
+<p>The <code>pointwise</code> data frame has one row per fold. In
+addition to the columns <code>elpd</code>, <code>mcse_elpd</code> and
+<code>bias_elpd</code>, it has the Pareto <span class="math inline">\(k\)</span> diagnostic of each fold:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.data.frame</span>(psis_fit))</span></code></pre></div>
+<pre><code>        elpd   mcse_elpd    bias_elpd    pareto_k
+1 -6.8116030 0.001281372 8.209566e-07  0.01102696
+2 -6.6335547 0.001338279 8.954950e-07 -0.01737998
+3 -3.7547263 0.001166649 6.805346e-07  0.11373431
+4 -3.7363362 0.001100461 6.055075e-07  0.09163469
+5 -0.8959251 0.001346340 9.063158e-07 -0.11121818
+6 -0.7529864 0.001300402 8.455222e-07 -0.03248909</code></pre>
+<p>The five folds with the highest Pareto <span class="math inline">\(k\)</span> values:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>pw <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(psis_fit)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>pw[<span class="fu">order</span>(pw<span class="sc">$</span>pareto_k, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>], ]</span></code></pre></div>
+<pre><code>          elpd   mcse_elpd    bias_elpd  pareto_k
+261 -15.035075 0.333926345 5.575340e-02 0.9422118
+93  -12.104830 0.095006172 4.513086e-03 0.7271593
+235  -8.941652 0.018369888 1.687264e-04 0.3327119
+104  -5.372438 0.005169965 1.336427e-05 0.3254629
+204  -5.172847 0.002936720 4.312163e-06 0.2582232</code></pre>
+<p>If a <code>psis</code> object for <code>-log_lik</code> already
+exists, pass it as <code>psis_object</code>. Then
+<code>psis_diags()</code> does not run <code>psis()</code> again:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>r_eff <span class="ot">&lt;-</span> <span class="fu">relative_eff</span>(<span class="fu">exp</span>(log_lik), <span class="at">chain_id =</span> chain_id)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>psis_obj <span class="ot">&lt;-</span> <span class="fu">psis</span>(<span class="sc">-</span>log_lik, <span class="at">r_eff =</span> r_eff)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="fu">psis_diags</span>(log_lik, <span class="at">chain_id =</span> chain_id, <span class="at">r_eff =</span> r_eff, <span class="at">psis_object =</span> psis_obj)</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (psis): 4000 draws, 262 folds
+  elpd total    -881.903
+  mcse_total       0.291
+  bias_total       0.061
+  rmse_pred        0.298
+  interval    [-0.632, 0.571]
+First 5 folds:
+    elpd mcse_elpd bias_elpd pareto_k
+1 -6.812     0.001     0.000    0.011
+2 -6.634     0.001     0.000   -0.017
+3 -3.755     0.001     0.000    0.114
+4 -3.736     0.001     0.000    0.092
+5 -0.896     0.001     0.000   -0.111</code></pre>
+</div>
+<div id="mixture-importance-sampling-mixis_alpha-mixis_n_eff-mixis_diags" class="section level1">
+<h1>Mixture importance sampling: <code>mixis_alpha()</code>,
+<code>mixis_n_eff()</code>, <code>mixis_diags()</code></h1>
+<p>MixIS (Silva and Zanella, 2024) draws from one fit to a mixture of
+all LOO posteriors:</p>
+<p><span class="math display">\[
+q_\alpha(\theta) \propto p(\theta \mid y) \sum_{j=1}^{N}
+\frac{\alpha_j}{p(y_j \mid \theta)} .
+\]</span></p>
+<p>With <span class="math inline">\(\alpha_j = 1\)</span> for all <span class="math inline">\(j\)</span> (plain MixIS), the folds with a small
+<span class="math inline">\(p(y_j \mid y_{-j})\)</span> dominate the
+mixture. Balanced MixIS uses weights <span class="math inline">\(\alpha_j\)</span> that give each LOO posterior a
+similar share of the draws.</p>
+<div id="mixture-weights-mixis_alpha" class="section level2">
+<h2>Mixture weights: <code>mixis_alpha()</code></h2>
+<p><code>mixis_alpha()</code> computes the balanced weights <span class="math inline">\(\alpha_j = \exp(e_j - \max_k e_k)\)</span> from
+the PSIS estimates <span class="math inline">\(e_j\)</span>. It takes a
+<code>psis_diags()</code> result or a <code>loo()</code> result:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fu">mixis_alpha</span>(psis_fit)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">summary</span>(alpha)</span></code></pre></div>
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+4.100e-07 8.015e-03 6.442e-02 2.221e-01 4.988e-01 1.000e+00 </code></pre>
+</div>
+<div id="predicted-effective-sample-size-mixis_n_eff" class="section level2">
+<h2>Predicted effective sample size: <code>mixis_n_eff()</code></h2>
+<p><code>mixis_n_eff()</code> uses the draws of the full-data fit to
+predict the efficiency of a mixture with the given weights, before we
+fit it:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>mixis_pred <span class="ot">&lt;-</span> <span class="fu">mixis_n_eff</span>(log_lik, <span class="at">alpha =</span> alpha)</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">str</span>(mixis_pred)</span></code></pre></div>
+<pre><code>List of 4
+ $ r_eff   : num 0.998
+ $ n_eff_u : num 3992
+ $ pareto_k: num 0.809
+ $ ratio   : num 10.4</code></pre>
+<p>The output contains</p>
+<ul>
+<li><code>r_eff</code>: the predicted relative effective sample size of
+the weights shared by all folds, that is, of importance sampling from
+the posterior to the mixture;</li>
+<li><code>n_eff_u</code>: the predicted effective sample size of these
+weights for <code>ndraws</code> mixture draws (by default the number of
+rows of <code>log_lik</code>);</li>
+<li><code>pareto_k</code>: a Pareto <span class="math inline">\(k\)</span> diagnostic of the prediction. Above 0.7
+the prediction is not reliable;</li>
+<li><code>ratio</code>: <code>r_eff</code> of <code>alpha</code> divided
+by <code>r_eff</code> of plain MixIS. A ratio near 1 means that
+balancing gives little gain. Balancing is the recommended default; the
+ratio only helps to save computation when the draws are expensive.</li>
+</ul>
+<p>Here <code>pareto_k</code> is 0.81, so the predicted effective sample
+size is not reliable. We fit the mixture anyway and compare the
+prediction with the realized effective sample size below.</p>
+</div>
+<div id="diagnostics-mixis_diags" class="section level2">
+<h2>Diagnostics: <code>mixis_diags()</code></h2>
+<p>We now fit the mixture with the balanced weights:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>standata_mixis <span class="ot">&lt;-</span> standata</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>standata_mixis<span class="sc">$</span>mixis <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>standata_mixis<span class="sc">$</span>mixis_alpha <span class="ot">&lt;-</span> alpha</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>log_lik_mixis <span class="ot">&lt;-</span> <span class="fu">fit_log_lik</span>(standata_mixis)</span></code></pre></div>
+<p>The mixture can be multimodal, so MCMC can fail on it even when the
+full-data posterior is easy to sample. Check the usual MCMC convergence
+diagnostics of the mixture fit first.</p>
+<p><code>mixis_diags()</code> takes the log-likelihood at the mixture
+draws. Pass the same <code>alpha</code> that was used to fit the
+mixture:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>mixis_fit <span class="ot">&lt;-</span> <span class="fu">mixis_diags</span>(log_lik_mixis, <span class="at">alpha =</span> alpha, <span class="at">chain_id =</span> chain_id)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>mixis_fit</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (mixis): 4000 draws, 262 folds
+  elpd total    -882.035
+  mcse_total       0.199
+  bias_total       0.015
+  rmse_pred        0.200
+  interval    [-0.405, 0.391]
+First 5 folds:
+    elpd mcse_elpd bias_elpd pareto_k_v
+1 -6.812     0.001     0.000     -0.015
+2 -6.634     0.002     0.000     -0.029
+3 -3.756     0.001     0.000      0.049
+4 -3.737     0.001     0.000      0.039
+5 -0.893     0.001     0.000     -0.126</code></pre>
+<p>The <code>diagnostics</code> element has the Pareto <span class="math inline">\(k\)</span> diagnostic (<code>pareto_k_u</code>)
+and the effective sample size (<code>n_eff_u</code>) of the weights
+shared by all folds. A <code>pareto_k_u</code> above 0.7 means that the
+estimate is not reliable. A very small <code>n_eff_u</code>, for example
+below 10 with four chains, means that the chains stay in different modes
+of the mixture. Compare <code>n_eff_u</code> with the prediction of
+<code>mixis_n_eff()</code>. The weights of each fold are bounded between
+0 and 1, so the column <code>pareto_k_v</code> is of less concern:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>mixis_fit<span class="sc">$</span>diagnostics</span></code></pre></div>
+<pre><code>$pareto_k_u
+[1] -0.4059114
+
+$n_eff_u
+[1] 3992.963</code></pre>
+<p>The realized <code>n_eff_u</code> is 3993; the prediction of
+<code>mixis_n_eff()</code> was 3992.</p>
+</div>
+</div>
+<div id="brute-force-loo-brute_force_diags" class="section level1">
+<h1>Brute-force LOO: <code>brute_force_diags()</code></h1>
+<p>When importance sampling fails for a fold, we can refit the model
+without that fold. The estimate is then a plain mean over the draws
+<span class="math inline">\(\theta_{-i}^s \sim p(\theta \mid
+y_{-i})\)</span> of the refit:</p>
+<p><span class="math display">\[
+\widehat{\mathrm{elpd}}_i = \log \frac{1}{S} \sum_s p(y_i \mid
+\theta_{-i}^s) .
+\]</span></p>
+<p>This estimate still has an MC error. For an outlier, the refit draws
+rarely reach the region where <span class="math inline">\(p(y_i \mid
+\theta)\)</span> is large.</p>
+<p>We refit the model for the five folds with the highest Pareto <span class="math inline">\(k\)</span> values. Column <span class="math inline">\(j\)</span> of <code>log_lik_fold</code> is the
+log-likelihood of fold <code>folds[j]</code> at the draws of the refit
+without that fold:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">order</span>(pw<span class="sc">$</span>pareto_k, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>log_lik_fold <span class="ot">&lt;-</span> <span class="fu">sapply</span>(folds, <span class="cf">function</span>(i) {</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>  standata_i <span class="ot">&lt;-</span> standata</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>  standata_i<span class="sc">$</span>w[i] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>  <span class="fu">fit_log_lik</span>(standata_i)[, i]</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>})</span></code></pre></div>
+<p><code>brute_force_diags()</code> takes this matrix. The optional
+<code>log_lik_full</code> gives the log-likelihood of the same folds at
+the full-data draws. Its largest value bounds the tail of the MCSE
+estimate:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>bf_fit <span class="ot">&lt;-</span> <span class="fu">brute_force_diags</span>(log_lik_fold, <span class="at">log_lik_full =</span> log_lik[, folds],</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>                            <span class="at">chain_id =</span> chain_id)</span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>bf_fit</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (brute_force): 4000 draws, 5 folds
+  elpd total     -46.815
+  mcse_total       0.127
+  bias_total      -0.008
+  rmse_pred        0.128
+  interval    [-0.249, 0.258]
+First 5 folds:
+     elpd mcse_elpd bias_elpd
+1 -15.114     0.123    -0.008
+2 -12.163     0.031     0.000
+3  -8.974     0.014     0.000
+4  -5.383     0.005     0.000
+5  -5.181     0.003     0.000</code></pre>
+<p>The refits have independent draws, so the MCSE of the total is the
+root sum of squares of the MCSEs of the folds. Row <span class="math inline">\(j\)</span> of the result is fold
+<code>folds[j]</code>:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">cbind</span>(<span class="at">fold =</span> folds, <span class="fu">as.data.frame</span>(bf_fit))</span></code></pre></div>
+<pre><code>  fold       elpd   mcse_elpd     bias_elpd
+1  261 -15.114308 0.122554610 -7.509816e-03
+2   93 -12.163473 0.031106113 -4.837951e-04
+3  235  -8.973955 0.013601126 -9.249531e-05
+4  104  -5.383048 0.004572031 -1.045173e-05
+5  204  -5.180525 0.002784243 -3.876003e-06</code></pre>
+</div>
+<div id="cv-bridge-cv_bridge_diags" class="section level1">
+<h1>CV bridge: <code>cv_bridge_diags()</code></h1>
+<p>Brute-force LOO uses only the refit draws. The CV bridge uses both
+the refit draws and the draws of the full-data fit. It writes the LOO
+predictive density as a ratio of two normalizing constants,</p>
+<p><span class="math display">\[
+p(y_i \mid y_{-i}) = \frac{p(y)}{p(y_{-i})},
+\]</span></p>
+<p>and estimates the ratio with bridge sampling (Meng and Wong, 1996).
+The terms of the bridge estimator are bounded, so the estimate has a
+smaller MC error than brute-force LOO when the two posteriors
+overlap.</p>
+<p>Bridge sampling needs the two posteriors to have the same parameters.
+Therefore, refit the model with the likelihood weight of the fold set to
+0, as <code>w[i] = 0</code> does above, and do not remove the fold from
+the data. In a hierarchical model this keeps the parameters of a
+left-out group.</p>
+<p><code>cv_bridge_diags()</code> takes the same two matrices as
+<code>brute_force_diags()</code>, but <code>log_lik_full</code> is
+required:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>bridge_fit <span class="ot">&lt;-</span> <span class="fu">cv_bridge_diags</span>(log_lik_fold, <span class="at">log_lik_full =</span> log_lik[, folds],</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>                              <span class="at">chain_id =</span> chain_id)</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>bridge_fit</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (cv_bridge): 4000 draws, 5 folds
+  elpd total     -46.770
+  mcse_total       0.046
+  bias_total       0.000
+  rmse_pred        0.046
+  interval    [-0.090, 0.090]
+First 5 folds:
+     elpd mcse_elpd bias_elpd   gap converged
+1 -15.122     0.037     0.000 5.825      TRUE
+2 -12.133     0.020     0.000 2.278      TRUE
+3  -8.960     0.011     0.000 0.727      TRUE
+4  -5.377     0.003     0.000 0.099      TRUE
+5  -5.177     0.002     0.000 0.039      TRUE</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">cbind</span>(<span class="at">fold =</span> folds, <span class="fu">as.data.frame</span>(bridge_fit))</span></code></pre></div>
+<pre><code>  fold       elpd   mcse_elpd bias_elpd        gap converged
+1  261 -15.122222 0.036799902         0 5.82526818      TRUE
+2   93 -12.132977 0.019508306         0 2.27848184      TRUE
+3  235  -8.960450 0.011152406         0 0.72703428      TRUE
+4  104  -5.377255 0.003427052         0 0.09949816      TRUE
+5  204  -5.176806 0.002132091         0 0.03861600      TRUE</code></pre>
+<p>The <code>pointwise</code> data frame has two more columns:</p>
+<ul>
+<li><code>gap</code>: the distance, in nats, between the median
+log-likelihood of the fold at the refit draws and at the full-data
+draws. A large gap means that the two posteriors do not overlap. Above
+about 50 nats the estimate can be biased. A fold with a gap above 500
+gets <code>NA</code>;</li>
+<li><code>converged</code>: whether the iterative bridge estimate
+converged.</li>
+</ul>
+<p>The CV bridge has no detectable finite-sample bias, so
+<code>bias_elpd</code> is 0. The <code>mcse_elpd</code> of a fold is
+well calibrated up to about 0.3.</p>
+<p>If the two fits have different chains, give the chains of the
+full-data draws in <code>chain_id_full</code>.</p>
+</div>
+<div id="the-cv_diags-object" class="section level1">
+<h1>The <code>cv_diags</code> object</h1>
+<p>All four functions return an object of class <code>&quot;cv_diags&quot;</code>
+with the same structure:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">str</span>(<span class="fu">unclass</span>(bf_fit), <span class="at">max.level =</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>List of 5
+ $ pointwise  :&#39;data.frame&#39;:    5 obs. of  3 variables:
+ $ mc_error   :List of 4
+ $ diagnostics: list()
+ $ method     : chr &quot;brute_force&quot;
+ $ dims       : int [1:2] 4000 5</code></pre>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Element</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pointwise</code></td>
+<td>one row per fold: <code>elpd</code>, <code>mcse_elpd</code>,
+<code>bias_elpd</code>, and method-specific columns</td>
+</tr>
+<tr class="even">
+<td><code>mc_error</code></td>
+<td><code>mcse_total</code>, <code>bias_total</code>,
+<code>rmse_pred</code> and <code>interval</code> of the total</td>
+</tr>
+<tr class="odd">
+<td><code>diagnostics</code></td>
+<td>a method-specific list</td>
+</tr>
+<tr class="even">
+<td><code>method</code></td>
+<td><code>&quot;psis&quot;</code>, <code>&quot;mixis&quot;</code>,
+<code>&quot;brute_force&quot;</code> or <code>&quot;cv_bridge&quot;</code></td>
+</tr>
+<tr class="odd">
+<td><code>dims</code></td>
+<td>the number of draws and the number of folds</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>mc_error</code> element summarizes the MC error of the
+total <span class="math inline">\(\widehat{\mathrm{elpd}} = \sum_i
+\widehat{\mathrm{elpd}}_i\)</span>:</p>
+<ul>
+<li><code>mcse_total</code>: the MCSE of the total;</li>
+<li><code>bias_total</code>: the predicted Jensen bias of the total, the
+sum of <code>bias_elpd</code>. The bias is a diagnostic only; the
+functions do not correct the estimate;</li>
+<li><code>rmse_pred</code>: the predicted root mean squared error, <span class="math inline">\(\sqrt{\mathrm{bias}^2 +
+\mathrm{mcse}^2}\)</span>;</li>
+<li><code>interval</code>: an approximate 95% interval for the exact
+elpd, given as offsets from the estimate.</li>
+</ul>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>psis_fit<span class="sc">$</span>mc_error</span></code></pre></div>
+<pre><code>$mcse_total
+[1] 0.2913714
+
+$bias_total
+[1] 0.06085467
+
+$rmse_pred
+[1] 0.2976585
+
+$interval
+     lower      upper 
+-0.6319425  0.5710879 </code></pre>
+<p><code>print()</code> shows the totals and the first <code>n</code>
+folds. <code>as.data.frame()</code> returns the <code>pointwise</code>
+data frame:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">print</span>(mixis_fit, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">n =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>Monte Carlo diagnostics (mixis): 4000 draws, 262 folds
+  elpd total     -882.04
+  mcse_total        0.20
+  bias_total        0.01
+  rmse_pred         0.20
+  interval    [-0.41, 0.39]
+First 3 folds:
+   elpd mcse_elpd bias_elpd pareto_k_v
+1 -6.81      0.00      0.00      -0.02
+2 -6.63      0.00      0.00      -0.03
+3 -3.76      0.00      0.00       0.05</code></pre>
+<p>Finally, we compare the totals of PSIS-LOO and MixIS:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a>fits <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">psis =</span> psis_fit, <span class="at">mixis =</span> mixis_fit)</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">sapply</span>(fits, <span class="cf">function</span>(x) {</span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">elpd =</span> <span class="fu">sum</span>(x<span class="sc">$</span>pointwise<span class="sc">$</span>elpd), <span class="fu">unlist</span>(x<span class="sc">$</span>mc_error[<span class="fu">c</span>(<span class="st">&quot;mcse_total&quot;</span>, <span class="st">&quot;rmse_pred&quot;</span>)]))</span>
+<span id="cb41-4"><a href="#cb41-4" tabindex="-1"></a>}))</span></code></pre></div>
+<pre><code>           elpd mcse_total rmse_pred
+psis  -881.9031  0.2913714 0.2976585
+mixis -882.0351  0.1993626 0.1998974</code></pre>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Meng, X.-L., and Wong, W. H. (1996). Simulating ratios of normalizing
+constants via a simple identity: a theoretical exploration.
+<em>Statistica Sinica</em>, 6(4), 831–860.</p>
+<p>Silva, L. A., and Zanella, G. (2024). Robust leave-one-out
+cross-validation for high-dimensional Bayesian models. <em>Journal of
+the American Statistical Association</em>, 119(547), 2369–2381.
+:10.1080/01621459.2023.2257893.</p>
+<p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian
+model evaluation using leave-one-out cross-validation and WAIC.
+<em>Statistics and Computing</em>. 27(5), 1413–1432.
+:10.1007/s11222-016-9696-4.</p>
+<p>Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. <em>Journal of Machine Learning
+Research</em>, 25(72):1-58.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

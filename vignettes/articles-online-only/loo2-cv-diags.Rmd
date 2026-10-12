@@ -1,0 +1,482 @@
+---
+title: "Monte Carlo diagnostics of cross-validation estimates"
+author: "Aki Vehtari and Florence Bockting"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: yes
+params:
+  EVAL: true
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Monte Carlo diagnostics of cross-validation estimates}
+-->
+```{r, child="../children/SETTINGS-knitr.txt"}
+```
+
+# Introduction
+
+Every cross-validation (CV) estimate computed from MCMC draws has a Monte
+Carlo (MC) error. The expected log predictive density of fold $i$,
+
+$$
+\mathrm{elpd}_i = \log p(y_i \mid y_{-i})
+= \log \int p(y_i \mid \theta)\, p(\theta \mid y_{-i})\, d\theta ,
+$$
+
+is estimated from Monte Carlo means: the log of a mean, minus the log of a
+mean, or the log of a ratio of means. The log of a noisy mean has both a
+variance and a bias (Jensen's inequality), and the draws that enter the mean
+often have a heavy right tail.
+
+This vignette demonstrates the functions in the __loo__ package that
+compute these MC errors for four ways of estimating $\mathrm{elpd}_i$:
+
+| Method | Function | Draws needed |
+|---|---|---|
+| PSIS-LOO | `psis_diags()` | one fit to the full data |
+| Mixture importance sampling (MixIS) | `mixis_alpha()`, `mixis_n_eff()`, `mixis_diags()` | one fit to a mixture of the LOO posteriors |
+| Brute-force LOO | `brute_force_diags()` | one refit for each fold |
+| CV bridge | `cv_bridge_diags()` | one refit for each fold and the full-data fit |
+
+All functions take log-likelihood matrices with one row per draw and one
+column per fold. A fold is one observation (LOO) or a group of
+observations (leave-one-group-out), in which case the column is the sum of
+the log-likelihood over the observations in the group. All functions return
+an object of class `"cv_diags"`, described at the end of this vignette.
+
+For background on the methods we refer to the following papers:
+
+* Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. _Statistics and
+Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4. Links:
+[published](https://link.springer.com/article/10.1007/s11222-016-9696-4) |
+[preprint arXiv](https://arxiv.org/abs/1507.04544).
+
+* Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. *Journal of Machine Learning Research*,
+25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
+
+* Silva, L. A., and Zanella, G. (2024). Robust leave-one-out
+cross-validation for high-dimensional Bayesian models. *Journal of the
+American Statistical Association*, 119(547), 2369--2381.
+\doi:10.1080/01621459.2023.2257893. Links:
+[preprint arXiv](https://arxiv.org/abs/2209.09190)
+
+* Meng, X.-L., and Wong, W. H. (1996). Simulating ratios of normalizing
+constants via a simple identity: a theoretical exploration. *Statistica
+Sinica*, 6(4), 831--860.
+
+
+# Setup
+
+In addition to __loo__, we load the __rstan__ package for fitting the
+model. The data come from the __rstanarm__ package.
+
+```{r setup, message=FALSE}
+library("rstan")
+library("loo")
+seed <- 9547
+set.seed(seed)
+```
+
+
+# Example: negative binomial model for the roaches data
+
+## Coding the Stan model
+
+We use a negative binomial regression for the number of roaches, as in the
+vignette
+[_Using the loo package (version >= 2.0.0)_](https://mc-stan.org/loo/articles/loo2-example.html).
+The Stan program has two additions, so that one program gives all the fits
+of this vignette:
+
+* the data vector `w` multiplies the log-likelihood of each observation.
+  With `w[i] = 0` the fit leaves out observation $i$;
+* with `mixis = 1` the program samples the mixture of the LOO posteriors
+  that MixIS uses. The vector `mixis_alpha` weights the components of the
+  mixture.
+
+```{r stancode}
+stancode <- "
+data {
+  int<lower=1> N;
+  int<lower=1> K;
+  matrix[N, K] x;
+  array[N] int<lower=0> y;
+  vector[N] offset_; // offset is reserved keyword in Stan so use offset_
+  vector<lower=0, upper=1>[N] w;
+  int<lower=0, upper=1> mixis;
+  vector<lower=0>[N] mixis_alpha;
+}
+parameters {
+  real intercept;
+  vector[K] beta;
+  real<lower=0> phi;
+}
+model {
+  vector[N] eta = intercept + x * beta + offset_;
+  vector[N] ll;
+  for (n in 1:N) {
+    ll[n] = neg_binomial_2_log_lpmf(y[n] | eta[n], phi);
+  }
+  intercept ~ normal(0, 5);
+  beta ~ normal(0, 1);
+  phi ~ exponential(1);
+  target += dot_product(w, ll);
+  if (mixis) {
+    target += log_sum_exp(log(mixis_alpha) - ll);
+  }
+}
+generated quantities {
+  vector[N] log_lik;
+  {
+    vector[N] eta = intercept + x * beta + offset_;
+    for (n in 1:N) {
+      log_lik[n] = neg_binomial_2_log_lpmf(y[n] | eta[n], phi);
+    }
+  }
+}
+"
+```
+
+## Fitting the model with RStan
+
+```{r data}
+data(roaches, package = "rstanarm")
+roaches$roach1 <- sqrt(roaches$roach1)
+n <- nrow(roaches)
+
+standata <- list(
+  N = n,
+  K = 3,
+  x = as.matrix(roaches[, c("roach1", "treatment", "senior")]),
+  y = roaches$y,
+  offset_ = log(roaches$exposure2),
+  w = rep(1, n),
+  mixis = 0,
+  mixis_alpha = rep(1, n)
+)
+
+stanmodel <- stan_model(model_code = stancode)
+```
+
+All fits in this vignette use 4 chains with 1000 draws each after warmup.
+The helper `fit_log_lik()` fits the model to a modified data list and
+returns the $S \times N$ log-likelihood matrix. `extract_log_lik()` stacks
+the draws chain by chain, so `chain_id` gives the chain of each row.
+
+```{r fit-helper}
+fit_log_lik <- function(data) {
+  fit <- sampling(stanmodel, data = data, chains = 4, iter = 2000,
+                  seed = seed, refresh = 0)
+  extract_log_lik(fit)
+}
+chain_id <- rep(1:4, each = 1000)
+```
+
+The full-data fit:
+
+```{r fit-full}
+log_lik <- fit_log_lik(standata)
+dim(log_lik)
+```
+
+
+# PSIS-LOO: `psis_diags()`
+
+PSIS-LOO uses the draws $\theta^s \sim p(\theta \mid y)$ of the full-data
+fit for every fold. The estimate is the same as in `loo()`:
+
+$$
+\widehat{\mathrm{elpd}}_i = \log \sum_s w_i^s\, p(y_i \mid \theta^s),
+$$
+
+with the self-normalized Pareto smoothed importance weights $w_i^s$. `psis_diags()` adds
+the MC error of this estimate:
+
+* the MCSE of each fold accounts for the heavy right tail of the importance
+  ratios $1 / p(y_i \mid \theta^s)$;
+* the bias of each fold is the Jensen bias of the log of the mean ratio;
+* all folds use the same draws, so their errors are correlated. The MCSE of
+  the total takes the correlation into account.
+
+```{r psis-diags}
+psis_fit <- psis_diags(log_lik, chain_id = chain_id)
+psis_fit
+```
+
+The `pointwise` data frame has one row per fold. In addition to the
+columns `elpd`, `mcse_elpd` and `bias_elpd`, it has the Pareto $k$
+diagnostic of each fold:
+
+```{r psis-pointwise}
+head(as.data.frame(psis_fit))
+```
+
+The five folds with the highest Pareto $k$ values:
+
+```{r psis-high-k}
+pw <- as.data.frame(psis_fit)
+pw[order(pw$pareto_k, decreasing = TRUE)[1:5], ]
+```
+
+If a `psis` object for `-log_lik` already exists, pass it as
+`psis_object`. Then `psis_diags()` does not run `psis()` again:
+
+```{r psis-object, warning=FALSE}
+r_eff <- relative_eff(exp(log_lik), chain_id = chain_id)
+psis_obj <- psis(-log_lik, r_eff = r_eff)
+psis_diags(log_lik, chain_id = chain_id, r_eff = r_eff, psis_object = psis_obj)
+```
+
+
+# Mixture importance sampling: `mixis_alpha()`, `mixis_n_eff()`, `mixis_diags()`
+
+MixIS (Silva and Zanella, 2024) draws from one fit to a mixture of all LOO
+posteriors:
+
+$$
+q_\alpha(\theta) \propto p(\theta \mid y) \sum_{j=1}^{N} \frac{\alpha_j}{p(y_j \mid \theta)} .
+$$
+
+With $\alpha_j = 1$ for all $j$ (plain MixIS), the folds with a small
+$p(y_j \mid y_{-j})$ dominate the mixture. Balanced MixIS uses weights
+$\alpha_j$ that give each LOO posterior a similar share of the draws.
+
+## Mixture weights: `mixis_alpha()`
+
+`mixis_alpha()` computes the balanced weights
+$\alpha_j = \exp(e_j - \max_k e_k)$ from the PSIS estimates $e_j$. It
+takes a `psis_diags()` result or a `loo()` result:
+
+```{r mixis-alpha}
+alpha <- mixis_alpha(psis_fit)
+summary(alpha)
+```
+
+## Predicted effective sample size: `mixis_n_eff()`
+
+`mixis_n_eff()` uses the draws of the full-data fit to predict the
+efficiency of a mixture with the given weights, before we fit it:
+
+```{r mixis-n-eff}
+mixis_pred <- mixis_n_eff(log_lik, alpha = alpha)
+str(mixis_pred)
+```
+
+The output contains
+
+* `r_eff`: the predicted relative effective sample size of the weights
+  shared by all folds, that is, of importance sampling from the posterior
+  to the mixture;
+* `n_eff_u`: the predicted effective sample size of these weights for
+  `ndraws` mixture draws (by default the number of rows of `log_lik`);
+* `pareto_k`: a Pareto $k$ diagnostic of the prediction. Above 0.7 the
+  prediction is not reliable;
+* `ratio`: `r_eff` of `alpha` divided by `r_eff` of plain MixIS. A ratio
+  near 1 means that balancing gives little gain. Balancing is the
+  recommended default; the ratio only helps to save computation when the
+  draws are expensive.
+
+Here `pareto_k` is `r round(mixis_pred$pareto_k, 2)`, so the predicted
+effective sample size is not reliable. We fit the mixture anyway and
+compare the prediction with the realized effective sample size below.
+
+## Diagnostics: `mixis_diags()`
+
+We now fit the mixture with the balanced weights:
+
+```{r fit-mixis}
+standata_mixis <- standata
+standata_mixis$mixis <- 1
+standata_mixis$mixis_alpha <- alpha
+log_lik_mixis <- fit_log_lik(standata_mixis)
+```
+
+The mixture can be multimodal, so MCMC can fail on it even when the
+full-data posterior is easy to sample. Check the usual MCMC convergence
+diagnostics of the mixture fit first.
+
+`mixis_diags()` takes the log-likelihood at the mixture draws. Pass the
+same `alpha` that was used to fit the mixture:
+
+```{r mixis-diags}
+mixis_fit <- mixis_diags(log_lik_mixis, alpha = alpha, chain_id = chain_id)
+mixis_fit
+```
+
+The `diagnostics` element has the Pareto $k$ diagnostic (`pareto_k_u`)
+and the effective sample size (`n_eff_u`) of the weights shared by all
+folds. A `pareto_k_u` above 0.7 means that the estimate is not reliable. A
+very small `n_eff_u`, for example below 10 with four chains, means that
+the chains stay in different modes of the mixture. Compare `n_eff_u` with
+the prediction of `mixis_n_eff()`. The weights of each fold are bounded
+between 0 and 1, so the column `pareto_k_v` is of less concern:
+
+```{r mixis-diagnostics}
+mixis_fit$diagnostics
+```
+
+The realized `n_eff_u` is `r round(mixis_fit$diagnostics$n_eff_u)`; the
+prediction of `mixis_n_eff()` was `r round(mixis_pred$n_eff_u)`.
+
+
+# Brute-force LOO: `brute_force_diags()`
+
+When importance sampling fails for a fold, we can refit the model without
+that fold. The estimate is then a plain mean over the draws
+$\theta_{-i}^s \sim p(\theta \mid y_{-i})$ of the refit:
+
+$$
+\widehat{\mathrm{elpd}}_i = \log \frac{1}{S} \sum_s p(y_i \mid \theta_{-i}^s) .
+$$
+
+This estimate still has an MC error. For an outlier, the refit draws rarely
+reach the region where $p(y_i \mid \theta)$ is large.
+
+We refit the model for the five folds with the highest Pareto $k$ values.
+Column $j$ of `log_lik_fold` is the log-likelihood of fold `folds[j]` at the
+draws of the refit without that fold:
+
+```{r refits}
+folds <- order(pw$pareto_k, decreasing = TRUE)[1:5]
+log_lik_fold <- sapply(folds, function(i) {
+  standata_i <- standata
+  standata_i$w[i] <- 0
+  fit_log_lik(standata_i)[, i]
+})
+```
+
+`brute_force_diags()` takes this matrix. The optional `log_lik_full` gives
+the log-likelihood of the same folds at the full-data draws. Its largest
+value bounds the tail of the MCSE estimate:
+
+```{r brute-force}
+bf_fit <- brute_force_diags(log_lik_fold, log_lik_full = log_lik[, folds],
+                            chain_id = chain_id)
+bf_fit
+```
+
+The refits have independent draws, so the MCSE of the total is the root sum
+of squares of the MCSEs of the folds. Row $j$ of the result is fold
+`folds[j]`:
+
+```{r brute-force-folds}
+cbind(fold = folds, as.data.frame(bf_fit))
+```
+
+
+# CV bridge: `cv_bridge_diags()`
+
+Brute-force LOO uses only the refit draws. The CV bridge uses both the
+refit draws and the draws of the full-data fit. It writes the LOO
+predictive density as a ratio of two normalizing constants,
+
+$$
+p(y_i \mid y_{-i}) = \frac{p(y)}{p(y_{-i})},
+$$
+
+and estimates the ratio with bridge sampling (Meng and Wong, 1996). The
+terms of the bridge estimator are bounded, so the estimate has a smaller MC
+error than brute-force LOO when the two posteriors overlap.
+
+Bridge sampling needs the two posteriors to have the same parameters.
+Therefore, refit the model with the likelihood weight of the fold set to 0,
+as `w[i] = 0` does above, and do not remove the fold from the data. In a
+hierarchical model this keeps the parameters of a left-out group.
+
+`cv_bridge_diags()` takes the same two matrices as `brute_force_diags()`,
+but `log_lik_full` is required:
+
+```{r bridge}
+bridge_fit <- cv_bridge_diags(log_lik_fold, log_lik_full = log_lik[, folds],
+                              chain_id = chain_id)
+bridge_fit
+cbind(fold = folds, as.data.frame(bridge_fit))
+```
+
+The `pointwise` data frame has two more columns:
+
+* `gap`: the distance, in nats, between the median log-likelihood of the
+  fold at the refit draws and at the full-data draws. A large gap means
+  that the two posteriors do not overlap. Above about 50 nats the estimate
+  can be biased. A fold with a gap above 500 gets `NA`;
+* `converged`: whether the iterative bridge estimate converged.
+
+The CV bridge has no detectable finite-sample bias, so `bias_elpd` is 0.
+The `mcse_elpd` of a fold is well calibrated up to about 0.3.
+
+If the two fits have different chains, give the chains of the full-data
+draws in `chain_id_full`.
+
+
+# The `cv_diags` object
+
+All four functions return an object of class `"cv_diags"` with the same
+structure:
+
+```{r cv-diags-str}
+str(unclass(bf_fit), max.level = 1)
+```
+
+| Element | Content |
+|---|---|
+| `pointwise` | one row per fold: `elpd`, `mcse_elpd`, `bias_elpd`, and method-specific columns |
+| `mc_error` | `mcse_total`, `bias_total`, `rmse_pred` and `interval` of the total |
+| `diagnostics` | a method-specific list |
+| `method` | `"psis"`, `"mixis"`, `"brute_force"` or `"cv_bridge"` |
+| `dims` | the number of draws and the number of folds |
+
+The `mc_error` element summarizes the MC error of the total
+$\widehat{\mathrm{elpd}} = \sum_i \widehat{\mathrm{elpd}}_i$:
+
+* `mcse_total`: the MCSE of the total;
+* `bias_total`: the predicted Jensen bias of the total, the sum of
+  `bias_elpd`. The bias is a diagnostic only; the functions do not correct
+  the estimate;
+* `rmse_pred`: the predicted root mean squared error,
+  $\sqrt{\mathrm{bias}^2 + \mathrm{mcse}^2}$;
+* `interval`: an approximate 95% interval for the exact elpd, given as
+  offsets from the estimate.
+
+```{r mc-error}
+psis_fit$mc_error
+```
+
+`print()` shows the totals and the first `n` folds. `as.data.frame()`
+returns the `pointwise` data frame:
+
+```{r print}
+print(mixis_fit, digits = 2, n = 3)
+```
+
+Finally, we compare the totals of PSIS-LOO and MixIS:
+
+```{r compare}
+fits <- list(psis = psis_fit, mixis = mixis_fit)
+t(sapply(fits, function(x) {
+  c(elpd = sum(x$pointwise$elpd), unlist(x$mc_error[c("mcse_total", "rmse_pred")]))
+}))
+```
+
+
+# References
+
+Meng, X.-L., and Wong, W. H. (1996). Simulating ratios of normalizing
+constants via a simple identity: a theoretical exploration. *Statistica
+Sinica*, 6(4), 831--860.
+
+Silva, L. A., and Zanella, G. (2024). Robust leave-one-out
+cross-validation for high-dimensional Bayesian models. *Journal of the
+American Statistical Association*, 119(547), 2369--2381.
+\doi:10.1080/01621459.2023.2257893.
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. _Statistics and
+Computing_. 27(5), 1413--1432. \doi:10.1007/s11222-016-9696-4.
+
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024).
+Pareto smoothed importance sampling. *Journal of Machine Learning Research*,
+25(72):1-58.
