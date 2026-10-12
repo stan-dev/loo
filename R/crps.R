@@ -94,7 +94,7 @@ crps.matrix <- function(x, x2, y, ..., permutations = 1) {
 crps.numeric <- function(x, x2, y, ..., permutations = 1) {
   stopifnot(length(x) == length(x2),
             length(y) == 1)
-  crps.matrix(as.matrix(x), as.matrix(x2), y, permutations)
+  crps.matrix(as.matrix(x), as.matrix(x2), y, permutations = permutations)
 }
 
 
@@ -140,7 +140,7 @@ scrps.matrix <- function(x, x2, y, ..., permutations = 1) {
 scrps.numeric <- function(x, x2, y, ..., permutations = 1) {
   stopifnot(length(x) == length(x2),
             length(y) == 1)
-  scrps.matrix(as.matrix(x), as.matrix(x2), y, permutations)
+  scrps.matrix(as.matrix(x), as.matrix(x2), y, permutations = permutations)
 }
 
 

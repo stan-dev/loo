@@ -140,7 +140,7 @@ print(loo_1)
 ```
 
 ```
-Computed from 4000 by 3020 log-likelihood matrix
+Computed from 4000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1968.5 15.6
@@ -182,7 +182,7 @@ print(loo_2)
 ```
 
 ```
-Computed from 4000 by 3020 log-likelihood matrix
+Computed from 4000 posterior draws and 3020 log-likelihood terms
 
          Estimate   SE
 elpd_loo  -1952.3 16.2

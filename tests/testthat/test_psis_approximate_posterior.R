@@ -308,6 +308,29 @@ test_that("ADVI meanfield approximation, normal model", {
 })
 
 
+test_that("approximate posterior methods reject undefined log density ratios", {
+  log_p <- c(-Inf, rep(0, 9))
+  log_g <- c(-Inf, rep(0, 9))
+  error <- "The log density ratio is undefined for one or more draws."
+
+  expect_error(
+    psis_approximate_posterior(
+      log_p = log_p,
+      log_g = log_g,
+      cores = 1,
+      save_psis = FALSE
+    ),
+    error,
+    fixed = TRUE
+  )
+  expect_error(
+    ap_psis(matrix(seq(-9, 0, length.out = 10), ncol = 1), log_p, log_g),
+    error,
+    fixed = TRUE
+  )
+})
+
+
 test_that("Deprecation of log_q argument", {
   log_p <- test_data_psis_approximate_posterior$laplace_independent$log_p
   log_g <- test_data_psis_approximate_posterior$laplace_independent$log_q

@@ -5,7 +5,7 @@
     Message
       Replacing NAs in `r_eff` with 1s
     Output
-      Computed from 1000 by 32 log-weights matrix.
+      Computed from 1000 posterior draws and 32 log-weight terms.
       MCSE and ESS estimates assume MCMC draws (r_eff in [0.6, 1.0]).
       
       All Pareto k estimates are good (k < 0.67).
@@ -17,7 +17,7 @@
       print(loo_tis)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix using tis_loo .
+      Computed from 1000 posterior draws and 32 log-likelihood terms using tis_loo .
       
                Estimate  SE
       elpd_loo    -83.6 4.3
@@ -31,7 +31,7 @@
       print(loo_sis)
     Output
       
-      Computed from 1000 by 32 log-likelihood matrix using sis_loo .
+      Computed from 1000 posterior draws and 32 log-likelihood terms using sis_loo .
       
                Estimate  SE
       elpd_loo    -83.6 4.3
