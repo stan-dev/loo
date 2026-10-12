@@ -10,7 +10,7 @@ output:
     toc: true
     toc_depth: 3
 params:
-  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+  EVAL: true
 vignette: >
   %\VignetteIndexEntry{Predictive model performance: Predictive schemes with `pred_measure()`}
   %\VignetteEngine{knitr::rmarkdown}
