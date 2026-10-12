@@ -279,7 +279,7 @@ stacking_weights <-
         sweep(lpd_point, 2, log(w_full), "+")
       )
       -colSums(exp_diff_over_exp(
-        lpd_point[, 1:(K - 1), drop = FALSE],
+        lpd_point[, seq_len(K - 1), drop = FALSE],
         matrix(lpd_point[, K], N, K - 1),
         matrix(mixture_lpd, N, K - 1)
       ))
