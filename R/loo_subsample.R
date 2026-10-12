@@ -542,7 +542,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
   if (loo_approximation == "waic") {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    waic_full_obj <- waic.function(.llfun, data = data, draws = draws)
+    waic_full_obj <- waic.function(.llfun, data = data, draws = draws, cores = cores)
     return(waic_full_obj$pointwise[,"elpd_waic"])
   }
 
