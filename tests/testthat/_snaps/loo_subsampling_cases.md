@@ -4,8 +4,8 @@
       print(looss_1)
     Output
       
-      Computed from 4000 by 100 subsampled log-likelihood
-      values from 3020 total observations.
+      Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+      terms, and 2) slower, more accurate computation with 100 subsampled terms.
       
                Estimate   SE subsampling SE
       elpd_loo  -1968.5 15.6            0.3
@@ -24,8 +24,8 @@
       print(looss_1b)
     Output
       
-      Computed from 4000 by 200 subsampled log-likelihood
-      values from 3020 total observations.
+      Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+      terms, and 2) slower, more accurate computation with 200 subsampled terms.
       
                Estimate   SE subsampling SE
       elpd_loo  -1968.3 15.6            0.2
@@ -44,7 +44,7 @@
       print(aploo_1)
     Output
       
-      Computed from 2000 by 3020 log-likelihood matrix.
+      Computed from 2000 posterior draws and 3020 log-likelihood terms.
       
                Estimate   SE
       elpd_loo  -1968.4 15.6
@@ -64,8 +64,8 @@
       print(looapss_1)
     Output
       
-      Computed from 2000 by 100 subsampled log-likelihood
-      values from 3020 total observations.
+      Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+      terms, and 2) slower, more accurate computation with 100 subsampled terms.
       
                Estimate   SE subsampling SE
       elpd_loo  -1968.2 15.6            0.4
@@ -85,8 +85,8 @@
       print(looss_2)
     Output
       
-      Computed from 4000 by 100 subsampled log-likelihood
-      values from 3020 total observations.
+      Subsampling loo uses 1) faster, more biased computation with 3020 log-lik.
+      terms, and 2) slower, more accurate computation with 100 subsampled terms.
       
                Estimate   SE subsampling SE
       elpd_loo  -1952.0 16.2            0.2
@@ -105,8 +105,8 @@
       print(comp)
     Output
              elpd_diff se_diff subsampling_se_diff
-      model2  0.0       0.0     0.0               
-      model1 16.5      22.5     0.4               
+      model2   0.0       0.0     0.0              
+      model1 -16.5      22.5     0.4              
 
 ---
 
@@ -114,8 +114,8 @@
       print(comp)
     Output
              elpd_diff se_diff subsampling_se_diff
-      model2  0.0       0.0     0.0               
-      model1 16.1       4.4     0.1               
+      model2   0.0       0.0     0.0              
+      model1 -16.1       4.4     0.1              
 
 ---
 
@@ -123,8 +123,8 @@
       print(comp2)
     Output
              elpd_diff se_diff subsampling_se_diff
-      model2  0.0       0.0     0.0               
-      model1 16.3       4.4     0.1               
+      model2   0.0       0.0     0.0              
+      model1 -16.3       4.4     0.1              
 
 ---
 
@@ -132,6 +132,6 @@
       print(comp3)
     Output
              elpd_diff se_diff subsampling_se_diff
-      model2  0.0       0.0     0.0               
-      model1 16.5       4.4     0.3               
+      model2   0.0       0.0     0.0              
+      model1 -16.5       4.4     0.3              
 

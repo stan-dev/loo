@@ -628,6 +628,13 @@ test_that("whhest works as expected", {
 })
 
 
+test_that("difference_of_squares is stable for nearby large values", {
+  x <- 1e8 + 1.4901161193847656e-8
+
+  expect_equal(difference_of_squares(x, 1e8), 2.9802322387695312)
+})
+
+
 test_that("srs_diff_est works as expected", {
   set.seed(1234)
   N <- 1000

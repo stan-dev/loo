@@ -1185,7 +1185,7 @@ srs_diff_est <- function(y_approx, y, y_idx) {
   t_pi_tilde <- sum(y_approx)
   t_pi2_tilde <- sum(y_approx^2)
   t_e <- N * mean(e_i)
-  t_hat_epsilon <- N * mean(y^2 - y_approx_m^2)
+  t_hat_epsilon <- N * mean(difference_of_squares(y, y_approx_m))
 
   est_list <- list(m = length(y), N = N)
   # eq (7)

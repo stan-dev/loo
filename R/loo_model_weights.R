@@ -257,6 +257,10 @@ stacking_weights <-
     if (K < 2) {
       stop("At least two models are required for stacking weights.")
     }
+    validate_lpd_point(lpd_point)
+    if (any(rowSums(is.finite(lpd_point)) == 0)) {
+      stop("Each observation must have a finite predictive density for at least one model.")
+    }
 
     negative_log_score_loo <- function(w) {
       # objective function: log score
@@ -272,11 +276,15 @@ stacking_weights <-
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
       grad <- rep(0, K - 1)
-      # avoid over- and underflows using log weights, rowLogSumExps,
-      # and by subtracting the row maximum of lpd_point
-      mlpd <- matrixStats::rowMaxs(lpd_point)
+      mixture_lpd <- matrixStats::rowLogSumExps(
+        sweep(lpd_point, 2, log(w_full), "+")
+      )
       for (k in 1:(K - 1)) {
-        grad[k] <- sum((exp(lpd_point[, k] - mlpd) - exp(lpd_point[, K] - mlpd)) / exp(matrixStats::rowLogSumExps(sweep(lpd_point, 2, log(w_full), '+')) - mlpd))
+        grad[k] <- sum(exp_diff_over_exp(
+          lpd_point[, k],
+          lpd_point[, K],
+          mixture_lpd
+        ))
       }
       return(-grad)
     }
@@ -317,9 +325,13 @@ pseudobma_weights <-
     if (K < 2) {
       stop("At least two models are required for pseudo-BMA weights.")
     }
+    validate_lpd_point(lpd_point)
+    elpd <- colSums2(lpd_point)
+    if (!any(is.finite(elpd))) {
+      stop("At least one model must have a finite total predictive density.")
+    }
 
     if (!BB) {
-      elpd <- colSums2(lpd_point)
       uwts <- exp(elpd - max(elpd))
       wts <- structure(
         uwts / sum(uwts),
@@ -345,15 +357,6 @@ pseudobma_weights <-
   }
 
 
-#' Generate dirichlet simulations, rewritten version
-#' @importFrom stats rgamma
-#' @noRd
-dirichlet_rng <- function(n, alpha) {
-  K <- length(alpha)
-  gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
-  gamma_sim / rowSums(gamma_sim)
-}
-
 #' @export
 print.stacking_weights <- function(x, digits = 3, ...) {
   cat("Method: stacking\n------\n")
@@ -370,6 +373,27 @@ print.pseudobma_weights <- function(x, digits = 3, ...) {
 print.pseudobma_bb_weights <- function(x, digits = 3, ...) {
   cat("Method: pseudo-BMA+ with Bayesian bootstrap\n------\n")
   print_weight_vector(x, digits = digits)
+}
+
+
+
+# internal ----------------------------------------------------------------
+# `-Inf` is a valid zero predictive density; `NA`, `NaN` and `+Inf` make
+# stacking fail in the optimizer and pseudo-BMA return invalid weights.
+validate_lpd_point <- function(lpd_point) {
+  if (anyNA(lpd_point) || any(lpd_point == Inf)) {
+    stop("All values in 'lpd_point' must be finite or -Inf.")
+  }
+  invisible(lpd_point)
+}
+
+#' Generate dirichlet simulations, rewritten version
+#' @importFrom stats rgamma
+#' @noRd
+dirichlet_rng <- function(n, alpha) {
+  K <- length(alpha)
+  gamma_sim <- matrix(rgamma(K * n, alpha), ncol = K, byrow = TRUE)
+  gamma_sim / rowSums(gamma_sim)
 }
 
 print_weight_vector <- function(x, digits) {

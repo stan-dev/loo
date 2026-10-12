@@ -64,6 +64,14 @@ waic <- function(x, ...) {
   UseMethod("waic")
 }
 
+validate_waic_log_lik <- function(x) {
+  validate_ll(x)
+  if (any(x == -Inf)) {
+    stop("All log-likelihood values must be finite for WAIC.")
+  }
+  invisible(x)
+}
+
 #' @export
 #' @templateVar fn waic
 #' @template array
@@ -77,7 +85,7 @@ waic.array <- function(x, ...) {
 #' @template matrix
 #'
 waic.matrix <- function(x, ...) {
-  ll <- validate_ll(x)
+  ll <- validate_waic_log_lik(x)
   lldim <- dim(ll)
   lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
   p_waic <- matrixStats::colVars(ll)
@@ -156,7 +164,7 @@ waic.function <-
 
 .waic_i <- function(i, llfun, data, draws, ...) {
   ll_i <- llfun(data_i = data[i,, drop=FALSE], draws = draws, ...)
-  ll_i <- as.vector(ll_i)
+  ll_i <- validate_waic_log_lik(as.vector(ll_i))
   lpd_i <- logMeanExp(ll_i)
   p_waic_i <- var(ll_i)
   elpd_waic_i <- lpd_i - p_waic_i

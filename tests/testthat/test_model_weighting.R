@@ -20,6 +20,41 @@ loo_list <- lapply(1:length(ll_list), function(j) {
 
 tol <- 0.01 # absolute tolerance of weights
 
+test_that("stacking gradient is stable for similar model predictions", {
+  a <- -30 + 1e-14
+  b <- -30
+
+  expect_equal(exp_diff_over_exp(a, b, b), 1.065814103640156e-14)
+  expect_equal(exp_diff_over_exp(b, a, b), -1.065814103640156e-14)
+  expect_equal(
+    exp_diff_over_exp(c(-Inf, 0, Inf), c(-Inf, 0, Inf), c(0, 0, 0)),
+    c(0, 0, 0)
+  )
+})
+
+test_that("exp_diff_over_exp propagates missing values", {
+  expect_equal(exp_diff_over_exp(NaN, 0, 0), NaN)
+  expect_equal(exp_diff_over_exp(0, NaN, 0), NaN)
+  expect_equal(exp_diff_over_exp(0, -1, NaN), NaN)
+  expect_equal(exp_diff_over_exp(NA_real_, 0, 0), NA_real_)
+  # equal numerators short-circuit to an exact zero, whatever the denominator
+  expect_equal(exp_diff_over_exp(0, 0, NaN), 0)
+  expect_equal(
+    exp_diff_over_exp(c(NaN, 0), c(0, -1), c(0, 0)),
+    c(NaN, exp_diff_over_exp(0, -1, 0))
+  )
+})
+
+test_that("stacking handles equal infinite log predictive densities", {
+  lpd <- matrix(
+    c(-Inf, 0, -Inf, -1, -1, -1),
+    nrow = 2,
+    byrow = TRUE
+  )
+
+  expect_equal(as.numeric(stacking_weights(lpd)), c(0, 1, 0), tolerance = 1e-6)
+})
+
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(
     loo_model_weights(log_lik1),
@@ -109,6 +144,59 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
 
   w3_b <- loo_model_weights(loo_list, method = "pseudobma", BB = FALSE)
   expect_identical(w3, w3_b)
+})
+
+test_that("pseudo-BMA gives zero weight to an impossible model", {
+  lpd <- cbind(rep(-Inf, 3), c(-2, -1, 0))
+
+  expect_equal(as.numeric(pseudobma_weights(lpd, BB = FALSE)), c(0, 1))
+})
+
+lpd_bad_values <- list(`NA` = NA_real_, `NaN` = NaN, `Inf` = Inf)
+
+# One test_that() per value, so a failure names which one broke
+for (lpd_bad_name in names(lpd_bad_values)) {
+  test_that(paste("model weighting rejects", lpd_bad_name, "predictive densities"), {
+    bad <- lpd_bad_values[[lpd_bad_name]]
+    set.seed(1)
+    lpd <- cbind(rnorm(20, -2), rnorm(20, -2.2))
+    error <- "All values in 'lpd_point' must be finite or -Inf."
+
+    single <- lpd
+    single[3, 2] <- bad
+    expect_error(stacking_weights(single), error, fixed = TRUE)
+    expect_error(pseudobma_weights(single, BB = FALSE), error, fixed = TRUE)
+    expect_error(pseudobma_weights(single, BB = TRUE), error, fixed = TRUE)
+
+    whole_column <- lpd
+    whole_column[, 2] <- bad
+    expect_error(stacking_weights(whole_column), error, fixed = TRUE)
+    expect_error(pseudobma_weights(whole_column, BB = FALSE), error, fixed = TRUE)
+  })
+}
+
+test_that("model weighting still accepts -Inf predictive densities", {
+  set.seed(1)
+  lpd <- cbind(rnorm(20, -2), rnorm(20, -2.2))
+  lpd[3, 2] <- -Inf
+
+  expect_no_error(stacking_weights(lpd))
+  expect_no_error(pseudobma_weights(lpd, BB = FALSE))
+  expect_no_error(pseudobma_weights(lpd, BB = TRUE))
+})
+
+test_that("model weighting rejects inputs with no finite predictive density", {
+  stacking_lpd <- rbind(c(-Inf, -Inf), c(-1, -1))
+  expect_error(
+    stacking_weights(stacking_lpd),
+    "Each observation must have a finite predictive density for at least one model.",
+    fixed = TRUE
+  )
+
+  pseudobma_lpd <- matrix(-Inf, nrow = 2, ncol = 2)
+  error <- "At least one model must have a finite total predictive density."
+  expect_error(pseudobma_weights(pseudobma_lpd, BB = FALSE), error, fixed = TRUE)
+  expect_error(pseudobma_weights(pseudobma_lpd, BB = TRUE), error, fixed = TRUE)
 })
 
 test_that("stacking_weights and pseudobma_weights throw correct errors", {
