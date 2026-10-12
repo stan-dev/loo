@@ -13,9 +13,15 @@
 #' @param total_shift A vector representing the total shift made by the moment
 #'   matching algorithm.
 #' @param total_scaling A vector representing the total scaling of marginal
-#'   variance made by the moment matching algorithm.
-#' @param total_mapping A vector representing the total covariance
-#'   transformation made by the moment matching algorithm.
+#'   variance made by the moment matching algorithm. With `cov = TRUE`,
+#'   [loo_moment_match()] includes the scaling in `total_mapping` instead, and
+#'   this vector is all ones.
+#' @param total_mapping A square matrix representing the total linear
+#'   transformation made by the moment matching algorithm: the product of the
+#'   linear parts of the accepted steps, in the order in which they were
+#'   accepted. Used only when `cov = TRUE`. The transformation is
+#'   `T(theta) = total_mapping %*% diag(total_scaling) %*% (theta - m) + m +
+#'   total_shift`, where `m` is the mean of `upars`.
 #' @param i Observation index.
 #' @param log_prob_upars A function that takes arguments `x` and `upars` and
 #'   returns a matrix of log-posterior density values of the unconstrained
@@ -85,9 +91,14 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
   log_liki_half <- log_lik_i_upars(x, upars = upars_trans_half, i = i, ...)
 
   # compute weights
-  log_prob_half_trans_inv <- (log_prob_half_trans_inv -
-                              log(prod(total_scaling)) -
-                              log(det(total_mapping)))
+  # log of the absolute Jacobian determinant of T; the mapping is part of T
+  # only when cov = TRUE
+  log_det_jacobian <- sum(log(total_scaling))
+  if (cov) {
+    log_det_jacobian <- log_det_jacobian +
+      as.numeric(determinant(total_mapping, logarithm = TRUE)$modulus)
+  }
+  log_prob_half_trans_inv <- log_prob_half_trans_inv - log_det_jacobian
   stable_S <- log_prob_half_trans > log_prob_half_trans_inv
 
   lwi_half <- -log_liki_half + log_prob_half_trans
@@ -125,7 +136,7 @@ loo_moment_match_split <- function(x, upars, cov, total_shift, total_scaling,
   # currently ignores chain information
   # since we have two proposal distributions
   # compute S_eff separately from both and take the smaller
-  take <- seq_len(S)[-seq_len(S_half)]
+  take <- seq_len(S_half)
   log_liki_half_1 <- log_liki_half[take, drop = FALSE]
   dim(log_liki_half_1) <- c(length(take), 1, 1)
   take <- seq_len(S)[-seq_len(S_half)]

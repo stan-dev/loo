@@ -502,13 +502,15 @@ test_that("loo_moment_match_split works", {
 
   expect_equal(lwi_1_ps, split$lwi)
 
+  # with cov = TRUE, loo_moment_match() includes the scaling in the mapping
+  # and leaves total_scaling at one
   split2 <- loo_moment_match_split(
     x,
     upars,
-    cov = FALSE,
+    cov = TRUE,
     total_shift = c(-0.1, -0.2),
-    total_scaling = c(0.7, 0.7),
-    total_mapping = matrix(c(1, 0.1, 0.1, 1), 2, 2),
+    total_scaling = c(1, 1),
+    total_mapping = 0.7 * matrix(c(1, 0.1, 0.1, 1), 2, 2),
     i = 1,
     log_prob_upars = log_prob_upars_test,
     log_lik_i_upars = log_lik_i_upars_test,
@@ -570,6 +572,12 @@ test_that("loo_moment_match_split evaluates the inverse of its transformation", 
       r_eff_i = 1,
       is_method = "psis"
     )
+    expect_length(seen, 2)
+    first <- seq_len(as.integer(0.5 * S))
+    # first call: second half untransformed; second call: first half
+    # untransformed
+    expect_equal(seen[[1]][second, , drop = FALSE], upars[second, , drop = FALSE])
+    expect_equal(seen[[2]][first, , drop = FALSE], upars[first, , drop = FALSE])
     # the second call evaluates the inverse-transformed draws
     inv <- seen[[2]][second, , drop = FALSE]
     fwd <- sweep(inv, 2, m, "-")
@@ -579,6 +587,56 @@ test_that("loo_moment_match_split evaluates the inverse of its transformation", 
     }
     fwd <- sweep(fwd, 2, shift + m, "+")
     expect_equal(unname(fwd), unname(upars[second, , drop = FALSE]))
+  }
+})
+
+test_that("the total transformation composes the accepted steps in order", {
+  # The moment matching loop starts again with the shift step after every
+  # accepted step, so a scaling step can follow a covariance step. The
+  # transformation that loo_moment_match_split() rebuilds from the totals
+  # must map the original draws to the draws that the steps produced one
+  # after another.
+  first <- seq_len(as.integer(0.5 * S))
+  sequences <- list(
+    list(cov = TRUE, steps = c("cov", "scale", "shift", "cov", "scale")),
+    list(cov = FALSE, steps = c("scale", "shift", "scale"))
+  )
+  for (sq in sequences) {
+    total <- list(shift = c(0, 0), scaling = c(1, 1), mapping = diag(2))
+    u <- upars
+    for (step in sq$steps) {
+      trans <- switch(step,
+        shift = shift(x, u, lwi_1),
+        scale = shift_and_scale(x, u, lwi_1),
+        cov = shift_and_cov(x, u, lwi_1)
+      )
+      u <- trans$upars
+      total <- add_step_to_total(total, trans, sq$cov)
+    }
+    seen <- list()
+    log_prob_record <- function(x, upars, ...) {
+      seen[[length(seen) + 1]] <<- upars
+      log_prob_upars_test(x, upars, ...)
+    }
+    loo_moment_match_split(
+      x,
+      upars,
+      cov = sq$cov,
+      total_shift = total$shift,
+      total_scaling = total$scaling,
+      total_mapping = total$mapping,
+      i = 1,
+      log_prob_upars = log_prob_record,
+      log_lik_i_upars = log_lik_i_upars_test,
+      cores = 1,
+      r_eff_i = 1,
+      is_method = "psis"
+    )
+    # the first call evaluates T(theta) for the first half of the draws
+    expect_equal(
+      unname(seen[[1]][first, , drop = FALSE]),
+      unname(u[first, , drop = FALSE])
+    )
   }
 })
 
