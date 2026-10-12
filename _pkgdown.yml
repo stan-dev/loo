@@ -26,6 +26,7 @@ articles:
       - loo2-large-data
       - loo2-moment-matching
       - loo2-mixis
+      - articles-online-only/loo2-cv-diags
   - title: Frequently asked questions
     contents:
       - faq
@@ -74,6 +75,16 @@ reference:
       - kfold_split_grouped
       - kfold
       - elpd
+  - title: Monte Carlo diagnostics of CV
+    desc: |
+      Monte Carlo error, bias and tail diagnostics of the elpd estimate of each CV method.
+    contents:
+      - psis_diags
+      - mixis_diags
+      - brute_force_diags
+      - cv_bridge_diags
+      - mixis_alpha
+      - mixis_n_eff
   - title: Other functions
     contents:
       - loo_predictive_metric

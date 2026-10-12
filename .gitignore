@@ -27,3 +27,6 @@ cran-comments.md
 CRAN-RELEASE
 release-prep.R
 CRAN-SUBMISSION
+
+vignettes/articles-online-only/*.html
+!vignettes/articles-online-only/loo2-cv-diags.html

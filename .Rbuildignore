@@ -19,6 +19,7 @@ vignettes/loo2-non-factorized_cache/*
 .vscode/*
 ^\.github$
 ^vignettes/online-only$
+^vignettes/articles-online-only$
 
 ^CRAN-SUBMISSION$
 ^release-prep\.R$
