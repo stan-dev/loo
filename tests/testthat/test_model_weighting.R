@@ -147,26 +147,12 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
 })
 
 test_that("Bayesian bootstrap gives expected result", {
-  lpd_point <- matrix(
-    c(
-      -0.2,
-      -0.8,
-      -1.1,
-      -1.4,
-      -0.3,
-      -0.5,
-      -0.6,
-      -0.7,
-      -0.1,
-      -1.0,
-      -1.2,
-      -0.4,
-      -0.9,
-      -0.5,
-      -0.8
-    ),
-    ncol = 3,
-    byrow = TRUE
+  lpd_point <- rbind(
+    c(-0.2, -0.8, -1.1),
+    c(-1.4, -0.3, -0.5),
+    c(-0.6, -0.7, -0.1),
+    c(-1.0, -1.2, -0.4),
+    c(-0.9, -0.5, -0.8)
   )
   BB_n <- 25
   alpha <- 0.7
@@ -181,6 +167,17 @@ test_that("Bayesian bootstrap gives expected result", {
     unname(as.numeric(weights)),
     style = "deparse"
   )
+
+  # Compare to a reference loop over the same Bayesian bootstrap draws
+  set.seed(0)
+  BB_weighting <- dirichlet_rng(BB_n, rep(alpha, nrow(lpd_point)))
+  expected <- matrix(NA, BB_n, ncol(lpd_point))
+  for (bb in 1:BB_n) {
+    z_bb <- BB_weighting[bb, ] %*% lpd_point * nrow(lpd_point)
+    uwts <- exp(z_bb - max(z_bb))
+    expected[bb, ] <- uwts / sum(uwts)
+  }
+  expect_equal(as.numeric(weights), colMeans(expected))
 })
 
 test_that("pseudo-BMA gives zero weight to an impossible model", {

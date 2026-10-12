@@ -301,13 +301,11 @@ stacking_weights <-
       control = optim_control
     )$par
 
-    wts <- structure(
+    structure(
       c(w, 1 - sum(w)),
       names = paste0("model", 1:K),
       class = c("stacking_weights")
     )
-
-    return(wts)
   }
 
 
@@ -343,13 +341,14 @@ pseudobma_weights <-
 
     BB_weighting <- dirichlet_rng(BB_n, rep(alpha, N))
     z <- BB_weighting %*% lpd_point * N
-    uwts <- exp(z - matrixStats::rowMaxs(z))
+    uwts <- exp(z - rowMaxs(z))
     structure(
       colMeans(uwts / rowSums(uwts)),
       names = paste0("model", 1:K),
       class = "pseudobma_bb_weights"
     )
   }
+
 
 #' @export
 print.stacking_weights <- function(x, digits = 3, ...) {
