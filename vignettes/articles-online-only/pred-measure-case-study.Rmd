@@ -1,0 +1,802 @@
+---
+title: "Model comparison case study: Uncertainty, scores, and predictive schemes"
+author: "Florence Bockting and Aki Vehtari"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    css:
+      - !expr system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown")
+      - styles.css
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: true
+vignette: >
+  %\VignetteIndexEntry{Model comparison case study: Uncertainty, scores, and predictive schemes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, child="../children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = TRUE,
+  warning = TRUE,
+  eval = params$EVAL,
+  fig.width = 7,
+  fig.height = 4,
+  fig.align = "center"
+)
+
+# brms::kfold() exports the fits to future.apply, which caps globals at 500 MiB
+options(future.globals.maxSize = 4 * 1024^3)
+```
+
+```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
+```
+
+## Introduction
+
+This case study is a version of the case study
+[Uncertainty in Bayesian LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html).
+It uses the same three examples and the same workflow. It replaces
+`loo_compare()` with the `pred_measure()` family and `model_compare()`.
+
+The `pred_measure()` family adds two choices to the workflow:
+
+1. **The predictive measure.** The log score (`elpd`) is the default. Other
+   scores answer other questions about the predictions.
+2. **The predictive scheme.** PSIS-LOO is the default. Other schemes predict
+   other kinds of new data.
+
+This case study shows when these choices change the conclusion of a
+comparison.
+
+::: {.callout .callout-note}
+**What this article does not cover**
+
++ **The arguments of the entry points.** See the
+  [Predictive model performance: Predictive schemes with `pred_measure()`](pred-measure-workflow.html)
+  article.
++ **The output columns of `model_compare()`.** See the
+  [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+  article.
++ **Measure definitions.** See the
+  [Predictive model performance: Overview of measures](overview-measures.html)
+  article.
+:::
+
+### Uncertainty in the difference
+
+`model_compare()` reports three quantities for `elpd`:
+
++ `elpd_diff`: the estimated difference in predictive performance.
++ `se_diff`: the standard error of that estimate.
++ `p_worse`: the probability that a model predicts worse than the reference
+  model. This probability uses a normal approximation of the error of
+  `elpd_diff`.
+
+For the other measures, `model_compare()` reports `<measure>_diff` and
+`<measure>_se_diff`.
+
+### When the normal approximation is not reliable
+
+Sivula et al. (2025) identify three scenarios in which `se_diff` and `p_worse`
+can be miscalibrated:
+
+| Scenario | Cause | Effect | Flag in `model_compare()` |
+| :--- | :--- | :--- | :--- |
+| 1. Similar predictions | the models predict almost the same | `se_diff` underestimated, `p_worse` overestimated | `diag_diff`: `|elpd_diff| < 4` |
+| 2. Misspecification with outliers | the model does not fit some observations | the estimator can be biased | none; use model checking |
+| 3. Small data | few observations | `se_diff` too small | `diag_diff`: `N < 100` |
+
+When both flags of `diag_diff` apply, `model_compare()` shows `N < 100` only.
+For small data, a conservative heuristic is to double `se_diff`.
+
+A second diagnostic, `diag_elpd`, flags models with high Pareto $\hat k$
+values. Then the PSIS-LOO estimate itself can be biased. `diag_elpd` is
+available for PSIS-LOO inputs only.
+
+::: {.callout .callout-warning}
+**The flags are for `elpd` only**
+
+Sivula et al. (2025) studied the uncertainty of `elpd_diff`. Thus
+`model_compare()` reports `p_worse` and `diag_diff` for `elpd` only. The other
+measures can also have a miscalibrated `<measure>_se_diff` in the three
+scenarios. Read their standard errors with the same caution.
+:::
+
+### Examples
+
+| Example | $n$ | Scenarios | Score topic | Scheme topic |
+| :--- | :---: | :--- | :--- | :--- |
+| [Primate milk](#milk) | 17 | 1, 3 | log score and point error | PSIS-LOO |
+| [Sleep study](#sleepstudy) | 144 | 2 | log score, `rps`, `srps` | PSIS-LOO, K-fold, grouped K-fold |
+| [Roaches](#roaches) | 262 | 1, 2 | scores for counts | PSIS-LOO, K-fold |
+
+In all examples, the true data-generating process is more complex than any of
+the models. This is the usual applied setting.
+
+```{r load-libraries, message=FALSE}
+library(loo)
+library(ggplot2)
+theme_set(theme_minimal())
+
+SEED <- 2030
+CHAINS <- 2
+ITER <- 400
+```
+
+Each fit uses `r CHAINS` chains with `r ITER / 2` draws after warmup, so
+$S = `r CHAINS * ITER / 2`$. For $S = `r CHAINS * ITER / 2`$, the Pareto
+$\hat k$ threshold is $\min(1 - 1/\log_{10} S,\, 0.7) =
+`r round(min(1 - 1 / log10(CHAINS * ITER / 2), 0.7), 2)`$.
+
+Two helper functions compute the measures of one fit under one scheme. They
+use the entry points of the
+[Predictive schemes](pred-measure-workflow.html) article:
+
+```{r helpers}
+loo_measure <- function(fit, measures) {
+  loo_pred_measure(
+    loo = brms::loo(fit, save_psis = TRUE),
+    y = as.vector(brms::get_y(fit)),
+    ypred = brms::posterior_predict(fit),
+    mupred = brms::posterior_epred(fit),
+    measures = measures
+  )
+}
+
+kfold_measure <- function(fit, folds, measures) {
+  kf <- brms::kfold(fit, folds = folds, save_fits = TRUE)
+  kfold_pred_measure(
+    y = as.vector(brms::get_y(fit)),
+    ypred = brms::kfold_predict(kf, method = "predict")$yrep,
+    mupred = brms::kfold_predict(kf, method = "fitted")$yrep,
+    kfold = kf,
+    measures = measures
+  )
+}
+```
+
+## Primate milk {#milk}
+
+McElreath (2020) describes the primate milk data. A hypothesis states that
+primates with larger brains produce more energetic milk. The data have 17
+primate species. The outcome is the energy content of milk (`kcal.per.g`). The
+predictors are the percent of the brain mass that is neocortex (`neocortex`)
+and the logarithm of the female body mass (`log(mass)`).
+
+```{r milk-data}
+data(milk, package = "rethinking")
+milk <- na.omit(milk)
+milk$neocortex <- milk$neocortex.perc / 100
+nrow(milk)
+```
+
+The four models are normal regressions with $\operatorname{normal}(0, 1)$
+priors on the coefficients:
+
+$$
+\begin{aligned}
+\mathrm{M}_1: &\quad \mathrm{kcal.per.g} \sim \operatorname{normal}(\alpha, \sigma) \\
+\mathrm{M}_2: &\quad \mathrm{kcal.per.g} \sim \operatorname{normal}(\alpha + \beta_1\,\mathrm{neocortex}, \sigma) \\
+\mathrm{M}_3: &\quad \mathrm{kcal.per.g} \sim \operatorname{normal}(\alpha + \beta_2\log(\mathrm{mass}), \sigma) \\
+\mathrm{M}_4: &\quad \mathrm{kcal.per.g} \sim \operatorname{normal}(\alpha + \beta_1\,\mathrm{neocortex} + \beta_2\log(\mathrm{mass}), \sigma)
+\end{aligned}
+$$
+
+```{r milk-fit, results="hide", message=FALSE, warning=FALSE}
+milk_1 <- brms::brm(kcal.per.g ~ 1, data = milk,
+                    chains = CHAINS, iter = ITER, seed = SEED, refresh = 0)
+milk_2 <- update(milk_1, formula. = ~ neocortex, newdata = milk,
+                 prior = brms::prior(normal(0, 1), class = "b"),
+                 seed = SEED, refresh = 0)
+milk_3 <- update(milk_1, formula. = ~ log(mass), newdata = milk,
+                 prior = brms::prior(normal(0, 1), class = "b"),
+                 seed = SEED, refresh = 0)
+milk_4 <- update(milk_1, formula. = ~ neocortex + log(mass), newdata = milk,
+                 prior = brms::prior(normal(0, 1), class = "b"),
+                 seed = SEED, refresh = 0)
+```
+
+**Model checking.** Before the comparison, check the calibration of the
+predictive distributions with LOO-PIT (Tesso and Vehtari, 2026). The
+LOO-PIT values of a calibrated model are close to uniform:
+
+```{r milk-pit, fig.height=3}
+brms::pp_check(milk_4, type = "loo_pit_ecdf")
+```
+
+<!-- TODO: check the LOO-PIT plots of milk_1 to milk_3 after the render -->
+
+**Measures.** The comparison uses four measures:
+
++ `elpd`: the log score of the whole predictive distribution.
++ `rps`: the continuous ranked probability score, in the units of the outcome.
++ `rmse`: the error of the point prediction.
++ `r2`: the predictive $R^2$, the share of the variance that the model
+  explains.
+
+```{r milk-measures, warning=FALSE}
+measures_milk <- c("elpd", "rps", "rmse", "r2")
+
+set.seed(SEED)
+comp_milk <- model_compare(list(
+  M_1 = loo_measure(milk_1, measures_milk),
+  M_2 = loo_measure(milk_2, measures_milk),
+  M_3 = loo_measure(milk_3, measures_milk),
+  M_4 = loo_measure(milk_4, measures_milk)
+))
+comp_milk
+```
+
+**Result.** The data have 17 observations. Thus `diag_diff` shows `N < 100`
+for all comparisons (Scenario 3). The differences are also small
+(Scenario 1). The flag `|elpd_diff| < 4` is not shown, because `N < 100`
+has priority.
+
+**Doubled standard error.** A conservative heuristic doubles `se_diff`. This
+does not correct the skewness of the error distribution. It shows how
+sensitive `p_worse` is:
+
+```{r milk-double-se}
+data.frame(
+  model = comp_milk$model,
+  p_worse = round(comp_milk$p_worse, 2),
+  p_worse_2se = round(
+    stats::pnorm(0, comp_milk$elpd_diff, 2 * comp_milk$se_diff), 2
+  )
+)
+```
+
+**Other measures.** Do the other measures rank the models in the same order?
+
+```{r milk-all}
+print(comp_milk, measures = "all")
+```
+
+<!-- TODO: check after the render that the ranking agrees across measures -->
+
+`print()` names one reference model for each measure. The reference model is
+the best model on that measure. Thus the reference can differ between
+measures. `rmse` and `r2` score only the predictive mean, `mupred`. They
+ignore the predictive uncertainty. `elpd` and `rps` score the whole predictive
+distribution.
+
+**Interpretation.** With 17 observations, the uncertainty in all differences is
+large. No measure can separate the models reliably. Collect more data if
+possible. The predictive distribution includes the noise of the data model.
+Thus a comparison of predictive performance often has more uncertainty than
+the posterior of the parameters (Wang and Gelman, 2015). For a small model, also
+look at the posterior of the quantities of interest:
+
+```{r milk-posterior}
+brms::fixef(milk_4)
+```
+
+`neocortex` and `log(mass)` are collinear. In $\mathrm{M}_4$, the two
+coefficients together carry the information. Each covariate alone carries
+little information. This explains why $\mathrm{M}_2$ and $\mathrm{M}_3$
+predict no better than the intercept-only model $\mathrm{M}_1$.
+
+## Sleep study {#sleepstudy}
+
+Belenky et al. (2003) studied chronic sleep restriction. The `sleepstudy` data
+(**lme4**) hold the average reaction time (ms) of 18 subjects. The subjects
+slept at most three hours each night. Days 0 and 1 were adaptation and
+training, so the case study keeps days 2 to 9. This gives 144 observations.
+
+```{r sleep-data}
+data("sleepstudy", package = "lme4")
+sleepstudy2 <- subset(sleepstudy, Days >= 2)
+nrow(sleepstudy2)
+```
+
+The three models use a normal data model and the default priors of **brms**:
+
+$$
+\begin{aligned}
+\mathrm{M}_1: &\quad \mathrm{Reaction} \sim \mathrm{Days} \\
+\mathrm{M}_2: &\quad \mathrm{Reaction} \sim \mathrm{Days} + (1 \mid \mathrm{Subject}) \\
+\mathrm{M}_3: &\quad \mathrm{Reaction} \sim \mathrm{Days} + (\mathrm{Days} \mid \mathrm{Subject})
+\end{aligned}
+$$
+
+The design of the study suggests $\mathrm{M}_3$. The comparison shows how much
+information the data have about the varying intercepts and slopes.
+
+```{r sleep-fit, results="hide", message=FALSE, warning=FALSE}
+sleep_1 <- brms::brm(Reaction ~ Days, data = sleepstudy2,
+                     family = gaussian(),
+                     chains = CHAINS, iter = ITER, seed = SEED, refresh = 0)
+sleep_2 <- update(sleep_1, formula. = ~ . + (1 | Subject),
+                  seed = SEED, refresh = 0)
+sleep_3 <- update(sleep_1, formula. = ~ . + (Days | Subject),
+                  seed = SEED, refresh = 0)
+```
+
+### PSIS-LOO and the log score
+
+First, compare the models on `elpd` with PSIS-LOO:
+
+```{r sleep-loo, warning=FALSE}
+loo_sleep <- lapply(
+  list(M_1 = sleep_1, M_2 = sleep_2, M_3 = sleep_3),
+  brms::loo, save_psis = TRUE
+)
+model_compare(lapply(loo_sleep, function(x) loo_pred_measure(loo = x)))
+```
+
+`print()` reports the models with high Pareto $\hat k$ values, and
+`diag_elpd` flags them. A high $\hat k$ can come from misspecification or from
+a flexible model. Then the PSIS-LOO estimate can be optimistic.
+
+**Reloo.** `reloo = TRUE` refits the model once for each observation with a
+high $\hat k$. This makes `elpd_loo` accurate.
+
+```{r sleep-reloo, results="hide", message=FALSE, warning=FALSE}
+reloo_sleep <- lapply(
+  list(M_1 = sleep_1, M_2 = sleep_2, M_3 = sleep_3),
+  brms::loo, reloo = TRUE, save_psis = TRUE
+)
+```
+
+```{r sleep-reloo-compare}
+model_compare(lapply(reloo_sleep, function(x) loo_pred_measure(loo = x)))
+```
+
+::: {.callout .callout-warning}
+**Reloo gives a correct `elpd` only**
+
+`reloo` replaces `elpd_loo` of the refitted observations. It keeps the old
+PSIS weights for the other measures. Thus request only `elpd`, `mlpd`, or `ic`
+from a `loo` object after `reloo`. For the other measures, use K-fold
+([see below](#sleep-scores)). The
+[Predictive schemes](pred-measure-workflow.html#computing-loo) article has the
+details.
+:::
+
+### Model checking
+
+A more accurate `elpd` does not fix a misspecified model. Outliers can still
+make the normal approximation of the uncertainty inaccurate (Scenario 2).
+Check the calibration with LOO-PIT:
+
+```{r sleep-pit, fig.height=3, warning=FALSE}
+brms::pp_check(sleep_3, type = "loo_pit_ecdf")
+```
+
+<!-- TODO: check after the render that the curve of M_3 is S-shaped -->
+
+An S-shaped LOO-PIT ECDF shows predictive distributions that are too wide. The
+LOO intervals show the cause:
+
+```{r sleep-intervals, warning=FALSE}
+brms::pp_check(sleep_3, type = "loo_intervals")
+```
+
+A few observations lie far outside their predictive intervals. These outliers
+increase the residual scale $\sigma$ of the normal model. Thus the predictive
+distributions are too wide for the other observations.
+
+**Pointwise differences.** The pointwise `elpd` differences of
+$\mathrm{M}_3$ and $\mathrm{M}_2$ show the effect of the outliers:
+
+```{r sleep-pointwise}
+pointwise_diff <- function(loo_a, loo_b) {
+  loo_a$pointwise[, "elpd_loo"] - loo_b$pointwise[, "elpd_loo"]
+}
+
+ggplot(data.frame(i = seq_len(nrow(sleepstudy2)),
+                  diff = pointwise_diff(reloo_sleep$M_3, reloo_sleep$M_2)),
+       aes(i, diff)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_point() +
+  labs(x = "observation", y = "pointwise elpd difference (M_3 - M_2)")
+```
+
+$\mathrm{M}_3$ is better for most observations. A few observations have a
+large difference. These large values make the normal approximation of
+`elpd_diff` less accurate.
+
+### Student-t models
+
+A Student-$t$ data model has heavier tails. It can accommodate the outliers
+without an increase of the scale for all observations. Models
+$\mathrm{M}_{1t}$, $\mathrm{M}_{2t}$, and $\mathrm{M}_{3t}$ use the formulas of
+$\mathrm{M}_1$ to $\mathrm{M}_3$ with `family = student()`:
+
+```{r sleep-fit-t, results="hide", message=FALSE, warning=FALSE}
+sleep_1t <- update(sleep_1, family = brms::student(), seed = SEED, refresh = 0)
+sleep_2t <- update(sleep_2, family = brms::student(), seed = SEED, refresh = 0)
+sleep_3t <- update(sleep_3, family = brms::student(), seed = SEED, refresh = 0)
+
+reloo_sleep_t <- lapply(
+  list(M_1t = sleep_1t, M_2t = sleep_2t, M_3t = sleep_3t),
+  brms::loo, reloo = TRUE, save_psis = TRUE
+)
+```
+
+```{r sleep-pit-t, fig.height=3, warning=FALSE}
+brms::pp_check(sleep_3t, type = "loo_pit_ecdf")
+```
+
+Compare $\mathrm{M}_3$ and $\mathrm{M}_{3t}$:
+
+```{r sleep-compare-3t}
+model_compare(list(
+  M_3 = loo_pred_measure(loo = reloo_sleep$M_3),
+  M_3t = loo_pred_measure(loo = reloo_sleep_t$M_3t)
+))
+```
+
+$\mathrm{M}_3$ is misspecified, so its `se_diff` can be inflated. Thus the
+true probability that $\mathrm{M}_{3t}$ predicts better is likely even higher
+than `1 - p_worse`.
+
+Compare the three Student-$t$ models:
+
+```{r sleep-compare-t}
+comp_sleep_t <- model_compare(
+  lapply(reloo_sleep_t, function(x) loo_pred_measure(loo = x))
+)
+comp_sleep_t
+```
+
+The models pass the model checking. $n = 144$ is larger than 100. If the
+differences are not small, the normal approximation is likely well calibrated.
+
+```{r sleep-pointwise-t}
+ggplot(data.frame(i = seq_len(nrow(sleepstudy2)),
+                  diff = pointwise_diff(reloo_sleep_t$M_3t,
+                                        reloo_sleep_t$M_2t)),
+       aes(i, diff)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_point() +
+  labs(x = "observation", y = "pointwise elpd difference (M_3t - M_2t)")
+```
+
+<!-- TODO: check after the render that the t-model plot has no large outliers -->
+
+### Choice of the score {#sleep-scores}
+
+The log score is a strictly proper and local score: it uses only the predictive
+density at the observed value (Gneiting and Raftery, 2007). This makes it
+sensitive to observations in the tails. A single outlier can dominate
+`elpd_diff`. Two other proper scores react differently to outliers:
+
+| Score | Uses | Penalty for an outlier | Use when |
+| :--- | :--- | :--- | :--- |
+| `elpd` | density at $y_i$ | grows with $-\log p(y_i)$, unbounded | the whole predictive distribution matters, including the tails |
+| `rps` | distance between $y_i$ and the predictive draws | grows linearly with the distance | the distance to the observation matters; the units of $y$ help communication |
+| `srps` | `rps`, scaled by the predictive spread | grows with the distance relative to the spread | the predictive spread differs strongly between observations |
+
+`srps` is the scaled CRPS of Bolin and Wallin (2023). It is locally scale
+invariant: observations with a wide predictive distribution do not dominate the
+average. `rps` does not have this property.
+
+**K-fold.** `rps` and `srps` need reliable weights for each observation. The
+models have high Pareto $\hat k$ values, and `reloo` corrects `elpd` only.
+Thus compute all measures with 10-fold cross-validation. All models use the
+same folds, so the pointwise differences are paired:
+
+```{r sleep-kfold, results="hide", message=FALSE, warning=FALSE}
+measures_sleep <- c("elpd", "rps", "srps", "rmse")
+
+set.seed(SEED)
+folds_sleep <- kfold_split_random(K = 10, N = nrow(sleepstudy2))
+
+kfold_sleep <- lapply(
+  list(M_1 = sleep_1, M_2 = sleep_2, M_3 = sleep_3,
+       M_1t = sleep_1t, M_2t = sleep_2t, M_3t = sleep_3t),
+  kfold_measure, folds = folds_sleep, measures = measures_sleep
+)
+```
+
+**Normal versus Student-$t$.** Compare $\mathrm{M}_3$ and $\mathrm{M}_{3t}$ on
+all measures:
+
+```{r sleep-kfold-3t}
+comp_sleep_3t <- model_compare(kfold_sleep[c("M_3", "M_3t")])
+print(comp_sleep_3t, measures = "all")
+```
+
+<!-- TODO: check after the render that the text below matches the output -->
+
+The scores weigh the outliers differently. `elpd` gives a large penalty to an
+observation in the far tail of the normal model. `rps` grows only linearly
+with the distance, so it shows a smaller advantage for $\mathrm{M}_{3t}$.
+`rmse` scores the predictive mean only. The two models have similar means, so
+`rmse` cannot see the difference in the tails.
+
+**All six models.** Compare all models on `srps`:
+
+```{r sleep-kfold-all}
+comp_sleep_kfold <- model_compare(kfold_sleep)
+print(comp_sleep_kfold, measures = c("elpd", "srps"))
+```
+
+A conclusion that holds for several proper scores is more robust than a
+conclusion from one score. If the scores disagree, the models differ in the
+part of the predictive distribution that one score emphasizes.
+
+### Choice of the predictive scheme {#sleep-schemes}
+
+LOO and random K-fold leave out single observations. The other observations of
+the same subject stay in the training data. Thus these schemes answer this
+question: how well does the model predict a new day of a *known* subject?
+
+A different question is: how well does the model predict a *new* subject?
+Then leave out all observations of a subject together. This is leave-one-group-out
+or grouped K-fold cross-validation. Random cross-validation of grouped data
+answers the second question too optimistically (Roberts et al., 2017).
+
+`kfold_split_grouped()` puts the observations of each subject in one fold.
+With 18 subjects and $K = 6$, each fold holds three subjects:
+
+```{r sleep-grouped, results="hide", message=FALSE, warning=FALSE}
+set.seed(SEED)
+folds_subject <- kfold_split_grouped(K = 6, x = sleepstudy2$Subject)
+
+grouped_sleep <- lapply(
+  list(M_1t = sleep_1t, M_2t = sleep_2t, M_3t = sleep_3t),
+  kfold_measure, folds = folds_subject, measures = measures_sleep
+)
+```
+
+For a held-out subject, `brms::kfold_predict()` draws new varying effects from
+the population distribution (`allow_new_levels = TRUE`).
+
+```{r sleep-grouped-compare}
+comp_sleep_grouped <- model_compare(grouped_sleep)
+print(comp_sleep_grouped, measures = c("elpd", "srps"))
+```
+
+Compare the result with random 10-fold for the same models:
+
+```{r sleep-random-compare}
+print(model_compare(kfold_sleep[c("M_1t", "M_2t", "M_3t")]),
+      measures = c("elpd", "srps"))
+```
+
+<!-- TODO: check after the render that the text below matches the output -->
+
+For a new subject, the varying effects carry no information about that
+subject. The models can only use the population distribution of the effects.
+Thus the differences between the models are smaller than with random folds.
+The remaining difference shows how well each model describes the variation
+between subjects.
+
+**Interpretation.** The effect of sleep restriction is large. The main
+conclusion is the same for all models. $\mathrm{M}_{3t}$ passes the model
+checking and predicts best. Continue the analysis with the posterior of
+$\mathrm{M}_{3t}$. Choose the scheme from the intended use of the model: new
+days of the same subjects, or new subjects.
+
+## Roaches {#roaches}
+
+Gelman and Hill (2007, Sec. 8.3) describe the roaches data. A pest management
+treatment was applied to 160 apartments, and 104 apartments were controls. The
+outcome `y` is the number of roaches caught in traps. The traps were used for
+different numbers of days. The predictors are:
+
++ `sqrt_roach1`: the square root of the pre-treatment roach count.
++ `treatment`: an indicator of the treatment.
++ `senior`: an indicator of a building for elderly residents.
++ `offset(log(exposure2))`: the logarithm of the number of trap days.
+
+```{r roaches-data}
+data(roaches, package = "rstanarm")
+roaches$sqrt_roach1 <- sqrt(roaches$roach1)
+nrow(roaches)
+```
+
+The models use the same linear predictor with different data models. The
+coefficients have $\operatorname{normal}(0, 1)$ priors. The negative-binomial
+shape has an $\operatorname{inv\text{-}gamma}(0.4, 0.3)$ prior.
+
+| Model | Data model | Linear predictor |
+| :--- | :--- | :--- |
+| $\mathrm{M}_1$ | Poisson | linear in `sqrt_roach1` |
+| $\mathrm{M}_2$ | negative-binomial | linear in `sqrt_roach1` |
+| $\mathrm{M}_3$ | zero-inflated negative-binomial | linear in `sqrt_roach1` |
+| $\mathrm{M}_4$ | zero-inflated negative-binomial | spline of `sqrt_roach1` |
+
+The zero-inflation part of $\mathrm{M}_3$ and $\mathrm{M}_4$ uses the same
+predictors, with its own coefficients.
+
+```{r roaches-fit, results="hide", message=FALSE, warning=FALSE}
+f_roach <- y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2))
+f_zi <- zi ~ sqrt_roach1 + treatment + senior + offset(log(exposure2))
+prior_b <- brms::prior(normal(0, 1), class = "b")
+prior_shape <- brms::prior(inv_gamma(0.4, 0.3), class = "shape")
+prior_zi <- brms::prior(normal(0, 1), class = "b", dpar = "zi") +
+  brms::prior(normal(0, 1), class = "Intercept", dpar = "zi")
+
+roach_1 <- brms::brm(f_roach, data = roaches, family = poisson(),
+                     prior = prior_b,
+                     chains = CHAINS, iter = ITER, seed = SEED, refresh = 0)
+roach_2 <- brms::brm(f_roach, data = roaches, family = brms::negbinomial(),
+                     prior = prior_b + prior_shape,
+                     chains = CHAINS, iter = ITER, seed = SEED, refresh = 0)
+roach_3 <- brms::brm(brms::bf(f_roach, f_zi), data = roaches,
+                     family = brms::zero_inflated_negbinomial(),
+                     prior = prior_b + prior_shape + prior_zi,
+                     chains = CHAINS, iter = ITER, seed = SEED, refresh = 0)
+roach_4 <- brms::brm(
+  brms::bf(y ~ s(sqrt_roach1) + treatment + senior + offset(log(exposure2)),
+           zi ~ s(sqrt_roach1) + treatment + senior + offset(log(exposure2))),
+  data = roaches, family = brms::zero_inflated_negbinomial(),
+  prior = prior_b + prior_shape + prior_zi,
+  chains = CHAINS, iter = ITER, seed = SEED, refresh = 0
+)
+```
+
+### PSIS-LOO and the log score
+
+```{r roaches-loo, warning=FALSE}
+loo_roach <- lapply(
+  list(M_1 = roach_1, M_2 = roach_2, M_3 = roach_3),
+  brms::loo, save_psis = TRUE
+)
+model_compare(lapply(loo_roach, function(x) loo_pred_measure(loo = x)))
+```
+
+The Poisson model $\mathrm{M}_1$ has many high Pareto $\hat k$ values. It is
+underdispersed for these data (Scenario 2). See the
+[roaches case study](https://users.aalto.fi/~ave/modelselection/roaches.html)
+for the model checking. The difference to $\mathrm{M}_1$ is so large that the
+bias of PSIS-LOO does not change the conclusion.
+
+### Scores for count data
+
+For counts, the predictive distribution is discrete. These scores are useful
+(Czado et al., 2009):
+
+| Score | For counts |
+| :--- | :--- |
+| `elpd` | the log of the predictive probability of the observed count |
+| `rps` | the ranked probability score; it rewards probability on counts near the observed count |
+| `mae` | the absolute error of the predictive mean |
+| `rmse` | the squared error of the predictive mean; large counts dominate it |
+
+The counts range from 0 to `r max(roaches$y)`. Thus `rmse` depends mostly on
+the few apartments with many roaches. `mae` and `rps` are less sensitive to
+them.
+
+**K-fold.** The Poisson model has many high $\hat k$ values, and
+`reloo` would refit it many times. `rps`, `mae`, and `rmse` also need reliable
+weights. Thus compute all measures with 10-fold cross-validation:
+
+```{r roaches-kfold, results="hide", message=FALSE, warning=FALSE}
+measures_roach <- c("elpd", "rps", "mae", "rmse")
+
+set.seed(SEED)
+folds_roach <- kfold_split_random(K = 10, N = nrow(roaches))
+
+kfold_roach <- lapply(
+  list(M_1 = roach_1, M_2 = roach_2, M_3 = roach_3, M_4 = roach_4),
+  kfold_measure, folds = folds_roach, measures = measures_roach
+)
+```
+
+```{r roaches-kfold-compare}
+comp_roach <- model_compare(kfold_roach[c("M_1", "M_2", "M_3")])
+print(comp_roach, measures = "all")
+```
+
+<!-- TODO: check after the render that the text below matches the output -->
+
+The zero-inflated negative-binomial model $\mathrm{M}_3$ is best on `elpd`.
+The data have more than 100 observations, and the difference to $\mathrm{M}_2$
+is not small. Thus the normal approximation is likely well calibrated.
+
+`mae` and `rmse` score the predictive mean only. A Poisson and a
+negative-binomial model with the same mean get the same point error. Thus
+these measures cannot detect the overdispersion that `elpd` and `rps` detect.
+
+### A small difference
+
+$\mathrm{M}_3$ uses an ad hoc square root of the pre-treatment count.
+$\mathrm{M}_4$ replaces the linear term with a spline:
+
+```{r roaches-spline}
+comp_roach_spline <- model_compare(kfold_roach[c("M_3", "M_4")])
+print(comp_roach_spline, measures = "all")
+```
+
+<!-- TODO: check after the render that diag_diff shows |elpd_diff| < 4 -->
+
+Here $n > 100$, so `diag_diff` can show the flag `|elpd_diff| < 4`
+(Scenario 1). In the milk example, the difference was also small, but
+`N < 100` had priority. When the difference is this small, the models predict
+almost equally well. Use either model.
+
+## Summary
+
+### Which score?
+
+| Question | Score | Notes |
+| :--- | :--- | :--- |
+| How good is the whole predictive distribution? | `elpd` | default; strictly proper; sensitive to outliers; `p_worse` and `diag_diff` are available |
+| How close is the predictive distribution to the observation? | `rps` | proper; in the units of $y$; good for counts and ordered outcomes |
+| Does the comparison depend on observations with a wide predictive spread? | `srps` | proper; locally scale invariant |
+| How good is the point prediction? | `mae`, `rmse` | ignore the predictive uncertainty; easy to communicate |
+| Which share of the variance does the model explain? | `r2` | relative to the variance of $y$; easy to communicate |
+
+Choose the score from the use of the predictions before the comparison.
+Report several scores when they answer different questions.
+
+### Which scheme?
+
+| Question | Scheme | Entry point |
+| :--- | :--- | :--- |
+| A new observation, exchangeable with the data | PSIS-LOO | `loo_pred_measure()` |
+| As above, with many high Pareto $\hat k$ | K-fold, random folds | `kfold_pred_measure()` |
+| A new group, for example a new subject | K-fold, grouped folds | `kfold_pred_measure()` with `kfold_split_grouped()` |
+| Data withheld from the start | test data | `test_pred_measure()` |
+| The future of a time series | leave-future-out | not in the `pred_measure()` family; see the [LFO vignette](../loo2-lfo.html) |
+
+### Which uncertainty check?
+
+1. Check the models before the comparison, for example with LOO-PIT.
+2. Read `diag_elpd`. If it flags a model, use `reloo` or moment matching for
+   `elpd`, or K-fold for all measures.
+3. Read `diag_diff`. With `N < 100`, double `se_diff` as a sensitivity check.
+   With `|elpd_diff| < 4`, the models predict almost equally well.
+4. Plot the pointwise differences. A few large values show outliers.
+
+## References
+
+Belenky, G., Wesensten, N. J., Thorne, D. R., et al. (2003). Patterns of
+performance degradation and restoration during sleep restriction and subsequent
+recovery: A sleep dose-response study. *Journal of Sleep Research*,
+12(1):1–12.
+
+Bolin, D. and Wallin, J. (2023). Local scale invariance and robustness of
+proper scoring rules. *Statistical Science*, 38(1):140–159.
+
+Czado, C., Gneiting, T., and Held, L. (2009). Predictive model assessment for
+count data. *Biometrics*, 65(4):1254–1261.
+doi:10.1111/j.1541-0420.2009.01191.x
+
+Gelman, A. and Hill, J. (2007). *Data Analysis Using Regression and
+Multilevel/Hierarchical Models*. Cambridge University Press.
+
+Gneiting, T. and Raftery, A. E. (2007). Strictly proper scoring rules,
+prediction, and estimation. *Journal of the American Statistical Association*,
+102(477):359–378.
+
+McElreath, R. (2020). *Statistical Rethinking: A Bayesian Course with Examples
+in R and Stan*. 2nd edition. CRC Press.
+
+Roberts, D. R., Bahn, V., Ciuti, S., et al. (2017). Cross-validation strategies
+for data with temporal, spatial, hierarchical, or phylogenetic structure.
+*Ecography*, 40(8):913–929. doi:10.1111/ecog.02881
+
+Sivula, T., Magnusson, M., Matamoros, A. A., and Vehtari, A. (2025).
+Uncertainty in Bayesian leave-one-out cross-validation based model comparison.
+*Bayesian Analysis*. doi:10.1214/25-BA1569
+
+Tesso, H. and Vehtari, A. (2026). LOO-PIT predictive model checking. Preprint
+at [arXiv:2603.02928](https://arxiv.org/abs/2603.02928).
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. *Statistics and
+Computing*, 27(5):1413–1432. doi:10.1007/s11222-016-9696-4
+
+Wang, W. and Gelman, A. (2015). Difficulty of selecting among multilevel models
+using predictive accuracy. *Statistics and Its Interface*, 8(2):153–160.
+
+## See also
+
+- [Uncertainty in Bayesian LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html)
+- [Predictive model performance: Predictive schemes with `pred_measure()`](pred-measure-workflow.html)
+- [Predictive model performance: Overview of measures](overview-measures.html)
+- [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+- [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html)
