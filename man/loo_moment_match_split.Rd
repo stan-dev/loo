@@ -34,10 +34,15 @@ matched.}
 matching algorithm.}
 
 \item{total_scaling}{A vector representing the total scaling of marginal
-variance made by the moment matching algorithm.}
+variance made by the moment matching algorithm. With \code{cov = TRUE},
+\code{\link[=loo_moment_match]{loo_moment_match()}} includes the scaling in \code{total_mapping} instead, and
+this vector is all ones.}
 
-\item{total_mapping}{A vector representing the total covariance
-transformation made by the moment matching algorithm.}
+\item{total_mapping}{A square matrix representing the total linear
+transformation made by the moment matching algorithm: the product of the
+linear parts of the accepted steps, in the order in which they were
+accepted. Used only when \code{cov = TRUE}. The transformation is
+\code{T(theta) = total_mapping \%*\% diag(total_scaling) \%*\% (theta - m) + m + total_shift}, where \code{m} is the mean of \code{upars}.}
 
 \item{i}{Observation index.}
 
