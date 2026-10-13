@@ -119,12 +119,17 @@ matching algorithm.</p></dd>
 
 <dt id="arg-total-scaling">total_scaling<a class="anchor" aria-label="anchor" href="#arg-total-scaling"></a></dt>
 <dd><p>A vector representing the total scaling of marginal
-variance made by the moment matching algorithm.</p></dd>
+variance made by the moment matching algorithm. With <code>cov = TRUE</code>,
+<code><a href="loo_moment_match.html">loo_moment_match()</a></code> includes the scaling in <code>total_mapping</code> instead, and
+this vector is all ones.</p></dd>
 
 
 <dt id="arg-total-mapping">total_mapping<a class="anchor" aria-label="anchor" href="#arg-total-mapping"></a></dt>
-<dd><p>A vector representing the total covariance
-transformation made by the moment matching algorithm.</p></dd>
+<dd><p>A square matrix representing the total linear
+transformation made by the moment matching algorithm: the product of the
+linear parts of the accepted steps, in the order in which they were
+accepted. Used only when <code>cov = TRUE</code>. The transformation is
+<code>T(theta) = total_mapping %*% diag(total_scaling) %*% (theta - m) + m + total_shift</code>, where <code>m</code> is the mean of <code>upars</code>.</p></dd>
 
 
 <dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>

@@ -50,12 +50,19 @@ loo_moment_match_split(
 - total_scaling:
 
   A vector representing the total scaling of marginal variance made by
-  the moment matching algorithm.
+  the moment matching algorithm. With `cov = TRUE`,
+  [`loo_moment_match()`](https://mc-stan.org/loo/dev/reference/loo_moment_match.md)
+  includes the scaling in `total_mapping` instead, and this vector is
+  all ones.
 
 - total_mapping:
 
-  A vector representing the total covariance transformation made by the
-  moment matching algorithm.
+  A square matrix representing the total linear transformation made by
+  the moment matching algorithm: the product of the linear parts of the
+  accepted steps, in the order in which they were accepted. Used only
+  when `cov = TRUE`. The transformation is
+  `T(theta) = total_mapping %*% diag(total_scaling) %*% (theta - m) + m + total_shift`,
+  where `m` is the mean of `upars`.
 
 - i:
 

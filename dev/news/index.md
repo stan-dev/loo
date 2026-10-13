@@ -22,6 +22,10 @@
   the `permutations` argument for numeric input by
   [@thanasibakis](https://github.com/thanasibakis) in
   [\#398](https://github.com/stan-dev/loo/issues/398)
+- Speed up the Bayesian bootstrap in
+  [`pseudobma_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
+  by [@VisruthSK](https://github.com/VisruthSK) in
+  [\#368](https://github.com/stan-dev/loo/issues/368)
 
 ## loo 2.10.1
 
