@@ -1,0 +1,656 @@
+---
+title: "Predictive model performance: Predictive schemes with `pred_measure()`"
+author: "Florence Bockting"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    css:
+      - !expr system.file("rmarkdown/templates/html_vignette/resources/vignette.css", package = "rmarkdown")
+      - styles.css
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: true
+vignette: >
+  %\VignetteIndexEntry{Predictive model performance: Predictive schemes with `pred_measure()`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, child="../children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  eval = params$EVAL,
+  fig.width = 7,
+  fig.height = 4,
+  fig.align = "center"
+)
+```
+
+```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
+```
+
+## Introduction
+
+How well does a fitted model predict data that were not used to fit it? The
+formula reference (Vehtari et al., 2026) divides this into three questions:
+<!-- TODO -->
+
+1. **What counts as a good prediction?** This is the *predictive measure*, for
+   example the log score or the RMSE.
+   + Discussed in the vignette [Predictive model performance: Overview of measures](overview-measures.html)
+2. **Which predictions are evaluated?** This is the *predictive scheme*. It
+   sets the observations that train the model before observation $i$ is
+   evaluated.
+   + Focus of this vignette.
+3. **How are the predictions computed?** From posterior draws, from refits, or
+   with importance weights.
+
+::: {.callout .callout-note}
+**What this article does not cover**
+
++ **Measure definitions**
+  + See the [Predictive model performance: Overview of measures](overview-measures.html).
++ **Model comparison** 
+  + See the [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+  vignette and
+  + the [Model comparison case study: Uncertainty, scores, and predictive schemes](pred-measure-case-study.html) <!-- TODO -->
++ **Leave-one-group-out and leave-future-out schemes.**
+  + Any reference? <!-- TODO -->
+:::
+
+### Training data and evaluation data {#data-sets}
+
+This vignette focuses on the predictive scheme. A predictive scheme is a rule
+that splits the observed data $y = (y_1, \ldots, y_n)$ into a training set
+$\mathcal{T}$ used to fit the model and an evaluation set $\mathcal{E}$ (i.e., 
+the observations whose predictive performance is evaluated).
+
+For example, in the case of in-sample evaluation, the training set is the full
+data set. In a hold-out evaluation, the data set is split into two disjoint
+sets: one for training and one for evaluation.
+Between these two extremes are cross-validation schemes, where the training
+set is a subset of the data, and the evaluation set is the remaining data.
+For example, in leave-one-out cross-validation, the training set is the full
+data set minus one observation. In K-fold cross-validation, the training set is
+the full data set minus one of $K$ disjoint subsets of the data (i.e., the folds).
+
+### Overview of the predictive schemes
+
+The predictive measure API in the **loo** package has one entry point for
+each predictive scheme:
+
+| Scheme | Training data $\mathcal{T}(i)$ | Evaluation data $\mathcal{E}$ | Predictive distribution $p^q(y_i)$ | Weights $w_i^s$ | Entry point |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [in-sample](#in-sample) | $\{1, \ldots, n\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y)$ | $1/S$ | `insample_pred_measure()` |
+| [LOO](#psis-loo)* | $\{1, \ldots, n\} \setminus \{i\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-i})$ | PSIS weights | `loo_pred_measure()` |
+| [K-fold](#k-fold) | $\{1, \ldots, n\} \setminus \mathcal{I}_{k(i)}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-\mathcal{I}_{k(i)}})$ | $1/S$ | `kfold_pred_measure()` |
+| [test data](#test-data) | $\mathcal{R}$ | $\mathcal{S}$ | $p(y_i \mid y_{\mathcal{R}})$ | $1/S$ | `test_pred_measure()` |
+
+*here with focus on PSIS-LOO.
+
+For further discussion, see the paper [Predictive measures: A formula reference]() <!-- TODO -->.
+
+## Running example
+
+**Prediction task.** The `sleepstudy` data (**lme4**) come from a study of sleep
+restriction (Belenky et al., 2003). Eighteen subjects slept at most three hours
+each night. The outcome `y` is the average reaction time (ms) of a subject on
+one day. Days 0 and 1 were adaptation and training, so this vignette keeps days
+2 to 9. The predictor `Days` counts the days of sleep restriction, from 0 to 7.
+This gives 144 observations.
+
+```{r load-libraries-internal, echo=FALSE}
+devtools::load_all("../..", quiet = TRUE)
+devtools::load_all("../../../../GitHub/brms", quiet = TRUE)
+library(ggplot2)
+
+theme_set(theme_minimal())
+SEED <- 42
+```
+
+```{r load-libraries, eval=FALSE}
+library(loo)      # for evaluating the predictive performance
+library(brms)     # for model fitting
+library(lme4)     # for the sleepstudy data
+library(ggplot2)  # for plotting
+
+theme_set(theme_minimal())
+SEED <- 42
+```
+
+The model is a normal regression of `y` on `Days`. It has no subject effects.
+As fitting is not the focus of this vignette, we do not discuss the modelling
+step in depth but show the code in the [appendix](#appendix-model-code).
+
+| Object | Data | Description |
+| :--- | :--- | :--- |
+| `fit_full` | all 18 subjects, 144 observations | fit to full data|
+| `fit_train` | 13 subjects, 104 observations | fit to training data |
+| `test_data` | the other 5 subjects, 40 observations | test data set |
+
+Each fit uses the `brms` default of 4 chains and 2000 iterations.
+
+```{r fit-models, echo=FALSE, results="hide"}
+set.seed(SEED)
+
+data("sleepstudy", package = "lme4")
+sleepstudy <- subset(sleepstudy, Days >= 2)
+sleepstudy$Days <- sleepstudy$Days - 2
+sleepstudy$y <- sleepstudy$Reaction
+
+prior_sleep <- brms::prior(normal(200, 100), class = b, coef = "Intercept") +
+  brms::prior(normal(0, 20), class = b, coef = "Days") +
+  brms::prior(exponential(0.02), class = sigma)
+
+# all subjects
+fit_full <- brms::brm(
+  y ~ 0 + Intercept + Days,
+  data = sleepstudy,
+  family = gaussian(),
+  prior = prior_sleep,
+  seed = SEED,
+  refresh = 0
+)
+
+# five subjects held out as test data
+test_subjects <- sample(unique(sleepstudy$Subject), size = 5)
+train_data <- subset(sleepstudy, !Subject %in% test_subjects)
+test_data <- subset(sleepstudy, Subject %in% test_subjects)
+
+fit_train <- update(
+  fit_full, newdata = train_data, seed = SEED, refresh = 0
+)
+```
+
+### Measures
+
+For the example, we will use the following measures to evaluate the 
+predictive performance of the model: `elpd`, `mlpd`, `rps`, `rmse`, and `r2`.
+See the vignette [Predictive model performance: Overview of measures](overview-measures.html)
+for a discussion of the measures.
+
+Each measure requires specific inputs: the observed values (`y`), the
+pointwise log predictive densities (`ylp`), the predicted means (`mupred`),
+or draws from the predictive distribution (`ypred`). The following table
+summarizes the input requirements for the measures used in this example.
+
+| Measure | `y` | `ylp` | `mupred` | `ypred` |
+| :--- | :---: | :---: | :---: | :---: |
+| `elpd` | | ✓ | | |
+| `mlpd` | | ✓ | | |
+| `rps` | ✓ | | | ✓ |
+| `rmse` | ✓ | | ✓ | |
+| `r2` | ✓ | | ✓ | |
+
+```{r inputs}
+measures <- c("elpd", "mlpd", "rps", "rmse", "r2")
+
+y <- fit_full$data$y
+ylp <- brms::log_lik(fit_full)
+ypred <- brms::posterior_predict(fit_full)
+mupred <- brms::posterior_epred(fit_full)
+```
+
+## Predictive schemes
+### In-sample {#in-sample}
+We start the discussion with the special case of using in-sample evaluations.
+In-sample performance evaluates the fitted model on the same data used for
+fitting and is therefore typically optimistic as an estimate of performance
+on new data. Thus, it should not be used to estimate predictive performance.
+Nevertheless, it can be useful as a reference point, and the amount of optimism
+relative to a cross-validation or test-data estimate can itself be informative.
+
+**Implementation**
+
+```{r insample}
+insample_sleep <- insample_pred_measure(
+  y = y,
+  ypred = ypred,
+  mupred = mupred,
+  ylp = ylp,
+  measures = measures
+)
+str(insample_sleep)
+```
+
+**Result**
+The returned structure of the `pred_measure` class includes the
+`$estimates` and `$pointwise` components per selected measure. Furthermore, the
+following attributes are included in the result:
+
++ `measure_info`: a list with entries for each measure with respective additional information
++ `source`: indicates the predictive scheme used, here `"insample"`.
++ `dims`: provides the dimensions of the data used for evaluation.
++ `class`: indicates the class of the result, here `"pred_measure"` and `"insample_pred_measure"`.
+
+The corresponding print method shows the estimates and standard errors for
+each measure, as well as the number of observations used for evaluation.
+
+```{r insample-print}
+insample_sleep
+```
+
+### PSIS-LOO {#psis-loo}
+Next, we focus on the leave-one-out cross-validation (LOO) scheme, specifically
+using Pareto-smoothed importance sampling (PSIS) to approximate the LOO
+predictive performance. In this scheme, each observation is left out of the
+training set one at a time.
+
+While exact leave-one-out cross-validation needs one refit for each observation,
+PSIS-LOO uses the draws of the full-data fit instead.
+It gives them Pareto-smoothed importance weights, so that each $y_i$ is scored
+as if it was left out (Vehtari et al., 2024).
+
+**Implementation**
+We first compute the PSIS-LOO object using `brms::loo()` and then pass it to
+`loo_pred_measure()`. Otherwise, the input structure is the same as for the
+in-sample evaluation.
+
+```{r loo}
+loo_sleep <- brms::loo(fit_full, save_psis = TRUE)
+
+loo_sleep_measure <- loo_pred_measure(
+  loo = loo_sleep,
+  y = y,
+  ypred = ypred,
+  mupred = mupred,
+  measures = measures
+)
+loo_sleep_measure
+```
+
+**Result**
+Compared to the in-sample evaluation, the rows now have the suffix `_loo`.
+The measure `elpd` also adds `p_loo`, the difference between the in-sample and
+the LOO log score (Vehtari et al., 2026). <!-- TODO -->
+
+The output structure of the `loo_pred_measure` class includes two additional
+components compared to the `insample_pred_measure` class:
+
++ `$diagnostics`: including `pareto_k`, the Pareto $\hat k$ values for each
+observation, and (relative) effective sample size, `n_eff` and `r_eff`.
++ `$log_weights`: the log PSIS weights.
+
+```{r}
+names(loo_sleep_measure)
+```
+
+**Plot** 
+The following plot compares the in-sample and LOO scores for
+three measures: the log score, the RPS, and the squared error. Each point
+is one observation. The x-axis shows the in-sample value, and the y-axis
+the LOO value. The color shows the Pareto $\hat k$. We do not show `mlpd`
+and `r2`. Their pointwise values are the same as those of `elpd` and `rmse`.
+
+```{r loo-plot, echo=FALSE}
+pw_measures <- c(
+  elpd = "log score (higher is better)",
+  rps  = "RPS (lower is better)",
+  rmse = "squared error (lower is better)"
+)
+
+df_all <- do.call(rbind, lapply(names(pw_measures), function(m) data.frame(
+  measure  = pw_measures[[m]],
+  insample = insample_sleep$pointwise[, m],
+  loo      = loo_sleep_measure$pointwise[, paste0(m, "_loo")],
+  pareto_k = loo_sleep_measure$diagnostics$pareto_k
+)))
+
+ggplot(df_all, aes(insample, loo, color = pareto_k)) +
+  geom_abline(linetype = "dashed") +
+  geom_point() +
+  scale_color_viridis_c() +
+  facet_wrap(~measure, scales = "free") +
+  labs(x = "pointwise in-sample value",
+       y = "pointwise LOO value",
+       color = "Pareto k") +
+  geom_blank(aes(x = loo, y = insample))
+```
+
+The log score is a utility (higher is better). The RPS and the squared error
+are losses (lower is better). Thus, an observation that is harder to predict
+when it is left out lies below the diagonal for the log score, but above the
+diagonal for the RPS and the squared error. The farther a point lies from the
+diagonal, the more the observation influences the posterior. Such
+observations often have a high Pareto $\hat k$. The color lets you check
+whether an influential observation moves away from the diagonal for all
+measures or only for some.
+
+### K-fold {#k-fold}
+Next, we focus on K-fold cross-validation. The data are split into $K$ folds.
+The model is fit once for each fold, without the observations in that fold.
+This needs $K$ fits, not $n$.
+
+**Implementation**
+**loo** does not refit the model. We first compute the K-fold object using
+`brms::kfold()`. Set `save_fits = TRUE`. Without the fits,
+`brms::kfold_predict()` cannot compute the held-out draws:
+`method = "predict"` gives `ypred`, and `method = "fitted"` gives `mupred`.
+
+```{r kfold, results="hide"}
+set.seed(SEED)
+kfold_sleep <- brms::kfold(fit_full, K = 5, save_fits = TRUE)
+ypred_kfold <- brms::kfold_predict(kfold_sleep, method = "predict")$yrep
+mupred_kfold <- brms::kfold_predict(kfold_sleep, method = "fitted")$yrep
+```
+
+We then pass the K-fold object to `kfold_pred_measure()`. Otherwise, the input
+structure is the same as for the in-sample evaluation.
+
+```{r kfold-measures}
+kfold_sleep_measure <- kfold_pred_measure(
+  y = y,
+  ypred = ypred_kfold,
+  mupred = mupred_kfold,
+  kfold = kfold_sleep,
+  measures = measures
+)
+kfold_sleep_measure
+```
+
+**Result**
+The rows in the result object now have the suffix `_kfold`.
+The measure `elpd` also adds `p_kfold`, the difference between the in-sample
+and the K-fold log score.
+
+The output structure of the `kfold_pred_measure` class takes the attributes
+`K`, `folds`, `fold_type`, `joint`, `yhash`, and `model_name` from the `kfold`
+object. It has `$diagnostics` only when the `kfold` object has them. Recent
+versions of `brms::kfold()` do. K-fold uses no importance weights, so there is
+no `$log_weights` component.
+
+```{r}
+names(kfold_sleep_measure)
+```
+
+**Plot**
+The following plot has the same layout as the PSIS-LOO plot. The y-axis now
+shows the K-fold value. The color shows the fold of each observation.
+
+```{r kfold-plot, echo=FALSE}
+df_kfold <- do.call(rbind, lapply(names(pw_measures), function(m) data.frame(
+  measure  = pw_measures[[m]],
+  insample = insample_sleep$pointwise[, m],
+  kfold    = kfold_sleep_measure$pointwise[, paste0(m, "_kfold")],
+  fold     = factor(attr(kfold_sleep_measure, "folds"))
+)))
+
+ggplot(df_kfold, aes(insample, kfold, color = fold)) +
+  geom_abline(linetype = "dashed") +
+  geom_point() +
+  facet_wrap(~measure, scales = "free") +
+  labs(x = "pointwise in-sample value",
+       y = "pointwise K-fold value",
+       color = "fold") +
+  geom_blank(aes(x = kfold, y = insample))
+```
+
+The direction of the diagonal is the same as in the PSIS-LOO plot. With
+$K = 5$, each fit uses about 80% of the data. Thus K-fold and PSIS-LOO answer a
+similar question. Each K-fold fit has less data than a LOO fit, so the K-fold
+estimates are often slightly worse. Use K-fold when PSIS-LOO shows many high
+Pareto $\hat k$ values.
+
+`brms::kfold()` also accepts `folds = "grouped"` with `group = "Subject"`. Then
+each fold holds out whole subjects, and the predictive question changes to new
+subjects.
+
+### Test data {#test-data}
+Finally, we focus on the test data scheme. The data are split once into a
+training set and a test set. The model is fit only to the training set. It then
+predicts the test set, which it did not see. For the current example, we hold out
+five subjects. This gives 40 test observations.
+
+This scheme needs no importance weights and no refits. It needs one fit to the
+training data.
+
+**Implementation**
+We compute the draws of `fit_train` at `test_data` with `newdata`. Pass the log
+densities of the test observations as `ylp_test`, not as `ylp`. The measures
+`elpd`, `mlpd`, and `ic` need `ylp_test`.
+
+```{r test}
+ypred_test <- brms::posterior_predict(fit_train, newdata = test_data)
+mupred_test <- brms::posterior_epred(fit_train, newdata = test_data)
+ylp_test <- brms::log_lik(fit_train, newdata = test_data)
+
+test_sleep_measure <- test_pred_measure(
+  y = test_data$y,
+  ypred = ypred_test,
+  mupred = mupred_test,
+  ylp_test = ylp_test,
+  measures = measures
+)
+test_sleep_measure
+```
+
+**Result**
+The rows in the result object now have the suffix `_test`. The attribute
+`dims` gives the size of the test set, 40 observations, not the size of the
+training set. The output has only `$estimates` and `$pointwise`.
+
+```{r}
+names(test_sleep_measure)
+```
+
+**Plot**
+The test observations are not in the training data. Thus there is no in-sample
+value. The following plot shows the pointwise test values on the y-axis for
+each of the five test subjects on the x-axis.
+
+```{r test-plot, echo=FALSE}
+df_test <- do.call(rbind, lapply(names(pw_measures), function(m) data.frame(
+  measure = pw_measures[[m]],
+  subject = test_data$Subject,
+  test    = test_sleep_measure$pointwise[, paste0(m, "_test")]
+)))
+
+ggplot(df_test, aes(subject, test, color = subject)) +
+  geom_point(position = position_jitter(width = 0.1, seed = SEED)) +
+  facet_wrap(~measure, scales = "free") +
+  labs(x = "test subject", y = "pointwise test value") +
+  theme(legend.position = "none")
+```
+
+The test set holds five subjects that the model did not see. The plot shows whether
+one subject controls the estimate. The test set is small, so the standard errors
+are larger than in the other schemes. A different split can give
+a different estimate.
+
+## Comparison of predictive schemes {#compare-predictive-schemes}
+All four schemes use the same model and the same measures. They differ in the
+predictive question. The plot shows the estimate and $\pm 1$ standard error
+for each scheme and measure.
+
+`elpd` is a sum over the evaluation data (Vehtari et al., 2026, Eq. 2.7). The
+test set has 40 observations, and the other schemes have 144. Thus do not
+compare the `elpd` of the test data with the other schemes. Use `mlpd` for
+this comparison.
+
+```{r scheme-overview, echo=FALSE}
+results <- list(
+  "in-sample" = insample_sleep$estimates,
+  "PSIS-LOO"  = loo_sleep_measure$estimates,
+  "K-fold"    = kfold_sleep_measure$estimates,
+  "test data" = test_sleep_measure$estimates
+)
+suffix <- c("in-sample" = "", "PSIS-LOO" = "_loo", "K-fold" = "_kfold",
+            "test data" = "_test")
+direction <- c(elpd = "higher", mlpd = "higher", rps = "lower",
+               rmse = "lower", r2 = "higher")
+
+df_est <- do.call(rbind, lapply(names(results), function(s) {
+  est <- results[[s]][paste0(measures, suffix[[s]]), , drop = FALSE]
+  data.frame(
+    scheme   = s,
+    measure  = paste0(measures, " (", direction[measures], " is better)"),
+    estimate = est[, "Estimate"],
+    se       = est[, "SE"]
+  )
+}))
+
+df_est$scheme <- factor(df_est$scheme, levels = rev(names(results)))
+df_est$measure <- factor(df_est$measure, levels = unique(df_est$measure))
+
+ggplot(df_est, aes(estimate, scheme, color = scheme)) +
+  geom_linerange(aes(xmin = estimate - se, xmax = estimate + se),
+                 linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  scale_color_manual(
+    values = c("in-sample" = "grey50", "PSIS-LOO" = "#0072B2",
+               "K-fold" = "#009E73", "test data" = "#D55E00"),
+    guide = "none"
+  ) +
+  facet_wrap(~measure, ncol = 3, nrow = 2, scales = "free_x") +
+  labs(x = "estimate ± 1 SE", y = NULL) +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_rect(color = "grey70", fill = NA),
+        panel.spacing.y = unit(1, "lines"),
+        strip.background = element_rect(fill = "grey92", color = "grey70"),
+        strip.text = element_text(hjust = 0.5, face = "bold"))
+```
+
+In-sample, PSIS-LOO, and K-fold score the same 144 observations. The
+in-sample estimate is the most optimistic, because the model has seen each
+$y_i$. PSIS-LOO and K-fold ask a similar question, so their estimates are
+close. The test data score five new subjects. The interval of the test data is
+wider, because the test set has only 40 observations. One split is noisy. A
+different split can move the estimate to the other side of PSIS-LOO.
+
+## Add measures to an existing result {#add-measures}
+
+Besides the four scheme functions, the family has `pred_measure()`.
+This function adds measures to an object of class `pred_measure`. It takes the
+predictive scheme from the result, for example `kfold`, and adds new measures to
+the result object. If a requested measure is already stored, `pred_measure()`
+warns and skips it.
+
+For example, we first compute only `elpd` with PSIS-LOO.
+
+```{r}
+loo_elpd <- loo_pred_measure(loo = loo_sleep, save_psis = TRUE)
+loo_elpd
+```
+
+To add further measures to the output, we can now use `pred_measure()` and
+provide the additional measures with their required input. Additionally, we
+pass the initially computed result object (here: `loo_elpd`).
+
+```{r add-measures}
+pred_measure(
+  y = y,
+  mupred = mupred,
+  predperf = loo_elpd,
+  measures = c("mae", "rmse")
+)
+```
+
+## Custom measures {#custom-measures}
+
+The argument `measures` also accepts functions. Use them to define custom
+measures. A custom function must follow three rules:
+
++ **Arguments.** Name the arguments from `y`, `ypred`, `mupred`, `ylp`, and
+  `log_weights`. **loo** maps the inputs by these names.
++ **Weights.** `log_weights` holds the PSIS weights for PSIS-LOO. In the other
+  schemes it is `NULL`. A function that ignores `log_weights` gives in-sample
+  values under PSIS-LOO.
++ **Return value.** Return a list with `estimate`, `se`, and `pointwise`.
+
+After you construct the custom function, wrap it in
+`custom_measure()`, which sets the name, whether the measure is a loss (lower is
+better) or a utility, and how `model_compare()` computes the standard error of a
+difference (`se_diff_fun`). The default is a utility (higher is better). If you do not give
+`se_diff_fun`, `model_compare()` reports an `NA` standard error.
+
+**Example.** The coverage of the central 90% predictive interval is the
+proportion of observations inside that interval. For a calibrated model, it is
+close to 0.9. Observation $i$ is inside the interval when its probability
+integral transform lies between 0.05 and 0.95:
+
+$$
+\text{pit}_i = \sum_{s=1}^S w_i^s\, \mathbb{1}\{\tilde y_i^s \le y_i\},
+\qquad
+\text{cover}_i = \mathbb{1}\{0.05 < \text{pit}_i \le 0.95\} .
+$$
+
+```{r custom-function}
+coverage <- function(y, ypred, log_weights = NULL, prob = 0.9) {
+  if (is.null(log_weights)) {
+    log_weights <- matrix(-log(nrow(ypred)), nrow(ypred), ncol(ypred))
+  }
+  w <- exp(sweep(log_weights, 2, matrixStats::colLogSumExps(log_weights)))
+  pit <- colSums(w * sweep(ypred, 2, y, "<="))
+  alpha <- 1 - prob
+  cover_i <- as.numeric(pit > alpha / 2 & pit <= 1 - alpha / 2)
+  list(
+    estimate = mean(cover_i),
+    se = sqrt(var(cover_i) / length(cover_i)),
+    pointwise = cover_i
+  )
+}
+```
+
+The same function works in every scheme:
+
+```{r custom-measures}
+cover90 <- custom_measure(coverage, name = "cover90", se_diff_fun = "mean")
+
+insample_pred_measure(
+  y = y,
+  ypred = ypred,
+  measures = list("rps", cover90 = cover90)
+)
+
+loo_pred_measure(
+  loo = loo_sleep,
+  y = y,
+  ypred = ypred,
+  measures = list("rps", cover90 = cover90)
+)
+```
+
+## References
+
+Belenky, G., Wesensten, N. J., Thorne, D. R., et al. (2003). Patterns of
+performance degradation and restoration during sleep restriction and subsequent
+recovery: A sleep dose-response study. *Journal of Sleep Research*,
+12(1):1–12.
+
+Paananen, T., Piironen, J., Bürkner, P.-C., and Vehtari, A. (2021). Implicitly
+adaptive importance sampling. *Statistics and Computing*, 31(2):16.
+
+Silva, L. and Zanella, G. (2022). Robust leave-one-out cross-validation for
+high-dimensional Bayesian models. Preprint at
+[arXiv:2209.09190](https://arxiv.org/abs/2209.09190).
+
+Vehtari, A., Axen, S., Weber, F., and Bockting, F. (2026). Predictive measures
+and model comparison in the loo package: A formula reference. [TODO: arXiv ID]
+
+Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
+evaluation using leave-one-out cross-validation and WAIC. *Statistics and
+Computing*, 27(5):1413–1432. doi:10.1007/s11222-016-9696-4
+
+Vehtari, A., Simpson, D., Gelman, A., Yao, Y., and Gabry, J. (2024). Pareto
+smoothed importance sampling. *Journal of Machine Learning Research*,
+25(72):1–58.
+
+## See also
+
+- [Predictive model performance: Overview of measures](overview-measures.html)
+- [Model comparison: Explanation of `model_compare()`](model-comparison.html)
+- [Cross-validation FAQ](https://users.aalto.fi/~ave/CV-FAQ.html)
+
+## Appendix: model code {#appendix-model-code}
+
+```{r fit-models-code, ref.label="fit-models", eval=FALSE}
+```

@@ -228,8 +228,8 @@ stacking to average Bayesian predictive distributions.
 }
 \seealso{
 \itemize{
-\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes}, particularly
-\href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights using the \strong{loo} package}.
+\item The \strong{loo} package \href{https://mc-stan.org/loo/articles/index.html}{vignettes}, particularly
+\href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights}.
 \item \code{\link[=loo]{loo()}} for details on leave-one-out ELPD estimation.
 \item \code{\link[=constrOptim]{constrOptim()}} for the choice of optimization methods and control-parameters.
 \item \code{\link[=relative_eff]{relative_eff()}} for computing \code{r_eff}.

@@ -1,0 +1,8 @@
+```{r load-brms-github, include=FALSE}
+# Features used in these vignettes require brms from GitHub master (not yet on CRAN).
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+remotes::install_github("paul-buerkner/brms", ref = "master", upgrade = "never")
+suppressPackageStartupMessages(library(brms))
+```

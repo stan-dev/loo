@@ -1,5 +1,25 @@
 # loo (development version)
 
+* Add a predictive performance API by @florence-bockting in #363:
+  - new functions `insample_pred_measure()`, `loo_pred_measure()`,
+    `kfold_pred_measure()`, `test_pred_measure()`, and `pred_measure()`
+  - new built-in measures `measure_*()`, listed in `supported_measures_list`
+* Deprecate `elpd()`, `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()`, and
+  `loo_predictive_metric()`. Use `measure_*()` and `*_pred_measure()`. See
+  `vignette("migration-guide")`. By @florence-bockting in #363
+* Add `model_compare()` by @florence-bockting in #380:
+  - compares models on each measure of `*_pred_measure()` results
+  - compares each measure against its own best model
+  - shows loss measures on the utility scale
+  - ranks models by `elpd`, else by the first shared measure (alphabetical)
+  - new `print()` argument `measures`
+* Deprecate `loo_compare()`. Use `model_compare()`. Methods in other packages
+  (e.g. **brms**) still work. By @florence-bockting in #380
+* Add `custom_measure()` to set the name, loss flag, and SE of the difference
+  for a custom measure by @florence-bockting in #380
+* `loo_pred_measure()` warns when `loo_moment_match()` or `reloo()` changed the
+  `loo` object and the measure is not `elpd`, `mlpd`, or `ic`, by
+  @florence-bockting in #380
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 

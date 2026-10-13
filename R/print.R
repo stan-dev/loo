@@ -237,9 +237,88 @@ print_mcse_summary <- function(x, digits) {
 }
 
 # print and warning helpers
-.fr <- function(x, digits) format(round(x, digits), nsmall = digits)
+.fr <- function(x, digits) {
+  format(round(x, digits), nsmall = digits, scientific = FALSE)
+}
 .warn <- function(..., call. = FALSE) warning(..., call. = call.)
 .k_help <- function() "See help('pareto-k-diagnostic') for details.\n"
+
+#' Decimal places for one measure
+#'
+#' A measure on a fixed scale carries `digits` in `.measure_spec`. A measure on
+#' the scale of the data carries none, and takes its places from the standard
+#' error. A custom measure is in the second group.
+#' @noRd
+#' @param measure Bare measure name, without the source suffix.
+#' @param se Standard errors of the column to print. Used only when the measure
+#'   sets no `digits`.
+#' @return A single integer.
+.measure_digits <- function(measure, se = NULL) {
+  d <- .measure_spec[[measure]]$digits
+  if (!is.null(d)) {
+    return(d)
+  }
+  .se_digits(se)
+}
+
+#' Decimal places that show two significant digits of the standard error
+#'
+#' @noRd
+#' @param se Numeric vector. `NA`, zero and infinite values are dropped.
+#' @return A single integer between `min_digits` and `max_digits`. Returns 2
+#'   when no usable standard error is left.
+.se_digits <- function(se, sig = 2L, min_digits = 1L, max_digits = 4L) {
+  se <- se[is.finite(se) & se > 0]
+  if (!length(se)) {
+    return(2L)
+  }
+  d <- sig - 1L - floor(log10(min(se)))
+  max(min_digits, min(max_digits, d))
+}
+
+#' Resolve the `digits` argument of a print method for one measure
+#'
+#' `NULL` uses the per-measure default. A single number sets one format for
+#' every column, as before. 
+#' @noRd
+.resolve_digits <- function(digits, measure, se = NULL) {
+  if (is.null(digits)) {
+    return(.measure_digits(measure, se))
+  }
+  if (is.null(names(digits))) {
+    return(digits[[1L]])
+  }
+  if (measure %in% names(digits)) {
+    return(digits[[measure]])
+  }
+  .measure_digits(measure, se)
+}
+
+#' Format an `estimates` matrix row by row
+#'
+#' @noRd
+#' @param est Matrix with columns `Estimate` and `SE`, one row per measure.
+#' @param digits `NULL`, a single number, or a named vector. See
+#'   `.resolve_digits()`.
+#' @param suffix Source suffix to strip from the row names, such as `"_loo"`.
+#' @return A character data frame, ready to print.
+.format_estimates <- function(est, digits, suffix = "") {
+  est <- as.matrix(est)
+  measures <- rownames(est)
+  if (nzchar(suffix)) {
+    measures <- sub(paste0(suffix, "$"), "", measures)
+  }
+  measures[measures == "p"] <- "elpd"
+
+  out <- est
+  storage.mode(out) <- "character"
+  has_se <- "SE" %in% colnames(est)
+  for (i in seq_len(nrow(est))) {
+    se <- if (has_se) est[i, "SE"] else NULL
+    out[i, ] <- .fr(est[i, ], .resolve_digits(digits, measures[i], se))
+  }
+  as.data.frame(out, stringsAsFactors = FALSE)
+}
 
 # compatibility with old loo objects
 convert_old_object <- function(x, digits = 1, ...) {
@@ -248,4 +327,87 @@ convert_old_object <- function(x, digits = 1, ...) {
   nms <- names(uz)
   ses <- grepl("se", nms)
   list(estimates = data.frame(Estimate = uz[!ses], SE = uz[ses]))
+}
+
+# print.R: S3 print methods for predictive measure objects and source
+# labeling helpers.
+
+
+#' @export
+print.pred_measure <- function(x, digits = NULL, ...) {
+  dims <- attr(x, "dims")
+  if (is.null(dims) && !is.null(x$log_weights)) {
+    dims <- dim(x$log_weights)
+  }
+  source <- .pred_measure_source_label(x)
+
+  cat("\n")
+  if (!is.null(dims) && length(dims) == 2) {
+    cat(
+      sprintf(
+        "Computed from %s posterior draws and %s observations.\n",
+        dims[1],
+        dims[2]
+      )
+    )
+  }
+  cat(sprintf("Data source: %s\n\n", source))
+  print(
+    .format_estimates(x$estimates, digits, suffix = .compare_suffix(list(x))),
+    quote = FALSE
+  )
+  invisible(x)
+}
+
+#' @export
+print.loo_pred_measure <- function(x, digits = NULL, plot_k = FALSE, ...) {
+  print.pred_measure(x, digits = digits, ...)
+  cat("------\n")
+  pareto_k <- x$diagnostics$pareto_k
+  if (is.null(pareto_k)) {
+    cat("No Pareto-k diagnostics available.\n")
+    return(invisible(x))
+  }
+
+  print(pareto_k_table(x), digits = 1)
+
+  if (plot_k) {
+    graphics::plot(
+      pareto_k,
+      ylab = "Pareto-k",
+      xlab = "Observation",
+      main = "Pareto-k diagnostics",
+      pch = 16
+    )
+  }
+  invisible(x)
+}
+
+.pred_measure_source_label <- function(x) {
+  labels <- c(loo = "loo", insample = "in-sample", kfold = "k-fold", test = "test")
+  source <- attr(x, "source")
+  if (!is.null(source) && source %in% names(labels)) {
+    return(unname(labels[source]))
+  }
+  # fall back to the class, for objects that lost their attributes
+  cls <- class(x)
+  hit <- names(labels)[paste0(names(labels), "_pred_measure") %in% cls]
+  if (length(hit)) unname(labels[hit[1]]) else "unknown"
+}
+
+#' @export
+print.measure <- function(x, digits = NULL, ...) {
+  dims <- attr(x, "dims")
+  name <- attr(x, "measure")
+
+  if (length(dims) < 2) {
+    # number of draws are NULL
+    cat("\nComputed from", dims[1], "pointwise terms.\n\n")
+  } else {
+    cat("\nComputed from", dims[1], "draws by", dims[2], "observations.\n\n")
+  }
+
+  print(.format_estimates(x$estimates, digits), quote = FALSE)
+
+  invisible(x)
 }
