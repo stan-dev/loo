@@ -275,18 +275,14 @@ stacking_weights <-
       # gradient of the objective function
       stopifnot(length(w) == K - 1)
       w_full <- c(w, 1 - sum(w))
-      grad <- rep(0, K - 1)
       mixture_lpd <- matrixStats::rowLogSumExps(
         sweep(lpd_point, 2, log(w_full), "+")
       )
-      for (k in 1:(K - 1)) {
-        grad[k] <- sum(exp_diff_over_exp(
-          lpd_point[, k],
-          lpd_point[, K],
-          mixture_lpd
-        ))
-      }
-      return(-grad)
+      -colSums(exp_diff_over_exp(
+        lpd_point[, seq_len(K - 1), drop = FALSE],
+        matrix(lpd_point[, K], N, K - 1),
+        matrix(mixture_lpd, N, K - 1)
+      ))
     }
 
     ui <- rbind(rep(-1, K - 1), diag(K - 1))  # K-1 simplex constraint matrix
