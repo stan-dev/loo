@@ -268,9 +268,11 @@ loo_moment_match_i <- function(i,
   lwfi <- rep(-matrixStats::logSumExp(rep(0, S)),S)
 
   # initialize objects that keep track of the total transformation
-  total_shift <- rep(0, npars)
-  total_scaling <- rep(1, npars)
-  total_mapping <- diag(npars)
+  total <- list(
+    shift = rep(0, npars),
+    scaling = rep(1, npars),
+    mapping = diag(npars)
+  )
 
   # try several transformations one by one
   # if one does not work, do not apply it and try another one
@@ -302,7 +304,7 @@ loo_moment_match_i <- function(i,
     }
     if (quantities_i$ki < ki) {
       uparsi <- trans$upars
-      total_shift <- total_shift + trans$shift
+      total <- add_step_to_total(total, trans, cov)
 
       lwi <- quantities_i$lwi
       lwfi <- quantities_i$lwfi
@@ -332,8 +334,7 @@ loo_moment_match_i <- function(i,
     }
     if (quantities_i$ki < ki) {
       uparsi <- trans$upars
-      total_shift <- total_shift + trans$shift
-      total_scaling <- total_scaling * trans$scaling
+      total <- add_step_to_total(total, trans, cov)
 
       lwi <- quantities_i$lwi
       lwfi <- quantities_i$lwfi
@@ -365,8 +366,7 @@ loo_moment_match_i <- function(i,
       }
       if (quantities_i$ki < ki) {
         uparsi <- trans$upars
-        total_shift <- total_shift + trans$shift
-        total_mapping <- trans$mapping %*% total_mapping
+        total <- add_step_to_total(total, trans, cov)
 
         lwi <- quantities_i$lwi
         lwfi <- quantities_i$lwfi
@@ -389,7 +389,7 @@ loo_moment_match_i <- function(i,
   if (split && (iterind > 1)) {
     # compute split transformation
     split_obj <- loo_moment_match_split(
-      x, upars, cov, total_shift, total_scaling, total_mapping, i,
+      x, upars, cov, total$shift, total$scaling, total$mapping, i,
       log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
       cores = 1, r_eff_i = r_eff_i, is_method = is_method, ...
     )
@@ -485,6 +485,39 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
 }
 
 
+
+#' Add one accepted moment matching step to the total transformation
+#'
+#' Each step maps the current draws `u` to `L (u - mean(u)) + mean(u) + shift`,
+#' where `L` is the identity, `diag(scaling)` or `mapping`. The shifts add up,
+#' and the linear parts compose in the order in which the steps were accepted.
+#' After any accepted step the loop in `loo_moment_match_i()` starts again with
+#' the shift step, so a scaling step can follow a covariance step. With
+#' `cov = TRUE` the scaling is therefore applied to the rows of `mapping`
+#' (`diag(scaling) %*% mapping`), and `scaling` stays one. With `cov = FALSE`
+#' there is no covariance step, and the scalings are kept in `scaling`.
+#'
+#' @noRd
+#' @param total A list with `shift`, `scaling` and `mapping`.
+#' @param trans The output of `shift()`, `shift_and_scale()` or
+#'   `shift_and_cov()`.
+#' @param cov Logical; the `cov` argument of the moment matching.
+#' @return The updated `total`.
+#'
+add_step_to_total <- function(total, trans, cov) {
+  total$shift <- total$shift + trans$shift
+  if (!is.null(trans$scaling)) {
+    if (cov) {
+      total$mapping <- trans$scaling * total$mapping
+    } else {
+      total$scaling <- total$scaling * trans$scaling
+    }
+  }
+  if (!is.null(trans$mapping)) {
+    total$mapping <- trans$mapping %*% total$mapping
+  }
+  total
+}
 
 #' Shift a matrix of parameters to their weighted mean.
 #' Also calls update_quantities_i which updates the importance weights based on
