@@ -9,6 +9,8 @@ comparison-model minus reference-model by @florence-bockting in #391
 * Fix `crps()` and `scrps()` ignoring the `permutations` argument for numeric
 input by @thanasibakis in #398
 * Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
+* Use a tolerance relative to the magnitude of `x` in `is_constant()` by
+@avehtari in #407
 
 # loo 2.10.1
 

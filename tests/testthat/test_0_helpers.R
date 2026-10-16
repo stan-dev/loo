@@ -91,3 +91,15 @@ test_that("loo_cores works", {
   expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
   options(loo.cores = NULL)
 })
+
+test_that("is_constant uses a tolerance relative to the magnitude of x", {
+  expect_true(is_constant(rep(0, 5)))
+  expect_true(is_constant(rep(1e-300, 5)))
+  expect_true(is_constant(rep(-Inf, 5)))
+  expect_true(is_constant(c(1, 1 + .Machine$double.eps)))
+  expect_false(is_constant(c(1e-20, 2e-20)))
+  expect_false(is_constant(c(1e-300, 2e-300)))
+  expect_false(is_constant(c(-Inf, 2)))
+  expect_false(is_constant(c(1, 2)))
+  expect_true(is.na(is_constant(c(1, NA))))
+})

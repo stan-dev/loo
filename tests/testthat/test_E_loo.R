@@ -245,3 +245,15 @@ test_that("weighted variance works", {
   x <- 1e8 + c(-1, 0, 1)
   expect_equal(.wvar(x, rep(1 / 3, 3)), 1)
 })
+
+test_that("E_loo pareto_k does not depend on the scale of x", {
+  # posterior::pareto_khat() of h * r also needs the relative tolerance
+  # with an older posterior it returns NA here
+  skip_if(posterior:::is_constant(c(1e-20, 2e-20)),
+          "posterior::is_constant() has an absolute tolerance")
+  k <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
+  for (s in c(1e-20, 1e-200)) {
+    k_s <- E_loo(s * x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
+    expect_equal(k_s, k, tolerance = 1e-10)
+  }
+})
