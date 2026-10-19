@@ -329,6 +329,6 @@ the \strong{loo} website for answers to frequently asked questions.
 \item \code{\link[=psis]{psis()}} for the underlying Pareto Smoothed Importance Sampling (PSIS)
 procedure used in the LOO-CV approximation.
 \item \link{pareto-k-diagnostic} for convenience functions for looking at diagnostics.
-\item \code{\link[=loo_compare]{loo_compare()}} for model comparison.
+\item \code{\link[=model_compare]{model_compare()}} for model comparison.
 }
 }

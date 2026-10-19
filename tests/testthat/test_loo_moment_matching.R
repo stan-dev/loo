@@ -273,6 +273,8 @@ test_that("loo_moment_match.default works", {
     cores = 1
   ))
 
+  expect_identical(attr(loo_moment_match_object, "posthoc"), "moment_match")
+
   # diagnostic Pareto k decreases but influence pareto k stays the same
   expect_lt(
     loo_moment_match_object$diagnostics$pareto_k[1],
