@@ -72,14 +72,17 @@ that splits the observed data $y = (y_1, \ldots, y_n)$ into a training set
 $\mathcal{T}$ used to fit the model and an evaluation set $\mathcal{E}$ (i.e., 
 the observations whose predictive performance is evaluated).
 
-For example, in the case of in-sample evaluation, the training set is the full
-data set. In a hold-out evaluation, the data set is split into two disjoint
-sets: one for training and one for evaluation.
-Between these two extremes are cross-validation schemes, where the training
-set is a subset of the data, and the evaluation set is the remaining data.
-For example, in leave-one-out cross-validation, the training set is the full
-data set minus one observation. In K-fold cross-validation, the training set is
-the full data set minus one of $K$ disjoint subsets of the data (i.e., the folds).
+Predictive schemes include:
+
++ the special case of *in-sample* evaluation, where the training and test set
+  are the same, consisting of the full data set. 
++ *hold-out* evaluation, where the data set is split into two disjoint sets: 
+  one for training and one for evaluation.
++ *cross-validation* schemes, where the training set is a subset of the data,
+  and the evaluation set is the remaining data. For example, in leave-one-out
+  cross-validation, the training set is the full data set minus one observation.
+  In K-fold cross-validation, the training set is the full data set minus one
+  of $K$ disjoint subsets of the data (i.e., the folds).
 
 ### Overview of the predictive schemes
 
@@ -89,11 +92,9 @@ each predictive scheme:
 | Scheme | Training data $\mathcal{T}(i)$ | Evaluation data $\mathcal{E}$ | Predictive distribution $p^q(y_i)$ | Weights $w_i^s$ | Entry point |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | [in-sample](#in-sample) | $\{1, \ldots, n\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y)$ | $1/S$ | `insample_pred_measure()` |
-| [LOO](#psis-loo)* | $\{1, \ldots, n\} \setminus \{i\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-i})$ | PSIS weights | `loo_pred_measure()` |
+| [PSIS-LOO](#psis-loo)* | $\{1, \ldots, n\} \setminus \{i\}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-i})$ | PSIS weights | `loo_pred_measure()` |
 | [K-fold](#k-fold) | $\{1, \ldots, n\} \setminus \mathcal{I}_{k(i)}$ | $\{1, \ldots, n\}$ | $p(y_i \mid y_{-\mathcal{I}_{k(i)}})$ | $1/S$ | `kfold_pred_measure()` |
 | [test data](#test-data) | $\mathcal{R}$ | $\mathcal{S}$ | $p(y_i \mid y_{\mathcal{R}})$ | $1/S$ | `test_pred_measure()` |
-
-*here with focus on PSIS-LOO.
 
 For further discussion, see the paper [Predictive measures: A formula reference]() <!-- TODO -->.
 
@@ -125,9 +126,13 @@ theme_set(theme_minimal())
 SEED <- 42
 ```
 
-The model is a normal regression of `y` on `Days`. It has no subject effects.
-As fitting is not the focus of this vignette, we do not discuss the modelling
-step in depth but show the code in the [appendix](#appendix-model-code).
+To model the data, we use a normal regression of `y` on `Days` with no subject
+effects. As fitting is not the focus of this vignette, we do not discuss the
+modelling step in depth but show the code in the [appendix](#appendix-model-code).
+
+For discussing the different predictive schemes, we fit the model once to the
+full data set and once to a subset of the data (i.e., the training data). For
+the test data we holdout the observations of 5 subjects.
 
 | Object | Data | Description |
 | :--- | :--- | :--- |
@@ -171,15 +176,15 @@ fit_train <- update(
 
 ### Measures
 
-For the example, we will use the following measures to evaluate the 
-predictive performance of the model: `elpd`, `mlpd`, `rps`, `rmse`, and `r2`.
+To mesaure predictive performance of the model, we will use the following
+measures: `elpd`, `mlpd`, `rps`, `rmse`, and `r2`.
 See the vignette [Predictive model performance: Overview of measures](overview-measures.html)
 for a discussion of the measures.
 
-Each measure requires specific inputs: the observed values (`y`), the
-pointwise log predictive densities (`ylp`), the predicted means (`mupred`),
-or draws from the predictive distribution (`ypred`). The following table
-summarizes the input requirements for the measures used in this example.
+Each measure requires one or more of the following inputs: the observed
+values (`y`), the pointwise log predictive densities (`ylp`), the predicted
+means (`mupred`), or draws from the predictive distribution (`ypred`). The
+following table shows the required inputs for each measure.
 
 | Measure | `y` | `ylp` | `mupred` | `ypred` |
 | :--- | :---: | :---: | :---: | :---: |
@@ -188,6 +193,8 @@ summarizes the input requirements for the measures used in this example.
 | `rps` | ✓ | | | ✓ |
 | `rmse` | ✓ | | ✓ | |
 | `r2` | ✓ | | ✓ | |
+
+To compute the corresponding inputs we use functions from `brms`.
 
 ```{r inputs}
 measures <- c("elpd", "mlpd", "rps", "rmse", "r2")
@@ -202,8 +209,7 @@ mupred <- brms::posterior_epred(fit_full)
 ### In-sample {#in-sample}
 We start the discussion with the special case of using in-sample evaluations.
 In-sample performance evaluates the fitted model on the same data used for
-fitting and is therefore typically optimistic as an estimate of performance
-on new data. Thus, it should not be used to estimate predictive performance.
+fitting. It should not be used to estimate predictive performance.
 Nevertheless, it can be useful as a reference point, and the amount of optimism
 relative to a cross-validation or test-data estimate can itself be informative.
 
@@ -226,9 +232,9 @@ The returned structure of the `pred_measure` class includes the
 following attributes are included in the result:
 
 + `measure_info`: a list with entries for each measure with respective additional information
-+ `source`: indicates the predictive scheme used, here `"insample"`.
 + `dims`: provides the dimensions of the data used for evaluation.
 + `class`: indicates the class of the result, here `"pred_measure"` and `"insample_pred_measure"`.
++ `source`: indicates the predictive scheme used, here `"insample"`.
 
 The corresponding print method shows the estimates and standard errors for
 each measure, as well as the number of observations used for evaluation.
@@ -240,13 +246,10 @@ insample_sleep
 ### PSIS-LOO {#psis-loo}
 Next, we focus on the leave-one-out cross-validation (LOO) scheme, specifically
 using Pareto-smoothed importance sampling (PSIS) to approximate the LOO
-predictive performance. In this scheme, each observation is left out of the
-training set one at a time.
-
-While exact leave-one-out cross-validation needs one refit for each observation,
-PSIS-LOO uses the draws of the full-data fit instead.
-It gives them Pareto-smoothed importance weights, so that each $y_i$ is scored
-as if it was left out (Vehtari et al., 2024).
+predictive performance. While exact leave-one-out cross-validation needs one
+refit for each observation, PSIS-LOO uses the draws of the full-data fit instead.
+PSIS-LOO then weights the draws with Pareto-smoothed importance weights, so
+that each $y_i$ is scored as if it was left out (Vehtari et al., 2024).
 
 **Implementation**
 We first compute the PSIS-LOO object using `brms::loo()` and then pass it to
@@ -268,8 +271,8 @@ loo_sleep_measure
 
 **Result**
 Compared to the in-sample evaluation, the rows now have the suffix `_loo`.
-The measure `elpd` also adds `p_loo`, the difference between the in-sample and
-the LOO log score (Vehtari et al., 2026). <!-- TODO -->
+The measure `elpd` also adds automatically `p_loo`, the difference between the
+in-sample and the LOO log score (Vehtari et al., 2026). <!-- TODO -->
 
 The output structure of the `loo_pred_measure` class includes two additional
 components compared to the `insample_pred_measure` class:
@@ -287,7 +290,7 @@ The following plot compares the in-sample and LOO scores for
 three measures: the log score, the RPS, and the squared error. Each point
 is one observation. The x-axis shows the in-sample value, and the y-axis
 the LOO value. The color shows the Pareto $\hat k$. We do not show `mlpd`
-and `r2`. Their pointwise values are the same as those of `elpd` and `rmse`.
+and `r2` as their pointwise values are the same as those of `elpd` and `rmse`.
 
 ```{r loo-plot, echo=FALSE}
 pw_measures <- c(
@@ -329,7 +332,7 @@ The model is fit once for each fold, without the observations in that fold.
 This needs $K$ fits, not $n$.
 
 **Implementation**
-**loo** does not refit the model. We first compute the K-fold object using
+The **loo** package does not refit the model but this can be done with
 `brms::kfold()`. Set `save_fits = TRUE`. Without the fits,
 `brms::kfold_predict()` cannot compute the held-out draws:
 `method = "predict"` gives `ypred`, and `method = "fitted"` gives `mupred`.
@@ -342,7 +345,7 @@ mupred_kfold <- brms::kfold_predict(kfold_sleep, method = "fitted")$yrep
 ```
 
 We then pass the K-fold object to `kfold_pred_measure()`. Otherwise, the input
-structure is the same as for the in-sample evaluation.
+structure is the same as for the previous examples.
 
 ```{r kfold-measures}
 kfold_sleep_measure <- kfold_pred_measure(
@@ -360,19 +363,20 @@ The rows in the result object now have the suffix `_kfold`.
 The measure `elpd` also adds `p_kfold`, the difference between the in-sample
 and the K-fold log score.
 
-The output structure of the `kfold_pred_measure` class takes the attributes
+The output structure of the `kfold_pred_measure` class copies the attributes
 `K`, `folds`, `fold_type`, `joint`, `yhash`, and `model_name` from the `kfold`
-object. It has `$diagnostics` only when the `kfold` object has them. Recent
-versions of `brms::kfold()` do. K-fold uses no importance weights, so there is
-no `$log_weights` component.
+object. It has `$diagnostics` only when the `kfold` object has them.
+K-fold uses no importance weights, so there is no `$log_weights` component as
+in the case of PSIS-LOO.
 
 ```{r}
 names(kfold_sleep_measure)
 ```
 
 **Plot**
-The following plot has the same layout as the PSIS-LOO plot. The y-axis now
-shows the K-fold value. The color shows the fold of each observation.
+The following plot compares the in-sample and K-fold values for the three
+measures. Each point is one observation. The color shows the fold of each
+observation.
 
 ```{r kfold-plot, echo=FALSE}
 df_kfold <- do.call(rbind, lapply(names(pw_measures), function(m) data.frame(
@@ -395,21 +399,17 @@ ggplot(df_kfold, aes(insample, kfold, color = fold)) +
 The direction of the diagonal is the same as in the PSIS-LOO plot. With
 $K = 5$, each fit uses about 80% of the data. Thus K-fold and PSIS-LOO answer a
 similar question. Each K-fold fit has less data than a LOO fit, so the K-fold
-estimates are often slightly worse. Use K-fold when PSIS-LOO shows many high
-Pareto $\hat k$ values.
+estimates are often slightly worse.
 
 `brms::kfold()` also accepts `folds = "grouped"` with `group = "Subject"`. Then
 each fold holds out whole subjects, and the predictive question changes to new
 subjects.
 
 ### Test data {#test-data}
-Finally, we focus on the test data scheme. The data are split once into a
-training set and a test set. The model is fit only to the training set. It then
-predicts the test set, which it did not see. For the current example, we hold out
-five subjects. This gives 40 test observations.
-
-This scheme needs no importance weights and no refits. It needs one fit to the
-training data.
+Finally, we focus on the test data scheme, where the data is split into two
+disjoint sets, a training and a test set. The model is fit only to the
+training set. It then predicts the test set, which it did not see. For the
+current example, we hold out five subjects. This gives 40 test observations.
 
 **Implementation**
 We compute the draws of `fit_train` at `test_data` with `newdata`. Pass the log
@@ -528,22 +528,24 @@ different split can move the estimate to the other side of PSIS-LOO.
 
 ## Add measures to an existing result {#add-measures}
 
-Besides the four scheme functions, the family has `pred_measure()`.
-This function adds measures to an object of class `pred_measure`. It takes the
-predictive scheme from the result, for example `kfold`, and adds new measures to
+Besides the four scheme functions, the `pred_measure()` function adds measures
+to an object of class `pred_measure`. It takes the predictive scheme from the
+result, for example `kfold`, and adds new measures to
 the result object. If a requested measure is already stored, `pred_measure()`
 warns and skips it.
 
 For example, we first compute only `elpd` with PSIS-LOO.
 
 ```{r}
-loo_elpd <- loo_pred_measure(loo = loo_sleep, save_psis = TRUE)
+loo_elpd <- loo_pred_measure(
+  loo = loo_sleep, measures = "elpd", save_psis = TRUE
+)
 loo_elpd
 ```
 
-To add further measures to the output, we can now use `pred_measure()` and
-provide the additional measures with their required input. Additionally, we
-pass the initially computed result object (here: `loo_elpd`).
+And decide then that we want to add further measures to the output.
+We can do that using `pred_measure()` and provide the additional measures with
+their required input:
 
 ```{r add-measures}
 pred_measure(
