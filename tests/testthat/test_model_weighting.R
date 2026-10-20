@@ -55,6 +55,21 @@ test_that("stacking handles equal infinite log predictive densities", {
   expect_equal(as.numeric(stacking_weights(lpd)), c(0, 1, 0), tolerance = 1e-6)
 })
 
+test_that("loo_model_weights accepts models with different numbers of draws", {
+  ll_short <- list(log_lik1, log_lik2[1:250, ], log_lik3)
+  loo_short <- loo_list
+  loo_short[[2]] <- loo(log_lik2[1:250, ], r_eff = r_eff_list[[2]])
+
+  for (method in c("stacking", "pseudobma")) {
+    w_mat <- loo_model_weights(ll_short, method = method, BB = FALSE,
+                               r_eff_list = r_eff_list)
+    w_loo <- loo_model_weights(loo_short, method = method, BB = FALSE)
+    expect_equal(as.numeric(w_mat), as.numeric(w_loo))
+    expect_true(all(w_loo >= 0))
+    expect_equal(sum(w_loo), 1)
+  }
+})
+
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(
     loo_model_weights(log_lik1),
@@ -68,17 +83,13 @@ test_that("loo_model_weights throws correct errors and warnings", {
   )
 
   expect_error(
-    loo_model_weights(list(log_lik1, log_lik2[-1, ])),
-    "same dimensions"
-  )
-  expect_error(
     loo_model_weights(list(log_lik1, log_lik2, log_lik3[, -1])),
-    "same dimensions"
+    "same number of observations"
   )
 
   loo_list2 <- loo_list
-  attr(loo_list2[[3]], "dims") <- c(10, 10)
-  expect_error(loo_model_weights(loo_list2), "same dimensions")
+  loo_list2[[3]] <- loo(log_lik3[, -1], r_eff = rep(0.9, 49))
+  expect_error(loo_model_weights(loo_list2), "same number of observations")
 
   expect_error(
     loo_model_weights(ll_list, r_eff_list = r_eff_list[-1]),

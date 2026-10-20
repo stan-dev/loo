@@ -11,7 +11,8 @@
 #'   elements are named the names will be used to label the models in the
 #'   results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 #'   where \eqn{S} is the size of the posterior sample (with all chains merged)
-#'   and \eqn{N} is the number of data points. If `x` is a list of
+#'   and \eqn{N} is the number of data points. All models must have the same
+#'   \eqn{N}, but \eqn{S} can differ between models. If `x` is a list of
 #'   log-likelihood matrices then [loo()] is called internally on each matrix.
 #'   Currently the `loo_model_weights()` function is not implemented to be used
 #'   with results from K-fold CV, but you can still obtain weights using K-fold
@@ -420,7 +421,8 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 #' Validate log-likelihood list argument
 #'
 #' Checks that log-likelihood list has at least 2 elements and that each element
-#' has the same dimensions.
+#' has the same number of observations (columns). The number of posterior
+#' draws (rows) can differ, because the weights use only the pointwise elpd.
 #'
 #' @noRd
 #' @param log_lik_list User's list of log-likelihood matrices (the `x` argument
@@ -432,9 +434,9 @@ validate_log_lik_list <- function(log_lik_list) {
   if (length(log_lik_list) < 2) {
     stop("At least two models are required.", call. = FALSE)
   }
-  if (length(unique(sapply(log_lik_list, ncol))) != 1 |
-     length(unique(sapply(log_lik_list, nrow))) != 1) {
-    stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
+  if (length(unique(sapply(log_lik_list, ncol))) != 1) {
+    stop("Each log-likelihood matrix must have the same number of ",
+         "observations (columns).", call. = FALSE)
   }
   invisible(TRUE)
 }
@@ -448,10 +450,12 @@ validate_psis_loo_list <- function(psis_loo_list) {
     stop("List elements must all be 'psis_loo' objects or log-likelihood matrices.")
   }
 
-  dims <- sapply(psis_loo_list, dim)
-  if (length(unique(dims[1, ])) != 1 |
-      length(unique(dims[2, ])) != 1) {
-    stop("Each object in the list must have the same dimensions.", call. = FALSE)
+  # the weights use only the pointwise elpd, so the number of posterior draws
+  # can differ between the objects
+  n_obs <- sapply(psis_loo_list, function(x) nrow(x$pointwise))
+  if (length(unique(n_obs)) != 1) {
+    stop("Each object in the list must have the same number of observations.",
+         call. = FALSE)
   }
   invisible(TRUE)
 }
