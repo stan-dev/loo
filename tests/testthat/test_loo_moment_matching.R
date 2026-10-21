@@ -787,15 +787,84 @@ test_that("the accuracy warning names a failed split transformation", {
   expect_no_warning(throw_large_kf_warning(0.5, 0.7, split_failed = TRUE))
 })
 
-test_that("an error in a transformation stops moment matching early", {
+test_that("an error in the first transformation keeps the PSIS results", {
   loo_manual <- suppressWarnings(loo(loglik))
-  # the remaining high Pareto k gives a second warning
-  suppressWarnings(expect_warning(
-    mm <- mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1)),
-    "overflow in log_lik_i_upars"
-  ))
-  # the first transformation failed, so no transformation was accepted
-  expect_equal(mm$diagnostics$pareto_k, loo_manual$diagnostics$pareto_k)
+  # k_threshold = 0 moment-matches all observations; the first call of
+  # log_lik_i_upars is the first transformation of observation 1
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1),
+            k_threshold = 0),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  # no transformation was accepted, so the observation counts as failed
+  expect_match(warnings, "failed for observation(s) 1.", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "overflow in log_lik_i_upars", all = FALSE)
+  expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
+  expect_equal(mm$diagnostics$pareto_k[1], loo_manual$diagnostics$pareto_k[1])
+})
+
+test_that("moment matching stops if it fails for all observations", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # only observation 1 is above k_threshold = 0.7
+  expect_error(
+    suppressWarnings(mm_with(loo_manual,
+                             log_lik_i_upars = failing_log_lik_i_upars(1))),
+    "Moment matching failed for all observations.*overflow in log_lik_i_upars"
+  )
+  # a log_lik_i with the wrong arguments fails for every observation
+  wrong_log_lik_i <- function(x) x
+  expect_error(
+    suppressWarnings(mm_with(loo_manual, log_lik_i = wrong_log_lik_i,
+                             k_threshold = 0)),
+    "Moment matching failed for all observations"
+  )
+})
+
+test_that("errors in loo itself are not reported as failed observations", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # log_lik_i returns without an error, and loo's own code then fails
+  non_numeric_log_lik_i <- function(x, i, ...) {
+    if (i == 1) "not numeric" else log_lik_i_test(x, i)
+  }
+  cores_list <- if (os_is_windows()) 1 else c(1, 2)
+  for (cores in cores_list) {
+    expect_error(
+      # with cores = 2, mclapply() also warns that a worker had an error
+      suppressWarnings(mm_with(loo_manual, log_lik_i = non_numeric_log_lik_i,
+                               k_threshold = 0, cores = cores)),
+      "non-numeric argument to mathematical function"
+    )
+  }
+})
+
+test_that("a parallel worker that dies gives failed observations", {
+  skip_on_cran()
+  skip_on_os("windows")  # the worker is a forked process
+  loo_manual <- suppressWarnings(loo(loglik))
+  parent <- Sys.getpid()
+  dying_log_lik_i <- function(x, i, ...) {
+    if (i == 1 && Sys.getpid() != parent) {
+      tools::pskill(Sys.getpid(), tools::SIGKILL)
+    }
+    log_lik_i_test(x, i)
+  }
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i = dying_log_lik_i, k_threshold = 0,
+            cores = 2),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(warnings, "a parallel worker did not return a result",
+               all = FALSE)
+  expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
 })
 
 test_that("an error for one observation keeps its PSIS results", {

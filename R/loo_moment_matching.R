@@ -112,18 +112,14 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   I <- which(ks > k_threshold)
 
   loo_moment_match_i_fun <- function(i) {
-    # an error for one observation keeps its original PSIS results
-    tryCatch(
-      loo_moment_match_i(i = i, x = x, log_lik_i = log_lik_i,
-                         unconstrain_pars = unconstrain_pars,
-                         log_prob_upars = log_prob_upars,
-                         log_lik_i_upars = log_lik_i_upars,
-                         max_iters = max_iters, k_threshold = k_threshold,
-                         split = split, cov = cov, N = N, S = S, upars = upars,
-                         orig_log_prob = orig_log_prob, k = ks[i],
-                         is_method = is_method, npars = npars, ...),
-      error = function(e) list(i = i, failed = TRUE, error = conditionMessage(e))
-    )
+    loo_moment_match_i(i = i, x = x, log_lik_i = log_lik_i,
+                       unconstrain_pars = unconstrain_pars,
+                       log_prob_upars = log_prob_upars,
+                       log_lik_i_upars = log_lik_i_upars,
+                       max_iters = max_iters, k_threshold = k_threshold,
+                       split = split, cov = cov, N = N, S = S, upars = upars,
+                       orig_log_prob = orig_log_prob, k = ks[i],
+                       is_method = is_method, npars = npars, ...)
   }
 
   if (cores == 1) {
@@ -149,10 +145,15 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   error_msg <- NULL
   for (ii in seq_along(I)) {
     i <- I[ii]
-    # parallel::mclapply() returns a "try-error" string if a worker fails
-    if (inherits(mm_list[[ii]], "try-error")) {
+    # parallel::mclapply() returns NULL if a worker dies, for example when it
+    # runs out of memory, and a "try-error" string if a worker stops with an
+    # error. Errors of the user functions are caught in loo_moment_match_i(),
+    # so a worker error is an error in loo itself, as it is with cores = 1.
+    if (is.null(mm_list[[ii]])) {
       mm_list[[ii]] <- list(i = i, failed = TRUE,
-                            error = as.character(mm_list[[ii]]))
+                            error = "a parallel worker did not return a result")
+    } else if (inherits(mm_list[[ii]], "try-error")) {
+      stop(try_error_message(mm_list[[ii]]), call. = FALSE)
     }
     if (!is.null(mm_list[[ii]]$error)) {
       error_msg <- c(error_msg, mm_list[[ii]]$error)
@@ -179,6 +180,10 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     if (!is.null(loo$psis_object)) {
       loo$psis_object$log_weights[, i] <- mm_list[[ii]]$lwi
     }
+  }
+  if (length(I) > 0 && length(failed) == length(I)) {
+    stop("Moment matching failed for all observations. The first error ",
+         "message:\n", error_msg[1], call. = FALSE)
   }
   if (!is.null(loo$psis_object)) {
     attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(loo$psis_object$log_weights)
@@ -281,7 +286,12 @@ loo_moment_match_i <- function(i,
   uparsi <- upars
   ki <- k
   kfi <- 0
-  log_liki <- log_lik_i(x, i, ...)
+  log_liki <- tryCatch(log_lik_i(x, i, ...), error = function(e) e)
+  if (inherits(log_liki, "error")) {
+    # the user function failed for this observation, which keeps its PSIS
+    # results
+    return(list(i = i, failed = TRUE, error = conditionMessage(log_liki)))
+  }
   S_per_chain <- NROW(log_liki)
   N_chains <- NCOL(log_liki)
   dim(log_liki) <- c(S_per_chain, N_chains, 1)
@@ -467,6 +477,9 @@ loo_moment_match_i <- function(i,
        lwi = lwi,
        i = i,
        error = error_msg,
+       # an error before any transformation was accepted leaves the PSIS
+       # results
+       failed = !is.null(error_msg) && iterind == 1,
        split_failed = split && (iterind > 1) && !split_done)
 }
 
@@ -716,7 +729,8 @@ throw_moment_match_error_warning <- function(failed, stopped, error_msg) {
   warning(
     msg,
     "The cause was an error in 'log_prob_upars', 'log_lik_i_upars' or ",
-    "'log_lik_i'. The first error message:\n", error_msg[1],
+    "'log_lik_i', or a parallel worker that did not return a result. The ",
+    "first error message:\n", error_msg[1],
     call. = FALSE
   )
 }
