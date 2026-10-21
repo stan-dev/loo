@@ -17,7 +17,8 @@
 #'   Currently the `loo_model_weights()` function is not implemented to be used
 #'   with results from K-fold CV, but you can still obtain weights using K-fold
 #'   CV results by calling the `stacking_weights()` or `pseudobma_weights()`
-#'   function directly.
+#'   function directly. Objects from [loo_subsample()] are not supported,
+#'   because they have pointwise values only for the subsampled observations.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
@@ -448,6 +449,13 @@ validate_psis_loo_list <- function(psis_loo_list) {
   }
   if (!all(sapply(psis_loo_list, is.psis_loo))) {
     stop("List elements must all be 'psis_loo' objects or log-likelihood matrices.")
+  }
+  # the pointwise values of a subsampled object cover only its subsample, so
+  # the objects would not have values for the same observations
+  if (any(sapply(psis_loo_list, inherits, "psis_loo_ss"))) {
+    stop("loo_model_weights() does not support objects from loo_subsample(), ",
+         "because they have pointwise values only for the subsampled ",
+         "observations. Use loo() for all observations.", call. = FALSE)
   }
 
   # the weights use only the pointwise elpd, so the number of posterior draws

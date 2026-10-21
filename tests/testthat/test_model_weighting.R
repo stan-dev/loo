@@ -70,6 +70,41 @@ test_that("loo_model_weights accepts models with different numbers of draws", {
   }
 })
 
+test_that("loo_model_weights rejects objects from loo_subsample()", {
+  # restore the random number stream, which later tests in this file use
+  old_seed <- .Random.seed
+  on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
+  set.seed(409)
+  N <- 200
+  dat <- data.frame(y = rbinom(N, size = 10, prob = 0.7), K = 10)
+  llfun <- function(data_i, draws) {
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+  post1 <- as.matrix(rbeta(500, 140, 60))
+  post2 <- as.matrix(rbeta(500, 30, 20))
+  # the worse model gives high Pareto k values and a warning
+  ss <- function(post) {
+    suppressWarnings(loo_subsample(llfun, draws = post, data = dat,
+                                   observations = 50, loo_approximation = "plpd",
+                                   r_eff = rep(1, N)))
+  }
+  loo_ss1 <- ss(post1)
+  loo_ss2 <- ss(post2)
+  # the two subsamples contain different observations
+  expect_false(setequal(obs_idx(loo_ss1), obs_idx(loo_ss2)))
+  expect_error(
+    loo_model_weights(list(loo_ss1, loo_ss2)),
+    "does not support objects from loo_subsample()",
+    fixed = TRUE
+  )
+  loo_full <- suppressWarnings(loo(llfun, draws = post1, data = dat, r_eff = rep(1, N)))
+  expect_error(
+    loo_model_weights(list(loo_full, loo_ss2)),
+    "does not support objects from loo_subsample()",
+    fixed = TRUE
+  )
+})
+
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(
     loo_model_weights(log_lik1),
