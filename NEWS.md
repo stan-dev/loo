@@ -1,5 +1,6 @@
 # loo (development version)
 
+* Handle errors of the user functions in loo_moment_match() by @avehtari in #410
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 
