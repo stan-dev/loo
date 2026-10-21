@@ -63,7 +63,9 @@ class \code{tis}.
 \item{\code{diagnostics}}{
 A named list containing one vector:
 \itemize{
-\item \code{pareto_k}: Not used in \code{tis}, all set to 0.
+\item \code{pareto_k}: Estimates of the shape parameter \eqn{k} of the
+generalized Pareto distribution, computed from the log ratios before
+truncation as in \code{\link[=psis]{psis()}}. \code{tis()} uses them only as a diagnostic.
 \item \code{n_eff}: Effective sample size estimates.
 }
 }
@@ -79,7 +81,7 @@ used internally by the \code{\link[=weights]{weights()}}method to normalize the 
 If specified, the user's \code{r_eff} argument.
 }
 \item{\code{tail_len}}{
-Not used for \code{tis}.
+Vector of tail lengths used for the Pareto k diagnostic.
 }
 \item{\code{dims}}{
 Integer vector of length 2 containing \code{S} (posterior sample size)

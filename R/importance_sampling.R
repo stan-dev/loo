@@ -196,10 +196,11 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
   S <- nrow(log_ratios)
   k_threshold <- ps_khat_threshold(S)
   tail_len <- n_pareto(r_eff, S)
+  # all methods report the Pareto k diagnostic, which needs a long enough tail
+  throw_tail_length_warnings(tail_len)
 
   if (method == "psis") {
     is_fun <- do_psis_i
-    throw_tail_length_warnings(tail_len)
   } else if (method == "tis") {
     is_fun <- do_tis_i
   } else if (method == "sis") {

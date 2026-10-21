@@ -30,7 +30,9 @@
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
-#'    * `pareto_k`: Not used in `sis`, all set to 0.
+#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
+#'    generalized Pareto distribution, computed from the log ratios as in
+#'    [psis()]. `sis()` uses them only as a diagnostic.
 #'    * `n_eff`: effective sample size estimates.
 #'  }
 #' }
@@ -45,7 +47,7 @@
 #'     If specified, the user's `r_eff` argument.
 #'   }
 #'   \item{`tail_len`}{
-#'     Not used for `sis`.
+#'     Vector of tail lengths used for the Pareto k diagnostic.
 #'   }
 #'   \item{`dims`}{
 #'     Integer vector of length 2 containing `S` (posterior sample size)
@@ -135,13 +137,16 @@ is.sis <- function(x) {
 #' @noRd
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
+#' @param tail_len_i An integer tail length for the Pareto k diagnostic.
 #' @param ... Not used. Included to conform to PSIS API.
 #'
 #' @details Implementation standard importance sampling.
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
-#' * `pareto_k`: scalar Pareto k estimate. For IS, this defaults to 0.
-do_sis_i <- function(log_ratios_i, ...) {
-  S <- length(log_ratios_i)
-  list(log_weights = log_ratios_i, pareto_k = 0)
+#' * `pareto_k`: scalar Pareto k estimate, the same as for `psis()`.
+do_sis_i <- function(log_ratios_i, tail_len_i, ...) {
+  list(
+    log_weights = log_ratios_i,
+    pareto_k = pareto_k_i(log_ratios_i, tail_len_i)
+  )
 }

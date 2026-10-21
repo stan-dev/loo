@@ -305,6 +305,39 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
   tail_len >= min_len
 }
 
+#' Pareto k diagnostic for a single vector of log ratios
+#'
+#' Fits the generalized Pareto distribution to the same tail as `do_psis_i()`,
+#' without smoothing, so that `sis()` and `tis()` report the same diagnostic as
+#' `psis()` for the same log ratios.
+#'
+#' @noRd
+#' @param log_ratios_i A vector of log importance ratios.
+#' @param tail_len_i An integer tail length.
+#' @return Scalar Pareto k estimate. `Inf` if the tail is too short or constant,
+#'   or if the fit fails, as in `do_psis_i()`.
+#'
+pareto_k_i <- function(log_ratios_i, tail_len_i) {
+  if (!enough_tail_samples(tail_len_i)) {
+    return(Inf)
+  }
+  S <- length(log_ratios_i)
+  lw_sorted <- sort.int(log_ratios_i - max(log_ratios_i))
+  tail_ids <- seq(S - tail_len_i + 1, S)
+  lw_tail <- lw_sorted[tail_ids]
+  if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
+    warning(
+      "Can't fit generalized Pareto distribution ",
+      "because all tail values are the same.",
+      call. = FALSE
+    )
+    return(Inf)
+  }
+  cutoff <- lw_sorted[min(tail_ids) - 1]
+  k <- posterior::gpdfit(exp_x_minus_exp_y(lw_tail, cutoff), sort_x = FALSE)$k
+  if (is.na(k)) Inf else k
+}
+
 
 #' Throw warnings about Pareto k estimates
 #'

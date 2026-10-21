@@ -172,7 +172,12 @@ for (method_name in c("psis", "tis", "sis")) {
 
 test_that("explict test of values for 'sis' and 'tis'", {
   lw <- 1:16
-  expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
+  # too few draws for the Pareto k diagnostic, as in psis(); k is then Inf,
+  # which gives a second warning
+  suppressWarnings(expect_warning(
+    tis_true <- tis(log_ratios = lw, r_eff = NA),
+    "Not enough tail samples"
+  ))
   expect_equal(
     as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
     c(
@@ -196,7 +201,10 @@ test_that("explict test of values for 'sis' and 'tis'", {
       15.07238,
     tolerance = 0.001
   )
-  expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
+  suppressWarnings(expect_warning(
+    is_true <- sis(log_ratios = lw, r_eff = NA),
+    "Not enough tail samples"
+  ))
   expect_equal(
     as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
     lw,
@@ -216,7 +224,12 @@ test_that("explict test of values for 'sis' and 'tis'", {
     1.5599302
   )
 
-  expect_silent(tis_true <- tis(log_ratios = lw, r_eff = NA))
+  # too few draws for the Pareto k diagnostic, as in psis(); k is then Inf,
+  # which gives a second warning
+  suppressWarnings(expect_warning(
+    tis_true <- tis(log_ratios = lw, r_eff = NA),
+    "Not enough tail samples"
+  ))
   expect_equal(
     as.vector(weights(tis_true, log = TRUE, normalize = FALSE)),
     c(
@@ -234,7 +247,10 @@ test_that("explict test of values for 'sis' and 'tis'", {
       3.692668,
     tolerance = 0.001
   )
-  expect_silent(is_true <- sis(log_ratios = lw, r_eff = NA))
+  suppressWarnings(expect_warning(
+    is_true <- sis(log_ratios = lw, r_eff = NA),
+    "Not enough tail samples"
+  ))
   expect_equal(
     as.vector(weights(is_true, log = TRUE, normalize = FALSE)),
     lw,
@@ -256,4 +272,44 @@ test_that("tis_loo and sis_loo are returned", {
 
   expect_snapshot(print(loo_tis))
   expect_snapshot(print(loo_sis))
+})
+
+test_that("psis, sis and tis report the same Pareto k diagnostic", {
+  log_ratios <- -example_loglik_array()
+  r_eff <- relative_eff(exp(-log_ratios))
+  k_psis <- pareto_k_values(psis(log_ratios, r_eff = r_eff))
+  expect_true(all(is.finite(k_psis)))
+  expect_equal(pareto_k_values(sis(log_ratios, r_eff = r_eff)), k_psis)
+  expect_equal(pareto_k_values(tis(log_ratios, r_eff = r_eff)), k_psis)
+
+  # an observation with a thick tail gives a high k and a warning for all three
+  set.seed(227)
+  log_ratios_thick <- log_ratios
+  log_ratios_thick[, , 1] <- rt(length(log_ratios[, , 1]), df = 1)
+  for (method in list(psis, sis, tis)) {
+    expect_warning(
+      k <- pareto_k_values(method(log_ratios_thick, r_eff = r_eff)),
+      "Some Pareto k diagnostic values are too high"
+    )
+    expect_gt(k[1], 0.7)
+  }
+})
+
+test_that("psis, sis and tis report Inf for too few draws", {
+  # 3 iterations of 2 chains are too few for the tail of the diagnostic
+  log_ratios <- -example_loglik_array()[1:3, , , drop = FALSE]
+  r_eff <- relative_eff(exp(-log_ratios))
+  for (method in list(psis, sis, tis)) {
+    warnings <- character(0)
+    k <- withCallingHandlers(
+      pareto_k_values(method(log_ratios, r_eff = r_eff)),
+      warning = function(w) {
+        warnings <<- c(warnings, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    expect_equal(k, rep(Inf, 32))
+    expect_match(warnings, "Not enough tail samples", all = FALSE)
+    expect_match(warnings, "Pareto k diagnostic values are too high", all = FALSE)
+  }
 })

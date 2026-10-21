@@ -164,7 +164,7 @@ print_dims.importance_sampling_loo <- function(x, ...) {
   dims <- dim(x)
   cat(
     "Computed from", dims[1], "posterior draws and",
-    dims[2], "log-likelihood terms using", class(x)[1], ".\n"
+    dims[2], "log-likelihood terms using", paste0(class(x)[1], ".\n")
   )
 }
 

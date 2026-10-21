@@ -33,7 +33,9 @@
 #'   }
 #'  \item{`diagnostics`}{
 #'    A named list containing one vector:
-#'    * `pareto_k`: Not used in `tis`, all set to 0.
+#'    * `pareto_k`: Estimates of the shape parameter \eqn{k} of the
+#'    generalized Pareto distribution, computed from the log ratios before
+#'    truncation as in [psis()]. `tis()` uses them only as a diagnostic.
 #'    * `n_eff`: Effective sample size estimates.
 #'  }
 #' }
@@ -48,7 +50,7 @@
 #'     If specified, the user's `r_eff` argument.
 #'   }
 #'   \item{`tail_len`}{
-#'     Not used for `tis`.
+#'     Vector of tail lengths used for the Pareto k diagnostic.
 #'   }
 #'   \item{`dims`}{
 #'     Integer vector of length 2 containing `S` (posterior sample size)
@@ -139,6 +141,7 @@ is.tis <- function(x) {
 #' @noRd
 #' @param log_ratios_i A vector of log importance ratios (for `loo()`, negative
 #'   log likelihoods).
+#' @param tail_len_i An integer tail length for the Pareto k diagnostic.
 #' @param ... Not used. Included to conform to PSIS API.
 #'
 #' @details Implementation of Truncated importance sampling (TIS), a method for
@@ -148,13 +151,14 @@ is.tis <- function(x) {
 #'
 #' @return A named list containing:
 #' * `lw`: vector of unnormalized log weights
-#' * `pareto_k`: scalar Pareto k estimate. For 'tis', this defaults  to 0.
+#' * `pareto_k`: scalar Pareto k estimate of the log ratios before truncation,
+#'   the same as for `psis()`.
 #'
-do_tis_i <- function(log_ratios_i, ...) {
+do_tis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   log_Z <- logSumExp(log_ratios_i) - log(S) # Normalization term, c-hat in Ionides (2008) appendix
   log_cutpoint <- log_Z + 0.5 * log(S)
   lw_i <- pmin(log_ratios_i, log_cutpoint)
-  list(log_weights = lw_i, pareto_k = 0)
+  list(log_weights = lw_i, pareto_k = pareto_k_i(log_ratios_i, tail_len_i))
 }
 
