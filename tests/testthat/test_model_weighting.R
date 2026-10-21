@@ -75,6 +75,25 @@ test_that("loo_model_weights throws correct errors and warnings", {
   expect_no_warning(loo_model_weights(ll_list))
 })
 
+test_that("stacking_weights() warns if the optimizer stops before the optimum", {
+  lpd <- rbind(
+    c(-0.1, -3.0),
+    c(-0.2, -2.5),
+    c(-3.0, -0.1),
+    c(-2.8, -0.3),
+    c(-0.5, -0.6)
+  )
+  expect_no_warning(w <- stacking_weights(lpd))
+  local_mocked_bindings(
+    stacking_newton = function(w, ...) w
+  )
+  expect_warning(
+    w_stop <- stacking_weights(lpd),
+    "may not be optimal"
+  )
+  expect_equal(sum(w_stop), 1)
+})
+
 
 test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   w1 <- loo_model_weights(ll_list, method = "stacking", r_eff_list = r_eff_list)

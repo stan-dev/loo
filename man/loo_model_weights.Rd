@@ -125,9 +125,10 @@ while pseudo-BMA+ can serve as a computationally easier alternative.
 \code{stacking_weights()} maximizes the log score with an active-set method. It
 starts with the model with the largest total log predictive density, finds
 the optimal weights of the models in the active set with Newton steps, and
-adds the model that improves the log score most, until no model can improve
-it. A model whose weight reaches zero leaves the active set. At the returned
-weights, the log score is at most \eqn{N \times 10^{-8}} below its maximum.
+adds the model with the largest gradient of the log score, until no model can
+improve it. A model whose weight reaches zero leaves the active set. At the
+returned weights, the log score is at most \eqn{N \times 10^{-8}} below its
+maximum. If the method cannot reach this bound, it gives a warning.
 The optimal weights are usually sparse, so the method is fast also for many
 models. The method is a variant of the constrained Newton method for mixture
 proportions (Wang, 2007), and the stopping rule uses the optimality condition

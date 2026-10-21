@@ -69,9 +69,10 @@
 #' `stacking_weights()` maximizes the log score with an active-set method. It
 #' starts with the model with the largest total log predictive density, finds
 #' the optimal weights of the models in the active set with Newton steps, and
-#' adds the model that improves the log score most, until no model can improve
-#' it. A model whose weight reaches zero leaves the active set. At the returned
-#' weights, the log score is at most \eqn{N \times 10^{-8}} below its maximum.
+#' adds the model with the largest gradient of the log score, until no model can
+#' improve it. A model whose weight reaches zero leaves the active set. At the
+#' returned weights, the log score is at most \eqn{N \times 10^{-8}} below its
+#' maximum. If the method cannot reach this bound, it gives a warning.
 #' The optimal weights are usually sparse, so the method is fast also for many
 #' models. The method is a variant of the constrained Newton method for mixture
 #' proportions (Wang, 2007), and the stopping rule uses the optimality condition
@@ -359,34 +360,68 @@ stacking_weights_active_set <- function(lpd_point, tol = 1e-8) {
   }
   w <- rep(1 / length(active), length(active))
 
-  neg_log_score <- function(w, lpd) {
-    -sum(matrixStats::rowLogSumExps(sweep(lpd, 2, log(w), "+")))
-  }
-
+  converged <- FALSE
   for (outer in seq_len(K + 100)) {
-    w_res <- stacking_newton(w, lpd_point[, active, drop = FALSE],
-                             neg_log_score, tol = tol)
+    w_res <- stacking_newton(w, lpd_point[, active, drop = FALSE], tol = tol)
     keep <- w_res > 0
     active <- active[keep]
     w <- w_res[keep] / sum(w_res[keep])
 
-    # log g_k for all models
-    log_p <- matrixStats::rowLogSumExps(
-      sweep(lpd_point[, active, drop = FALSE], 2, log(w), "+")
-    )
-    log_g <- matrixStats::colLogSumExps(lpd_point - log_p) - log(N)
+    log_g <- stacking_log_g(lpd_point, active, w)
     k_new <- which.max(log_g)
-    if (log_g[k_new] <= tol || k_new %in% active) {
-      # optimal, or no model can be added within the numerical precision
+    if (log_g[k_new] <= tol) {
+      converged <- TRUE
+      break
+    }
+    if (k_new %in% active) {
+      # Newton stopped before the optimum of the active set
       break
     }
     active <- c(active, k_new)
     w <- c(w * (1 - 1e-3), 1e-3)
   }
 
+  if (!converged) {
+    # after the last iteration, the weights can include a model that was added
+    # without Newton steps
+    gap <- N * max(stacking_log_g(lpd_point, active, w))
+    warning(
+      "The stacking weights may not be optimal. ",
+      "The log score can be up to ", signif(gap, 2), " below its maximum.",
+      call. = FALSE
+    )
+  }
+
   out <- numeric(K)
   out[active] <- w
   out
+}
+
+#' Log of the stacking optimality measure g_k for all models
+#'
+#' @noRd
+#' @param lpd_point N by K matrix of pointwise log predictive densities.
+#' @param active Indices of the models with positive weight.
+#' @param w Weights of the models in `active`, summing to 1.
+#' @return Vector of K values `log(g_k)`, with
+#'   `g_k = mean_i exp(lpd_point[i, k]) / p_i`. The maximum is 0 at the optimum.
+#'
+stacking_log_g <- function(lpd_point, active, w) {
+  log_p <- matrixStats::rowLogSumExps(
+    sweep(lpd_point[, active, drop = FALSE], 2, log(w), "+")
+  )
+  matrixStats::colLogSumExps(lpd_point - log_p) - log(nrow(lpd_point))
+}
+
+#' Negative log score of a combination of models
+#'
+#' @noRd
+#' @param w Weights, non-negative and summing to 1.
+#' @param lpd N by length(w) matrix of log predictive densities.
+#' @return `-sum_i log(sum_k w_k exp(lpd[i, k]))`.
+#'
+stacking_neg_log_score <- function(w, lpd) {
+  -sum(matrixStats::rowLogSumExps(sweep(lpd, 2, log(w), "+")))
 }
 
 #' Newton steps for the stacking weights of a fixed set of models
@@ -395,14 +430,12 @@ stacking_weights_active_set <- function(lpd_point, tol = 1e-8) {
 #' @param w Starting weights, positive and summing to 1.
 #' @param lpd N by |active| matrix of log predictive densities. Each row has at
 #'   least one finite value.
-#' @param neg_log_score Function of `w` and `lpd` that returns the negative log
-#'   score.
 #' @param tol Tolerance of `stacking_weights_active_set()`. Newton stops when
 #'   every `g_k` of the set is within `tol / 10` of 1.
 #' @return Weights, non-negative and summing to 1. Models whose weight reaches
 #'   zero leave the set, and their weights in the result are zero.
 #'
-stacking_newton <- function(w, lpd, neg_log_score, tol, max_iter = 100) {
+stacking_newton <- function(w, lpd, tol, max_iter = 100) {
   out <- numeric(length(w))
   in_set <- seq_along(w)
   for (iter in seq_len(max_iter)) {
@@ -431,7 +464,7 @@ stacking_newton <- function(w, lpd, neg_log_score, tol, max_iter = 100) {
     if (max(abs(-grad / nrow(lpd) - 1)) < tol / 10) {
       break
     }
-    f0 <- neg_log_score(w, lpd_set)
+    f0 <- stacking_neg_log_score(w, lpd_set)
     decrement <- -sum(grad * step)
     # close to the optimum the change of the log score is below its rounding
     # error, and the line search cannot see it; take the Newton step there
@@ -447,7 +480,7 @@ stacking_newton <- function(w, lpd, neg_log_score, tol, max_iter = 100) {
       t <- t_max
       repeat {
         w_new <- pmax(w + t * step, 0)
-        f_new <- neg_log_score(w_new, lpd_set)
+        f_new <- stacking_neg_log_score(w_new, lpd_set)
         # a step to the boundary sets a weight to zero; accept it if the log
         # score does not get worse beyond rounding
         to_boundary <- t == t_max && t_max < 1 &&
