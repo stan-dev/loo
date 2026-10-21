@@ -13,8 +13,8 @@ loo_model_weights(x, ...)
   x,
   ...,
   method = c("stacking", "pseudobma"),
-  optim_method = "BFGS",
-  optim_control = list(),
+  optim_method = NULL,
+  optim_control = NULL,
   BB = TRUE,
   BB_n = 1000,
   alpha = 1,
@@ -22,7 +22,7 @@ loo_model_weights(x, ...)
   cores = getOption("mc.cores", 1)
 )
 
-stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
+stacking_weights(lpd_point, optim_method = NULL, optim_control = NULL)
 
 pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
 }
@@ -49,13 +49,9 @@ to use for obtaining the weights. \code{"stacking"} refers to stacking of
 predictive distributions and  \code{"pseudobma"} refers to pseudo-BMA+ weighting
 (or plain pseudo-BMA weighting if argument \code{BB} is \code{FALSE}).}
 
-\item{optim_method}{If \code{method="stacking"}, a string passed to the \code{method}
-argument of \code{\link[stats:constrOptim]{stats::constrOptim()}} to specify the optimization algorithm.
-The default is \code{optim_method="BFGS"}, but other options are available (see
-\code{\link[stats:optim]{stats::optim()}}).}
-
-\item{optim_control}{If \code{method="stacking"}, a list of control parameters for
-optimization passed to the \code{control} argument of \code{\link[stats:constrOptim]{stats::constrOptim()}}.}
+\item{optim_method, optim_control}{Deprecated and ignored. Earlier versions
+passed them to \code{\link[stats:constrOptim]{stats::constrOptim()}}. The stacking weights are now
+computed with an active-set Newton method, see Details.}
 
 \item{BB}{Logical used when \code{"method"}=\code{"pseudobma"}. If
 \code{TRUE} (the default), the Bayesian bootstrap will be used to adjust
@@ -127,6 +123,25 @@ regularizes the weights away from the extremes of 0 and 1.
 
 In general, we recommend stacking for averaging predictive distributions,
 while pseudo-BMA+ can serve as a computationally easier alternative.
+
+\code{stacking_weights()} maximizes the log score with an active-set method. It
+starts with the model with the largest total log predictive density, finds
+the optimal weights of the models in the active set with Newton steps, and
+adds the models with the largest gradients of the log score (at most ten at a
+time), until no model can improve it. A model whose weight reaches zero
+leaves the active set. At the returned weights, the log score is at most
+\eqn{N \times 10^{-8}} below its maximum. If the method cannot reach this
+bound, it gives a warning. The optimal weights are usually sparse, so the
+method is fast also for many models. The method is a variant of the
+constrained Newton method for mixture proportions (Wang, 2007), and the
+stopping rule uses the optimality condition of Lindsay (1983).
+
+Wang, Y. (2007). On fast computation of the non-parametric maximum
+likelihood estimate of a mixing distribution. \emph{Journal of the Royal
+Statistical Society: Series B}, 69(2), 185--198.
+
+Lindsay, B. G. (1983). The geometry of mixture likelihoods: a general
+theory. \emph{The Annals of Statistics}, 11(1), 86--94.
 }
 \examples{
 \dontrun{
@@ -173,8 +188,7 @@ r_eff_list <- lapply(model_list, function(x) {
 wts1 <- loo_model_weights(
   log_lik_list,
   method = "stacking",
-  r_eff_list = r_eff_list,
-  optim_control = list(reltol=1e-10)
+  r_eff_list = r_eff_list
 )
 print(wts1)
 
@@ -183,11 +197,7 @@ loo_list <- lapply(1:length(log_lik_list), function(j) {
   loo(log_lik_list[[j]], r_eff = r_eff_list[[j]])
 })
 
-wts2 <- loo_model_weights(
-  loo_list,
-  method = "stacking",
-  optim_control = list(reltol=1e-10)
-)
+wts2 <- loo_model_weights(loo_list, method = "stacking")
 all.equal(wts1, wts2)
 
 # can provide names to be used in the results
@@ -233,7 +243,6 @@ stacking to average Bayesian predictive distributions.
 \item The \strong{loo} package \href{https://mc-stan.org/loo/articles/}{vignettes}, particularly
 \href{https://mc-stan.org/loo/articles/loo2-weights.html}{Bayesian Stacking and Pseudo-BMA weights using the \strong{loo} package}.
 \item \code{\link[=loo]{loo()}} for details on leave-one-out ELPD estimation.
-\item \code{\link[=constrOptim]{constrOptim()}} for the choice of optimization methods and control-parameters.
 \item \code{\link[=relative_eff]{relative_eff()}} for computing \code{r_eff}.
 }
 }

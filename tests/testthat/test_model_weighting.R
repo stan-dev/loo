@@ -20,31 +20,6 @@ loo_list <- lapply(1:length(ll_list), function(j) {
 
 tol <- 0.01 # absolute tolerance of weights
 
-test_that("stacking gradient is stable for similar model predictions", {
-  a <- -30 + 1e-14
-  b <- -30
-
-  expect_equal(exp_diff_over_exp(a, b, b), 1.065814103640156e-14)
-  expect_equal(exp_diff_over_exp(b, a, b), -1.065814103640156e-14)
-  expect_equal(
-    exp_diff_over_exp(c(-Inf, 0, Inf), c(-Inf, 0, Inf), c(0, 0, 0)),
-    c(0, 0, 0)
-  )
-})
-
-test_that("exp_diff_over_exp propagates missing values", {
-  expect_equal(exp_diff_over_exp(NaN, 0, 0), NaN)
-  expect_equal(exp_diff_over_exp(0, NaN, 0), NaN)
-  expect_equal(exp_diff_over_exp(0, -1, NaN), NaN)
-  expect_equal(exp_diff_over_exp(NA_real_, 0, 0), NA_real_)
-  # equal numerators short-circuit to an exact zero, whatever the denominator
-  expect_equal(exp_diff_over_exp(0, 0, NaN), 0)
-  expect_equal(
-    exp_diff_over_exp(c(NaN, 0), c(0, -1), c(0, 0)),
-    c(NaN, exp_diff_over_exp(0, -1, 0))
-  )
-})
-
 test_that("stacking handles equal infinite log predictive densities", {
   lpd <- matrix(
     c(-Inf, 0, -Inf, -1, -1, -1),
@@ -146,6 +121,41 @@ test_that("loo_model_weights throws correct errors and warnings", {
   expect_no_warning(loo_model_weights(ll_list))
 })
 
+test_that("stacking_weights() warns if the optimizer stops before the optimum", {
+  lpd <- rbind(
+    c(-0.1, -3.0),
+    c(-0.2, -2.5),
+    c(-3.0, -0.1),
+    c(-2.8, -0.3),
+    c(-0.5, -0.6)
+  )
+  expect_no_warning(w <- stacking_weights(lpd))
+  local_mocked_bindings(
+    stacking_newton = function(w, ...) w
+  )
+  expect_warning(
+    w_stop <- stacking_weights(lpd),
+    "may not be optimal"
+  )
+  expect_equal(sum(w_stop), 1)
+})
+
+test_that("adding several models per iteration gives the same weights", {
+  # each model is the best one for its own observations, so many weights are
+  # nonzero; deterministic values keep the random number stream unchanged
+  N <- 240
+  K <- 30
+  lpd <- outer(seq_len(N), seq_len(K), function(i, k) {
+    -3 - ((7 * i + 13 * k) %% 11) / 5
+  })
+  lpd[cbind(seq_len(N), rep_len(seq_len(K), N))] <- 0
+  expect_no_warning(w_many <- stacking_weights_active_set(lpd))
+  w_one <- stacking_weights_active_set(lpd, max_add = 1)
+  expect_gt(sum(w_many > 0), 10)
+  expect_equal(w_many, w_one, tolerance = 1e-6)
+  expect_equal(as.numeric(stacking_weights(lpd)), w_many)
+})
+
 
 test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   w1 <- loo_model_weights(ll_list, method = "stacking", r_eff_list = r_eff_list)
@@ -192,6 +202,23 @@ test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   expect_identical(w3, w3_b)
 })
 
+# Upper bound of how far the log score of the weights `w` is below its
+# maximum: N * log(max_k g_k), with g_k = mean_i p_ik / sum_j w_j p_ij
+stacking_gap_bound <- function(w, lpd) {
+  log_p <- matrixStats::rowLogSumExps(sweep(lpd, 2, log(w), "+"))
+  nrow(lpd) * max(matrixStats::colLogSumExps(lpd - log_p) - log(nrow(lpd)))
+}
+
+# EM for mixture weights with fixed components: a slow independent solver
+stacking_em <- function(lpd, iter = 20000) {
+  w <- rep(1 / ncol(lpd), ncol(lpd))
+  for (i in seq_len(iter)) {
+    a <- sweep(lpd, 2, log(w), "+")
+    w <- colMeans(exp(a - matrixStats::rowLogSumExps(a)))
+  }
+  w
+}
+
 test_that("stacking_weights gives expected result", {
   set.seed(10)
   lpd_point <- matrix(rnorm(2000, -1), 400, 5)
@@ -201,12 +228,65 @@ test_that("stacking_weights gives expected result", {
   expect_s3_class(actual, "stacking_weights")
   expect_named(actual, paste0("model", 1:5))
   expect_equal(sum(actual), 1)
-  expect_equal(
-    as.numeric(actual),
-    c(0.158382400055713, 0.176065699214342, 0.19918082992972,
-      0.264490615659226, 0.201880455141),
-    tolerance = 1e-6
+  expect_lt(stacking_gap_bound(as.numeric(actual), lpd_point), 400 * 1e-8)
+  expect_equal(as.numeric(actual), stacking_em(lpd_point), tolerance = 1e-5)
+})
+
+test_that("stacking_weights finds the optimum for many models", {
+  set.seed(119)
+  N <- 100
+  K <- 500
+  y <- rnorm(N)
+  mu <- rnorm(K, 0, 0.5)
+  s <- exp(rnorm(K, 0, 0.3))
+  lpd <- sapply(seq_len(K), function(k) dnorm(y, mu[k], s[k], log = TRUE))
+
+  w <- as.numeric(stacking_weights(lpd))
+  expect_equal(sum(w), 1)
+  expect_true(all(w >= 0))
+  expect_lt(stacking_gap_bound(w, lpd), N * 1e-8)
+  # the optimal weights are sparse
+  expect_lt(sum(w > 0), 20)
+})
+
+test_that("stacking_weights handles -Inf, duplicate and identical models", {
+  set.seed(2)
+  N <- 60
+  lpd <- matrix(rnorm(3 * N, -1), N, 3)
+  # each model is impossible for a third of the observations, so the
+  # combination needs all three
+  lpd[1:20, 1] <- -Inf
+  lpd[21:40, 2] <- -Inf
+  lpd[41:60, 3] <- -Inf
+  w <- as.numeric(stacking_weights(lpd))
+  expect_true(all(w > 0))
+  expect_lt(stacking_gap_bound(w, lpd), N * 1e-8)
+
+  # duplicate models share the weight that one of them would get
+  lpd2 <- matrix(rnorm(4 * N, -1), N, 4)
+  w2 <- as.numeric(stacking_weights(lpd2))
+  w_dup <- as.numeric(stacking_weights(cbind(lpd2, lpd2[, 1])))
+  expect_equal(c(w_dup[1] + w_dup[5], w_dup[2:4]), w2, tolerance = 1e-6)
+
+  # identical models: all weight to one of them
+  lpd3 <- matrix(rep(rnorm(N, -1), 3), N, 3)
+  expect_equal(sort(as.numeric(stacking_weights(lpd3))), c(0, 0, 1))
+})
+
+test_that("optim_method and optim_control are deprecated", {
+  set.seed(3)
+  lpd <- matrix(rnorm(40, -1), 20, 2)
+  w <- stacking_weights(lpd)
+  expect_warning(
+    w2 <- stacking_weights(lpd, optim_control = list(reltol = 1e-10)),
+    "deprecated and ignored"
   )
+  expect_identical(w2, w)
+  expect_warning(
+    loo_model_weights(ll_list, optim_method = "Nelder-Mead"),
+    "deprecated and ignored"
+  )
+  expect_no_warning(loo_model_weights(ll_list))
 })
 
 test_that("Bayesian bootstrap gives expected result", {

@@ -1,6 +1,6 @@
 # loo_model_weights (stacking and pseudo-BMA) gives expected result
 
-    WAoAAAACAAQFAgACAwAAAAAOAAAAAz/KEXnf1DM9P+l7oXTYyi4+YzIpAwAAAA==
+    WAoAAAACAAQGAQACAwAAAAAOAAAAAz/KD9BbGOhwP+l8C+k5xeQAAAAAAAAAAA==
 
 ---
 
