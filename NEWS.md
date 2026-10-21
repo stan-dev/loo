@@ -1,5 +1,8 @@
 # loo (development version)
 
+* `sis()` and `tis()` now compute the Pareto k diagnostic in the same way as
+`psis()`, instead of setting all values to 0, and give the same warnings. The
+weights do not change. by @avehtari in #411
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 
