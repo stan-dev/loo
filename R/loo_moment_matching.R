@@ -140,6 +140,8 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 
   # update results
   failed <- integer(0)
+  # observations where log_lik_i() failed, a subset of failed
+  log_lik_failed <- integer(0)
   stopped <- integer(0)
   split_failed <- integer(0)
   error_msg <- NULL
@@ -159,6 +161,9 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
       error_msg <- c(error_msg, mm_list[[ii]]$error)
       if (isTRUE(mm_list[[ii]]$failed)) {
         failed <- c(failed, i)
+        if (isTRUE(mm_list[[ii]]$log_lik_failed)) {
+          log_lik_failed <- c(log_lik_failed, i)
+        }
         next
       }
       stopped <- c(stopped, i)
@@ -179,8 +184,12 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
       loo$psis_object$log_weights[, i] <- mm_list[[ii]]$lwi
     }
   }
-  if (length(I) > 0 && length(failed) == length(I)) {
-    stop("Moment matching failed for all observations. The first error ",
+  # log_lik_i() is evaluated at the original draws, so an error for every
+  # observation is probably an error in the function, for example wrong
+  # arguments. An error at the first transformation can come from extreme
+  # draws, and keeps the PSIS results with a warning.
+  if (length(I) > 0 && length(log_lik_failed) == length(I)) {
+    stop("'log_lik_i' failed for all observations. The first error ",
          "message:\n", error_msg[1], call. = FALSE)
   }
   if (!is.null(loo$psis_object)) {
@@ -288,7 +297,8 @@ loo_moment_match_i <- function(i,
   if (inherits(log_liki, "error")) {
     # the user function failed for this observation, which keeps its PSIS
     # results
-    return(list(i = i, failed = TRUE, error = conditionMessage(log_liki)))
+    return(list(i = i, failed = TRUE, log_lik_failed = TRUE,
+                error = conditionMessage(log_liki)))
   }
   S_per_chain <- NROW(log_liki)
   N_chains <- NCOL(log_liki)

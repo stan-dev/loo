@@ -808,20 +808,33 @@ test_that("an error in the first transformation keeps the PSIS results", {
   expect_equal(mm$diagnostics$pareto_k[1], loo_manual$diagnostics$pareto_k[1])
 })
 
-test_that("moment matching stops if it fails for all observations", {
+test_that("first-transformation errors everywhere keep the PSIS results", {
   loo_manual <- suppressWarnings(loo(loglik))
-  # only observation 1 is above k_threshold = 0.7
-  expect_error(
-    suppressWarnings(mm_with(loo_manual,
-                             log_lik_i_upars = failing_log_lik_i_upars(1))),
-    "Moment matching failed for all observations.*overflow in log_lik_i_upars"
+  # only observation 1 is above k_threshold = 0.7, and its first
+  # transformation fails, as with an overflow in a *_rng function (#274)
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1)),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
+  expect_match(warnings, "failed for observation(s) 1.", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "overflow in log_lik_i_upars", all = FALSE)
+  expect_equal(mm$pointwise, loo_manual$pointwise)
+  expect_equal(mm$diagnostics, loo_manual$diagnostics)
+})
+
+test_that("moment matching stops if log_lik_i fails for all observations", {
+  loo_manual <- suppressWarnings(loo(loglik))
   # a log_lik_i with the wrong arguments fails for every observation
   wrong_log_lik_i <- function(x) x
   expect_error(
     suppressWarnings(mm_with(loo_manual, log_lik_i = wrong_log_lik_i,
                              k_threshold = 0)),
-    "Moment matching failed for all observations"
+    "'log_lik_i' failed for all observations"
   )
 })
 
