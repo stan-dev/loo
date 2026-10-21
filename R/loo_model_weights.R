@@ -30,12 +30,9 @@
 #' @param alpha Positive scalar shape parameter in the Dirichlet distribution
 #'   used for the Bayesian bootstrap. The default is `alpha=1`, which
 #'   corresponds to a uniform distribution on the simplex space.
-#' @param optim_method If `method="stacking"`, a string passed to the `method`
-#'   argument of [stats::constrOptim()] to specify the optimization algorithm.
-#'   The default is `optim_method="BFGS"`, but other options are available (see
-#'   [stats::optim()]).
-#' @param optim_control If `method="stacking"`, a list of control parameters for
-#'   optimization passed to the `control` argument of [stats::constrOptim()].
+#' @param optim_method,optim_control Deprecated and ignored. Earlier versions
+#'   passed them to [stats::constrOptim()]. The stacking weights are now
+#'   computed with an active-set Newton method, see Details.
 #' @param r_eff_list Optionally, a list of relative effective sample size
 #'   estimates for the likelihood `(exp(log_lik))` of each observation in
 #'   each model. See [psis()] and  [relative_eff()] helper
@@ -69,11 +66,28 @@
 #' In general, we recommend stacking for averaging predictive distributions,
 #' while pseudo-BMA+ can serve as a computationally easier alternative.
 #'
+#' `stacking_weights()` maximizes the log score with an active-set method. It
+#' starts with the model with the largest total log predictive density, finds
+#' the optimal weights of the models in the active set with Newton steps, and
+#' adds the model that improves the log score most, until no model can improve
+#' it. A model whose weight reaches zero leaves the active set. At the returned
+#' weights, the log score is at most \eqn{N \times 10^{-8}} below its maximum.
+#' The optimal weights are usually sparse, so the method is fast also for many
+#' models. The method is a variant of the constrained Newton method for mixture
+#' proportions (Wang, 2007), and the stopping rule uses the optimality condition
+#' of Lindsay (1983).
+#'
+#' Wang, Y. (2007). On fast computation of the non-parametric maximum
+#' likelihood estimate of a mixing distribution. *Journal of the Royal
+#' Statistical Society: Series B*, 69(2), 185--198.
+#'
+#' Lindsay, B. G. (1983). The geometry of mixture likelihoods: a general
+#' theory. *The Annals of Statistics*, 11(1), 86--94.
+#'
 #' @seealso
 #' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/), particularly
 #'   [Bayesian Stacking and Pseudo-BMA weights using the __loo__ package](https://mc-stan.org/loo/articles/loo2-weights.html).
 #' * [loo()] for details on leave-one-out ELPD estimation.
-#' * [constrOptim()] for the choice of optimization methods and control-parameters.
 #' * [relative_eff()] for computing `r_eff`.
 #'
 #' @template loo-and-psis-references
@@ -124,8 +138,7 @@
 #' wts1 <- loo_model_weights(
 #'   log_lik_list,
 #'   method = "stacking",
-#'   r_eff_list = r_eff_list,
-#'   optim_control = list(reltol=1e-10)
+#'   r_eff_list = r_eff_list
 #' )
 #' print(wts1)
 #'
@@ -134,11 +147,7 @@
 #'   loo(log_lik_list[[j]], r_eff = r_eff_list[[j]])
 #' })
 #'
-#' wts2 <- loo_model_weights(
-#'   loo_list,
-#'   method = "stacking",
-#'   optim_control = list(reltol=1e-10)
-#' )
+#' wts2 <- loo_model_weights(loo_list, method = "stacking")
 #' all.equal(wts1, wts2)
 #'
 #' # can provide names to be used in the results
@@ -172,8 +181,8 @@ loo_model_weights.default <-
   function(x,
            ...,
            method = c("stacking", "pseudobma"),
-           optim_method = "BFGS",
-           optim_control = list(),
+           optim_method = NULL,
+           optim_control = NULL,
            BB = TRUE,
            BB_n = 1000,
            alpha = 1,
@@ -244,12 +253,10 @@ loo_model_weights.default <-
 #'   approximately using [loo()] or by running exact leave-one-out or K-fold
 #'   cross-validation.
 #'
-#' @importFrom stats constrOptim
-#'
 stacking_weights <-
   function(lpd_point,
-           optim_method = "BFGS",
-           optim_control = list()) {
+           optim_method = NULL,
+           optim_control = NULL) {
 
     stopifnot(is.matrix(lpd_point))
     N <- nrow(lpd_point)
@@ -262,43 +269,17 @@ stacking_weights <-
       stop("Each observation must have a finite predictive density for at least one model.")
     }
 
-    negative_log_score_loo <- function(w) {
-      # objective function: log score
-      stopifnot(length(w) == K - 1)
-      w_full <- c(w, 1 - sum(w))
-      # avoid over- and underflows using log weights and rowLogSumExps
-      sum <- sum(matrixStats::rowLogSumExps(sweep(lpd_point[1:N,], 2, log(w_full), '+')))
-      return(-as.numeric(sum))
-    }
-
-    gradient <- function(w) {
-      # gradient of the objective function
-      stopifnot(length(w) == K - 1)
-      w_full <- c(w, 1 - sum(w))
-      mixture_lpd <- matrixStats::rowLogSumExps(
-        sweep(lpd_point, 2, log(w_full), "+")
+    if (!is.null(optim_method) || !is.null(optim_control)) {
+      warning(
+        "The arguments 'optim_method' and 'optim_control' are deprecated and ",
+        "ignored. The stacking weights are now computed with an active-set ",
+        "Newton method.",
+        call. = FALSE
       )
-      -colSums(exp_diff_over_exp(
-        lpd_point[, seq_len(K - 1), drop = FALSE],
-        matrix(lpd_point[, K], N, K - 1),
-        matrix(mixture_lpd, N, K - 1)
-      ))
     }
-
-    ui <- rbind(rep(-1, K - 1), diag(K - 1))  # K-1 simplex constraint matrix
-    ci <- c(-1, rep(0, K - 1))
-    w <- constrOptim(
-      theta = rep(1 / K, K - 1),
-      f = negative_log_score_loo,
-      grad = gradient,
-      ui = ui,
-      ci = ci,
-      method = optim_method,
-      control = optim_control
-    )$par
 
     structure(
-      c(w, 1 - sum(w)),
+      stacking_weights_active_set(lpd_point),
       names = paste0("model", 1:K),
       class = c("stacking_weights")
     )
@@ -345,6 +326,152 @@ pseudobma_weights <-
     )
   }
 
+
+#' Stacking weights with an active-set Newton method
+#'
+#' Maximizes `sum_i log(sum_k w_k exp(lpd_point[i, k]))` over the simplex. The
+#' problem is concave in `w`, and the optimal weights are usually sparse. The
+#' method optimizes the weights of the active models with Newton steps and adds
+#' the model with the largest `g_k = mean_i exp(lpd_point[i, k]) / p_i`, where
+#' `p_i` is the predictive density of the combination, until `max_k g_k` is at
+#' most `exp(tol)`. Then the log score is at most `N * tol` below its maximum,
+#' by Jensen's inequality.
+#'
+#' @noRd
+#' @param lpd_point N by K matrix of pointwise log predictive densities. Each
+#'   row must have at least one finite value.
+#' @param tol Tolerance for `max_k log(g_k)`.
+#' @return Vector of K weights that sums to 1.
+#'
+stacking_weights_active_set <- function(lpd_point, tol = 1e-8) {
+  N <- nrow(lpd_point)
+  K <- ncol(lpd_point)
+
+  # start with the best model, and add the best model of each observation
+  # that no model in the set can predict, so that every row has a finite value
+  active <- which.max(colSums(pmax(lpd_point, -1e300)))
+  uncovered <- which(rowSums(is.finite(lpd_point[, active, drop = FALSE])) == 0)
+  while (length(uncovered) > 0) {
+    active <- c(active, which.max(lpd_point[uncovered[1], ]))
+    uncovered <- which(
+      rowSums(is.finite(lpd_point[, active, drop = FALSE])) == 0
+    )
+  }
+  w <- rep(1 / length(active), length(active))
+
+  neg_log_score <- function(w, lpd) {
+    -sum(matrixStats::rowLogSumExps(sweep(lpd, 2, log(w), "+")))
+  }
+
+  for (outer in seq_len(K + 100)) {
+    w_res <- stacking_newton(w, lpd_point[, active, drop = FALSE],
+                             neg_log_score, tol = tol)
+    keep <- w_res > 0
+    active <- active[keep]
+    w <- w_res[keep] / sum(w_res[keep])
+
+    # log g_k for all models
+    log_p <- matrixStats::rowLogSumExps(
+      sweep(lpd_point[, active, drop = FALSE], 2, log(w), "+")
+    )
+    log_g <- matrixStats::colLogSumExps(lpd_point - log_p) - log(N)
+    k_new <- which.max(log_g)
+    if (log_g[k_new] <= tol || k_new %in% active) {
+      # optimal, or no model can be added within the numerical precision
+      break
+    }
+    active <- c(active, k_new)
+    w <- c(w * (1 - 1e-3), 1e-3)
+  }
+
+  out <- numeric(K)
+  out[active] <- w
+  out
+}
+
+#' Newton steps for the stacking weights of a fixed set of models
+#'
+#' @noRd
+#' @param w Starting weights, positive and summing to 1.
+#' @param lpd N by |active| matrix of log predictive densities. Each row has at
+#'   least one finite value.
+#' @param neg_log_score Function of `w` and `lpd` that returns the negative log
+#'   score.
+#' @param tol Tolerance of `stacking_weights_active_set()`. Newton stops when
+#'   every `g_k` of the set is within `tol / 10` of 1.
+#' @return Weights, non-negative and summing to 1. Models whose weight reaches
+#'   zero leave the set, and their weights in the result are zero.
+#'
+stacking_newton <- function(w, lpd, neg_log_score, tol, max_iter = 100) {
+  out <- numeric(length(w))
+  in_set <- seq_along(w)
+  for (iter in seq_len(max_iter)) {
+    n_active <- length(w)
+    if (n_active == 1) {
+      break
+    }
+    lpd_set <- lpd[, in_set, drop = FALSE]
+    # scale each row by its maximum over the current set, so that the
+    # densities are at most 1 and the largest one in each row is 1
+    dens <- exp(lpd_set - matrixStats::rowMaxs(lpd_set))
+    p <- drop(dens %*% w)
+    grad <- -colSums(dens / p)
+    hess <- crossprod(dens / p)
+    # a small ridge keeps the system solvable for identical models
+    hess <- hess + diag(1e-12 * mean(diag(hess)), n_active)
+    kkt <- rbind(cbind(hess, 1), c(rep(1, n_active), 0))
+    step <- tryCatch(
+      solve(kkt, c(-grad, 0))[seq_len(n_active)],
+      error = function(e) NULL
+    )
+    if (is.null(step)) {
+      break
+    }
+    # at the optimum of this set, g_k = -grad_k / N is 1 for every model
+    if (max(abs(-grad / nrow(lpd) - 1)) < tol / 10) {
+      break
+    }
+    f0 <- neg_log_score(w, lpd_set)
+    decrement <- -sum(grad * step)
+    # close to the optimum the change of the log score is below its rounding
+    # error, and the line search cannot see it; take the Newton step there
+    near_optimum <- decrement < 1e-10 * max(1, abs(f0))
+    # largest step that keeps the weights non-negative
+    ratio <- ifelse(step < 0, -w / step, Inf)
+    t_max <- min(1, ratio)
+    if (t_max < 1e-10) {
+      # a weight is almost zero and the step would make it negative: the
+      # optimum of this set has that weight at zero
+      w[ratio < 1e-10] <- 0
+    } else {
+      t <- t_max
+      repeat {
+        w_new <- pmax(w + t * step, 0)
+        f_new <- neg_log_score(w_new, lpd_set)
+        # a step to the boundary sets a weight to zero; accept it if the log
+        # score does not get worse beyond rounding
+        to_boundary <- t == t_max && t_max < 1 &&
+          f_new <= f0 + 1e-12 * max(1, abs(f0))
+        if (near_optimum || f_new <= f0 - 1e-4 * t * decrement ||
+            to_boundary || t < 1e-10) {
+          break
+        }
+        t <- t / 2
+      }
+      if (t < 1e-10) {
+        break
+      }
+      w <- w_new
+    }
+    w <- w / sum(w)
+    # models whose weight reached zero leave the set
+    keep <- w > 0
+    in_set <- in_set[keep]
+    w <- w[keep] / sum(w[keep])
+  }
+  out[in_set] <- w
+  out
+}
 
 #' @export
 print.stacking_weights <- function(x, digits = 3, ...) {
