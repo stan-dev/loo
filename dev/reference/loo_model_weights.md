@@ -48,8 +48,17 @@ pseudobma_weights(lpd_point, BB = TRUE, BB_n = 1000, alpha = 1)
   CV results by calling the `stacking_weights()` or
   `pseudobma_weights()` function directly. Objects from
   [`loo_subsample()`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
-  are not supported, because they have pointwise values only for the
-  subsampled observations.
+  are supported only with `method = "pseudobma"` and `BB = FALSE`, which
+  use the subsampling estimates of `elpd_loo`. The weights do not
+  account for the subsampling uncertainty of these estimates. The
+  subsamples can differ between the models, but the differences between
+  the estimates are more accurate when all models use the same
+  observations (pass the first object as the `observations` argument of
+  [`loo_subsample()`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
+  for the other models). Stacking and the Bayesian bootstrap need
+  pointwise values for all observations, and objects from
+  [`loo_subsample()`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
+  have them only for the subsampled observations.
 
 - ...:
 
@@ -265,8 +274,8 @@ fit1 <- sampling(mod, data=list(N=N, y=y, mu_fixed=-1))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 #> Chain 2: 
-#> Chain 2: Gradient evaluation took 4e-06 seconds
-#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+#> Chain 2: Gradient evaluation took 2e-06 seconds
+#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 2: Adjust your expectations accordingly!
 #> Chain 2: 
 #> Chain 2: 
@@ -315,8 +324,8 @@ fit1 <- sampling(mod, data=list(N=N, y=y, mu_fixed=-1))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 #> Chain 4: 
-#> Chain 4: Gradient evaluation took 1e-06 seconds
-#> Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+#> Chain 4: Gradient evaluation took 2e-06 seconds
+#> Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 4: Adjust your expectations accordingly!
 #> Chain 4: 
 #> Chain 4: 
@@ -341,8 +350,8 @@ fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 5e-06 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.05 seconds.
+#> Chain 1: Gradient evaluation took 4e-06 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -366,8 +375,8 @@ fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 #> Chain 2: 
-#> Chain 2: Gradient evaluation took 1e-06 seconds
-#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+#> Chain 2: Gradient evaluation took 2e-06 seconds
+#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 2: Adjust your expectations accordingly!
 #> Chain 2: 
 #> Chain 2: 
@@ -391,8 +400,8 @@ fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
 #> Chain 3: 
-#> Chain 3: Gradient evaluation took 1e-06 seconds
-#> Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+#> Chain 3: Gradient evaluation took 2e-06 seconds
+#> Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 3: Adjust your expectations accordingly!
 #> Chain 3: 
 #> Chain 3: 
@@ -416,8 +425,8 @@ fit2 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.5))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 #> Chain 4: 
-#> Chain 4: Gradient evaluation took 1e-06 seconds
-#> Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+#> Chain 4: Gradient evaluation took 2e-06 seconds
+#> Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 4: Adjust your expectations accordingly!
 #> Chain 4: 
 #> Chain 4: 
@@ -442,8 +451,8 @@ fit3 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.6))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 3e-06 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.03 seconds.
+#> Chain 1: Gradient evaluation took 4e-06 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -467,8 +476,8 @@ fit3 <- sampling(mod, data=list(N=N, y=y, mu_fixed=0.6))
 #> 
 #> SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 #> Chain 2: 
-#> Chain 2: Gradient evaluation took 1e-06 seconds
-#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.01 seconds.
+#> Chain 2: Gradient evaluation took 2e-06 seconds
+#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.02 seconds.
 #> Chain 2: Adjust your expectations accordingly!
 #> Chain 2: 
 #> Chain 2: 

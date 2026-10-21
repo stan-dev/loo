@@ -2,6 +2,10 @@
 
 ## loo (development version)
 
+- Handle errors of the user functions in
+  [`loo_moment_match()`](https://mc-stan.org/loo/dev/reference/loo_moment_match.md)
+  by [@avehtari](https://github.com/avehtari) in
+  [\#410](https://github.com/stan-dev/loo/issues/410)
 - Allow different numbers of draws in
   [`loo_model_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
   by [@avehtari](https://github.com/avehtari) in

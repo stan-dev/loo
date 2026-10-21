@@ -243,7 +243,7 @@ log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.01 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.008 seconds (Generated Quantities)</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -319,7 +319,13 @@ predictive densities of all the observations.</p>
 <span>  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.005 seconds (Generated Quantities)
+ Elapsed Time: 0.004 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.004 seconds (Generated Quantities)
+
+
+ Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.005 seconds (Generated Quantities)
@@ -328,22 +334,16 @@ predictive densities of all the observations.</p>
  Elapsed Time: 0.005 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.005 seconds (Generated Quantities)
-
-
- Elapsed Time: 0.006 seconds (Generated Quantities)
+ Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.005 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.005 seconds (Generated Quantities)
+ Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
- Elapsed Time: 0.005 seconds (Generated Quantities)
-
-
- Elapsed Time: 0.005 seconds (Generated Quantities)
+ Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.005 seconds (Generated Quantities)</code></pre>
