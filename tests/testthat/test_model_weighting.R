@@ -98,6 +98,8 @@ test_that("loo_model_weights accepts loo_subsample() objects only for pseudo-BMA
 
   # stacking and pseudo-BMA+ need pointwise values for all observations
   expect_error(loo_model_weights(list(loo_ss1, loo_ss2)), error, fixed = TRUE)
+  expect_error(loo_model_weights(list(loo_ss1, loo_ss2), BB = FALSE), error,
+               fixed = TRUE)
   expect_error(loo_model_weights(list(loo_full, loo_ss2)), error, fixed = TRUE)
   expect_error(
     loo_model_weights(list(loo_ss1, loo_ss2), method = "pseudobma"),
@@ -125,6 +127,18 @@ test_that("loo_model_weights accepts loo_subsample() objects only for pseudo-BMA
     loo_model_weights(list(loo_ss1, loo_ss_short), method = "pseudobma", BB = FALSE),
     "same number of observations"
   )
+})
+
+test_that("pseudo-BMA weights from elpd estimates reject NA and Inf", {
+  error <- "All elpd_loo estimates must be finite or -Inf."
+  expect_error(pseudobma_weights_from_elpd(c(-10, NA)), error, fixed = TRUE)
+  expect_error(pseudobma_weights_from_elpd(c(-10, NaN)), error, fixed = TRUE)
+  expect_error(pseudobma_weights_from_elpd(c(-10, Inf)), error, fixed = TRUE)
+  expect_error(
+    pseudobma_weights_from_elpd(c(-Inf, -Inf)),
+    "At least one model must have a finite total predictive density."
+  )
+  expect_equal(as.numeric(pseudobma_weights_from_elpd(c(-10, -Inf))), c(1, 0))
 })
 
 test_that("loo_model_weights throws correct errors and warnings", {

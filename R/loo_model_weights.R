@@ -19,10 +19,14 @@
 #'   CV results by calling the `stacking_weights()` or `pseudobma_weights()`
 #'   function directly. Objects from [loo_subsample()] are supported only with
 #'   `method = "pseudobma"` and `BB = FALSE`, which use the subsampling
-#'   estimates of `elpd_loo`. The subsamples and their sizes can differ between
-#'   the models. Stacking and the Bayesian bootstrap need pointwise values for
-#'   all observations, and objects from [loo_subsample()] have them only for
-#'   the subsampled observations.
+#'   estimates of `elpd_loo`. The weights do not account for the subsampling
+#'   uncertainty of these estimates. The subsamples can differ between the
+#'   models, but the differences between the estimates are more accurate when
+#'   all models use the same observations (pass the first object as the
+#'   `observations` argument of [loo_subsample()] for the other models).
+#'   Stacking and the Bayesian bootstrap need pointwise values for all
+#'   observations, and objects from [loo_subsample()] have them only for the
+#'   subsampled observations.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
@@ -359,13 +363,17 @@ pseudobma_weights <-
 #' Pseudo-BMA weights from the elpd of each model
 #'
 #' @noRd
-#' @param elpd Vector of elpd estimates, one for each model. At least one must
-#'   be finite.
+#' @param elpd Vector of elpd estimates, one for each model. Each must be finite
+#'   or `-Inf`, and at least one must be finite.
 #' @return Weights proportional to `exp(elpd)`, with class
 #'   `"pseudobma_weights"`.
 pseudobma_weights_from_elpd <- function(elpd) {
+  if (anyNA(elpd) || any(elpd == Inf)) {
+    stop("All elpd_loo estimates must be finite or -Inf.", call. = FALSE)
+  }
   if (!any(is.finite(elpd))) {
-    stop("At least one model must have a finite total predictive density.")
+    stop("At least one model must have a finite total predictive density.",
+         call. = FALSE)
   }
   uwts <- exp(elpd - max(elpd))
   structure(

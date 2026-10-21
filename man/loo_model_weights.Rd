@@ -40,10 +40,14 @@ with results from K-fold CV, but you can still obtain weights using K-fold
 CV results by calling the \code{stacking_weights()} or \code{pseudobma_weights()}
 function directly. Objects from \code{\link[=loo_subsample]{loo_subsample()}} are supported only with
 \code{method = "pseudobma"} and \code{BB = FALSE}, which use the subsampling
-estimates of \code{elpd_loo}. The subsamples and their sizes can differ between
-the models. Stacking and the Bayesian bootstrap need pointwise values for
-all observations, and objects from \code{\link[=loo_subsample]{loo_subsample()}} have them only for
-the subsampled observations.}
+estimates of \code{elpd_loo}. The weights do not account for the subsampling
+uncertainty of these estimates. The subsamples can differ between the
+models, but the differences between the estimates are more accurate when
+all models use the same observations (pass the first object as the
+\code{observations} argument of \code{\link[=loo_subsample]{loo_subsample()}} for the other models).
+Stacking and the Bayesian bootstrap need pointwise values for all
+observations, and objects from \code{\link[=loo_subsample]{loo_subsample()}} have them only for the
+subsampled observations.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
