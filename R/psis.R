@@ -216,13 +216,12 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
 
   if (enough_tail_samples(tail_len_i)) {
     # only the tail and the cutoff need sorting: a partial sort finds the
-    # cutoff value, and the values at or above it are few
+    # cutoff value, and the values at or above it are usually few
     cut_pos <- S - tail_len_i
     cut_val <- sort.int(lw_i, partial = cut_pos)[cut_pos]
     top <- which(lw_i >= cut_val)
     top <- top[order(lw_i[top])]
-    top <- top[seq(length(top) - tail_len_i, length(top))] # cutoff and tail
-    tail_ids <- top[-1]
+    tail_ids <- top[seq(length(top) - tail_len_i + 1, length(top))]
     lw_tail <- lw_i[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
       warning(
@@ -231,7 +230,7 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
         call. = FALSE
       )
     } else {
-      cutoff <- lw_i[top[1]] # largest value not in the tail
+      cutoff <- cut_val # largest value not in the tail
       smoothed <- psis_smooth_tail(lw_tail, cutoff)
       khat <- smoothed$k
       lw_i[tail_ids] <- smoothed$tail
