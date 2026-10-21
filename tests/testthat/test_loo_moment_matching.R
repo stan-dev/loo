@@ -734,3 +734,87 @@ test_that("passing arguments works", {
     passed_arg = TRUE
   ))
 })
+
+# log_lik_i_upars() that fails in the calls listed in `fail_calls`, as a model
+# can fail for the extreme draws of a transformation
+failing_log_lik_i_upars <- function(fail_calls) {
+  calls <- 0
+  function(x, upars, i, ...) {
+    calls <<- calls + 1
+    if (calls %in% fail_calls) {
+      stop("overflow in log_lik_i_upars")
+    }
+    log_lik_i_upars_test(x, upars, i)
+  }
+}
+
+mm_with <- function(loo_x, log_lik_i = log_lik_i_test,
+                    log_lik_i_upars = log_lik_i_upars_test, split = TRUE,
+                    k_threshold = 0.7, cores = 1) {
+  loo_moment_match(
+    x, loo = loo_x, post_draws = post_draws_test, log_lik_i = log_lik_i,
+    unconstrain_pars = unconstrain_pars_test,
+    log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars,
+    k_threshold = k_threshold, split = split, cores = cores
+  )
+}
+
+test_that("an error in the split step keeps the result without the split", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # observation 1 needs two transformations; the third call is the split step
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(3)),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(warnings, "stopped early for observation(s) 1", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "The split transformation failed", all = FALSE)
+  mm_no_split <- suppressWarnings(mm_with(loo_manual, split = FALSE))
+  expect_equal(mm$pointwise, mm_no_split$pointwise)
+  expect_equal(mm$diagnostics, mm_no_split$diagnostics)
+})
+
+test_that("the accuracy warning names a failed split transformation", {
+  expect_warning(throw_large_kf_warning(0.8, 0.7), "Setting the argument 'split'")
+  expect_warning(
+    throw_large_kf_warning(0.8, 0.7, split_failed = TRUE),
+    "The split transformation failed"
+  )
+  expect_no_warning(throw_large_kf_warning(0.5, 0.7, split_failed = TRUE))
+})
+
+test_that("an error in a transformation stops moment matching early", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # the remaining high Pareto k gives a second warning
+  suppressWarnings(expect_warning(
+    mm <- mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1)),
+    "overflow in log_lik_i_upars"
+  ))
+  # the first transformation failed, so no transformation was accepted
+  expect_equal(mm$diagnostics$pareto_k, loo_manual$diagnostics$pareto_k)
+})
+
+test_that("an error for one observation keeps its PSIS results", {
+  skip_on_cran()
+  loo_manual <- suppressWarnings(loo(loglik))
+  failing_log_lik_i <- function(x, i, ...) {
+    if (i == 1) stop("log_lik_i failed")
+    log_lik_i_test(x, i)
+  }
+  mm_ok <- suppressWarnings(mm_with(loo_manual, k_threshold = 0))
+  for (cores in c(1, 2)) {
+    # observation 1 keeps its high Pareto k, which gives a second warning
+    suppressWarnings(expect_warning(
+      mm <- mm_with(loo_manual, log_lik_i = failing_log_lik_i,
+                    k_threshold = 0, cores = cores),
+      "failed for observation(s) 1.",
+      fixed = TRUE
+    ))
+    expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
+    expect_equal(mm$pointwise[-1, ], mm_ok$pointwise[-1, ])
+  }
+})
