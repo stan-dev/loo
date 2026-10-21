@@ -69,14 +69,14 @@
 #' `stacking_weights()` maximizes the log score with an active-set method. It
 #' starts with the model with the largest total log predictive density, finds
 #' the optimal weights of the models in the active set with Newton steps, and
-#' adds the model with the largest gradient of the log score, until no model can
-#' improve it. A model whose weight reaches zero leaves the active set. At the
-#' returned weights, the log score is at most \eqn{N \times 10^{-8}} below its
-#' maximum. If the method cannot reach this bound, it gives a warning.
-#' The optimal weights are usually sparse, so the method is fast also for many
-#' models. The method is a variant of the constrained Newton method for mixture
-#' proportions (Wang, 2007), and the stopping rule uses the optimality condition
-#' of Lindsay (1983).
+#' adds the models with the largest gradients of the log score (at most ten at a
+#' time), until no model can improve it. A model whose weight reaches zero
+#' leaves the active set. At the returned weights, the log score is at most
+#' \eqn{N \times 10^{-8}} below its maximum. If the method cannot reach this
+#' bound, it gives a warning. The optimal weights are usually sparse, so the
+#' method is fast also for many models. The method is a variant of the
+#' constrained Newton method for mixture proportions (Wang, 2007), and the
+#' stopping rule uses the optimality condition of Lindsay (1983).
 #'
 #' Wang, Y. (2007). On fast computation of the non-parametric maximum
 #' likelihood estimate of a mixing distribution. *Journal of the Royal
@@ -333,7 +333,7 @@ pseudobma_weights <-
 #' Maximizes `sum_i log(sum_k w_k exp(lpd_point[i, k]))` over the simplex. The
 #' problem is concave in `w`, and the optimal weights are usually sparse. The
 #' method optimizes the weights of the active models with Newton steps and adds
-#' the model with the largest `g_k = mean_i exp(lpd_point[i, k]) / p_i`, where
+#' the models with the largest `g_k = mean_i exp(lpd_point[i, k]) / p_i`, where
 #' `p_i` is the predictive density of the combination, until `max_k g_k` is at
 #' most `exp(tol)`. Then the log score is at most `N * tol` below its maximum,
 #' by Jensen's inequality.
@@ -342,9 +342,11 @@ pseudobma_weights <-
 #' @param lpd_point N by K matrix of pointwise log predictive densities. Each
 #'   row must have at least one finite value.
 #' @param tol Tolerance for `max_k log(g_k)`.
+#' @param max_add Largest number of models added in one outer iteration. Each
+#'   added model has `log(g_k) > tol` and starts at weight 0.001.
 #' @return Vector of K weights that sums to 1.
 #'
-stacking_weights_active_set <- function(lpd_point, tol = 1e-8) {
+stacking_weights_active_set <- function(lpd_point, tol = 1e-8, max_add = 10) {
   N <- nrow(lpd_point)
   K <- ncol(lpd_point)
 
@@ -377,8 +379,13 @@ stacking_weights_active_set <- function(lpd_point, tol = 1e-8) {
       # Newton stopped before the optimum of the active set
       break
     }
-    active <- c(active, k_new)
-    w <- c(w * (1 - 1e-3), 1e-3)
+    # add the models with the largest g_k, at most max_add at a time; with many
+    # nonzero weights this needs fewer outer iterations than one model at a time
+    new <- setdiff(which(log_g > tol), active)
+    new <- new[order(log_g[new], decreasing = TRUE)]
+    new <- new[seq_len(min(length(new), max_add))]
+    active <- c(active, new)
+    w <- c(w * (1 - 1e-3 * length(new)), rep(1e-3, length(new)))
   }
 
   if (!converged) {

@@ -94,6 +94,22 @@ test_that("stacking_weights() warns if the optimizer stops before the optimum", 
   expect_equal(sum(w_stop), 1)
 })
 
+test_that("adding several models per iteration gives the same weights", {
+  # each model is the best one for its own observations, so many weights are
+  # nonzero; deterministic values keep the random number stream unchanged
+  N <- 240
+  K <- 30
+  lpd <- outer(seq_len(N), seq_len(K), function(i, k) {
+    -3 - ((7 * i + 13 * k) %% 11) / 5
+  })
+  lpd[cbind(seq_len(N), rep_len(seq_len(K), N))] <- 0
+  expect_no_warning(w_many <- stacking_weights_active_set(lpd))
+  w_one <- stacking_weights_active_set(lpd, max_add = 1)
+  expect_gt(sum(w_many > 0), 10)
+  expect_equal(w_many, w_one, tolerance = 1e-6)
+  expect_equal(as.numeric(stacking_weights(lpd)), w_many)
+})
+
 
 test_that("loo_model_weights (stacking and pseudo-BMA) gives expected result", {
   w1 <- loo_model_weights(ll_list, method = "stacking", r_eff_list = r_eff_list)
