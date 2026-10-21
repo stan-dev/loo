@@ -38,8 +38,12 @@ log-likelihood matrices then \code{\link[=loo]{loo()}} is called internally on e
 Currently the \code{loo_model_weights()} function is not implemented to be used
 with results from K-fold CV, but you can still obtain weights using K-fold
 CV results by calling the \code{stacking_weights()} or \code{pseudobma_weights()}
-function directly. Objects from \code{\link[=loo_subsample]{loo_subsample()}} are not supported,
-because they have pointwise values only for the subsampled observations.}
+function directly. Objects from \code{\link[=loo_subsample]{loo_subsample()}} are supported only with
+\code{method = "pseudobma"} and \code{BB = FALSE}, which use the subsampling
+estimates of \code{elpd_loo}. The subsamples and their sizes can differ between
+the models. Stacking and the Bayesian bootstrap need pointwise values for
+all observations, and objects from \code{\link[=loo_subsample]{loo_subsample()}} have them only for
+the subsampled observations.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
