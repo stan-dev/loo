@@ -2,6 +2,10 @@
 
 ## loo (development version)
 
+- Allow different numbers of draws in
+  [`loo_model_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
+  by [@avehtari](https://github.com/avehtari) in
+  [\#409](https://github.com/stan-dev/loo/issues/409)
 - Improve numerical stability in
   [`loo()`](https://mc-stan.org/loo/dev/reference/loo.md),
   [`psis()`](https://mc-stan.org/loo/dev/reference/psis.md), model
