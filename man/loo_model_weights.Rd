@@ -32,12 +32,14 @@ pointwise log-likelihood matrices, one for each model. If the list
 elements are named the names will be used to label the models in the
 results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 where \eqn{S} is the size of the posterior sample (with all chains merged)
-and \eqn{N} is the number of data points. If \code{x} is a list of
+and \eqn{N} is the number of data points. All models must have the same
+\eqn{N}, but \eqn{S} can differ between models. If \code{x} is a list of
 log-likelihood matrices then \code{\link[=loo]{loo()}} is called internally on each matrix.
 Currently the \code{loo_model_weights()} function is not implemented to be used
 with results from K-fold CV, but you can still obtain weights using K-fold
 CV results by calling the \code{stacking_weights()} or \code{pseudobma_weights()}
-function directly.}
+function directly. Objects from \code{\link[=loo_subsample]{loo_subsample()}} are not supported,
+because they have pointwise values only for the subsampled observations.}
 
 \item{...}{Unused, except for the generic to pass arguments to individual
 methods.}
