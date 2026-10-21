@@ -157,12 +157,10 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     }
     if (!is.null(mm_list[[ii]]$error)) {
       error_msg <- c(error_msg, mm_list[[ii]]$error)
-    }
-    if (isTRUE(mm_list[[ii]]$failed)) {
-      failed <- c(failed, i)
-      next
-    }
-    if (!is.null(mm_list[[ii]]$error)) {
+      if (isTRUE(mm_list[[ii]]$failed)) {
+        failed <- c(failed, i)
+        next
+      }
       stopped <- c(stopped, i)
     }
     if (isTRUE(mm_list[[ii]]$split_failed)) {
@@ -435,6 +433,7 @@ loo_moment_match_i <- function(i,
   # if no transformations were successful
   # stop and collect values
   split_done <- FALSE
+  split_failed <- FALSE
   if (split && (iterind > 1)) {
     # compute split transformation
     split_obj <- try(loo_moment_match_split(
@@ -445,6 +444,7 @@ loo_moment_match_i <- function(i,
     if (inherits(split_obj, "try-error")) {
       # use the result without the split transformation
       error_msg <- try_error_message(split_obj)
+      split_failed <- TRUE
     } else {
       log_liki <- split_obj$log_liki
       lwi <- split_obj$lwi
@@ -480,7 +480,7 @@ loo_moment_match_i <- function(i,
        # an error before any transformation was accepted leaves the PSIS
        # results
        failed = !is.null(error_msg) && iterind == 1,
-       split_failed = split && (iterind > 1) && !split_done)
+       split_failed = split_failed)
 }
 
 

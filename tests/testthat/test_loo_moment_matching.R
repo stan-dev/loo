@@ -875,7 +875,10 @@ test_that("an error for one observation keeps its PSIS results", {
     log_lik_i_test(x, i)
   }
   mm_ok <- suppressWarnings(mm_with(loo_manual, k_threshold = 0))
-  for (cores in c(1, 2)) {
+  # On Windows the workers are PSOCK processes that load the installed loo, so
+  # with devtools::test() they would not run this version of the code
+  cores_list <- if (os_is_windows()) 1 else c(1, 2)
+  for (cores in cores_list) {
     # observation 1 keeps its high Pareto k, which gives a second warning
     suppressWarnings(expect_warning(
       mm <- mm_with(loo_manual, log_lik_i = failing_log_lik_i,
