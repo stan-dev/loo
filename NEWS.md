@@ -1,5 +1,6 @@
 # loo (development version)
 
+* Allow different numbers of draws in `loo_model_weights()` by @avehtari in #409
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 
