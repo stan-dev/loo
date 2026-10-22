@@ -277,6 +277,11 @@ release_questions <- function() {
 }
 # nocov end
 
+# `x` is constant if `max(x) - min(x)` is at most `tol` times the largest
+# absolute value in `x`. Default is `.Machine$double.eps`.
 is_constant <- function(x, tol = .Machine$double.eps) {
-  abs(max(x) - min(x)) < tol
+  r <- range(x)
+  spread <- r[2] - r[1]
+  # the equality check covers all-zero and all-infinite x
+  r[1] == r[2] || (is.finite(spread) && spread <= tol * max(abs(r)))
 }
