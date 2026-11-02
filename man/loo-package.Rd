@@ -40,6 +40,49 @@ We recommend PSIS-LOO-CV instead of WAIC, because PSIS provides useful
 diagnostics and effective sample size and Monte Carlo standard error
 estimates.
 }
+\section{Warning classes}{
+
+
+Every warning signaled by \pkg{loo} has the class \code{loo_warning} and one
+class for its cause. Warnings that question the reliability of a result
+also have the class \code{loo_warning_diagnostic}. Use these classes to handle
+or muffle a specific warning, for example with \code{\link[=withCallingHandlers]{withCallingHandlers()}}
+and \code{invokeRestart("muffleWarning")}.
+
+Diagnostic warnings:
+\itemize{
+\item \code{loo_warning_pareto_k_high}: Some Pareto k values are too high.
+\item \code{loo_warning_pareto_tail_not_fitted}: There are not enough tail samples to
+fit the generalized Pareto distribution.
+\item \code{loo_warning_pareto_tail_constant}: All tail values are the same.
+\item \code{loo_warning_p_waic_high}: Some \code{p_waic} estimates are greater than 0.4.
+\item \code{loo_warning_moment_match_failed}: Moment matching failed for some
+observations.
+\item \code{loo_warning_moment_match_max_iters}: Moment matching reached
+\code{max_iters}.
+\item \code{loo_warning_large_kf}: The accuracy of self-normalized importance
+sampling may be bad.
+\item \code{loo_warning_y_mismatch}: The models do not have the same \code{y} variable.
+\item \code{loo_warning_cv_mismatch}: The models use different types of
+cross-validation or different numbers of folds.
+\item \code{loo_warning_chance_difference}: The difference in performance is
+potentially due to chance.
+\item \code{loo_warning_subsample_se}: A subsampling standard error is naive or
+negative.
+}
+
+Other warnings:
+\itemize{
+\item \code{loo_warning_multicore_unavailable}: Multicore is not implemented for
+the selected method.
+\item \code{loo_warning_pareto_k_not_plotted}: Some Pareto k values are \code{Inf}, \code{NA},
+or \code{NaN} and are not plotted.
+\item \code{loo_warning_llfun_not_matrix}: The values from \code{llfun} are not a matrix
+and were coerced.
+\item \code{loo_warning_deprecated}: A deprecated feature was used.
+}
+}
+
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
