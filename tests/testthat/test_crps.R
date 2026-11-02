@@ -56,3 +56,12 @@ test_that("methods for single data point don't error", {
   expect_silent(crps(x1[,1], x2[,1], y[1]))
   expect_silent(scrps(x1[,1], x2[,1], y[1]))
 })
+
+test_that("methods for single data point pass permutations to matrix methods", {
+  set.seed(1); a <- crps(x1[,1], x2[,1], y[1], permutations = 5)
+  set.seed(1); b <- crps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5)
+  expect_equal(a, b)
+  set.seed(1); a <- scrps(x1[,1], x2[,1], y[1], permutations = 5)
+  set.seed(1); b <- scrps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5)
+  expect_equal(a, b)
+})

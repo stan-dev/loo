@@ -19,11 +19,10 @@ vignettes/loo2-non-factorized_cache/*
 .vscode/*
 ^\.github$
 ^vignettes/online-only$
-
+^\.git-blame-ignore-revs$
 ^CRAN-SUBMISSION$
 ^release-prep\.R$
 ^_pkgdown\.yml$
 ^pkgdown$
 ^touchstone$
-^.git-blame-ignore-revs
 ^notes-release.md
