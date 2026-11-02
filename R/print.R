@@ -238,7 +238,12 @@ print_mcse_summary <- function(x, digits) {
 
 # print and warning helpers
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
-.warn <- function(..., call. = FALSE) warning(..., call. = call.)
+.warn <- function(..., class = NULL) {
+  rlang::warn(paste(c(...), collapse = ""), class = c(class, "loo_warning"))
+}
+.warn_diagnostic <- function(..., class) {
+  .warn(..., class = c(class, "loo_warning_diagnostic"))
+}
 .k_help <- function() "See help('pareto-k-diagnostic') for details.\n"
 
 # compatibility with old loo objects

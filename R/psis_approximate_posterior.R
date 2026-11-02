@@ -137,7 +137,8 @@ ap_psis.matrix <- function(log_ratios, log_p, log_g,
 ap_psis.default <- function(log_ratios, log_p, log_g, ...) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
-    warning("llfun values do not return a matrix, coerce to matrix")
+    .warn("llfun values do not return a matrix, coerce to matrix",
+          class = "loo_warning_llfun_not_matrix")
     ap_psis.matrix(as.matrix(log_ratios), log_p, log_g, cores = 1)
   }
 

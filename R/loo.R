@@ -549,18 +549,6 @@ log_var_epd_ratio <- function(log_lik_ratio, lw, r_eff) {
   matrixStats::colLogSumExps(2 * (lw + log_abs_diff)) - log(r_eff)
 }
 
-
-#' Warning message if r_eff not specified
-#' @noRd
-throw_loo_r_eff_warning <- function() {
-  warning(
-    "Relative effective sample sizes ('r_eff' argument) not specified.\n",
-    "For models fit with MCMC, the reported PSIS ESS and \n",
-    "MCSE estimates can be over-optimistic.",
-    call. = FALSE
-  )
-}
-
 #' Combine many psis objects into a single psis object
 #'
 #' @noRd
@@ -621,12 +609,12 @@ NULL
   if (is.character(i)) {
     needs_warning <- which(flags == i)
     if (length(needs_warning)) {
-      warning(
+      .warn(
         "Accessing ", flags[needs_warning], " using '[' is deprecated ",
         "and will be removed in a future release. ",
         "Please extract the ", flags[needs_warning],
         " estimate from the 'estimates' component instead.",
-        call. = FALSE
+        class = "loo_warning_deprecated"
       )
     }
   }
@@ -643,12 +631,12 @@ NULL
   if (is.character(i)) {
     needs_warning <- which(flags == i)
     if (length(needs_warning)) {
-      warning(
+      .warn(
         "Accessing ", flags[needs_warning], " using '[[' is deprecated ",
         "and will be removed in a future release. ",
         "Please extract the ", flags[needs_warning],
         " estimate from the 'estimates' component instead.",
-        call. = FALSE
+        class = "loo_warning_deprecated"
       )
     }
   }
@@ -664,12 +652,12 @@ NULL
              "elpd_waic", "se_elpd_waic", "p_waic", "se_p_waic", "waic", "se_waic")
   needs_warning <- which(flags == name)
   if (length(needs_warning)) {
-    warning(
+    .warn(
       "Accessing ", flags[needs_warning], " using '$' is deprecated ",
       "and will be removed in a future release. ",
       "Please extract the ", flags[needs_warning],
       " estimate from the 'estimates' component instead.",
-      call. = FALSE
+      class = "loo_warning_deprecated"
     )
   }
   NextMethod()

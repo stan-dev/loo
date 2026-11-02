@@ -224,10 +224,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
     tail_ids <- top[seq(length(top) - tail_len_i + 1, length(top))]
     lw_tail <- lw_i[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
-      warning(
+      .warn_diagnostic(
         "Can't fit generalized Pareto distribution ",
         "because all tail values are the same.",
-        call. = FALSE
+        class = "loo_warning_pareto_tail_constant"
       )
     } else {
       cutoff <- cut_val # largest value not in the tail
@@ -320,7 +320,11 @@ enough_tail_samples <- function(tail_len, min_len = 5) {
 #'
 throw_pareto_warnings <- function(k, k_threshold) {
   if (isTRUE(any(k > k_threshold))) {
-    .warn("Some Pareto k diagnostic values are too high. ", .k_help())
+    .warn_diagnostic(
+      "Some Pareto k diagnostic values are too high. ",
+      .k_help(),
+      class = "loo_warning_pareto_k_high"
+    )
   }
 }
 
@@ -334,15 +338,14 @@ throw_tail_length_warnings <- function(tail_lengths) {
   tail_len_bad <- !sapply(tail_lengths, enough_tail_samples)
   if (any(tail_len_bad)) {
     if (length(tail_lengths) == 1) {
-      warning(
+      .warn_diagnostic(
         "Not enough tail samples to fit the generalized Pareto distribution.",
-        call. = FALSE,
-        immediate. = TRUE
+        class = "loo_warning_pareto_tail_not_fitted"
       )
     } else {
       bad <- which(tail_len_bad)
       Nbad <- length(bad)
-      warning(
+      .warn_diagnostic(
         "Not enough tail samples to fit the generalized Pareto distribution ",
         "in some or all columns of matrix of log importance ratios. ",
         "Skipping the following columns: ",
@@ -352,8 +355,7 @@ throw_tail_length_warnings <- function(tail_lengths) {
         } else {
           "\n"
         },
-        call. = FALSE,
-        immediate. = TRUE
+        class = "loo_warning_pareto_tail_not_fitted"
       )
     }
   }
@@ -402,14 +404,4 @@ called_from_loo <- function() {
   patts <- "loo.array\\(|loo.matrix\\(|loo.function\\("
   check <- sapply(txt, function(x) grepl(patts, x))
   isTRUE(any(check))
-}
-
-#' Warning message about missing `r_eff` argument
-#' @noRd
-throw_psis_r_eff_warning <- function() {
-  warning(
-    "Relative effective sample sizes ('r_eff' argument) not specified. ",
-    "PSIS ESS (n_eff) will not be adjusted based on MCMC ESS (n_eff).",
-    call. = FALSE
-  )
 }

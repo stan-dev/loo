@@ -272,8 +272,9 @@ plot.psis_loo <- function(x,
   k[is.na(k)] <- 0  # FIXME when reloo is changed to make NA k values -Inf
   k_inf <- !is.finite(k)
   if (any(k_inf)) {
-    warning(signif(100 * mean(k_inf), 2),
-            "% of Pareto k estimates are Inf/NA/NaN and not plotted.")
+    .warn(signif(100 * mean(k_inf), 2),
+          "% of Pareto k estimates are Inf/NA/NaN and not plotted.",
+          class = "loo_warning_pareto_k_not_plotted")
   }
 
   if (diagnostic == "ESS" || diagnostic == "n_eff") {

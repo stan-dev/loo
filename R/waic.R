@@ -209,7 +209,11 @@ throw_pwaic_warnings <- function(p, digits = 1, warn = TRUE) {
     msg <- paste0("\n", count, " (", .fr(100 * prop, digits),
                   "%) p_waic estimates greater than 0.4. ",
                   "We recommend trying loo instead.")
-    if (warn) .warn(msg) else cat(msg, "\n")
+    if (warn) {
+      .warn_diagnostic(msg, class = "loo_warning_p_waic_high")
+    } else {
+      cat(msg, "\n")
+    }
   }
   invisible(NULL)
 }
