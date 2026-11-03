@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 set.seed(123)
 
 LLarr <- example_loglik_array()
@@ -31,7 +30,7 @@ test_that("relative_eff returns NA for all-zero likelihoods", {
     chain_id = chain_id,
     data = data.frame(i = 1:2),
     draws = matrix(0, nrow = length(likelihood), ncol = 1),
-    cores = 1
+    parallel = FALSE
   )
   expect_true(all(is.na(out)))
 })
@@ -62,7 +61,7 @@ test_that("relative_eff matrix and function methods return identical output", {
     chain_id = chain,
     data = data,
     draws = draws,
-    cores = 1
+    parallel = FALSE
   )
   expect_identical(r_eff_mat, r_eff_fn)
 })
@@ -71,14 +70,14 @@ test_that("relative_eff with multiple cores runs", {
   skip_on_cran()
   source(test_path("data-for-tests/function_method_stuff.R"))
   dim(llmat_from_fn) <- c(nrow(llmat_from_fn), 1, ncol(llmat_from_fn))
-  r_eff_arr <- relative_eff(llmat_from_fn, cores = 2)
+  r_eff_arr <- relative_eff(llmat_from_fn, parallel = TRUE)
   r_eff_fn <-
     relative_eff(
       llfun,
       chain_id = rep(1, nrow(draws)),
       data = data,
       draws = draws,
-      cores = 2
+      parallel = TRUE
     )
   expect_identical(r_eff_arr, r_eff_fn)
 })

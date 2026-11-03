@@ -8,7 +8,7 @@ psislw(
   lw,
   wcp = 0.2,
   wtrunc = 3/4,
-  cores = getOption("mc.cores", 1),
+  parallel = TRUE,
   llfun = NULL,
   llargs = NULL,
   ...
@@ -26,13 +26,9 @@ distribution.}
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}, the old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until it is
-removed. \strong{As of version 2.0.0, the default is now 1 core if
-\code{mc.cores} is not set, but we recommend using as many (or close to as
-many) cores as possible.}}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 
 \item{llfun, llargs}{See \code{\link[=loo.function]{loo.function()}}.}
 

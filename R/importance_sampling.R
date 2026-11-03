@@ -30,14 +30,13 @@ importance_sampling.array <-
   function(log_ratios, method,
            ...,
            r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+           parallel = TRUE) {
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- llarray_to_matrix(log_ratios)
     log_ratios <- validate_log_ratios(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, parallel = parallel, method = method)
   }
 
 #' @rdname importance_sampling
@@ -47,12 +46,11 @@ importance_sampling.matrix <-
   function(log_ratios, method,
            ...,
            r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+           parallel = TRUE) {
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_log_ratios(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
-    do_importance_sampling(log_ratios, r_eff = r_eff, cores = cores, method = method)
+    do_importance_sampling(log_ratios, r_eff = r_eff, parallel = parallel, method = method)
   }
 
 #' @rdname importance_sampling
@@ -64,7 +62,7 @@ importance_sampling.default <-
     assert_importance_sampling_method_is_implemented(method)
     dim(log_ratios) <- c(length(log_ratios), 1)
     r_eff <- prepare_psis_r_eff(r_eff, len = 1)
-    importance_sampling.matrix(log_ratios, r_eff = r_eff, cores = 1, method = method)
+    importance_sampling.matrix(log_ratios, r_eff = r_eff, parallel = FALSE, method = method)
   }
 
 
@@ -185,12 +183,11 @@ importance_sampling_object <-
 #' @noRd
 #' @param lr Matrix of log ratios (`-loglik`)
 #' @param r_eff Vector of relative effective sample sizes
-#' @param cores User's integer `cores` argument
+#' @param parallel Logical
 #' @return A list with class `"psis"` and structure described in the main doc at
 #'   the top of this file.
 #'
-do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
-  stopifnot(cores == as.integer(cores))
+do_importance_sampling <- function(log_ratios, r_eff, parallel, method) {
   assert_importance_sampling_method_is_implemented(method)
   N <- ncol(log_ratios)
   S <- nrow(log_ratios)
@@ -208,29 +205,14 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     stop("Incorrect IS method.")
   }
 
-  if (cores == 1) {
-    lw_list <- lapply(seq_len(N), function(i)
-      is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i]))
-  } else {
-    if (!os_is_windows()) {
-      lw_list <- parallel::mclapply(
-        X = seq_len(N),
-        mc.cores = cores,
-        FUN = function(i)
-          is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-      )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      lw_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = function(i)
-            is_fun(log_ratios_i = log_ratios[, i], tail_len_i = tail_len[i])
-        )
-    }
-  }
+  lw_list <- loo_map(
+    seq_len(N),
+    importance_sampling_i,
+    is_fun = is_fun,
+    log_ratios = slices(log_ratios, parallel),
+    tail_len = tail_len,
+    parallel = parallel
+  )
 
   log_weights <- psis_apply(lw_list, "log_weights", fun_val = numeric(S))
   pareto_k <- psis_apply(lw_list, "pareto_k")
@@ -244,3 +226,8 @@ do_importance_sampling <- function(log_ratios, r_eff, cores, method) {
     method = rep(method, length(pareto_k)) # Conform to other attr that exist per obs.
   )
 }
+
+importance_sampling_i <- function(i, is_fun, log_ratios, tail_len) {
+  is_fun(log_ratios_i = slice(log_ratios, i), tail_len_i = tail_len[i])
+}
+

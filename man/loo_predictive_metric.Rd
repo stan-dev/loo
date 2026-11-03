@@ -14,7 +14,7 @@ loo_predictive_metric(x, ...)
   ...,
   metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
   r_eff = 1,
-  cores = getOption("mc.cores", 1)
+  parallel = TRUE
 )
 }
 \arguments{
@@ -53,8 +53,9 @@ negative rates.
 \item{r_eff}{A Vector of relative effective sample size estimates containing
 one element per observation. See \code{\link[=psis]{psis()}} for more details.}
 
-\item{cores}{The number of cores to use for parallelization of \verb{[psis()]}.
-See \code{\link[=psis]{psis()}} for details.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 }
 \value{
 A list with the following components:
@@ -77,6 +78,7 @@ function, so this function assumes that the PSIS approximation is working
 well.
 }
 \examples{
+mirai::daemons(2)
 \donttest{
 if (requireNamespace("rstanarm", quietly = TRUE)) {
 # Use rstanarm package to quickly fit a model and get both a log-likelihood
@@ -104,4 +106,5 @@ mae_90q <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
                                 type = 'quantile', probs = 0.9)
 }
 }
+mirai::daemons(0)
 }

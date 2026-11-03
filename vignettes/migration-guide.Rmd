@@ -79,7 +79,7 @@ loo_compare(loo1, loo2)
 | Deprecated | Replacement | Since | Planned removal |
 |------------|-------------|-------|-----------------|
 | `psislw()` | `psis()` | 2.0.0 | 3.0.0 |
-| `options(loo.cores = ...)` | `options(mc.cores = ...)` or `cores` argument | 2.0.0 | |
+| `options(loo.cores = ...)` | `mirai::daemons()` and the `parallel` argument | 2.0.0 | |
 
 ```r
 # Deprecated

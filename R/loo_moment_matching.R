@@ -33,7 +33,7 @@
 #' @param cov Logical; Indicate whether to match the covariance matrix of the
 #'   samples or not. If `FALSE`, only the mean and marginal variances are
 #'   matched.
-#' @template cores
+#' @template parallel
 #' @param ... Further arguments passed to the custom functions documented above.
 #'
 #' @return The `loo_moment_match()` methods return an updated `loo` object. The
@@ -67,7 +67,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
                           log_lik_i_upars, max_iters = 30L,
                           k_threshold = NULL, split = TRUE,
-                          cov = TRUE, cores = getOption("mc.cores", 1),
+                          cov = TRUE, parallel = TRUE,
                           ...) {
 
   # input checks
@@ -81,7 +81,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   checkmate::assertNumber(k_threshold, null.ok=TRUE)
   checkmate::assertLogical(split)
   checkmate::assertLogical(cov)
-  checkmate::assertNumber(cores)
+  checkmate::assertFlag(parallel)
 
 
   if ("psis_loo" %in% class(loo)) {
@@ -111,32 +111,29 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   kfs <- rep(0,N)
   I <- which(ks > k_threshold)
 
-  loo_moment_match_i_fun <- function(i) {
-    loo_moment_match_i(i = i, x = x, log_lik_i = log_lik_i,
-                       unconstrain_pars = unconstrain_pars,
-                       log_prob_upars = log_prob_upars,
-                       log_lik_i_upars = log_lik_i_upars,
-                       max_iters = max_iters, k_threshold = k_threshold,
-                       split = split, cov = cov, N = N, S = S, upars = upars,
-                       orig_log_prob = orig_log_prob, k = ks[i],
-                       is_method = is_method, npars = npars, ...)
-  }
-
-  if (cores == 1) {
-    mm_list <- lapply(X = I, FUN = function(i) loo_moment_match_i_fun(i))
-  }
-  else {
-    if (!os_is_windows()) {
-      mm_list <- parallel::mclapply(X = I, mc.cores = cores,
-                                    FUN = function(i) loo_moment_match_i_fun(i))
-    }
-    else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      mm_list <- parallel::parLapply(cl = cl, X = I,
-                                    fun = function(i) loo_moment_match_i_fun(i))
-    }
-  }
+  mm_list <- loo_map(
+    I,
+    loo_moment_match_i,
+    x = x,
+    log_lik_i = log_lik_i,
+    unconstrain_pars = unconstrain_pars,
+    log_prob_upars = log_prob_upars,
+    log_lik_i_upars = log_lik_i_upars,
+    max_iters = max_iters,
+    k_threshold = k_threshold,
+    split = split,
+    cov = cov,
+    N = N,
+    S = S,
+    upars = upars,
+    orig_log_prob = orig_log_prob,
+    k = ks,
+    is_method = is_method,
+    npars = npars,
+    ...,
+    parallel = parallel,
+    batch = FALSE
+  )
 
   # update results
   failed <- integer(0)
@@ -147,16 +144,6 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   error_msg <- NULL
   for (ii in seq_along(I)) {
     i <- I[ii]
-    # parallel::mclapply() returns NULL if a worker dies, for example when it
-    # runs out of memory, and a "try-error" string if a worker stops with an
-    # error. Errors of the user functions are caught in loo_moment_match_i(),
-    # so a worker error is an error in loo itself, as it is with cores = 1.
-    if (is.null(mm_list[[ii]])) {
-      mm_list[[ii]] <- list(i = i, failed = TRUE,
-                            error = "a parallel worker did not return a result")
-    } else if (inherits(mm_list[[ii]], "try-error")) {
-      stop(try_error_message(mm_list[[ii]]), call. = FALSE)
-    }
     if (!is.null(mm_list[[ii]]$error)) {
       error_msg <- c(error_msg, mm_list[[ii]]$error)
       if (isTRUE(mm_list[[ii]]$failed)) {
@@ -265,7 +252,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
 #'   the unconstrained space.
 #' @param orig_log_prob log probability densities of the original draws from the
 #'   model `x`.
-#' @param k Pareto k value before moment matching
+#' @param k Pareto k values before moment matching
 #' @template is_method
 #' @param npars Number of parameters in the model
 #' @param ... Further arguments passed to the custom functions documented above.
@@ -291,7 +278,7 @@ loo_moment_match_i <- function(i,
                                ...) {
   # initialize values for this LOO-fold
   uparsi <- upars
-  ki <- k
+  ki <- k[i]
   kfi <- 0
   log_liki <- tryCatch(log_lik_i(x, i, ...), error = function(e) e)
   if (inherits(log_liki, "error")) {
@@ -303,14 +290,14 @@ loo_moment_match_i <- function(i,
   S_per_chain <- NROW(log_liki)
   N_chains <- NCOL(log_liki)
   dim(log_liki) <- c(S_per_chain, N_chains, 1)
-  r_eff_i <- loo::relative_eff(exp(log_liki), cores = 1)
+  r_eff_i <- loo::relative_eff(exp(log_liki), parallel = FALSE)
   dim(log_liki) <- NULL
   lpd <- matrixStats::logSumExp(log_liki) - log(length(log_liki))
 
   is_obj <- suppressWarnings(importance_sampling.default(-log_liki,
                                                          method = is_method,
                                                          r_eff = r_eff_i,
-                                                         cores = 1))
+                                                         parallel = FALSE))
   lwi <- as.vector(weights(is_obj))
   lwfi <- rep(-matrixStats::logSumExp(rep(0, S)),S)
 
@@ -343,7 +330,7 @@ loo_moment_match_i <- function(i,
                                         log_prob_upars = log_prob_upars,
                                         log_lik_i_upars = log_lik_i_upars,
                                         r_eff_i = r_eff_i,
-                                        cores = 1,
+                                        parallel = FALSE,
                                         is_method = is_method,
                                         ...),
                         silent = TRUE
@@ -375,7 +362,7 @@ loo_moment_match_i <- function(i,
                                         log_prob_upars = log_prob_upars,
                                         log_lik_i_upars = log_lik_i_upars,
                                         r_eff_i = r_eff_i,
-                                        cores = 1,
+                                        parallel = FALSE,
                                         is_method = is_method,
                                         ...),
                         silent = TRUE
@@ -408,7 +395,7 @@ loo_moment_match_i <- function(i,
                                           log_prob_upars = log_prob_upars,
                                           log_lik_i_upars = log_lik_i_upars,
                                           r_eff_i = r_eff_i,
-                                          cores = 1,
+                                          parallel = FALSE,
                                           is_method = is_method,
                                           ...),
                           silent = TRUE
@@ -449,7 +436,7 @@ loo_moment_match_i <- function(i,
     split_obj <- try(loo_moment_match_split(
       x, upars, cov, total$shift, total$scaling, total$mapping, i,
       log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
-      cores = 1, r_eff_i = r_eff_i, is_method = is_method, ...
+      parallel = FALSE, r_eff_i = r_eff_i, is_method = is_method, ...
     ), silent = TRUE)
     if (inherits(split_obj, "try-error")) {
       # use the result without the split transformation
@@ -465,7 +452,7 @@ loo_moment_match_i <- function(i,
   }
   if (!split_done) {
     dim(log_liki) <- c(S_per_chain, N_chains, 1)
-    r_eff_i <- loo::relative_eff(exp(log_liki), cores = 1)
+    r_eff_i <- loo::relative_eff(exp(log_liki), parallel = FALSE)
     dim(log_liki) <- NULL
   }
 
@@ -533,14 +520,14 @@ update_quantities_i <- function(x, upars, i, orig_log_prob,
   is_obj_new <- suppressWarnings(importance_sampling.default(lr,
                                                              method = is_method,
                                                              r_eff = r_eff_i,
-                                                             cores = 1))
+                                                             parallel = FALSE))
   lwi_new <- as.vector(weights(is_obj_new))
   ki_new <- is_obj_new$diagnostics$pareto_k
 
   is_obj_f_new <- suppressWarnings(importance_sampling.default(log_prob_new - orig_log_prob,
                                                                method = is_method,
                                                                r_eff = r_eff_i,
-                                                               cores = 1))
+                                                               parallel = FALSE))
   lwfi_new <- as.vector(weights(is_obj_f_new))
   kfi_new <- is_obj_f_new$diagnostics$pareto_k
 

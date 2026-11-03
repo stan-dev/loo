@@ -17,7 +17,7 @@ loo(x, ...)
   ...,
   r_eff = 1,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1),
+  parallel = TRUE,
   is_method = c("psis", "tis", "sis")
 )
 
@@ -26,7 +26,7 @@ loo(x, ...)
   ...,
   r_eff = 1,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1),
+  parallel = TRUE,
   is_method = c("psis", "tis", "sis")
 )
 
@@ -37,7 +37,7 @@ loo(x, ...)
   draws = NULL,
   r_eff = 1,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1),
+  parallel = TRUE,
   is_method = c("psis", "tis", "sis")
 )
 
@@ -73,19 +73,9 @@ This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to 
 weighted expectations after running \code{loo}. Several functions in the
 \pkg{bayesplot} package also accept \code{psis} objects.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
-\itemize{
-\item Note for Windows 10 users: it is \strong{strongly}
-\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 
 \item{is_method}{The importance sampling method to use. The following methods
 are implemented:
@@ -226,16 +216,17 @@ method that calls \code{loo.array()}. The \code{loo.stanreg()} method in the
 }
 
 \examples{
+mirai::daemons(2)
 ### Array and matrix methods (using example objects included with loo package)
 # Array method
 LLarr <- example_loglik_array()
 rel_n_eff <- relative_eff(exp(LLarr))
-loo(LLarr, r_eff = rel_n_eff, cores = 2)
+loo(LLarr, r_eff = rel_n_eff)
 
 # Matrix method
 LLmat <- example_loglik_matrix()
 rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
-loo(LLmat, r_eff = rel_n_eff, cores = 2)
+loo(LLmat, r_eff = rel_n_eff)
 
 
 ### Using log-likelihood function instead of array or matrix
@@ -293,20 +284,21 @@ loo.stanfit <-
          pars = "log_lik",
          ...,
          save_psis = FALSE,
-         cores = getOption("mc.cores", 1)) {
+         parallel = TRUE) {
   stopifnot(length(pars) == 1L)
   LLarray <- loo::extract_log_lik(stanfit = x,
                                   parameter_name = pars,
                                   merge_chains = FALSE)
-  r_eff <- loo::relative_eff(x = exp(LLarray), cores = cores)
+  r_eff <- loo::relative_eff(x = exp(LLarray), parallel = parallel)
   loo::loo.array(LLarray,
                  r_eff = r_eff,
-                 cores = cores,
+                 parallel = parallel,
                  save_psis = save_psis)
 }
 }
 
 
+mirai::daemons(0)
 }
 \references{
 Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model

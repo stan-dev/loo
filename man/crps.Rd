@@ -25,31 +25,13 @@ loo_scrps(x, ...)
 
 \method{crps}{numeric}(x, x2, y, ..., permutations = 1)
 
-\method{loo_crps}{matrix}(
-  x,
-  x2,
-  y,
-  log_lik,
-  ...,
-  permutations = 1,
-  r_eff = 1,
-  cores = getOption("mc.cores", 1)
-)
+\method{loo_crps}{matrix}(x, x2, y, log_lik, ..., permutations = 1, r_eff = 1, parallel = TRUE)
 
 \method{scrps}{matrix}(x, x2, y, ..., permutations = 1)
 
 \method{scrps}{numeric}(x, x2, y, ..., permutations = 1)
 
-\method{loo_scrps}{matrix}(
-  x,
-  x2,
-  y,
-  log_lik,
-  ...,
-  permutations = 1,
-  r_eff = 1,
-  cores = getOption("mc.cores", 1)
-)
+\method{loo_scrps}{matrix}(x, x2, y, log_lik, ..., permutations = 1, r_eff = 1, parallel = TRUE)
 }
 \arguments{
 \item{x}{A \code{S} by \code{N} matrix (draws by observations), or a vector of length
@@ -76,8 +58,9 @@ the computed expected value.}
 \item{r_eff}{An optional vector of relative effective sample size estimates
 containing one element per observation. See \code{\link[=psis]{psis()}} for details.}
 
-\item{cores}{The number of cores to use for parallelization of \verb{[psis()]}.
-See \code{\link[=psis]{psis()}} for details.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 }
 \value{
 A list containing two elements: \code{estimates} and \code{pointwise}.

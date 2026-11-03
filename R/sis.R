@@ -6,7 +6,7 @@
 #'   scale (for Importance sampling LOO, these are *negative* log-likelihood
 #'   values). See the **Methods (by class)** section below for a detailed
 #'   description of how to specify the inputs for each method.
-#' @template cores
+#' @template parallel
 #' @param ... Arguments passed on to the various methods.
 #' @param r_eff Vector of relative effective sample size estimates containing
 #'   one element per observation. The values provided should be the relative
@@ -64,6 +64,7 @@
 #' @template loo-and-psis-references
 #'
 #' @examples
+#' mirai::daemons(2)
 #' log_ratios <- -1 * example_loglik_array()
 #' r_eff <- relative_eff(exp(-log_ratios))
 #' sis_result <- sis(log_ratios, r_eff = r_eff)
@@ -77,6 +78,7 @@
 #' uw <- weights(sis_result, log=FALSE, normalize = FALSE) # unnormalized weights
 #'
 #' @export
+#' mirai::daemons(0)
 sis <- function(log_ratios, ...) UseMethod("sis")
 
 #' @export
@@ -86,10 +88,10 @@ sis <- function(log_ratios, ...) UseMethod("sis")
 sis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
-                            cores = cores,
+                            parallel = parallel,
                             method = "sis")
   }
 
@@ -101,11 +103,11 @@ sis.matrix <-
   function(log_ratios,
            ...,
            r_eff = NULL,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
     importance_sampling.matrix(log_ratios,
                                ...,
                                r_eff = r_eff,
-                               cores = cores,
+                               parallel = parallel,
                                method = "sis")
   }
 

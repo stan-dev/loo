@@ -29,7 +29,7 @@
 #'   This is useful if you plan to use the [E_loo()] function to compute
 #'   weighted expectations after running `loo`. Several functions in the
 #'   \pkg{bayesplot} package also accept `psis` objects.
-#' @template cores
+#' @template parallel
 #' @template is_method
 #'
 #' @details The `loo()` function is an S3 generic and methods are provided for
@@ -100,16 +100,17 @@
 #' @template loo-and-psis-references
 #'
 #' @examples
+#' mirai::daemons(2)
 #' ### Array and matrix methods (using example objects included with loo package)
 #' # Array method
 #' LLarr <- example_loglik_array()
 #' rel_n_eff <- relative_eff(exp(LLarr))
-#' loo(LLarr, r_eff = rel_n_eff, cores = 2)
+#' loo(LLarr, r_eff = rel_n_eff)
 #'
 #' # Matrix method
 #' LLmat <- example_loglik_matrix()
 #' rel_n_eff <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
-#' loo(LLmat, r_eff = rel_n_eff, cores = 2)
+#' loo(LLmat, r_eff = rel_n_eff)
 #'
 #'
 #' ### Using log-likelihood function instead of array or matrix
@@ -167,20 +168,21 @@
 #'          pars = "log_lik",
 #'          ...,
 #'          save_psis = FALSE,
-#'          cores = getOption("mc.cores", 1)) {
+#'          parallel = TRUE) {
 #'   stopifnot(length(pars) == 1L)
 #'   LLarray <- loo::extract_log_lik(stanfit = x,
 #'                                   parameter_name = pars,
 #'                                   merge_chains = FALSE)
-#'   r_eff <- loo::relative_eff(x = exp(LLarray), cores = cores)
+#'   r_eff <- loo::relative_eff(x = exp(LLarray), parallel = parallel)
 #'   loo::loo.array(LLarray,
 #'                  r_eff = r_eff,
-#'                  cores = cores,
+#'                  parallel = parallel,
 #'                  save_psis = save_psis)
 #' }
 #' }
 #'
 #'
+#' mirai::daemons(0)
 
 loo <- function(x, ...) {
   UseMethod("loo")
@@ -195,11 +197,11 @@ loo.array <-
            ...,
            r_eff = 1,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
+           parallel = TRUE,
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
     validate_log_lik(x)
-    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
+    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, parallel = parallel, method = is_method)
     ll <- llarray_to_matrix(x)
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     importance_sampling_loo_object(
@@ -220,7 +222,7 @@ loo.matrix <-
            ...,
            r_eff = 1,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
+           parallel = TRUE,
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
     validate_log_lik(x)
@@ -228,7 +230,7 @@ loo.matrix <-
       importance_sampling.matrix(
         log_ratios = -x,
         r_eff = r_eff,
-        cores = cores,
+        parallel = parallel,
         method = is_method
       )
     pointwise <- pointwise_loo_calcs(x, psis_out)
@@ -256,10 +258,9 @@ loo.function <-
            draws = NULL,
            r_eff = 1,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
+           parallel = TRUE,
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
-    cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     assert_importance_sampling_method_is_implemented(is_method)
     .llfun <- validate_llfun(x)
@@ -276,7 +277,7 @@ loo.function <-
         draws = draws,
         r_eff = r_eff,
         save_psis = save_psis,
-        cores = cores,
+        parallel = parallel,
         method = is_method,
         ...
       )
@@ -378,7 +379,7 @@ loo_i <-
       importance_sampling.matrix(
         log_ratios = -ll_i,
         r_eff = r_eff,
-        cores = 1,
+        parallel = FALSE,
         method = is_method
       )
     structure(
@@ -690,65 +691,29 @@ NULL
 #'
 parallel_psis_list <- function(N, .loo_i, .llfun,
                                data, draws, r_eff,
-                               save_psis, cores,
+                               save_psis, parallel,
                                ...){
   parallel_importance_sampling_list(N, .loo_i, .llfun,
                                     data, draws, r_eff,
-                                    save_psis, cores,
+                                    save_psis, parallel,
                                     method = "psis", ...)
 }
 
 #' @rdname parallel_psis_list
 parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
                                               data, draws, r_eff,
-                                              save_psis, cores,
+                                              save_psis, parallel,
                                               method, ...){
-  if (cores == 1) {
-    psis_list <-
-      lapply(
-        X = seq_len(N),
-        FUN = .loo_i,
-        llfun = .llfun,
-        data = data,
-        draws = draws,
-        r_eff = r_eff,
-        save_psis = save_psis,
-        is_method = method,
-        ...
-      )
-  } else {
-    if (!os_is_windows()) {
-      # On Mac or Linux use mclapply() for multiple cores
-      psis_list <-
-        parallel::mclapply(
-          mc.cores = cores,
-          X = seq_len(N),
-          FUN = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          is_method = method,
-          ...
-        )
-    } else {
-      # On Windows use makePSOCKcluster() and parLapply() for multiple cores
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      psis_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(N),
-          fun = .loo_i,
-          llfun = .llfun,
-          data = data,
-          draws = draws,
-          r_eff = r_eff,
-          save_psis = save_psis,
-          is_method = method,
-          ...
-        )
-    }
-  }
+  loo_map(
+    seq_len(N),
+    .loo_i,
+    llfun = .llfun,
+    data = data,
+    draws = draws,
+    r_eff = r_eff,
+    save_psis = save_psis,
+    is_method = method,
+    ...,
+    parallel = parallel
+  )
 }

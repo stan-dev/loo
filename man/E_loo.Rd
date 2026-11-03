@@ -91,6 +91,7 @@ specific Pareto k diagnostic, which must also be small for a reliable
 estimate. See more details below.
 }
 \examples{
+mirai::daemons(2)
 \donttest{
 if (requireNamespace("rstanarm", quietly = TRUE)) {
 # Use rstanarm package to quickly fit a model and get both a log-likelihood
@@ -112,7 +113,7 @@ log_ratios <- -1 * log_lik(fit)
 dim(log_ratios)
 
 r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
-psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
+psis_object <- psis(log_ratios, r_eff = r_eff)
 
 E_loo(yrep, psis_object, type = "mean")
 E_loo(yrep, psis_object, type = "var")
@@ -126,4 +127,5 @@ E_loo(yrep, psis_object, type = "mean", log_ratios = log_ratios)
 }
 }
 
+mirai::daemons(0)
 }

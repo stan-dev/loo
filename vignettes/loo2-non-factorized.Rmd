@@ -324,6 +324,7 @@ interface to Stan to generate a Stan program and fit the model, and also the
 
 ```{r setup, cache=FALSE}
 library("loo")
+mirai::daemons(2)
 library("brms")
 library("bayesplot")
 library("ggplot2")

@@ -81,13 +81,18 @@ test_that("nlist works", {
   expect_equal(nlist(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = 3))
 })
 
-test_that("loo_cores works", {
-  expect_equal(loo_cores(10), 10)
-  options(mc.cores = 2)
-  expect_equal(loo_cores(getOption("mc.cores", 1)), 2)
-  options(mc.cores = 1)
 
-  options(loo.cores = 2)
-  expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
-  options(loo.cores = NULL)
+test_that("loo_map re-raises warnings from daemons", {
+  expect_warning(
+    out <- loo_map(
+      1L,
+      function(i) {
+        warning("from worker")
+        i
+      },
+      parallel = TRUE
+    ),
+    "from worker"
+  )
+  expect_equal(out, list(1L))
 })

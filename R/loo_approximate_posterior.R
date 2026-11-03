@@ -7,7 +7,7 @@
 #' @param save_psis Should the `"psis"` object created internally by
 #'   `loo_approximate_posterior()` be saved in the returned object? See
 #'   [loo()] for details.
-#' @template cores
+#' @template parallel
 #' @inheritParams psis_approximate_posterior
 #'
 #' @details The `loo_approximate_posterior()` function is an S3 generic and
@@ -46,9 +46,9 @@ loo_approximate_posterior.array <-
            log_g,
            ...,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
     checkmate::assert_flag(save_psis)
-    checkmate::assert_int(cores)
+    checkmate::assert_flag(parallel)
     checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
     checkmate::assert_matrix(log_g, mode = "numeric", nrows = nrow(log_p), ncols = ncol(log_p))
 
@@ -61,7 +61,7 @@ loo_approximate_posterior.array <-
       log_g = log_g,
       ...,
       save_psis = save_psis,
-      cores = cores
+      parallel = parallel
     )
   }
 
@@ -74,9 +74,9 @@ loo_approximate_posterior.matrix <-
            log_g,
            ...,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
     checkmate::assert_flag(save_psis)
-    checkmate::assert_int(cores)
+    checkmate::assert_flag(parallel)
     checkmate::assert_numeric(log_p, len = nrow(x))
     checkmate::assert_null(dim(log_p))
     checkmate::assert_numeric(log_g, len = length(log_p))
@@ -88,7 +88,7 @@ loo_approximate_posterior.matrix <-
         log_g = log_g,
         log_liks = x,
         ...,
-        cores = cores,
+        parallel = parallel,
         save_psis = save_psis
       )
     ap_psis$approximate_posterior <- list(log_p = log_p, log_g = log_g)
@@ -113,11 +113,10 @@ loo_approximate_posterior.function <-
            log_p = NULL,
            log_g = NULL,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
 
     checkmate::assert_numeric(log_p, len = length(log_g))
     checkmate::assert_numeric(log_g, len = length(log_p))
-    cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
@@ -131,7 +130,7 @@ loo_approximate_posterior.function <-
                                     save_psis = save_psis,
                                     log_p = log_p,
                                     log_g = log_g,
-                                    cores = cores,
+                                    parallel = parallel,
                                     ...)
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
@@ -182,7 +181,7 @@ loo_approximate_posterior.function <-
     if (!is.matrix(ll_i)) {
       ll_i <- as.matrix(ll_i)
     }
-    psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, cores = 1)
+    psis_out <- ap_psis(log_ratios = -ll_i, log_p = log_p, log_g = log_g, parallel = FALSE)
 
     structure(
       list(

@@ -22,7 +22,7 @@
 #' @keywords internal
 #'
 psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL,
-                                       cores, save_psis, ..., log_q = NULL) {
+                                       parallel, save_psis, ..., log_q = NULL) {
   if (!is.null(log_q)) {
     .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
     log_g <- log_q
@@ -30,7 +30,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_g), null.ok = FALSE)
   checkmate::assert_numeric(log_g, any.missing = FALSE, len = length(log_p), null.ok = FALSE)
   checkmate::assert_matrix(log_liks, null.ok = TRUE, nrows = length(log_p))
-  checkmate::assert_integerish(cores)
+  checkmate::assert_flag(parallel)
   checkmate::assert_flag(save_psis)
 
   if (is.null(log_liks)) {
@@ -42,7 +42,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
   } else {
     log_ratios <- correct_log_ratios(log_ratios = -log_liks, log_p = log_p, log_g = log_g)
   }
-  psis_out <- psis.matrix(log_ratios, cores = cores, r_eff = rep(1, ncol(log_ratios)))
+  psis_out <- psis.matrix(log_ratios, parallel = parallel, r_eff = rep(1, ncol(log_ratios)))
 
   if (is.null(log_liks)) {
     return(psis_out)
@@ -101,8 +101,7 @@ ap_psis <- function(log_ratios, log_p, log_g, ...) {
 #'
 ap_psis.array <-
   function(log_ratios, log_p, log_g, ...,
-           cores = getOption("mc.cores", 1)) {
-    cores <- loo_cores(cores)
+           parallel = TRUE) {
     stopifnot(length(dim(log_ratios)) == 3)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
@@ -110,7 +109,7 @@ ap_psis.array <-
     ap_psis.matrix(log_ratios = log_ratios,
                    log_p = log_p,
                    log_g = log_g,
-                   cores = cores)
+                   parallel = parallel)
   }
 
 #' @export
@@ -119,15 +118,14 @@ ap_psis.array <-
 #'
 ap_psis.matrix <- function(log_ratios, log_p, log_g,
            ...,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
     checkmate::assert_numeric(log_p, len = nrow(log_ratios))
     checkmate::assert_numeric(log_g, len = nrow(log_ratios))
-    cores <- loo_cores(cores)
     log_ratios <- validate_ll(log_ratios)
 
     log_ratios <- correct_log_ratios(log_ratios, log_p = log_p, log_g = log_g)
 
-    do_psis(log_ratios, r_eff = rep(1, ncol(log_ratios)), cores = cores)
+    do_psis(log_ratios, r_eff = rep(1, ncol(log_ratios)), parallel = parallel)
   }
 
 #' @export
@@ -138,6 +136,6 @@ ap_psis.default <- function(log_ratios, log_p, log_g, ...) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
     warning("llfun values do not return a matrix, coerce to matrix")
-    ap_psis.matrix(as.matrix(log_ratios), log_p, log_g, cores = 1)
+    ap_psis.matrix(as.matrix(log_ratios), log_p, log_g, parallel = FALSE)
   }
 

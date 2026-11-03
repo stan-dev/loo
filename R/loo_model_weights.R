@@ -51,7 +51,7 @@
 #'   each model. See [psis()] and  [relative_eff()] helper
 #'   function for computing `r_eff`. If `x` is a list of `"psis_loo"`
 #'   objects then `r_eff_list` is ignored.
-#' @template cores
+#' @template parallel
 #' @param ... Unused, except for the generic to pass arguments to individual
 #'   methods.
 #'
@@ -188,9 +188,8 @@ loo_model_weights.default <-
            BB_n = 1000,
            alpha = 1,
            r_eff_list = NULL,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
 
-    cores <- loo_cores(cores)
     method <- match.arg(method)
     K <- length(x) # number of models
     subsampled <- FALSE # set below for a list of loo objects
@@ -204,7 +203,7 @@ loo_model_weights.default <-
       for (k in 1:K) {
         r_eff_k <- r_eff_list[[k]] # possibly NULL
         log_likelihood <- x[[k]]
-        loo_object <- loo(log_likelihood, r_eff = r_eff_k, cores = cores)
+        loo_object <- loo(log_likelihood, r_eff = r_eff_k, parallel = parallel)
         lpd_point[, k] <- loo_object$pointwise[, "elpd_loo"]    #calculate log(p_k (y_i | y_-i))
         elpd_loo[k] <- loo_object$estimates["elpd_loo", "Estimate"]
       }

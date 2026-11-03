@@ -83,6 +83,8 @@
 #' @template loo-and-compare-references
 #'
 #' @examples
+#' mirai::daemons(2)
+#'
 #' # very artificial example, just for demonstration!
 #' LL <- example_loglik_array()
 #' loo1 <- loo(LL)     # should be worst model when compared
@@ -101,6 +103,8 @@
 #' # works for waic (and kfold) too
 #' loo_compare(waic(LL), waic(LL - 10))
 #' }
+#'
+#' mirai::daemons(0)
 #'
 loo_compare <- function(x, ...) {
   UseMethod("loo_compare")

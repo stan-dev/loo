@@ -9,21 +9,9 @@
 \usage{
 importance_sampling(log_ratios, method, ...)
 
-\method{importance_sampling}{array}(
-  log_ratios,
-  method,
-  ...,
-  r_eff = 1,
-  cores = getOption("mc.cores", 1)
-)
+\method{importance_sampling}{array}(log_ratios, method, ..., r_eff = 1, parallel = TRUE)
 
-\method{importance_sampling}{matrix}(
-  log_ratios,
-  method,
-  ...,
-  r_eff = 1,
-  cores = getOption("mc.cores", 1)
-)
+\method{importance_sampling}{matrix}(log_ratios, method, ..., r_eff = 1, parallel = TRUE)
 
 \method{importance_sampling}{default}(log_ratios, method, ..., r_eff = 1)
 }
@@ -56,19 +44,9 @@ value is used for all observations) or a vector with length equal to the
 number of observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}}
 helper function for computing \code{r_eff}.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
-\itemize{
-\item Note for Windows 10 users: it is \strong{strongly}
-\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 }
 \description{
 A parent class for different importance sampling methods.

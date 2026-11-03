@@ -13,8 +13,10 @@
 #' @return A vector of length equal to the number of observations.
 #'
 #' @examples
+#' mirai::daemons(2)
 #' x <- loo(example_loglik_array())
 #' pointwise(x, "elpd_loo")
+#' mirai::daemons(0)
 #'
 pointwise <- function(x, estimate, ...) {
   UseMethod("pointwise")

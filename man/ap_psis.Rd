@@ -10,9 +10,9 @@ using approximate posteriors}
 \usage{
 ap_psis(log_ratios, log_p, log_g, ...)
 
-\method{ap_psis}{array}(log_ratios, log_p, log_g, ..., cores = getOption("mc.cores", 1))
+\method{ap_psis}{array}(log_ratios, log_p, log_g, ..., parallel = TRUE)
 
-\method{ap_psis}{matrix}(log_ratios, log_p, log_g, ..., cores = getOption("mc.cores", 1))
+\method{ap_psis}{matrix}(log_ratios, log_p, log_g, ..., parallel = TRUE)
 
 \method{ap_psis}{default}(log_ratios, log_p, log_g, ...)
 }
@@ -27,19 +27,9 @@ proposal distribution (g). A vector of length S.}
 
 \item{...}{Currently not in use.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
-\itemize{
-\item Note for Windows 10 users: it is \strong{strongly}
-\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 }
 \description{
 Pareto smoothed importance sampling (PSIS)

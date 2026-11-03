@@ -37,7 +37,8 @@ Depends:
 Imports:
     checkmate,
     matrixStats (>= 0.52),
-    parallel,
+    mirai,
+    mori,
     posterior (>= 1.7.0),
     stats
 Suggests:
@@ -51,7 +52,8 @@ Suggests:
     rstanarm (>= 2.19.0),
     rstantools,
     spdep,
-    testthat (>= 3.0)
+    testthat (>= 3.0),
+    withr
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

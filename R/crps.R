@@ -103,8 +103,7 @@ crps.numeric <- function(x, x2, y, ..., permutations = 1) {
 #' @param log_lik A log-likelihood matrix the same size as `x`.
 #' @param r_eff An optional vector of relative effective sample size estimates
 #'   containing one element per observation. See [psis()] for details.
-#' @param cores The number of cores to use for parallelization of `[psis()]`.
-#'   See [psis()] for details.
+#' @template parallel
 loo_crps.matrix <-
   function(x,
            x2,
@@ -113,13 +112,13 @@ loo_crps.matrix <-
            ...,
            permutations = 1,
            r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
+           parallel = TRUE) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
+                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, parallel = parallel, ...),
                        simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+  psis_obj <- psis(-log_lik, r_eff = r_eff, parallel = parallel)
   EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
   crps_output(.crps_fun(EXX, EXy))
 }
@@ -155,13 +154,13 @@ loo_scrps.matrix <-
     ...,
     permutations = 1,
     r_eff = 1,
-    cores = getOption("mc.cores", 1)) {
+    parallel = TRUE) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
-                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
+                       EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, parallel = parallel, ...),
                        simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
-  psis_obj <- psis(-log_lik, r_eff = r_eff, cores = cores)
+  psis_obj <- psis(-log_lik, r_eff = r_eff, parallel = parallel)
   EXy <- E_loo(abs(sweep(x, 2, y)), psis_obj, log_ratios = -log_lik, ...)$value
   crps_output(.crps_fun(EXX, EXy, scale = TRUE))
 }
@@ -175,12 +174,12 @@ EXX_compute <- function(x, x2) {
 }
 
 
-EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, ...) {
+EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, parallel = TRUE, ...) {
   S <- nrow(x)
   shuffle <- sample (1:S)
   x2 <- x2[shuffle,]
   log_lik2 <- log_lik[shuffle,]
-  psis_obj_joint <- psis(-log_lik - log_lik2 , r_eff = r_eff)
+  psis_obj_joint <- psis(-log_lik - log_lik2 , r_eff = r_eff, parallel = parallel)
   E_loo(abs(x - x2), psis_obj_joint, log_ratios = -log_lik - log_lik2, ...)$value
 }
 

@@ -4,9 +4,9 @@ LLvec <- LLmat[, 1]
 chain_id <- rep(1:2, each = dim(LLarr)[1])
 r_eff_mat <- relative_eff(exp(LLmat), chain_id)
 r_eff_vec <- relative_eff(exp(LLvec), chain_id = chain_id)
-# cores = 1 because forked processes can segfault on CRAN's macOS machines if
+# parallel = FALSE because forked processes can segfault on CRAN's macOS machines if
 # R is linked to Apple's Accelerate/vecLib BLAS, which is not fork-safe
-psis_mat <- psis(-LLmat, r_eff = r_eff_mat, cores = 1)
+psis_mat <- psis(-LLmat, r_eff = r_eff_mat, parallel = FALSE)
 psis_vec <- psis(-LLvec, r_eff = r_eff_vec)
 
 set.seed(123)
