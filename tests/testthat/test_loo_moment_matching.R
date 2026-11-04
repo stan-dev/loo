@@ -504,13 +504,15 @@ test_that("loo_moment_match_split works", {
 
   expect_equal(lwi_1_ps, split$lwi)
 
+  # with cov = TRUE, loo_moment_match() includes the scaling in the mapping
+  # and leaves total_scaling at one
   split2 <- loo_moment_match_split(
     x,
     upars,
-    cov = FALSE,
+    cov = TRUE,
     total_shift = c(-0.1, -0.2),
-    total_scaling = c(0.7, 0.7),
-    total_mapping = matrix(c(1, 0.1, 0.1, 1), 2, 2),
+    total_scaling = c(1, 1),
+    total_mapping = 0.7 * matrix(c(1, 0.1, 0.1, 1), 2, 2),
     i = 1,
     log_prob_upars = log_prob_upars_test,
     log_lik_i_upars = log_lik_i_upars_test,
@@ -541,6 +543,103 @@ test_that("loo_moment_match_split works", {
     is_method = "psis"
   ))
   expect_false(anyNA(split3$lwi))
+})
+
+test_that("loo_moment_match_split evaluates the inverse of its transformation", {
+  # The second half of the draws is untransformed. For these draws theta,
+  # the mixture proposal needs the density at T^-1(theta), where
+  # T(theta) = M diag(s) (theta - m) + m + shift.
+  shift <- c(-0.1, -0.2)
+  scaling <- c(0.7, 1.3)
+  m <- colMeans(upars)
+  second <- seq_len(S)[-seq_len(as.integer(0.5 * S))]
+  for (cov in c(FALSE, TRUE)) {
+    mapping <- if (cov) matrix(c(1, 0.1, 0.1, 1), 2, 2) else diag(2)
+    seen <- list()
+    log_prob_record <- function(x, upars, ...) {
+      seen[[length(seen) + 1]] <<- upars
+      log_prob_upars_test(x, upars, ...)
+    }
+    loo_moment_match_split(
+      x,
+      upars,
+      cov = cov,
+      total_shift = shift,
+      total_scaling = scaling,
+      total_mapping = mapping,
+      i = 1,
+      log_prob_upars = log_prob_record,
+      log_lik_i_upars = log_lik_i_upars_test,
+      cores = 1,
+      r_eff_i = 1,
+      is_method = "psis"
+    )
+    expect_length(seen, 2)
+    first <- seq_len(as.integer(0.5 * S))
+    # first call: second half untransformed; second call: first half
+    # untransformed
+    expect_equal(seen[[1]][second, , drop = FALSE], upars[second, , drop = FALSE])
+    expect_equal(seen[[2]][first, , drop = FALSE], upars[first, , drop = FALSE])
+    # the second call evaluates the inverse-transformed draws
+    inv <- seen[[2]][second, , drop = FALSE]
+    fwd <- sweep(inv, 2, m, "-")
+    fwd <- sweep(fwd, 2, scaling, "*")
+    if (cov) {
+      fwd <- tcrossprod(fwd, mapping)
+    }
+    fwd <- sweep(fwd, 2, shift + m, "+")
+    expect_equal(unname(fwd), unname(upars[second, , drop = FALSE]))
+  }
+})
+
+test_that("the total transformation composes the accepted steps in order", {
+  # The moment matching loop starts again with the shift step after every
+  # accepted step, so a scaling step can follow a covariance step. The
+  # transformation that loo_moment_match_split() rebuilds from the totals
+  # must map the original draws to the draws that the steps produced one
+  # after another.
+  first <- seq_len(as.integer(0.5 * S))
+  sequences <- list(
+    list(cov = TRUE, steps = c("cov", "scale", "shift", "cov", "scale")),
+    list(cov = FALSE, steps = c("scale", "shift", "scale"))
+  )
+  for (sq in sequences) {
+    total <- list(shift = c(0, 0), scaling = c(1, 1), mapping = diag(2))
+    u <- upars
+    for (step in sq$steps) {
+      trans <- switch(step,
+        shift = shift(x, u, lwi_1),
+        scale = shift_and_scale(x, u, lwi_1),
+        cov = shift_and_cov(x, u, lwi_1)
+      )
+      u <- trans$upars
+      total <- add_step_to_total(total, trans, sq$cov)
+    }
+    seen <- list()
+    log_prob_record <- function(x, upars, ...) {
+      seen[[length(seen) + 1]] <<- upars
+      log_prob_upars_test(x, upars, ...)
+    }
+    loo_moment_match_split(
+      x,
+      upars,
+      cov = sq$cov,
+      total_shift = total$shift,
+      total_scaling = total$scaling,
+      total_mapping = total$mapping,
+      i = 1,
+      log_prob_upars = log_prob_record,
+      log_lik_i_upars = log_lik_i_upars_test,
+      cores = 1,
+      r_eff_i = 1,
+      is_method = "psis"
+    )
+    # the first call evaluates T(theta) for the first half of the draws
+    expect_equal(
+      unname(seen[[1]][first, , drop = FALSE]),
+      unname(u[first, , drop = FALSE])
+    )
+  }
 })
 
 test_that("shift_and_scale is stable for large parameter values", {
@@ -636,4 +735,173 @@ test_that("passing arguments works", {
     cores = 1,
     passed_arg = TRUE
   ))
+})
+
+# log_lik_i_upars() that fails in the calls listed in `fail_calls`, as a model
+# can fail for the extreme draws of a transformation
+failing_log_lik_i_upars <- function(fail_calls) {
+  calls <- 0
+  function(x, upars, i, ...) {
+    calls <<- calls + 1
+    if (calls %in% fail_calls) {
+      stop("overflow in log_lik_i_upars")
+    }
+    log_lik_i_upars_test(x, upars, i)
+  }
+}
+
+mm_with <- function(loo_x, log_lik_i = log_lik_i_test,
+                    log_lik_i_upars = log_lik_i_upars_test, split = TRUE,
+                    k_threshold = 0.7, cores = 1) {
+  loo_moment_match(
+    x, loo = loo_x, post_draws = post_draws_test, log_lik_i = log_lik_i,
+    unconstrain_pars = unconstrain_pars_test,
+    log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars,
+    k_threshold = k_threshold, split = split, cores = cores
+  )
+}
+
+test_that("an error in the split step keeps the result without the split", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # observation 1 needs two transformations; the third call is the split step
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(3)),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(warnings, "stopped early for observation(s) 1", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "The split transformation failed", all = FALSE)
+  mm_no_split <- suppressWarnings(mm_with(loo_manual, split = FALSE))
+  expect_equal(mm$pointwise, mm_no_split$pointwise)
+  expect_equal(mm$diagnostics, mm_no_split$diagnostics)
+})
+
+test_that("the accuracy warning names a failed split transformation", {
+  expect_warning(throw_large_kf_warning(0.8, 0.7), "Setting the argument 'split'")
+  expect_warning(
+    throw_large_kf_warning(0.8, 0.7, split_failed = TRUE),
+    "The split transformation failed"
+  )
+  expect_no_warning(throw_large_kf_warning(0.5, 0.7, split_failed = TRUE))
+})
+
+test_that("an error in the first transformation keeps the PSIS results", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # k_threshold = 0 moment-matches all observations; the first call of
+  # log_lik_i_upars is the first transformation of observation 1
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1),
+            k_threshold = 0),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  # no transformation was accepted, so the observation counts as failed
+  expect_match(warnings, "failed for observation(s) 1.", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "overflow in log_lik_i_upars", all = FALSE)
+  expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
+  expect_equal(mm$diagnostics$pareto_k[1], loo_manual$diagnostics$pareto_k[1])
+})
+
+test_that("first-transformation errors everywhere keep the PSIS results", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # only observation 1 is above k_threshold = 0.7, and its first
+  # transformation fails, as with an overflow in a *_rng function (#274)
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i_upars = failing_log_lik_i_upars(1)),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(warnings, "failed for observation(s) 1.", fixed = TRUE,
+               all = FALSE)
+  expect_match(warnings, "overflow in log_lik_i_upars", all = FALSE)
+  expect_equal(mm$pointwise, loo_manual$pointwise)
+  expect_equal(mm$diagnostics, loo_manual$diagnostics)
+})
+
+test_that("moment matching stops if log_lik_i fails for all observations", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # a log_lik_i with the wrong arguments fails for every observation
+  wrong_log_lik_i <- function(x) x
+  expect_error(
+    suppressWarnings(mm_with(loo_manual, log_lik_i = wrong_log_lik_i,
+                             k_threshold = 0)),
+    "'log_lik_i' failed for all observations"
+  )
+})
+
+test_that("errors in loo itself are not reported as failed observations", {
+  loo_manual <- suppressWarnings(loo(loglik))
+  # log_lik_i returns without an error, and loo's own code then fails
+  non_numeric_log_lik_i <- function(x, i, ...) {
+    if (i == 1) "not numeric" else log_lik_i_test(x, i)
+  }
+  cores_list <- if (os_is_windows()) 1 else c(1, 2)
+  for (cores in cores_list) {
+    expect_error(
+      # with cores = 2, mclapply() also warns that a worker had an error
+      suppressWarnings(mm_with(loo_manual, log_lik_i = non_numeric_log_lik_i,
+                               k_threshold = 0, cores = cores)),
+      "non-numeric argument to mathematical function"
+    )
+  }
+})
+
+test_that("a parallel worker that dies gives failed observations", {
+  skip_on_cran()
+  skip_on_os("windows")  # the worker is a forked process
+  loo_manual <- suppressWarnings(loo(loglik))
+  parent <- Sys.getpid()
+  dying_log_lik_i <- function(x, i, ...) {
+    if (i == 1 && Sys.getpid() != parent) {
+      tools::pskill(Sys.getpid(), tools::SIGKILL)
+    }
+    log_lik_i_test(x, i)
+  }
+  warnings <- character(0)
+  mm <- withCallingHandlers(
+    mm_with(loo_manual, log_lik_i = dying_log_lik_i, k_threshold = 0,
+            cores = 2),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_match(warnings, "a parallel worker did not return a result",
+               all = FALSE)
+  expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
+})
+
+test_that("an error for one observation keeps its PSIS results", {
+  skip_on_cran()
+  loo_manual <- suppressWarnings(loo(loglik))
+  failing_log_lik_i <- function(x, i, ...) {
+    if (i == 1) stop("log_lik_i failed")
+    log_lik_i_test(x, i)
+  }
+  mm_ok <- suppressWarnings(mm_with(loo_manual, k_threshold = 0))
+  # On Windows the workers are PSOCK processes that load the installed loo, so
+  # with devtools::test() they would not run this version of the code
+  cores_list <- if (os_is_windows()) 1 else c(1, 2)
+  for (cores in cores_list) {
+    # observation 1 keeps its high Pareto k, which gives a second warning
+    suppressWarnings(expect_warning(
+      mm <- mm_with(loo_manual, log_lik_i = failing_log_lik_i,
+                    k_threshold = 0, cores = cores),
+      "failed for observation(s) 1.",
+      fixed = TRUE
+    ))
+    expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
+    expect_equal(mm$pointwise[-1, ], mm_ok$pointwise[-1, ])
+  }
 })

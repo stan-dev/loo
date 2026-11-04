@@ -20,12 +20,17 @@
 * `loo_pred_measure()` warns when `loo_moment_match()` or `reloo()` changed the
   `loo` object and the measure is not `elpd`, `mlpd`, or `ic`, by
   @florence-bockting in #380
+* Handle errors of the user functions in `loo_moment_match()` by @avehtari in #410
+* Allow different numbers of draws in `loo_model_weights()` by @avehtari in #409
 * Improve numerical stability in `loo()`, `psis()`, model weighting, subsampling, 
 and moment matching in #395 
 * Fix `loo_compare()` when used with subsampling: compute model comparison by 
 comparison-model minus reference-model by @florence-bockting in #391
 * Update user messages in `print()` by @ishaan-arora-1, @florence-bockting in 
 #328.
+* Fix `crps()` and `scrps()` ignoring the `permutations` argument for numeric
+input by @thanasibakis in #398
+* Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
 
 # loo 2.10.1
 

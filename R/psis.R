@@ -215,9 +215,14 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   khat <- Inf
 
   if (enough_tail_samples(tail_len_i)) {
-    ord <- sort.int(lw_i, index.return = TRUE)
-    tail_ids <- seq(S - tail_len_i + 1, S)
-    lw_tail <- ord$x[tail_ids]
+    # only the tail and the cutoff need sorting: a partial sort finds the
+    # cutoff value, and the values at or above it are usually few
+    cut_pos <- S - tail_len_i
+    cut_val <- sort.int(lw_i, partial = cut_pos)[cut_pos]
+    top <- which(lw_i >= cut_val)
+    top <- top[order(lw_i[top])]
+    tail_ids <- top[seq(length(top) - tail_len_i + 1, length(top))]
+    lw_tail <- lw_i[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
       warning(
         "Can't fit generalized Pareto distribution ",
@@ -225,10 +230,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
         call. = FALSE
       )
     } else {
-      cutoff <- ord$x[min(tail_ids) - 1] # largest value smaller than tail values
+      cutoff <- cut_val # largest value not in the tail
       smoothed <- psis_smooth_tail(lw_tail, cutoff)
       khat <- smoothed$k
-      lw_i[ord$ix[tail_ids]] <- smoothed$tail
+      lw_i[tail_ids] <- smoothed$tail
     }
   }
 

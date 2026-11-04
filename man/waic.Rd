@@ -14,7 +14,7 @@ waic(x, ...)
 
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{`function`}(x, ..., data = NULL, draws = NULL)
+\method{waic}{`function`}(x, ..., data = NULL, draws = NULL, cores = getOption("mc.cores", 1))
 
 is.waic(x)
 }
@@ -25,6 +25,20 @@ each method.}
 
 \item{draws, data, ...}{For the function method only. See the
 \strong{Methods (by class)} section below for details on these arguments.}
+
+\item{cores}{The number of cores to use for parallelization. This defaults to
+the option \code{mc.cores} which can be set for an entire R session by
+\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
+deprecated but will be given precedence over \code{mc.cores} until
+\code{loo.cores} is removed in a future release. \strong{As of version
+2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
+recommend using as many (or close to as many) cores as possible.
+\itemize{
+\item Note for Windows 10 users: it is \strong{strongly}
+\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
+the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
+setting \code{mc.cores} interactively or in a script is fine).
+}}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:
