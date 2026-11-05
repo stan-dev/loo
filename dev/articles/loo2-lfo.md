@@ -721,7 +721,7 @@ Research*, 25(72):1-58. [PDF](https://jmlr.org/papers/v25/19-556.html)
 sessionInfo()
 ```
 
-    R version 4.6.1 (2026-06-24)
+    R version 4.6.2 (2026-10-29)
     Platform: x86_64-pc-linux-gnu
     Running under: Ubuntu 24.04.5 LTS
 
@@ -748,22 +748,22 @@ sessionInfo()
     loaded via a namespace (and not attached):
      [1] gtable_0.3.6         tensorA_0.36.2.1     xfun_0.62           
      [4] bslib_0.12.0         QuickJSR_1.11.0      htmlwidgets_1.6.4   
-     [7] processx_3.9.0       inline_0.3.21        lattice_0.22-9      
+     [7] processx_3.9.0       inline_0.3.21        lattice_0.23-1      
     [10] callr_3.8.0          ps_1.9.3             vctrs_0.7.3         
-    [13] tools_4.6.1          generics_0.1.4       stats4_4.6.1        
-    [16] parallel_4.6.1       tibble_3.3.1         pkgconfig_2.0.3     
-    [19] Matrix_1.7-5         checkmate_2.3.4      RColorBrewer_1.1-3  
+    [13] tools_4.6.2          generics_0.1.4       stats4_4.6.2        
+    [16] parallel_4.6.2       tibble_3.3.1         pkgconfig_2.0.3     
+    [19] Matrix_1.7-6         checkmate_2.3.4      RColorBrewer_1.1-3  
     [22] S7_0.2.2             desc_1.4.3           distributional_0.9.0
-    [25] RcppParallel_6.2.1   lifecycle_1.0.5      compiler_4.6.1      
+    [25] RcppParallel_6.2.1   lifecycle_1.0.5      compiler_4.6.2      
     [28] farver_2.1.2         stringr_1.6.0        textshaping_1.0.5   
     [31] Brobdingnag_1.3-1    codetools_0.2-20     htmltools_0.5.9     
     [34] sass_0.4.10          yaml_2.3.12          pillar_1.11.1       
     [37] pkgdown_2.2.1        jquerylib_0.1.4      cachem_1.1.0        
-    [40] StanHeaders_2.39.1   bridgesampling_1.2-1 abind_1.4-8         
-    [43] nlme_3.1-169         posterior_1.7.0      rstan_2.32.7        
+    [40] StanHeaders_2.39.1.1 bridgesampling_1.2-1 abind_1.4-8         
+    [43] nlme_3.1-171         posterior_1.7.0      rstan_2.32.7        
     [46] tidyselect_1.2.1     digest_0.6.39        mvtnorm_1.4-2       
     [49] stringi_1.8.9        dplyr_1.2.1          labeling_0.4.3      
-    [52] fastmap_1.2.0        grid_4.6.1           cli_3.6.6           
+    [52] fastmap_1.2.0        grid_4.6.2           cli_3.6.6           
     [55] magrittr_2.0.5       pkgbuild_1.4.8       withr_3.0.3         
     [58] scales_1.4.0         backports_1.5.1      rmarkdown_2.32      
     [61] matrixStats_1.5.0    otel_0.2.0           gridExtra_2.3.1     
