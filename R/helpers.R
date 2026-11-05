@@ -309,7 +309,7 @@ map_blocks_mizu <- function(X, FUN, ..., batch) {
   mizu::mizu_collect(handle)
 }
 
-mizu_blocks_per_worker <- 8L
+mizu_blocks_per_worker <- 1L
 
 mizu_pool_is_set <- function() {
   isNamespaceLoaded("mizu") && !is.null(mizu::mizu_default_pool())
