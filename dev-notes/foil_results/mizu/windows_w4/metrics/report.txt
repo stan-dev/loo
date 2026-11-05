@@ -1,0 +1,10 @@
+metrics: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  13.2s
+Candidate: 13.4s
+
+Change: +220.2ms (+1.67%)
+  50% CrI: [+174.4ms, +274.3ms] (+1.32%, +2.08%)
+  80% CrI: [+141.6ms, +329.6ms] (+1.07%, +2.51%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

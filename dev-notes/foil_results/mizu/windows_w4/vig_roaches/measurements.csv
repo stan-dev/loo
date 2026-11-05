@@ -1,0 +1,11 @@
+repetition,order,baseline_seconds,candidate_seconds
+1,baseline_first,2.1910671,2.2889576
+2,candidate_first,2.204831,2.2444143
+3,baseline_first,2.2217299,2.2675089
+4,candidate_first,2.217382,2.2731348000000002
+5,baseline_first,2.3329222,2.3317707
+6,candidate_first,2.235116,2.2976675
+7,baseline_first,2.2483811,2.2983116
+8,candidate_first,2.2793631,2.3031013
+9,candidate_first,2.284433,2.337919
+10,baseline_first,2.2731907,2.3161562

@@ -1,0 +1,16 @@
+ 11.                 └─mirai:::mmap(x, dots, envir = parent.frame())
+ 12.                   └─base::lapply(seq_len(xlen), collect_map)
+ 13.                     └─mirai (local) FUN(X[[i]], ...)
+ 14.                       ├─base::eval(expr)
+ 15.                       │ └─base::eval(expr)
+ 16.                       └─mirai:::stop_m(x, i, xi)
+ 17.                         └─cli::cli_abort(...)
+ 18.                           └─rlang::abort(...)
+Execution halted
+ backend workers            case median_ms min_ms uss_mb_total
+    mizu       4    call_8_cheap      0.59   0.44          176
+    mizu       4       tiny_2000      4.27   2.91          209
+    mizu       4   psislike_4000    342.79 307.76         1324
+    mizu       4      cheap_100k    355.39 239.60          341
+    mizu       4     skewed_1000    119.04 113.59          349
+    mizu       4 per_element_200     24.20  17.88          353

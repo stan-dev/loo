@@ -1,0 +1,10 @@
+vig_roaches: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  2.2s
+Candidate: 2.3s
+
+Change: +46.6ms (+2.07%)
+  50% CrI: [+42.0ms, +51.1ms] (+1.86%, +2.28%)
+  80% CrI: [+37.4ms, +54.9ms] (+1.65%, +2.45%)
+
+P(candidate faster): 0.0% (1 of 10,000 draws)

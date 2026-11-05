@@ -1,0 +1,10 @@
+moment_matching: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  10.4s
+Candidate: 8.7s
+
+Change: -1.7s (-15.96%)
+  50% CrI: [-1.7s, -1.6s] (-16.32%, -15.60%)
+  80% CrI: [-1.7s, -1.6s] (-16.63%, -15.25%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

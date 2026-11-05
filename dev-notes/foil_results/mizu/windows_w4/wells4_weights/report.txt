@@ -1,0 +1,10 @@
+wells4_weights: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  35.3s
+Candidate: 35.5s
+
+Change: +265.8ms (+0.75%)
+  50% CrI: [+176.1ms, +351.3ms] (+0.50%, +1.00%)
+  80% CrI: [+92.5ms, +423.2ms] (+0.26%, +1.20%)
+
+P(candidate faster): 2.3% (230 of 10,000 draws)
