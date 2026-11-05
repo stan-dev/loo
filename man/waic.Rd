@@ -26,9 +26,14 @@ each method.}
 \item{draws, data, ...}{For the function method only. See the
 \strong{Methods (by class)} section below for details on these arguments.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
+local machine or on remote workers. If a default pool has been set with
+\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
+memory with the session and give the lowest overhead for fully local
+computation. Otherwise the work runs on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
+inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
+copies.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:

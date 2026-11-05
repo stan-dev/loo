@@ -96,3 +96,63 @@ test_that("loo_map re-raises warnings from daemons", {
   )
   expect_equal(out, list(1L))
 })
+
+test_that("loo_map runs on a default mizu pool and matches lapply", {
+  skip_if_not_installed("mizu")
+  pool <- mizu::mizu_pool(2L)
+  withr::defer(mizu::mizu_pool_stop(pool))
+  previous <- mizu::mizu_set_default_pool(pool)
+  withr::defer(mizu::mizu_set_default_pool(previous))
+
+  scale_by <- c(10, 20)
+  f <- function(i, scale_by) i * scale_by[2]
+  expect_true(mizu_pool_is_set())
+  expect_equal(
+    loo_map(1:50, f, scale_by = scale_by, parallel = TRUE),
+    lapply(1:50, f, scale_by = scale_by)
+  )
+  expect_equal(
+    loo_map(1:7, f, scale_by = scale_by, parallel = TRUE, batch = FALSE),
+    lapply(1:7, f, scale_by = scale_by)
+  )
+  expect_equal(loo_map(integer(0), f, scale_by = scale_by, parallel = TRUE), list())
+})
+
+test_that("loo_map re-raises warnings and errors from mizu workers", {
+  skip_if_not_installed("mizu")
+  pool <- mizu::mizu_pool(2L)
+  withr::defer(mizu::mizu_pool_stop(pool))
+  previous <- mizu::mizu_set_default_pool(pool)
+  withr::defer(mizu::mizu_set_default_pool(previous))
+
+  expect_warning(
+    out <- loo_map(1L, function(i) {
+      warning("from mizu worker")
+      i
+    }, parallel = TRUE),
+    "from mizu worker"
+  )
+  expect_equal(out, list(1L))
+  expect_error(
+    loo_map(1:3, function(i) stop("mizu boom"), parallel = TRUE),
+    "mizu boom"
+  )
+})
+
+test_that("loo gives the same result on mizu, mirai and sequentially", {
+  skip_if_not_installed("mizu")
+  set.seed(1)
+  ll <- matrix(rnorm(400 * 30, -1, 0.5), 400, 30)
+  sequential <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = FALSE))
+  on_mirai <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = TRUE))
+
+  pool <- mizu::mizu_pool(2L)
+  withr::defer(mizu::mizu_pool_stop(pool))
+  previous <- mizu::mizu_set_default_pool(pool)
+  withr::defer(mizu::mizu_set_default_pool(previous))
+  on_mizu <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = TRUE))
+
+  expect_equal(on_mirai$estimates, sequential$estimates)
+  expect_equal(on_mizu$estimates, sequential$estimates)
+  expect_equal(on_mizu$diagnostics, sequential$diagnostics)
+})

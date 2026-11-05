@@ -47,6 +47,7 @@ Suggests:
     ggplot2,
     graphics,
     knitr,
+    mizu,
     rmarkdown,
     rstan,
     rstanarm (>= 2.19.0),

@@ -68,9 +68,14 @@ functions for help computing \code{r_eff}.}
 \item{save_psis}{Should the \code{"psis"} object created internally by
 \code{loo_subsample()} be saved in the returned object? See \code{\link[=loo]{loo()}} for details.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
+local machine or on remote workers. If a default pool has been set with
+\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
+memory with the session and give the lowest overhead for fully local
+computation. Otherwise the work runs on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
+inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
+copies.}
 
 \item{loo_approximation}{What type of approximation of the loo_i's should be used?
 The default is \code{"plpd"} (the log predictive density using the posterior expectation).

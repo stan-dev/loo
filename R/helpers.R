@@ -270,20 +270,53 @@ nlist <- function(...) {
 #'   suits a few expensive, uneven elements.
 #' @return A list the length of `X`, as from `lapply()`.
 loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
-  if (!parallel) {
+  if (!parallel || length(X) == 0L) {
     return(lapply(X, FUN, ...))
   }
+  blocks <- if (mizu_pool_is_set()) {
+    map_blocks_mizu(X, FUN, ..., batch = batch)
+  } else {
+    map_blocks_mirai(X, FUN, ..., batch = batch)
+  }
+  lapply(concat_field(blocks, "warnings"), warning)
+  concat_field(blocks, "value")
+}
+
+map_blocks_mirai <- function(X, FUN, ..., batch) {
   mirai::require_daemons()
   n_blocks <- if (batch) mirai::info()[["connections"]] else length(X)
-  groups <- unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
   share <- if (daemons_are_local()) mori::share else identity
-  blocks <- mirai::mirai_map(
-    groups,
+  mirai::mirai_map(
+    split_blocks(X, n_blocks),
     lapply_with_warnings,
     .args = c(list(.fun = FUN), lapply(list(...), share))
   )[mirai::.stop]
-  lapply(concat_field(blocks, "warnings"), warning)
-  concat_field(blocks, "value")
+}
+
+map_blocks_mizu <- function(X, FUN, ..., batch) {
+  pool <- mizu::mizu_default_pool()
+  n_workers <- sum(mizu::mizu_pool_info(pool)[["workers"]] == "live")
+  n_blocks <- if (batch) n_workers * mizu_blocks_per_worker else length(X)
+  groups <- split_blocks(X, n_blocks)
+  handle <- do.call(
+    mizu::mizu_map,
+    c(
+      list(pool, groups, lapply_with_warnings, .fun = FUN, .n_chunks = length(groups)),
+      lapply(list(...), mori::share)
+    )
+  )
+  mizu::mizu_collect(handle)
+}
+
+mizu_blocks_per_worker <- 4L
+
+mizu_pool_is_set <- function() {
+  isNamespaceLoaded("mizu") && !is.null(mizu::mizu_default_pool())
+}
+
+split_blocks <- function(X, n_blocks) {
+  n_blocks <- max(1L, min(n_blocks, length(X)))
+  unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
 }
 
 #' Split a matrix or 3-d array along its last dimension

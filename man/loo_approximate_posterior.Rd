@@ -54,9 +54,14 @@ proposal distribution (g). A vector of length S.}
 \code{loo_approximate_posterior()} be saved in the returned object? See
 \code{\link[=loo]{loo()}} for details.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
+local machine or on remote workers. If a default pool has been set with
+\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
+memory with the session and give the lowest overhead for fully local
+computation. Otherwise the work runs on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
+inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
+copies.}
 
 \item{data, draws, ...}{For the \code{loo_approximate_posterior.function()} method,
 these are the data, posterior draws, and other arguments to pass to the
