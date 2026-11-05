@@ -73,14 +73,9 @@ This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to 
 weighted expectations after running \code{loo}. Several functions in the
 \pkg{bayesplot} package also accept \code{psis} objects.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
-local machine or on remote workers. If a default pool has been set with
-\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
-memory with the session and give the lowest overhead for fully local
-computation. Otherwise the work runs on mirai daemons, which you set up
-beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
-copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 
 \item{is_method}{The importance sampling method to use. The following methods
 are implemented:

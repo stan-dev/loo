@@ -40,14 +40,9 @@ indexes for each each row of \code{x} (if a matrix) or each value in
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
-local machine or on remote workers. If a default pool has been set with
-\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
-memory with the session and give the lowest overhead for fully local
-computation. Otherwise the work runs on mirai daemons, which you set up
-beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
-copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 
 \item{data, draws, ...}{Same as for the \code{\link[=loo]{loo()}} function method.}
 }

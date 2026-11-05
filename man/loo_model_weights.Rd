@@ -83,14 +83,9 @@ each model. See \code{\link[=psis]{psis()}} and  \code{\link[=relative_eff]{rela
 function for computing \code{r_eff}. If \code{x} is a list of \code{"psis_loo"}
 objects then \code{r_eff_list} is ignored.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel on the
-local machine or on remote workers. If a default pool has been set with
-\code{\link[mizu:mizu_set_default_pool]{mizu::mizu_set_default_pool()}}, that pool is used: mizu workers share
-memory with the session and give the lowest overhead for fully local
-computation. Otherwise the work runs on mirai daemons, which you set up
-beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local workers of either kind read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote mirai daemons receive
-copies.}
+\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
+from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
 
 \item{lpd_point}{If calling \code{stacking_weights()} or \code{pseudobma_weights()}
 directly, a matrix of pointwise leave-one-out (or K-fold) log likelihoods

@@ -247,77 +247,43 @@ nlist <- function(...) {
   return(out)
 }
 
-#' Map a function over `X`, optionally on a mizu pool or mirai daemons
+#' Map a function over `X`, optionally on mirai daemons
 #'
 #' With `parallel = FALSE` this is `lapply()`. With `parallel = TRUE`, `X` is
-#' split into blocks that run on the default mizu pool if one is set with
-#' [mizu::mizu_set_default_pool()], and otherwise on the daemons set up with
-#' [mirai::daemons()]. The results come back in the original order.
+#' split into blocks that run on the daemons set up with [mirai::daemons()], and
+#' the results come back in the original order.
 #'
-#' `FUN` and `...` are sent to the workers, so `FUN` should not capture a large
-#' environment; pass data as arguments instead. mizu workers and local mirai
-#' daemons read the arguments from shared memory ([mori::share()]); remote
-#' daemons receive copies. Warnings raised on a worker are signalled again on
-#' the host, and the first error stops the map.
+#' `FUN` and `...` are sent to the daemons, so `FUN` should not capture a large
+#' environment; pass data as arguments instead. Local daemons read the
+#' arguments from shared memory ([mori::share()]); remote daemons receive
+#' copies. Warnings raised on a daemon are signalled again on the host, and the
+#' first error stops the map.
 #'
 #' @noRd
 #' @param X A vector or list to map over.
 #' @param FUN The function to apply to each element of `X`.
 #' @param ... Further arguments passed to `FUN`.
-#' @param parallel If `TRUE`, run on the mizu pool or mirai daemons.
-#' @param batch If `TRUE`, send a few blocks of consecutive elements per worker,
-#'   which suits many cheap elements. If `FALSE`, send each element as its own
-#'   task so that idle workers take the next one, which suits a few expensive,
-#'   uneven elements.
+#' @param parallel If `TRUE`, run on mirai daemons.
+#' @param batch If `TRUE`, send each daemon one block of consecutive elements
+#'   as a single task, which suits many cheap elements. If `FALSE`, send each
+#'   element as its own task so that idle daemons take the next one, which
+#'   suits a few expensive, uneven elements.
 #' @return A list the length of `X`, as from `lapply()`.
 loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
-  if (!parallel || length(X) == 0L) {
+  if (!parallel) {
     return(lapply(X, FUN, ...))
   }
-  blocks <- if (mizu_pool_is_set()) {
-    map_blocks_mizu(X, FUN, ..., batch = batch)
-  } else {
-    map_blocks_mirai(X, FUN, ..., batch = batch)
-  }
-  lapply(concat_field(blocks, "warnings"), warning)
-  concat_field(blocks, "value")
-}
-
-map_blocks_mirai <- function(X, FUN, ..., batch) {
   mirai::require_daemons()
   n_blocks <- if (batch) mirai::info()[["connections"]] else length(X)
+  groups <- unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
   share <- if (daemons_are_local()) mori::share else identity
-  mirai::mirai_map(
-    split_blocks(X, n_blocks),
+  blocks <- mirai::mirai_map(
+    groups,
     lapply_with_warnings,
     .args = c(list(.fun = FUN), lapply(list(...), share))
   )[mirai::.stop]
-}
-
-map_blocks_mizu <- function(X, FUN, ..., batch) {
-  pool <- mizu::mizu_default_pool()
-  n_workers <- sum(mizu::mizu_pool_info(pool)[["workers"]] == "live")
-  n_blocks <- if (batch) n_workers * mizu_blocks_per_worker else length(X)
-  groups <- split_blocks(X, n_blocks)
-  handle <- do.call(
-    mizu::mizu_map,
-    c(
-      list(pool, groups, lapply_with_warnings, .fun = FUN, .n_chunks = length(groups)),
-      lapply(list(...), mori::share)
-    )
-  )
-  mizu::mizu_collect(handle)
-}
-
-mizu_blocks_per_worker <- 1L
-
-mizu_pool_is_set <- function() {
-  isNamespaceLoaded("mizu") && !is.null(mizu::mizu_default_pool())
-}
-
-split_blocks <- function(X, n_blocks) {
-  n_blocks <- max(1L, min(n_blocks, length(X)))
-  unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
+  lapply(concat_field(blocks, "warnings"), warning)
+  concat_field(blocks, "value")
 }
 
 #' Split a matrix or 3-d array along its last dimension
