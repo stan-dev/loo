@@ -69,8 +69,12 @@ functions for help computing \code{r_eff}.}
 \code{loo_subsample()} be saved in the returned object? See \code{\link[=loo]{loo()}} for details.}
 
 \item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
+and \pkg{mori} packages, which are only suggested. Local daemons read
+inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
+Daemons start with an empty global environment, so a log-likelihood
+function must be self-contained or get what it needs through \code{data},
+\code{draws} or \code{...}.}
 
 \item{loo_approximation}{What type of approximation of the loo_i's should be used?
 The default is \code{"plpd"} (the log predictive density using the posterior expectation).

@@ -59,8 +59,12 @@ the computed expected value.}
 containing one element per observation. See \code{\link[=psis]{psis()}} for details.}
 
 \item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
+and \pkg{mori} packages, which are only suggested. Local daemons read
+inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
+Daemons start with an empty global environment, so a log-likelihood
+function must be self-contained or get what it needs through \code{data},
+\code{draws} or \code{...}.}
 }
 \value{
 A list containing two elements: \code{estimates} and \code{pointwise}.
