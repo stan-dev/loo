@@ -97,62 +97,152 @@ test_that("loo_map re-raises warnings from daemons", {
   expect_equal(out, list(1L))
 })
 
-test_that("loo_map runs on a default mizu pool and matches lapply", {
-  skip_if_not_installed("mizu")
-  pool <- mizu::mizu_pool(2L)
-  withr::defer(mizu::mizu_pool_stop(pool))
+local_mizu_pool <- function(n = 2L, env = parent.frame()) {
+  pool <- mizu::mizu_pool(n)
   previous <- mizu::mizu_set_default_pool(pool)
-  withr::defer(mizu::mizu_set_default_pool(previous))
+  withr::defer(
+    {
+      mizu::mizu_set_default_pool(previous)
+      mizu::mizu_pool_stop(pool)
+    },
+    envir = env
+  )
+  pool
+}
 
+test_that("loo_map on mizu matches lapply for every batch and size", {
+  skip_if_not_installed("mizu")
+  local_mizu_pool()
   scale_by <- c(10, 20)
   f <- function(i, scale_by) i * scale_by[2]
   expect_true(mizu_pool_is_set())
-  expect_equal(
-    loo_map(1:50, f, scale_by = scale_by, parallel = TRUE),
-    lapply(1:50, f, scale_by = scale_by)
+  for (n in c(1L, 2L, 3L, 7L, 50L, 1001L)) {
+    for (batch in c(TRUE, FALSE)) {
+      expect_identical(
+        loo_map(seq_len(n), f, scale_by = scale_by, parallel = TRUE, batch = batch),
+        lapply(seq_len(n), f, scale_by = scale_by)
+      )
+    }
+  }
+  expect_identical(
+    loo_map(integer(0), f, scale_by = scale_by, parallel = TRUE),
+    list()
   )
-  expect_equal(
-    loo_map(1:7, f, scale_by = scale_by, parallel = TRUE, batch = FALSE),
-    lapply(1:7, f, scale_by = scale_by)
-  )
-  expect_equal(loo_map(integer(0), f, scale_by = scale_by, parallel = TRUE), list())
 })
 
-test_that("loo_map re-raises warnings and errors from mizu workers", {
+test_that("loo_map on mizu preserves order of unevenly slow elements", {
   skip_if_not_installed("mizu")
-  pool <- mizu::mizu_pool(2L)
-  withr::defer(mizu::mizu_pool_stop(pool))
-  previous <- mizu::mizu_set_default_pool(pool)
-  withr::defer(mizu::mizu_set_default_pool(previous))
+  local_mizu_pool()
+  slow_early <- function(i) {
+    if (i <= 2L) Sys.sleep(0.2)
+    i
+  }
+  expect_identical(
+    loo_map(1:20, slow_early, parallel = TRUE, batch = FALSE),
+    as.list(1:20)
+  )
+})
 
-  expect_warning(
-    out <- loo_map(1L, function(i) {
-      warning("from mizu worker")
+test_that("loo_map on mizu passes mori-shared and plain arguments", {
+  skip_if_not_installed("mizu")
+  local_mizu_pool()
+  big <- matrix(rnorm(2e4), 100)
+  lst <- list(a = 1:3, b = "x")
+  f <- function(i, big, lst, k) c(sum(big[, i]), length(lst$a), k)
+  expect_identical(
+    loo_map(1:20, f, big = big, lst = lst, k = 5L, parallel = TRUE),
+    lapply(1:20, f, big = big, lst = lst, k = 5L)
+  )
+})
+
+test_that("loo_map on mizu re-raises every worker warning exactly once", {
+  skip_if_not_installed("mizu")
+  local_mizu_pool()
+  seen <- character()
+  out <- withCallingHandlers(
+    loo_map(1:6, function(i) {
+      warning("w", i)
       i
     }, parallel = TRUE),
-    "from mizu worker"
+    warning = function(w) {
+      seen <<- c(seen, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
-  expect_equal(out, list(1L))
-  expect_error(
-    loo_map(1:3, function(i) stop("mizu boom"), parallel = TRUE),
-    "mizu boom"
-  )
+  expect_identical(out, as.list(1:6))
+  expect_setequal(seen, paste0("w", 1:6))
+  expect_length(seen, 6L)
 })
 
-test_that("loo gives the same result on mizu, mirai and sequentially", {
+test_that("loo_map on mizu stops on the first worker error", {
+  skip_if_not_installed("mizu")
+  local_mizu_pool()
+  expect_error(
+    loo_map(1:10, function(i) if (i == 4L) stop("mizu boom") else i, parallel = TRUE),
+    "mizu boom"
+  )
+  expect_error(
+    loo_map(1:10, function(i) stop("mizu boom"), parallel = TRUE, batch = FALSE),
+    "mizu boom"
+  )
+  expect_identical(loo_map(1:3, identity, parallel = TRUE), as.list(1:3))
+})
+
+test_that("loo_map prefers a mizu pool over mirai daemons and falls back to mirai", {
+  skip_if(identical(Sys.getenv("LOO_TEST_BACKEND"), "mizu"))
+  skip_if_not_installed("mizu")
+  mirai_pids <- unlist(loo_map(1:40, function(i) Sys.getpid(), parallel = TRUE, batch = FALSE))
+  expect_false(mizu_pool_is_set())
+
+  pool <- local_mizu_pool()
+  mizu_pids <- unlist(loo_map(1:40, function(i) Sys.getpid(), parallel = TRUE, batch = FALSE))
+  expect_true(mizu_pool_is_set())
+  expect_length(intersect(mirai_pids, mizu_pids), 0L)
+  expect_false(Sys.getpid() %in% mizu_pids)
+
+  mizu::mizu_set_default_pool(NULL)
+  expect_false(mizu_pool_is_set())
+  again <- unlist(loo_map(1:40, function(i) Sys.getpid(), parallel = TRUE, batch = FALSE))
+  expect_true(all(again %in% mirai_pids))
+  mizu::mizu_set_default_pool(pool)
+})
+
+test_that("parallel = FALSE ignores a mizu pool", {
+  skip_if_not_installed("mizu")
+  local_mizu_pool()
+  pids <- unlist(loo_map(1:3, function(i) Sys.getpid(), parallel = FALSE))
+  expect_true(all(pids == Sys.getpid()))
+})
+
+test_that("psis, relative_eff and loo give identical results on mizu, mirai and sequentially", {
   skip_if_not_installed("mizu")
   set.seed(1)
-  ll <- matrix(rnorm(400 * 30, -1, 0.5), 400, 30)
-  sequential <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = FALSE))
-  on_mirai <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = TRUE))
+  S <- 400
+  N <- 40
+  ll <- matrix(rnorm(S * N, -1, 0.5), S, N)
+  ll[, 1:3] <- ll[, 1:3] * c(1, 4)
+  arr <- array(ll, c(100, 4, N))
+  llfun <- function(data_i, draws) dnorm(data_i$y, draws[, 1], 1, log = TRUE)
+  dat <- data.frame(y = rnorm(N))
+  dr <- cbind(rnorm(S))
 
-  pool <- mizu::mizu_pool(2L)
-  withr::defer(mizu::mizu_pool_stop(pool))
-  previous <- mizu::mizu_set_default_pool(pool)
-  withr::defer(mizu::mizu_set_default_pool(previous))
-  on_mizu <- suppressWarnings(loo(ll, r_eff = rep(1, 30), parallel = TRUE))
-
-  expect_equal(on_mirai$estimates, sequential$estimates)
-  expect_equal(on_mizu$estimates, sequential$estimates)
-  expect_equal(on_mizu$diagnostics, sequential$diagnostics)
+  compute <- function(parallel) {
+    suppressWarnings(list(
+      r_eff = relative_eff(exp(arr), parallel = parallel),
+      psis = psis(-ll, r_eff = rep(1, N), parallel = parallel),
+      tis = tis(-ll, r_eff = rep(1, N), parallel = parallel),
+      loo_array = loo(arr, r_eff = rep(1, N), parallel = parallel),
+      loo_fun = loo(llfun, data = dat, draws = dr, r_eff = rep(1, N), parallel = parallel),
+      r_eff_fun = relative_eff(
+        function(data_i, draws, ...) exp(llfun(data_i, draws)),
+        chain_id = rep(1:2, each = S / 2), data = dat, draws = dr, parallel = parallel
+      )
+    ))
+  }
+  sequential <- compute(FALSE)
+  on_mirai <- compute(TRUE)
+  local_mizu_pool()
+  on_mizu <- compute(TRUE)
+  expect_identical(on_mirai, sequential)
+  expect_identical(on_mizu, sequential)
 })

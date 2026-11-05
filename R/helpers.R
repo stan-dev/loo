@@ -247,27 +247,28 @@ nlist <- function(...) {
   return(out)
 }
 
-#' Map a function over `X`, optionally on mirai daemons
+#' Map a function over `X`, optionally on a mizu pool or mirai daemons
 #'
 #' With `parallel = FALSE` this is `lapply()`. With `parallel = TRUE`, `X` is
-#' split into blocks that run on the daemons set up with [mirai::daemons()], and
-#' the results come back in the original order.
+#' split into blocks that run on the default mizu pool if one is set with
+#' [mizu::mizu_set_default_pool()], and otherwise on the daemons set up with
+#' [mirai::daemons()]. The results come back in the original order.
 #'
-#' `FUN` and `...` are sent to the daemons, so `FUN` should not capture a large
-#' environment; pass data as arguments instead. Local daemons read the
-#' arguments from shared memory ([mori::share()]); remote daemons receive
-#' copies. Warnings raised on a daemon are signalled again on the host, and the
-#' first error stops the map.
+#' `FUN` and `...` are sent to the workers, so `FUN` should not capture a large
+#' environment; pass data as arguments instead. mizu workers and local mirai
+#' daemons read the arguments from shared memory ([mori::share()]); remote
+#' daemons receive copies. Warnings raised on a worker are signalled again on
+#' the host, and the first error stops the map.
 #'
 #' @noRd
 #' @param X A vector or list to map over.
 #' @param FUN The function to apply to each element of `X`.
 #' @param ... Further arguments passed to `FUN`.
-#' @param parallel If `TRUE`, run on mirai daemons.
-#' @param batch If `TRUE`, send each daemon one block of consecutive elements
-#'   as a single task, which suits many cheap elements. If `FALSE`, send each
-#'   element as its own task so that idle daemons take the next one, which
-#'   suits a few expensive, uneven elements.
+#' @param parallel If `TRUE`, run on the mizu pool or mirai daemons.
+#' @param batch If `TRUE`, send a few blocks of consecutive elements per worker,
+#'   which suits many cheap elements. If `FALSE`, send each element as its own
+#'   task so that idle workers take the next one, which suits a few expensive,
+#'   uneven elements.
 #' @return A list the length of `X`, as from `lapply()`.
 loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
   if (!parallel || length(X) == 0L) {
@@ -308,7 +309,7 @@ map_blocks_mizu <- function(X, FUN, ..., batch) {
   mizu::mizu_collect(handle)
 }
 
-mizu_blocks_per_worker <- 4L
+mizu_blocks_per_worker <- 8L
 
 mizu_pool_is_set <- function() {
   isNamespaceLoaded("mizu") && !is.null(mizu::mizu_default_pool())
