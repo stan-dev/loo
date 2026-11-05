@@ -96,3 +96,11 @@ test_that("loo_map re-raises warnings from daemons", {
   )
   expect_equal(out, list(1L))
 })
+
+test_that("parallel = TRUE names the missing packages", {
+  expect_error(
+    check_parallel_packages(c("mirai", "notapackage")),
+    "'notapackage' package"
+  )
+  expect_silent(check_parallel_packages("stats"))
+})

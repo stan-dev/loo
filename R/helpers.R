@@ -273,15 +273,13 @@ loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
   if (!parallel) {
     return(lapply(X, FUN, ...))
   }
+  check_parallel_packages()
   mirai::require_daemons()
   n_blocks <- if (batch) mirai::info()[["connections"]] else length(X)
   groups <- unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
   share <- if (daemons_are_local()) mori::share else identity
-  blocks <- mirai::mirai_map(
-    groups,
-    lapply_with_warnings,
-    .args = c(list(.fun = FUN), lapply(list(...), share))
-  )[mirai::.stop]
+  args <- c(list(.fun = FUN), lapply(list(...), share))
+  blocks <- mirai::mirai_map(groups, lapply_with_warnings, .args = args)[mirai::.stop]
   lapply(concat_field(blocks, "warnings"), warning)
   concat_field(blocks, "value")
 }
@@ -303,6 +301,17 @@ slices <- function(x, parallel) {
 
 slice <- function(x, i) {
   if (is.list(x)) x[[i]] else if (length(dim(x)) == 2L) x[, i] else x[, , i]
+}
+
+check_parallel_packages <- function(packages = c("mirai", "mori")) {
+  missing <- packages[!vapply(packages, requireNamespace, NA, quietly = TRUE)]
+  if (length(missing) > 0L) {
+    stop(
+      "`parallel = TRUE` needs the ", paste0("'", missing, "'", collapse = " and "),
+      " package. Install it, or use `parallel = FALSE`.",
+      call. = FALSE
+    )
+  }
 }
 
 daemons_are_local <- function() {
