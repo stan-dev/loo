@@ -107,7 +107,7 @@ test_that("elpd_loo_approximation works as expected", {
   test_elpd_loo_approximation(FALSE)
 })
 
-test_that("elpd_loo_approximation with multiple cores", {
+test_that("elpd_loo_approximation runs with parallel = TRUE", {
   test_elpd_loo_approximation(TRUE)
 })
 

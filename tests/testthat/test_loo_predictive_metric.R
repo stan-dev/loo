@@ -1,8 +1,6 @@
 LL <- example_loglik_matrix()
 chain_id <- rep(1:2, each = dim(LL)[1] / 2)
 r_eff <- relative_eff(exp(LL), chain_id)
-# parallel = FALSE because forked processes can segfault on CRAN's macOS machines if
-# R is linked to Apple's Accelerate/vecLib BLAS, which is not fork-safe
 psis_obj <- psis(-LL, r_eff = r_eff, parallel = FALSE)
 
 set.seed(123)

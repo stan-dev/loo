@@ -66,7 +66,7 @@ test_that("relative_eff matrix and function methods return identical output", {
   expect_identical(r_eff_mat, r_eff_fn)
 })
 
-test_that("relative_eff with multiple cores runs", {
+test_that("relative_eff.function matches relative_eff.array with parallel = TRUE", {
   skip_on_cran()
   source(test_path("data-for-tests/function_method_stuff.R"))
   dim(llmat_from_fn) <- c(nrow(llmat_from_fn), 1, ncol(llmat_from_fn))

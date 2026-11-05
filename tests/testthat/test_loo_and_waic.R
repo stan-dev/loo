@@ -17,12 +17,16 @@ test_that("loo, waic and elpd results haven't changed", {
   expect_snapshot_value(elpd1, style = "serialize")
 })
 
-test_that("loo with cores=1 and cores=2 gives same results", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo gives the same results with parallel = FALSE and parallel = TRUE", {
   skip_on_cran()
-  loo2 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr, parallel = TRUE))
-  expect_equal(loo1$estimates, loo2$estimates)
+  sequential <- suppressWarnings(
+    loo(LLarr, r_eff = r_eff_arr, parallel = FALSE)
+  )
+  in_parallel <- suppressWarnings(
+    loo(LLarr, r_eff = r_eff_arr, parallel = TRUE)
+  )
+  expect_equal(sequential$estimates, in_parallel$estimates)
+  expect_equal(sequential$diagnostics, in_parallel$diagnostics)
 })
 
 test_that("mcse_elpd is stable for extreme log likelihoods", {
@@ -218,9 +222,7 @@ test_that("loo.array and loo.matrix give same result", {
   expect_equal(loo1$pointwise[, 2], l2$pointwise[, 2], tolerance = 0.005)
 })
 
-test_that("loo.array runs with multiple cores", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo.array gives the same results with parallel = FALSE and TRUE", {
   skip_on_cran()
   loo_with_arr1 <- loo(LLarr, parallel = FALSE, r_eff = NA)
   loo_with_arr2 <- loo(LLarr, parallel = TRUE, r_eff = NA)
@@ -288,9 +290,7 @@ test_that("function and matrix methods return same result", {
   expect_identical(dim(loo_with_mat), dim(loo_with_fn))
 })
 
-test_that("loo.function runs with multiple cores", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo.function gives the same results with parallel = FALSE and TRUE", {
   skip_on_cran()
   loo_with_fn1 <- loo(
     llfun,
