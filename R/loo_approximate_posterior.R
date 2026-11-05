@@ -121,17 +121,20 @@ loo_approximate_posterior.function <-
     .llfun <- validate_llfun(x)
     N <- dim(data)[1]
 
-    psis_list <- parallel_psis_list(N = N,
-                                    .loo_i = .loo_ap_i,
-                                    .llfun = .llfun,
-                                    data = data,
-                                    draws = draws,
-                                    r_eff = 1, # r_eff is ignored
-                                    save_psis = save_psis,
-                                    log_p = log_p,
-                                    log_g = log_g,
-                                    parallel = parallel,
-                                    ...)
+    psis_list <- loo_map(
+      seq_len(N),
+      .loo_ap_i,
+      llfun = .llfun,
+      data = data,
+      draws = draws,
+      r_eff = 1, # r_eff is ignored
+      save_psis = save_psis,
+      log_p = log_p,
+      log_g = log_g,
+      is_method = "psis",
+      ...,
+      parallel = parallel
+    )
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {

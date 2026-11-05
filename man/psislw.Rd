@@ -8,7 +8,7 @@ psislw(
   lw,
   wcp = 0.2,
   wtrunc = 3/4,
-  parallel = TRUE,
+  cores = getOption("mc.cores", 1),
   llfun = NULL,
   llargs = NULL,
   ...
@@ -26,9 +26,7 @@ distribution.}
 \item{wtrunc}{For truncating very large weights to \eqn{S}^\code{wtrunc}. Set
 to zero for no truncation.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. Local daemons read inputs
-from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.}
+\item{cores}{Ignored. \code{psislw()} is deprecated and always runs sequentially.}
 
 \item{llfun, llargs}{See \code{\link[=loo.function]{loo.function()}}.}
 

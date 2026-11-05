@@ -13,7 +13,7 @@
 #'   distribution.
 #' @param wtrunc For truncating very large weights to \eqn{S}^`wtrunc`. Set
 #'   to zero for no truncation.
-#' @template parallel
+#' @param cores Ignored. `psislw()` is deprecated and always runs sequentially.
 #' @param llfun,llargs See [loo.function()].
 #' @param ... Ignored when `psislw()` is called directly. The `...` is
 #'   only used internally when `psislw()` is called by the [loo()]
@@ -27,7 +27,7 @@
 #' @template loo-and-psis-references
 #'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
-                   parallel = TRUE,
+                   cores = getOption("mc.cores", 1),
                    llfun = NULL, llargs = NULL,
                    ...) {
   .Deprecated("psis")
@@ -115,7 +115,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     N <- llargs$N
     LL_FUN <- TRUE
   }
-  out <- loo_map(1:N, .psis_loop, parallel = parallel)
+  out <- lapply(X = 1:N, FUN = .psis_loop)
 
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
   psislw_warnings(pareto_k)

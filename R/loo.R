@@ -268,19 +268,18 @@ loo.function <-
 
     r_eff <- prepare_psis_r_eff(r_eff, len = N)
 
-    psis_list <-
-      parallel_importance_sampling_list(
-        N = N,
-        .loo_i = .loo_i,
-        .llfun = .llfun,
-        data = data,
-        draws = draws,
-        r_eff = r_eff,
-        save_psis = save_psis,
-        parallel = parallel,
-        method = is_method,
-        ...
-      )
+    psis_list <- loo_map(
+      seq_len(N),
+      .loo_i,
+      llfun = .llfun,
+      data = data,
+      draws = draws,
+      r_eff = r_eff,
+      save_psis = save_psis,
+      is_method = is_method,
+      ...,
+      parallel = parallel
+    )
 
     pointwise <- lapply(psis_list, "[[", "pointwise")
     if (save_psis) {
@@ -674,46 +673,4 @@ NULL
     )
   }
   NextMethod()
-}
-
-
-#' Parallel psis list computations
-#'
-#' @details Refactored function to handle parallel computations
-#' for psis_list
-#'
-#' @keywords internal
-#' @inheritParams loo.function
-#' @param .loo_i The function used to compute individual loo contributions.
-#' @param .llfun See `llfun` in [loo.function()].
-#' @param N The total number of observations (i.e. `nrow(data)`).
-#' @param method See `is_method` for [loo()]
-#'
-parallel_psis_list <- function(N, .loo_i, .llfun,
-                               data, draws, r_eff,
-                               save_psis, parallel,
-                               ...){
-  parallel_importance_sampling_list(N, .loo_i, .llfun,
-                                    data, draws, r_eff,
-                                    save_psis, parallel,
-                                    method = "psis", ...)
-}
-
-#' @rdname parallel_psis_list
-parallel_importance_sampling_list <- function(N, .loo_i, .llfun,
-                                              data, draws, r_eff,
-                                              save_psis, parallel,
-                                              method, ...){
-  loo_map(
-    seq_len(N),
-    .loo_i,
-    llfun = .llfun,
-    data = data,
-    draws = draws,
-    r_eff = r_eff,
-    save_psis = save_psis,
-    is_method = method,
-    ...,
-    parallel = parallel
-  )
 }
