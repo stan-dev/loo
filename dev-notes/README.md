@@ -14,7 +14,7 @@ delete before the PR is merged.
 Each benchmark folder holds `report.txt` (baseline, candidate, change and credible intervals)
 and `measurements.csv` (per-run times and memory).
 
-- `parallel-vs-baseline/windows_w4/`: 9 benchmarks, Windows, 4 workers. `configs/` has the foil configs.
+- `parallel-vs-baseline/windows_w4/`: 9 benchmarks, Windows, 4 workers. `configs/` has the foil configs. New runs come from `bench/run.sh` (see `bench/README.md`) and land in `foil_results/<platform>/w<N>/`.
 - `mizu/windows_w4/`: 19 benchmarks, mirai baseline `45479fb6` vs mizu candidate, Windows, 4 workers,
   with `SUMMARY.txt`. `quick/` has two quick runs. `microbench/` has `loo_map` timings on Windows and WSL.
 
