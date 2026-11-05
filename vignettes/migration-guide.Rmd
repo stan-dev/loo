@@ -116,8 +116,8 @@ The following are targeted for **removal** in loo 3.0.0:
 - `compare()` and `R/compare.R`
 - `psislw()` and `R/psislw.R`
 
-The deprecated option `options(loo.cores = ...)` remains for backward
-compatibility until a separate removal decision is made.
+`options(loo.cores = ...)` and `options(mc.cores = ...)` are no longer read:
+use `mirai::daemons()` and the `parallel` argument.
 
 ---
 
