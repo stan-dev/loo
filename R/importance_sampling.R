@@ -30,7 +30,7 @@ importance_sampling.array <-
   function(log_ratios, method,
            ...,
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     stopifnot(length(dim(log_ratios)) == 3)
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- llarray_to_matrix(log_ratios)
@@ -46,7 +46,7 @@ importance_sampling.matrix <-
   function(log_ratios, method,
            ...,
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     assert_importance_sampling_method_is_implemented(method)
     log_ratios <- validate_log_ratios(log_ratios)
     r_eff <- prepare_psis_r_eff(r_eff, len = ncol(log_ratios))
@@ -137,6 +137,9 @@ implemented_is_methods <- function() c("psis", "tis", "sis")
 #' @param pareto_k Vector of GPD k estimates.
 #' @param tail_len Vector of tail lengths used to fit GPD.
 #' @param r_eff Vector of relative MCMC ESS (n_eff) for `exp(log lik)`
+#' @param norm_const_log,n_eff Optional per-observation normalizing constants
+#'   and effective sample sizes that were already computed, one per column of
+#'   `unnormalized_log_weights`. Computed here if `NULL`.
 #' @template is_method
 #' @return A list of class `"psis"` with structure described in the main doc at
 #'   the top of this file.
@@ -146,7 +149,9 @@ importance_sampling_object <-
            pareto_k,
            tail_len,
            r_eff,
-           method) {
+           method,
+           norm_const_log = NULL,
+           n_eff = NULL) {
     stopifnot(is.matrix(unnormalized_log_weights))
     methods <- unique(method)
     stopifnot(all(methods %in% implemented_is_methods()))
@@ -157,7 +162,9 @@ importance_sampling_object <-
       classes <- c("importance_sampling", "list")
     }
 
-    norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
+    if (is.null(norm_const_log)) {
+      norm_const_log <- matrixStats::colLogSumExps(unnormalized_log_weights)
+    }
     out <- structure(
       list(
         log_weights = unnormalized_log_weights,
@@ -172,9 +179,11 @@ importance_sampling_object <-
       class = classes
     )
 
-    # need normalized weights (not on log scale) for psis_n_eff
-    w <- weights(out, normalize = TRUE, log = FALSE)
-    out$diagnostics[["n_eff"]] <- psis_n_eff(w, r_eff)
+    if (is.null(n_eff)) {
+      w <- weights(out, normalize = TRUE, log = FALSE)
+      n_eff <- psis_n_eff(w, r_eff)
+    }
+    out$diagnostics[["n_eff"]] <- n_eff
     return(out)
   }
 
@@ -211,6 +220,7 @@ do_importance_sampling <- function(log_ratios, r_eff, parallel, method) {
     is_fun = is_fun,
     log_ratios = slices(log_ratios, parallel),
     tail_len = tail_len,
+    r_eff = r_eff,
     parallel = parallel
   )
 
@@ -223,11 +233,15 @@ do_importance_sampling <- function(log_ratios, r_eff, parallel, method) {
     pareto_k = pareto_k,
     tail_len = tail_len,
     r_eff = r_eff,
-    method = rep(method, length(pareto_k)) # Conform to other attr that exist per obs.
+    method = rep(method, length(pareto_k)), # Conform to other attr that exist per obs.
+    norm_const_log = psis_apply(lw_list, "norm_const_log"),
+    n_eff = psis_apply(lw_list, "n_eff")
   )
 }
 
-importance_sampling_i <- function(i, is_fun, log_ratios, tail_len) {
-  is_fun(log_ratios_i = slice(log_ratios, i), tail_len_i = tail_len[i])
+importance_sampling_i <- function(i, is_fun, log_ratios, tail_len, r_eff) {
+  out <- is_fun(log_ratios_i = slice(log_ratios, i), tail_len_i = tail_len[i])
+  out$norm_const_log <- matrixStats::logSumExp(out$log_weights)
+  out$n_eff <- psis_n_eff(exp(out$log_weights - out$norm_const_log), r_eff[i])
+  out
 }
-
