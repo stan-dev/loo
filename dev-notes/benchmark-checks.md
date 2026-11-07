@@ -49,3 +49,17 @@ In a mori test one repetition took 8,867 s (candidate) and 55 s (baseline) while
 ## Data files
 
 The `real_*.rds` files in `bench/` total 551 MB. `qs2` with zstd level 19 and byte shuffle gives 476 MB (13% smaller); wells and wells4 stay at 153 MB each, over GitHub's 100 MB file limit. They are MCMC output and do not compress losslessly.
+
+## Linux slowdowns are daemon start-up, not per-call cost
+foil times the whole benchmark script, and each candidate script starts its daemons inside it, while the baseline forks for free on Linux. On the cluster the candidate takes 1.2 to 1.7 s on the short benchmarks whatever the worker count, which is the added start-up.
+
+Checked on WSL (Ubuntu, R 4.5.3, 20 threads) with `waic()` on the function interface (4000 observations, 2000 draws), median of 7 calls, daemons already running:
+
+| Workers | Baseline `cores = N` (fork) | Candidate `parallel = TRUE` |
+|---|---|---|
+| 1 | 0.324 s | 0.337 s (`parallel = FALSE` path) |
+| 2 | 0.209 s | 0.170 s |
+| 8 | 0.146 s | 0.069 s |
+| 16 | 0.123 s | 0.054 s |
+
+Starting daemons and loading loo on them took 0.33 s for 2, 0.37 s for 8 and 0.74 s for 24 on the same machine. Per call the candidate is faster than forking; the benchmark scripts pay the start-up once or twice per run.
