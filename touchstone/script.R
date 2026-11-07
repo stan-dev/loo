@@ -9,9 +9,11 @@ touchstone::pin_assets("touchstone/wine.rds")
 
 # The base branch takes `cores`; branches with `parallel` take `parallel` and
 # run on mirai daemons started beforehand. `sequential` and `two_workers` hold
-# the arguments that give the same amount of parallelism on either.
+# the arguments that give the same amount of parallelism on either. Workers are
+# separate R processes that only find the branch's loo through R_LIBS.
 setup <- rlang::expr({
   suppressPackageStartupMessages(library(loo))
+  Sys.setenv(R_LIBS = paste(.libPaths(), collapse = .Platform$path.sep))
   wine_log_lik_matrix <- readRDS(touchstone::path_pinned_asset(
     "touchstone/wine.rds"
   ))
