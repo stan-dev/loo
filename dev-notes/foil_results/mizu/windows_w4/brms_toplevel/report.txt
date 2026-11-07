@@ -1,0 +1,10 @@
+brms_toplevel: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  7.7s
+Candidate: 8.0s
+
+Change: +290.9ms (+3.77%)
+  50% CrI: [+111.1ms, +515.0ms] (+1.44%, +6.68%)
+  80% CrI: [+14.9ms, +729.0ms] (+0.19%, +9.44%)
+
+P(candidate faster): 7.9% (786 of 10,000 draws)

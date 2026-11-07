@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+vig_milk_kline: candidate 1/40 benchmark
+vig_milk_kline: baseline 2/40 benchmark
+vig_milk_kline: baseline 3/40 benchmark
+vig_milk_kline: candidate 4/40 benchmark
+vig_milk_kline: candidate 5/40 benchmark
+vig_milk_kline: baseline 6/40 benchmark
+vig_milk_kline: baseline 7/40 benchmark
+vig_milk_kline: candidate 8/40 benchmark
+vig_milk_kline: candidate 9/40 benchmark
+vig_milk_kline: baseline 10/40 benchmark
+vig_milk_kline: baseline 11/40 benchmark
+vig_milk_kline: candidate 12/40 benchmark
+vig_milk_kline: baseline 13/40 benchmark
+vig_milk_kline: candidate 14/40 benchmark
+vig_milk_kline: candidate 15/40 benchmark
+vig_milk_kline: baseline 16/40 benchmark
+vig_milk_kline: candidate 17/40 benchmark
+vig_milk_kline: baseline 18/40 benchmark
+vig_milk_kline: baseline 19/40 benchmark
+vig_milk_kline: candidate 20/40 benchmark
+vig_milk_kline: candidate 21/40 benchmark
+vig_milk_kline: baseline 22/40 benchmark
+vig_milk_kline: baseline 23/40 benchmark
+vig_milk_kline: candidate 24/40 benchmark
+vig_milk_kline: baseline 25/40 benchmark
+vig_milk_kline: candidate 26/40 benchmark
+vig_milk_kline: candidate 27/40 benchmark
+vig_milk_kline: baseline 28/40 benchmark
+vig_milk_kline: baseline 29/40 benchmark
+vig_milk_kline: candidate 30/40 benchmark
+vig_milk_kline: candidate 31/40 benchmark
+vig_milk_kline: baseline 32/40 benchmark
+vig_milk_kline: candidate 33/40 benchmark
+vig_milk_kline: baseline 34/40 benchmark
+vig_milk_kline: baseline 35/40 benchmark
+vig_milk_kline: candidate 36/40 benchmark
+vig_milk_kline: baseline 37/40 benchmark
+vig_milk_kline: candidate 38/40 benchmark
+vig_milk_kline: candidate 39/40 benchmark
+vig_milk_kline: baseline 40/40 benchmark
+vig_milk_kline: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  11.6s
+Candidate: 1.4s
+
+Change: -10.2s (-87.85%)
+  80% CrI: [-10.7s, -9.7s] (-88.35%, -87.32%)
+  90% CrI: [-10.8s, -9.6s] (-88.48%, -87.15%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  652.7MB
+Candidate: 942.2MB
+
+Change: +289.5MB (+44.35%)
+  80% CrI: [+288.4MB, +290.7MB] (+44.18%, +44.54%)
+  90% CrI: [+288.1MB, +291.1MB] (+44.14%, +44.59%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

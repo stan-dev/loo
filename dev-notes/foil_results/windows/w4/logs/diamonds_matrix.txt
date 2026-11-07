@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+diamonds_matrix: candidate 1/40 benchmark
+diamonds_matrix: baseline 2/40 benchmark
+diamonds_matrix: baseline 3/40 benchmark
+diamonds_matrix: candidate 4/40 benchmark
+diamonds_matrix: candidate 5/40 benchmark
+diamonds_matrix: baseline 6/40 benchmark
+diamonds_matrix: baseline 7/40 benchmark
+diamonds_matrix: candidate 8/40 benchmark
+diamonds_matrix: candidate 9/40 benchmark
+diamonds_matrix: baseline 10/40 benchmark
+diamonds_matrix: candidate 11/40 benchmark
+diamonds_matrix: baseline 12/40 benchmark
+diamonds_matrix: baseline 13/40 benchmark
+diamonds_matrix: candidate 14/40 benchmark
+diamonds_matrix: baseline 15/40 benchmark
+diamonds_matrix: candidate 16/40 benchmark
+diamonds_matrix: candidate 17/40 benchmark
+diamonds_matrix: baseline 18/40 benchmark
+diamonds_matrix: baseline 19/40 benchmark
+diamonds_matrix: candidate 20/40 benchmark
+diamonds_matrix: candidate 21/40 benchmark
+diamonds_matrix: baseline 22/40 benchmark
+diamonds_matrix: baseline 23/40 benchmark
+diamonds_matrix: candidate 24/40 benchmark
+diamonds_matrix: candidate 25/40 benchmark
+diamonds_matrix: baseline 26/40 benchmark
+diamonds_matrix: candidate 27/40 benchmark
+diamonds_matrix: baseline 28/40 benchmark
+diamonds_matrix: baseline 29/40 benchmark
+diamonds_matrix: candidate 30/40 benchmark
+diamonds_matrix: baseline 31/40 benchmark
+diamonds_matrix: candidate 32/40 benchmark
+diamonds_matrix: candidate 33/40 benchmark
+diamonds_matrix: baseline 34/40 benchmark
+diamonds_matrix: candidate 35/40 benchmark
+diamonds_matrix: baseline 36/40 benchmark
+diamonds_matrix: baseline 37/40 benchmark
+diamonds_matrix: candidate 38/40 benchmark
+diamonds_matrix: baseline 39/40 benchmark
+diamonds_matrix: candidate 40/40 benchmark
+diamonds_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  9.6s
+Candidate: 5.7s
+
+Change: -3.9s (-40.81%)
+  80% CrI: [-4.1s, -3.7s] (-42.22%, -39.31%)
+  90% CrI: [-4.2s, -3.7s] (-42.65%, -38.84%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.6GB
+Candidate: 1.9GB
+
+Change: +259.4MB (+16.17%)
+  80% CrI: [+247.1MB, +271.3MB] (+15.40%, +16.93%)
+  90% CrI: [+243.6MB, +274.5MB] (+15.18%, +17.13%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

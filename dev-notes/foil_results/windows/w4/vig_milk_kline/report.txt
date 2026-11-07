@@ -1,0 +1,23 @@
+vig_milk_kline: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  11.6s
+Candidate: 1.4s
+
+Change: -10.2s (-87.85%)
+  80% CrI: [-10.7s, -9.7s] (-88.35%, -87.32%)
+  90% CrI: [-10.8s, -9.6s] (-88.48%, -87.15%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  652.7MB
+Candidate: 942.2MB
+
+Change: +289.5MB (+44.35%)
+  80% CrI: [+288.4MB, +290.7MB] (+44.18%, +44.54%)
+  90% CrI: [+288.1MB, +291.1MB] (+44.14%, +44.59%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

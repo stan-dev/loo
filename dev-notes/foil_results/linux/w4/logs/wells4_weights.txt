@@ -1,0 +1,31 @@
+wells4_weights: candidate 1/20 benchmark
+wells4_weights: baseline 2/20 benchmark
+wells4_weights: candidate 3/20 benchmark
+wells4_weights: baseline 4/20 benchmark
+wells4_weights: baseline 5/20 benchmark
+wells4_weights: candidate 6/20 benchmark
+wells4_weights: baseline 7/20 benchmark
+wells4_weights: candidate 8/20 benchmark
+wells4_weights: baseline 9/20 benchmark
+wells4_weights: candidate 10/20 benchmark
+wells4_weights: candidate 11/20 benchmark
+wells4_weights: baseline 12/20 benchmark
+wells4_weights: candidate 13/20 benchmark
+wells4_weights: baseline 14/20 benchmark
+wells4_weights: baseline 15/20 benchmark
+wells4_weights: candidate 16/20 benchmark
+wells4_weights: candidate 17/20 benchmark
+wells4_weights: baseline 18/20 benchmark
+wells4_weights: baseline 19/20 benchmark
+wells4_weights: candidate 20/20 benchmark
+wells4_weights: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  27.0s
+Candidate: 17.8s
+
+Change: -9.2s (-33.97%)
+  80% CrI: [-9.2s, -9.1s] (-34.09%, -33.86%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

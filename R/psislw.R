@@ -13,13 +13,7 @@
 #'   distribution.
 #' @param wtrunc For truncating very large weights to \eqn{S}^`wtrunc`. Set
 #'   to zero for no truncation.
-#' @param cores The number of cores to use for parallelization. This defaults to
-#'   the option `mc.cores` which can be set for an entire R session by
-#'   `options(mc.cores = NUMBER)`, the old option `loo.cores` is now
-#'   deprecated but will be given precedence over `mc.cores` until it is
-#'   removed. **As of version 2.0.0, the default is now 1 core if
-#'   `mc.cores` is not set, but we recommend using as many (or close to as
-#'   many) cores as possible.**
+#' @param cores Ignored. `psislw()` is deprecated and always runs sequentially.
 #' @param llfun,llargs See [loo.function()].
 #' @param ... Ignored when `psislw()` is called directly. The `...` is
 #'   only used internally when `psislw()` is called by the [loo()]
@@ -32,15 +26,11 @@
 #'
 #' @template loo-and-psis-references
 #'
-#' @importFrom parallel mclapply makePSOCKcluster stopCluster parLapply
-#'
 psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("mc.cores", 1),
                    llfun = NULL, llargs = NULL,
                    ...) {
   .Deprecated("psis")
-
-  cores <- loo_cores(cores)
 
   .psis <- function(lw_i) {
     x <- lw_i - max(lw_i)
@@ -125,21 +115,7 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     N <- llargs$N
     LL_FUN <- TRUE
   }
-  if (cores == 1) {
-    # don't call functions from parallel package if cores=1
-    out <- lapply(X = 1:N, FUN = .psis_loop)
-  } else {
-    # parallelize
-    if (.Platform$OS.type != "windows") {
-      out <- mclapply(X = 1:N, FUN = .psis_loop, mc.cores = cores)
-    } else {
-      # nocov start
-      cl <- makePSOCKcluster(cores)
-      on.exit(stopCluster(cl))
-      out <- parLapply(cl, X = 1:N, fun = .psis_loop)
-      # nocov end
-    }
-  }
+  out <- lapply(X = 1:N, FUN = .psis_loop)
 
   pareto_k <- vapply(out, "[[", 2L, FUN.VALUE = numeric(1))
   psislw_warnings(pareto_k)

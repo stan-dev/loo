@@ -3,7 +3,7 @@
     Code
       loo_moment_match(x, loo_manual, post_draws_test, log_lik_i_test,
         unconstrain_pars_test, log_prob_upars_test, log_lik_i_upars_test, max_iters = 1,
-        k_thres = 0.5, split = TRUE, cov = TRUE, cores = 1)
+        k_thres = 0.5, split = TRUE, cov = TRUE, parallel = FALSE)
     Condition
       Warning:
       The maximum number of moment matching iterations ('max_iters' argument)

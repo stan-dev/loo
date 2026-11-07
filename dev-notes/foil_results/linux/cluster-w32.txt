@@ -1,0 +1,36 @@
+job: loo-bench-w32
+mode: stage
+node: rci-tide-cpu-01.sdsu.edu
+image: Ubuntu 24.04.5 LTS, R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
+commit: 9bd4e7f1c8e3b908ffb66fdcf7654bd0f92ad740
+baseline: af50d00b
+cpu_request_limit: max 100000
+memory_limit_bytes: 21474836480
+cgroup_probe: read-only
+kernel: 5.15.0-202-generic
+cpu: CPU(s): 64
+cpu: Model name: Intel(R) Xeon(R) Gold 6430
+cpu: Thread(s) per core: 1
+cpu: Core(s) per socket: 32
+cpu: Socket(s): 2
+cpu: L3 cache: 120 MiB (2 instances)
+bench_tarball_md5: ee7a5eb595b2
+loadavg_start: 22.51 28.83 31.66 23/5060 6927
+job: loo-bench-w32
+mode: stage
+node: rci-tide-cpu-01.sdsu.edu
+image: Ubuntu 24.04.5 LTS, R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
+commit: 9bd4e7f1c8e3b908ffb66fdcf7654bd0f92ad740
+baseline: af50d00b
+cpu_request_limit: max 100000
+memory_limit_bytes: 21474836480
+cgroup_probe: read-only
+kernel: 5.15.0-202-generic
+cpu: CPU(s): 64
+cpu: Model name: Intel(R) Xeon(R) Gold 6430
+cpu: Thread(s) per core: 1
+cpu: Core(s) per socket: 32
+cpu: Socket(s): 2
+cpu: L3 cache: 120 MiB (2 instances)
+bench_tarball_md5: ee7a5eb595b2
+loadavg_end: 593.76 602.26 458.91 16/5002 1979941

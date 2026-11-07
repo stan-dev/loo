@@ -1,0 +1,53 @@
+benchmark                  metric        baseline candidate    change  80% CrI              90% CrI             
+ap_matrix                  time              3.4s      3.4s  (-0.34%)  (-1.44%, +0.80%)     (-1.76%, +1.11%)    
+ap_matrix                  peak memory        n/a       n/a       n/a  n/a                  n/a                 
+brms_toplevel              time             11.0s     11.2s  (+1.87%)  (+1.27%, +2.55%)     (+1.11%, +2.79%)    
+brms_toplevel              peak memory        n/a       n/a       n/a  n/a                  n/a                 
+diamonds_function          time             11.7s     14.4s (+23.47%)  (+17.44%, +29.69%)   (+15.87%, +31.38%)  
+diamonds_function          peak memory        n/a       n/a       n/a  n/a                  n/a                 
+diamonds_matrix            time              5.0s      4.8s  (-3.83%)  (-4.26%, -3.32%)     (-4.38%, -3.17%)    
+diamonds_matrix            peak memory        n/a       n/a       n/a  n/a                  n/a                 
+loo_five_calls             time              3.1s      2.4s (-24.93%)  (-25.48%, -24.30%)   (-25.61%, -24.09%)  
+loo_five_calls             peak memory        n/a       n/a       n/a  n/a                  n/a                 
+loo_function_heavy_draws   time              8.4s     10.6s (+25.95%)  (+22.51%, +30.85%)   (+21.67%, +32.61%)  
+loo_function_heavy_draws   peak memory        n/a       n/a       n/a  n/a                  n/a                 
+loo_function               time              1.5s      2.3s (+51.12%)  (+49.29%, +52.84%)   (+48.76%, +53.32%)  
+loo_function               peak memory        n/a       n/a       n/a  n/a                  n/a                 
+loo_subsample              time              0.6s      1.7s (+162.07%)  (+157.97%, +165.46%) (+156.54%, +166.41%)
+loo_subsample              peak memory        n/a       n/a       n/a  n/a                  n/a                 
+metrics                    time             14.7s     14.7s  (+0.43%)  (-0.06%, +1.06%)     n/a                 
+metrics                    peak memory        n/a       n/a       n/a  n/a                  n/a                 
+moment_matching            time              2.8s      4.4s (+59.03%)  (+57.53%, +60.41%)   (+57.07%, +60.81%)  
+moment_matching            peak memory        n/a       n/a       n/a  n/a                  n/a                 
+psis_matrix_large          time              8.7s      5.7s (-33.96%)  (-34.36%, -33.40%)   n/a                 
+psis_matrix_large          peak memory        n/a       n/a       n/a  n/a                  n/a                 
+psis_matrix_small          time             10.1s      5.9s (-41.45%)  (-41.76%, -41.12%)   (-41.86%, -41.03%)  
+psis_matrix_small          peak memory        n/a       n/a       n/a  n/a                  n/a                 
+radon_loo_ap               time              1.3s      2.2s (+73.97%)  (+71.87%, +76.23%)   (+71.28%, +76.84%)  
+radon_loo_ap               peak memory        n/a       n/a       n/a  n/a                  n/a                 
+radon_loo_function         time              1.1s      2.1s (+88.91%)  (+85.80%, +91.55%)   (+84.78%, +92.31%)  
+radon_loo_function         peak memory        n/a       n/a       n/a  n/a                  n/a                 
+relative_eff               time              2.1s      3.3s (+57.67%)  (+56.57%, +58.93%)   (+56.29%, +59.30%)  
+relative_eff               peak memory        n/a       n/a       n/a  n/a                  n/a                 
+sar_loo                    time             18.5s      3.8s (-79.16%)  (-79.40%, -78.91%)   n/a                 
+sar_loo                    peak memory        n/a       n/a       n/a  n/a                  n/a                 
+subsample_methods          time              8.4s      6.3s (-25.03%)  (-25.61%, -24.38%)   (-25.78%, -24.17%)  
+subsample_methods          peak memory        n/a       n/a       n/a  n/a                  n/a                 
+vig_large_data             time             42.3s     38.7s  (-8.51%)  (-10.28%, -6.86%)    n/a                 
+vig_large_data             peak memory        n/a       n/a       n/a  n/a                  n/a                 
+vig_milk_kline             time              6.4s      1.8s (-72.05%)  (-72.29%, -71.81%)   (-72.36%, -71.73%)  
+vig_milk_kline             peak memory        n/a       n/a       n/a  n/a                  n/a                 
+vig_moment_matching        time             12.6s     16.8s (+32.80%)  (+32.44%, +33.24%)   n/a                 
+vig_moment_matching        peak memory        n/a       n/a       n/a  n/a                  n/a                 
+vig_roaches                time              2.4s      2.1s (-13.53%)  (-14.41%, -12.56%)   (-14.62%, -12.26%)  
+vig_roaches                peak memory        n/a       n/a       n/a  n/a                  n/a                 
+vig_wells_rstan            time              8.5s      6.7s (-21.68%)  (-21.95%, -21.37%)   n/a                 
+vig_wells_rstan            peak memory        n/a       n/a       n/a  n/a                  n/a                 
+waic_function              time              0.4s      1.3s (+244.35%)  (+238.82%, +250.04%) (+237.30%, +251.85%)
+waic_function              peak memory        n/a       n/a       n/a  n/a                  n/a                 
+wells4_weights             time             22.8s     11.2s (-51.00%)  (-51.28%, -50.70%)   n/a                 
+wells4_weights             peak memory        n/a       n/a       n/a  n/a                  n/a                 
+wells_loo_subsample        time             16.5s     11.9s (-27.93%)  (-28.51%, -27.39%)   (-28.68%, -27.25%)  
+wells_loo_subsample        peak memory        n/a       n/a       n/a  n/a                  n/a                 
+wells_relative_eff_loo     time             14.5s     16.8s (+16.42%)  (+13.90%, +19.05%)   (+13.13%, +19.81%)  
+wells_relative_eff_loo     peak memory        n/a       n/a       n/a  n/a                  n/a                 

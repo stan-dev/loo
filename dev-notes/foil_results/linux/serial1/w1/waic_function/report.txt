@@ -1,0 +1,12 @@
+waic_function: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.3s
+Candidate: 1.8s
+
+Change: +484.1ms (+37.17%)
+  80% CrI: [+480.7ms, +487.7ms] (+36.89%, +37.45%)
+  90% CrI: [+479.7ms, +488.7ms] (+36.81%, +37.54%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

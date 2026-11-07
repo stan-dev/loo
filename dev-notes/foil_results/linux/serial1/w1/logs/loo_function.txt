@@ -1,0 +1,52 @@
+loo_function: candidate 1/40 benchmark
+loo_function: baseline 2/40 benchmark
+loo_function: candidate 3/40 benchmark
+loo_function: baseline 4/40 benchmark
+loo_function: baseline 5/40 benchmark
+loo_function: candidate 6/40 benchmark
+loo_function: baseline 7/40 benchmark
+loo_function: candidate 8/40 benchmark
+loo_function: baseline 9/40 benchmark
+loo_function: candidate 10/40 benchmark
+loo_function: candidate 11/40 benchmark
+loo_function: baseline 12/40 benchmark
+loo_function: candidate 13/40 benchmark
+loo_function: baseline 14/40 benchmark
+loo_function: baseline 15/40 benchmark
+loo_function: candidate 16/40 benchmark
+loo_function: candidate 17/40 benchmark
+loo_function: baseline 18/40 benchmark
+loo_function: baseline 19/40 benchmark
+loo_function: candidate 20/40 benchmark
+loo_function: baseline 21/40 benchmark
+loo_function: candidate 22/40 benchmark
+loo_function: candidate 23/40 benchmark
+loo_function: baseline 24/40 benchmark
+loo_function: candidate 25/40 benchmark
+loo_function: baseline 26/40 benchmark
+loo_function: baseline 27/40 benchmark
+loo_function: candidate 28/40 benchmark
+loo_function: candidate 29/40 benchmark
+loo_function: baseline 30/40 benchmark
+loo_function: baseline 31/40 benchmark
+loo_function: candidate 32/40 benchmark
+loo_function: baseline 33/40 benchmark
+loo_function: candidate 34/40 benchmark
+loo_function: candidate 35/40 benchmark
+loo_function: baseline 36/40 benchmark
+loo_function: baseline 37/40 benchmark
+loo_function: candidate 38/40 benchmark
+loo_function: candidate 39/40 benchmark
+loo_function: baseline 40/40 benchmark
+loo_function: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  7.9s
+Candidate: 9.0s
+
+Change: +1.1s (+13.75%)
+  80% CrI: [+1.1s, +1.1s] (+13.43%, +14.03%)
+  90% CrI: [+1.1s, +1.1s] (+13.32%, +14.11%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

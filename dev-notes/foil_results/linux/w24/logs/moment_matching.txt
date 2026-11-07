@@ -1,0 +1,52 @@
+moment_matching: baseline 1/40 benchmark
+moment_matching: candidate 2/40 benchmark
+moment_matching: candidate 3/40 benchmark
+moment_matching: baseline 4/40 benchmark
+moment_matching: baseline 5/40 benchmark
+moment_matching: candidate 6/40 benchmark
+moment_matching: candidate 7/40 benchmark
+moment_matching: baseline 8/40 benchmark
+moment_matching: baseline 9/40 benchmark
+moment_matching: candidate 10/40 benchmark
+moment_matching: candidate 11/40 benchmark
+moment_matching: baseline 12/40 benchmark
+moment_matching: candidate 13/40 benchmark
+moment_matching: baseline 14/40 benchmark
+moment_matching: baseline 15/40 benchmark
+moment_matching: candidate 16/40 benchmark
+moment_matching: candidate 17/40 benchmark
+moment_matching: baseline 18/40 benchmark
+moment_matching: baseline 19/40 benchmark
+moment_matching: candidate 20/40 benchmark
+moment_matching: baseline 21/40 benchmark
+moment_matching: candidate 22/40 benchmark
+moment_matching: candidate 23/40 benchmark
+moment_matching: baseline 24/40 benchmark
+moment_matching: baseline 25/40 benchmark
+moment_matching: candidate 26/40 benchmark
+moment_matching: candidate 27/40 benchmark
+moment_matching: baseline 28/40 benchmark
+moment_matching: candidate 29/40 benchmark
+moment_matching: baseline 30/40 benchmark
+moment_matching: baseline 31/40 benchmark
+moment_matching: candidate 32/40 benchmark
+moment_matching: candidate 33/40 benchmark
+moment_matching: baseline 34/40 benchmark
+moment_matching: baseline 35/40 benchmark
+moment_matching: candidate 36/40 benchmark
+moment_matching: baseline 37/40 benchmark
+moment_matching: candidate 38/40 benchmark
+moment_matching: candidate 39/40 benchmark
+moment_matching: baseline 40/40 benchmark
+moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  2.8s
+Candidate: 4.4s
+
+Change: +1.6s (+59.03%)
+  80% CrI: [+1.6s, +1.7s] (+57.53%, +60.41%)
+  90% CrI: [+1.6s, +1.7s] (+57.07%, +60.81%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

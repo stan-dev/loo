@@ -1,0 +1,12 @@
+relative_eff: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  2.1s
+Candidate: 3.3s
+
+Change: +1.2s (+57.67%)
+  80% CrI: [+1.2s, +1.2s] (+56.57%, +58.93%)
+  90% CrI: [+1.2s, +1.2s] (+56.29%, +59.30%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

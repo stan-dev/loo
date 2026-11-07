@@ -1,0 +1,42 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+vig_wells_rstan: candidate 1/20 benchmark
+vig_wells_rstan: baseline 2/20 benchmark
+vig_wells_rstan: baseline 3/20 benchmark
+vig_wells_rstan: candidate 4/20 benchmark
+vig_wells_rstan: candidate 5/20 benchmark
+vig_wells_rstan: baseline 6/20 benchmark
+vig_wells_rstan: baseline 7/20 benchmark
+vig_wells_rstan: candidate 8/20 benchmark
+vig_wells_rstan: candidate 9/20 benchmark
+vig_wells_rstan: baseline 10/20 benchmark
+vig_wells_rstan: candidate 11/20 benchmark
+vig_wells_rstan: baseline 12/20 benchmark
+vig_wells_rstan: baseline 13/20 benchmark
+vig_wells_rstan: candidate 14/20 benchmark
+vig_wells_rstan: baseline 15/20 benchmark
+vig_wells_rstan: candidate 16/20 benchmark
+vig_wells_rstan: baseline 17/20 benchmark
+vig_wells_rstan: candidate 18/20 benchmark
+vig_wells_rstan: candidate 19/20 benchmark
+vig_wells_rstan: baseline 20/20 benchmark
+vig_wells_rstan: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  17.9s
+Candidate: 12.0s
+
+Change: -5.9s (-32.82%)
+  80% CrI: [-6.0s, -5.8s] (-33.48%, -32.45%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  2.1GB
+Candidate: 1.4GB
+
+Change: -728.9MB (-33.93%)
+  80% CrI: [-734.0MB, -723.8MB] (-34.14%, -33.73%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

@@ -1,0 +1,21 @@
+wells4_weights: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  54.7s
+Candidate: 19.5s
+
+Change: -35.2s (-64.39%)
+  80% CrI: [-36.4s, -33.9s] (-66.15%, -62.52%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  2.4GB
+Candidate: 2.8GB
+
+Change: +362.6MB (+15.02%)
+  80% CrI: [+340.2MB, +380.4MB] (+14.09%, +15.76%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

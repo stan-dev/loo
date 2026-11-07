@@ -1,0 +1,10 @@
+bench                        base     cand    change  80% CrI
+radon_loo_ap                 3.6s     3.8s  (+6.57%)  (+6.27%, +6.88%)
+radon_loo_function           3.3s     3.5s  (+5.55%)  (+4.71%, +6.23%)
+vig_large_data              17.8s    12.3s (-31.22%)  (-31.63%, -30.74%)
+vig_milk_kline               8.1s     1.1s (-86.12%)  (-86.16%, -86.09%)
+vig_moment_matching         30.1s    11.5s (-61.60%)  (-62.23%, -60.90%)
+vig_roaches                  3.7s     1.9s (-49.24%)  (-49.57%, -48.86%)
+vig_wells_rstan             19.2s    14.4s (-24.94%)  (-27.12%, -22.65%)
+wells_loo_subsample         10.2s     3.0s (-70.70%)  (-70.75%, -70.64%)
+wells_relative_eff_loo       4.9s     4.6s  (-5.99%)  (-7.77%, -4.73%)

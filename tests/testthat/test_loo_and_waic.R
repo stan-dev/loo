@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 set.seed(123)
 
 LLarr <- example_loglik_array()
@@ -12,26 +11,22 @@ loo1 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr))
 waic1 <- suppressWarnings(waic(LLarr))
 elpd1 <- suppressWarnings(elpd(LLarr))
 
-test_that("using loo.cores is deprecated", {
-  options(mc.cores = NULL)
-  options(loo.cores = 1)
-  expect_warning(loo(LLarr, r_eff = r_eff_arr, cores = 2), "loo.cores")
-  options(loo.cores = NULL)
-  options(mc.cores = 1)
-})
-
 test_that("loo, waic and elpd results haven't changed", {
   expect_snapshot_value(loo1, style = "serialize")
   expect_snapshot_value(waic1, style = "serialize")
   expect_snapshot_value(elpd1, style = "serialize")
 })
 
-test_that("loo with cores=1 and cores=2 gives same results", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo gives the same results with parallel = FALSE and parallel = TRUE", {
   skip_on_cran()
-  loo2 <- suppressWarnings(loo(LLarr, r_eff = r_eff_arr, cores = 2))
-  expect_equal(loo1$estimates, loo2$estimates)
+  sequential <- suppressWarnings(
+    loo(LLarr, r_eff = r_eff_arr, parallel = FALSE)
+  )
+  in_parallel <- suppressWarnings(
+    loo(LLarr, r_eff = r_eff_arr, parallel = TRUE)
+  )
+  expect_equal(sequential$estimates, in_parallel$estimates)
+  expect_equal(sequential$diagnostics, in_parallel$diagnostics)
 })
 
 test_that("mcse_elpd is stable for extreme log likelihoods", {
@@ -90,7 +85,7 @@ for (bad_value in c("-Inf", "Inf")) {
       fixed = TRUE
     )
     expect_error(
-      loo(llfun, data = data, draws = draws, r_eff = NA, cores = 1),
+      loo(llfun, data = data, draws = draws, r_eff = NA, parallel = FALSE),
       error,
       fixed = TRUE
     )
@@ -227,12 +222,10 @@ test_that("loo.array and loo.matrix give same result", {
   expect_equal(loo1$pointwise[, 2], l2$pointwise[, 2], tolerance = 0.005)
 })
 
-test_that("loo.array runs with multiple cores", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo.array gives the same results with parallel = FALSE and TRUE", {
   skip_on_cran()
-  loo_with_arr1 <- loo(LLarr, cores = 1, r_eff = NA)
-  loo_with_arr2 <- loo(LLarr, cores = 2, r_eff = NA)
+  loo_with_arr1 <- loo(LLarr, parallel = FALSE, r_eff = NA)
+  loo_with_arr2 <- loo(LLarr, parallel = TRUE, r_eff = NA)
   expect_identical(loo_with_arr1$estimates, loo_with_arr2$estimates)
 })
 
@@ -271,21 +264,6 @@ loo_with_mat <- loo(
   save_psis = TRUE
 )
 
-test_that("loo.cores deprecation warning works with function method", {
-  options(loo.cores = 1)
-  expect_warning(
-    loo(
-      llfun,
-      cores = 2,
-      data = data,
-      draws = draws,
-      r_eff = rep(1, nrow(data))
-    ),
-    "loo.cores"
-  )
-  options(loo.cores = NULL)
-})
-
 test_that("loo_i results match loo results for ith data point", {
   expect_no_warning(
     loo_i_val <- loo_i(i = 2, llfun = llfun, data = data, draws = draws),
@@ -312,40 +290,28 @@ test_that("function and matrix methods return same result", {
   expect_identical(dim(loo_with_mat), dim(loo_with_fn))
 })
 
-test_that("loo.function runs with multiple cores", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo.function gives the same results with parallel = FALSE and TRUE", {
   skip_on_cran()
   loo_with_fn1 <- loo(
     llfun,
     data = data,
     draws = draws,
     r_eff = rep(1, nrow(data)),
-    cores = 1
+    parallel = FALSE
   )
   loo_with_fn2 <- loo(
     llfun,
     data = data,
     draws = draws,
     r_eff = rep(1, nrow(data)),
-    cores = 2
+    parallel = TRUE
   )
   expect_identical(loo_with_fn2$estimates, loo_with_fn1$estimates)
 })
 
-test_that("waic.function runs with multiple cores", {
-  waic_with_fn1 <- waic(
-    llfun,
-    data = data,
-    draws = draws,
-    cores = 1
-  )
-  waic_with_fn2 <- waic(
-    llfun,
-    data = data,
-    draws = draws,
-    cores = 2
-  )
+test_that("waic.function runs in parallel", {
+  waic_with_fn1 <- waic(llfun, data = data, draws = draws, parallel = FALSE)
+  waic_with_fn2 <- waic(llfun, data = data, draws = draws, parallel = TRUE)
   expect_identical(waic_with_fn2$estimates, waic_with_fn1$estimates)
 })
 
@@ -364,4 +330,16 @@ test_that("loo doesn't throw r_eff warnings", {
   expect_no_warning(loo(-LLarr))
   expect_no_warning(loo(-LLmat))
   expect_no_warning(loo(llfun, data = data, draws = draws))
+})
+
+test_that("loo.matrix gives identical results sequentially and on two daemons", {
+  skip_if_not_installed("mirai")
+  skip_if_not_installed("mori")
+  sequential <- suppressWarnings(loo(LLmat, r_eff = rep(0.9, ncol(LLmat)), parallel = FALSE))
+  in_parallel <- suppressWarnings(
+    with_two_daemons(loo(LLmat, r_eff = rep(0.9, ncol(LLmat)), parallel = TRUE))
+  )
+  expect_identical(in_parallel$pointwise, sequential$pointwise)
+  expect_identical(in_parallel$diagnostics, sequential$diagnostics)
+  expect_identical(in_parallel$estimates, sequential$estimates)
 })

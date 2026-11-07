@@ -1,0 +1,23 @@
+subsample_methods: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  11.4s
+Candidate: 3.5s
+
+Change: -7.9s (-69.13%)
+  80% CrI: [-8.5s, -7.3s] (-70.96%, -67.26%)
+  90% CrI: [-8.6s, -7.2s] (-71.44%, -66.74%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.1GB
+Candidate: 1.6GB
+
+Change: +432.6MB (+38.07%)
+  80% CrI: [+430.0MB, +435.3MB] (+37.81%, +38.36%)
+  90% CrI: [+429.4MB, +436.1MB] (+37.75%, +38.45%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

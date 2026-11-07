@@ -29,6 +29,7 @@ For this illustration we consider a high-dimensional Bayesian Logistic regressio
 ```{r, warnings=FALSE, message=FALSE}
 library("rstan")
 library("loo")
+mirai::daemons(2)
 library("matrixStats")
 options(mc.cores = parallel::detectCores(), parallel=FALSE)
 set.seed(24877)

@@ -44,6 +44,7 @@ __bayesplot__:
 library("rstanarm")
 library("bayesplot")
 library("loo")
+mirai::daemons(2)
 ```
 
 
@@ -209,7 +210,7 @@ fit2 <- update(fit1, family = neg_binomial_2)
 ```
 
 ```{r loo2}
-loo2 <- loo(fit2, save_psis = TRUE, cores = 2)
+loo2 <- loo(fit2, save_psis = TRUE)
 print(loo2)
 ```
 

@@ -1,0 +1,11 @@
+repetition,order,baseline_seconds,candidate_seconds,baseline_peak_bytes,candidate_peak_bytes
+1,baseline_first,8.762213157,6.972418167,,
+2,candidate_first,8.805578118,7.019689943,,
+3,baseline_first,8.774106989,7.037255552,,
+4,candidate_first,8.780196523,6.961463038,,
+5,baseline_first,8.755286139,6.99415769,,
+6,candidate_first,8.772040079,7.015322028,,
+7,candidate_first,8.829127115,7.037131292,,
+8,baseline_first,8.767171729,6.9835929530000005,,
+9,baseline_first,8.74442739,7.009161573,,
+10,candidate_first,8.740869739,6.943633871,,

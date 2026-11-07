@@ -59,6 +59,7 @@
 #'
 #'
 #' @examples
+#' mirai::daemons(2)
 #' \donttest{
 #' if (requireNamespace("rstanarm", quietly = TRUE)) {
 #' # Use rstanarm package to quickly fit a model and get both a log-likelihood
@@ -80,7 +81,7 @@
 #' dim(log_ratios)
 #'
 #' r_eff <- relative_eff(exp(-log_ratios), chain_id = rep(1:4, each = 1000))
-#' psis_object <- psis(log_ratios, r_eff = r_eff, cores = 2)
+#' psis_object <- psis(log_ratios, r_eff = r_eff)
 #'
 #' E_loo(yrep, psis_object, type = "mean")
 #' E_loo(yrep, psis_object, type = "var")
@@ -94,6 +95,7 @@
 #' }
 #' }
 #'
+#' mirai::daemons(0)
 E_loo <- function(x, psis_object, ...) {
   UseMethod("E_loo")
 }

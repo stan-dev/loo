@@ -36,8 +36,7 @@
 #'     }
 #' @param r_eff A Vector of relative effective sample size estimates containing
 #'     one element per observation. See [psis()] for more details.
-#' @param cores The number of cores to use for parallelization of `[psis()]`.
-#'   See [psis()] for details.
+#' @template parallel
 #' @param ... Additional arguments passed on to [E_loo()]
 #'
 #' @return A list with the following components:
@@ -52,6 +51,7 @@
 #' @export
 #'
 #' @examples
+#' mirai::daemons(2)
 #' \donttest{
 #' if (requireNamespace("rstanarm", quietly = TRUE)) {
 #' # Use rstanarm package to quickly fit a model and get both a log-likelihood
@@ -79,6 +79,7 @@
 #'                                 type = 'quantile', probs = 0.9)
 #' }
 #' }
+#' mirai::daemons(0)
 loo_predictive_metric <- function(x, ...) {
   UseMethod("loo_predictive_metric")
 }
@@ -92,7 +93,7 @@ loo_predictive_metric.matrix <-
            ...,
            metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = 1,
-           cores = getOption("mc.cores", 1)) {
+           parallel = getOption("loo.parallel", TRUE)) {
     stopifnot(
       is.numeric(x),
       is.numeric(y),
@@ -100,7 +101,7 @@ loo_predictive_metric.matrix <-
       identical(dim(x), dim(log_lik))
     )
     metric <- match.arg(metric)
-    psis_object <- psis(-log_lik, r_eff = r_eff, cores = cores)
+    psis_object <- psis(-log_lik, r_eff = r_eff, parallel = parallel)
     pred_loo <- E_loo(x,
                       psis_object = psis_object,
                       log_ratios = -log_lik,

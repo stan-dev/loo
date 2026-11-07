@@ -1,0 +1,52 @@
+radon_loo_ap: baseline 1/40 benchmark
+radon_loo_ap: candidate 2/40 benchmark
+radon_loo_ap: candidate 3/40 benchmark
+radon_loo_ap: baseline 4/40 benchmark
+radon_loo_ap: baseline 5/40 benchmark
+radon_loo_ap: candidate 6/40 benchmark
+radon_loo_ap: candidate 7/40 benchmark
+radon_loo_ap: baseline 8/40 benchmark
+radon_loo_ap: baseline 9/40 benchmark
+radon_loo_ap: candidate 10/40 benchmark
+radon_loo_ap: baseline 11/40 benchmark
+radon_loo_ap: candidate 12/40 benchmark
+radon_loo_ap: candidate 13/40 benchmark
+radon_loo_ap: baseline 14/40 benchmark
+radon_loo_ap: candidate 15/40 benchmark
+radon_loo_ap: baseline 16/40 benchmark
+radon_loo_ap: baseline 17/40 benchmark
+radon_loo_ap: candidate 18/40 benchmark
+radon_loo_ap: candidate 19/40 benchmark
+radon_loo_ap: baseline 20/40 benchmark
+radon_loo_ap: baseline 21/40 benchmark
+radon_loo_ap: candidate 22/40 benchmark
+radon_loo_ap: candidate 23/40 benchmark
+radon_loo_ap: baseline 24/40 benchmark
+radon_loo_ap: baseline 25/40 benchmark
+radon_loo_ap: candidate 26/40 benchmark
+radon_loo_ap: candidate 27/40 benchmark
+radon_loo_ap: baseline 28/40 benchmark
+radon_loo_ap: baseline 29/40 benchmark
+radon_loo_ap: candidate 30/40 benchmark
+radon_loo_ap: candidate 31/40 benchmark
+radon_loo_ap: baseline 32/40 benchmark
+radon_loo_ap: candidate 33/40 benchmark
+radon_loo_ap: baseline 34/40 benchmark
+radon_loo_ap: baseline 35/40 benchmark
+radon_loo_ap: candidate 36/40 benchmark
+radon_loo_ap: baseline 37/40 benchmark
+radon_loo_ap: candidate 38/40 benchmark
+radon_loo_ap: candidate 39/40 benchmark
+radon_loo_ap: baseline 40/40 benchmark
+radon_loo_ap: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.3s
+Candidate: 2.2s
+
+Change: +932.5ms (+73.97%)
+  80% CrI: [+911.3ms, +956.3ms] (+71.87%, +76.23%)
+  90% CrI: [+905.2ms, +963.3ms] (+71.28%, +76.84%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

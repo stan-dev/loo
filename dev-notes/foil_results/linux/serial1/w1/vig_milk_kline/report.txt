@@ -1,0 +1,12 @@
+vig_milk_kline: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  0.9s
+Candidate: 1.4s
+
+Change: +490.4ms (+53.78%)
+  80% CrI: [+487.5ms, +493.4ms] (+53.45%, +54.12%)
+  90% CrI: [+486.7ms, +494.2ms] (+53.36%, +54.21%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

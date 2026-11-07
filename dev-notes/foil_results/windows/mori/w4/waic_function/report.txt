@@ -1,0 +1,23 @@
+waic_function: Comparing candidate (HEAD) to baseline (499b56680f50b80e7302a6f5ec3372850ed96405) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.3s
+Candidate: 1.3s
+
+Change: +9.9ms (+0.77%)
+  80% CrI: [-4.9ms, +39.2ms] (-0.37%, +3.05%)
+  90% CrI: [-7.9ms, +50.3ms] (-0.60%, +3.94%)
+
+P(candidate faster): 22.1% (2,210 of 10,000 draws)
+
+Peak memory
+
+Baseline:  743.5MB
+Candidate: 743.8MB
+
+Change: +303.0KB (+0.04%)
+  80% CrI: [+79.8KB, +530.8KB] (+0.01%, +0.07%)
+  90% CrI: [+12.7KB, +596.6KB] (+0.00%, +0.08%)
+
+P(candidate smaller): 4.3% (428 of 10,000 draws)

@@ -1,0 +1,42 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+psis_matrix_large: candidate 1/20 benchmark
+psis_matrix_large: baseline 2/20 benchmark
+psis_matrix_large: baseline 3/20 benchmark
+psis_matrix_large: candidate 4/20 benchmark
+psis_matrix_large: candidate 5/20 benchmark
+psis_matrix_large: baseline 6/20 benchmark
+psis_matrix_large: baseline 7/20 benchmark
+psis_matrix_large: candidate 8/20 benchmark
+psis_matrix_large: baseline 9/20 benchmark
+psis_matrix_large: candidate 10/20 benchmark
+psis_matrix_large: candidate 11/20 benchmark
+psis_matrix_large: baseline 12/20 benchmark
+psis_matrix_large: baseline 13/20 benchmark
+psis_matrix_large: candidate 14/20 benchmark
+psis_matrix_large: candidate 15/20 benchmark
+psis_matrix_large: baseline 16/20 benchmark
+psis_matrix_large: candidate 17/20 benchmark
+psis_matrix_large: baseline 18/20 benchmark
+psis_matrix_large: baseline 19/20 benchmark
+psis_matrix_large: candidate 20/20 benchmark
+psis_matrix_large: Comparing candidate (HEAD) to baseline (499b56680f50b80e7302a6f5ec3372850ed96405) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  13.5s
+Candidate: 8.9s
+
+Change: -4.6s (-33.82%)
+  80% CrI: [-5.2s, -3.9s] (-37.42%, -29.77%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  5.7GB
+Candidate: 1.9GB
+
+Change: -3.8GB (-66.10%)
+  80% CrI: [-3.8GB, -3.7GB] (-66.33%, -65.80%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

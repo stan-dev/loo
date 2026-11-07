@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+radon_loo_ap: baseline 1/40 benchmark
+radon_loo_ap: candidate 2/40 benchmark
+radon_loo_ap: baseline 3/40 benchmark
+radon_loo_ap: candidate 4/40 benchmark
+radon_loo_ap: candidate 5/40 benchmark
+radon_loo_ap: baseline 6/40 benchmark
+radon_loo_ap: candidate 7/40 benchmark
+radon_loo_ap: baseline 8/40 benchmark
+radon_loo_ap: candidate 9/40 benchmark
+radon_loo_ap: baseline 10/40 benchmark
+radon_loo_ap: baseline 11/40 benchmark
+radon_loo_ap: candidate 12/40 benchmark
+radon_loo_ap: baseline 13/40 benchmark
+radon_loo_ap: candidate 14/40 benchmark
+radon_loo_ap: candidate 15/40 benchmark
+radon_loo_ap: baseline 16/40 benchmark
+radon_loo_ap: candidate 17/40 benchmark
+radon_loo_ap: baseline 18/40 benchmark
+radon_loo_ap: baseline 19/40 benchmark
+radon_loo_ap: candidate 20/40 benchmark
+radon_loo_ap: baseline 21/40 benchmark
+radon_loo_ap: candidate 22/40 benchmark
+radon_loo_ap: candidate 23/40 benchmark
+radon_loo_ap: baseline 24/40 benchmark
+radon_loo_ap: candidate 25/40 benchmark
+radon_loo_ap: baseline 26/40 benchmark
+radon_loo_ap: baseline 27/40 benchmark
+radon_loo_ap: candidate 28/40 benchmark
+radon_loo_ap: candidate 29/40 benchmark
+radon_loo_ap: baseline 30/40 benchmark
+radon_loo_ap: baseline 31/40 benchmark
+radon_loo_ap: candidate 32/40 benchmark
+radon_loo_ap: candidate 33/40 benchmark
+radon_loo_ap: baseline 34/40 benchmark
+radon_loo_ap: candidate 35/40 benchmark
+radon_loo_ap: baseline 36/40 benchmark
+radon_loo_ap: baseline 37/40 benchmark
+radon_loo_ap: candidate 38/40 benchmark
+radon_loo_ap: baseline 39/40 benchmark
+radon_loo_ap: candidate 40/40 benchmark
+radon_loo_ap: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  5.3s
+Candidate: 5.5s
+
+Change: +204.5ms (+3.87%)
+  80% CrI: [-22.6ms, +458.9ms] (-0.42%, +8.88%)
+  90% CrI: [-86.6ms, +532.2ms] (-1.61%, +10.43%)
+
+P(candidate faster): 12.2% (1,218 of 10,000 draws)
+
+Peak memory
+
+Baseline:  952.3MB
+Candidate: 946.2MB
+
+Change: -6.1MB (-0.64%)
+  80% CrI: [-8.8MB, -3.3MB] (-0.92%, -0.35%)
+  90% CrI: [-9.5MB, -2.6MB] (-1.00%, -0.27%)
+
+P(candidate smaller): 99.8% (9,976 of 10,000 draws)

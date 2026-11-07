@@ -1,0 +1,31 @@
+sar_loo: baseline 1/20 benchmark
+sar_loo: candidate 2/20 benchmark
+sar_loo: candidate 3/20 benchmark
+sar_loo: baseline 4/20 benchmark
+sar_loo: candidate 5/20 benchmark
+sar_loo: baseline 6/20 benchmark
+sar_loo: baseline 7/20 benchmark
+sar_loo: candidate 8/20 benchmark
+sar_loo: candidate 9/20 benchmark
+sar_loo: baseline 10/20 benchmark
+sar_loo: candidate 11/20 benchmark
+sar_loo: baseline 12/20 benchmark
+sar_loo: baseline 13/20 benchmark
+sar_loo: candidate 14/20 benchmark
+sar_loo: baseline 15/20 benchmark
+sar_loo: candidate 16/20 benchmark
+sar_loo: candidate 17/20 benchmark
+sar_loo: baseline 18/20 benchmark
+sar_loo: baseline 19/20 benchmark
+sar_loo: candidate 20/20 benchmark
+sar_loo: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.8s
+Candidate: 2.8s
+
+Change: +941.8ms (+51.00%)
+  80% CrI: [+937.1ms, +946.7ms] (+50.74%, +51.27%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

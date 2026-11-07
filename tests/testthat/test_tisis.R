@@ -1,5 +1,3 @@
-options(mc.cores = 1)
-options(loo.cores = NULL)
 set.seed(123)
 
 LLarr <- example_loglik_array()

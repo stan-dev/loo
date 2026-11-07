@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+waic_function: candidate 1/40 benchmark
+waic_function: baseline 2/40 benchmark
+waic_function: baseline 3/40 benchmark
+waic_function: candidate 4/40 benchmark
+waic_function: candidate 5/40 benchmark
+waic_function: baseline 6/40 benchmark
+waic_function: baseline 7/40 benchmark
+waic_function: candidate 8/40 benchmark
+waic_function: baseline 9/40 benchmark
+waic_function: candidate 10/40 benchmark
+waic_function: baseline 11/40 benchmark
+waic_function: candidate 12/40 benchmark
+waic_function: candidate 13/40 benchmark
+waic_function: baseline 14/40 benchmark
+waic_function: candidate 15/40 benchmark
+waic_function: baseline 16/40 benchmark
+waic_function: candidate 17/40 benchmark
+waic_function: baseline 18/40 benchmark
+waic_function: candidate 19/40 benchmark
+waic_function: baseline 20/40 benchmark
+waic_function: baseline 21/40 benchmark
+waic_function: candidate 22/40 benchmark
+waic_function: baseline 23/40 benchmark
+waic_function: candidate 24/40 benchmark
+waic_function: baseline 25/40 benchmark
+waic_function: candidate 26/40 benchmark
+waic_function: baseline 27/40 benchmark
+waic_function: candidate 28/40 benchmark
+waic_function: candidate 29/40 benchmark
+waic_function: baseline 30/40 benchmark
+waic_function: candidate 31/40 benchmark
+waic_function: baseline 32/40 benchmark
+waic_function: candidate 33/40 benchmark
+waic_function: baseline 34/40 benchmark
+waic_function: baseline 35/40 benchmark
+waic_function: candidate 36/40 benchmark
+waic_function: baseline 37/40 benchmark
+waic_function: candidate 38/40 benchmark
+waic_function: candidate 39/40 benchmark
+waic_function: baseline 40/40 benchmark
+waic_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.6s
+Candidate: 1.5s
+
+Change: -98.3ms (-5.98%)
+  80% CrI: [-102.6ms, -93.4ms] (-6.23%, -5.69%)
+  90% CrI: [-103.6ms, -92.0ms] (-6.29%, -5.61%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  456.1MB
+Candidate: 432.8MB
+
+Change: -23.3MB (-5.10%)
+  80% CrI: [-23.4MB, -23.1MB] (-5.14%, -5.06%)
+  90% CrI: [-23.5MB, -23.0MB] (-5.14%, -5.04%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

@@ -1,0 +1,12 @@
+moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  6.4s
+Candidate: 7.1s
+
+Change: +748.8ms (+11.77%)
+  80% CrI: [+733.5ms, +764.7ms] (+11.53%, +12.01%)
+  90% CrI: [+728.7ms, +769.7ms] (+11.46%, +12.09%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

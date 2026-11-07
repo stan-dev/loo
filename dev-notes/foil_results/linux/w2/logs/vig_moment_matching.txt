@@ -1,0 +1,31 @@
+vig_moment_matching: baseline 1/20 benchmark
+vig_moment_matching: candidate 2/20 benchmark
+vig_moment_matching: candidate 3/20 benchmark
+vig_moment_matching: baseline 4/20 benchmark
+vig_moment_matching: candidate 5/20 benchmark
+vig_moment_matching: baseline 6/20 benchmark
+vig_moment_matching: baseline 7/20 benchmark
+vig_moment_matching: candidate 8/20 benchmark
+vig_moment_matching: baseline 9/20 benchmark
+vig_moment_matching: candidate 10/20 benchmark
+vig_moment_matching: candidate 11/20 benchmark
+vig_moment_matching: baseline 12/20 benchmark
+vig_moment_matching: baseline 13/20 benchmark
+vig_moment_matching: candidate 14/20 benchmark
+vig_moment_matching: candidate 15/20 benchmark
+vig_moment_matching: baseline 16/20 benchmark
+vig_moment_matching: baseline 17/20 benchmark
+vig_moment_matching: candidate 18/20 benchmark
+vig_moment_matching: candidate 19/20 benchmark
+vig_moment_matching: baseline 20/20 benchmark
+vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  18.9s
+Candidate: 16.3s
+
+Change: -2.6s (-13.53%)
+  80% CrI: [-2.7s, -2.4s] (-14.06%, -12.82%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

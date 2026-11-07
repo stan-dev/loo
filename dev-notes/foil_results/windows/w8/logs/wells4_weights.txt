@@ -1,0 +1,42 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+wells4_weights: baseline 1/20 benchmark
+wells4_weights: candidate 2/20 benchmark
+wells4_weights: candidate 3/20 benchmark
+wells4_weights: baseline 4/20 benchmark
+wells4_weights: candidate 5/20 benchmark
+wells4_weights: baseline 6/20 benchmark
+wells4_weights: baseline 7/20 benchmark
+wells4_weights: candidate 8/20 benchmark
+wells4_weights: candidate 9/20 benchmark
+wells4_weights: baseline 10/20 benchmark
+wells4_weights: baseline 11/20 benchmark
+wells4_weights: candidate 12/20 benchmark
+wells4_weights: baseline 13/20 benchmark
+wells4_weights: candidate 14/20 benchmark
+wells4_weights: candidate 15/20 benchmark
+wells4_weights: baseline 16/20 benchmark
+wells4_weights: baseline 17/20 benchmark
+wells4_weights: candidate 18/20 benchmark
+wells4_weights: candidate 19/20 benchmark
+wells4_weights: baseline 20/20 benchmark
+wells4_weights: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  54.7s
+Candidate: 19.5s
+
+Change: -35.2s (-64.39%)
+  80% CrI: [-36.4s, -33.9s] (-66.15%, -62.52%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  2.4GB
+Candidate: 2.8GB
+
+Change: +362.6MB (+15.02%)
+  80% CrI: [+340.2MB, +380.4MB] (+14.09%, +15.76%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

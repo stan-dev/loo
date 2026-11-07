@@ -1,0 +1,12 @@
+loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.6s
+Candidate: 2.5s
+
+Change: +876.3ms (+54.84%)
+  80% CrI: [+847.4ms, +904.6ms] (+53.00%, +56.62%)
+  90% CrI: [+839.5ms, +912.9ms] (+52.50%, +57.14%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+subsample_methods: baseline 1/40 benchmark
+subsample_methods: candidate 2/40 benchmark
+subsample_methods: candidate 3/40 benchmark
+subsample_methods: baseline 4/40 benchmark
+subsample_methods: candidate 5/40 benchmark
+subsample_methods: baseline 6/40 benchmark
+subsample_methods: baseline 7/40 benchmark
+subsample_methods: candidate 8/40 benchmark
+subsample_methods: baseline 9/40 benchmark
+subsample_methods: candidate 10/40 benchmark
+subsample_methods: candidate 11/40 benchmark
+subsample_methods: baseline 12/40 benchmark
+subsample_methods: baseline 13/40 benchmark
+subsample_methods: candidate 14/40 benchmark
+subsample_methods: candidate 15/40 benchmark
+subsample_methods: baseline 16/40 benchmark
+subsample_methods: baseline 17/40 benchmark
+subsample_methods: candidate 18/40 benchmark
+subsample_methods: baseline 19/40 benchmark
+subsample_methods: candidate 20/40 benchmark
+subsample_methods: candidate 21/40 benchmark
+subsample_methods: baseline 22/40 benchmark
+subsample_methods: candidate 23/40 benchmark
+subsample_methods: baseline 24/40 benchmark
+subsample_methods: candidate 25/40 benchmark
+subsample_methods: baseline 26/40 benchmark
+subsample_methods: baseline 27/40 benchmark
+subsample_methods: candidate 28/40 benchmark
+subsample_methods: candidate 29/40 benchmark
+subsample_methods: baseline 30/40 benchmark
+subsample_methods: baseline 31/40 benchmark
+subsample_methods: candidate 32/40 benchmark
+subsample_methods: baseline 33/40 benchmark
+subsample_methods: candidate 34/40 benchmark
+subsample_methods: candidate 35/40 benchmark
+subsample_methods: baseline 36/40 benchmark
+subsample_methods: candidate 37/40 benchmark
+subsample_methods: baseline 38/40 benchmark
+subsample_methods: baseline 39/40 benchmark
+subsample_methods: candidate 40/40 benchmark
+subsample_methods: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  8.9s
+Candidate: 3.4s
+
+Change: -5.5s (-61.92%)
+  80% CrI: [-5.8s, -5.2s] (-63.40%, -60.31%)
+  90% CrI: [-5.9s, -5.1s] (-63.84%, -59.85%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  666.4MB
+Candidate: 886.8MB
+
+Change: +220.4MB (+33.08%)
+  80% CrI: [+218.7MB, +222.4MB] (+32.73%, +33.48%)
+  90% CrI: [+218.3MB, +223.0MB] (+32.64%, +33.60%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

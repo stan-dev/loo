@@ -1,0 +1,8 @@
+baseline = "HEAD~1"
+candidate = "HEAD"
+repetitions = 10
+block-size = 4
+output-dir = "C:/Users/visru/AppData/Local/Temp/foilbench/results3"
+timeout = 3600
+worktree-startup = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/install.R"]
+

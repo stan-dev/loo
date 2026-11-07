@@ -1,0 +1,42 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+vig_large_data: baseline 1/20 benchmark
+vig_large_data: candidate 2/20 benchmark
+vig_large_data: candidate 3/20 benchmark
+vig_large_data: baseline 4/20 benchmark
+vig_large_data: baseline 5/20 benchmark
+vig_large_data: candidate 6/20 benchmark
+vig_large_data: candidate 7/20 benchmark
+vig_large_data: baseline 8/20 benchmark
+vig_large_data: candidate 9/20 benchmark
+vig_large_data: baseline 10/20 benchmark
+vig_large_data: candidate 11/20 benchmark
+vig_large_data: baseline 12/20 benchmark
+vig_large_data: baseline 13/20 benchmark
+vig_large_data: candidate 14/20 benchmark
+vig_large_data: baseline 15/20 benchmark
+vig_large_data: candidate 16/20 benchmark
+vig_large_data: baseline 17/20 benchmark
+vig_large_data: candidate 18/20 benchmark
+vig_large_data: candidate 19/20 benchmark
+vig_large_data: baseline 20/20 benchmark
+vig_large_data: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  26.7s
+Candidate: 12.4s
+
+Change: -14.3s (-53.58%)
+  80% CrI: [-16.1s, -12.9s] (-57.87%, -49.59%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.8GB
+Candidate: 1.9GB
+
+Change: +90.8MB (+5.15%)
+  80% CrI: [+89.5MB, +93.1MB] (+5.07%, +5.28%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

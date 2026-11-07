@@ -1,0 +1,11 @@
+vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  16.7s
+Candidate: 17.3s
+
+Change: +600.8ms (+3.60%)
+  80% CrI: [+572.8ms, +631.8ms] (+3.43%, +3.79%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

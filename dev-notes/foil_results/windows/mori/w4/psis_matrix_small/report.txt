@@ -1,0 +1,23 @@
+psis_matrix_small: Comparing candidate (HEAD) to baseline (499b56680f50b80e7302a6f5ec3372850ed96405) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  3.9s
+Candidate: 3.7s
+
+Change: -160.8ms (-4.16%)
+  80% CrI: [-283.4ms, -66.1ms] (-7.12%, -1.76%)
+  90% CrI: [-324.7ms, -44.7ms] (-8.09%, -1.18%)
+
+P(candidate faster): 99.3% (9,933 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.2GB
+Candidate: 1.2GB
+
+Change: +4.2MB (+0.37%)
+  80% CrI: [+2.2MB, +6.5MB] (+0.19%, +0.57%)
+  90% CrI: [+1.7MB, +7.3MB] (+0.14%, +0.63%)
+
+P(candidate smaller): 0.3% (32 of 10,000 draws)

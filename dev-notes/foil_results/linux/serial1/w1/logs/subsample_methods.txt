@@ -1,0 +1,52 @@
+subsample_methods: baseline 1/40 benchmark
+subsample_methods: candidate 2/40 benchmark
+subsample_methods: candidate 3/40 benchmark
+subsample_methods: baseline 4/40 benchmark
+subsample_methods: candidate 5/40 benchmark
+subsample_methods: baseline 6/40 benchmark
+subsample_methods: baseline 7/40 benchmark
+subsample_methods: candidate 8/40 benchmark
+subsample_methods: candidate 9/40 benchmark
+subsample_methods: baseline 10/40 benchmark
+subsample_methods: candidate 11/40 benchmark
+subsample_methods: baseline 12/40 benchmark
+subsample_methods: baseline 13/40 benchmark
+subsample_methods: candidate 14/40 benchmark
+subsample_methods: baseline 15/40 benchmark
+subsample_methods: candidate 16/40 benchmark
+subsample_methods: baseline 17/40 benchmark
+subsample_methods: candidate 18/40 benchmark
+subsample_methods: baseline 19/40 benchmark
+subsample_methods: candidate 20/40 benchmark
+subsample_methods: candidate 21/40 benchmark
+subsample_methods: baseline 22/40 benchmark
+subsample_methods: candidate 23/40 benchmark
+subsample_methods: baseline 24/40 benchmark
+subsample_methods: baseline 25/40 benchmark
+subsample_methods: candidate 26/40 benchmark
+subsample_methods: baseline 27/40 benchmark
+subsample_methods: candidate 28/40 benchmark
+subsample_methods: candidate 29/40 benchmark
+subsample_methods: baseline 30/40 benchmark
+subsample_methods: candidate 31/40 benchmark
+subsample_methods: baseline 32/40 benchmark
+subsample_methods: baseline 33/40 benchmark
+subsample_methods: candidate 34/40 benchmark
+subsample_methods: candidate 35/40 benchmark
+subsample_methods: baseline 36/40 benchmark
+subsample_methods: baseline 37/40 benchmark
+subsample_methods: candidate 38/40 benchmark
+subsample_methods: candidate 39/40 benchmark
+subsample_methods: baseline 40/40 benchmark
+subsample_methods: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  5.4s
+Candidate: 6.0s
+
+Change: +567.8ms (+10.49%)
+  80% CrI: [+563.1ms, +572.6ms] (+10.40%, +10.58%)
+  90% CrI: [+561.8ms, +574.0ms] (+10.37%, +10.61%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

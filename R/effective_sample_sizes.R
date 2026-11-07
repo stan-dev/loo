@@ -18,10 +18,11 @@
 #'   `x` (if a vector). No `chain_id` is needed if `x` is a 3-D
 #'   array. If there are `C` chains then valid chain indexes are values
 #'   in `1:C`.
-#' @param cores The number of cores to use for parallelization.
+#' @template parallel
 #' @return A vector of relative effective sample sizes.
 #'
 #' @examples
+#' mirai::daemons(2)
 #' LLarr <- example_loglik_array()
 #' LLmat <- example_loglik_matrix()
 #' dim(LLarr)
@@ -31,6 +32,7 @@
 #' rel_n_eff_2 <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
 #' all.equal(rel_n_eff_1, rel_n_eff_2)
 #'
+#' mirai::daemons(0)
 relative_eff <- function(x, ...) {
   UseMethod("relative_eff")
 }
@@ -42,48 +44,33 @@ relative_eff <- function(x, ...) {
 relative_eff.default <- function(x, chain_id, ...) {
   dim(x) <- c(length(x), 1)
   class(x) <- "matrix"
-  relative_eff.matrix(x, chain_id)
+  relative_eff.matrix(x, chain_id, parallel = FALSE)
 }
 
 #' @export
 #' @templateVar fn relative_eff
 #' @template matrix
 #'
-relative_eff.matrix <- function(x, chain_id, ..., cores = getOption("mc.cores", 1)) {
+relative_eff.matrix <- function(x, chain_id, ..., parallel = getOption("loo.parallel", TRUE)) {
   x <- llmatrix_to_array(x, chain_id)
-  relative_eff.array(x, cores = cores)
+  relative_eff.array(x, parallel = parallel)
 }
 
 #' @export
 #' @templateVar fn relative_eff
 #' @template array
 #'
-relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
+relative_eff.array <- function(x, ..., parallel = getOption("loo.parallel", TRUE)) {
   stopifnot(length(dim(x)) == 3)
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
-  if (cores == 1) {
-    n_eff_vec <- apply(x, 3, posterior::ess_mean)
-  } else {
-    if (!os_is_windows()) {
-      n_eff_list <-
-        parallel::mclapply(
-          mc.cores = cores,
-          X = seq_len(dim(x)[3]),
-          FUN = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
-        )
-    } else {
-      cl <- parallel::makePSOCKcluster(cores)
-      on.exit(parallel::stopCluster(cl))
-      n_eff_list <-
-        parallel::parLapply(
-          cl = cl,
-          X = seq_len(dim(x)[3]),
-          fun = function(i) posterior::ess_mean(x[, , i, drop = TRUE])
-        )
-    }
-    n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
-  }
+  n_eff_list <- loo_map(
+    seq_len(dim(x)[3]),
+    ess_mean_i,
+    x = slices(x, parallel),
+    parallel = parallel
+  )
+  n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
 
   return(n_eff_vec / S)
 }
@@ -97,52 +84,36 @@ relative_eff.function <-
   function(x,
            chain_id,
            ...,
-           cores = getOption("mc.cores", 1),
+           parallel = getOption("loo.parallel", TRUE),
            data = NULL,
            draws = NULL) {
 
     f_i <- validate_llfun(x) # not really an llfun, should return exp(ll) or exp(-ll)
     N <- dim(data)[1]
 
-    if (cores == 1) {
-      n_eff_list <-
-        lapply(
-          X = seq_len(N),
-          FUN = function(i) {
-            val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-            relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-          }
-        )
-    } else {
-      if (!os_is_windows()) {
-        n_eff_list <-
-          parallel::mclapply(
-            X = seq_len(N),
-            FUN = function(i) {
-              val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-            },
-            mc.cores = cores
-          )
-      } else {
-        cl <- parallel::makePSOCKcluster(cores)
-        parallel::clusterExport(cl=cl, varlist=c("draws", "chain_id", "data"), envir=environment())
-        on.exit(parallel::stopCluster(cl))
-        n_eff_list <-
-          parallel::parLapply(
-            cl = cl,
-            X = seq_len(N),
-            fun = function(i) {
-              val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
-              relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
-            }
-          )
-      }
-    }
+    n_eff_list <- loo_map(
+      seq_len(N),
+      relative_eff_i,
+      data = data,
+      f_i = f_i,
+      draws = draws,
+      chain_id = chain_id,
+      ...,
+      parallel = parallel
+    )
 
     n_eff_vec <- unlist(n_eff_list, use.names = FALSE)
     return(n_eff_vec)
   }
+
+ess_mean_i <- function(i, x) {
+  posterior::ess_mean(slice(x, i))
+}
+
+relative_eff_i <- function(i, data, f_i, draws, chain_id, ...) {
+  val_i <- f_i(data_i = data[i, , drop = FALSE], draws = draws, ...)
+  relative_eff.default(as.vector(val_i), chain_id = chain_id)
+}
 
 #' @export
 #' @describeIn relative_eff

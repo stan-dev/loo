@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 
 test_that("overall loo_subampling works as expected (compared with loo) for diff_est", {
   set.seed(123)

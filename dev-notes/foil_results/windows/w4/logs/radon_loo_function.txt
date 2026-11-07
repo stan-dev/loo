@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+radon_loo_function: candidate 1/40 benchmark
+radon_loo_function: baseline 2/40 benchmark
+radon_loo_function: baseline 3/40 benchmark
+radon_loo_function: candidate 4/40 benchmark
+radon_loo_function: baseline 5/40 benchmark
+radon_loo_function: candidate 6/40 benchmark
+radon_loo_function: candidate 7/40 benchmark
+radon_loo_function: baseline 8/40 benchmark
+radon_loo_function: baseline 9/40 benchmark
+radon_loo_function: candidate 10/40 benchmark
+radon_loo_function: candidate 11/40 benchmark
+radon_loo_function: baseline 12/40 benchmark
+radon_loo_function: baseline 13/40 benchmark
+radon_loo_function: candidate 14/40 benchmark
+radon_loo_function: candidate 15/40 benchmark
+radon_loo_function: baseline 16/40 benchmark
+radon_loo_function: baseline 17/40 benchmark
+radon_loo_function: candidate 18/40 benchmark
+radon_loo_function: candidate 19/40 benchmark
+radon_loo_function: baseline 20/40 benchmark
+radon_loo_function: baseline 21/40 benchmark
+radon_loo_function: candidate 22/40 benchmark
+radon_loo_function: candidate 23/40 benchmark
+radon_loo_function: baseline 24/40 benchmark
+radon_loo_function: baseline 25/40 benchmark
+radon_loo_function: candidate 26/40 benchmark
+radon_loo_function: baseline 27/40 benchmark
+radon_loo_function: candidate 28/40 benchmark
+radon_loo_function: candidate 29/40 benchmark
+radon_loo_function: baseline 30/40 benchmark
+radon_loo_function: candidate 31/40 benchmark
+radon_loo_function: baseline 32/40 benchmark
+radon_loo_function: candidate 33/40 benchmark
+radon_loo_function: baseline 34/40 benchmark
+radon_loo_function: baseline 35/40 benchmark
+radon_loo_function: candidate 36/40 benchmark
+radon_loo_function: candidate 37/40 benchmark
+radon_loo_function: baseline 38/40 benchmark
+radon_loo_function: baseline 39/40 benchmark
+radon_loo_function: candidate 40/40 benchmark
+radon_loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  4.6s
+Candidate: 5.0s
+
+Change: +362.6ms (+7.89%)
+  80% CrI: [+242.2ms, +518.8ms] (+5.22%, +11.47%)
+  90% CrI: [+212.9ms, +569.2ms] (+4.59%, +12.66%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)
+
+Peak memory
+
+Baseline:  949.6MB
+Candidate: 940.8MB
+
+Change: -8.9MB (-0.94%)
+  80% CrI: [-10.9MB, -6.8MB] (-1.15%, -0.71%)
+  90% CrI: [-11.4MB, -6.1MB] (-1.20%, -0.64%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

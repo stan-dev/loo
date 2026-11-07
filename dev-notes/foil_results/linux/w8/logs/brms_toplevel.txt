@@ -1,0 +1,52 @@
+brms_toplevel: baseline 1/40 benchmark
+brms_toplevel: candidate 2/40 benchmark
+brms_toplevel: candidate 3/40 benchmark
+brms_toplevel: baseline 4/40 benchmark
+brms_toplevel: baseline 5/40 benchmark
+brms_toplevel: candidate 6/40 benchmark
+brms_toplevel: candidate 7/40 benchmark
+brms_toplevel: baseline 8/40 benchmark
+brms_toplevel: candidate 9/40 benchmark
+brms_toplevel: baseline 10/40 benchmark
+brms_toplevel: candidate 11/40 benchmark
+brms_toplevel: baseline 12/40 benchmark
+brms_toplevel: baseline 13/40 benchmark
+brms_toplevel: candidate 14/40 benchmark
+brms_toplevel: baseline 15/40 benchmark
+brms_toplevel: candidate 16/40 benchmark
+brms_toplevel: baseline 17/40 benchmark
+brms_toplevel: candidate 18/40 benchmark
+brms_toplevel: candidate 19/40 benchmark
+brms_toplevel: baseline 20/40 benchmark
+brms_toplevel: candidate 21/40 benchmark
+brms_toplevel: baseline 22/40 benchmark
+brms_toplevel: baseline 23/40 benchmark
+brms_toplevel: candidate 24/40 benchmark
+brms_toplevel: candidate 25/40 benchmark
+brms_toplevel: baseline 26/40 benchmark
+brms_toplevel: baseline 27/40 benchmark
+brms_toplevel: candidate 28/40 benchmark
+brms_toplevel: baseline 29/40 benchmark
+brms_toplevel: candidate 30/40 benchmark
+brms_toplevel: candidate 31/40 benchmark
+brms_toplevel: baseline 32/40 benchmark
+brms_toplevel: candidate 33/40 benchmark
+brms_toplevel: baseline 34/40 benchmark
+brms_toplevel: baseline 35/40 benchmark
+brms_toplevel: candidate 36/40 benchmark
+brms_toplevel: baseline 37/40 benchmark
+brms_toplevel: candidate 38/40 benchmark
+brms_toplevel: candidate 39/40 benchmark
+brms_toplevel: baseline 40/40 benchmark
+brms_toplevel: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  10.0s
+Candidate: 10.3s
+
+Change: +286.3ms (+2.85%)
+  80% CrI: [+261.5ms, +310.2ms] (+2.60%, +3.10%)
+  90% CrI: [+254.1ms, +316.6ms] (+2.53%, +3.16%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

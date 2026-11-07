@@ -1,0 +1,31 @@
+metrics: candidate 1/20 benchmark
+metrics: baseline 2/20 benchmark
+metrics: baseline 3/20 benchmark
+metrics: candidate 4/20 benchmark
+metrics: baseline 5/20 benchmark
+metrics: candidate 6/20 benchmark
+metrics: candidate 7/20 benchmark
+metrics: baseline 8/20 benchmark
+metrics: baseline 9/20 benchmark
+metrics: candidate 10/20 benchmark
+metrics: baseline 11/20 benchmark
+metrics: candidate 12/20 benchmark
+metrics: candidate 13/20 benchmark
+metrics: baseline 14/20 benchmark
+metrics: candidate 15/20 benchmark
+metrics: baseline 16/20 benchmark
+metrics: baseline 17/20 benchmark
+metrics: candidate 18/20 benchmark
+metrics: candidate 19/20 benchmark
+metrics: baseline 20/20 benchmark
+metrics: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  14.7s
+Candidate: 14.7s
+
+Change: +62.4ms (+0.43%)
+  80% CrI: [-9.3ms, +154.7ms] (-0.06%, +1.06%)
+
+P(candidate faster): 13.8% (1,378 of 10,000 draws)

@@ -1,0 +1,52 @@
+loo_five_calls: candidate 1/40 benchmark
+loo_five_calls: baseline 2/40 benchmark
+loo_five_calls: baseline 3/40 benchmark
+loo_five_calls: candidate 4/40 benchmark
+loo_five_calls: baseline 5/40 benchmark
+loo_five_calls: candidate 6/40 benchmark
+loo_five_calls: candidate 7/40 benchmark
+loo_five_calls: baseline 8/40 benchmark
+loo_five_calls: candidate 9/40 benchmark
+loo_five_calls: baseline 10/40 benchmark
+loo_five_calls: baseline 11/40 benchmark
+loo_five_calls: candidate 12/40 benchmark
+loo_five_calls: candidate 13/40 benchmark
+loo_five_calls: baseline 14/40 benchmark
+loo_five_calls: baseline 15/40 benchmark
+loo_five_calls: candidate 16/40 benchmark
+loo_five_calls: candidate 17/40 benchmark
+loo_five_calls: baseline 18/40 benchmark
+loo_five_calls: candidate 19/40 benchmark
+loo_five_calls: baseline 20/40 benchmark
+loo_five_calls: baseline 21/40 benchmark
+loo_five_calls: candidate 22/40 benchmark
+loo_five_calls: baseline 23/40 benchmark
+loo_five_calls: candidate 24/40 benchmark
+loo_five_calls: baseline 25/40 benchmark
+loo_five_calls: candidate 26/40 benchmark
+loo_five_calls: baseline 27/40 benchmark
+loo_five_calls: candidate 28/40 benchmark
+loo_five_calls: candidate 29/40 benchmark
+loo_five_calls: baseline 30/40 benchmark
+loo_five_calls: candidate 31/40 benchmark
+loo_five_calls: baseline 32/40 benchmark
+loo_five_calls: baseline 33/40 benchmark
+loo_five_calls: candidate 34/40 benchmark
+loo_five_calls: candidate 35/40 benchmark
+loo_five_calls: baseline 36/40 benchmark
+loo_five_calls: baseline 37/40 benchmark
+loo_five_calls: candidate 38/40 benchmark
+loo_five_calls: candidate 39/40 benchmark
+loo_five_calls: baseline 40/40 benchmark
+loo_five_calls: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  9.7s
+Candidate: 10.4s
+
+Change: +735.4ms (+7.62%)
+  80% CrI: [+706.9ms, +769.3ms] (+7.32%, +7.97%)
+  90% CrI: [+698.1ms, +780.5ms] (+7.23%, +8.09%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

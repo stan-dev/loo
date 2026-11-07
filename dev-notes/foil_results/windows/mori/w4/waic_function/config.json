@@ -1,0 +1,48 @@
+{
+  "seed": 2056598670991740511,
+  "repetitions": 20,
+  "block_size": 4,
+  "draws": 10000,
+  "timeout_seconds": 3600,
+  "isolate": false,
+  "shrinkage": 0.0,
+  "intervals": [
+    0.8,
+    0.9
+  ],
+  "working_directory": null,
+  "foil_version": "0.1.0",
+  "baseline": {
+    "revision": "499b56680f50b80e7302a6f5ec3372850ed96405",
+    "hash": "499b56680f50b80e7302a6f5ec3372850ed96405"
+  },
+  "candidate": {
+    "revision": "HEAD",
+    "hash": "24c52ca5828cc82450d4057465f63c1e935c7b70"
+  },
+  "suite_lifecycle": {
+    "startup": [],
+    "startup_each_run": [],
+    "teardown_each_run": [],
+    "teardown": []
+  },
+  "worktree_lifecycle": {
+    "startup": [
+      "Rscript",
+      "-e",
+      "source(file.path(Sys.getenv('BENCH_DIR'), 'install.R'))"
+    ],
+    "teardown": []
+  },
+  "benchmark_lifecycle": {
+    "startup": [],
+    "startup_each_run": [],
+    "teardown_each_run": [],
+    "teardown": []
+  },
+  "command": [
+    "Rscript",
+    "-e",
+    "source(file.path(Sys.getenv('BENCH_DIR'), paste0('b_', Sys.getenv('BENCHMARK'), '.R')))"
+  ]
+}

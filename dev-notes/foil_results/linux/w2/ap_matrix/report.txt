@@ -1,0 +1,12 @@
+ap_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  3.5s
+Candidate: 3.6s
+
+Change: +77.5ms (+2.22%)
+  80% CrI: [+51.5ms, +100.1ms] (+1.47%, +2.87%)
+  90% CrI: [+42.9ms, +106.2ms] (+1.23%, +3.04%)
+
+P(candidate faster): 0.0% (3 of 10,000 draws)

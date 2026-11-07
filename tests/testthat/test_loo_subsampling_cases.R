@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 
 test_that("Test loo_subsampling and loo_approx with radon data", {
   skip_on_cran() # avoid going over time limit for tests

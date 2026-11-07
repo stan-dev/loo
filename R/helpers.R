@@ -1,9 +1,3 @@
-#' Detect if OS is Windows
-#' @noRd
-os_is_windows <- function() {
-  checkmate::test_os("windows")
-}
-
 #' More stable version of `log(mean(exp(x)))`
 #'
 #' @noRd
@@ -253,16 +247,95 @@ nlist <- function(...) {
   return(out)
 }
 
-
-# Check how many cores to use and throw deprecation warning if loo.cores is used
-loo_cores <- function(cores) {
-  loo_cores_op <- getOption("loo.cores", NA)
-  if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
-    cores <- loo_cores_op
-    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
-            call. = FALSE)
+#' Map a function over `X`, optionally on mirai daemons
+#'
+#' With `parallel = FALSE` this is `lapply()`. With `parallel = TRUE`, `X` is
+#' split into blocks that run on the daemons set up with [mirai::daemons()], and
+#' the results come back in the original order.
+#'
+#' `FUN` and `...` are sent to the daemons, so `FUN` should not capture a large
+#' environment; pass data as arguments instead. Local daemons read arguments
+#' larger than `share_bytes` (or all of them when `batch = FALSE`) from shared memory
+#' ([mori::share()]) and copy the rest; remote daemons receive
+#' copies. Warnings raised on a daemon are signalled again on the host, and the
+#' first error stops the map.
+#'
+#' @noRd
+#' @param X A vector or list to map over.
+#' @param FUN The function to apply to each element of `X`.
+#' @param ... Further arguments passed to `FUN`.
+#' @param parallel If `TRUE`, run on mirai daemons.
+#' @param batch If `TRUE`, send each daemon one block of consecutive elements
+#'   as a single task, which suits many cheap elements. If `FALSE`, send each
+#'   element as its own task so that idle daemons take the next one, which
+#'   suits a few expensive, uneven elements.
+#' @param share_bytes Arguments larger than this many bytes are shared with
+#'   mori on local daemons; smaller ones are copied.
+#' @return A list the length of `X`, as from `lapply()`.
+loo_map <- function(X, FUN, ..., parallel, batch = TRUE,
+                    share_bytes = getOption("loo.share_bytes", 4 * 2^20)) {
+  if (!parallel) {
+    return(lapply(X, FUN, ...))
   }
-  return(cores)
+  check_parallel_packages()
+  mirai::require_daemons()
+  n_blocks <- if (batch) mirai::info()[["connections"]] else length(X)
+  groups <- unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
+  share <- if (daemons_are_local()) function(x) share_if_large(x, batch, share_bytes) else identity
+  args <- c(list(.fun = FUN), lapply(list(...), share))
+  blocks <- mirai::mirai_map(groups, lapply_with_warnings, .args = args)[mirai::.stop]
+  lapply(concat_field(blocks, "warnings"), warning)
+  concat_field(blocks, "value")
+}
+
+#' Split a matrix or 3-d array along its last dimension
+#'
+#' mori shares a list of vectors without copying it, but gives every daemon a
+#' private copy of a whole array as soon as the array is indexed. Daemons
+#' therefore receive `slices(x, parallel)` and read it with `slice(x, i)`.
+#' Sequential calls keep `x` as it is.
+#'
+#' @noRd
+slices <- function(x, parallel) {
+  if (!parallel) {
+    return(x)
+  }
+  lapply(seq_len(dim(x)[length(dim(x))]), slice, x = x)
+}
+
+slice <- function(x, i) {
+  if (is.list(x)) x[[i]] else if (length(dim(x)) == 2L) x[, i] else x[, , i]
+}
+
+check_parallel_packages <- function(packages = c("mirai", "mori")) {
+  missing <- packages[!vapply(packages, requireNamespace, NA, quietly = TRUE)]
+  if (length(missing) > 0L) {
+    stop(
+      "`parallel = TRUE` needs the ", paste0("'", missing, "'", collapse = " and "),
+      " package. Install it, or use `parallel = FALSE`.",
+      call. = FALSE
+    )
+  }
+}
+
+daemons_are_local <- function() {
+  isTRUE(grepl("^(ipc|abstract)://", mirai::nextget("url")))
+}
+
+concat_field <- function(blocks, field) {
+  unlist(lapply(blocks, `[[`, field), recursive = FALSE)
+}
+
+lapply_with_warnings <- function(block, .fun, ...) {
+  warnings <- list()
+  value <- withCallingHandlers(
+    lapply(block, .fun, ...),
+    warning = function(w) {
+      warnings <<- c(warnings, list(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  list(value = value, warnings = warnings)
 }
 
 
@@ -279,4 +352,8 @@ release_questions <- function() {
 
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
+}
+
+share_if_large <- function(x, batch, share_bytes) {
+  if (!batch || utils::object.size(x) > share_bytes) mori::share(x) else x
 }

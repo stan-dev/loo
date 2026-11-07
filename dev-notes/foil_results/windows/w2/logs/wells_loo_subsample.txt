@@ -1,0 +1,64 @@
+Warning: the working tree has modified tracked files, which are never benchmarked.
+wells_loo_subsample: baseline 1/40 benchmark
+wells_loo_subsample: candidate 2/40 benchmark
+wells_loo_subsample: candidate 3/40 benchmark
+wells_loo_subsample: baseline 4/40 benchmark
+wells_loo_subsample: baseline 5/40 benchmark
+wells_loo_subsample: candidate 6/40 benchmark
+wells_loo_subsample: candidate 7/40 benchmark
+wells_loo_subsample: baseline 8/40 benchmark
+wells_loo_subsample: baseline 9/40 benchmark
+wells_loo_subsample: candidate 10/40 benchmark
+wells_loo_subsample: candidate 11/40 benchmark
+wells_loo_subsample: baseline 12/40 benchmark
+wells_loo_subsample: candidate 13/40 benchmark
+wells_loo_subsample: baseline 14/40 benchmark
+wells_loo_subsample: baseline 15/40 benchmark
+wells_loo_subsample: candidate 16/40 benchmark
+wells_loo_subsample: baseline 17/40 benchmark
+wells_loo_subsample: candidate 18/40 benchmark
+wells_loo_subsample: candidate 19/40 benchmark
+wells_loo_subsample: baseline 20/40 benchmark
+wells_loo_subsample: candidate 21/40 benchmark
+wells_loo_subsample: baseline 22/40 benchmark
+wells_loo_subsample: baseline 23/40 benchmark
+wells_loo_subsample: candidate 24/40 benchmark
+wells_loo_subsample: baseline 25/40 benchmark
+wells_loo_subsample: candidate 26/40 benchmark
+wells_loo_subsample: candidate 27/40 benchmark
+wells_loo_subsample: baseline 28/40 benchmark
+wells_loo_subsample: baseline 29/40 benchmark
+wells_loo_subsample: candidate 30/40 benchmark
+wells_loo_subsample: candidate 31/40 benchmark
+wells_loo_subsample: baseline 32/40 benchmark
+wells_loo_subsample: baseline 33/40 benchmark
+wells_loo_subsample: candidate 34/40 benchmark
+wells_loo_subsample: candidate 35/40 benchmark
+wells_loo_subsample: baseline 36/40 benchmark
+wells_loo_subsample: baseline 37/40 benchmark
+wells_loo_subsample: candidate 38/40 benchmark
+wells_loo_subsample: candidate 39/40 benchmark
+wells_loo_subsample: baseline 40/40 benchmark
+wells_loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  12.8s
+Candidate: 5.5s
+
+Change: -7.3s (-57.10%)
+  80% CrI: [-7.6s, -7.1s] (-58.41%, -55.68%)
+  90% CrI: [-7.6s, -7.0s] (-58.77%, -55.29%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  499.9MB
+Candidate: 549.8MB
+
+Change: +49.9MB (+9.98%)
+  80% CrI: [+49.6MB, +50.2MB] (+9.91%, +10.04%)
+  90% CrI: [+49.5MB, +50.3MB] (+9.89%, +10.06%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

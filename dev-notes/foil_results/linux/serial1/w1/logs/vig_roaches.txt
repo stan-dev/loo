@@ -1,0 +1,52 @@
+vig_roaches: baseline 1/40 benchmark
+vig_roaches: candidate 2/40 benchmark
+vig_roaches: candidate 3/40 benchmark
+vig_roaches: baseline 4/40 benchmark
+vig_roaches: baseline 5/40 benchmark
+vig_roaches: candidate 6/40 benchmark
+vig_roaches: candidate 7/40 benchmark
+vig_roaches: baseline 8/40 benchmark
+vig_roaches: candidate 9/40 benchmark
+vig_roaches: baseline 10/40 benchmark
+vig_roaches: baseline 11/40 benchmark
+vig_roaches: candidate 12/40 benchmark
+vig_roaches: baseline 13/40 benchmark
+vig_roaches: candidate 14/40 benchmark
+vig_roaches: candidate 15/40 benchmark
+vig_roaches: baseline 16/40 benchmark
+vig_roaches: baseline 17/40 benchmark
+vig_roaches: candidate 18/40 benchmark
+vig_roaches: baseline 19/40 benchmark
+vig_roaches: candidate 20/40 benchmark
+vig_roaches: candidate 21/40 benchmark
+vig_roaches: baseline 22/40 benchmark
+vig_roaches: candidate 23/40 benchmark
+vig_roaches: baseline 24/40 benchmark
+vig_roaches: candidate 25/40 benchmark
+vig_roaches: baseline 26/40 benchmark
+vig_roaches: baseline 27/40 benchmark
+vig_roaches: candidate 28/40 benchmark
+vig_roaches: candidate 29/40 benchmark
+vig_roaches: baseline 30/40 benchmark
+vig_roaches: baseline 31/40 benchmark
+vig_roaches: candidate 32/40 benchmark
+vig_roaches: candidate 33/40 benchmark
+vig_roaches: baseline 34/40 benchmark
+vig_roaches: baseline 35/40 benchmark
+vig_roaches: candidate 36/40 benchmark
+vig_roaches: candidate 37/40 benchmark
+vig_roaches: baseline 38/40 benchmark
+vig_roaches: baseline 39/40 benchmark
+vig_roaches: candidate 40/40 benchmark
+vig_roaches: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.8s
+Candidate: 2.5s
+
+Change: +692.3ms (+38.82%)
+  80% CrI: [+688.3ms, +696.6ms] (+38.58%, +39.08%)
+  90% CrI: [+687.2ms, +697.8ms] (+38.51%, +39.14%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

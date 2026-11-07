@@ -9,7 +9,7 @@ test_that("Laplace approximation, independent posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -22,7 +22,7 @@ test_that("Laplace approximation, independent posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -40,7 +40,7 @@ test_that("Laplace approximation, correlated posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -53,7 +53,7 @@ test_that("Laplace approximation, correlated posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -70,7 +70,7 @@ test_that("Laplace approximation, normal model", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -83,7 +83,7 @@ test_that("Laplace approximation, normal model", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -101,7 +101,7 @@ test_that("ADVI fullrank approximation, independent posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -114,7 +114,7 @@ test_that("ADVI fullrank approximation, independent posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -132,7 +132,7 @@ test_that("ADVI fullrank approximation, correlated posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -145,7 +145,7 @@ test_that("ADVI fullrank approximation, correlated posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -162,7 +162,7 @@ test_that("ADVI fullrank approximation, correlated posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -175,7 +175,7 @@ test_that("ADVI fullrank approximation, correlated posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -193,7 +193,7 @@ test_that("ADVI meanfield approximation, independent posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -206,7 +206,7 @@ test_that("ADVI meanfield approximation, independent posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -224,7 +224,7 @@ test_that("ADVI meanfield approximation, correlated posterior", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -237,7 +237,7 @@ test_that("ADVI meanfield approximation, correlated posterior", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -255,7 +255,7 @@ test_that("ADVI meanfield approximation, normal model", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -268,7 +268,7 @@ test_that("ADVI meanfield approximation, normal model", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -286,7 +286,7 @@ test_that("ADVI meanfield approximation, normal model", {
       psis_approximate_posterior(
         log_p = log_p,
         log_g = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -299,7 +299,7 @@ test_that("ADVI meanfield approximation, normal model", {
         log_p = log_p,
         log_g = log_g,
         log_liks = ll,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       )
   )
@@ -317,7 +317,7 @@ test_that("approximate posterior methods reject undefined log density ratios", {
     psis_approximate_posterior(
       log_p = log_p,
       log_g = log_g,
-      cores = 1,
+      parallel = FALSE,
       save_psis = FALSE
     ),
     error,
@@ -340,7 +340,7 @@ test_that("Deprecation of log_q argument", {
       loo:::psis_approximate_posterior(
         log_p = log_p,
         log_q = log_g,
-        cores = 1,
+        parallel = FALSE,
         save_psis = FALSE
       ),
     regexp = "argument log_q has been changed to log_g"

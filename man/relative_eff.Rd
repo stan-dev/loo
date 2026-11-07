@@ -13,15 +13,15 @@ relative_eff(x, ...)
 
 \method{relative_eff}{default}(x, chain_id, ...)
 
-\method{relative_eff}{matrix}(x, chain_id, ..., cores = getOption("mc.cores", 1))
+\method{relative_eff}{matrix}(x, chain_id, ..., parallel = getOption("loo.parallel", TRUE))
 
-\method{relative_eff}{array}(x, ..., cores = getOption("mc.cores", 1))
+\method{relative_eff}{array}(x, ..., parallel = getOption("loo.parallel", TRUE))
 
 \method{relative_eff}{`function`}(
   x,
   chain_id,
   ...,
-  cores = getOption("mc.cores", 1),
+  parallel = getOption("loo.parallel", TRUE),
   data = NULL,
   draws = NULL
 )
@@ -47,7 +47,15 @@ indexes for each each row of \code{x} (if a matrix) or each value in
 array. If there are \code{C} chains then valid chain indexes are values
 in \code{1:C}.}
 
-\item{cores}{The number of cores to use for parallelization.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{data, draws, ...}{Same as for the \code{\link[=loo]{loo()}} function method.}
 }
@@ -105,6 +113,7 @@ the \code{r_eff} attribute of \code{x}.
 
 }}
 \examples{
+mirai::daemons(2)
 LLarr <- example_loglik_array()
 LLmat <- example_loglik_matrix()
 dim(LLarr)
@@ -114,4 +123,5 @@ rel_n_eff_1 <- relative_eff(exp(LLarr))
 rel_n_eff_2 <- relative_eff(exp(LLmat), chain_id = rep(1:2, each = 500))
 all.equal(rel_n_eff_1, rel_n_eff_2)
 
+mirai::daemons(0)
 }

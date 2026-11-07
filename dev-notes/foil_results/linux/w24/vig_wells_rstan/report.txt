@@ -1,0 +1,11 @@
+vig_wells_rstan: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  8.5s
+Candidate: 6.7s
+
+Change: -1.9s (-21.68%)
+  80% CrI: [-1.9s, -1.8s] (-21.95%, -21.37%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

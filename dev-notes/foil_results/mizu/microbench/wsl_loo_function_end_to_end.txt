@@ -1,0 +1,10 @@
+End-to-end loo() with a log-likelihood function, WSL2 (Ubuntu, R 4.5.3), 4 workers.
+Two loo() calls, N = 4000 observations, S = 2000 draws. Seconds, whole run.
+Share of time inside loo_map: 98-99% on both backends.
+
+repeat   mirai   mizu
+1        5.17    4.80
+2        4.03    3.41
+3        3.17    3.69
+
+Windows (same script, 4 workers): mirai 4.30 s, mizu 4.32 s (99% in loo_map on both).
