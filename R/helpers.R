@@ -254,8 +254,9 @@ nlist <- function(...) {
 #' the results come back in the original order.
 #'
 #' `FUN` and `...` are sent to the daemons, so `FUN` should not capture a large
-#' environment; pass data as arguments instead. Local daemons read the
-#' arguments from shared memory ([mori::share()]); remote daemons receive
+#' environment; pass data as arguments instead. Local daemons read arguments
+#' larger than `share_bytes` (or all of them when `batch = FALSE`) from shared memory
+#' ([mori::share()]) and copy the rest; remote daemons receive
 #' copies. Warnings raised on a daemon are signalled again on the host, and the
 #' first error stops the map.
 #'
@@ -268,8 +269,11 @@ nlist <- function(...) {
 #'   as a single task, which suits many cheap elements. If `FALSE`, send each
 #'   element as its own task so that idle daemons take the next one, which
 #'   suits a few expensive, uneven elements.
+#' @param share_bytes Arguments larger than this many bytes are shared with
+#'   mori on local daemons; smaller ones are copied.
 #' @return A list the length of `X`, as from `lapply()`.
-loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
+loo_map <- function(X, FUN, ..., parallel, batch = TRUE,
+                    share_bytes = getOption("loo.share_bytes", 4 * 2^20)) {
   if (!parallel) {
     return(lapply(X, FUN, ...))
   }
@@ -277,7 +281,7 @@ loo_map <- function(X, FUN, ..., parallel, batch = TRUE) {
   mirai::require_daemons()
   n_blocks <- if (batch) mirai::info()[["connections"]] else length(X)
   groups <- unname(split(X, ceiling(seq_along(X) * n_blocks / length(X))))
-  share <- if (daemons_are_local()) mori::share else identity
+  share <- if (daemons_are_local()) function(x) share_if_large(x, batch, share_bytes) else identity
   args <- c(list(.fun = FUN), lapply(list(...), share))
   blocks <- mirai::mirai_map(groups, lapply_with_warnings, .args = args)[mirai::.stop]
   lapply(concat_field(blocks, "warnings"), warning)
@@ -348,4 +352,8 @@ release_questions <- function() {
 
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
+}
+
+share_if_large <- function(x, batch, share_bytes) {
+  if (!batch || utils::object.size(x) > share_bytes) mori::share(x) else x
 }
