@@ -1,0 +1,73 @@
+sar_loo: candidate 1/50 benchmark
+sar_loo: baseline 2/50 benchmark
+sar_loo: candidate 3/50 benchmark
+sar_loo: baseline 4/50 benchmark
+sar_loo: baseline 5/50 benchmark
+sar_loo: candidate 6/50 benchmark
+sar_loo: baseline 7/50 benchmark
+sar_loo: candidate 8/50 benchmark
+sar_loo: baseline 9/50 benchmark
+sar_loo: candidate 10/50 benchmark
+sar_loo: candidate 11/50 benchmark
+sar_loo: baseline 12/50 benchmark
+sar_loo: candidate 13/50 benchmark
+sar_loo: baseline 14/50 benchmark
+sar_loo: baseline 15/50 benchmark
+sar_loo: candidate 16/50 benchmark
+sar_loo: baseline 17/50 benchmark
+sar_loo: candidate 18/50 benchmark
+sar_loo: baseline 19/50 benchmark
+sar_loo: candidate 20/50 benchmark
+sar_loo: candidate 21/50 benchmark
+sar_loo: baseline 22/50 benchmark
+sar_loo: candidate 23/50 benchmark
+sar_loo: baseline 24/50 benchmark
+sar_loo: baseline 25/50 benchmark
+sar_loo: candidate 26/50 benchmark
+sar_loo: candidate 27/50 benchmark
+sar_loo: baseline 28/50 benchmark
+sar_loo: candidate 29/50 benchmark
+sar_loo: baseline 30/50 benchmark
+sar_loo: baseline 31/50 benchmark
+sar_loo: candidate 32/50 benchmark
+sar_loo: baseline 33/50 benchmark
+sar_loo: candidate 34/50 benchmark
+sar_loo: baseline 35/50 benchmark
+sar_loo: candidate 36/50 benchmark
+sar_loo: candidate 37/50 benchmark
+sar_loo: baseline 38/50 benchmark
+sar_loo: candidate 39/50 benchmark
+sar_loo: baseline 40/50 benchmark
+sar_loo: baseline 41/50 benchmark
+sar_loo: candidate 42/50 benchmark
+sar_loo: baseline 43/50 benchmark
+sar_loo: candidate 44/50 benchmark
+sar_loo: candidate 45/50 benchmark
+sar_loo: baseline 46/50 benchmark
+sar_loo: candidate 47/50 benchmark
+sar_loo: baseline 48/50 benchmark
+sar_loo: candidate 49/50 benchmark
+sar_loo: baseline 50/50 benchmark
+sar_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  35.6s
+Candidate: 3.4s
+
+Change: -32.2s (-90.49%)
+  80% CrI: [-32.7s, -31.6s] (-90.89%, -90.05%)
+  90% CrI: [-32.8s, -31.4s] (-91.00%, -89.92%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  675.4MB
+Candidate: 987.1MB
+
+Change: +311.7MB (+46.14%)
+  80% CrI: [+310.4MB, +312.8MB] (+45.95%, +46.32%)
+  90% CrI: [+310.0MB, +313.1MB] (+45.89%, +46.37%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

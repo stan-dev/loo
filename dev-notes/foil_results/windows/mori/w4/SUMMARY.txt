@@ -1,0 +1,13 @@
+benchmark                  metric        baseline candidate    change  80% CrI              90% CrI             
+diamonds_matrix            time              9.1s      8.4s  (-8.26%)  (-9.87%, -6.60%)     (-10.33%, -6.14%)   
+diamonds_matrix            peak memory      2.3GB     1.8GB (-20.92%)  (-21.08%, -20.76%)   (-21.13%, -20.72%)  
+loo_function               time              5.1s      5.5s  (+6.72%)  (+4.35%, +9.75%)     (+3.70%, +10.73%)   
+loo_function               peak memory    994.6MB   992.6MB  (-0.20%)  (-0.28%, -0.12%)     (-0.30%, -0.10%)    
+psis_matrix_large          time             21.0s     19.0s  (-9.50%)  (-11.45%, -7.64%)    (-12.03%, -7.10%)   
+psis_matrix_large          peak memory      4.6GB     2.6GB (-44.74%)  (-44.95%, -44.50%)   (-45.01%, -44.43%)  
+psis_matrix_small          time              4.8s      4.7s  (-2.53%)  (-3.76%, -1.26%)     (-4.10%, -0.86%)    
+psis_matrix_small          peak memory      1.1GB     1.0GB  (-5.15%)  (-5.31%, -4.97%)     (-5.35%, -4.92%)    
+relative_eff               time              4.3s      3.7s (-13.07%)  (-13.51%, -12.63%)   (-13.65%, -12.51%)  
+relative_eff               peak memory      2.5GB     1.3GB (-49.75%)  (-49.87%, -49.56%)   (-49.89%, -49.50%)  
+waic_function              time              1.2s      1.3s  (+7.11%)  (+6.59%, +7.66%)     (+6.43%, +7.85%)    
+waic_function              peak memory    742.8MB   739.9MB  (-0.39%)  (-0.42%, -0.36%)     (-0.42%, -0.35%)    

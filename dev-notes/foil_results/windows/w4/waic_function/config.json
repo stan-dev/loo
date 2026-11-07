@@ -1,0 +1,46 @@
+{
+  "seed": 2745127553986029799,
+  "repetitions": 25,
+  "block_size": 4,
+  "draws": 10000,
+  "timeout_seconds": 3600,
+  "isolate": false,
+  "shrinkage": 0.0,
+  "intervals": [
+    0.8,
+    0.9
+  ],
+  "working_directory": null,
+  "foil_version": "0.1.0",
+  "baseline": {
+    "revision": "origin/loo-v3.0.0",
+    "hash": "af50d00bd9a75fcf52626c7e53436e9cf8b53ad1"
+  },
+  "candidate": {
+    "revision": "HEAD",
+    "hash": "b131a115c41465268a63728f8b7477ce62368d77"
+  },
+  "suite_lifecycle": {
+    "startup": [],
+    "startup_each_run": [],
+    "teardown_each_run": [],
+    "teardown": []
+  },
+  "worktree_lifecycle": {
+    "startup": [
+      "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
+      "C:/Users/visru/Documents/Github/loo/bench/install.R"
+    ],
+    "teardown": []
+  },
+  "benchmark_lifecycle": {
+    "startup": [],
+    "startup_each_run": [],
+    "teardown_each_run": [],
+    "teardown": []
+  },
+  "command": [
+    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
+    "C:/Users/visru/Documents/Github/loo/bench/b_waic_function.R"
+  ]
+}

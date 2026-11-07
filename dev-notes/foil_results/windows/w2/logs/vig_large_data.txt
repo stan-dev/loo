@@ -1,0 +1,73 @@
+vig_large_data: baseline 1/50 benchmark
+vig_large_data: candidate 2/50 benchmark
+vig_large_data: candidate 3/50 benchmark
+vig_large_data: baseline 4/50 benchmark
+vig_large_data: baseline 5/50 benchmark
+vig_large_data: candidate 6/50 benchmark
+vig_large_data: candidate 7/50 benchmark
+vig_large_data: baseline 8/50 benchmark
+vig_large_data: candidate 9/50 benchmark
+vig_large_data: baseline 10/50 benchmark
+vig_large_data: baseline 11/50 benchmark
+vig_large_data: candidate 12/50 benchmark
+vig_large_data: candidate 13/50 benchmark
+vig_large_data: baseline 14/50 benchmark
+vig_large_data: baseline 15/50 benchmark
+vig_large_data: candidate 16/50 benchmark
+vig_large_data: baseline 17/50 benchmark
+vig_large_data: candidate 18/50 benchmark
+vig_large_data: candidate 19/50 benchmark
+vig_large_data: baseline 20/50 benchmark
+vig_large_data: candidate 21/50 benchmark
+vig_large_data: baseline 22/50 benchmark
+vig_large_data: baseline 23/50 benchmark
+vig_large_data: candidate 24/50 benchmark
+vig_large_data: candidate 25/50 benchmark
+vig_large_data: baseline 26/50 benchmark
+vig_large_data: candidate 27/50 benchmark
+vig_large_data: baseline 28/50 benchmark
+vig_large_data: baseline 29/50 benchmark
+vig_large_data: candidate 30/50 benchmark
+vig_large_data: baseline 31/50 benchmark
+vig_large_data: candidate 32/50 benchmark
+vig_large_data: baseline 33/50 benchmark
+vig_large_data: candidate 34/50 benchmark
+vig_large_data: baseline 35/50 benchmark
+vig_large_data: candidate 36/50 benchmark
+vig_large_data: candidate 37/50 benchmark
+vig_large_data: baseline 38/50 benchmark
+vig_large_data: candidate 39/50 benchmark
+vig_large_data: baseline 40/50 benchmark
+vig_large_data: candidate 41/50 benchmark
+vig_large_data: baseline 42/50 benchmark
+vig_large_data: baseline 43/50 benchmark
+vig_large_data: candidate 44/50 benchmark
+vig_large_data: baseline 45/50 benchmark
+vig_large_data: candidate 46/50 benchmark
+vig_large_data: candidate 47/50 benchmark
+vig_large_data: baseline 48/50 benchmark
+vig_large_data: candidate 49/50 benchmark
+vig_large_data: baseline 50/50 benchmark
+vig_large_data: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  27.1s
+Candidate: 24.1s
+
+Change: -3.0s (-10.89%)
+  80% CrI: [-3.1s, -2.8s] (-11.41%, -10.37%)
+  90% CrI: [-3.1s, -2.8s] (-11.56%, -10.23%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  542.6MB
+Candidate: 575.0MB
+
+Change: +32.4MB (+5.97%)
+  80% CrI: [+30.8MB, +34.0MB] (+5.67%, +6.27%)
+  90% CrI: [+30.3MB, +34.5MB] (+5.59%, +6.36%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

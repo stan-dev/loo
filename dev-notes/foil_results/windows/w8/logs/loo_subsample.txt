@@ -1,0 +1,73 @@
+loo_subsample: baseline 1/50 benchmark
+loo_subsample: candidate 2/50 benchmark
+loo_subsample: candidate 3/50 benchmark
+loo_subsample: baseline 4/50 benchmark
+loo_subsample: candidate 5/50 benchmark
+loo_subsample: baseline 6/50 benchmark
+loo_subsample: baseline 7/50 benchmark
+loo_subsample: candidate 8/50 benchmark
+loo_subsample: candidate 9/50 benchmark
+loo_subsample: baseline 10/50 benchmark
+loo_subsample: candidate 11/50 benchmark
+loo_subsample: baseline 12/50 benchmark
+loo_subsample: baseline 13/50 benchmark
+loo_subsample: candidate 14/50 benchmark
+loo_subsample: baseline 15/50 benchmark
+loo_subsample: candidate 16/50 benchmark
+loo_subsample: baseline 17/50 benchmark
+loo_subsample: candidate 18/50 benchmark
+loo_subsample: baseline 19/50 benchmark
+loo_subsample: candidate 20/50 benchmark
+loo_subsample: candidate 21/50 benchmark
+loo_subsample: baseline 22/50 benchmark
+loo_subsample: candidate 23/50 benchmark
+loo_subsample: baseline 24/50 benchmark
+loo_subsample: baseline 25/50 benchmark
+loo_subsample: candidate 26/50 benchmark
+loo_subsample: baseline 27/50 benchmark
+loo_subsample: candidate 28/50 benchmark
+loo_subsample: candidate 29/50 benchmark
+loo_subsample: baseline 30/50 benchmark
+loo_subsample: candidate 31/50 benchmark
+loo_subsample: baseline 32/50 benchmark
+loo_subsample: baseline 33/50 benchmark
+loo_subsample: candidate 34/50 benchmark
+loo_subsample: candidate 35/50 benchmark
+loo_subsample: baseline 36/50 benchmark
+loo_subsample: baseline 37/50 benchmark
+loo_subsample: candidate 38/50 benchmark
+loo_subsample: candidate 39/50 benchmark
+loo_subsample: baseline 40/50 benchmark
+loo_subsample: baseline 41/50 benchmark
+loo_subsample: candidate 42/50 benchmark
+loo_subsample: candidate 43/50 benchmark
+loo_subsample: baseline 44/50 benchmark
+loo_subsample: baseline 45/50 benchmark
+loo_subsample: candidate 46/50 benchmark
+loo_subsample: candidate 47/50 benchmark
+loo_subsample: baseline 48/50 benchmark
+loo_subsample: candidate 49/50 benchmark
+loo_subsample: baseline 50/50 benchmark
+loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  1.9s
+Candidate: 1.7s
+
+Change: -167.0ms (-8.91%)
+  80% CrI: [-207.6ms, -110.6ms] (-10.61%, -5.96%)
+  90% CrI: [-217.8ms, -91.2ms] (-10.96%, -4.89%)
+
+P(candidate faster): 99.9% (9,988 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.2GB
+Candidate: 1.5GB
+
+Change: +317.6MB (+27.48%)
+  80% CrI: [+315.5MB, +319.7MB] (+27.27%, +27.72%)
+  90% CrI: [+315.0MB, +320.3MB] (+27.21%, +27.78%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

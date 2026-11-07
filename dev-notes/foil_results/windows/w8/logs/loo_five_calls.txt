@@ -1,0 +1,73 @@
+loo_five_calls: candidate 1/50 benchmark
+loo_five_calls: baseline 2/50 benchmark
+loo_five_calls: candidate 3/50 benchmark
+loo_five_calls: baseline 4/50 benchmark
+loo_five_calls: baseline 5/50 benchmark
+loo_five_calls: candidate 6/50 benchmark
+loo_five_calls: baseline 7/50 benchmark
+loo_five_calls: candidate 8/50 benchmark
+loo_five_calls: candidate 9/50 benchmark
+loo_five_calls: baseline 10/50 benchmark
+loo_five_calls: baseline 11/50 benchmark
+loo_five_calls: candidate 12/50 benchmark
+loo_five_calls: candidate 13/50 benchmark
+loo_five_calls: baseline 14/50 benchmark
+loo_five_calls: baseline 15/50 benchmark
+loo_five_calls: candidate 16/50 benchmark
+loo_five_calls: baseline 17/50 benchmark
+loo_five_calls: candidate 18/50 benchmark
+loo_five_calls: candidate 19/50 benchmark
+loo_five_calls: baseline 20/50 benchmark
+loo_five_calls: candidate 21/50 benchmark
+loo_five_calls: baseline 22/50 benchmark
+loo_five_calls: baseline 23/50 benchmark
+loo_five_calls: candidate 24/50 benchmark
+loo_five_calls: candidate 25/50 benchmark
+loo_five_calls: baseline 26/50 benchmark
+loo_five_calls: baseline 27/50 benchmark
+loo_five_calls: candidate 28/50 benchmark
+loo_five_calls: candidate 29/50 benchmark
+loo_five_calls: baseline 30/50 benchmark
+loo_five_calls: baseline 31/50 benchmark
+loo_five_calls: candidate 32/50 benchmark
+loo_five_calls: baseline 33/50 benchmark
+loo_five_calls: candidate 34/50 benchmark
+loo_five_calls: candidate 35/50 benchmark
+loo_five_calls: baseline 36/50 benchmark
+loo_five_calls: candidate 37/50 benchmark
+loo_five_calls: baseline 38/50 benchmark
+loo_five_calls: baseline 39/50 benchmark
+loo_five_calls: candidate 40/50 benchmark
+loo_five_calls: baseline 41/50 benchmark
+loo_five_calls: candidate 42/50 benchmark
+loo_five_calls: baseline 43/50 benchmark
+loo_five_calls: candidate 44/50 benchmark
+loo_five_calls: candidate 45/50 benchmark
+loo_five_calls: baseline 46/50 benchmark
+loo_five_calls: candidate 47/50 benchmark
+loo_five_calls: baseline 48/50 benchmark
+loo_five_calls: candidate 49/50 benchmark
+loo_five_calls: baseline 50/50 benchmark
+loo_five_calls: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  9.1s
+Candidate: 5.4s
+
+Change: -3.7s (-40.71%)
+  80% CrI: [-4.1s, -3.3s] (-44.12%, -37.21%)
+  90% CrI: [-4.3s, -3.2s] (-45.06%, -36.15%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.8GB
+Candidate: 1.7GB
+
+Change: -29.5MB (-1.68%)
+  80% CrI: [-32.4MB, -27.0MB] (-1.84%, -1.54%)
+  90% CrI: [-33.2MB, -26.4MB] (-1.89%, -1.50%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

@@ -1,0 +1,73 @@
+diamonds_function: baseline 1/50 benchmark
+diamonds_function: candidate 2/50 benchmark
+diamonds_function: candidate 3/50 benchmark
+diamonds_function: baseline 4/50 benchmark
+diamonds_function: candidate 5/50 benchmark
+diamonds_function: baseline 6/50 benchmark
+diamonds_function: baseline 7/50 benchmark
+diamonds_function: candidate 8/50 benchmark
+diamonds_function: candidate 9/50 benchmark
+diamonds_function: baseline 10/50 benchmark
+diamonds_function: baseline 11/50 benchmark
+diamonds_function: candidate 12/50 benchmark
+diamonds_function: baseline 13/50 benchmark
+diamonds_function: candidate 14/50 benchmark
+diamonds_function: candidate 15/50 benchmark
+diamonds_function: baseline 16/50 benchmark
+diamonds_function: baseline 17/50 benchmark
+diamonds_function: candidate 18/50 benchmark
+diamonds_function: candidate 19/50 benchmark
+diamonds_function: baseline 20/50 benchmark
+diamonds_function: candidate 21/50 benchmark
+diamonds_function: baseline 22/50 benchmark
+diamonds_function: baseline 23/50 benchmark
+diamonds_function: candidate 24/50 benchmark
+diamonds_function: baseline 25/50 benchmark
+diamonds_function: candidate 26/50 benchmark
+diamonds_function: candidate 27/50 benchmark
+diamonds_function: baseline 28/50 benchmark
+diamonds_function: candidate 29/50 benchmark
+diamonds_function: baseline 30/50 benchmark
+diamonds_function: baseline 31/50 benchmark
+diamonds_function: candidate 32/50 benchmark
+diamonds_function: baseline 33/50 benchmark
+diamonds_function: candidate 34/50 benchmark
+diamonds_function: candidate 35/50 benchmark
+diamonds_function: baseline 36/50 benchmark
+diamonds_function: baseline 37/50 benchmark
+diamonds_function: candidate 38/50 benchmark
+diamonds_function: candidate 39/50 benchmark
+diamonds_function: baseline 40/50 benchmark
+diamonds_function: candidate 41/50 benchmark
+diamonds_function: baseline 42/50 benchmark
+diamonds_function: baseline 43/50 benchmark
+diamonds_function: candidate 44/50 benchmark
+diamonds_function: candidate 45/50 benchmark
+diamonds_function: baseline 46/50 benchmark
+diamonds_function: baseline 47/50 benchmark
+diamonds_function: candidate 48/50 benchmark
+diamonds_function: candidate 49/50 benchmark
+diamonds_function: baseline 50/50 benchmark
+diamonds_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  4.4s
+Candidate: 4.9s
+
+Change: +502.4ms (+11.39%)
+  80% CrI: [+357.8ms, +619.3ms] (+8.00%, +14.04%)
+  90% CrI: [+309.9ms, +651.3ms] (+6.91%, +14.68%)
+
+P(candidate faster): 0.0% (1 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.0GB
+Candidate: 1.1GB
+
+Change: +101.8MB (+9.74%)
+  80% CrI: [+99.6MB, +103.9MB] (+9.50%, +9.96%)
+  90% CrI: [+99.0MB, +104.5MB] (+9.44%, +10.02%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

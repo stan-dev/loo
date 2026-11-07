@@ -1,0 +1,73 @@
+loo_function: baseline 1/50 benchmark
+loo_function: candidate 2/50 benchmark
+loo_function: baseline 3/50 benchmark
+loo_function: candidate 4/50 benchmark
+loo_function: candidate 5/50 benchmark
+loo_function: baseline 6/50 benchmark
+loo_function: candidate 7/50 benchmark
+loo_function: baseline 8/50 benchmark
+loo_function: candidate 9/50 benchmark
+loo_function: baseline 10/50 benchmark
+loo_function: baseline 11/50 benchmark
+loo_function: candidate 12/50 benchmark
+loo_function: baseline 13/50 benchmark
+loo_function: candidate 14/50 benchmark
+loo_function: candidate 15/50 benchmark
+loo_function: baseline 16/50 benchmark
+loo_function: candidate 17/50 benchmark
+loo_function: baseline 18/50 benchmark
+loo_function: candidate 19/50 benchmark
+loo_function: baseline 20/50 benchmark
+loo_function: baseline 21/50 benchmark
+loo_function: candidate 22/50 benchmark
+loo_function: baseline 23/50 benchmark
+loo_function: candidate 24/50 benchmark
+loo_function: baseline 25/50 benchmark
+loo_function: candidate 26/50 benchmark
+loo_function: baseline 27/50 benchmark
+loo_function: candidate 28/50 benchmark
+loo_function: candidate 29/50 benchmark
+loo_function: baseline 30/50 benchmark
+loo_function: candidate 31/50 benchmark
+loo_function: baseline 32/50 benchmark
+loo_function: candidate 33/50 benchmark
+loo_function: baseline 34/50 benchmark
+loo_function: baseline 35/50 benchmark
+loo_function: candidate 36/50 benchmark
+loo_function: candidate 37/50 benchmark
+loo_function: baseline 38/50 benchmark
+loo_function: baseline 39/50 benchmark
+loo_function: candidate 40/50 benchmark
+loo_function: baseline 41/50 benchmark
+loo_function: candidate 42/50 benchmark
+loo_function: baseline 43/50 benchmark
+loo_function: candidate 44/50 benchmark
+loo_function: candidate 45/50 benchmark
+loo_function: baseline 46/50 benchmark
+loo_function: candidate 47/50 benchmark
+loo_function: baseline 48/50 benchmark
+loo_function: candidate 49/50 benchmark
+loo_function: baseline 50/50 benchmark
+loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  5.6s
+Candidate: 6.0s
+
+Change: +417.2ms (+7.53%)
+  80% CrI: [+179.0ms, +638.4ms] (+3.18%, +11.67%)
+  90% CrI: [+111.6ms, +698.5ms] (+1.95%, +12.77%)
+
+P(candidate faster): 1.5% (145 of 10,000 draws)
+
+Peak memory
+
+Baseline:  937.3MB
+Candidate: 991.4MB
+
+Change: +54.1MB (+5.77%)
+  80% CrI: [+52.4MB, +55.9MB] (+5.58%, +5.97%)
+  90% CrI: [+51.9MB, +56.4MB] (+5.53%, +6.03%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

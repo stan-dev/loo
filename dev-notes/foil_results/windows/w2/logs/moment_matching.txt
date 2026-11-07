@@ -1,0 +1,73 @@
+moment_matching: candidate 1/50 benchmark
+moment_matching: baseline 2/50 benchmark
+moment_matching: baseline 3/50 benchmark
+moment_matching: candidate 4/50 benchmark
+moment_matching: baseline 5/50 benchmark
+moment_matching: candidate 6/50 benchmark
+moment_matching: candidate 7/50 benchmark
+moment_matching: baseline 8/50 benchmark
+moment_matching: candidate 9/50 benchmark
+moment_matching: baseline 10/50 benchmark
+moment_matching: candidate 11/50 benchmark
+moment_matching: baseline 12/50 benchmark
+moment_matching: baseline 13/50 benchmark
+moment_matching: candidate 14/50 benchmark
+moment_matching: baseline 15/50 benchmark
+moment_matching: candidate 16/50 benchmark
+moment_matching: baseline 17/50 benchmark
+moment_matching: candidate 18/50 benchmark
+moment_matching: candidate 19/50 benchmark
+moment_matching: baseline 20/50 benchmark
+moment_matching: baseline 21/50 benchmark
+moment_matching: candidate 22/50 benchmark
+moment_matching: candidate 23/50 benchmark
+moment_matching: baseline 24/50 benchmark
+moment_matching: candidate 25/50 benchmark
+moment_matching: baseline 26/50 benchmark
+moment_matching: baseline 27/50 benchmark
+moment_matching: candidate 28/50 benchmark
+moment_matching: candidate 29/50 benchmark
+moment_matching: baseline 30/50 benchmark
+moment_matching: baseline 31/50 benchmark
+moment_matching: candidate 32/50 benchmark
+moment_matching: candidate 33/50 benchmark
+moment_matching: baseline 34/50 benchmark
+moment_matching: candidate 35/50 benchmark
+moment_matching: baseline 36/50 benchmark
+moment_matching: baseline 37/50 benchmark
+moment_matching: candidate 38/50 benchmark
+moment_matching: baseline 39/50 benchmark
+moment_matching: candidate 40/50 benchmark
+moment_matching: baseline 41/50 benchmark
+moment_matching: candidate 42/50 benchmark
+moment_matching: baseline 43/50 benchmark
+moment_matching: candidate 44/50 benchmark
+moment_matching: candidate 45/50 benchmark
+moment_matching: baseline 46/50 benchmark
+moment_matching: candidate 47/50 benchmark
+moment_matching: baseline 48/50 benchmark
+moment_matching: baseline 49/50 benchmark
+moment_matching: candidate 50/50 benchmark
+moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  17.7s
+Candidate: 15.7s
+
+Change: -2.0s (-11.21%)
+  80% CrI: [-2.2s, -1.8s] (-12.21%, -10.22%)
+  90% CrI: [-2.2s, -1.7s] (-12.52%, -9.88%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  602.1MB
+Candidate: 705.4MB
+
+Change: +103.3MB (+17.17%)
+  80% CrI: [+102.0MB, +104.8MB] (+16.94%, +17.41%)
+  90% CrI: [+101.7MB, +105.2MB] (+16.87%, +17.48%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

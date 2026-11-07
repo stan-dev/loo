@@ -1,0 +1,73 @@
+brms_toplevel: candidate 1/50 benchmark
+brms_toplevel: baseline 2/50 benchmark
+brms_toplevel: baseline 3/50 benchmark
+brms_toplevel: candidate 4/50 benchmark
+brms_toplevel: candidate 5/50 benchmark
+brms_toplevel: baseline 6/50 benchmark
+brms_toplevel: baseline 7/50 benchmark
+brms_toplevel: candidate 8/50 benchmark
+brms_toplevel: baseline 9/50 benchmark
+brms_toplevel: candidate 10/50 benchmark
+brms_toplevel: candidate 11/50 benchmark
+brms_toplevel: baseline 12/50 benchmark
+brms_toplevel: baseline 13/50 benchmark
+brms_toplevel: candidate 14/50 benchmark
+brms_toplevel: candidate 15/50 benchmark
+brms_toplevel: baseline 16/50 benchmark
+brms_toplevel: candidate 17/50 benchmark
+brms_toplevel: baseline 18/50 benchmark
+brms_toplevel: baseline 19/50 benchmark
+brms_toplevel: candidate 20/50 benchmark
+brms_toplevel: candidate 21/50 benchmark
+brms_toplevel: baseline 22/50 benchmark
+brms_toplevel: baseline 23/50 benchmark
+brms_toplevel: candidate 24/50 benchmark
+brms_toplevel: candidate 25/50 benchmark
+brms_toplevel: baseline 26/50 benchmark
+brms_toplevel: baseline 27/50 benchmark
+brms_toplevel: candidate 28/50 benchmark
+brms_toplevel: baseline 29/50 benchmark
+brms_toplevel: candidate 30/50 benchmark
+brms_toplevel: candidate 31/50 benchmark
+brms_toplevel: baseline 32/50 benchmark
+brms_toplevel: candidate 33/50 benchmark
+brms_toplevel: baseline 34/50 benchmark
+brms_toplevel: baseline 35/50 benchmark
+brms_toplevel: candidate 36/50 benchmark
+brms_toplevel: baseline 37/50 benchmark
+brms_toplevel: candidate 38/50 benchmark
+brms_toplevel: candidate 39/50 benchmark
+brms_toplevel: baseline 40/50 benchmark
+brms_toplevel: baseline 41/50 benchmark
+brms_toplevel: candidate 42/50 benchmark
+brms_toplevel: candidate 43/50 benchmark
+brms_toplevel: baseline 44/50 benchmark
+brms_toplevel: candidate 45/50 benchmark
+brms_toplevel: baseline 46/50 benchmark
+brms_toplevel: baseline 47/50 benchmark
+brms_toplevel: candidate 48/50 benchmark
+brms_toplevel: candidate 49/50 benchmark
+brms_toplevel: baseline 50/50 benchmark
+brms_toplevel: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  15.8s
+Candidate: 8.3s
+
+Change: -7.4s (-47.25%)
+  80% CrI: [-8.0s, -7.0s] (-49.15%, -45.17%)
+  90% CrI: [-8.1s, -6.8s] (-49.70%, -44.48%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.2GB
+Candidate: 1.5GB
+
+Change: +307.8MB (+25.46%)
+  80% CrI: [+301.7MB, +313.2MB] (+24.89%, +25.96%)
+  90% CrI: [+300.0MB, +314.7MB] (+24.73%, +26.10%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)
