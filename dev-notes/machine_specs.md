@@ -29,3 +29,8 @@ Rscript (R) version 4.5.3 (2026-03-11)
 model name	: 12th Gen Intel(R) Core(TM) i7-12700H
 [wsl2]
 memory=12GB
+
+## Cluster (NRP TIDE), recorded 2026-11-07
+Node: Intel Xeon Gold 6430, 2 sockets x 32 cores, 64 CPUs, kernel 5.15
+Image: Ubuntu 24.04.5, R 4.5.3 (rocker/r-ver:4.5.3), 6 GiB memory-backed /dev/shm
+Each worker count ran as its own pod on its own node (anti-affinity), requests equal to limits. Time only: the cgroup is read-only, so foil's Linux fallback does not measure memory.

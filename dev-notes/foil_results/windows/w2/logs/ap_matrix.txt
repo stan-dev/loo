@@ -1,73 +1,64 @@
-ap_matrix: candidate 1/50 benchmark
-ap_matrix: baseline 2/50 benchmark
-ap_matrix: candidate 3/50 benchmark
-ap_matrix: baseline 4/50 benchmark
-ap_matrix: baseline 5/50 benchmark
-ap_matrix: candidate 6/50 benchmark
-ap_matrix: baseline 7/50 benchmark
-ap_matrix: candidate 8/50 benchmark
-ap_matrix: candidate 9/50 benchmark
-ap_matrix: baseline 10/50 benchmark
-ap_matrix: baseline 11/50 benchmark
-ap_matrix: candidate 12/50 benchmark
-ap_matrix: candidate 13/50 benchmark
-ap_matrix: baseline 14/50 benchmark
-ap_matrix: baseline 15/50 benchmark
-ap_matrix: candidate 16/50 benchmark
-ap_matrix: candidate 17/50 benchmark
-ap_matrix: baseline 18/50 benchmark
-ap_matrix: baseline 19/50 benchmark
-ap_matrix: candidate 20/50 benchmark
-ap_matrix: candidate 21/50 benchmark
-ap_matrix: baseline 22/50 benchmark
-ap_matrix: baseline 23/50 benchmark
-ap_matrix: candidate 24/50 benchmark
-ap_matrix: baseline 25/50 benchmark
-ap_matrix: candidate 26/50 benchmark
-ap_matrix: candidate 27/50 benchmark
-ap_matrix: baseline 28/50 benchmark
-ap_matrix: baseline 29/50 benchmark
-ap_matrix: candidate 30/50 benchmark
-ap_matrix: candidate 31/50 benchmark
-ap_matrix: baseline 32/50 benchmark
-ap_matrix: baseline 33/50 benchmark
-ap_matrix: candidate 34/50 benchmark
-ap_matrix: candidate 35/50 benchmark
-ap_matrix: baseline 36/50 benchmark
-ap_matrix: candidate 37/50 benchmark
-ap_matrix: baseline 38/50 benchmark
-ap_matrix: baseline 39/50 benchmark
-ap_matrix: candidate 40/50 benchmark
-ap_matrix: candidate 41/50 benchmark
-ap_matrix: baseline 42/50 benchmark
-ap_matrix: candidate 43/50 benchmark
-ap_matrix: baseline 44/50 benchmark
-ap_matrix: baseline 45/50 benchmark
-ap_matrix: candidate 46/50 benchmark
-ap_matrix: baseline 47/50 benchmark
-ap_matrix: candidate 48/50 benchmark
-ap_matrix: baseline 49/50 benchmark
-ap_matrix: candidate 50/50 benchmark
-ap_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+ap_matrix: candidate 1/40 benchmark
+ap_matrix: baseline 2/40 benchmark
+ap_matrix: candidate 3/40 benchmark
+ap_matrix: baseline 4/40 benchmark
+ap_matrix: baseline 5/40 benchmark
+ap_matrix: candidate 6/40 benchmark
+ap_matrix: baseline 7/40 benchmark
+ap_matrix: candidate 8/40 benchmark
+ap_matrix: baseline 9/40 benchmark
+ap_matrix: candidate 10/40 benchmark
+ap_matrix: candidate 11/40 benchmark
+ap_matrix: baseline 12/40 benchmark
+ap_matrix: candidate 13/40 benchmark
+ap_matrix: baseline 14/40 benchmark
+ap_matrix: baseline 15/40 benchmark
+ap_matrix: candidate 16/40 benchmark
+ap_matrix: candidate 17/40 benchmark
+ap_matrix: baseline 18/40 benchmark
+ap_matrix: baseline 19/40 benchmark
+ap_matrix: candidate 20/40 benchmark
+ap_matrix: baseline 21/40 benchmark
+ap_matrix: candidate 22/40 benchmark
+ap_matrix: candidate 23/40 benchmark
+ap_matrix: baseline 24/40 benchmark
+ap_matrix: baseline 25/40 benchmark
+ap_matrix: candidate 26/40 benchmark
+ap_matrix: candidate 27/40 benchmark
+ap_matrix: baseline 28/40 benchmark
+ap_matrix: candidate 29/40 benchmark
+ap_matrix: baseline 30/40 benchmark
+ap_matrix: baseline 31/40 benchmark
+ap_matrix: candidate 32/40 benchmark
+ap_matrix: baseline 33/40 benchmark
+ap_matrix: candidate 34/40 benchmark
+ap_matrix: candidate 35/40 benchmark
+ap_matrix: baseline 36/40 benchmark
+ap_matrix: candidate 37/40 benchmark
+ap_matrix: baseline 38/40 benchmark
+ap_matrix: baseline 39/40 benchmark
+ap_matrix: candidate 40/40 benchmark
+ap_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  6.2s
-Candidate: 5.5s
+Baseline:  5.7s
+Candidate: 4.3s
 
-Change: -690.0ms (-11.14%)
-  80% CrI: [-788.5ms, -605.4ms] (-12.60%, -9.88%)
-  90% CrI: [-820.8ms, -583.6ms] (-13.08%, -9.56%)
+Change: -1.4s (-24.32%)
+  80% CrI: [-1.5s, -1.3s] (-25.47%, -23.13%)
+  90% CrI: [-1.5s, -1.3s] (-25.85%, -22.75%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  0.9GB
-Candidate: 1.0GB
+Baseline:  880.0MB
+Candidate: 978.5MB
 
-Change: +148.3MB (+16.68%)
-  80% CrI: [+140.8MB, +154.5MB] (+15.83%, +17.38%)
-  90% CrI: [+138.5MB, +155.9MB] (+15.57%, +17.55%)
+Change: +98.4MB (+11.18%)
+  80% CrI: [+95.1MB, +101.4MB] (+10.79%, +11.55%)
+  90% CrI: [+94.2MB, +102.2MB] (+10.68%, +11.65%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

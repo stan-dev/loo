@@ -1,0 +1,12 @@
+diamonds_matrix: Comparing candidate (HEAD) to baseline (a06ea6eaa802a5604dabc53bf87c6f66b8b49be9) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  8.3s
+Candidate: 5.9s
+
+Change: -2.4s (-28.53%)
+  80% CrI: [-2.4s, -2.3s] (-28.64%, -28.42%)
+  90% CrI: [-2.4s, -2.3s] (-28.67%, -28.38%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

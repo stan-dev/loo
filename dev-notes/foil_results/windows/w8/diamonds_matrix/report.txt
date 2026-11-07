@@ -1,23 +1,23 @@
-diamonds_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+diamonds_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  12.3s
-Candidate: 8.6s
+Baseline:  11.5s
+Candidate: 5.4s
 
-Change: -3.7s (-30.05%)
-  80% CrI: [-3.9s, -3.5s] (-31.12%, -29.02%)
-  90% CrI: [-3.9s, -3.5s] (-31.42%, -28.72%)
+Change: -6.0s (-52.69%)
+  80% CrI: [-6.4s, -5.7s] (-54.89%, -50.33%)
+  90% CrI: [-6.5s, -5.6s] (-55.43%, -49.64%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
 Baseline:  2.5GB
-Candidate: 2.7GB
+Candidate: 2.8GB
 
-Change: +163.5MB (+6.56%)
-  80% CrI: [+159.5MB, +167.6MB] (+6.39%, +6.74%)
-  90% CrI: [+158.4MB, +168.9MB] (+6.35%, +6.79%)
+Change: +326.4MB (+13.18%)
+  80% CrI: [+312.2MB, +341.5MB] (+12.59%, +13.83%)
+  90% CrI: [+308.2MB, +346.0MB] (+12.42%, +14.02%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

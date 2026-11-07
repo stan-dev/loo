@@ -1,73 +1,64 @@
-vig_roaches: candidate 1/50 benchmark
-vig_roaches: baseline 2/50 benchmark
-vig_roaches: candidate 3/50 benchmark
-vig_roaches: baseline 4/50 benchmark
-vig_roaches: baseline 5/50 benchmark
-vig_roaches: candidate 6/50 benchmark
-vig_roaches: baseline 7/50 benchmark
-vig_roaches: candidate 8/50 benchmark
-vig_roaches: candidate 9/50 benchmark
-vig_roaches: baseline 10/50 benchmark
-vig_roaches: baseline 11/50 benchmark
-vig_roaches: candidate 12/50 benchmark
-vig_roaches: baseline 13/50 benchmark
-vig_roaches: candidate 14/50 benchmark
-vig_roaches: candidate 15/50 benchmark
-vig_roaches: baseline 16/50 benchmark
-vig_roaches: baseline 17/50 benchmark
-vig_roaches: candidate 18/50 benchmark
-vig_roaches: baseline 19/50 benchmark
-vig_roaches: candidate 20/50 benchmark
-vig_roaches: candidate 21/50 benchmark
-vig_roaches: baseline 22/50 benchmark
-vig_roaches: candidate 23/50 benchmark
-vig_roaches: baseline 24/50 benchmark
-vig_roaches: candidate 25/50 benchmark
-vig_roaches: baseline 26/50 benchmark
-vig_roaches: candidate 27/50 benchmark
-vig_roaches: baseline 28/50 benchmark
-vig_roaches: baseline 29/50 benchmark
-vig_roaches: candidate 30/50 benchmark
-vig_roaches: baseline 31/50 benchmark
-vig_roaches: candidate 32/50 benchmark
-vig_roaches: baseline 33/50 benchmark
-vig_roaches: candidate 34/50 benchmark
-vig_roaches: baseline 35/50 benchmark
-vig_roaches: candidate 36/50 benchmark
-vig_roaches: candidate 37/50 benchmark
-vig_roaches: baseline 38/50 benchmark
-vig_roaches: candidate 39/50 benchmark
-vig_roaches: baseline 40/50 benchmark
-vig_roaches: candidate 41/50 benchmark
-vig_roaches: baseline 42/50 benchmark
-vig_roaches: baseline 43/50 benchmark
-vig_roaches: candidate 44/50 benchmark
-vig_roaches: candidate 45/50 benchmark
-vig_roaches: baseline 46/50 benchmark
-vig_roaches: baseline 47/50 benchmark
-vig_roaches: candidate 48/50 benchmark
-vig_roaches: candidate 49/50 benchmark
-vig_roaches: baseline 50/50 benchmark
-vig_roaches: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+vig_roaches: candidate 1/40 benchmark
+vig_roaches: baseline 2/40 benchmark
+vig_roaches: baseline 3/40 benchmark
+vig_roaches: candidate 4/40 benchmark
+vig_roaches: baseline 5/40 benchmark
+vig_roaches: candidate 6/40 benchmark
+vig_roaches: candidate 7/40 benchmark
+vig_roaches: baseline 8/40 benchmark
+vig_roaches: baseline 9/40 benchmark
+vig_roaches: candidate 10/40 benchmark
+vig_roaches: candidate 11/40 benchmark
+vig_roaches: baseline 12/40 benchmark
+vig_roaches: candidate 13/40 benchmark
+vig_roaches: baseline 14/40 benchmark
+vig_roaches: baseline 15/40 benchmark
+vig_roaches: candidate 16/40 benchmark
+vig_roaches: candidate 17/40 benchmark
+vig_roaches: baseline 18/40 benchmark
+vig_roaches: baseline 19/40 benchmark
+vig_roaches: candidate 20/40 benchmark
+vig_roaches: candidate 21/40 benchmark
+vig_roaches: baseline 22/40 benchmark
+vig_roaches: baseline 23/40 benchmark
+vig_roaches: candidate 24/40 benchmark
+vig_roaches: candidate 25/40 benchmark
+vig_roaches: baseline 26/40 benchmark
+vig_roaches: baseline 27/40 benchmark
+vig_roaches: candidate 28/40 benchmark
+vig_roaches: baseline 29/40 benchmark
+vig_roaches: candidate 30/40 benchmark
+vig_roaches: candidate 31/40 benchmark
+vig_roaches: baseline 32/40 benchmark
+vig_roaches: candidate 33/40 benchmark
+vig_roaches: baseline 34/40 benchmark
+vig_roaches: candidate 35/40 benchmark
+vig_roaches: baseline 36/40 benchmark
+vig_roaches: baseline 37/40 benchmark
+vig_roaches: candidate 38/40 benchmark
+vig_roaches: baseline 39/40 benchmark
+vig_roaches: candidate 40/40 benchmark
+vig_roaches: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
 Baseline:  3.7s
-Candidate: 2.0s
+Candidate: 1.8s
 
-Change: -1.7s (-45.31%)
-  80% CrI: [-1.7s, -1.7s] (-45.79%, -44.85%)
-  90% CrI: [-1.7s, -1.6s] (-45.93%, -44.73%)
+Change: -1.9s (-51.11%)
+  80% CrI: [-1.9s, -1.9s] (-51.55%, -50.78%)
+  90% CrI: [-1.9s, -1.9s] (-51.67%, -50.71%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  548.1MB
-Candidate: 709.5MB
+Baseline:  549.0MB
+Candidate: 692.0MB
 
-Change: +161.4MB (+29.45%)
-  80% CrI: [+160.6MB, +162.1MB] (+29.28%, +29.60%)
-  90% CrI: [+160.4MB, +162.3MB] (+29.22%, +29.64%)
+Change: +142.9MB (+26.04%)
+  80% CrI: [+142.0MB, +143.9MB] (+25.84%, +26.22%)
+  90% CrI: [+141.7MB, +144.1MB] (+25.77%, +26.27%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

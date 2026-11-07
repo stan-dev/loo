@@ -1,0 +1,52 @@
+radon_loo_function: baseline 1/40 benchmark
+radon_loo_function: candidate 2/40 benchmark
+radon_loo_function: candidate 3/40 benchmark
+radon_loo_function: baseline 4/40 benchmark
+radon_loo_function: candidate 5/40 benchmark
+radon_loo_function: baseline 6/40 benchmark
+radon_loo_function: baseline 7/40 benchmark
+radon_loo_function: candidate 8/40 benchmark
+radon_loo_function: baseline 9/40 benchmark
+radon_loo_function: candidate 10/40 benchmark
+radon_loo_function: baseline 11/40 benchmark
+radon_loo_function: candidate 12/40 benchmark
+radon_loo_function: candidate 13/40 benchmark
+radon_loo_function: baseline 14/40 benchmark
+radon_loo_function: candidate 15/40 benchmark
+radon_loo_function: baseline 16/40 benchmark
+radon_loo_function: baseline 17/40 benchmark
+radon_loo_function: candidate 18/40 benchmark
+radon_loo_function: candidate 19/40 benchmark
+radon_loo_function: baseline 20/40 benchmark
+radon_loo_function: baseline 21/40 benchmark
+radon_loo_function: candidate 22/40 benchmark
+radon_loo_function: candidate 23/40 benchmark
+radon_loo_function: baseline 24/40 benchmark
+radon_loo_function: baseline 25/40 benchmark
+radon_loo_function: candidate 26/40 benchmark
+radon_loo_function: baseline 27/40 benchmark
+radon_loo_function: candidate 28/40 benchmark
+radon_loo_function: candidate 29/40 benchmark
+radon_loo_function: baseline 30/40 benchmark
+radon_loo_function: candidate 31/40 benchmark
+radon_loo_function: baseline 32/40 benchmark
+radon_loo_function: candidate 33/40 benchmark
+radon_loo_function: baseline 34/40 benchmark
+radon_loo_function: candidate 35/40 benchmark
+radon_loo_function: baseline 36/40 benchmark
+radon_loo_function: baseline 37/40 benchmark
+radon_loo_function: candidate 38/40 benchmark
+radon_loo_function: baseline 39/40 benchmark
+radon_loo_function: candidate 40/40 benchmark
+radon_loo_function: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  8.5s
+Candidate: 9.2s
+
+Change: +626.7ms (+7.34%)
+  80% CrI: [+618.2ms, +635.0ms] (+7.24%, +7.44%)
+  90% CrI: [+615.8ms, +637.5ms] (+7.21%, +7.47%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

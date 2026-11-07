@@ -17,9 +17,10 @@ Each benchmark folder holds `report.txt` (baseline, candidate, change and credib
 and `measurements.csv` (per-run times and memory).
 
 - `parallel-vs-baseline/windows_w4/`: 9 benchmarks, Windows, 4 workers. `configs/` has the foil configs. New runs come from `bench/run.sh` (see `bench/README.md`) and land in `foil_results/<platform>/w<N>/`.
-- `windows/w2`, `w4`, `w8`: all 26 benchmarks at 2, 4 and 8 workers, baseline `loo-v3.0.0` (`af50d00b`) against candidate `b131a115`, Windows, 25 repetitions each, with `SUMMARY.txt` and `environment.txt`.
-  `windows/mori/w4`: six benchmarks at 4 workers comparing `loo_map()` sharing every argument with mori against copying them. Both ran before the sharing rule in `mori-sharing.md`, and `bench/run.sh` now uses 20 repetitions, or 10 for the seven slowest (`bench/foil.toml`).
+- `windows/w2`, `w4`, `w8`: all 26 benchmarks at 2, 4 and 8 workers, baseline `loo-v3.0.0` (`af50d00b`) against candidate `24c52ca5`, Windows, 20 repetitions each (10 for the seven slowest), with `SUMMARY.txt` and `environment.txt`.
+  `windows/mori/w4`: six benchmarks at 4 workers comparing `loo_map()` sharing every argument with mori against copying them. The runs come from `bench/run.sh` (`bench/foil.toml`).
+- `linux/w2`, `w4`, `w8`, `w24`: the same 26 benchmarks on a TIDE node (one worker count per node), time only. `linux/mori/w4`: the six mori benchmarks. `linux/serial1/w1`: one mirai daemon against `lapply`. `linux/cluster-*.txt` describe the nodes.
 - `mizu/windows_w4/`: 19 benchmarks, mirai baseline `45479fb6` vs mizu candidate, Windows, 4 workers,
   with `SUMMARY.txt`. `quick/` has two quick runs. `microbench/` has `loo_map` timings on Windows and WSL.
 
-Only these runs exist; earlier WSL foil runs were not kept.
+`foil_results/RESULTS.md` collects every table.

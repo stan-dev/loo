@@ -1,0 +1,52 @@
+psis_matrix_small: candidate 1/40 benchmark
+psis_matrix_small: baseline 2/40 benchmark
+psis_matrix_small: candidate 3/40 benchmark
+psis_matrix_small: baseline 4/40 benchmark
+psis_matrix_small: baseline 5/40 benchmark
+psis_matrix_small: candidate 6/40 benchmark
+psis_matrix_small: baseline 7/40 benchmark
+psis_matrix_small: candidate 8/40 benchmark
+psis_matrix_small: candidate 9/40 benchmark
+psis_matrix_small: baseline 10/40 benchmark
+psis_matrix_small: baseline 11/40 benchmark
+psis_matrix_small: candidate 12/40 benchmark
+psis_matrix_small: baseline 13/40 benchmark
+psis_matrix_small: candidate 14/40 benchmark
+psis_matrix_small: candidate 15/40 benchmark
+psis_matrix_small: baseline 16/40 benchmark
+psis_matrix_small: candidate 17/40 benchmark
+psis_matrix_small: baseline 18/40 benchmark
+psis_matrix_small: baseline 19/40 benchmark
+psis_matrix_small: candidate 20/40 benchmark
+psis_matrix_small: baseline 21/40 benchmark
+psis_matrix_small: candidate 22/40 benchmark
+psis_matrix_small: candidate 23/40 benchmark
+psis_matrix_small: baseline 24/40 benchmark
+psis_matrix_small: baseline 25/40 benchmark
+psis_matrix_small: candidate 26/40 benchmark
+psis_matrix_small: candidate 27/40 benchmark
+psis_matrix_small: baseline 28/40 benchmark
+psis_matrix_small: candidate 29/40 benchmark
+psis_matrix_small: baseline 30/40 benchmark
+psis_matrix_small: baseline 31/40 benchmark
+psis_matrix_small: candidate 32/40 benchmark
+psis_matrix_small: baseline 33/40 benchmark
+psis_matrix_small: candidate 34/40 benchmark
+psis_matrix_small: candidate 35/40 benchmark
+psis_matrix_small: baseline 36/40 benchmark
+psis_matrix_small: candidate 37/40 benchmark
+psis_matrix_small: baseline 38/40 benchmark
+psis_matrix_small: baseline 39/40 benchmark
+psis_matrix_small: candidate 40/40 benchmark
+psis_matrix_small: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  10.4s
+Candidate: 3.4s
+
+Change: -7.0s (-67.11%)
+  80% CrI: [-7.2s, -6.9s] (-67.76%, -66.66%)
+  90% CrI: [-7.2s, -6.9s] (-67.98%, -66.55%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

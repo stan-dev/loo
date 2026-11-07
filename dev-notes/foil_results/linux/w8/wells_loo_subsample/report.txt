@@ -1,0 +1,12 @@
+wells_loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  10.8s
+Candidate: 7.3s
+
+Change: -3.5s (-32.86%)
+  80% CrI: [-3.6s, -3.5s] (-33.11%, -32.59%)
+  90% CrI: [-3.6s, -3.5s] (-33.18%, -32.52%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

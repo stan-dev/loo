@@ -1,23 +1,21 @@
-vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  20.7s
-Candidate: 12.9s
+Baseline:  19.6s
+Candidate: 10.5s
 
-Change: -7.8s (-37.71%)
-  80% CrI: [-8.0s, -7.7s] (-38.35%, -37.18%)
-  90% CrI: [-8.0s, -7.6s] (-38.54%, -37.03%)
+Change: -9.1s (-46.26%)
+  80% CrI: [-9.3s, -8.9s] (-46.90%, -45.69%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  1.4GB
+Baseline:  1.5GB
 Candidate: 2.1GB
 
-Change: +707.7MB (+50.62%)
-  80% CrI: [+695.6MB, +719.4MB] (+49.35%, +51.87%)
-  90% CrI: [+691.9MB, +722.6MB] (+48.98%, +52.21%)
+Change: +641.5MB (+43.14%)
+  80% CrI: [+629.5MB, +653.2MB] (+42.22%, +44.02%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

@@ -1,73 +1,64 @@
-radon_loo_function: candidate 1/50 benchmark
-radon_loo_function: baseline 2/50 benchmark
-radon_loo_function: baseline 3/50 benchmark
-radon_loo_function: candidate 4/50 benchmark
-radon_loo_function: baseline 5/50 benchmark
-radon_loo_function: candidate 6/50 benchmark
-radon_loo_function: candidate 7/50 benchmark
-radon_loo_function: baseline 8/50 benchmark
-radon_loo_function: baseline 9/50 benchmark
-radon_loo_function: candidate 10/50 benchmark
-radon_loo_function: baseline 11/50 benchmark
-radon_loo_function: candidate 12/50 benchmark
-radon_loo_function: candidate 13/50 benchmark
-radon_loo_function: baseline 14/50 benchmark
-radon_loo_function: candidate 15/50 benchmark
-radon_loo_function: baseline 16/50 benchmark
-radon_loo_function: candidate 17/50 benchmark
-radon_loo_function: baseline 18/50 benchmark
-radon_loo_function: baseline 19/50 benchmark
-radon_loo_function: candidate 20/50 benchmark
-radon_loo_function: baseline 21/50 benchmark
-radon_loo_function: candidate 22/50 benchmark
-radon_loo_function: candidate 23/50 benchmark
-radon_loo_function: baseline 24/50 benchmark
-radon_loo_function: baseline 25/50 benchmark
-radon_loo_function: candidate 26/50 benchmark
-radon_loo_function: candidate 27/50 benchmark
-radon_loo_function: baseline 28/50 benchmark
-radon_loo_function: baseline 29/50 benchmark
-radon_loo_function: candidate 30/50 benchmark
-radon_loo_function: candidate 31/50 benchmark
-radon_loo_function: baseline 32/50 benchmark
-radon_loo_function: candidate 33/50 benchmark
-radon_loo_function: baseline 34/50 benchmark
-radon_loo_function: baseline 35/50 benchmark
-radon_loo_function: candidate 36/50 benchmark
-radon_loo_function: baseline 37/50 benchmark
-radon_loo_function: candidate 38/50 benchmark
-radon_loo_function: candidate 39/50 benchmark
-radon_loo_function: baseline 40/50 benchmark
-radon_loo_function: baseline 41/50 benchmark
-radon_loo_function: candidate 42/50 benchmark
-radon_loo_function: candidate 43/50 benchmark
-radon_loo_function: baseline 44/50 benchmark
-radon_loo_function: baseline 45/50 benchmark
-radon_loo_function: candidate 46/50 benchmark
-radon_loo_function: candidate 47/50 benchmark
-radon_loo_function: baseline 48/50 benchmark
-radon_loo_function: baseline 49/50 benchmark
-radon_loo_function: candidate 50/50 benchmark
-radon_loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+radon_loo_function: candidate 1/40 benchmark
+radon_loo_function: baseline 2/40 benchmark
+radon_loo_function: baseline 3/40 benchmark
+radon_loo_function: candidate 4/40 benchmark
+radon_loo_function: baseline 5/40 benchmark
+radon_loo_function: candidate 6/40 benchmark
+radon_loo_function: candidate 7/40 benchmark
+radon_loo_function: baseline 8/40 benchmark
+radon_loo_function: baseline 9/40 benchmark
+radon_loo_function: candidate 10/40 benchmark
+radon_loo_function: baseline 11/40 benchmark
+radon_loo_function: candidate 12/40 benchmark
+radon_loo_function: candidate 13/40 benchmark
+radon_loo_function: baseline 14/40 benchmark
+radon_loo_function: candidate 15/40 benchmark
+radon_loo_function: baseline 16/40 benchmark
+radon_loo_function: baseline 17/40 benchmark
+radon_loo_function: candidate 18/40 benchmark
+radon_loo_function: candidate 19/40 benchmark
+radon_loo_function: baseline 20/40 benchmark
+radon_loo_function: candidate 21/40 benchmark
+radon_loo_function: baseline 22/40 benchmark
+radon_loo_function: baseline 23/40 benchmark
+radon_loo_function: candidate 24/40 benchmark
+radon_loo_function: baseline 25/40 benchmark
+radon_loo_function: candidate 26/40 benchmark
+radon_loo_function: baseline 27/40 benchmark
+radon_loo_function: candidate 28/40 benchmark
+radon_loo_function: candidate 29/40 benchmark
+radon_loo_function: baseline 30/40 benchmark
+radon_loo_function: candidate 31/40 benchmark
+radon_loo_function: baseline 32/40 benchmark
+radon_loo_function: candidate 33/40 benchmark
+radon_loo_function: baseline 34/40 benchmark
+radon_loo_function: candidate 35/40 benchmark
+radon_loo_function: baseline 36/40 benchmark
+radon_loo_function: baseline 37/40 benchmark
+radon_loo_function: candidate 38/40 benchmark
+radon_loo_function: baseline 39/40 benchmark
+radon_loo_function: candidate 40/40 benchmark
+radon_loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  3.9s
-Candidate: 4.4s
+Baseline:  4.4s
+Candidate: 4.3s
 
-Change: +506.2ms (+12.91%)
-  80% CrI: [+310.2ms, +729.3ms] (+7.76%, +18.54%)
-  90% CrI: [+250.2ms, +797.2ms] (+6.20%, +20.20%)
+Change: -38.2ms (-0.87%)
+  80% CrI: [-266.4ms, +173.4ms] (-5.90%, +4.08%)
+  90% CrI: [-340.4ms, +239.5ms] (-7.40%, +5.71%)
 
-P(candidate faster): 0.1% (10 of 10,000 draws)
+P(candidate faster): 59.1% (5,907 of 10,000 draws)
 
 Peak memory
 
 Baseline:  1.8GB
 Candidate: 1.7GB
 
-Change: -41.1MB (-2.33%)
-  80% CrI: [-43.4MB, -39.1MB] (-2.46%, -2.22%)
-  90% CrI: [-44.1MB, -38.6MB] (-2.50%, -2.19%)
+Change: -16.1MB (-0.92%)
+  80% CrI: [-17.6MB, -14.5MB] (-1.00%, -0.83%)
+  90% CrI: [-18.0MB, -14.1MB] (-1.02%, -0.80%)
 
 P(candidate smaller): 100.0% (10,000 of 10,000 draws)

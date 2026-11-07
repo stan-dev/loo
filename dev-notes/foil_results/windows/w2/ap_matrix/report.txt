@@ -1,23 +1,23 @@
-ap_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+ap_matrix: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  6.2s
-Candidate: 5.5s
+Baseline:  5.7s
+Candidate: 4.3s
 
-Change: -690.0ms (-11.14%)
-  80% CrI: [-788.5ms, -605.4ms] (-12.60%, -9.88%)
-  90% CrI: [-820.8ms, -583.6ms] (-13.08%, -9.56%)
+Change: -1.4s (-24.32%)
+  80% CrI: [-1.5s, -1.3s] (-25.47%, -23.13%)
+  90% CrI: [-1.5s, -1.3s] (-25.85%, -22.75%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  0.9GB
-Candidate: 1.0GB
+Baseline:  880.0MB
+Candidate: 978.5MB
 
-Change: +148.3MB (+16.68%)
-  80% CrI: [+140.8MB, +154.5MB] (+15.83%, +17.38%)
-  90% CrI: [+138.5MB, +155.9MB] (+15.57%, +17.55%)
+Change: +98.4MB (+11.18%)
+  80% CrI: [+95.1MB, +101.4MB] (+10.79%, +11.55%)
+  90% CrI: [+94.2MB, +102.2MB] (+10.68%, +11.65%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

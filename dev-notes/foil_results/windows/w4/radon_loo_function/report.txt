@@ -1,23 +1,23 @@
-radon_loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+radon_loo_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  5.0s
-Candidate: 5.1s
+Baseline:  4.6s
+Candidate: 5.0s
 
-Change: +89.1ms (+1.79%)
-  80% CrI: [-153.9ms, +338.1ms] (-3.00%, +6.94%)
-  90% CrI: [-219.8ms, +413.3ms] (-4.25%, +8.51%)
+Change: +362.6ms (+7.89%)
+  80% CrI: [+242.2ms, +518.8ms] (+5.22%, +11.47%)
+  90% CrI: [+212.9ms, +569.2ms] (+4.59%, +12.66%)
 
-P(candidate faster): 31.9% (3,195 of 10,000 draws)
+P(candidate faster): 0.0% (0 of 10,000 draws)
 
 Peak memory
 
-Baseline:  948.1MB
-Candidate: 933.7MB
+Baseline:  949.6MB
+Candidate: 940.8MB
 
-Change: -14.6MB (-1.54%)
-  80% CrI: [-17.4MB, -11.7MB] (-1.83%, -1.24%)
-  90% CrI: [-18.1MB, -10.9MB] (-1.90%, -1.15%)
+Change: -8.9MB (-0.94%)
+  80% CrI: [-10.9MB, -6.8MB] (-1.15%, -0.71%)
+  90% CrI: [-11.4MB, -6.1MB] (-1.20%, -0.64%)
 
 P(candidate smaller): 100.0% (10,000 of 10,000 draws)

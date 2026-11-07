@@ -1,23 +1,21 @@
-sar_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+sar_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  35.6s
-Candidate: 3.4s
+Baseline:  35.4s
+Candidate: 2.5s
 
-Change: -32.2s (-90.49%)
-  80% CrI: [-32.7s, -31.6s] (-90.89%, -90.05%)
-  90% CrI: [-32.8s, -31.4s] (-91.00%, -89.92%)
+Change: -32.9s (-93.00%)
+  80% CrI: [-33.7s, -32.0s] (-93.38%, -92.48%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  675.4MB
-Candidate: 987.1MB
+Baseline:  0.7GB
+Candidate: 1.0GB
 
-Change: +311.7MB (+46.14%)
-  80% CrI: [+310.4MB, +312.8MB] (+45.95%, +46.32%)
-  90% CrI: [+310.0MB, +313.1MB] (+45.89%, +46.37%)
+Change: +370.5MB (+54.91%)
+  80% CrI: [+369.6MB, +371.2MB] (+54.78%, +55.02%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

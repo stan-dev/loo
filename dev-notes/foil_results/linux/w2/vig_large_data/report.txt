@@ -1,0 +1,11 @@
+vig_large_data: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  26.6s
+Candidate: 23.1s
+
+Change: -3.5s (-12.98%)
+  80% CrI: [-5.3s, -1.8s] (-19.86%, -6.71%)
+
+P(candidate faster): 99.9% (9,989 of 10,000 draws)

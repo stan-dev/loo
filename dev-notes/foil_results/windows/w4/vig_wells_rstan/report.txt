@@ -1,23 +1,21 @@
-vig_wells_rstan: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+vig_wells_rstan: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  21.6s
-Candidate: 16.4s
+Baseline:  20.5s
+Candidate: 10.0s
 
-Change: -5.2s (-24.06%)
-  80% CrI: [-5.4s, -5.0s] (-24.82%, -23.27%)
-  90% CrI: [-5.4s, -4.9s] (-25.05%, -23.04%)
+Change: -10.5s (-51.30%)
+  80% CrI: [-11.4s, -9.8s] (-54.05%, -48.55%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  3.1GB
-Candidate: 2.1GB
+Baseline:  3.2GB
+Candidate: 1.8GB
 
-Change: -980.6MB (-31.93%)
-  80% CrI: [-990.1MB, -969.9MB] (-32.23%, -31.58%)
-  90% CrI: [-992.7MB, -966.8MB] (-32.32%, -31.48%)
+Change: -1.4GB (-44.37%)
+  80% CrI: [-1.4GB, -1.4GB] (-44.75%, -44.02%)
 
 P(candidate smaller): 100.0% (10,000 of 10,000 draws)

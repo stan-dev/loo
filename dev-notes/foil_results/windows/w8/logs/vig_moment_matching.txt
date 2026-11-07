@@ -1,63 +1,33 @@
-vig_moment_matching: baseline 1/50 benchmark
-vig_moment_matching: candidate 2/50 benchmark
-vig_moment_matching: candidate 3/50 benchmark
-vig_moment_matching: baseline 4/50 benchmark
-vig_moment_matching: baseline 5/50 benchmark
-vig_moment_matching: candidate 6/50 benchmark
-vig_moment_matching: candidate 7/50 benchmark
-vig_moment_matching: baseline 8/50 benchmark
-vig_moment_matching: candidate 9/50 benchmark
-vig_moment_matching: baseline 10/50 benchmark
-vig_moment_matching: baseline 11/50 benchmark
-vig_moment_matching: candidate 12/50 benchmark
-vig_moment_matching: candidate 13/50 benchmark
-vig_moment_matching: baseline 14/50 benchmark
-vig_moment_matching: baseline 15/50 benchmark
-vig_moment_matching: candidate 16/50 benchmark
-vig_moment_matching: baseline 17/50 benchmark
-vig_moment_matching: candidate 18/50 benchmark
-vig_moment_matching: baseline 19/50 benchmark
-vig_moment_matching: candidate 20/50 benchmark
-vig_moment_matching: candidate 21/50 benchmark
-vig_moment_matching: baseline 22/50 benchmark
-vig_moment_matching: candidate 23/50 benchmark
-vig_moment_matching: baseline 24/50 benchmark
-vig_moment_matching: candidate 25/50 benchmark
-vig_moment_matching: baseline 26/50 benchmark
-vig_moment_matching: candidate 27/50 benchmark
-vig_moment_matching: baseline 28/50 benchmark
-vig_moment_matching: baseline 29/50 benchmark
-vig_moment_matching: candidate 30/50 benchmark
-vig_moment_matching: baseline 31/50 benchmark
-vig_moment_matching: candidate 32/50 benchmark
-vig_moment_matching: baseline 33/50 benchmark
-vig_moment_matching: candidate 34/50 benchmark
-vig_moment_matching: candidate 35/50 benchmark
-vig_moment_matching: baseline 36/50 benchmark
-vig_moment_matching: baseline 37/50 benchmark
-vig_moment_matching: candidate 38/50 benchmark
-vig_moment_matching: candidate 39/50 benchmark
-vig_moment_matching: baseline 40/50 benchmark
-vig_moment_matching: baseline 41/50 benchmark
-vig_moment_matching: candidate 42/50 benchmark
-vig_moment_matching: candidate 43/50 benchmark
-vig_moment_matching: baseline 44/50 benchmark
-vig_moment_matching: candidate 45/50 benchmark
-vig_moment_matching: baseline 46/50 benchmark
-vig_moment_matching: baseline 47/50 benchmark
-vig_moment_matching: candidate 48/50 benchmark
-vig_moment_matching: baseline 49/50 benchmark
-vig_moment_matching: candidate 50/50 benchmark
-vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+vig_moment_matching: baseline 1/20 benchmark
+vig_moment_matching: candidate 2/20 benchmark
+vig_moment_matching: baseline 3/20 benchmark
+vig_moment_matching: candidate 4/20 benchmark
+vig_moment_matching: candidate 5/20 benchmark
+vig_moment_matching: baseline 6/20 benchmark
+vig_moment_matching: candidate 7/20 benchmark
+vig_moment_matching: baseline 8/20 benchmark
+vig_moment_matching: candidate 9/20 benchmark
+vig_moment_matching: baseline 10/20 benchmark
+vig_moment_matching: baseline 11/20 benchmark
+vig_moment_matching: candidate 12/20 benchmark
+vig_moment_matching: baseline 13/20 benchmark
+vig_moment_matching: candidate 14/20 benchmark
+vig_moment_matching: candidate 15/20 benchmark
+vig_moment_matching: baseline 16/20 benchmark
+vig_moment_matching: baseline 17/20 benchmark
+vig_moment_matching: candidate 18/20 benchmark
+vig_moment_matching: candidate 19/20 benchmark
+vig_moment_matching: baseline 20/20 benchmark
+vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  53.6s
-Candidate: 13.2s
+Baseline:  47.1s
+Candidate: 10.7s
 
-Change: -40.5s (-75.41%)
-  80% CrI: [-40.8s, -40.1s] (-75.71%, -75.10%)
-  90% CrI: [-41.0s, -40.0s] (-75.79%, -75.01%)
+Change: -36.5s (-77.35%)
+  80% CrI: [-36.9s, -36.1s] (-77.54%, -77.18%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
@@ -66,8 +36,7 @@ Peak memory
 Baseline:  3.9GB
 Candidate: 4.1GB
 
-Change: +287.0MB (+7.43%)
-  80% CrI: [+280.1MB, +294.1MB] (+7.25%, +7.62%)
-  90% CrI: [+278.1MB, +296.2MB] (+7.19%, +7.68%)
+Change: +208.3MB (+5.36%)
+  80% CrI: [+198.1MB, +220.0MB] (+5.10%, +5.68%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

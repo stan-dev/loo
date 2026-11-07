@@ -1,0 +1,31 @@
+psis_matrix_large: baseline 1/20 benchmark
+psis_matrix_large: candidate 2/20 benchmark
+psis_matrix_large: baseline 3/20 benchmark
+psis_matrix_large: candidate 4/20 benchmark
+psis_matrix_large: candidate 5/20 benchmark
+psis_matrix_large: baseline 6/20 benchmark
+psis_matrix_large: candidate 7/20 benchmark
+psis_matrix_large: baseline 8/20 benchmark
+psis_matrix_large: baseline 9/20 benchmark
+psis_matrix_large: candidate 10/20 benchmark
+psis_matrix_large: baseline 11/20 benchmark
+psis_matrix_large: candidate 12/20 benchmark
+psis_matrix_large: candidate 13/20 benchmark
+psis_matrix_large: baseline 14/20 benchmark
+psis_matrix_large: candidate 15/20 benchmark
+psis_matrix_large: baseline 16/20 benchmark
+psis_matrix_large: baseline 17/20 benchmark
+psis_matrix_large: candidate 18/20 benchmark
+psis_matrix_large: candidate 19/20 benchmark
+psis_matrix_large: baseline 20/20 benchmark
+psis_matrix_large: Comparing candidate (HEAD) to baseline (a06ea6eaa802a5604dabc53bf87c6f66b8b49be9) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  14.1s
+Candidate: 7.7s
+
+Change: -6.3s (-45.03%)
+  80% CrI: [-6.4s, -6.3s] (-45.19%, -44.87%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)

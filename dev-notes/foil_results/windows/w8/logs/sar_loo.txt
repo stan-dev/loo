@@ -1,73 +1,42 @@
-sar_loo: candidate 1/50 benchmark
-sar_loo: baseline 2/50 benchmark
-sar_loo: candidate 3/50 benchmark
-sar_loo: baseline 4/50 benchmark
-sar_loo: baseline 5/50 benchmark
-sar_loo: candidate 6/50 benchmark
-sar_loo: baseline 7/50 benchmark
-sar_loo: candidate 8/50 benchmark
-sar_loo: baseline 9/50 benchmark
-sar_loo: candidate 10/50 benchmark
-sar_loo: candidate 11/50 benchmark
-sar_loo: baseline 12/50 benchmark
-sar_loo: candidate 13/50 benchmark
-sar_loo: baseline 14/50 benchmark
-sar_loo: baseline 15/50 benchmark
-sar_loo: candidate 16/50 benchmark
-sar_loo: baseline 17/50 benchmark
-sar_loo: candidate 18/50 benchmark
-sar_loo: candidate 19/50 benchmark
-sar_loo: baseline 20/50 benchmark
-sar_loo: candidate 21/50 benchmark
-sar_loo: baseline 22/50 benchmark
-sar_loo: baseline 23/50 benchmark
-sar_loo: candidate 24/50 benchmark
-sar_loo: baseline 25/50 benchmark
-sar_loo: candidate 26/50 benchmark
-sar_loo: candidate 27/50 benchmark
-sar_loo: baseline 28/50 benchmark
-sar_loo: candidate 29/50 benchmark
-sar_loo: baseline 30/50 benchmark
-sar_loo: baseline 31/50 benchmark
-sar_loo: candidate 32/50 benchmark
-sar_loo: candidate 33/50 benchmark
-sar_loo: baseline 34/50 benchmark
-sar_loo: candidate 35/50 benchmark
-sar_loo: baseline 36/50 benchmark
-sar_loo: baseline 37/50 benchmark
-sar_loo: candidate 38/50 benchmark
-sar_loo: baseline 39/50 benchmark
-sar_loo: candidate 40/50 benchmark
-sar_loo: baseline 41/50 benchmark
-sar_loo: candidate 42/50 benchmark
-sar_loo: candidate 43/50 benchmark
-sar_loo: baseline 44/50 benchmark
-sar_loo: candidate 45/50 benchmark
-sar_loo: baseline 46/50 benchmark
-sar_loo: baseline 47/50 benchmark
-sar_loo: candidate 48/50 benchmark
-sar_loo: baseline 49/50 benchmark
-sar_loo: candidate 50/50 benchmark
-sar_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+sar_loo: baseline 1/20 benchmark
+sar_loo: candidate 2/20 benchmark
+sar_loo: candidate 3/20 benchmark
+sar_loo: baseline 4/20 benchmark
+sar_loo: baseline 5/20 benchmark
+sar_loo: candidate 6/20 benchmark
+sar_loo: candidate 7/20 benchmark
+sar_loo: baseline 8/20 benchmark
+sar_loo: candidate 9/20 benchmark
+sar_loo: baseline 10/20 benchmark
+sar_loo: candidate 11/20 benchmark
+sar_loo: baseline 12/20 benchmark
+sar_loo: baseline 13/20 benchmark
+sar_loo: candidate 14/20 benchmark
+sar_loo: baseline 15/20 benchmark
+sar_loo: candidate 16/20 benchmark
+sar_loo: baseline 17/20 benchmark
+sar_loo: candidate 18/20 benchmark
+sar_loo: candidate 19/20 benchmark
+sar_loo: baseline 20/20 benchmark
+sar_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  51.2s
-Candidate: 3.6s
+Baseline:  52.0s
+Candidate: 3.2s
 
-Change: -47.6s (-92.93%)
-  80% CrI: [-47.8s, -47.4s] (-93.22%, -92.57%)
-  90% CrI: [-47.9s, -47.4s] (-93.30%, -92.46%)
+Change: -48.8s (-93.90%)
+  80% CrI: [-49.4s, -48.3s] (-94.15%, -93.61%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
 Baseline:  1.2GB
-Candidate: 1.8GB
+Candidate: 1.9GB
 
-Change: +642.3MB (+55.55%)
-  80% CrI: [+640.8MB, +643.3MB] (+55.43%, +55.65%)
-  90% CrI: [+640.3MB, +643.5MB] (+55.38%, +55.67%)
+Change: +702.7MB (+60.90%)
+  80% CrI: [+699.4MB, +705.5MB] (+60.60%, +61.14%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

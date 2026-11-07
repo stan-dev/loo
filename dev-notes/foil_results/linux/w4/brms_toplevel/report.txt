@@ -1,0 +1,12 @@
+brms_toplevel: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  10.0s
+Candidate: 10.1s
+
+Change: +42.3ms (+0.42%)
+  80% CrI: [+27.3ms, +58.8ms] (+0.27%, +0.59%)
+  90% CrI: [+23.4ms, +63.7ms] (+0.23%, +0.64%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

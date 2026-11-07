@@ -1,14 +1,13 @@
 {
-  "seed": 3357010431166950104,
-  "repetitions": 25,
+  "seed": 4544673169594616924,
+  "repetitions": 10,
   "block_size": 4,
   "draws": 10000,
   "timeout_seconds": 3600,
   "isolate": false,
   "shrinkage": 0.0,
   "intervals": [
-    0.8,
-    0.9
+    0.8
   ],
   "working_directory": null,
   "foil_version": "0.1.0",
@@ -18,7 +17,7 @@
   },
   "candidate": {
     "revision": "HEAD",
-    "hash": "b131a115c41465268a63728f8b7477ce62368d77"
+    "hash": "24c52ca5828cc82450d4057465f63c1e935c7b70"
   },
   "suite_lifecycle": {
     "startup": [],
@@ -28,8 +27,9 @@
   },
   "worktree_lifecycle": {
     "startup": [
-      "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
-      "C:/Users/visru/Documents/Github/loo/bench/install.R"
+      "Rscript",
+      "-e",
+      "source(file.path(Sys.getenv('BENCH_DIR'), 'install.R'))"
     ],
     "teardown": []
   },
@@ -40,7 +40,8 @@
     "teardown": []
   },
   "command": [
-    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
-    "C:/Users/visru/Documents/Github/loo/bench/b_wells4_weights.R"
+    "Rscript",
+    "-e",
+    "source(file.path(Sys.getenv('BENCH_DIR'), paste0('b_', Sys.getenv('BENCHMARK'), '.R')))"
   ]
 }

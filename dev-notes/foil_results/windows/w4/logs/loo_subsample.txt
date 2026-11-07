@@ -1,73 +1,64 @@
-loo_subsample: baseline 1/50 benchmark
-loo_subsample: candidate 2/50 benchmark
-loo_subsample: candidate 3/50 benchmark
-loo_subsample: baseline 4/50 benchmark
-loo_subsample: candidate 5/50 benchmark
-loo_subsample: baseline 6/50 benchmark
-loo_subsample: baseline 7/50 benchmark
-loo_subsample: candidate 8/50 benchmark
-loo_subsample: candidate 9/50 benchmark
-loo_subsample: baseline 10/50 benchmark
-loo_subsample: candidate 11/50 benchmark
-loo_subsample: baseline 12/50 benchmark
-loo_subsample: baseline 13/50 benchmark
-loo_subsample: candidate 14/50 benchmark
-loo_subsample: baseline 15/50 benchmark
-loo_subsample: candidate 16/50 benchmark
-loo_subsample: candidate 17/50 benchmark
-loo_subsample: baseline 18/50 benchmark
-loo_subsample: baseline 19/50 benchmark
-loo_subsample: candidate 20/50 benchmark
-loo_subsample: candidate 21/50 benchmark
-loo_subsample: baseline 22/50 benchmark
-loo_subsample: baseline 23/50 benchmark
-loo_subsample: candidate 24/50 benchmark
-loo_subsample: baseline 25/50 benchmark
-loo_subsample: candidate 26/50 benchmark
-loo_subsample: baseline 27/50 benchmark
-loo_subsample: candidate 28/50 benchmark
-loo_subsample: candidate 29/50 benchmark
-loo_subsample: baseline 30/50 benchmark
-loo_subsample: candidate 31/50 benchmark
-loo_subsample: baseline 32/50 benchmark
-loo_subsample: candidate 33/50 benchmark
-loo_subsample: baseline 34/50 benchmark
-loo_subsample: candidate 35/50 benchmark
-loo_subsample: baseline 36/50 benchmark
-loo_subsample: baseline 37/50 benchmark
-loo_subsample: candidate 38/50 benchmark
-loo_subsample: baseline 39/50 benchmark
-loo_subsample: candidate 40/50 benchmark
-loo_subsample: baseline 41/50 benchmark
-loo_subsample: candidate 42/50 benchmark
-loo_subsample: candidate 43/50 benchmark
-loo_subsample: baseline 44/50 benchmark
-loo_subsample: candidate 45/50 benchmark
-loo_subsample: baseline 46/50 benchmark
-loo_subsample: baseline 47/50 benchmark
-loo_subsample: candidate 48/50 benchmark
-loo_subsample: baseline 49/50 benchmark
-loo_subsample: candidate 50/50 benchmark
-loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+loo_subsample: candidate 1/40 benchmark
+loo_subsample: baseline 2/40 benchmark
+loo_subsample: candidate 3/40 benchmark
+loo_subsample: baseline 4/40 benchmark
+loo_subsample: baseline 5/40 benchmark
+loo_subsample: candidate 6/40 benchmark
+loo_subsample: baseline 7/40 benchmark
+loo_subsample: candidate 8/40 benchmark
+loo_subsample: baseline 9/40 benchmark
+loo_subsample: candidate 10/40 benchmark
+loo_subsample: candidate 11/40 benchmark
+loo_subsample: baseline 12/40 benchmark
+loo_subsample: baseline 13/40 benchmark
+loo_subsample: candidate 14/40 benchmark
+loo_subsample: candidate 15/40 benchmark
+loo_subsample: baseline 16/40 benchmark
+loo_subsample: baseline 17/40 benchmark
+loo_subsample: candidate 18/40 benchmark
+loo_subsample: baseline 19/40 benchmark
+loo_subsample: candidate 20/40 benchmark
+loo_subsample: candidate 21/40 benchmark
+loo_subsample: baseline 22/40 benchmark
+loo_subsample: candidate 23/40 benchmark
+loo_subsample: baseline 24/40 benchmark
+loo_subsample: candidate 25/40 benchmark
+loo_subsample: baseline 26/40 benchmark
+loo_subsample: baseline 27/40 benchmark
+loo_subsample: candidate 28/40 benchmark
+loo_subsample: candidate 29/40 benchmark
+loo_subsample: baseline 30/40 benchmark
+loo_subsample: baseline 31/40 benchmark
+loo_subsample: candidate 32/40 benchmark
+loo_subsample: baseline 33/40 benchmark
+loo_subsample: candidate 34/40 benchmark
+loo_subsample: candidate 35/40 benchmark
+loo_subsample: baseline 36/40 benchmark
+loo_subsample: candidate 37/40 benchmark
+loo_subsample: baseline 38/40 benchmark
+loo_subsample: baseline 39/40 benchmark
+loo_subsample: candidate 40/40 benchmark
+loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  1.5s
-Candidate: 1.3s
+Baseline:  1.6s
+Candidate: 1.4s
 
-Change: -127.9ms (-8.71%)
-  80% CrI: [-157.0ms, -94.5ms] (-10.28%, -6.58%)
-  90% CrI: [-166.3ms, -82.3ms] (-10.81%, -5.75%)
+Change: -172.7ms (-10.71%)
+  80% CrI: [-192.9ms, -148.1ms] (-11.65%, -9.43%)
+  90% CrI: [-198.1ms, -139.5ms] (-11.90%, -8.97%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  698.8MB
-Candidate: 807.3MB
+Baseline:  695.0MB
+Candidate: 809.6MB
 
-Change: +108.5MB (+15.52%)
-  80% CrI: [+106.9MB, +110.2MB] (+15.24%, +15.84%)
-  90% CrI: [+106.4MB, +110.8MB] (+15.17%, +15.94%)
+Change: +114.6MB (+16.49%)
+  80% CrI: [+112.5MB, +116.3MB] (+16.13%, +16.79%)
+  90% CrI: [+111.9MB, +116.7MB] (+16.02%, +16.86%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

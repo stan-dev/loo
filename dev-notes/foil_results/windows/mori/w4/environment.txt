@@ -1,12 +1,12 @@
-recorded: 2026-11-06 07:54:34
+recorded: 2026-11-07 07:14:54
 os: Microsoft Windows 11 Home
 cpu: 12th Gen Intel(R) Core(TM) i7-12700H
 logical_cores: 20
 ram_gb: 15.7
-r_version: R version 4.6.1 (2026-06-24 ucrt)
+r_version: R version 4.6.2 (2026-10-29 ucrt)
 workers: 4
 mirai: 2.7.3
 mori: 0.2.2
-baseline: c56f5001ed7271d8990c814b47e259bd5cd004c4 (c56f5001)
-candidate: b131a115
+baseline: 499b56680f50b80e7302a6f5ec3372850ed96405 (499b5668)
+candidate: 24c52ca5
 foil: foil 0.1.0

@@ -1,0 +1,12 @@
+recorded: 2026-11-07 06:47:44
+os: Linux 5.15.0-202-generic
+cpu: Intel(R) Xeon(R) Gold 6430
+logical_cores: 64
+ram_gb: 755.4
+r_version: R version 4.5.3 (2026-03-11)
+workers: 4
+mirai: 2.6.1
+mori: 0.1.0
+baseline: origin/loo-v3.0.0 (af50d00b)
+candidate: 9bd4e7f1
+foil: foil 0.1.0

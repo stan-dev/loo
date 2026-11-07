@@ -1,13 +1,13 @@
-relative_eff: Comparing candidate (HEAD) to baseline (c56f5001ed7271d8990c814b47e259bd5cd004c4) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+relative_eff: Comparing candidate (HEAD) to baseline (499b56680f50b80e7302a6f5ec3372850ed96405) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  4.3s
-Candidate: 3.7s
+Baseline:  4.5s
+Candidate: 4.0s
 
-Change: -563.0ms (-13.07%)
-  80% CrI: [-585.1ms, -541.3ms] (-13.51%, -12.63%)
-  90% CrI: [-592.2ms, -535.4ms] (-13.65%, -12.51%)
+Change: -575.8ms (-12.73%)
+  80% CrI: [-707.6ms, -443.0ms] (-15.42%, -9.86%)
+  90% CrI: [-744.1ms, -400.2ms] (-16.16%, -8.88%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
@@ -16,8 +16,8 @@ Peak memory
 Baseline:  2.5GB
 Candidate: 1.3GB
 
-Change: -1.3GB (-49.75%)
-  80% CrI: [-1.3GB, -1.2GB] (-49.87%, -49.56%)
-  90% CrI: [-1.3GB, -1.2GB] (-49.89%, -49.50%)
+Change: -1.3GB (-49.56%)
+  80% CrI: [-1.3GB, -1.2GB] (-49.80%, -49.32%)
+  90% CrI: [-1.3GB, -1.2GB] (-49.86%, -49.25%)
 
 P(candidate smaller): 100.0% (10,000 of 10,000 draws)

@@ -1,63 +1,33 @@
-metrics: candidate 1/50 benchmark
-metrics: baseline 2/50 benchmark
-metrics: baseline 3/50 benchmark
-metrics: candidate 4/50 benchmark
-metrics: baseline 5/50 benchmark
-metrics: candidate 6/50 benchmark
-metrics: candidate 7/50 benchmark
-metrics: baseline 8/50 benchmark
-metrics: baseline 9/50 benchmark
-metrics: candidate 10/50 benchmark
-metrics: candidate 11/50 benchmark
-metrics: baseline 12/50 benchmark
-metrics: baseline 13/50 benchmark
-metrics: candidate 14/50 benchmark
-metrics: candidate 15/50 benchmark
-metrics: baseline 16/50 benchmark
-metrics: baseline 17/50 benchmark
-metrics: candidate 18/50 benchmark
-metrics: baseline 19/50 benchmark
-metrics: candidate 20/50 benchmark
-metrics: candidate 21/50 benchmark
-metrics: baseline 22/50 benchmark
-metrics: candidate 23/50 benchmark
-metrics: baseline 24/50 benchmark
-metrics: candidate 25/50 benchmark
-metrics: baseline 26/50 benchmark
-metrics: candidate 27/50 benchmark
-metrics: baseline 28/50 benchmark
-metrics: baseline 29/50 benchmark
-metrics: candidate 30/50 benchmark
-metrics: baseline 31/50 benchmark
-metrics: candidate 32/50 benchmark
-metrics: candidate 33/50 benchmark
-metrics: baseline 34/50 benchmark
-metrics: baseline 35/50 benchmark
-metrics: candidate 36/50 benchmark
-metrics: baseline 37/50 benchmark
-metrics: candidate 38/50 benchmark
-metrics: candidate 39/50 benchmark
-metrics: baseline 40/50 benchmark
-metrics: candidate 41/50 benchmark
-metrics: baseline 42/50 benchmark
-metrics: baseline 43/50 benchmark
-metrics: candidate 44/50 benchmark
-metrics: baseline 45/50 benchmark
-metrics: candidate 46/50 benchmark
-metrics: candidate 47/50 benchmark
-metrics: baseline 48/50 benchmark
-metrics: candidate 49/50 benchmark
-metrics: baseline 50/50 benchmark
-metrics: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+metrics: candidate 1/20 benchmark
+metrics: baseline 2/20 benchmark
+metrics: baseline 3/20 benchmark
+metrics: candidate 4/20 benchmark
+metrics: candidate 5/20 benchmark
+metrics: baseline 6/20 benchmark
+metrics: baseline 7/20 benchmark
+metrics: candidate 8/20 benchmark
+metrics: candidate 9/20 benchmark
+metrics: baseline 10/20 benchmark
+metrics: baseline 11/20 benchmark
+metrics: candidate 12/20 benchmark
+metrics: candidate 13/20 benchmark
+metrics: baseline 14/20 benchmark
+metrics: baseline 15/20 benchmark
+metrics: candidate 16/20 benchmark
+metrics: baseline 17/20 benchmark
+metrics: candidate 18/20 benchmark
+metrics: candidate 19/20 benchmark
+metrics: baseline 20/20 benchmark
+metrics: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  17.3s
-Candidate: 13.7s
+Baseline:  16.5s
+Candidate: 12.1s
 
-Change: -3.6s (-20.67%)
-  80% CrI: [-3.7s, -3.4s] (-21.39%, -19.94%)
-  90% CrI: [-3.8s, -3.4s] (-21.60%, -19.72%)
+Change: -4.4s (-26.86%)
+  80% CrI: [-5.0s, -4.0s] (-29.45%, -24.70%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
@@ -66,8 +36,7 @@ Peak memory
 Baseline:  0.9GB
 Candidate: 1.2GB
 
-Change: +285.6MB (+32.16%)
-  80% CrI: [+282.9MB, +288.9MB] (+31.77%, +32.66%)
-  90% CrI: [+282.3MB, +289.8MB] (+31.69%, +32.81%)
+Change: +260.5MB (+29.29%)
+  80% CrI: [+257.5MB, +265.2MB] (+28.87%, +29.96%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

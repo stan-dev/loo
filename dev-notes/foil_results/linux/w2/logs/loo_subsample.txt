@@ -1,0 +1,52 @@
+loo_subsample: candidate 1/40 benchmark
+loo_subsample: baseline 2/40 benchmark
+loo_subsample: baseline 3/40 benchmark
+loo_subsample: candidate 4/40 benchmark
+loo_subsample: baseline 5/40 benchmark
+loo_subsample: candidate 6/40 benchmark
+loo_subsample: candidate 7/40 benchmark
+loo_subsample: baseline 8/40 benchmark
+loo_subsample: baseline 9/40 benchmark
+loo_subsample: candidate 10/40 benchmark
+loo_subsample: baseline 11/40 benchmark
+loo_subsample: candidate 12/40 benchmark
+loo_subsample: candidate 13/40 benchmark
+loo_subsample: baseline 14/40 benchmark
+loo_subsample: candidate 15/40 benchmark
+loo_subsample: baseline 16/40 benchmark
+loo_subsample: baseline 17/40 benchmark
+loo_subsample: candidate 18/40 benchmark
+loo_subsample: candidate 19/40 benchmark
+loo_subsample: baseline 20/40 benchmark
+loo_subsample: baseline 21/40 benchmark
+loo_subsample: candidate 22/40 benchmark
+loo_subsample: candidate 23/40 benchmark
+loo_subsample: baseline 24/40 benchmark
+loo_subsample: candidate 25/40 benchmark
+loo_subsample: baseline 26/40 benchmark
+loo_subsample: baseline 27/40 benchmark
+loo_subsample: candidate 28/40 benchmark
+loo_subsample: candidate 29/40 benchmark
+loo_subsample: baseline 30/40 benchmark
+loo_subsample: baseline 31/40 benchmark
+loo_subsample: candidate 32/40 benchmark
+loo_subsample: baseline 33/40 benchmark
+loo_subsample: candidate 34/40 benchmark
+loo_subsample: candidate 35/40 benchmark
+loo_subsample: baseline 36/40 benchmark
+loo_subsample: candidate 37/40 benchmark
+loo_subsample: baseline 38/40 benchmark
+loo_subsample: baseline 39/40 benchmark
+loo_subsample: candidate 40/40 benchmark
+loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  0.8s
+Candidate: 1.3s
+
+Change: +484.1ms (+58.53%)
+  80% CrI: [+475.0ms, +494.2ms] (+57.35%, +59.88%)
+  90% CrI: [+472.6ms, +497.5ms] (+57.02%, +60.32%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

@@ -1,23 +1,23 @@
-wells_loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+wells_loo_subsample: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  17.9s
-Candidate: 4.3s
+Baseline:  19.7s
+Candidate: 4.1s
 
-Change: -13.5s (-75.80%)
-  80% CrI: [-14.0s, -13.1s] (-76.94%, -74.56%)
-  90% CrI: [-14.2s, -12.9s] (-77.22%, -74.21%)
+Change: -15.6s (-79.02%)
+  80% CrI: [-16.3s, -14.9s] (-79.95%, -77.85%)
+  90% CrI: [-16.5s, -14.7s] (-80.17%, -77.47%)
 
 P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
-Baseline:  1.2GB
-Candidate: 1.5GB
+Baseline:  1.1GB
+Candidate: 1.6GB
 
-Change: +395.8MB (+34.37%)
-  80% CrI: [+394.1MB, +397.2MB] (+34.22%, +34.49%)
-  90% CrI: [+393.6MB, +397.5MB] (+34.17%, +34.53%)
+Change: +406.1MB (+35.50%)
+  80% CrI: [+404.3MB, +407.7MB] (+35.34%, +35.65%)
+  90% CrI: [+403.8MB, +408.1MB] (+35.29%, +35.69%)
 
 P(candidate smaller): 0.0% (0 of 10,000 draws)

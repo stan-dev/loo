@@ -1,6 +1,6 @@
 {
-  "seed": 17076108993911326794,
-  "repetitions": 25,
+  "seed": 9898123481736069142,
+  "repetitions": 20,
   "block_size": 4,
   "draws": 10000,
   "timeout_seconds": 3600,
@@ -13,12 +13,12 @@
   "working_directory": null,
   "foil_version": "0.1.0",
   "baseline": {
-    "revision": "c56f5001ed7271d8990c814b47e259bd5cd004c4",
-    "hash": "c56f5001ed7271d8990c814b47e259bd5cd004c4"
+    "revision": "499b56680f50b80e7302a6f5ec3372850ed96405",
+    "hash": "499b56680f50b80e7302a6f5ec3372850ed96405"
   },
   "candidate": {
     "revision": "HEAD",
-    "hash": "b131a115c41465268a63728f8b7477ce62368d77"
+    "hash": "24c52ca5828cc82450d4057465f63c1e935c7b70"
   },
   "suite_lifecycle": {
     "startup": [],
@@ -28,8 +28,9 @@
   },
   "worktree_lifecycle": {
     "startup": [
-      "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
-      "C:/Users/visru/Documents/Github/loo/bench/install.R"
+      "Rscript",
+      "-e",
+      "source(file.path(Sys.getenv('BENCH_DIR'), 'install.R'))"
     ],
     "teardown": []
   },
@@ -40,7 +41,8 @@
     "teardown": []
   },
   "command": [
-    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe",
-    "C:/Users/visru/Documents/Github/loo/bench/b_psis_matrix_small.R"
+    "Rscript",
+    "-e",
+    "source(file.path(Sys.getenv('BENCH_DIR'), paste0('b_', Sys.getenv('BENCHMARK'), '.R')))"
   ]
 }

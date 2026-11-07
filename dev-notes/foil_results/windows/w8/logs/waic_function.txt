@@ -1,73 +1,64 @@
-waic_function: baseline 1/50 benchmark
-waic_function: candidate 2/50 benchmark
-waic_function: candidate 3/50 benchmark
-waic_function: baseline 4/50 benchmark
-waic_function: baseline 5/50 benchmark
-waic_function: candidate 6/50 benchmark
-waic_function: candidate 7/50 benchmark
-waic_function: baseline 8/50 benchmark
-waic_function: candidate 9/50 benchmark
-waic_function: baseline 10/50 benchmark
-waic_function: candidate 11/50 benchmark
-waic_function: baseline 12/50 benchmark
-waic_function: baseline 13/50 benchmark
-waic_function: candidate 14/50 benchmark
-waic_function: baseline 15/50 benchmark
-waic_function: candidate 16/50 benchmark
-waic_function: baseline 17/50 benchmark
-waic_function: candidate 18/50 benchmark
-waic_function: candidate 19/50 benchmark
-waic_function: baseline 20/50 benchmark
-waic_function: baseline 21/50 benchmark
-waic_function: candidate 22/50 benchmark
-waic_function: candidate 23/50 benchmark
-waic_function: baseline 24/50 benchmark
-waic_function: baseline 25/50 benchmark
-waic_function: candidate 26/50 benchmark
-waic_function: candidate 27/50 benchmark
-waic_function: baseline 28/50 benchmark
-waic_function: candidate 29/50 benchmark
-waic_function: baseline 30/50 benchmark
-waic_function: baseline 31/50 benchmark
-waic_function: candidate 32/50 benchmark
-waic_function: baseline 33/50 benchmark
-waic_function: candidate 34/50 benchmark
-waic_function: baseline 35/50 benchmark
-waic_function: candidate 36/50 benchmark
-waic_function: candidate 37/50 benchmark
-waic_function: baseline 38/50 benchmark
-waic_function: candidate 39/50 benchmark
-waic_function: baseline 40/50 benchmark
-waic_function: baseline 41/50 benchmark
-waic_function: candidate 42/50 benchmark
-waic_function: candidate 43/50 benchmark
-waic_function: baseline 44/50 benchmark
-waic_function: baseline 45/50 benchmark
-waic_function: candidate 46/50 benchmark
-waic_function: candidate 47/50 benchmark
-waic_function: baseline 48/50 benchmark
-waic_function: candidate 49/50 benchmark
-waic_function: baseline 50/50 benchmark
-waic_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+Warning: the working tree has modified tracked files, which are never benchmarked.
+waic_function: baseline 1/40 benchmark
+waic_function: candidate 2/40 benchmark
+waic_function: candidate 3/40 benchmark
+waic_function: baseline 4/40 benchmark
+waic_function: baseline 5/40 benchmark
+waic_function: candidate 6/40 benchmark
+waic_function: candidate 7/40 benchmark
+waic_function: baseline 8/40 benchmark
+waic_function: baseline 9/40 benchmark
+waic_function: candidate 10/40 benchmark
+waic_function: candidate 11/40 benchmark
+waic_function: baseline 12/40 benchmark
+waic_function: baseline 13/40 benchmark
+waic_function: candidate 14/40 benchmark
+waic_function: candidate 15/40 benchmark
+waic_function: baseline 16/40 benchmark
+waic_function: candidate 17/40 benchmark
+waic_function: baseline 18/40 benchmark
+waic_function: baseline 19/40 benchmark
+waic_function: candidate 20/40 benchmark
+waic_function: candidate 21/40 benchmark
+waic_function: baseline 22/40 benchmark
+waic_function: baseline 23/40 benchmark
+waic_function: candidate 24/40 benchmark
+waic_function: candidate 25/40 benchmark
+waic_function: baseline 26/40 benchmark
+waic_function: candidate 27/40 benchmark
+waic_function: baseline 28/40 benchmark
+waic_function: baseline 29/40 benchmark
+waic_function: candidate 30/40 benchmark
+waic_function: baseline 31/40 benchmark
+waic_function: candidate 32/40 benchmark
+waic_function: candidate 33/40 benchmark
+waic_function: baseline 34/40 benchmark
+waic_function: candidate 35/40 benchmark
+waic_function: baseline 36/40 benchmark
+waic_function: baseline 37/40 benchmark
+waic_function: candidate 38/40 benchmark
+waic_function: baseline 39/40 benchmark
+waic_function: candidate 40/40 benchmark
+waic_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  1.4s
-Candidate: 1.4s
+Baseline:  1.6s
+Candidate: 1.5s
 
-Change: -37.3ms (-2.61%)
-  80% CrI: [-55.8ms, -5.4ms] (-3.79%, -0.39%)
-  90% CrI: [-60.6ms, +6.9ms] (-4.09%, +0.49%)
+Change: -151.1ms (-9.22%)
+  80% CrI: [-181.9ms, -121.2ms] (-10.50%, -7.82%)
+  90% CrI: [-190.4ms, -112.8ms] (-10.83%, -7.36%)
 
-P(candidate faster): 92.7% (9,265 of 10,000 draws)
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
 
 Peak memory
 
 Baseline:  1.3GB
 Candidate: 1.3GB
 
-Change: +19.8MB (+1.49%)
-  80% CrI: [+16.1MB, +23.4MB] (+1.21%, +1.76%)
-  90% CrI: [+15.0MB, +24.3MB] (+1.13%, +1.83%)
+Change: +16.5MB (+1.24%)
+  80% CrI: [+10.4MB, +22.7MB] (+0.79%, +1.71%)
+  90% CrI: [+8.8MB, +24.4MB] (+0.67%, +1.83%)
 
-P(candidate smaller): 0.0% (0 of 10,000 draws)
+P(candidate smaller): 0.0% (1 of 10,000 draws)

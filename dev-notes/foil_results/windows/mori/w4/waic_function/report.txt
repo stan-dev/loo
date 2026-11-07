@@ -1,23 +1,23 @@
-waic_function: Comparing candidate (HEAD) to baseline (c56f5001ed7271d8990c814b47e259bd5cd004c4) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+waic_function: Comparing candidate (HEAD) to baseline (499b56680f50b80e7302a6f5ec3372850ed96405) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
 
 Time
 
-Baseline:  1.2s
+Baseline:  1.3s
 Candidate: 1.3s
 
-Change: +85.8ms (+7.11%)
-  80% CrI: [+79.3ms, +92.5ms] (+6.59%, +7.66%)
-  90% CrI: [+77.4ms, +94.5ms] (+6.43%, +7.85%)
+Change: +9.9ms (+0.77%)
+  80% CrI: [-4.9ms, +39.2ms] (-0.37%, +3.05%)
+  90% CrI: [-7.9ms, +50.3ms] (-0.60%, +3.94%)
 
-P(candidate faster): 0.0% (0 of 10,000 draws)
+P(candidate faster): 22.1% (2,210 of 10,000 draws)
 
 Peak memory
 
-Baseline:  742.8MB
-Candidate: 739.9MB
+Baseline:  743.5MB
+Candidate: 743.8MB
 
-Change: -2.9MB (-0.39%)
-  80% CrI: [-3.1MB, -2.7MB] (-0.42%, -0.36%)
-  90% CrI: [-3.1MB, -2.6MB] (-0.42%, -0.35%)
+Change: +303.0KB (+0.04%)
+  80% CrI: [+79.8KB, +530.8KB] (+0.01%, +0.07%)
+  90% CrI: [+12.7KB, +596.6KB] (+0.00%, +0.08%)
 
-P(candidate smaller): 100.0% (10,000 of 10,000 draws)
+P(candidate smaller): 4.3% (428 of 10,000 draws)

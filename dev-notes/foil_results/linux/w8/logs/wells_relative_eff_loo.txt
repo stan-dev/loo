@@ -1,0 +1,52 @@
+wells_relative_eff_loo: baseline 1/40 benchmark
+wells_relative_eff_loo: candidate 2/40 benchmark
+wells_relative_eff_loo: baseline 3/40 benchmark
+wells_relative_eff_loo: candidate 4/40 benchmark
+wells_relative_eff_loo: candidate 5/40 benchmark
+wells_relative_eff_loo: baseline 6/40 benchmark
+wells_relative_eff_loo: candidate 7/40 benchmark
+wells_relative_eff_loo: baseline 8/40 benchmark
+wells_relative_eff_loo: candidate 9/40 benchmark
+wells_relative_eff_loo: baseline 10/40 benchmark
+wells_relative_eff_loo: baseline 11/40 benchmark
+wells_relative_eff_loo: candidate 12/40 benchmark
+wells_relative_eff_loo: baseline 13/40 benchmark
+wells_relative_eff_loo: candidate 14/40 benchmark
+wells_relative_eff_loo: candidate 15/40 benchmark
+wells_relative_eff_loo: baseline 16/40 benchmark
+wells_relative_eff_loo: baseline 17/40 benchmark
+wells_relative_eff_loo: candidate 18/40 benchmark
+wells_relative_eff_loo: candidate 19/40 benchmark
+wells_relative_eff_loo: baseline 20/40 benchmark
+wells_relative_eff_loo: candidate 21/40 benchmark
+wells_relative_eff_loo: baseline 22/40 benchmark
+wells_relative_eff_loo: baseline 23/40 benchmark
+wells_relative_eff_loo: candidate 24/40 benchmark
+wells_relative_eff_loo: baseline 25/40 benchmark
+wells_relative_eff_loo: candidate 26/40 benchmark
+wells_relative_eff_loo: baseline 27/40 benchmark
+wells_relative_eff_loo: candidate 28/40 benchmark
+wells_relative_eff_loo: candidate 29/40 benchmark
+wells_relative_eff_loo: baseline 30/40 benchmark
+wells_relative_eff_loo: candidate 31/40 benchmark
+wells_relative_eff_loo: baseline 32/40 benchmark
+wells_relative_eff_loo: baseline 33/40 benchmark
+wells_relative_eff_loo: candidate 34/40 benchmark
+wells_relative_eff_loo: candidate 35/40 benchmark
+wells_relative_eff_loo: baseline 36/40 benchmark
+wells_relative_eff_loo: baseline 37/40 benchmark
+wells_relative_eff_loo: candidate 38/40 benchmark
+wells_relative_eff_loo: candidate 39/40 benchmark
+wells_relative_eff_loo: baseline 40/40 benchmark
+wells_relative_eff_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  12.0s
+Candidate: 12.6s
+
+Change: +608.6ms (+5.06%)
+  80% CrI: [+418.2ms, +829.6ms] (+3.48%, +6.92%)
+  90% CrI: [+366.6ms, +894.5ms] (+3.04%, +7.46%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

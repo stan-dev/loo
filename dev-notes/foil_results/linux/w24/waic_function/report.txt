@@ -1,0 +1,12 @@
+waic_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  0.4s
+Candidate: 1.3s
+
+Change: +888.7ms (+244.35%)
+  80% CrI: [+872.6ms, +903.6ms] (+238.82%, +250.04%)
+  90% CrI: [+867.9ms, +907.7ms] (+237.30%, +251.85%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

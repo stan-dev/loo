@@ -1,0 +1,52 @@
+relative_eff: candidate 1/40 benchmark
+relative_eff: baseline 2/40 benchmark
+relative_eff: baseline 3/40 benchmark
+relative_eff: candidate 4/40 benchmark
+relative_eff: baseline 5/40 benchmark
+relative_eff: candidate 6/40 benchmark
+relative_eff: candidate 7/40 benchmark
+relative_eff: baseline 8/40 benchmark
+relative_eff: baseline 9/40 benchmark
+relative_eff: candidate 10/40 benchmark
+relative_eff: candidate 11/40 benchmark
+relative_eff: baseline 12/40 benchmark
+relative_eff: baseline 13/40 benchmark
+relative_eff: candidate 14/40 benchmark
+relative_eff: candidate 15/40 benchmark
+relative_eff: baseline 16/40 benchmark
+relative_eff: baseline 17/40 benchmark
+relative_eff: candidate 18/40 benchmark
+relative_eff: candidate 19/40 benchmark
+relative_eff: baseline 20/40 benchmark
+relative_eff: baseline 21/40 benchmark
+relative_eff: candidate 22/40 benchmark
+relative_eff: candidate 23/40 benchmark
+relative_eff: baseline 24/40 benchmark
+relative_eff: candidate 25/40 benchmark
+relative_eff: baseline 26/40 benchmark
+relative_eff: candidate 27/40 benchmark
+relative_eff: baseline 28/40 benchmark
+relative_eff: baseline 29/40 benchmark
+relative_eff: candidate 30/40 benchmark
+relative_eff: baseline 31/40 benchmark
+relative_eff: candidate 32/40 benchmark
+relative_eff: baseline 33/40 benchmark
+relative_eff: candidate 34/40 benchmark
+relative_eff: baseline 35/40 benchmark
+relative_eff: candidate 36/40 benchmark
+relative_eff: candidate 37/40 benchmark
+relative_eff: baseline 38/40 benchmark
+relative_eff: candidate 39/40 benchmark
+relative_eff: baseline 40/40 benchmark
+relative_eff: Comparing candidate (HEAD) to baseline (refs/bench/serial) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  7.1s
+Candidate: 9.4s
+
+Change: +2.3s (+32.10%)
+  80% CrI: [+2.3s, +2.3s] (+32.02%, +32.17%)
+  90% CrI: [+2.3s, +2.3s] (+32.00%, +32.19%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)
