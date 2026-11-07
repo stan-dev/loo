@@ -280,3 +280,23 @@ release_questions <- function() {
 is_constant <- function(x, tol = .Machine$double.eps) {
   abs(max(x) - min(x)) < tol
 }
+
+#' Collect posterior warnings and signal each class once
+#'
+#' @noRd
+#' @param expr Expression to evaluate.
+#' @return The value of `expr`.
+.collect_warnings <- function(expr) {
+  collected <- list()
+  out <- withCallingHandlers(
+    expr,
+    posterior_warning = function(cnd) {
+      collected[[class(cnd)[1]]] <<- cnd
+      invokeRestart("muffleWarning")
+    }
+  )
+  for (cnd in collected) {
+    warning(cnd)
+  }
+  out
+}

@@ -63,7 +63,7 @@ relative_eff.array <- function(x, ..., cores = getOption("mc.cores", 1)) {
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
   if (cores == 1) {
-    n_eff_vec <- apply(x, 3, posterior::ess_mean)
+    n_eff_vec <- .collect_warnings(apply(x, 3, posterior::ess_mean))
   } else {
     if (!os_is_windows()) {
       n_eff_list <-
@@ -105,7 +105,7 @@ relative_eff.function <-
     N <- dim(data)[1]
 
     if (cores == 1) {
-      n_eff_list <-
+      n_eff_list <- .collect_warnings(
         lapply(
           X = seq_len(N),
           FUN = function(i) {
@@ -113,6 +113,7 @@ relative_eff.function <-
             relative_eff.default(as.vector(val_i), chain_id = chain_id, cores = 1)
           }
         )
+      )
     } else {
       if (!os_is_windows()) {
         n_eff_list <-

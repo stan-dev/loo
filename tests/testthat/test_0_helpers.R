@@ -91,3 +91,29 @@ test_that("loo_cores works", {
   expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
   options(loo.cores = NULL)
 })
+
+test_that(".collect_warnings() signals each posterior class once", {
+  warn_classed <- function(class) {
+    warning(structure(
+      class = c(class, "posterior_warning", "warning", "condition"),
+      list(message = class, call = NULL)
+    ))
+  }
+  caught <- character()
+  out <- withCallingHandlers(
+    .collect_warnings({
+      warn_classed("a")
+      warn_classed("a")
+      .collect_warnings(warn_classed("b"))
+      warn_classed("b")
+      warning("other")
+      1
+    }),
+    warning = function(cnd) {
+      caught <<- c(caught, conditionMessage(cnd))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_equal(out, 1)
+  expect_equal(caught, c("other", "a", "b"))
+})
