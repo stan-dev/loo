@@ -72,3 +72,19 @@ Closure size and the other function-based paths, same WSL setup, `loo()` and `lo
 | 8 | 1.187 s | 0.719 s | 0.585 s | 0.077 s |
 
 The log-likelihood function serializes to 412 bytes (data 64 KB, draws 32 KB), so nothing large rides along with the closure. Benchmark scripts define it in the global environment; a function created inside another function would carry that frame's objects.
+
+## Total against run time without daemon start-up
+Each candidate script times its own daemon start-up (`mirai::daemons()` plus loading loo on the daemons) and appends it to a file. `bench/scripts/isolate.R` subtracts it run by run from the foil measurement and bootstraps the paired log ratio, so one foil run gives both numbers. WSL (Ubuntu, R 4.5.3), 10 repetitions, 80% CrI, change against the pre-parallel loo; negative is faster.
+
+| Benchmark | Workers | Baseline | Candidate | Start-up | Total | Without start-up |
+|---|---|---|---|---|---|---|
+| `diamonds_function` | 4 | 6.29 s | 6.25 s | 0.33 s | -0.5% (-2.8%, +1.9%) | -5.8% (-8.0%, -3.4%) |
+| `loo_function` | 4 | 2.54 s | 2.56 s | 0.29 s | +1.0% (-1.4%, +3.1%) | -10.6% (-12.6%, -8.6%) |
+| `loo_subsample` | 4 | 0.65 s | 0.98 s | 0.30 s | +50.7% (+49.0%, +52.6%) | +4.3% (+3.1%, +5.7%) |
+| `relative_eff` | 4 | 2.82 s | 3.26 s | 0.30 s | +15.5% (+14.0%, +17.0%) | +4.8% (+3.4%, +6.1%) |
+| `waic_function` | 4 | 0.48 s | 0.69 s | 0.28 s | +43.9% (+42.2%, +45.7%) | -13.9% (-14.5%, -13.2%) |
+| `diamonds_function` | 8 | 6.10 s | 6.06 s | 0.45 s | -0.7% (-2.6%, +1.2%) | -8.1% (-9.9%, -6.3%) |
+| `loo_function` | 8 | 2.88 s | 2.77 s | 0.42 s | -3.7% (-5.5%, -1.6%) | -18.3% (-20.0%, -16.6%) |
+| `loo_subsample` | 8 | 0.91 s | 1.36 s | 0.42 s | +50.3% (+47.1%, +53.3%) | +3.4% (+0.7%, +6.1%) |
+| `relative_eff` | 8 | 3.18 s | 3.42 s | 0.45 s | +7.6% (+4.1%, +11.5%) | -6.4% (-9.4%, -3.2%) |
+| `waic_function` | 8 | 0.58 s | 0.93 s | 0.43 s | +60.4% (+58.4%, +62.3%) | -13.5% (-15.0%, -12.1%) |
