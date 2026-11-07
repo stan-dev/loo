@@ -1,0 +1,12 @@
+diamonds_function: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 20 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  11.4s
+Candidate: 13.1s
+
+Change: +1.7s (+15.07%)
+  80% CrI: [+1.5s, +1.9s] (+13.46%, +16.76%)
+  90% CrI: [+1.5s, +2.0s] (+12.98%, +17.25%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)
