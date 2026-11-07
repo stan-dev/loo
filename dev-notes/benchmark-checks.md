@@ -63,3 +63,12 @@ Checked on WSL (Ubuntu, R 4.5.3, 20 threads) with `waic()` on the function inter
 | 16 | 0.123 s | 0.054 s |
 
 Starting daemons and loading loo on them took 0.33 s for 2, 0.37 s for 8 and 0.74 s for 24 on the same machine. Per call the candidate is faster than forking; the benchmark scripts pay the start-up once or twice per run.
+
+Closure size and the other function-based paths, same WSL setup, `loo()` and `loo_subsample()` (300 observations, `plpd`) on the function interface, 4000 observations, median of 5 calls with daemons running:
+
+| Workers | `loo()` baseline | `loo()` candidate | `loo_subsample()` baseline | `loo_subsample()` candidate |
+|---|---|---|---|---|
+| 2 | 1.750 s | 1.471 s | 0.548 s | 0.172 s |
+| 8 | 1.187 s | 0.719 s | 0.585 s | 0.077 s |
+
+The log-likelihood function serializes to 412 bytes (data 64 KB, draws 32 KB), so nothing large rides along with the closure. Benchmark scripts define it in the global environment; a function created inside another function would carry that frame's objects.
