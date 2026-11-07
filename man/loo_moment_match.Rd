@@ -19,7 +19,7 @@ loo_moment_match(x, ...)
   k_threshold = NULL,
   split = TRUE,
   cov = TRUE,
-  parallel = TRUE,
+  parallel = getOption("loo.parallel", TRUE),
   ...
 )
 }
@@ -66,13 +66,15 @@ at the end of moment matching for each LOO fold.}
 samples or not. If \code{FALSE}, only the mean and marginal variances are
 matched.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 }
 \value{
 The \code{loo_moment_match()} methods return an updated \code{loo} object. The

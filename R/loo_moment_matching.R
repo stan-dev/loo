@@ -67,7 +67,7 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
                           unconstrain_pars, log_prob_upars,
                           log_lik_i_upars, max_iters = 30L,
                           k_threshold = NULL, split = TRUE,
-                          cov = TRUE, parallel = TRUE,
+                          cov = TRUE, parallel = getOption("loo.parallel", TRUE),
                           ...) {
 
   # input checks

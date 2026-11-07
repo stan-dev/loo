@@ -101,7 +101,7 @@ ap_psis <- function(log_ratios, log_p, log_g, ...) {
 #'
 ap_psis.array <-
   function(log_ratios, log_p, log_g, ...,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     stopifnot(length(dim(log_ratios)) == 3)
     log_ratios <- validate_ll(log_ratios)
     log_ratios <- llarray_to_matrix(log_ratios)
@@ -118,7 +118,7 @@ ap_psis.array <-
 #'
 ap_psis.matrix <- function(log_ratios, log_p, log_g,
            ...,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     checkmate::assert_numeric(log_p, len = nrow(log_ratios))
     checkmate::assert_numeric(log_g, len = nrow(log_ratios))
     log_ratios <- validate_ll(log_ratios)

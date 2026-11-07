@@ -46,7 +46,7 @@ loo_approximate_posterior.array <-
            log_g,
            ...,
            save_psis = FALSE,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     checkmate::assert_flag(save_psis)
     checkmate::assert_flag(parallel)
     checkmate::assert_matrix(log_p, mode = "numeric", nrows = dim(x)[1], ncols = dim(x)[2])
@@ -74,7 +74,7 @@ loo_approximate_posterior.matrix <-
            log_g,
            ...,
            save_psis = FALSE,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     checkmate::assert_flag(save_psis)
     checkmate::assert_flag(parallel)
     checkmate::assert_numeric(log_p, len = nrow(x))
@@ -113,7 +113,7 @@ loo_approximate_posterior.function <-
            log_p = NULL,
            log_g = NULL,
            save_psis = FALSE,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
 
     checkmate::assert_numeric(log_p, len = length(log_g))
     checkmate::assert_numeric(log_g, len = length(log_p))

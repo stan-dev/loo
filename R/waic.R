@@ -109,7 +109,7 @@ waic.function <-
            ...,
            data = NULL,
            draws = NULL,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
 
     .llfun <- validate_llfun(x)

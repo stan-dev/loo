@@ -14,7 +14,13 @@ waic(x, ...)
 
 \method{waic}{matrix}(x, ...)
 
-\method{waic}{`function`}(x, ..., data = NULL, draws = NULL, parallel = TRUE)
+\method{waic}{`function`}(
+  x,
+  ...,
+  data = NULL,
+  draws = NULL,
+  parallel = getOption("loo.parallel", TRUE)
+)
 
 is.waic(x)
 }
@@ -26,13 +32,15 @@ each method.}
 \item{draws, data, ...}{For the function method only. See the
 \strong{Methods (by class)} section below for details on these arguments.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 }
 \value{
 A named list (of class \code{c("waic", "loo")}) with components:

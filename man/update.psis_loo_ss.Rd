@@ -11,7 +11,7 @@
   draws = NULL,
   observations = NULL,
   r_eff = 1,
-  parallel = TRUE,
+  parallel = getOption("loo.parallel", TRUE),
   loo_approximation = NULL,
   loo_approximation_draws = NULL,
   llgrad = NULL,
@@ -50,13 +50,15 @@ for all observations) or a vector with length equal to the number of
 observations. The default value is 1. See the \code{\link[=relative_eff]{relative_eff()}} helper
 functions for help computing \code{r_eff}.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{loo_approximation}{What type of approximation of the loo_i's should be used?
 The default is \code{"plpd"} (the log predictive density using the posterior expectation).

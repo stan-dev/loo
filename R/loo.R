@@ -197,7 +197,7 @@ loo.array <-
            ...,
            r_eff = 1,
            save_psis = FALSE,
-           parallel = TRUE,
+           parallel = getOption("loo.parallel", TRUE),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
     validate_log_lik(x)
@@ -222,7 +222,7 @@ loo.matrix <-
            ...,
            r_eff = 1,
            save_psis = FALSE,
-           parallel = TRUE,
+           parallel = getOption("loo.parallel", TRUE),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
     validate_log_lik(x)
@@ -258,7 +258,7 @@ loo.function <-
            draws = NULL,
            r_eff = 1,
            save_psis = FALSE,
-           parallel = TRUE,
+           parallel = getOption("loo.parallel", TRUE),
            is_method = c("psis", "tis", "sis")) {
     is_method <- match.arg(is_method)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))

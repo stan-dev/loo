@@ -26,13 +26,15 @@ of observations and S is the number of samples from q. See
 \code{\link[=loo.matrix]{loo.matrix()}} for details. Default is \code{NULL}. Then only the
 posterior is evaluated using the k_hat diagnostic.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{save_psis}{Should the \code{psis} object created internally by \code{loo()} be
 saved in the returned object? The \code{loo()} function calls \code{\link[=psis]{psis()}}

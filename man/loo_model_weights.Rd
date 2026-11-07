@@ -19,7 +19,7 @@ loo_model_weights(x, ...)
   BB_n = 1000,
   alpha = 1,
   r_eff_list = NULL,
-  parallel = TRUE
+  parallel = getOption("loo.parallel", TRUE)
 )
 
 stacking_weights(lpd_point, optim_method = "BFGS", optim_control = list())
@@ -83,13 +83,15 @@ each model. See \code{\link[=psis]{psis()}} and  \code{\link[=relative_eff]{rela
 function for computing \code{r_eff}. If \code{x} is a list of \code{"psis_loo"}
 objects then \code{r_eff_list} is ignored.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{lpd_point}{If calling \code{stacking_weights()} or \code{pseudobma_weights()}
 directly, a matrix of pointwise leave-one-out (or K-fold) log likelihoods

@@ -117,7 +117,7 @@ The following are targeted for **removal** in loo 3.0.0:
 - `psislw()` and `R/psislw.R`
 
 `options(loo.cores = ...)` and `options(mc.cores = ...)` are no longer read:
-use `mirai::daemons()` and the `parallel` argument.
+use `mirai::daemons()` and the `parallel` argument. `options(loo.parallel = FALSE)` sets the default of `parallel`, and `options(loo.share_bytes = ...)` sets the size above which inputs are shared with mori (default 4 MiB).
 
 ---
 

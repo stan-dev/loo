@@ -10,9 +10,21 @@ using approximate posteriors}
 \usage{
 ap_psis(log_ratios, log_p, log_g, ...)
 
-\method{ap_psis}{array}(log_ratios, log_p, log_g, ..., parallel = TRUE)
+\method{ap_psis}{array}(
+  log_ratios,
+  log_p,
+  log_g,
+  ...,
+  parallel = getOption("loo.parallel", TRUE)
+)
 
-\method{ap_psis}{matrix}(log_ratios, log_p, log_g, ..., parallel = TRUE)
+\method{ap_psis}{matrix}(
+  log_ratios,
+  log_p,
+  log_g,
+  ...,
+  parallel = getOption("loo.parallel", TRUE)
+)
 
 \method{ap_psis}{default}(log_ratios, log_p, log_g, ...)
 }
@@ -27,13 +39,15 @@ proposal distribution (g). A vector of length S.}
 
 \item{...}{Currently not in use.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 }
 \description{
 Pareto smoothed importance sampling (PSIS)

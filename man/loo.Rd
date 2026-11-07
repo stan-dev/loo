@@ -17,7 +17,7 @@ loo(x, ...)
   ...,
   r_eff = 1,
   save_psis = FALSE,
-  parallel = TRUE,
+  parallel = getOption("loo.parallel", TRUE),
   is_method = c("psis", "tis", "sis")
 )
 
@@ -26,7 +26,7 @@ loo(x, ...)
   ...,
   r_eff = 1,
   save_psis = FALSE,
-  parallel = TRUE,
+  parallel = getOption("loo.parallel", TRUE),
   is_method = c("psis", "tis", "sis")
 )
 
@@ -37,7 +37,7 @@ loo(x, ...)
   draws = NULL,
   r_eff = 1,
   save_psis = FALSE,
-  parallel = TRUE,
+  parallel = getOption("loo.parallel", TRUE),
   is_method = c("psis", "tis", "sis")
 )
 
@@ -73,13 +73,15 @@ This is useful if you plan to use the \code{\link[=E_loo]{E_loo()}} function to 
 weighted expectations after running \code{loo}. Several functions in the
 \pkg{bayesplot} package also accept \code{psis} objects.}
 
-\item{parallel}{Logical. If \code{TRUE} (the default), run on mirai daemons, which
-you set up beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. This needs the \pkg{mirai}
-and \pkg{mori} packages, which are only suggested. Local daemons read
-inputs from shared memory (\code{\link[mori:share]{mori::share()}}); remote daemons receive copies.
-Daemons start with an empty global environment, so a log-likelihood
-function must be self-contained or get what it needs through \code{data},
-\code{draws} or \code{...}.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{is_method}{The importance sampling method to use. The following methods
 are implemented:

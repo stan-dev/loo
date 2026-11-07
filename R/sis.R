@@ -88,7 +88,7 @@ sis <- function(log_ratios, ...) UseMethod("sis")
 sis.array <-
   function(log_ratios, ...,
            r_eff = NULL,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             parallel = parallel,
@@ -103,7 +103,7 @@ sis.matrix <-
   function(log_ratios,
            ...,
            r_eff = NULL,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.matrix(log_ratios,
                                ...,
                                r_eff = r_eff,

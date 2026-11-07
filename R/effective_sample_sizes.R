@@ -51,7 +51,7 @@ relative_eff.default <- function(x, chain_id, ...) {
 #' @templateVar fn relative_eff
 #' @template matrix
 #'
-relative_eff.matrix <- function(x, chain_id, ..., parallel = TRUE) {
+relative_eff.matrix <- function(x, chain_id, ..., parallel = getOption("loo.parallel", TRUE)) {
   x <- llmatrix_to_array(x, chain_id)
   relative_eff.array(x, parallel = parallel)
 }
@@ -60,7 +60,7 @@ relative_eff.matrix <- function(x, chain_id, ..., parallel = TRUE) {
 #' @templateVar fn relative_eff
 #' @template array
 #'
-relative_eff.array <- function(x, ..., parallel = TRUE) {
+relative_eff.array <- function(x, ..., parallel = getOption("loo.parallel", TRUE)) {
   stopifnot(length(dim(x)) == 3)
   S <- prod(dim(x)[1:2]) # posterior sample size = iter * chains
 
@@ -84,7 +84,7 @@ relative_eff.function <-
   function(x,
            chain_id,
            ...,
-           parallel = TRUE,
+           parallel = getOption("loo.parallel", TRUE),
            data = NULL,
            draws = NULL) {
 

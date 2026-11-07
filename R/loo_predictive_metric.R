@@ -93,7 +93,7 @@ loo_predictive_metric.matrix <-
            ...,
            metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     stopifnot(
       is.numeric(x),
       is.numeric(y),

@@ -100,7 +100,7 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(log_ratios, ..., r_eff = 1, parallel = TRUE) {
+  function(log_ratios, ..., r_eff = 1, parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.array(
       log_ratios = log_ratios,
       ...,
@@ -116,7 +116,7 @@ psis.array <-
 #' @template matrix
 #'
 psis.matrix <-
-  function(log_ratios, ..., r_eff = 1, parallel = TRUE) {
+  function(log_ratios, ..., r_eff = 1, parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.matrix(
       log_ratios,
       ...,

@@ -112,7 +112,7 @@ loo_crps.matrix <-
            ...,
            permutations = 1,
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, parallel = parallel, ...),
@@ -154,7 +154,7 @@ loo_scrps.matrix <-
     ...,
     permutations = 1,
     r_eff = 1,
-    parallel = TRUE) {
+    parallel = getOption("loo.parallel", TRUE)) {
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, parallel = parallel, ...),
@@ -174,7 +174,7 @@ EXX_compute <- function(x, x2) {
 }
 
 
-EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, parallel = TRUE, ...) {
+EXX_loo_compute <- function(x, x2, log_lik, r_eff = 1, parallel, ...) {
   S <- nrow(x)
   shuffle <- sample (1:S)
   x2 <- x2[shuffle,]

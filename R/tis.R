@@ -93,7 +93,7 @@ tis <- function(log_ratios, ...) UseMethod("tis")
 tis.array <-
   function(log_ratios, ...,
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
   importance_sampling.array(log_ratios = log_ratios, ...,
                             r_eff = r_eff,
                             parallel = parallel,
@@ -108,7 +108,7 @@ tis.matrix <-
   function(log_ratios,
            ...,
            r_eff = 1,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.matrix(log_ratios,
                                ...,
                                r_eff = r_eff,

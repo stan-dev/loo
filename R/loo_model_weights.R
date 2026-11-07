@@ -188,7 +188,7 @@ loo_model_weights.default <-
            BB_n = 1000,
            alpha = 1,
            r_eff_list = NULL,
-           parallel = TRUE) {
+           parallel = getOption("loo.parallel", TRUE)) {
 
     method <- match.arg(method)
     K <- length(x) # number of models
