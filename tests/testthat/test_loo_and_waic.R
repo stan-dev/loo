@@ -331,3 +331,15 @@ test_that("loo doesn't throw r_eff warnings", {
   expect_no_warning(loo(-LLmat))
   expect_no_warning(loo(llfun, data = data, draws = draws))
 })
+
+test_that("loo.matrix gives identical results sequentially and on two daemons", {
+  skip_if_not_installed("mirai")
+  skip_if_not_installed("mori")
+  sequential <- suppressWarnings(loo(LLmat, r_eff = rep(0.9, ncol(LLmat)), parallel = FALSE))
+  in_parallel <- suppressWarnings(
+    with_two_daemons(loo(LLmat, r_eff = rep(0.9, ncol(LLmat)), parallel = TRUE))
+  )
+  expect_identical(in_parallel$pointwise, sequential$pointwise)
+  expect_identical(in_parallel$diagnostics, sequential$diagnostics)
+  expect_identical(in_parallel$estimates, sequential$estimates)
+})

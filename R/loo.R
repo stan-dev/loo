@@ -203,7 +203,7 @@ loo.array <-
     validate_log_lik(x)
     psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, parallel = parallel, method = is_method)
     ll <- llarray_to_matrix(x)
-    pointwise <- pointwise_loo_calcs(ll, psis_out)
+    pointwise <- pointwise_loo_calcs(ll, psis_out, parallel = parallel)
     importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
@@ -233,7 +233,7 @@ loo.matrix <-
         parallel = parallel,
         method = is_method
       )
-    pointwise <- pointwise_loo_calcs(x, psis_out)
+    pointwise <- pointwise_loo_calcs(x, psis_out, parallel = parallel)
     importance_sampling_loo_object(
       pointwise = pointwise,
       diagnostics = psis_out$diagnostics,
@@ -424,21 +424,42 @@ is.psis_loo <- function(x) {
 #' @noRd
 #' @param ll Log-likelihood matrix.
 #' @param psis_object The object returned by `psis()`.
+#' @param parallel Logical, passed to [loo_map()].
 #' @return Named list with pointwise elpd_loo, mcse_elpd_loo, p_loo, looic,
 #' and influence_pareto_k.
 #'
-pointwise_loo_calcs <- function(ll, psis_object) {
+pointwise_loo_calcs <- function(ll, psis_object, parallel = FALSE) {
   if (!is.matrix(ll)) {
     ll <- as.matrix(ll)
   }
-  lw <- weights(psis_object, normalize = TRUE, log = TRUE)
-  elpd_loo <- matrixStats::colLogSumExps(ll + lw)
-  lpd <- matrixStats::colLogSumExps(ll) - log(nrow(ll)) # colLogMeanExps
-  p_loo <- lpd - elpd_loo
-  mcse_elpd_loo <- mcse_elpd(ll, lw, E_elpd = elpd_loo, r_eff = relative_eff(psis_object))
+  N <- ncol(ll)
+  pointwise <- loo_map(
+    seq_len(N),
+    pointwise_loo_i,
+    ll = slices(ll, parallel),
+    log_weights = slices(psis_object$log_weights, parallel),
+    norm_const_log = attr(psis_object, "norm_const_log"),
+    r_eff = rep_len(relative_eff(psis_object), N),
+    parallel = parallel
+  )
+  elpd_loo <- vapply(pointwise, `[[`, numeric(1), "elpd_loo")
+  mcse_elpd_loo <- vapply(pointwise, `[[`, numeric(1), "mcse_elpd_loo")
+  p_loo <- vapply(pointwise, `[[`, numeric(1), "p_loo")
   looic <- -2 * elpd_loo
   influence_pareto_k <- psis_object$diagnostics$pareto_k
   cbind(elpd_loo, mcse_elpd_loo, p_loo, looic, influence_pareto_k)
+}
+
+pointwise_loo_i <- function(i, ll, log_weights, norm_const_log, r_eff) {
+  ll_i <- slice(ll, i)
+  lw_i <- slice(log_weights, i) - norm_const_log[i]
+  elpd_loo <- matrixStats::logSumExp(ll_i + lw_i)
+  lpd <- matrixStats::logSumExp(ll_i) - log(length(ll_i))
+  list(
+    elpd_loo = elpd_loo,
+    mcse_elpd_loo = mcse_elpd(ll_i, lw_i, E_elpd = elpd_loo, r_eff = r_eff[i]),
+    p_loo = lpd - elpd_loo
+  )
 }
 
 #' Structure the object returned by the loo methods

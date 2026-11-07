@@ -48,7 +48,7 @@ psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NU
     return(psis_out)
   }
 
-  pointwise <- pointwise_loo_calcs(log_liks, psis_out)
+  pointwise <- pointwise_loo_calcs(log_liks, psis_out, parallel = parallel)
   importance_sampling_loo_object(
     pointwise = pointwise,
     diagnostics = psis_out$diagnostics,

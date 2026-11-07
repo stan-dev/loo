@@ -197,15 +197,6 @@ test_that("do_psis_i selects the same tail as a full sort, also with ties", {
 })
 
 
-with_two_daemons <- function(code) {
-  mirai::daemons(0)
-  mirai::daemons(2, dispatcher = FALSE)
-  withr::defer({
-    mirai::daemons(0)
-    mirai::daemons(1, dispatcher = FALSE)
-  })
-  force(code)
-}
 
 test_that("importance sampling gives identical objects sequentially and in parallel", {
   skip_if_not_installed("mirai")
