@@ -120,3 +120,5 @@ reference:
       - elpd
       - crps
       - loo_predictive_metric
+      - compare
+      - psislw
