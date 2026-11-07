@@ -149,15 +149,14 @@ we recommend one of the following actions:
 the MCMC draws from the posterior distribution to obtain more
 reliable importance sampling estimates. This results in a smaller
 shape parameter \eqn{k}.  See \code{\link[=loo_moment_match]{loo_moment_match()}} and the
-vignette \emph{Avoiding model refits in leave-one-out cross-validation
-with moment matching} for an example of this.
+vignette \emph{Avoiding model refits with moment matching} for an
+example of this.
 \item Sampling from a leave-one-out mixture distribution (see the
-vignette \emph{Mixture IS leave-one-out cross-validation for
-high-dimensional Bayesian models}), directly from \eqn{p(\theta^s
-  | y_{-i})} for the problematic observations \eqn{i}, or using
-\eqn{K}-fold cross-validation (see the vignette \emph{Holdout
-validation and K-fold cross-validation of Stan programs with the
-loo package}) will generally be more stable.
+vignette \emph{Mixture IS leave-one-out cross-validation}),
+directly from \eqn{p(\theta^s | y_{-i})} for the problematic
+observations \eqn{i}, or using \eqn{K}-fold cross-validation
+(see the vignette \emph{Holdout validation and K-fold cross-validation})
+will generally be more stable.
 \item Using a model that is more robust to anomalous observations will
 generally make approximate LOO-CV more stable.
 }

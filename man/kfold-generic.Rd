@@ -29,7 +29,7 @@ the pointwise contributions for each data point.
 
 It is important for the object to have at least these classes and
 components so that it is compatible with other functions like
-\code{\link[=loo_compare]{loo_compare()}} and \code{print()} methods.
+\code{\link[=model_compare]{model_compare()}} and \code{print()} methods.
 }
 \description{
 For developers of Bayesian modeling packages, \strong{loo} includes
@@ -39,5 +39,5 @@ CV without name conflicts between packages. See, for example, the
 
 The \strong{Value} section below describes the objects that \code{kfold()}
 methods should return in order to be compatible with
-\code{\link[=loo_compare]{loo_compare()}} and the \strong{loo} package print methods.
+\code{\link[=model_compare]{model_compare()}} and the \strong{loo} package print methods.
 }
