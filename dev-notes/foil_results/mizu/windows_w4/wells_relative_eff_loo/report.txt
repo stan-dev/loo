@@ -1,0 +1,10 @@
+wells_relative_eff_loo: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  6.2s
+Candidate: 6.2s
+
+Change: +59.6ms (+0.96%)
+  50% CrI: [+12.6ms, +101.0ms] (+0.20%, +1.66%)
+  80% CrI: [-30.1ms, +132.4ms] (-0.47%, +2.21%)
+
+P(candidate faster): 19.9% (1,986 of 10,000 draws)

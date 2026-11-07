@@ -1,0 +1,23 @@
+loo_function_heavy_draws: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  8.4s
+Candidate: 8.6s
+
+Change: +184.6ms (+2.20%)
+  80% CrI: [+73.1ms, +310.0ms] (+0.86%, +3.71%)
+  90% CrI: [+43.1ms, +348.3ms] (+0.51%, +4.18%)
+
+P(candidate faster): 1.7% (168 of 10,000 draws)
+
+Peak memory
+
+Baseline:  482.2MB
+Candidate: 521.3MB
+
+Change: +39.1MB (+8.11%)
+  80% CrI: [+38.5MB, +39.6MB] (+7.97%, +8.21%)
+  90% CrI: [+38.2MB, +39.7MB] (+7.93%, +8.24%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

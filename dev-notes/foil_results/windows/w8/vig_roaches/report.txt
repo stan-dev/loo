@@ -1,0 +1,23 @@
+vig_roaches: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  5.9s
+Candidate: 2.5s
+
+Change: -3.4s (-57.91%)
+  80% CrI: [-3.7s, -3.3s] (-59.49%, -56.70%)
+  90% CrI: [-3.7s, -3.2s] (-60.06%, -56.38%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.4GB
+Candidate: 1.9GB
+
+Change: +544.7MB (+39.44%)
+  80% CrI: [+539.9MB, +549.0MB] (+39.05%, +39.83%)
+  90% CrI: [+538.4MB, +550.4MB] (+38.94%, +39.96%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

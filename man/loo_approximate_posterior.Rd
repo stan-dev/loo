@@ -16,7 +16,7 @@ loo_approximate_posterior(x, log_p, log_g, ...)
   log_g,
   ...,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1)
+  parallel = getOption("loo.parallel", TRUE)
 )
 
 \method{loo_approximate_posterior}{matrix}(
@@ -25,7 +25,7 @@ loo_approximate_posterior(x, log_p, log_g, ...)
   log_g,
   ...,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1)
+  parallel = getOption("loo.parallel", TRUE)
 )
 
 \method{loo_approximate_posterior}{`function`}(
@@ -36,7 +36,7 @@ loo_approximate_posterior(x, log_p, log_g, ...)
   log_p = NULL,
   log_g = NULL,
   save_psis = FALSE,
-  cores = getOption("mc.cores", 1)
+  parallel = getOption("loo.parallel", TRUE)
 )
 }
 \arguments{
@@ -54,19 +54,15 @@ proposal distribution (g). A vector of length S.}
 \code{loo_approximate_posterior()} be saved in the returned object? See
 \code{\link[=loo]{loo()}} for details.}
 
-\item{cores}{The number of cores to use for parallelization. This defaults to
-the option \code{mc.cores} which can be set for an entire R session by
-\code{options(mc.cores = NUMBER)}. The old option \code{loo.cores} is now
-deprecated but will be given precedence over \code{mc.cores} until
-\code{loo.cores} is removed in a future release. \strong{As of version
-2.0.0 the default is now 1 core if \code{mc.cores} is not set}, but we
-recommend using as many (or close to as many) cores as possible.
-\itemize{
-\item Note for Windows 10 users: it is \strong{strongly}
-\href{https://github.com/stan-dev/loo/issues/94}{recommended} to avoid using
-the \code{.Rprofile} file to set \code{mc.cores} (using the \code{cores} argument or
-setting \code{mc.cores} interactively or in a script is fine).
-}}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 
 \item{data, draws, ...}{For the \code{loo_approximate_posterior.function()} method,
 these are the data, posterior draws, and other arguments to pass to the

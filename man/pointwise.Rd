@@ -29,7 +29,9 @@ A vector of length equal to the number of observations.
 Convenience function for extracting pointwise estimates
 }
 \examples{
+mirai::daemons(2)
 x <- loo(example_loglik_array())
 pointwise(x, "elpd_loo")
+mirai::daemons(0)
 
 }

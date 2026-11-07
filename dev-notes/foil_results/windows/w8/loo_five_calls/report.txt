@@ -1,0 +1,23 @@
+loo_five_calls: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  9.1s
+Candidate: 5.4s
+
+Change: -3.7s (-40.71%)
+  80% CrI: [-4.1s, -3.3s] (-44.12%, -37.21%)
+  90% CrI: [-4.3s, -3.2s] (-45.06%, -36.15%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.8GB
+Candidate: 1.7GB
+
+Change: -29.5MB (-1.68%)
+  80% CrI: [-32.4MB, -27.0MB] (-1.84%, -1.54%)
+  90% CrI: [-33.2MB, -26.4MB] (-1.89%, -1.50%)
+
+P(candidate smaller): 100.0% (10,000 of 10,000 draws)

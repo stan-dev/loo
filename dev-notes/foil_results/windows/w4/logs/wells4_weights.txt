@@ -1,0 +1,73 @@
+wells4_weights: candidate 1/50 benchmark
+wells4_weights: baseline 2/50 benchmark
+wells4_weights: candidate 3/50 benchmark
+wells4_weights: baseline 4/50 benchmark
+wells4_weights: baseline 5/50 benchmark
+wells4_weights: candidate 6/50 benchmark
+wells4_weights: baseline 7/50 benchmark
+wells4_weights: candidate 8/50 benchmark
+wells4_weights: candidate 9/50 benchmark
+wells4_weights: baseline 10/50 benchmark
+wells4_weights: baseline 11/50 benchmark
+wells4_weights: candidate 12/50 benchmark
+wells4_weights: candidate 13/50 benchmark
+wells4_weights: baseline 14/50 benchmark
+wells4_weights: baseline 15/50 benchmark
+wells4_weights: candidate 16/50 benchmark
+wells4_weights: baseline 17/50 benchmark
+wells4_weights: candidate 18/50 benchmark
+wells4_weights: candidate 19/50 benchmark
+wells4_weights: baseline 20/50 benchmark
+wells4_weights: candidate 21/50 benchmark
+wells4_weights: baseline 22/50 benchmark
+wells4_weights: baseline 23/50 benchmark
+wells4_weights: candidate 24/50 benchmark
+wells4_weights: baseline 25/50 benchmark
+wells4_weights: candidate 26/50 benchmark
+wells4_weights: candidate 27/50 benchmark
+wells4_weights: baseline 28/50 benchmark
+wells4_weights: candidate 29/50 benchmark
+wells4_weights: baseline 30/50 benchmark
+wells4_weights: baseline 31/50 benchmark
+wells4_weights: candidate 32/50 benchmark
+wells4_weights: candidate 33/50 benchmark
+wells4_weights: baseline 34/50 benchmark
+wells4_weights: baseline 35/50 benchmark
+wells4_weights: candidate 36/50 benchmark
+wells4_weights: candidate 37/50 benchmark
+wells4_weights: baseline 38/50 benchmark
+wells4_weights: baseline 39/50 benchmark
+wells4_weights: candidate 40/50 benchmark
+wells4_weights: candidate 41/50 benchmark
+wells4_weights: baseline 42/50 benchmark
+wells4_weights: baseline 43/50 benchmark
+wells4_weights: candidate 44/50 benchmark
+wells4_weights: candidate 45/50 benchmark
+wells4_weights: baseline 46/50 benchmark
+wells4_weights: baseline 47/50 benchmark
+wells4_weights: candidate 48/50 benchmark
+wells4_weights: candidate 49/50 benchmark
+wells4_weights: baseline 50/50 benchmark
+wells4_weights: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  54.4s
+Candidate: 41.3s
+
+Change: -13.1s (-24.01%)
+  80% CrI: [-13.9s, -12.4s] (-25.25%, -22.95%)
+  90% CrI: [-14.1s, -12.2s] (-25.63%, -22.67%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.6GB
+Candidate: 1.8GB
+
+Change: +187.1MB (+11.36%)
+  80% CrI: [+177.2MB, +196.5MB] (+10.76%, +11.93%)
+  90% CrI: [+174.5MB, +199.3MB] (+10.60%, +12.10%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

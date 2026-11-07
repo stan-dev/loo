@@ -49,6 +49,7 @@ In addition to the __loo__ package, we'll also be using __rstan__:
 ```{r setup, message=FALSE}
 library("rstan")
 library("loo")
+mirai::daemons(2)
 set.seed(4711)
 ```
 
@@ -154,8 +155,7 @@ r_eff <- relative_eff(llfun_logistic,
                       log = FALSE, # relative_eff wants likelihood not log-likelihood values
                       chain_id = rep(1:4, each = 1000), 
                       data = stan_df_1, 
-                      draws = parameter_draws_1, 
-                      cores = 2)
+                      draws = parameter_draws_1)
 
 loo_i(i = 1, llfun_logistic, r_eff = r_eff, data = stan_df_1, draws = parameter_draws_1)
 ```
@@ -178,7 +178,6 @@ loo_ss_1 <-
   loo_subsample(
     llfun_logistic,
     observations = 100, # take a subsample of size 100
-    cores = 2,
     # these next objects were computed above
     r_eff = r_eff, 
     draws = parameter_draws_1,
@@ -277,8 +276,7 @@ loo_ss_1c <-
     observations = 100,
     estimator = "hh_pps", # use Hansen-Hurwitz
     loo_approximation = "lpd", # use lpd instead of plpd
-    loo_approximation_draws = 100,
-    cores = 2
+    loo_approximation_draws = 100
   )
 print(loo_ss_1c)
 ```
@@ -330,8 +328,7 @@ loo_ap_1 <-
     draws = parameter_draws_laplace,
     data = stan_df_1,
     log_p = log_p,
-    log_g = log_g,
-    cores = 2
+    log_g = log_g
   )
 print(loo_ap_1)
 ```
@@ -368,8 +365,7 @@ loo_ap_ss_1 <-
     data = stan_df_1,
     log_p = log_p,
     log_g = log_g,
-    observations = 100,
-    cores = 2
+    observations = 100
   )
 print(loo_ap_ss_1)
 ```
@@ -418,8 +414,7 @@ r_eff_1 <- relative_eff(
   log = FALSE, # relative_eff wants likelihood not log-likelihood values
   chain_id = rep(1:4, each = 1000),
   data = stan_df_1,
-  draws = parameter_draws_1,
-  cores = 2
+  draws = parameter_draws_1
 )
 
 set.seed(4711)
@@ -428,8 +423,7 @@ loo_ss_1 <- loo_subsample(
   r_eff = r_eff_1,
   draws = parameter_draws_1,
   data = stan_df_1,
-  observations = 200,
-  cores = 2
+  observations = 200
 )
 
 # compute subsampling loo for a second model (with log-arsenic)
@@ -439,16 +433,14 @@ r_eff_2 <- relative_eff(
   log = FALSE, # relative_eff wants likelihood not log-likelihood values
   chain_id = rep(1:4, each = 1000),
   data = stan_df_2,
-  draws = parameter_draws_2,
-  cores = 2
+  draws = parameter_draws_2
 )
 loo_ss_2 <- loo_subsample(
   x = llfun_logistic,
   r_eff = r_eff_2, 
   draws = parameter_draws_2,
   data = stan_df_2,
-  observations = 200,
-  cores = 2
+  observations = 200
 )
 
 print(loo_ss_2)
@@ -505,8 +497,7 @@ loo_ss_2 <-
     r_eff = r_eff_2,
     draws = parameter_draws_2,
     data = stan_df_2,
-    observations = loo_ss_1,
-    cores = 2
+    observations = loo_ss_1
   )
 ```
 
@@ -520,8 +511,7 @@ loo_ss_2 <- loo_subsample(
   r_eff = r_eff_2, 
   draws = parameter_draws_2,
   data = stan_df_2,
-  observations = idx,
-  cores = 2
+  observations = idx
 )
 ```
 
@@ -564,8 +554,7 @@ loo_full_2 <- loo(
   x = llfun_logistic,
   r_eff = r_eff_2,
   draws = parameter_draws_2,
-  data = stan_df_2,
-  cores = 2
+  data = stan_df_2
 )
 loo_compare(loo_ss_1, loo_full_2)
 ```

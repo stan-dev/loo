@@ -1,0 +1,87 @@
+baseline = "origin/loo-v3.0.0"
+candidate = "HEAD"
+repetitions = 25
+block-size = 4
+interval = [0.8, 0.9]
+output-dir = "C:/Users/visru/Documents/Github/loo/dev-notes/foil_results/windows/w8"
+timeout = 3600
+env = { WORKERS = "8", BENCH_DIR = "C:/Users/visru/Documents/Github/loo/bench", LOO_ROOT = "C:/Users/visru/Documents/Github/loo" }
+worktree-startup = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/install.R"]
+
+[benchmarks.ap_matrix]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_ap_matrix.R"]
+
+[benchmarks.brms_toplevel]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_brms_toplevel.R"]
+
+[benchmarks.diamonds_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_diamonds_function.R"]
+
+[benchmarks.diamonds_matrix]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_diamonds_matrix.R"]
+
+[benchmarks.loo_five_calls]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_loo_five_calls.R"]
+
+[benchmarks.loo_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_loo_function.R"]
+
+[benchmarks.loo_function_heavy_draws]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_loo_function_heavy_draws.R"]
+
+[benchmarks.loo_subsample]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_loo_subsample.R"]
+
+[benchmarks.metrics]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_metrics.R"]
+
+[benchmarks.moment_matching]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_moment_matching.R"]
+
+[benchmarks.psis_matrix_large]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_psis_matrix_large.R"]
+
+[benchmarks.psis_matrix_small]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_psis_matrix_small.R"]
+
+[benchmarks.radon_loo_ap]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_radon_loo_ap.R"]
+
+[benchmarks.radon_loo_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_radon_loo_function.R"]
+
+[benchmarks.relative_eff]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_relative_eff.R"]
+
+[benchmarks.sar_loo]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_sar_loo.R"]
+
+[benchmarks.subsample_methods]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_subsample_methods.R"]
+
+[benchmarks.vig_large_data]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_vig_large_data.R"]
+
+[benchmarks.vig_milk_kline]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_vig_milk_kline.R"]
+
+[benchmarks.vig_moment_matching]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_vig_moment_matching.R"]
+
+[benchmarks.vig_roaches]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_vig_roaches.R"]
+
+[benchmarks.vig_wells_rstan]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_vig_wells_rstan.R"]
+
+[benchmarks.waic_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_waic_function.R"]
+
+[benchmarks.wells4_weights]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_wells4_weights.R"]
+
+[benchmarks.wells_loo_subsample]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_wells_loo_subsample.R"]
+
+[benchmarks.wells_relative_eff_loo]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/Documents/Github/loo/bench/b_wells_relative_eff_loo.R"]

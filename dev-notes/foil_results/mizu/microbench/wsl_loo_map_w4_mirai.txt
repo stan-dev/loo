@@ -1,0 +1,12 @@
+-- call_8_cheap,tiny_2000,psislike_4000,cheap_100k
+ backend workers          case median_ms min_ms uss_mb_total
+   mirai       4  call_8_cheap      3.09   2.34          187
+   mirai       4     tiny_2000      7.78   6.46          359
+   mirai       4 psislike_4000    469.19 332.59         1369
+   mirai       4    cheap_100k    232.08 141.55          244
+-- per_element_200
+ backend workers            case median_ms min_ms uss_mb_total
+   mirai       4 per_element_200    139.21   99.1          185
+-- skewed_1000
+ backend workers        case median_ms min_ms uss_mb_total
+   mirai       4 skewed_1000    585.29 209.66          194

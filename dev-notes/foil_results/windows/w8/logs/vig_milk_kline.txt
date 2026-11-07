@@ -1,0 +1,73 @@
+vig_milk_kline: candidate 1/50 benchmark
+vig_milk_kline: baseline 2/50 benchmark
+vig_milk_kline: baseline 3/50 benchmark
+vig_milk_kline: candidate 4/50 benchmark
+vig_milk_kline: candidate 5/50 benchmark
+vig_milk_kline: baseline 6/50 benchmark
+vig_milk_kline: baseline 7/50 benchmark
+vig_milk_kline: candidate 8/50 benchmark
+vig_milk_kline: baseline 9/50 benchmark
+vig_milk_kline: candidate 10/50 benchmark
+vig_milk_kline: candidate 11/50 benchmark
+vig_milk_kline: baseline 12/50 benchmark
+vig_milk_kline: baseline 13/50 benchmark
+vig_milk_kline: candidate 14/50 benchmark
+vig_milk_kline: candidate 15/50 benchmark
+vig_milk_kline: baseline 16/50 benchmark
+vig_milk_kline: candidate 17/50 benchmark
+vig_milk_kline: baseline 18/50 benchmark
+vig_milk_kline: candidate 19/50 benchmark
+vig_milk_kline: baseline 20/50 benchmark
+vig_milk_kline: baseline 21/50 benchmark
+vig_milk_kline: candidate 22/50 benchmark
+vig_milk_kline: baseline 23/50 benchmark
+vig_milk_kline: candidate 24/50 benchmark
+vig_milk_kline: baseline 25/50 benchmark
+vig_milk_kline: candidate 26/50 benchmark
+vig_milk_kline: baseline 27/50 benchmark
+vig_milk_kline: candidate 28/50 benchmark
+vig_milk_kline: candidate 29/50 benchmark
+vig_milk_kline: baseline 30/50 benchmark
+vig_milk_kline: candidate 31/50 benchmark
+vig_milk_kline: baseline 32/50 benchmark
+vig_milk_kline: candidate 33/50 benchmark
+vig_milk_kline: baseline 34/50 benchmark
+vig_milk_kline: candidate 35/50 benchmark
+vig_milk_kline: baseline 36/50 benchmark
+vig_milk_kline: baseline 37/50 benchmark
+vig_milk_kline: candidate 38/50 benchmark
+vig_milk_kline: baseline 39/50 benchmark
+vig_milk_kline: candidate 40/50 benchmark
+vig_milk_kline: candidate 41/50 benchmark
+vig_milk_kline: baseline 42/50 benchmark
+vig_milk_kline: baseline 43/50 benchmark
+vig_milk_kline: candidate 44/50 benchmark
+vig_milk_kline: baseline 45/50 benchmark
+vig_milk_kline: candidate 46/50 benchmark
+vig_milk_kline: candidate 47/50 benchmark
+vig_milk_kline: baseline 48/50 benchmark
+vig_milk_kline: baseline 49/50 benchmark
+vig_milk_kline: candidate 50/50 benchmark
+vig_milk_kline: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  16.6s
+Candidate: 1.8s
+
+Change: -14.8s (-88.89%)
+  80% CrI: [-15.3s, -14.3s] (-89.37%, -88.42%)
+  90% CrI: [-15.5s, -14.1s] (-89.52%, -88.29%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.1GB
+Candidate: 1.4GB
+
+Change: +306.5MB (+27.23%)
+  80% CrI: [+305.3MB, +308.2MB] (+27.10%, +27.43%)
+  90% CrI: [+305.0MB, +308.8MB] (+27.07%, +27.49%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

@@ -1,0 +1,73 @@
+vig_moment_matching: baseline 1/50 benchmark
+vig_moment_matching: candidate 2/50 benchmark
+vig_moment_matching: candidate 3/50 benchmark
+vig_moment_matching: baseline 4/50 benchmark
+vig_moment_matching: baseline 5/50 benchmark
+vig_moment_matching: candidate 6/50 benchmark
+vig_moment_matching: candidate 7/50 benchmark
+vig_moment_matching: baseline 8/50 benchmark
+vig_moment_matching: candidate 9/50 benchmark
+vig_moment_matching: baseline 10/50 benchmark
+vig_moment_matching: baseline 11/50 benchmark
+vig_moment_matching: candidate 12/50 benchmark
+vig_moment_matching: candidate 13/50 benchmark
+vig_moment_matching: baseline 14/50 benchmark
+vig_moment_matching: baseline 15/50 benchmark
+vig_moment_matching: candidate 16/50 benchmark
+vig_moment_matching: baseline 17/50 benchmark
+vig_moment_matching: candidate 18/50 benchmark
+vig_moment_matching: baseline 19/50 benchmark
+vig_moment_matching: candidate 20/50 benchmark
+vig_moment_matching: candidate 21/50 benchmark
+vig_moment_matching: baseline 22/50 benchmark
+vig_moment_matching: candidate 23/50 benchmark
+vig_moment_matching: baseline 24/50 benchmark
+vig_moment_matching: candidate 25/50 benchmark
+vig_moment_matching: baseline 26/50 benchmark
+vig_moment_matching: candidate 27/50 benchmark
+vig_moment_matching: baseline 28/50 benchmark
+vig_moment_matching: baseline 29/50 benchmark
+vig_moment_matching: candidate 30/50 benchmark
+vig_moment_matching: baseline 31/50 benchmark
+vig_moment_matching: candidate 32/50 benchmark
+vig_moment_matching: baseline 33/50 benchmark
+vig_moment_matching: candidate 34/50 benchmark
+vig_moment_matching: candidate 35/50 benchmark
+vig_moment_matching: baseline 36/50 benchmark
+vig_moment_matching: baseline 37/50 benchmark
+vig_moment_matching: candidate 38/50 benchmark
+vig_moment_matching: candidate 39/50 benchmark
+vig_moment_matching: baseline 40/50 benchmark
+vig_moment_matching: baseline 41/50 benchmark
+vig_moment_matching: candidate 42/50 benchmark
+vig_moment_matching: candidate 43/50 benchmark
+vig_moment_matching: baseline 44/50 benchmark
+vig_moment_matching: candidate 45/50 benchmark
+vig_moment_matching: baseline 46/50 benchmark
+vig_moment_matching: baseline 47/50 benchmark
+vig_moment_matching: candidate 48/50 benchmark
+vig_moment_matching: baseline 49/50 benchmark
+vig_moment_matching: candidate 50/50 benchmark
+vig_moment_matching: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  53.6s
+Candidate: 13.2s
+
+Change: -40.5s (-75.41%)
+  80% CrI: [-40.8s, -40.1s] (-75.71%, -75.10%)
+  90% CrI: [-41.0s, -40.0s] (-75.79%, -75.01%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  3.9GB
+Candidate: 4.1GB
+
+Change: +287.0MB (+7.43%)
+  80% CrI: [+280.1MB, +294.1MB] (+7.25%, +7.62%)
+  90% CrI: [+278.1MB, +296.2MB] (+7.19%, +7.68%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

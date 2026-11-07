@@ -10,7 +10,7 @@
 #' @inheritParams loo
 #' @param save_psis Should the `"psis"` object created internally by
 #'   `loo_subsample()` be saved in the returned object? See [loo()] for details.
-#' @template cores
+#' @template parallel
 #'
 #' @details The `loo_subsample()` function is an S3 generic and a methods is
 #'   currently provided for log-likelihood functions. The implementation works
@@ -111,13 +111,12 @@ loo_subsample.function <-
            log_g = NULL,
            r_eff = 1,
            save_psis = FALSE,
-           cores = getOption("mc.cores", 1),
+           parallel = getOption("loo.parallel", TRUE),
            loo_approximation = "plpd",
            loo_approximation_draws = NULL,
            estimator = "diff_srs",
            llgrad = NULL,
            llhess = NULL) {
-    cores <- loo_cores(cores)
     # Asserting inputs
     .llfun <- validate_llfun(x)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -133,7 +132,6 @@ loo_subsample.function <-
         r_eff <- prepare_psis_r_eff(r_eff, len = dim(data)[1])
     }
     checkmate::assert_flag(save_psis)
-    cores <- loo_cores(cores)
 
     checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
     checkmate::assert_int(loo_approximation_draws, lower = 1, upper = .ndraws(draws), null.ok = TRUE)
@@ -153,7 +151,7 @@ loo_subsample.function <-
           draws = draws,
           r_eff = r_eff,
           save_psis = save_psis,
-          cores = cores
+          parallel = parallel
         )
       } else {
         loo_obj <- loo_approximate_posterior.function(
@@ -164,7 +162,7 @@ loo_subsample.function <-
           data = data,
           draws = draws,
           save_psis = save_psis,
-          cores = cores
+          parallel = parallel
         )
       }
       return(loo_obj)
@@ -175,7 +173,7 @@ loo_subsample.function <-
       .llfun = .llfun,
       data = data,
       draws = draws,
-      cores = cores,
+      parallel = parallel,
       loo_approximation = loo_approximation,
       loo_approximation_draws = loo_approximation_draws,
       .llgrad = .llgrad,
@@ -208,7 +206,7 @@ loo_subsample.function <-
         log_p = log_p,
         log_g = log_g,
         save_psis = save_psis,
-        cores = cores
+        parallel = parallel
       )
     } else {
       loo_obj <- loo.function(
@@ -217,7 +215,7 @@ loo_subsample.function <-
         draws = draws,
         r_eff = r_eff,
         save_psis = save_psis,
-        cores = cores
+        parallel = parallel
       )
     }
 
@@ -257,7 +255,7 @@ update.psis_loo_ss <- function(object, ...,
                                draws = NULL,
                                observations = NULL,
                                r_eff = 1,
-                               cores = getOption("mc.cores", 1),
+                               parallel = getOption("loo.parallel", TRUE),
                                loo_approximation = NULL,
                                loo_approximation_draws = NULL,
                                llgrad = NULL,
@@ -276,7 +274,6 @@ update.psis_loo_ss <- function(object, ...,
   if (!is.null(draws)) {
     # No current checks
   }
-  cores <- loo_cores(cores)
 
   # Update elpd approximations
   if (!is.null(loo_approximation) | !is.null(loo_approximation_draws)) {
@@ -295,7 +292,7 @@ update.psis_loo_ss <- function(object, ...,
     elpd_loo_approx <-
       elpd_loo_approximation(.llfun = object$loo_subsampling$.llfun,
                              data = data, draws = draws,
-                             cores = cores,
+                             parallel = parallel,
                              loo_approximation = loo_approximation,
                              loo_approximation_draws = loo_approximation_draws,
                              .llgrad = .llgrad, .llhess = .llhess)
@@ -357,14 +354,14 @@ update.psis_loo_ss <- function(object, ...,
                                                   log_p = object$approximate_posterior$log_p,
                                                   log_g = object$approximate_posterior$log_g,
                                                   save_psis = !is.null(object$psis_object),
-                                                  cores = cores)
+                                                  parallel = parallel)
       } else {
         loo_obj <- loo.function(x = object$loo_subsampling$.llfun,
                             data = data_new_subsample,
                             draws = draws,
                             r_eff = r_eff,
                             save_psis = !is.null(object$psis_object),
-                            cores = cores)
+                            parallel = parallel)
       }
       # Add stuff to pointwise
       loo_obj$pointwise <-
@@ -486,27 +483,22 @@ lpd_i <- function(i, llfun, data, draws) {
 
 
 #' Utility function to compute lpd using user-defined likelihood function
-#' using platform-dependent parallel backends when cores > 1
+#' optionally in parallel
 #'
 #' @details
 #' See `elpd_loo_approximation` for usage examples
 #'
 #' @noRd
 #' @return a vector of computed log probability densities
-compute_lpds <- function(N, data, draws, llfun, cores) {
-  if (cores == 1) {
-    lpds <- lapply(X = seq_len(N), FUN = lpd_i, llfun, data, draws)
-  } else {
-    if (.Platform$OS.type != "windows") {
-      lpds <- mclapply(X = seq_len(N), mc.cores = cores, FUN = lpd_i, llfun, data, draws)
-    } else {
-      cl <- makePSOCKcluster(cores)
-      on.exit(stopCluster(cl))
-      lpds <- parLapply(cl, X = seq_len(N), fun = lpd_i, llfun, data, draws)
-    }
-  }
-
-  unlist(lpds)
+compute_lpds <- function(N, data, draws, llfun, parallel) {
+  unlist(loo_map(
+    seq_len(N),
+    lpd_i,
+    llfun = llfun,
+    data = data,
+    draws = draws,
+    parallel = parallel
+  ))
 }
 
 #' Compute approximation to loo_i:s
@@ -517,7 +509,7 @@ compute_lpds <- function(N, data, draws, llfun, cores) {
 #' @inheritParams loo_subsample.function
 #'
 #' @return a vector with approximations of elpd_{loo,i}s
-elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation, loo_approximation_draws = NULL, .llgrad = NULL, .llhess = NULL) {
+elpd_loo_approximation <- function(.llfun, data, draws, parallel, loo_approximation, loo_approximation_draws = NULL, .llgrad = NULL, .llhess = NULL) {
   checkmate::assert_function(.llfun, args = c("data_i", "draws"), ordered = TRUE)
   stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
   checkmate::assert_choice(loo_approximation, choices = loo_approximation_choices(), null.ok = FALSE)
@@ -529,27 +521,26 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     checkmate::assert_function(.llhess, args = c("data_i", "draws"), ordered = TRUE)
   }
 
-  cores <- loo_cores(cores)
   N <- dim(data)[1]
 
   if (loo_approximation == "none") return(rep(1L,N))
 
   if (loo_approximation %in% c("tis", "sis")) {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation, cores = cores))
+    is_values <- suppressWarnings(loo.function(.llfun, data = data, draws = draws, is_method = loo_approximation, parallel = parallel))
     return(is_values$pointwise[, "elpd_loo"])
   }
 
   if (loo_approximation == "waic") {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    waic_full_obj <- waic.function(.llfun, data = data, draws = draws, cores = cores)
+    waic_full_obj <- waic.function(.llfun, data = data, draws = draws, parallel = parallel)
     return(waic_full_obj$pointwise[,"elpd_waic"])
   }
 
   # Compute the lpd or log p(y_i|y_{-i})
   if (loo_approximation == "lpd") {
     draws <- .thin_draws(draws, loo_approximation_draws)
-    lpds <- compute_lpds(N, data, draws, .llfun, cores)
+    lpds <- compute_lpds(N, data, draws, .llfun, parallel)
     return(lpds) # Use only the lpd
   }
 
@@ -561,7 +552,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     draws <- .thin_draws(draws, loo_approximation_draws)
     point_est <- .compute_point_estimate(draws)
-    lpds <- compute_lpds(N, data, point_est, .llfun, cores)
+    lpds <- compute_lpds(N, data, point_est, .llfun, parallel)
     if (loo_approximation == "plpd") return(lpds) # Use only the lpd
   }
 
@@ -572,7 +563,7 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
 
     point_est <- .compute_point_estimate(draws)
     # Compute the lpds
-    lpds <- compute_lpds(N, data, point_est, .llfun, cores)
+    lpds <- compute_lpds(N, data, point_est, .llfun, parallel)
 
     if (loo_approximation == "waic_grad" |
         loo_approximation == "waic_hess") {
@@ -584,9 +575,6 @@ elpd_loo_approximation <- function(.llfun, data, draws, cores, loo_approximation
     }
 
     p_eff_approx <- numeric(N)
-    if (cores>1) warning("Multicore is not implemented for waic_delta",
-                         call. = FALSE)
-
     if (loo_approximation == "waic_grad") {
       for(i in 1:nrow(data)) {
         grad_i <- t(.llgrad(data[i,,drop = FALSE], point_est))

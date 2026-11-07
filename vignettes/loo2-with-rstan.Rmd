@@ -122,6 +122,7 @@ approximation to exact LOO-CV:
 
 ```{r, eval=FALSE}
 library("loo")
+mirai::daemons(2)
 
 # Extract pointwise log-likelihood
 # using merge_chains=FALSE returns an array, which is easier to 
@@ -131,11 +132,9 @@ log_lik_1 <- extract_log_lik(fit_1, merge_chains = FALSE)
 # as of loo v2.0.0 we can optionally provide relative effective sample sizes
 # when calling loo, which allows for better estimates of the PSIS effective
 # sample sizes and Monte Carlo error
-r_eff <- relative_eff(exp(log_lik_1), cores = 2) 
+r_eff <- relative_eff(exp(log_lik_1)) 
 
-# preferably use more than 2 cores (as many cores as possible)
-# will use value of 'mc.cores' option if cores is not specified
-loo_1 <- loo(log_lik_1, r_eff = r_eff, cores = 2)
+loo_1 <- loo(log_lik_1, r_eff = r_eff)
 print(loo_1)
 ```
 
@@ -177,7 +176,7 @@ fit_2 <- stan(fit = fit_1, data = standata)
 
 log_lik_2 <- extract_log_lik(fit_2, merge_chains = FALSE)
 r_eff_2 <- relative_eff(exp(log_lik_2))
-loo_2 <- loo(log_lik_2, r_eff = r_eff_2, cores = 2)
+loo_2 <- loo(log_lik_2, r_eff = r_eff_2)
 print(loo_2)
 ```
 

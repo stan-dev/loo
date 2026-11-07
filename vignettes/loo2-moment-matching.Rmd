@@ -105,6 +105,7 @@ and the __rstanarm__ package for the data.
 ```{r setup, message=FALSE}
 library("rstan")
 library("loo")
+mirai::daemons(2)
 seed <- 9547
 set.seed(seed)
 ```

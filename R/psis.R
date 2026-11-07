@@ -12,7 +12,7 @@
 #'   **Methods (by class)** section below for a detailed description of how
 #'   to specify the inputs for each method.
 #' @param ... Arguments passed on to the various methods.
-#' @template cores
+#' @template parallel
 #' @param r_eff Vector of relative effective sample size estimates containing
 #'   one element per observation. The values provided should be the relative
 #'   effective sample sizes of `1/exp(log_ratios)` (i.e., `1/ratios`).
@@ -76,6 +76,7 @@
 #' @template loo-and-psis-references
 #'
 #' @examples
+#' mirai::daemons(2)
 #' log_ratios <- -1 * example_loglik_array()
 #' r_eff <- relative_eff(exp(-log_ratios))
 #' psis_result <- psis(log_ratios, r_eff = r_eff)
@@ -91,6 +92,7 @@
 #'
 #'
 #'
+#' mirai::daemons(0)
 psis <- function(log_ratios, ...) UseMethod("psis")
 
 #' @export
@@ -98,12 +100,12 @@ psis <- function(log_ratios, ...) UseMethod("psis")
 #' @template array
 #'
 psis.array <-
-  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+  function(log_ratios, ..., r_eff = 1, parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.array(
       log_ratios = log_ratios,
       ...,
       r_eff = r_eff,
-      cores = cores,
+      parallel = parallel,
       method = "psis"
     )
   }
@@ -114,12 +116,12 @@ psis.array <-
 #' @template matrix
 #'
 psis.matrix <-
-  function(log_ratios, ..., r_eff = 1, cores = getOption("mc.cores", 1)) {
+  function(log_ratios, ..., r_eff = 1, parallel = getOption("loo.parallel", TRUE)) {
     importance_sampling.matrix(
       log_ratios,
       ...,
       r_eff = r_eff,
-      cores = cores,
+      parallel = parallel,
       method = "psis"
     )
   }
@@ -165,11 +167,11 @@ psis_object <-
 
 #' @noRd
 #' @seealso do_importance_sampling
-do_psis <- function(log_ratios, r_eff, cores, method) {
+do_psis <- function(log_ratios, r_eff, parallel, method) {
   do_importance_sampling(
     log_ratios = log_ratios,
     r_eff = r_eff,
-    cores = cores,
+    parallel = parallel,
     method = "psis"
   )
 }

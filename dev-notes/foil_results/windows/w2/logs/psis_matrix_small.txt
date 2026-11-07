@@ -1,0 +1,73 @@
+psis_matrix_small: baseline 1/50 benchmark
+psis_matrix_small: candidate 2/50 benchmark
+psis_matrix_small: candidate 3/50 benchmark
+psis_matrix_small: baseline 4/50 benchmark
+psis_matrix_small: baseline 5/50 benchmark
+psis_matrix_small: candidate 6/50 benchmark
+psis_matrix_small: candidate 7/50 benchmark
+psis_matrix_small: baseline 8/50 benchmark
+psis_matrix_small: candidate 9/50 benchmark
+psis_matrix_small: baseline 10/50 benchmark
+psis_matrix_small: baseline 11/50 benchmark
+psis_matrix_small: candidate 12/50 benchmark
+psis_matrix_small: candidate 13/50 benchmark
+psis_matrix_small: baseline 14/50 benchmark
+psis_matrix_small: baseline 15/50 benchmark
+psis_matrix_small: candidate 16/50 benchmark
+psis_matrix_small: candidate 17/50 benchmark
+psis_matrix_small: baseline 18/50 benchmark
+psis_matrix_small: baseline 19/50 benchmark
+psis_matrix_small: candidate 20/50 benchmark
+psis_matrix_small: baseline 21/50 benchmark
+psis_matrix_small: candidate 22/50 benchmark
+psis_matrix_small: candidate 23/50 benchmark
+psis_matrix_small: baseline 24/50 benchmark
+psis_matrix_small: baseline 25/50 benchmark
+psis_matrix_small: candidate 26/50 benchmark
+psis_matrix_small: candidate 27/50 benchmark
+psis_matrix_small: baseline 28/50 benchmark
+psis_matrix_small: candidate 29/50 benchmark
+psis_matrix_small: baseline 30/50 benchmark
+psis_matrix_small: baseline 31/50 benchmark
+psis_matrix_small: candidate 32/50 benchmark
+psis_matrix_small: baseline 33/50 benchmark
+psis_matrix_small: candidate 34/50 benchmark
+psis_matrix_small: candidate 35/50 benchmark
+psis_matrix_small: baseline 36/50 benchmark
+psis_matrix_small: baseline 37/50 benchmark
+psis_matrix_small: candidate 38/50 benchmark
+psis_matrix_small: candidate 39/50 benchmark
+psis_matrix_small: baseline 40/50 benchmark
+psis_matrix_small: baseline 41/50 benchmark
+psis_matrix_small: candidate 42/50 benchmark
+psis_matrix_small: baseline 43/50 benchmark
+psis_matrix_small: candidate 44/50 benchmark
+psis_matrix_small: candidate 45/50 benchmark
+psis_matrix_small: baseline 46/50 benchmark
+psis_matrix_small: candidate 47/50 benchmark
+psis_matrix_small: baseline 48/50 benchmark
+psis_matrix_small: candidate 49/50 benchmark
+psis_matrix_small: baseline 50/50 benchmark
+psis_matrix_small: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  16.2s
+Candidate: 5.4s
+
+Change: -10.7s (-66.42%)
+  80% CrI: [-10.8s, -10.7s] (-66.78%, -66.07%)
+  90% CrI: [-10.9s, -10.6s] (-66.89%, -65.98%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  428.9MB
+Candidate: 622.7MB
+
+Change: +193.8MB (+45.17%)
+  80% CrI: [+193.6MB, +193.9MB] (+45.12%, +45.23%)
+  90% CrI: [+193.5MB, +194.0MB] (+45.10%, +45.25%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

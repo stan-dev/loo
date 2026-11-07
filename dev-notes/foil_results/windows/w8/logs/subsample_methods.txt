@@ -1,0 +1,73 @@
+subsample_methods: baseline 1/50 benchmark
+subsample_methods: candidate 2/50 benchmark
+subsample_methods: baseline 3/50 benchmark
+subsample_methods: candidate 4/50 benchmark
+subsample_methods: candidate 5/50 benchmark
+subsample_methods: baseline 6/50 benchmark
+subsample_methods: candidate 7/50 benchmark
+subsample_methods: baseline 8/50 benchmark
+subsample_methods: candidate 9/50 benchmark
+subsample_methods: baseline 10/50 benchmark
+subsample_methods: baseline 11/50 benchmark
+subsample_methods: candidate 12/50 benchmark
+subsample_methods: candidate 13/50 benchmark
+subsample_methods: baseline 14/50 benchmark
+subsample_methods: baseline 15/50 benchmark
+subsample_methods: candidate 16/50 benchmark
+subsample_methods: candidate 17/50 benchmark
+subsample_methods: baseline 18/50 benchmark
+subsample_methods: baseline 19/50 benchmark
+subsample_methods: candidate 20/50 benchmark
+subsample_methods: candidate 21/50 benchmark
+subsample_methods: baseline 22/50 benchmark
+subsample_methods: baseline 23/50 benchmark
+subsample_methods: candidate 24/50 benchmark
+subsample_methods: candidate 25/50 benchmark
+subsample_methods: baseline 26/50 benchmark
+subsample_methods: baseline 27/50 benchmark
+subsample_methods: candidate 28/50 benchmark
+subsample_methods: candidate 29/50 benchmark
+subsample_methods: baseline 30/50 benchmark
+subsample_methods: baseline 31/50 benchmark
+subsample_methods: candidate 32/50 benchmark
+subsample_methods: baseline 33/50 benchmark
+subsample_methods: candidate 34/50 benchmark
+subsample_methods: baseline 35/50 benchmark
+subsample_methods: candidate 36/50 benchmark
+subsample_methods: candidate 37/50 benchmark
+subsample_methods: baseline 38/50 benchmark
+subsample_methods: candidate 39/50 benchmark
+subsample_methods: baseline 40/50 benchmark
+subsample_methods: baseline 41/50 benchmark
+subsample_methods: candidate 42/50 benchmark
+subsample_methods: candidate 43/50 benchmark
+subsample_methods: baseline 44/50 benchmark
+subsample_methods: candidate 45/50 benchmark
+subsample_methods: baseline 46/50 benchmark
+subsample_methods: baseline 47/50 benchmark
+subsample_methods: candidate 48/50 benchmark
+subsample_methods: baseline 49/50 benchmark
+subsample_methods: candidate 50/50 benchmark
+subsample_methods: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  11.1s
+Candidate: 3.2s
+
+Change: -7.8s (-70.60%)
+  80% CrI: [-8.3s, -7.4s] (-72.21%, -69.10%)
+  90% CrI: [-8.5s, -7.3s] (-72.68%, -68.66%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  1.1GB
+Candidate: 1.6GB
+
+Change: +426.7MB (+37.46%)
+  80% CrI: [+425.6MB, +427.9MB] (+37.34%, +37.59%)
+  90% CrI: [+425.3MB, +428.3MB] (+37.31%, +37.64%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

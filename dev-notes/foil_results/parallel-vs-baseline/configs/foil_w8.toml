@@ -1,0 +1,45 @@
+baseline = "HEAD~1"
+candidate = "HEAD"
+repetitions = 10
+block-size = 4
+output-dir = "C:/Users/visru/AppData/Local/Temp/foilbench/results3/w8"
+timeout = 3600
+env = { WORKERS = "8" }
+worktree-startup = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/install.R"]
+
+
+[benchmarks.moment_matching]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_moment_matching.R"]
+
+[benchmarks.radon_loo_ap]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_radon_loo_ap.R"]
+
+[benchmarks.radon_loo_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_radon_loo_function.R"]
+
+[benchmarks.wells_relative_eff_loo]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_wells_relative_eff_loo.R"]
+
+[benchmarks.wells_loo_subsample]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_wells_loo_subsample.R"]
+
+[benchmarks.loo_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_loo_function.R"]
+
+[benchmarks.relative_eff]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_relative_eff.R"]
+
+[benchmarks.waic_function]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_waic_function.R"]
+
+[benchmarks.loo_subsample]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_loo_subsample.R"]
+
+[benchmarks.psis_matrix_small]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_psis_matrix_small.R"]
+
+[benchmarks.psis_matrix_large]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_psis_matrix_large.R"]
+
+[benchmarks.loo_five_calls]
+command = ["C:/Program Files/R/R-4.6.1/bin/Rscript.exe", "C:/Users/visru/AppData/Local/Temp/foilbench/b_loo_five_calls.R"]

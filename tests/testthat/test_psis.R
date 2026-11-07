@@ -1,5 +1,3 @@
-options(mc.cores = 1)
-options(loo.cores = NULL)
 set.seed(123)
 
 LLarr <- example_loglik_array()
@@ -198,3 +196,34 @@ test_that("do_psis_i selects the same tail as a full sort, also with ties", {
   }
 })
 
+
+
+test_that("importance sampling gives identical objects sequentially and in parallel", {
+  skip_if_not_installed("mirai")
+  skip_if_not_installed("mori")
+  for (method in c("psis", "tis", "sis")) {
+    fit <- get(method)
+    sequential <- suppressWarnings(
+      fit(-LLmat, r_eff = r_eff_vec[1], parallel = FALSE)
+    )
+    in_parallel <- suppressWarnings(
+      with_two_daemons(fit(-LLmat, r_eff = r_eff_vec[1], parallel = TRUE))
+    )
+    expect_identical(in_parallel, sequential)
+  }
+})
+
+test_that("norm_const_log and n_eff are the normalizing constants and effective sample sizes of the log weights", {
+  for (method in c("psis", "tis", "sis")) {
+    obj <- suppressWarnings(
+      importance_sampling(-LLmat, method = method, r_eff = 0.8, parallel = FALSE)
+    )
+    expect_equal(
+      attr(obj, "norm_const_log"),
+      matrixStats::colLogSumExps(obj$log_weights)
+    )
+    w <- exp(sweep(obj$log_weights, 2, attr(obj, "norm_const_log")))
+    expect_equal(obj$diagnostics$n_eff, psis_n_eff(w, rep(0.8, ncol(w))))
+    expect_equal(colSums(w), rep(1, ncol(w)))
+  }
+})

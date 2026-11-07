@@ -33,7 +33,7 @@ loo_scrps(x, ...)
   ...,
   permutations = 1,
   r_eff = 1,
-  cores = getOption("mc.cores", 1)
+  parallel = getOption("loo.parallel", TRUE)
 )
 
 \method{scrps}{matrix}(x, x2, y, ..., permutations = 1)
@@ -48,7 +48,7 @@ loo_scrps(x, ...)
   ...,
   permutations = 1,
   r_eff = 1,
-  cores = getOption("mc.cores", 1)
+  parallel = getOption("loo.parallel", TRUE)
 )
 }
 \arguments{
@@ -76,8 +76,15 @@ the computed expected value.}
 \item{r_eff}{An optional vector of relative effective sample size estimates
 containing one element per observation. See \code{\link[=psis]{psis()}} for details.}
 
-\item{cores}{The number of cores to use for parallelization of \verb{[psis()]}.
-See \code{\link[=psis]{psis()}} for details.}
+\item{parallel}{Logical. If \code{TRUE}, run on mirai daemons, which you set up
+beforehand with \code{\link[mirai:daemons]{mirai::daemons()}}. The default is
+\code{getOption("loo.parallel", TRUE)}. This needs the \pkg{mirai} and \pkg{mori}
+packages, which are only suggested. Local daemons read inputs larger than
+\code{getOption("loo.share_bytes", 4 * 2^20)} bytes (4 MiB) from shared memory
+(\code{\link[mori:share]{mori::share()}}) and receive copies of smaller ones; remote daemons
+always receive copies. Daemons start with an empty global environment, so a
+log-likelihood function must be self-contained or get what it needs
+through \code{data}, \code{draws} or \code{...}.}
 }
 \value{
 A list containing two elements: \code{estimates} and \code{pointwise}.

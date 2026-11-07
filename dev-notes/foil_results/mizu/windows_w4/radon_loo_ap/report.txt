@@ -1,0 +1,10 @@
+radon_loo_ap: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  5.3s
+Candidate: 5.4s
+
+Change: +46.2ms (+0.86%)
+  50% CrI: [+5.7ms, +90.6ms] (+0.10%, +1.70%)
+  80% CrI: [-26.0ms, +129.2ms] (-0.48%, +2.44%)
+
+P(candidate faster): 22.1% (2,210 of 10,000 draws)

@@ -1,0 +1,10 @@
+loo_five_calls: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  5.7s
+Candidate: 6.0s
+
+Change: +210.6ms (+3.67%)
+  50% CrI: [+157.9ms, +269.4ms] (+2.74%, +4.71%)
+  80% CrI: [+109.3ms, +331.4ms] (+1.88%, +5.85%)
+
+P(candidate faster): 0.3% (28 of 10,000 draws)

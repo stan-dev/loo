@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 
 set.seed(123)
 S <- 4000
@@ -172,7 +171,7 @@ test_that("loo_moment_match.default warnings work", {
       k_thres = 0.5,
       split = FALSE,
       cov = TRUE,
-      cores = 1
+      parallel = FALSE
     ),
     "The accuracy of self-normalized importance sampling"
   )
@@ -189,7 +188,7 @@ test_that("loo_moment_match.default warnings work", {
       max_iters = 30L,
       split = FALSE,
       cov = TRUE,
-      cores = 1
+      parallel = FALSE
     ),
     "The accuracy of self-normalized importance sampling"
   )
@@ -206,7 +205,7 @@ test_that("loo_moment_match.default warnings work", {
     k_thres = 100,
     split = TRUE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_snapshot(loo_moment_match(
@@ -221,7 +220,7 @@ test_that("loo_moment_match.default warnings work", {
     k_thres = 0.5,
     split = TRUE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_error(
@@ -237,7 +236,7 @@ test_that("loo_moment_match.default warnings work", {
       k_thres = 0.5,
       split = TRUE,
       cov = TRUE,
-      cores = 1
+      parallel = FALSE
     ),
     "loo_moment_match currently supports only"
   )
@@ -252,7 +251,7 @@ test_that("loo_moment_match.default works", {
     lwi_x,
     method = "psis",
     r_eff = 1,
-    cores = 1
+    parallel = FALSE
   )))
 
   # loo object
@@ -270,7 +269,7 @@ test_that("loo_moment_match.default works", {
     k_thres = 0.8,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   # diagnostic Pareto k decreases but influence pareto k stays the same
@@ -306,7 +305,7 @@ test_that("loo_moment_match.default works", {
     k_thres = 0.5,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_snapshot_value(loo_moment_match_object2, style = "serialize")
@@ -323,7 +322,7 @@ test_that("loo_moment_match.default works", {
     k_thres = 0.5,
     split = TRUE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_snapshot_value(loo_moment_match_object3, style = "serialize")
@@ -340,7 +339,7 @@ test_that("loo_moment_match.default works", {
     k_thres = 100,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_equal(loo_manual, loo_moment_match_object4)
@@ -358,7 +357,7 @@ test_that("loo_moment_match.default works", {
     k_thres = 0.8,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_equal(
@@ -405,15 +404,13 @@ test_that("variance and covariance transformations work", {
     k_thres = 0.0,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   expect_snapshot_value(loo_moment_match_object, style = "serialize")
 })
 
-test_that("loo_moment_match.default works with multiple cores", {
-  # forked processes can segfault on CRAN's macOS machines if R is linked to
-  # Apple's Accelerate/vecLib BLAS, which is not fork-safe
+test_that("loo_moment_match.default works in parallel", {
   skip_on_cran()
   # loo object
   loo_manual <- suppressWarnings(loo(loglik))
@@ -430,7 +427,7 @@ test_that("loo_moment_match.default works with multiple cores", {
     k_thres = 0.5,
     split = FALSE,
     cov = TRUE,
-    cores = 1
+    parallel = FALSE
   ))
 
   loo_moment_match_manual4 <- suppressWarnings(loo_moment_match(
@@ -445,7 +442,7 @@ test_that("loo_moment_match.default works with multiple cores", {
     k_thres = 0.5,
     split = FALSE,
     cov = TRUE,
-    cores = 2
+    parallel = TRUE
   ))
 
   expect_equal(
@@ -479,7 +476,7 @@ test_that("loo_moment_match_split works", {
     lwi_1,
     method = "psis",
     r_eff = 1,
-    cores = 1
+    parallel = FALSE
   ))
   lwi_1_ps <- as.vector(weights(is_obj_1))
 
@@ -493,7 +490,7 @@ test_that("loo_moment_match_split works", {
     i = 1,
     log_prob_upars = log_prob_upars_test,
     log_lik_i_upars = log_lik_i_upars_test,
-    cores = 1,
+    parallel = FALSE,
     r_eff_i = 1,
     is_method = "psis"
   )
@@ -514,7 +511,7 @@ test_that("loo_moment_match_split works", {
     i = 1,
     log_prob_upars = log_prob_upars_test,
     log_lik_i_upars = log_lik_i_upars_test,
-    cores = 1,
+    parallel = FALSE,
     r_eff_i = 1,
     is_method = "psis"
   )
@@ -536,7 +533,7 @@ test_that("loo_moment_match_split works", {
     i = 1,
     log_prob_upars = log_prob_with_inf,
     log_lik_i_upars = log_lik_i_upars_test,
-    cores = 1,
+    parallel = FALSE,
     r_eff_i = 1,
     is_method = "psis"
   ))
@@ -568,7 +565,7 @@ test_that("loo_moment_match_split evaluates the inverse of its transformation", 
       i = 1,
       log_prob_upars = log_prob_record,
       log_lik_i_upars = log_lik_i_upars_test,
-      cores = 1,
+      parallel = FALSE,
       r_eff_i = 1,
       is_method = "psis"
     )
@@ -628,7 +625,7 @@ test_that("the total transformation composes the accepted steps in order", {
       i = 1,
       log_prob_upars = log_prob_record,
       log_lik_i_upars = log_lik_i_upars_test,
-      cores = 1,
+      parallel = FALSE,
       r_eff_i = 1,
       is_method = "psis"
     )
@@ -730,7 +727,7 @@ test_that("passing arguments works", {
     k_thres = 0.5,
     split = TRUE,
     cov = TRUE,
-    cores = 1,
+    parallel = FALSE,
     passed_arg = TRUE
   ))
 })
@@ -750,12 +747,12 @@ failing_log_lik_i_upars <- function(fail_calls) {
 
 mm_with <- function(loo_x, log_lik_i = log_lik_i_test,
                     log_lik_i_upars = log_lik_i_upars_test, split = TRUE,
-                    k_threshold = 0.7, cores = 1) {
+                    k_threshold = 0.7, parallel = FALSE) {
   loo_moment_match(
     x, loo = loo_x, post_draws = post_draws_test, log_lik_i = log_lik_i,
     unconstrain_pars = unconstrain_pars_test,
     log_prob_upars = log_prob_upars_test, log_lik_i_upars = log_lik_i_upars,
-    k_threshold = k_threshold, split = split, cores = cores
+    k_threshold = k_threshold, split = split, parallel = parallel
   )
 }
 
@@ -844,40 +841,13 @@ test_that("errors in loo itself are not reported as failed observations", {
   non_numeric_log_lik_i <- function(x, i, ...) {
     if (i == 1) "not numeric" else log_lik_i_test(x, i)
   }
-  cores_list <- if (os_is_windows()) 1 else c(1, 2)
-  for (cores in cores_list) {
+  for (parallel in c(FALSE, TRUE)) {
     expect_error(
-      # with cores = 2, mclapply() also warns that a worker had an error
       suppressWarnings(mm_with(loo_manual, log_lik_i = non_numeric_log_lik_i,
-                               k_threshold = 0, cores = cores)),
+                               k_threshold = 0, parallel = parallel)),
       "non-numeric argument to mathematical function"
     )
   }
-})
-
-test_that("a parallel worker that dies gives failed observations", {
-  skip_on_cran()
-  skip_on_os("windows")  # the worker is a forked process
-  loo_manual <- suppressWarnings(loo(loglik))
-  parent <- Sys.getpid()
-  dying_log_lik_i <- function(x, i, ...) {
-    if (i == 1 && Sys.getpid() != parent) {
-      tools::pskill(Sys.getpid(), tools::SIGKILL)
-    }
-    log_lik_i_test(x, i)
-  }
-  warnings <- character(0)
-  mm <- withCallingHandlers(
-    mm_with(loo_manual, log_lik_i = dying_log_lik_i, k_threshold = 0,
-            cores = 2),
-    warning = function(w) {
-      warnings <<- c(warnings, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
-  expect_match(warnings, "a parallel worker did not return a result",
-               all = FALSE)
-  expect_equal(mm$pointwise[1, ], loo_manual$pointwise[1, ])
 })
 
 test_that("an error for one observation keeps its PSIS results", {
@@ -888,14 +858,11 @@ test_that("an error for one observation keeps its PSIS results", {
     log_lik_i_test(x, i)
   }
   mm_ok <- suppressWarnings(mm_with(loo_manual, k_threshold = 0))
-  # On Windows the workers are PSOCK processes that load the installed loo, so
-  # with devtools::test() they would not run this version of the code
-  cores_list <- if (os_is_windows()) 1 else c(1, 2)
-  for (cores in cores_list) {
+  for (parallel in c(FALSE, TRUE)) {
     # observation 1 keeps its high Pareto k, which gives a second warning
     suppressWarnings(expect_warning(
       mm <- mm_with(loo_manual, log_lik_i = failing_log_lik_i,
-                    k_threshold = 0, cores = cores),
+                    k_threshold = 0, parallel = parallel),
       "failed for observation(s) 1.",
       fixed = TRUE
     ))

@@ -1,4 +1,3 @@
-options(mc.cores = 1)
 
 generate_test_elpd_dataset <- function() {
   N <- 10
@@ -17,7 +16,7 @@ generate_test_elpd_dataset <- function() {
   list(fake_posterior = fake_posterior, fake_data = fake_data)
 }
 
-test_elpd_loo_approximation <- function(cores) {
+test_elpd_loo_approximation <- function(parallel) {
   set.seed(123)
   test_data <- generate_test_elpd_dataset()
   fake_posterior <- test_data$fake_posterior
@@ -34,7 +33,7 @@ test_elpd_loo_approximation <- function(cores) {
       data = fake_data,
       draws = fake_posterior,
       loo_approximation = "plpd",
-      cores = cores
+      parallel = parallel
     )
   )
   # Compute it manually
@@ -55,7 +54,7 @@ test_elpd_loo_approximation <- function(cores) {
       data = fake_data,
       draws = fake_posterior,
       loo_approximation = "lpd",
-      cores = cores
+      parallel = parallel
     )
   )
   # Compute it manually
@@ -83,7 +82,7 @@ test_elpd_loo_approximation <- function(cores) {
       data = fake_data,
       draws = fake_posterior,
       loo_approximation = "waic",
-      cores = cores
+      parallel = parallel
     )
   )
   expect_true(all(pi_vals > pi_vals_waic))
@@ -97,7 +96,7 @@ test_elpd_loo_approximation <- function(cores) {
       draws = fake_posterior,
       loo_approximation = "tis",
       loo_approximation_draws = 100,
-      cores = cores
+      parallel = parallel
     )
   )
   expect_true(all(pi_vals > pi_vals_tis))
@@ -105,11 +104,11 @@ test_elpd_loo_approximation <- function(cores) {
 }
 
 test_that("elpd_loo_approximation works as expected", {
-  test_elpd_loo_approximation(1)
+  test_elpd_loo_approximation(FALSE)
 })
 
-test_that("elpd_loo_approximation with multiple cores", {
-  test_elpd_loo_approximation(2)
+test_that("elpd_loo_approximation runs with parallel = TRUE", {
+  test_elpd_loo_approximation(TRUE)
 })
 
 test_that("Test loo_approximation_draws", {
@@ -137,7 +136,7 @@ test_that("Test loo_approximation_draws", {
       draws = fake_posterior,
       loo_approximation = "waic",
       loo_approximation_draws = NULL,
-      cores = 1
+      parallel = FALSE
     )
   )
   expect_silent(
@@ -147,7 +146,7 @@ test_that("Test loo_approximation_draws", {
       draws = fake_posterior,
       loo_approximation = "waic",
       loo_approximation_draws = 10,
-      cores = 1
+      parallel = FALSE
     )
   )
   expect_silent(
@@ -157,7 +156,7 @@ test_that("Test loo_approximation_draws", {
       draws = fake_posterior[1:10 * 100, ],
       loo_approximation = "waic",
       loo_approximation_draws = NULL,
-      cores = 1
+      parallel = FALSE
     )
   )
   expect_silent(
@@ -167,7 +166,7 @@ test_that("Test loo_approximation_draws", {
       draws = fake_posterior[1:10 * 100, , drop = FALSE],
       loo_approximation = "waic",
       loo_approximation_draws = NULL,
-      cores = 1
+      parallel = FALSE
     )
   )
   expect_failure(expect_equal(res1, res3))
@@ -295,7 +294,7 @@ test_that("waic using delta method and gradient", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic"
     )
   )
@@ -304,7 +303,7 @@ test_that("waic using delta method and gradient", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic_grad",
       .llgrad = .llgrad
     )
@@ -314,7 +313,7 @@ test_that("waic using delta method and gradient", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic_grad_marginal",
       .llgrad = .llgrad
     )
@@ -332,7 +331,7 @@ test_that("waic using delta method and gradient", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic",
       observations = 50,
@@ -344,7 +343,7 @@ test_that("waic using delta method and gradient", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_grad",
       observations = 50,
@@ -356,7 +355,7 @@ test_that("waic using delta method and gradient", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_grad_marginal",
       observations = 50,
@@ -368,7 +367,7 @@ test_that("waic using delta method and gradient", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "plpd",
       observations = 50,
@@ -380,7 +379,7 @@ test_that("waic using delta method and gradient", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_grad",
       observations = 50
@@ -476,7 +475,7 @@ test_that("waic using delta 2nd order method", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic"
     )
   )
@@ -485,7 +484,7 @@ test_that("waic using delta 2nd order method", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic_grad",
       .llgrad = .llgrad
     )
@@ -495,7 +494,7 @@ test_that("waic using delta 2nd order method", {
       .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       loo_approximation = "waic_hess",
       .llgrad = .llgrad,
       .llhess = .llhess
@@ -511,7 +510,7 @@ test_that("waic using delta 2nd order method", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic",
       observations = 50,
@@ -523,7 +522,7 @@ test_that("waic using delta 2nd order method", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_hess",
       observations = 50,
@@ -535,7 +534,7 @@ test_that("waic using delta 2nd order method", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_hess",
       observations = 50,
@@ -548,7 +547,7 @@ test_that("waic using delta 2nd order method", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "waic_grad",
       observations = 50,
@@ -560,7 +559,7 @@ test_that("waic using delta 2nd order method", {
       x = .llfun,
       data = fake_data,
       draws = fake_posterior,
-      cores = 1,
+      parallel = FALSE,
       r_eff = rep(1, nrow(fake_data)),
       loo_approximation = "plpd",
       observations = 50,

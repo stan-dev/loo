@@ -1,0 +1,73 @@
+vig_roaches: candidate 1/50 benchmark
+vig_roaches: baseline 2/50 benchmark
+vig_roaches: baseline 3/50 benchmark
+vig_roaches: candidate 4/50 benchmark
+vig_roaches: candidate 5/50 benchmark
+vig_roaches: baseline 6/50 benchmark
+vig_roaches: baseline 7/50 benchmark
+vig_roaches: candidate 8/50 benchmark
+vig_roaches: baseline 9/50 benchmark
+vig_roaches: candidate 10/50 benchmark
+vig_roaches: baseline 11/50 benchmark
+vig_roaches: candidate 12/50 benchmark
+vig_roaches: candidate 13/50 benchmark
+vig_roaches: baseline 14/50 benchmark
+vig_roaches: candidate 15/50 benchmark
+vig_roaches: baseline 16/50 benchmark
+vig_roaches: candidate 17/50 benchmark
+vig_roaches: baseline 18/50 benchmark
+vig_roaches: candidate 19/50 benchmark
+vig_roaches: baseline 20/50 benchmark
+vig_roaches: baseline 21/50 benchmark
+vig_roaches: candidate 22/50 benchmark
+vig_roaches: baseline 23/50 benchmark
+vig_roaches: candidate 24/50 benchmark
+vig_roaches: baseline 25/50 benchmark
+vig_roaches: candidate 26/50 benchmark
+vig_roaches: baseline 27/50 benchmark
+vig_roaches: candidate 28/50 benchmark
+vig_roaches: candidate 29/50 benchmark
+vig_roaches: baseline 30/50 benchmark
+vig_roaches: candidate 31/50 benchmark
+vig_roaches: baseline 32/50 benchmark
+vig_roaches: candidate 33/50 benchmark
+vig_roaches: baseline 34/50 benchmark
+vig_roaches: candidate 35/50 benchmark
+vig_roaches: baseline 36/50 benchmark
+vig_roaches: baseline 37/50 benchmark
+vig_roaches: candidate 38/50 benchmark
+vig_roaches: baseline 39/50 benchmark
+vig_roaches: candidate 40/50 benchmark
+vig_roaches: baseline 41/50 benchmark
+vig_roaches: candidate 42/50 benchmark
+vig_roaches: baseline 43/50 benchmark
+vig_roaches: candidate 44/50 benchmark
+vig_roaches: candidate 45/50 benchmark
+vig_roaches: baseline 46/50 benchmark
+vig_roaches: candidate 47/50 benchmark
+vig_roaches: baseline 48/50 benchmark
+vig_roaches: candidate 49/50 benchmark
+vig_roaches: baseline 50/50 benchmark
+vig_roaches: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  4.5s
+Candidate: 2.2s
+
+Change: -2.3s (-51.43%)
+  80% CrI: [-2.5s, -2.2s] (-52.54%, -50.13%)
+  90% CrI: [-2.5s, -2.2s] (-52.81%, -49.72%)
+
+P(candidate faster): 100.0% (10,000 of 10,000 draws)
+
+Peak memory
+
+Baseline:  0.9GB
+Candidate: 1.1GB
+
+Change: +267.4MB (+31.26%)
+  80% CrI: [+265.1MB, +269.5MB] (+30.99%, +31.51%)
+  90% CrI: [+264.5MB, +270.1MB] (+30.91%, +31.58%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)

@@ -81,13 +81,43 @@ test_that("nlist works", {
   expect_equal(nlist(a = 1, b = 2, c = 3), list(a = 1, b = 2, c = 3))
 })
 
-test_that("loo_cores works", {
-  expect_equal(loo_cores(10), 10)
-  options(mc.cores = 2)
-  expect_equal(loo_cores(getOption("mc.cores", 1)), 2)
-  options(mc.cores = 1)
 
-  options(loo.cores = 2)
-  expect_warning(expect_equal(loo_cores(10), 2), "deprecated")
-  options(loo.cores = NULL)
+test_that("loo_map re-raises warnings from daemons", {
+  expect_warning(
+    out <- loo_map(
+      1L,
+      function(i) {
+        warning("from worker")
+        i
+      },
+      parallel = TRUE
+    ),
+    "from worker"
+  )
+  expect_equal(out, list(1L))
+})
+
+test_that("parallel = TRUE names the missing packages", {
+  expect_error(
+    check_parallel_packages(c("mirai", "notapackage")),
+    "'notapackage' package"
+  )
+  expect_silent(check_parallel_packages("stats"))
+})
+
+test_that("loo_map gives the same result whether arguments are shared or copied", {
+  skip_if_not_installed("mori")
+  x <- matrix(rnorm(40), 10)
+  column_sum <- function(i, x) sum(x[, i])
+  copied <- loo_map(1:4, column_sum, x = x, parallel = TRUE, share_bytes = Inf)
+  shared <- loo_map(1:4, column_sum, x = x, parallel = TRUE, share_bytes = 0)
+  unbatched <- loo_map(1:4, column_sum, x = x, parallel = TRUE, batch = FALSE)
+  expect_equal(shared, copied)
+  expect_equal(unbatched, copied)
+  expect_equal(copied, as.list(colSums(x)), ignore_attr = TRUE)
+})
+
+test_that("loo.parallel sets the default of parallel", {
+  withr::local_options(loo.parallel = FALSE)
+  expect_false(eval(formals(loo.matrix)$parallel))
 })

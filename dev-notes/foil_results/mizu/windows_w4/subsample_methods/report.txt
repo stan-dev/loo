@@ -1,0 +1,10 @@
+subsample_methods: Comparing candidate (HEAD) to baseline (45479fb6) with 10 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Baseline:  3.1s
+Candidate: 3.2s
+
+Change: +95.7ms (+3.04%)
+  50% CrI: [+86.7ms, +103.2ms] (+2.75%, +3.29%)
+  80% CrI: [+77.3ms, +108.8ms] (+2.46%, +3.49%)
+
+P(candidate faster): 0.0% (0 of 10,000 draws)

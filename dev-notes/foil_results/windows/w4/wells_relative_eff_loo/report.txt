@@ -1,0 +1,23 @@
+wells_relative_eff_loo: Comparing candidate (HEAD) to baseline (origin/loo-v3.0.0) with 25 paired repetitions and 10000 Bayesian bootstrap draws.
+
+Time
+
+Baseline:  6.8s
+Candidate: 6.7s
+
+Change: -161.9ms (-2.38%)
+  80% CrI: [-412.4ms, +99.7ms] (-5.92%, +1.49%)
+  90% CrI: [-486.5ms, +178.9ms] (-6.90%, +2.66%)
+
+P(candidate faster): 79.7% (7,966 of 10,000 draws)
+
+Peak memory
+
+Baseline:  892.1MB
+Candidate: 971.8MB
+
+Change: +79.7MB (+8.93%)
+  80% CrI: [+77.9MB, +81.5MB] (+8.72%, +9.15%)
+  90% CrI: [+77.3MB, +82.1MB] (+8.65%, +9.22%)
+
+P(candidate smaller): 0.0% (0 of 10,000 draws)
