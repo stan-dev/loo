@@ -238,7 +238,10 @@ print_mcse_summary <- function(x, digits) {
 
 # print and warning helpers
 .fr <- function(x, digits) format(round(x, digits), nsmall = digits)
-.warn <- function(..., class = NULL) {
+.warn <- function(..., class = NULL, immediate = FALSE) {
+  if (immediate && getOption("warn") < 1) {
+    rlang::local_options(warn = 1)
+  }
   rlang::warn(paste(c(...), collapse = ""), class = c(class, "loo_warning"))
 }
 .warn_diagnostic <- function(..., class) {

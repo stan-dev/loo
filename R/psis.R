@@ -340,7 +340,8 @@ throw_tail_length_warnings <- function(tail_lengths) {
     if (length(tail_lengths) == 1) {
       .warn_diagnostic(
         "Not enough tail samples to fit the generalized Pareto distribution.",
-        class = "loo_warning_pareto_tail_not_fitted"
+        class = "loo_warning_pareto_tail_not_fitted",
+        immediate = TRUE
       )
     } else {
       bad <- which(tail_len_bad)
@@ -355,7 +356,8 @@ throw_tail_length_warnings <- function(tail_lengths) {
         } else {
           "\n"
         },
-        class = "loo_warning_pareto_tail_not_fitted"
+        class = "loo_warning_pareto_tail_not_fitted",
+        immediate = TRUE
       )
     }
   }

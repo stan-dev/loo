@@ -20,3 +20,14 @@ test_that("warning helpers signal their classes", {
   expect_warning(throw_moment_match_error_warning(1, 2, "e"), class = "loo_warning_moment_match_failed")
   expect_warning(throw_large_kf_warning(1, 0.7), class = "loo_warning_large_kf")
 })
+
+test_that("user-facing functions signal loo warning classes", {
+  LLarr <- example_loglik_array()
+  w1 <- suppressWarnings(waic(LLarr))
+  w2 <- w1
+  attr(w2, "yhash") <- "b"
+  expect_warning(waic(LLarr), class = "loo_warning_p_waic_high")
+  expect_warning(loo_compare(w1, w2), class = "loo_warning_y_mismatch")
+  expect_warning(compare(w1, w1), class = "deprecatedWarning")
+  expect_warning(compare(w1, w1), class = "loo_warning_deprecated")
+})

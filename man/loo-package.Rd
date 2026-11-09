@@ -67,7 +67,9 @@ sampling may be bad.
 cross-validation or different numbers of folds.
 \item \code{loo_warning_chance_difference}: The difference in performance is
 potentially due to chance.
-\item \code{loo_warning_subsample_se}: A subsampling standard error is naive or
+\item \code{loo_warning_subsample_naive_se}: The difference SE in \code{loo_compare()}
+uses the naive estimator.
+\item \code{loo_warning_subsample_negative_se}: The subsampling SE estimate is
 negative.
 }
 

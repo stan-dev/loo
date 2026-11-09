@@ -65,7 +65,9 @@
 #' cross-validation or different numbers of folds.
 #' * `loo_warning_chance_difference`: The difference in performance is
 #' potentially due to chance.
-#' * `loo_warning_subsample_se`: A subsampling standard error is naive or
+#' * `loo_warning_subsample_naive_se`: The difference SE in `loo_compare()`
+#' uses the naive estimator.
+#' * `loo_warning_subsample_negative_se`: The subsampling SE estimate is
 #' negative.
 #'
 #' Other warnings:

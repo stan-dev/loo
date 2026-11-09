@@ -12,9 +12,8 @@ comparison-model minus reference-model by @florence-bockting in #391
 input by @thanasibakis in #398
 * Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
 * All warnings now have the class `loo_warning` and a class for each cause;
-diagnostics warnings have the class `loo_warning_diagnostic` by
-@florence-bockting in #417
-
+diagnostics warnings have the class `loo_warning_diagnostic`. The base warning
+class is now `rlang_warning` by @florence-bockting in #417
 
 # loo 2.10.1
 
