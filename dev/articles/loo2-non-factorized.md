@@ -428,16 +428,16 @@ in the upcoming section.
     Computed from 4000 posterior draws and 49 log-likelihood terms.
 
              Estimate   SE
-    elpd_loo   -186.9 10.9
-    p_loo         8.1  5.2
-    looic       373.8 21.8
+    elpd_loo   -186.8 10.7
+    p_loo         7.9  5.1
+    looic       373.5 21.4
     ------
     MCSE of elpd_loo is NA.
     MCSE and ESS estimates assume independent draws (r_eff=1).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     48    98.0%   550     
+    (-Inf, 0.7]   (good)     48    98.0%   1051    
        (0.7, 1]   (bad)       1     2.0%   <NA>    
        (1, Inf)   (very bad)  0     0.0%   <NA>    
     See help('pareto-k-diagnostic') for details.
@@ -461,8 +461,8 @@ fit_dummy <- brm(
 ```
 
     Running /opt/R/4.6.2/lib/R/bin/R CMD SHLIB foo.c
-    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    using C compiler: ‘gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0’
+    gcc -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from <command-line>:
     /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:3:10: fatal error: stdexcept: No such file or directory
         3 | #include <stdexcept>
@@ -547,7 +547,7 @@ exact_elpd <- sum(exact_elpds)
 round(exact_elpd, 1)
 ```
 
-    [1] -189
+    [1] -188.6
 
 The results of the approximate and exact LOO-CV are similar but not as
 close as we would expect if there were no problematic observations. We
@@ -588,7 +588,7 @@ round(without_pt_4, 1)
 ```
 
     approx  exact 
-    -173.0 -173.1 
+      -173   -173 
 
 From this we can conclude that the difference we found when including
 *all* observations does not indicate a bug in our implementation of the

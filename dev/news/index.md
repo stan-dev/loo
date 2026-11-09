@@ -34,6 +34,9 @@
   [`pseudobma_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
   by [@VisruthSK](https://github.com/VisruthSK) in
   [\#368](https://github.com/stan-dev/loo/issues/368)
+- Use a tolerance relative to the magnitude of `x` in `is_constant()` by
+  [@avehtari](https://github.com/avehtari) in
+  [\#407](https://github.com/stan-dev/loo/issues/407)
 
 ## loo 2.10.1
 

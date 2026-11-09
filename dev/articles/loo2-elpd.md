@@ -122,8 +122,8 @@ stanmodel <- stan_model(model_code = stancode)
     Trying to compile a simple C file
 
     Running /opt/R/4.6.2/lib/R/bin/R CMD SHLIB foo.c
-    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    using C compiler: ‘gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0’
+    gcc -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from <command-line>:
     /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:3:10: fatal error: stdexcept: No such file or directory
         3 | #include <stdexcept>
@@ -170,8 +170,8 @@ using [`elpd()`](https://mc-stan.org/loo/dev/reference/elpd.md).
     Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
 
          Estimate    SE
-    elpd  -1741.0 290.7
-    ic     3482.1 581.5
+    elpd  -1736.7 289.5
+    ic     3473.4 578.9
 
 When one wants to compare different models, the function
 [`loo_compare()`](https://mc-stan.org/loo/dev/reference/loo_compare.md)
@@ -238,28 +238,28 @@ for(k in 1:10){
      Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.007 seconds (Generated Quantities)
+     Elapsed Time: 0.006 seconds (Generated Quantities)
 
 
      Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.007 seconds (Generated Quantities)
+     Elapsed Time: 0.006 seconds (Generated Quantities)
+
+
+     Elapsed Time: 0.006 seconds (Generated Quantities)
 
 
      Elapsed Time: 0.007 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.007 seconds (Generated Quantities)
+     Elapsed Time: 0.006 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.007 seconds (Generated Quantities)
+     Elapsed Time: 0.006 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.007 seconds (Generated Quantities)
-
-
-     Elapsed Time: 0.007 seconds (Generated Quantities)
+     Elapsed Time: 0.006 seconds (Generated Quantities)
 
 
      Elapsed Time: 0.007 seconds (Generated Quantities)
@@ -278,8 +278,8 @@ using [`elpd()`](https://mc-stan.org/loo/dev/reference/elpd.md).
     Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.
 
          Estimate     SE
-    elpd  -5560.1  730.0
-    ic    11120.2 1460.1
+    elpd  -5551.4  727.0
+    ic    11102.9 1454.0
 
 If one wants to compare several models (with `loo_compare`), one should
 use the same folds for all the different models.

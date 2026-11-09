@@ -148,18 +148,18 @@ print(loo_post)
     Computed from 4000 posterior draws and 126 log-likelihood terms.
 
              Estimate   SE
-    elpd_loo    -43.0  6.9
-    p_loo        24.0  4.9
-    looic        85.9 13.8
+    elpd_loo    -42.6  7.0
+    p_loo        23.8  5.1
+    looic        85.2 14.1
     ------
     MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.3, 1.0]).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     97    77.0%   101     
+    (-Inf, 0.7]   (good)     98    77.8%   106     
        (0.7, 1]   (bad)      21    16.7%   <NA>    
-       (1, Inf)   (very bad)  8     6.3%   <NA>    
+       (1, Inf)   (very bad)  7     5.6%   <NA>    
     See help('pareto-k-diagnostic') for details.
 
 As we can see the diagnostics signal either “bad” or “very bad”
@@ -236,7 +236,7 @@ print(paste("RMSE(PSIS) =",round( sqrt(mean((elpd_loo-elpd_psis)^2)) ,2)))
 print(paste("RMSE(MixIS) =",round( sqrt(mean((elpd_loo-elpd_mixis)^2)) ,2)))
 ```
 
-    [1] "RMSE(MixIS) = 0.04"
+    [1] "RMSE(MixIS) = 0.05"
 
 Here mixture estimator provides a reduction in RMSE. Note that this
 value would increase with the number of samples drawn from the posterior
@@ -254,14 +254,14 @@ elpd_psis <- loo_post$pointwise[,1]
 print(paste("ELPD (PSIS)=",round(sum(elpd_psis),2)))
 ```
 
-    [1] "ELPD (PSIS)= -42.95"
+    [1] "ELPD (PSIS)= -42.59"
 
 ``` r
 
 print(paste("ELPD (MixIS)=",round(sum(elpd_mixis),2)))
 ```
 
-    [1] "ELPD (MixIS)= -45.49"
+    [1] "ELPD (MixIS)= -45.1"
 
 ``` r
 

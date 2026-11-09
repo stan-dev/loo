@@ -130,8 +130,8 @@ stanmodel <- stan_model(model_code = stancode)
 ```
 
     Running /opt/R/4.6.2/lib/R/bin/R CMD SHLIB foo.c
-    using C compiler: ‘gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0’
-    gcc -std=gnu2x -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
+    using C compiler: ‘gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0’
+    gcc -I"/opt/R/4.6.2/lib/R/include" -DNDEBUG   -I"/home/runner/work/_temp/Library/Rcpp/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/"  -I"/home/runner/work/_temp/Library/RcppEigen/include/unsupported"  -I"/home/runner/work/_temp/Library/BH/include" -I"/home/runner/work/_temp/Library/StanHeaders/include/src/"  -I"/home/runner/work/_temp/Library/StanHeaders/include/"  -I"/home/runner/work/_temp/Library/RcppParallel/include/" -DRCPP_PARALLEL_USE_TBB=1 -DTBB_INTERFACE_NEW -I/home/runner/work/_temp/Library/RcppParallel/include -I"/home/runner/work/_temp/Library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include    -fpic  -g -O2  -c foo.c -o foo.o
     In file included from <command-line>:
     /home/runner/work/_temp/Library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:3:10: fatal error: stdexcept: No such file or directory
         3 | #include <stdexcept>
@@ -151,11 +151,11 @@ print(fit, pars = "beta")
     post-warmup draws per chain=1000, total post-warmup draws=4000.
 
              mean se_mean   sd  2.5%   25%   50%   75% 97.5% n_eff Rhat
-    beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2318    1
-    beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2467    1
-    beta[3] -0.31       0 0.04 -0.38 -0.34 -0.32 -0.29 -0.24  2000    1
+    beta[1]  0.16       0 0.00  0.16  0.16  0.16  0.16  0.16  2849    1
+    beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2460    1
+    beta[3] -0.31       0 0.03 -0.38 -0.34 -0.31 -0.29 -0.25  2483    1
 
-    Samples were drawn using NUTS(diag_e) at Thu Nov  5 23:34:05 2026.
+    Samples were drawn using NUTS(diag_e) at Mon Nov  9 10:29:53 2026.
     For each parameter, n_eff is a crude measure of effective sample size,
     and Rhat is the potential scale reduction factor on split chains (at 
     convergence, Rhat=1).
@@ -181,17 +181,17 @@ loo1
     Computed from 4000 posterior draws and 262 log-likelihood terms.
 
              Estimate     SE
-    elpd_loo  -5462.4  695.2
-    p_loo       259.6   55.7
-    looic     10924.8 1390.4
+    elpd_loo  -5453.4  692.3
+    p_loo       248.6   53.0
+    looic     10906.8 1384.5
     ------
     MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     247   94.3%   104     
-       (0.7, 1]   (bad)        8    3.1%   <NA>    
+    (-Inf, 0.7]   (good)     246   93.9%   79      
+       (0.7, 1]   (bad)        9    3.4%   <NA>    
        (1, Inf)   (very bad)   7    2.7%   <NA>    
     See help('pareto-k-diagnostic') for details.
 
@@ -250,12 +250,12 @@ loo2
     Computed from 4000 posterior draws and 262 log-likelihood terms.
 
              Estimate     SE
-    elpd_loo  -5479.1  700.2
-    p_loo       276.3   62.6
-    looic     10958.2 1400.4
+    elpd_loo  -5477.3  699.9
+    p_loo       272.4   62.1
+    looic     10954.5 1399.9
     ------
     MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
 
     All Pareto k estimates are good (k < 0.7).
     See help('pareto-k-diagnostic') for details.
@@ -418,12 +418,12 @@ loo3
     Computed from 4000 posterior draws and 262 log-likelihood terms.
 
              Estimate     SE
-    elpd_loo  -5479.1  700.2
-    p_loo       276.3   62.6
-    looic     10958.2 1400.4
+    elpd_loo  -5477.3  699.9
+    p_loo       272.4   62.1
+    looic     10954.5 1399.9
     ------
     MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.4, 1.0]).
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
 
     All Pareto k estimates are good (k < 0.7).
     See help('pareto-k-diagnostic') for details.
