@@ -11,12 +11,22 @@
 #'   elements are named the names will be used to label the models in the
 #'   results. Each matrix/object should have dimensions \eqn{S} by \eqn{N},
 #'   where \eqn{S} is the size of the posterior sample (with all chains merged)
-#'   and \eqn{N} is the number of data points. If `x` is a list of
+#'   and \eqn{N} is the number of data points. All models must have the same
+#'   \eqn{N}, but \eqn{S} can differ between models. If `x` is a list of
 #'   log-likelihood matrices then [loo()] is called internally on each matrix.
 #'   Currently the `loo_model_weights()` function is not implemented to be used
 #'   with results from K-fold CV, but you can still obtain weights using K-fold
 #'   CV results by calling the `stacking_weights()` or `pseudobma_weights()`
-#'   function directly.
+#'   function directly. Objects from [loo_subsample()] are supported only with
+#'   `method = "pseudobma"` and `BB = FALSE`, which use the subsampling
+#'   estimates of `elpd_loo`. The weights do not account for the subsampling
+#'   uncertainty of these estimates. The subsamples can differ between the
+#'   models, but the differences between the estimates are more accurate when
+#'   all models use the same observations (pass the first object as the
+#'   `observations` argument of [loo_subsample()] for the other models).
+#'   Stacking and the Bayesian bootstrap need pointwise values for all
+#'   observations, and objects from [loo_subsample()] have them only for the
+#'   subsampled observations.
 #' @param method Either `"stacking"` (the default) or `"pseudobma"`, indicating which method
 #'   to use for obtaining the weights. `"stacking"` refers to stacking of
 #'   predictive distributions and  `"pseudobma"` refers to pseudo-BMA+ weighting
@@ -183,6 +193,7 @@ loo_model_weights.default <-
     cores <- loo_cores(cores)
     method <- match.arg(method)
     K <- length(x) # number of models
+    subsampled <- FALSE # set below for a list of loo objects
 
     if (is.matrix(x[[1]])) {
       N <- ncol(x[[1]]) # number of data points
@@ -198,9 +209,14 @@ loo_model_weights.default <-
         elpd_loo[k] <- loo_object$estimates["elpd_loo", "Estimate"]
       }
     } else if (is.psis_loo(x[[1]])) {
-      validate_psis_loo_list(x)
-      lpd_point <- do.call(cbind, lapply(x, function(obj) obj$pointwise[, "elpd_loo"]))
+      # pseudo-BMA without the Bayesian bootstrap needs only the elpd of each
+      # model, which loo_subsample() estimates for all observations
+      validate_psis_loo_list(x, allow_subsampling = method == "pseudobma" && !BB)
       elpd_loo <- sapply(x, function(obj) obj$estimates["elpd_loo", "Estimate"])
+      subsampled <- any(sapply(x, inherits, "psis_loo_ss"))
+      if (!subsampled) {
+        lpd_point <- do.call(cbind, lapply(x, function(obj) obj$pointwise[, "elpd_loo"]))
+      }
     } else {
       stop("'x' must be a list of matrices or a list of 'psis_loo' objects.")
     }
@@ -213,6 +229,10 @@ loo_model_weights.default <-
         optim_control = optim_control
       )
 
+    } else if (subsampled) {
+      # method == "pseudobma" with BB = FALSE (checked above): the subsampling
+      # estimates of elpd_loo
+      wts <- pseudobma_weights_from_elpd(elpd_loo)
     } else {
       # method =="pseudobma"
       wts <- pseudobma_weights(
@@ -326,13 +346,7 @@ pseudobma_weights <-
     }
 
     if (!BB) {
-      uwts <- exp(elpd - max(elpd))
-      wts <- structure(
-        uwts / sum(uwts),
-        names = paste0("model", 1:K),
-        class = "pseudobma_weights"
-      )
-      return(wts)
+      return(pseudobma_weights_from_elpd(elpd))
     }
 
     BB_weighting <- dirichlet_rng(BB_n, rep(alpha, N))
@@ -345,6 +359,29 @@ pseudobma_weights <-
     )
   }
 
+
+#' Pseudo-BMA weights from the elpd of each model
+#'
+#' @noRd
+#' @param elpd Vector of elpd estimates, one for each model. Each must be finite
+#'   or `-Inf`, and at least one must be finite.
+#' @return Weights proportional to `exp(elpd)`, with class
+#'   `"pseudobma_weights"`.
+pseudobma_weights_from_elpd <- function(elpd) {
+  if (anyNA(elpd) || any(elpd == Inf)) {
+    stop("All elpd_loo estimates must be finite or -Inf.", call. = FALSE)
+  }
+  if (!any(is.finite(elpd))) {
+    stop("At least one model must have a finite total predictive density.",
+         call. = FALSE)
+  }
+  uwts <- exp(elpd - max(elpd))
+  structure(
+    uwts / sum(uwts),
+    names = paste0("model", seq_along(elpd)),
+    class = "pseudobma_weights"
+  )
+}
 
 #' @export
 print.stacking_weights <- function(x, digits = 3, ...) {
@@ -420,7 +457,8 @@ validate_r_eff_list <- function(r_eff_list, K, N) {
 #' Validate log-likelihood list argument
 #'
 #' Checks that log-likelihood list has at least 2 elements and that each element
-#' has the same dimensions.
+#' has the same number of observations (columns). The number of posterior
+#' draws (rows) can differ, because the weights use only the pointwise elpd.
 #'
 #' @noRd
 #' @param log_lik_list User's list of log-likelihood matrices (the `x` argument
@@ -432,14 +470,14 @@ validate_log_lik_list <- function(log_lik_list) {
   if (length(log_lik_list) < 2) {
     stop("At least two models are required.", call. = FALSE)
   }
-  if (length(unique(sapply(log_lik_list, ncol))) != 1 |
-     length(unique(sapply(log_lik_list, nrow))) != 1) {
-    stop("Each log-likelihood matrix must have the same dimensions.", call. = FALSE)
+  if (length(unique(sapply(log_lik_list, ncol))) != 1) {
+    stop("Each log-likelihood matrix must have the same number of ",
+         "observations (columns).", call. = FALSE)
   }
   invisible(TRUE)
 }
 
-validate_psis_loo_list <- function(psis_loo_list) {
+validate_psis_loo_list <- function(psis_loo_list, allow_subsampling = FALSE) {
   stopifnot(is.list(psis_loo_list))
   if (length(psis_loo_list) < 2) {
     stop("At least two models are required.", call. = FALSE)
@@ -447,11 +485,30 @@ validate_psis_loo_list <- function(psis_loo_list) {
   if (!all(sapply(psis_loo_list, is.psis_loo))) {
     stop("List elements must all be 'psis_loo' objects or log-likelihood matrices.")
   }
+  # the pointwise values of a subsampled object cover only its subsample, so
+  # the objects would not have values for the same observations
+  subsampled <- sapply(psis_loo_list, inherits, "psis_loo_ss")
+  if (any(subsampled) && !allow_subsampling) {
+    stop("loo_model_weights() supports objects from loo_subsample() only with ",
+         "method = \"pseudobma\" and BB = FALSE, because they have pointwise ",
+         "values only for the subsampled observations. Use loo() for all ",
+         "observations.", call. = FALSE)
+  }
 
-  dims <- sapply(psis_loo_list, dim)
-  if (length(unique(dims[1, ])) != 1 |
-      length(unique(dims[2, ])) != 1) {
-    stop("Each object in the list must have the same dimensions.", call. = FALSE)
+  # the weights use only the pointwise elpd or its total, so the number of
+  # posterior draws can differ between the objects
+  # a subsampled object has an approximation of elpd_loo for every observation
+  # (nobs() is the size of the subsample)
+  n_obs <- sapply(psis_loo_list, function(x) {
+    if (inherits(x, "psis_loo_ss")) {
+      length(x$loo_subsampling$elpd_loo_approx)
+    } else {
+      nrow(x$pointwise)
+    }
+  })
+  if (length(unique(n_obs)) != 1) {
+    stop("Each object in the list must have the same number of observations.",
+         call. = FALSE)
   }
   invisible(TRUE)
 }

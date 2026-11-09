@@ -178,3 +178,23 @@ test_that("psis_smooth_tail returns original tail values if k is infinite", {
   expect_equal(val$k, Inf)
 })
 
+test_that("do_psis_i selects the same tail as a full sort, also with ties", {
+  # reference: the tail from a full sort, as in loo 2.10.1
+  do_psis_i_full_sort <- function(log_ratios_i, tail_len_i) {
+    S <- length(log_ratios_i)
+    lw_i <- log_ratios_i - max(log_ratios_i)
+    ord <- sort.int(lw_i, index.return = TRUE)
+    tail_ids <- seq(S - tail_len_i + 1, S)
+    smoothed <- psis_smooth_tail(ord$x[tail_ids], ord$x[min(tail_ids) - 1])
+    lw_i[ord$ix[tail_ids]] <- smoothed$tail
+    lw_i[lw_i > 0] <- 0
+    list(log_weights = lw_i + max(log_ratios_i), pareto_k = smoothed$k)
+  }
+  set.seed(260)
+  # rounding gives many ties, also at the cutoff
+  for (x in list(round(rnorm(4000), 1), round(rt(1000, df = 2), 2))) {
+    tail_len <- n_pareto(1, length(x))
+    expect_identical(do_psis_i(x, tail_len), do_psis_i_full_sort(x, tail_len))
+  }
+})
+

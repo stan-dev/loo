@@ -55,6 +55,92 @@ test_that("stacking handles equal infinite log predictive densities", {
   expect_equal(as.numeric(stacking_weights(lpd)), c(0, 1, 0), tolerance = 1e-6)
 })
 
+test_that("loo_model_weights accepts models with different numbers of draws", {
+  ll_short <- list(log_lik1, log_lik2[1:250, ], log_lik3)
+  loo_short <- loo_list
+  loo_short[[2]] <- loo(log_lik2[1:250, ], r_eff = r_eff_list[[2]])
+
+  for (method in c("stacking", "pseudobma")) {
+    w_mat <- loo_model_weights(ll_short, method = method, BB = FALSE,
+                               r_eff_list = r_eff_list)
+    w_loo <- loo_model_weights(loo_short, method = method, BB = FALSE)
+    expect_equal(as.numeric(w_mat), as.numeric(w_loo))
+    expect_true(all(w_loo >= 0))
+    expect_equal(sum(w_loo), 1)
+  }
+})
+
+test_that("loo_model_weights accepts loo_subsample() objects only for pseudo-BMA", {
+  # restore the random number stream, which later tests in this file use
+  old_seed <- .Random.seed
+  on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
+  set.seed(409)
+  N <- 200
+  dat <- data.frame(y = rbinom(N, size = 10, prob = 0.7), K = 10)
+  llfun <- function(data_i, draws) {
+    dbinom(data_i$y, size = data_i$K, prob = draws, log = TRUE)
+  }
+  post1 <- as.matrix(rbeta(500, 140, 60))
+  post2 <- as.matrix(rbeta(500, 30, 20))
+  # the worse model gives high Pareto k values and a warning
+  ss <- function(post, observations, data = dat) {
+    suppressWarnings(loo_subsample(llfun, draws = post, data = data,
+                                   observations = observations,
+                                   loo_approximation = "plpd",
+                                   r_eff = rep(1, nrow(data))))
+  }
+  # different subsamples of different sizes
+  loo_ss1 <- ss(post1, 50)
+  loo_ss2 <- ss(post2, 80)
+  expect_false(setequal(obs_idx(loo_ss1), obs_idx(loo_ss2)))
+  loo_full <- suppressWarnings(loo(llfun, draws = post1, data = dat, r_eff = rep(1, N)))
+  error <- "supports objects from loo_subsample() only with method = \"pseudobma\" and BB = FALSE"
+
+  # stacking and pseudo-BMA+ need pointwise values for all observations
+  expect_error(loo_model_weights(list(loo_ss1, loo_ss2)), error, fixed = TRUE)
+  expect_error(loo_model_weights(list(loo_ss1, loo_ss2), BB = FALSE), error,
+               fixed = TRUE)
+  expect_error(loo_model_weights(list(loo_full, loo_ss2)), error, fixed = TRUE)
+  expect_error(
+    loo_model_weights(list(loo_ss1, loo_ss2), method = "pseudobma"),
+    error,
+    fixed = TRUE
+  )
+
+  # pseudo-BMA uses the subsampling estimates of elpd_loo
+  elpd <- c(loo_ss1$estimates["elpd_loo", "Estimate"],
+            loo_ss2$estimates["elpd_loo", "Estimate"])
+  w <- loo_model_weights(list(a = loo_ss1, b = loo_ss2), method = "pseudobma",
+                         BB = FALSE)
+  expect_s3_class(w, "pseudobma_weights")
+  expect_named(w, c("a", "b"))
+  expect_equal(as.numeric(w), exp(elpd - max(elpd)) / sum(exp(elpd - max(elpd))))
+
+  # a full loo object and a subsampled object can be combined
+  w2 <- loo_model_weights(list(loo_full, loo_ss2), method = "pseudobma", BB = FALSE)
+  elpd2 <- c(loo_full$estimates["elpd_loo", "Estimate"], elpd[2])
+  expect_equal(as.numeric(w2), exp(elpd2 - max(elpd2)) / sum(exp(elpd2 - max(elpd2))))
+
+  # the models must still have the same number of observations
+  loo_ss_short <- ss(post2, 50, data = dat[1:150, ])
+  expect_error(
+    loo_model_weights(list(loo_ss1, loo_ss_short), method = "pseudobma", BB = FALSE),
+    "same number of observations"
+  )
+})
+
+test_that("pseudo-BMA weights from elpd estimates reject NA and Inf", {
+  error <- "All elpd_loo estimates must be finite or -Inf."
+  expect_error(pseudobma_weights_from_elpd(c(-10, NA)), error, fixed = TRUE)
+  expect_error(pseudobma_weights_from_elpd(c(-10, NaN)), error, fixed = TRUE)
+  expect_error(pseudobma_weights_from_elpd(c(-10, Inf)), error, fixed = TRUE)
+  expect_error(
+    pseudobma_weights_from_elpd(c(-Inf, -Inf)),
+    "At least one model must have a finite total predictive density."
+  )
+  expect_equal(as.numeric(pseudobma_weights_from_elpd(c(-10, -Inf))), c(1, 0))
+})
+
 test_that("loo_model_weights throws correct errors and warnings", {
   expect_error(
     loo_model_weights(log_lik1),
@@ -68,17 +154,13 @@ test_that("loo_model_weights throws correct errors and warnings", {
   )
 
   expect_error(
-    loo_model_weights(list(log_lik1, log_lik2[-1, ])),
-    "same dimensions"
-  )
-  expect_error(
     loo_model_weights(list(log_lik1, log_lik2, log_lik3[, -1])),
-    "same dimensions"
+    "same number of observations"
   )
 
   loo_list2 <- loo_list
-  attr(loo_list2[[3]], "dims") <- c(10, 10)
-  expect_error(loo_model_weights(loo_list2), "same dimensions")
+  loo_list2[[3]] <- loo(log_lik3[, -1], r_eff = rep(0.9, 49))
+  expect_error(loo_model_weights(loo_list2), "same number of observations")
 
   expect_error(
     loo_model_weights(ll_list, r_eff_list = r_eff_list[-1]),

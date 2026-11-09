@@ -139,8 +139,38 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   }
 
   # update results
+  failed <- integer(0)
+  # observations where log_lik_i() failed, a subset of failed
+  log_lik_failed <- integer(0)
+  stopped <- integer(0)
+  split_failed <- integer(0)
+  error_msg <- NULL
   for (ii in seq_along(I)) {
-    i <- mm_list[[ii]]$i
+    i <- I[ii]
+    # parallel::mclapply() returns NULL if a worker dies, for example when it
+    # runs out of memory, and a "try-error" string if a worker stops with an
+    # error. Errors of the user functions are caught in loo_moment_match_i(),
+    # so a worker error is an error in loo itself, as it is with cores = 1.
+    if (is.null(mm_list[[ii]])) {
+      mm_list[[ii]] <- list(i = i, failed = TRUE,
+                            error = "a parallel worker did not return a result")
+    } else if (inherits(mm_list[[ii]], "try-error")) {
+      stop(try_error_message(mm_list[[ii]]), call. = FALSE)
+    }
+    if (!is.null(mm_list[[ii]]$error)) {
+      error_msg <- c(error_msg, mm_list[[ii]]$error)
+      if (isTRUE(mm_list[[ii]]$failed)) {
+        failed <- c(failed, i)
+        if (isTRUE(mm_list[[ii]]$log_lik_failed)) {
+          log_lik_failed <- c(log_lik_failed, i)
+        }
+        next
+      }
+      stopped <- c(stopped, i)
+    }
+    if (isTRUE(mm_list[[ii]]$split_failed)) {
+      split_failed <- c(split_failed, i)
+    }
     loo$pointwise[i, "elpd_loo"] <- mm_list[[ii]]$elpd_loo_i
     loo$pointwise[i, "p_loo"] <- mm_list[[ii]]$p_loo
     loo$pointwise[i, "mcse_elpd_loo"] <- mm_list[[ii]]$mcse_elpd_loo
@@ -153,6 +183,14 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
     if (!is.null(loo$psis_object)) {
       loo$psis_object$log_weights[, i] <- mm_list[[ii]]$lwi
     }
+  }
+  # log_lik_i() is evaluated at the original draws, so an error for every
+  # observation is probably an error in the function, for example wrong
+  # arguments. An error at the first transformation can come from extreme
+  # draws, and keeps the PSIS results with a warning.
+  if (length(I) > 0 && length(log_lik_failed) == length(I)) {
+    stop("'log_lik_i' failed for all observations. The first error ",
+         "message:\n", error_msg[1], call. = FALSE)
   }
   if (!is.null(loo$psis_object)) {
     attr(loo$psis_object, "norm_const_log") <- matrixStats::colLogSumExps(loo$psis_object$log_weights)
@@ -173,11 +211,14 @@ loo_moment_match.default <- function(x, loo, post_draws, log_lik_i,
   loo$se_p_loo <- loo$estimates["p_loo","SE"]
   loo$se_looic <- loo$estimates["looic","SE"]
 
+  throw_moment_match_error_warning(failed, stopped, error_msg)
   # Warn if some Pareto ks are still high
   throw_pareto_warnings(loo$diagnostics$pareto_k, k_threshold)
   # if we don't split, accuracy may be compromised
   if (!split) {
     throw_large_kf_warning(kfs, k_threshold)
+  } else if (length(split_failed) > 0) {
+    throw_large_kf_warning(kfs[split_failed], k_threshold, split_failed = TRUE)
   }
 
   loo
@@ -252,7 +293,13 @@ loo_moment_match_i <- function(i,
   uparsi <- upars
   ki <- k
   kfi <- 0
-  log_liki <- log_lik_i(x, i, ...)
+  log_liki <- tryCatch(log_lik_i(x, i, ...), error = function(e) e)
+  if (inherits(log_liki, "error")) {
+    # the user function failed for this observation, which keeps its PSIS
+    # results
+    return(list(i = i, failed = TRUE, log_lik_failed = TRUE,
+                error = conditionMessage(log_liki)))
+  }
   S_per_chain <- NROW(log_liki)
   N_chains <- NCOL(log_liki)
   dim(log_liki) <- c(S_per_chain, N_chains, 1)
@@ -273,6 +320,9 @@ loo_moment_match_i <- function(i,
     scaling = rep(1, npars),
     mapping = diag(npars)
   )
+
+  # message of an error that stopped moment matching for this observation
+  error_msg <- NULL
 
   # try several transformations one by one
   # if one does not work, do not apply it and try another one
@@ -295,11 +345,13 @@ loo_moment_match_i <- function(i,
                                         r_eff_i = r_eff_i,
                                         cores = 1,
                                         is_method = is_method,
-                                        ...)
+                                        ...),
+                        silent = TRUE
                         )
     if (inherits(quantities_i, "try-error")) {
-      # Stan log prob caused an exception probably due to under- or
-      # overflow of parameters to invalid values
+      # log_prob_upars() or log_lik_i_upars() failed, for example because the
+      # transformed draws are extreme
+      error_msg <- try_error_message(quantities_i)
       break
     }
     if (quantities_i$ki < ki) {
@@ -325,11 +377,13 @@ loo_moment_match_i <- function(i,
                                         r_eff_i = r_eff_i,
                                         cores = 1,
                                         is_method = is_method,
-                                        ...)
+                                        ...),
+                        silent = TRUE
                         )
     if (inherits(quantities_i, "try-error")) {
-      # Stan log prob caused an exception probably due to under- or
-      # overflow of parameters to invalid values
+      # log_prob_upars() or log_lik_i_upars() failed, for example because the
+      # transformed draws are extreme
+      error_msg <- try_error_message(quantities_i)
       break
     }
     if (quantities_i$ki < ki) {
@@ -356,12 +410,14 @@ loo_moment_match_i <- function(i,
                                           r_eff_i = r_eff_i,
                                           cores = 1,
                                           is_method = is_method,
-                                          ...)
+                                          ...),
+                          silent = TRUE
                           )
 
       if (inherits(quantities_i, "try-error")) {
-        # Stan log prob caused an exception probably due to under- or
-        # overflow of parameters to invalid values
+        # log_prob_upars() or log_lik_i_upars() failed, for example because the
+        # transformed draws are extreme
+        error_msg <- try_error_message(quantities_i)
         break
       }
       if (quantities_i$ki < ki) {
@@ -386,19 +442,28 @@ loo_moment_match_i <- function(i,
   # if we don't do split transform, or
   # if no transformations were successful
   # stop and collect values
+  split_done <- FALSE
+  split_failed <- FALSE
   if (split && (iterind > 1)) {
     # compute split transformation
-    split_obj <- loo_moment_match_split(
+    split_obj <- try(loo_moment_match_split(
       x, upars, cov, total$shift, total$scaling, total$mapping, i,
       log_prob_upars = log_prob_upars, log_lik_i_upars = log_lik_i_upars,
       cores = 1, r_eff_i = r_eff_i, is_method = is_method, ...
-    )
-    log_liki <- split_obj$log_liki
-    lwi <- split_obj$lwi
-    lwfi <- split_obj$lwfi
-    r_eff_i <- split_obj$r_eff_i
+    ), silent = TRUE)
+    if (inherits(split_obj, "try-error")) {
+      # use the result without the split transformation
+      error_msg <- try_error_message(split_obj)
+      split_failed <- TRUE
+    } else {
+      log_liki <- split_obj$log_liki
+      lwi <- split_obj$lwi
+      lwfi <- split_obj$lwfi
+      r_eff_i <- split_obj$r_eff_i
+      split_done <- TRUE
+    }
   }
-  else {
+  if (!split_done) {
     dim(log_liki) <- c(S_per_chain, N_chains, 1)
     r_eff_i <- loo::relative_eff(exp(log_liki), cores = 1)
     dim(log_liki) <- NULL
@@ -420,7 +485,12 @@ loo_moment_match_i <- function(i,
        n_eff = min(1.0 / sum(exp(2 * lwi)),
                    1.0 / sum(exp(2 * lwfi))) * r_eff_i,
        lwi = lwi,
-       i = i)
+       i = i,
+       error = error_msg,
+       # an error before any transformation was accepted leaves the PSIS
+       # results
+       failed = !is.null(error_msg) && iterind == 1,
+       split_failed = split_failed)
 }
 
 
@@ -635,6 +705,46 @@ shift_and_cov <- function(x, upars, lwi, ...) {
 }
 
 
+#' Message of a "try-error" object without the call and the newline
+#' @noRd
+try_error_message <- function(x) {
+  cond <- attr(x, "condition")
+  if (!is.null(cond)) conditionMessage(cond) else trimws(as.character(x))
+}
+
+#' Warning message if a function call failed during moment matching
+#' @noRd
+#' @param failed Observations for which moment matching failed completely.
+#' @param stopped Observations for which moment matching stopped early.
+#' @param error_msg Error messages, the first one is shown.
+throw_moment_match_error_warning <- function(failed, stopped, error_msg) {
+  if (length(failed) == 0 && length(stopped) == 0) {
+    return(invisible(NULL))
+  }
+  msg <- NULL
+  if (length(stopped) > 0) {
+    msg <- c(msg, paste0(
+      "Moment matching stopped early for observation(s) ",
+      paste(stopped, collapse = ", "), ". The results for these ",
+      "observations use the last transformation that succeeded.\n"
+    ))
+  }
+  if (length(failed) > 0) {
+    msg <- c(msg, paste0(
+      "Moment matching failed for observation(s) ",
+      paste(failed, collapse = ", "), ". The results for these ",
+      "observations are the PSIS results without moment matching.\n"
+    ))
+  }
+  warning(
+    msg,
+    "The cause was an error in 'log_prob_upars', 'log_lik_i_upars' or ",
+    "'log_lik_i', or a parallel worker that did not return a result. The ",
+    "first error message:\n", error_msg[1],
+    call. = FALSE
+  )
+}
+
 #' Warning message if max_iters is reached
 #' @noRd
 throw_moment_match_max_iters_warning <- function() {
@@ -649,11 +759,19 @@ throw_moment_match_max_iters_warning <- function() {
 #' Warning message if not using split transformation and accuracy is
 #' compromised
 #' @noRd
-throw_large_kf_warning <- function(kf, k_threshold) {
+throw_large_kf_warning <- function(kf, k_threshold, split_failed = FALSE) {
   if (any(kf > k_threshold)) {
+    if (split_failed) {
+      advice <- paste0(
+        "The split transformation failed for these observations, ",
+        "see the warning about the error."
+      )
+    } else {
+      advice <- "Setting the argument 'split' to 'TRUE' will likely improve accuracy."
+    }
     warning(
       "The accuracy of self-normalized importance sampling may be bad.\n",
-      "Setting the argument 'split' to 'TRUE' will likely improve accuracy.",
+      advice,
       call. = FALSE
     )
   }
