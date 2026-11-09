@@ -12,7 +12,7 @@ comparison-model minus reference-model by @florence-bockting in #391
 input by @thanasibakis in #398
 * Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
 * Signal each class of posterior warning once per call in `relative_eff()`,
-`E_loo()`, and `loo_moment_match()` by @florence-bockting in #416
+`E_loo()`, and `loo_moment_match()` (requires posterior >= 1.7.1) by @florence-bockting in #416
 
 # loo 2.10.1
 

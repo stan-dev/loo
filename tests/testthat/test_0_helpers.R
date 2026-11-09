@@ -115,5 +115,43 @@ test_that(".collect_warnings() signals each posterior class once", {
     }
   )
   expect_equal(out, 1)
-  expect_equal(caught, c("other", "a", "b"))
+  expect_equal(caught, c("other", "a (2 times)", "b (2 times)"))
+})
+
+test_that(".collect_warnings() keeps the first warning and signals it after an error", {
+  warn_a <- function(msg) {
+    warning(structure(
+      class = c("a", "posterior_warning", "warning", "condition"),
+      list(message = msg, call = NULL)
+    ))
+  }
+  w <- capture_warnings(try(.collect_warnings({
+    warn_a("first")
+    warn_a("second")
+    stop("boom")
+  }), silent = TRUE))
+  expect_equal(w, "first (2 times)")
+})
+
+test_that("relative_eff() signals each posterior warning class once", {
+  local_mocked_bindings(
+    ess_mean = function(x, ...) {
+      warning(structure(
+        class = c("posterior_warning_x", "posterior_warning", "warning", "condition"),
+        list(message = "mocked", call = NULL)
+      ))
+      1
+    },
+    .package = "posterior"
+  )
+  w <- capture_warnings(relative_eff(exp(example_loglik_array()), cores = 1))
+  expect_equal(w, "mocked (32 times)")
+})
+
+test_that("relative_eff() signals the posterior ESS warning once", {
+  skip_if_not(packageVersion("posterior") >= "1.7.1")
+  set.seed(1)
+  x <- array(rep(c(1, 2), 300) + rnorm(600, 0, 0.1), dim = c(100, 2, 3))
+  w <- capture_warnings(relative_eff(x, cores = 1))
+  expect_equal(w, "The ESS has been capped to avoid unstable estimates. (3 times)")
 })
