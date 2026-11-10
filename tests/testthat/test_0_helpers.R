@@ -154,6 +154,8 @@ test_that("relative_eff() signals the posterior ESS warning once", {
   x <- array(rep(c(1, 2), 300) + rnorm(600, 0, 0.1), dim = c(100, 2, 3))
   w <- capture_warnings(relative_eff(x, cores = 1))
   expect_equal(w, "The ESS has been capped to avoid unstable estimates. (3 times)")
+})
+
 test_that("is_constant uses a tolerance relative to the magnitude of x", {
   expect_true(is_constant(rep(0, 5)))
   expect_true(is_constant(rep(1e-300, 5)))
