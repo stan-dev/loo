@@ -14,6 +14,8 @@ input by @thanasibakis in #398
 * All warnings now have the class `loo_warning` and a class for each cause;
 diagnostics warnings have the class `loo_warning_diagnostic`. The base warning
 class is now `rlang_warning` by @florence-bockting in #417
+* Use a tolerance relative to the magnitude of `x` in `is_constant()` by
+@avehtari in #407
 
 # loo 2.10.1
 
