@@ -11,6 +11,8 @@ comparison-model minus reference-model by @florence-bockting in #391
 * Fix `crps()` and `scrps()` ignoring the `permutations` argument for numeric
 input by @thanasibakis in #398
 * Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
+* Signal each class of posterior warning once per call in `relative_eff()`,
+`E_loo()`, and `loo_moment_match()` (requires posterior >= 1.7.1) by @florence-bockting in #416
 * Use a tolerance relative to the magnitude of `x` in `is_constant()` by
 @avehtari in #407
 

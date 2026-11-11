@@ -285,3 +285,32 @@ is_constant <- function(x, tol = .Machine$double.eps) {
   # the equality check covers all-zero and all-infinite x
   r[1] == r[2] || (is.finite(spread) && spread <= tol * max(abs(r)))
 }
+
+#' Collect posterior warnings and signal each class once
+#'
+#' @noRd
+#' @param expr Expression to evaluate.
+#' @return The value of `expr`.
+.collect_warnings <- function(expr) {
+  collected <- list()
+  counts <- list()
+  on.exit(for (cls in names(collected)) {
+    cnd <- collected[[cls]]
+    if (counts[[cls]] > 1) {
+      cnd$message <- paste0(cnd$message, " (", counts[[cls]], " times)")
+    }
+    warning(cnd)
+  })
+  withCallingHandlers(
+    expr,
+    posterior_warning = function(cnd) {
+      cls <- class(cnd)[1]
+      if (is.null(collected[[cls]])) {
+        collected[[cls]] <<- cnd
+        counts[[cls]] <<- 0
+      }
+      counts[[cls]] <<- counts[[cls]] + 1
+      invokeRestart("muffleWarning")
+    }
+  )
+}
