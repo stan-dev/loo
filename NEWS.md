@@ -14,6 +14,8 @@ input by @thanasibakis in #398
 * All warnings now have the class `loo_warning` and a class for each cause;
 diagnostics warnings have the class `loo_warning_diagnostic`. The base warning
 class is now `rlang_warning` by @florence-bockting in #417
+* Signal each class of posterior warning once per call in `relative_eff()`,
+`E_loo()`, and `loo_moment_match()` (requires posterior >= 1.7.1) by @florence-bockting in #416
 * Use a tolerance relative to the magnitude of `x` in `is_constant()` by
 @avehtari in #407
 

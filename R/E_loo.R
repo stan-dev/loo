@@ -271,15 +271,17 @@ E_loo_khat.default <- function(x, psis_object, log_ratios, ...) {
 #' @export
 E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   tail_lengths <- attr(psis_object, "tail_len")
-  if (is.null(x)) {
-    sapply(seq_len(ncol(log_ratios)), function(i) {
-      .E_loo_khat_i(x, log_ratios[, i], tail_lengths[i])
-    })
-  } else {
-    sapply(seq_len(ncol(log_ratios)), function(i) {
-      .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
-    })
-  }
+  .collect_warnings(
+    if (is.null(x)) {
+      sapply(seq_len(ncol(log_ratios)), function(i) {
+        .E_loo_khat_i(x, log_ratios[, i], tail_lengths[i])
+      })
+    } else {
+      sapply(seq_len(ncol(log_ratios)), function(i) {
+        .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
+      })
+    }
+  )
 }
 
 #' Compute function-specific khat estimates
