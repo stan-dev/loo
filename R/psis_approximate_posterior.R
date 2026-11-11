@@ -24,8 +24,10 @@
 psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL,
                                        cores, save_psis, ..., log_q = NULL) {
   if (!is.null(log_q)) {
-    .warn("psis_approximate_posterior() argument log_q has been changed to log_g",
-      class = c("loo_warning_deprecated", "deprecatedWarning"))
+    .warn(
+      "psis_approximate_posterior() argument log_q has been changed to log_g",
+      class = c("loo_warning_deprecated", "deprecatedWarning")
+    )
     log_g <- log_q
   }
   checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_g), null.ok = FALSE)

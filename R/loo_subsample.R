@@ -1081,8 +1081,10 @@ loo_subsample_estimation_hh <- function(x) {
   if (hh_elpd_loo$hat_v_y_ppz > 0) {
     x$estimates["elpd_loo", "SE"]  <- sqrt(hh_elpd_loo$hat_v_y_ppz)
   } else {
-    .warn_diagnostic("Negative estimate of SE, more subsampling obs. needed.",
-    class = "loo_warning_subsample_negative_se")
+    .warn_diagnostic(
+      "Negative estimate of SE, more subsampling obs. needed.",
+      class = "loo_warning_subsample_negative_se"
+    )
     x$estimates["elpd_loo", "SE"]  <- NaN
   }
   x$estimates["elpd_loo", "subsampling SE"] <- sqrt(hh_elpd_loo$v_hat_y_ppz)
@@ -1092,8 +1094,10 @@ loo_subsample_estimation_hh <- function(x) {
   if (hh_p_loo$hat_v_y_ppz > 0) {
     x$estimates["p_loo", "SE"]  <- sqrt(hh_p_loo$hat_v_y_ppz)
   } else {
-    .warn_diagnostic("Negative estimate of SE, more subsampling obs. needed.",
-    class = "loo_warning_subsample_negative_se")
+    .warn_diagnostic(
+      "Negative estimate of SE, more subsampling obs. needed.",
+      class = "loo_warning_subsample_negative_se"
+    )
     x$estimates["p_loo", "SE"]  <- NaN
   }
   x$estimates["p_loo", "subsampling SE"] <- sqrt(hh_p_loo$v_hat_y_ppz)

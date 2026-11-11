@@ -51,8 +51,10 @@ loo_compare_ss <- function(ref_loo, compare_loo){
 
   # Using HH estimation
   if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
-    .warn_diagnostic("Hansen-Hurwitz estimator used. Naive diff SE is used.",
-    class = "loo_warning_subsample_naive_se")
+    .warn_diagnostic(
+      "Hansen-Hurwitz estimator used. Naive diff SE is used.",
+      class = "loo_warning_subsample_naive_se"
+    )
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 

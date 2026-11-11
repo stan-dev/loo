@@ -38,8 +38,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("mc.cores", 1),
                    llfun = NULL, llargs = NULL,
                    ...) {
-  .warn("'psislw' is deprecated.\nUse 'psis' instead.\nSee help(\"Deprecated\")",
-      class = c("loo_warning_deprecated", "deprecatedWarning"))
+  .warn(
+    "'psislw' is deprecated.\nUse 'psis' instead.\nSee help(\"Deprecated\")",
+    class = c("loo_warning_deprecated", "deprecatedWarning")
+  )
 
   cores <- loo_cores(cores)
 
