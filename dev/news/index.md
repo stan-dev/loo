@@ -34,6 +34,13 @@
   [`pseudobma_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
   by [@VisruthSK](https://github.com/VisruthSK) in
   [\#368](https://github.com/stan-dev/loo/issues/368)
+- Signal each class of posterior warning once per call in
+  [`relative_eff()`](https://mc-stan.org/loo/dev/reference/relative_eff.md),
+  [`E_loo()`](https://mc-stan.org/loo/dev/reference/E_loo.md), and
+  [`loo_moment_match()`](https://mc-stan.org/loo/dev/reference/loo_moment_match.md)
+  (requires posterior \>= 1.7.1) by
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#416](https://github.com/stan-dev/loo/issues/416)
 - Use a tolerance relative to the magnitude of `x` in `is_constant()` by
   [@avehtari](https://github.com/avehtari) in
   [\#407](https://github.com/stan-dev/loo/issues/407)
