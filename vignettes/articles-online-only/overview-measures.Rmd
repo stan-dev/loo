@@ -33,9 +33,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
-```
-
 ## Introduction
 
 A *predictive measure* summarizes how well a model predicts data. **loo**
@@ -125,6 +122,7 @@ predictions. Other weights give other predictive schemes, for example PSIS-LOO.
 
 ```{r load-libraries}
 library(loo)
+library(brms)
 library(ggplot2)
 theme_set(theme_minimal())
 ```

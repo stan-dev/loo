@@ -36,9 +36,6 @@ knitr::opts_chunk$set(
 options(future.globals.maxSize = 4 * 1024^3)
 ```
 
-```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
-```
-
 ## Introduction
 This vignette introduces the `loo::model_compare()` function.
 Use `model_compare()` instead of the deprecated `loo::loo_compare()` (see the
@@ -132,6 +129,7 @@ discuss diagnostic flags or interpretation of the output here.
 
 ```{r load-libraries}
 library(loo)
+library(brms)
 ```
 
 ```{r setup-example}

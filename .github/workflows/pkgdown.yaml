@@ -64,7 +64,6 @@ jobs:
             any::withr
             any::lme4
             stan-dev/pkgdown-config
-            any::devtools
 
       - name: Build site
         env:

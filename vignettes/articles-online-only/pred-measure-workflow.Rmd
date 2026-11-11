@@ -33,9 +33,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, child="../children/LOAD-BRMS-GITHUB.txt", eval=params$EVAL}
-```
-
 ## Introduction
 
 How well does a fitted model predict data that were not used to fit it? The
@@ -107,16 +104,7 @@ one day. Days 0 and 1 were adaptation and training, so this vignette keeps days
 2 to 9. The predictor `Days` counts the days of sleep restriction, from 0 to 7.
 This gives 144 observations.
 
-```{r load-libraries-internal, echo=FALSE}
-devtools::load_all("../..", quiet = TRUE)
-devtools::load_all("../../../../GitHub/brms", quiet = TRUE)
-library(ggplot2)
-
-theme_set(theme_minimal())
-SEED <- 42
-```
-
-```{r load-libraries, eval=FALSE}
+```{r load-libraries}
 library(loo)      # for evaluating the predictive performance
 library(brms)     # for model fitting
 library(lme4)     # for the sleepstudy data
