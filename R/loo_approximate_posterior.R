@@ -27,7 +27,7 @@
 #'  }
 #' }
 #'
-#' @seealso [loo()], [psis()], [loo_compare()]
+#' @seealso [loo()], [psis()], [model_compare()]
 #' @template loo-large-data-references
 #'
 #' @export loo_approximate_posterior

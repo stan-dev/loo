@@ -18,6 +18,7 @@ vignettes/loo2-non-factorized_cache/*
 .github/*
 .vscode/*
 ^\.github$
+^vignettes/articles-online-only$
 ^vignettes/online-only$
 ^\.git-blame-ignore-revs$
 ^CRAN-SUBMISSION$
@@ -26,3 +27,11 @@ vignettes/loo2-non-factorized_cache/*
 ^pkgdown$
 ^touchstone$
 ^notes-release.md
+^notes$
+^\.agents$
+^agent$
+^\.claude$
+^\.refactor-review$
+^internal-notes$
+^scratch-files$
+^skills-lock\.json$
