@@ -1,0 +1,259 @@
+# Migration guide
+
+## Introduction
+
+This vignette documents API changes for **loo 3.0.0**. It lists
+deprecated functions, their replacements, and what is planned for
+removal in the major release.
+
+| Status | Meaning |
+|----|----|
+| **Deprecated** | Still works but emits a warning (via [`.Deprecated()`](https://rdrr.io/r/base/Deprecated.html)). Use the replacement for new code. |
+| **Current** | Supported API; use for new code. |
+| **Planned removal** | Scheduled to be deleted in loo 3.0.0. |
+
+Release notes appear in `NEWS.md`. Deprecated functions are listed under
+**Deprecated functions** on the package website.
+
+------------------------------------------------------------------------
+
+## Deprecated source files
+
+| File | Status | Replacement / notes |
+|----|----|----|
+| `R/elpd.R` | Deprecated | [`measure_elpd()`](https://mc-stan.org/loo/pr/363/reference/measure_elpd.md) in `R/pred_measure-builtin.R` |
+| `R/crps.R` | Deprecated | [`measure_rps()`](https://mc-stan.org/loo/pr/363/reference/measure_rps.md), [`measure_srps()`](https://mc-stan.org/loo/pr/363/reference/measure_srps.md), [`loo_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/loo_pred_measure.md) |
+| `R/loo_predictive_metric.R` | Deprecated | [`loo_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/loo_pred_measure.md), `measure_*()` |
+| `R/pred_measure.R` | **Current** | `*_pred_measure()` entry points |
+| `R/pred_measure-compute.R` | **Current** | Internal orchestration |
+| `R/pred_measure-helpers.R` | **Current** | Validation and helpers |
+| `R/pred_measure-builtin.R` | **Current** | `measure_*()` implementations |
+| `R/compare.R` | Deprecated (removal in 3.0.0) | [`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md) in `R/model_compare.R` |
+| `R/psislw.R` | Deprecated (removal in 3.0.0) | [`psis()`](https://mc-stan.org/loo/pr/363/reference/psis.md) in `R/psis.R` (since 2.0.0) |
+| `R/loo_compare.R` | Deprecated | [`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md) in `R/model_compare.R` |
+| `R/model_compare.R` | **Current** | Model comparison |
+| `R/loo.R`, `R/psis.R`, `R/waic.R` | **Current** | Core LOO / PSIS / WAIC |
+
+------------------------------------------------------------------------
+
+## Function migration tables
+
+### Expected log predictive density
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| [`elpd()`](https://mc-stan.org/loo/pr/363/reference/elpd.md) | [`measure_elpd()`](https://mc-stan.org/loo/pr/363/reference/measure_elpd.md) | 3.0.0 |  |
+
+**Return type change:**
+[`elpd()`](https://mc-stan.org/loo/pr/363/reference/elpd.md) returns
+class `"elpd_generic"` with `elpd` and `ic` columns in `pointwise`.
+[`measure_elpd()`](https://mc-stan.org/loo/pr/363/reference/measure_elpd.md)
+returns class `"measure"`.
+
+``` r
+
+# Deprecated
+elpd(log_lik_matrix)
+
+# Current
+measure_elpd(log_lik_matrix)
+```
+
+### Scoring rules (CRPS / SCRPS)
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| `crps(x, x2, y)` | `measure_rps(y, ypred = x)` | 3.0.0 |  |
+| `scrps(x, x2, y)` | `measure_srps(y, ypred = x)` | 3.0.0 |  |
+| `loo_crps(...)` | `loo_pred_measure(..., measures = "rps")` | 3.0.0 |  |
+| `loo_scrps(...)` | `loo_pred_measure(..., measures = "srps")` | 3.0.0 |  |
+
+**API change:** deprecated functions require **two** draw matrices (`x`,
+`x2`) and use a permutation-based estimator. The replacement uses
+**one** draw matrix (`ypred`) and a PWM estimator. Results are not
+identical.
+
+``` r
+
+# Deprecated
+crps(ypred1, ypred2, y = y)
+
+# Current
+measure_rps(y = y, ypred = ypred1)
+```
+
+### Leave-one-out predictive metrics
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| [`loo_predictive_metric()`](https://mc-stan.org/loo/pr/363/reference/loo_predictive_metric.md) | [`loo_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/loo_pred_measure.md) | 3.0.0 |  |
+
+**Argument mapping:**
+
+| Old (`loo_predictive_metric`) | New (`loo_pred_measure`) |
+|----|----|
+| `x` (predictions) | `mupred` |
+| `log_lik` | via `loo(..., save_psis = TRUE)` or `ylp` + `psis_object` |
+| `metric = "mae"` | `measures = "mae"` |
+| `metric = "balanced_acc"` | `measures = "bacc"` |
+
+``` r
+
+# Deprecated
+loo_predictive_metric(x = mupred, y = y, log_lik = ll, metric = "mae")
+
+# Current
+loo_fit <- loo(ll, save_psis = TRUE)
+loo_pred_measure(loo = loo_fit, y = y, mupred = mupred, measures = "mae")
+```
+
+------------------------------------------------------------------------
+
+## Current predictive performance API (3.0.0)
+
+### Workflow entry points
+
+| Function | Evaluation mode | Source file |
+|----|----|----|
+| [`insample_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/insample_pred_measure.md) | In-sample | `pred_measure.R` |
+| [`loo_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/loo_pred_measure.md) | PSIS-LOO | `pred_measure.R` |
+| [`kfold_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/kfold_pred_measure.md) | K-fold CV | `pred_measure.R` |
+| [`test_pred_measure()`](https://mc-stan.org/loo/pr/363/reference/test_pred_measure.md) | Holdout test set | `pred_measure.R` |
+| [`pred_measure()`](https://mc-stan.org/loo/pr/363/reference/pred_measure.md) | Add measures incrementally | `pred_measure.R` |
+
+### Built-in measures
+
+Pass short names to the `measures` argument, or call standalone
+functions:
+
+| `measures =` | Function | Source file |
+|----|----|----|
+| `"elpd"` | [`measure_elpd()`](https://mc-stan.org/loo/pr/363/reference/measure_elpd.md) | `pred_measure-builtin.R` |
+| `"mlpd"` | [`measure_mlpd()`](https://mc-stan.org/loo/pr/363/reference/measure_mlpd.md) | `pred_measure-builtin.R` |
+| `"ic"` | [`measure_ic()`](https://mc-stan.org/loo/pr/363/reference/measure_ic.md) | `pred_measure-builtin.R` |
+| `"mae"` | [`measure_mae()`](https://mc-stan.org/loo/pr/363/reference/measure_mae.md) | `pred_measure-builtin.R` |
+| `"mse"` | [`measure_mse()`](https://mc-stan.org/loo/pr/363/reference/measure_mse.md) | `pred_measure-builtin.R` |
+| `"rmse"` | [`measure_rmse()`](https://mc-stan.org/loo/pr/363/reference/measure_rmse.md) | `pred_measure-builtin.R` |
+| `"r2"` | [`measure_r2()`](https://mc-stan.org/loo/pr/363/reference/measure_r2.md) | `pred_measure-builtin.R` |
+| `"acc"` | [`measure_acc()`](https://mc-stan.org/loo/pr/363/reference/measure_acc.md) | `pred_measure-builtin.R` |
+| `"bacc"` | [`measure_bacc()`](https://mc-stan.org/loo/pr/363/reference/measure_bacc.md) | `pred_measure-builtin.R` |
+| `"rps"` | [`measure_rps()`](https://mc-stan.org/loo/pr/363/reference/measure_rps.md) | `pred_measure-builtin.R` |
+| `"srps"` | [`measure_srps()`](https://mc-stan.org/loo/pr/363/reference/measure_srps.md) | `pred_measure-builtin.R` |
+
+List all registered built-in names:
+
+``` r
+
+supported_measures_list()
+```
+
+[`measure_brier()`](https://mc-stan.org/loo/pr/363/reference/measure_brier.md)
+is exported but not yet registered in
+[`supported_measures_list()`](https://mc-stan.org/loo/pr/363/reference/supported_measures_list.md).
+\## Model comparison
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| [`compare()`](https://mc-stan.org/loo/pr/363/reference/compare.md) | [`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md) | 2.0.0 | 3.0.0 |
+| [`loo_compare()`](https://mc-stan.org/loo/pr/363/reference/loo_compare.md) | [`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md) | 3.0.0 | TBD |
+
+[`compare()`](https://mc-stan.org/loo/pr/363/reference/compare.md)
+returns a vector or matrix with class `"compare.loo"`.
+[`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md)
+returns a `data.frame` with additional diagnostic columns. See
+[`?model_compare`](https://mc-stan.org/loo/pr/363/reference/model_compare.md)
+for the current output format.
+
+``` r
+
+# Deprecated
+compare(loo1, loo2)
+
+# Current
+model_compare(loo1, loo2)
+```
+
+#### `loo_compare()` is now `model_compare()`
+
+[`loo_compare()`](https://mc-stan.org/loo/pr/363/reference/loo_compare.md)
+has been renamed to
+[`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md),
+which better reflects that it compares models evaluated by leave-one-out
+CV, k-fold CV, a held-out test set, or in-sample scores.
+
+[`loo_compare()`](https://mc-stan.org/loo/pr/363/reference/loo_compare.md)
+is **deprecated** but still works, and is still an exported generic, so
+`loo_compare` methods registered by other packages (for example
+`loo_compare.brmsfit` in **brms** and `loo_compare.stanreg` in
+**rstanarm**) keep dispatching. It is frozen at its previous behavior:
+it compares `"loo"`, `"waic"`, and `"kfold"` objects on ELPD only, and
+returns exactly what
+[`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md)
+returns for those inputs. Everything added in 3.0.0 — the `pred_measure`
+sources and
+[`custom_measure()`](https://mc-stan.org/loo/pr/363/reference/custom_measure.md)
+— is available only through
+[`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md).
+
+``` r
+
+# Deprecated, but still returns the same table
+loo_compare(loo1, loo2)
+
+# Current
+model_compare(loo1, loo2)
+
+# Only available via model_compare()
+model_compare(kfold_pm1, kfold_pm2)
+model_compare(test_pm1, test_pm2)
+model_compare(loo_pm1, loo_pm2)
+```
+
+### PSIS importance sampling
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| [`psislw()`](https://mc-stan.org/loo/pr/363/reference/psislw.md) | [`psis()`](https://mc-stan.org/loo/pr/363/reference/psis.md) | 2.0.0 | 3.0.0 |
+| `options(loo.cores = ...)` | `options(mc.cores = ...)` or `cores` argument | 2.0.0 |  |
+
+``` r
+
+# Deprecated
+psislw(-log_lik_matrix)
+
+# Current
+psis(-log_lik_matrix)
+```
+
+### Accessing estimates from loo and waic objects
+
+Direct extraction of summary estimates via `$`, `[`, or `[[` on loo
+objects has been deprecated since loo 2.x. Use the `estimates` component
+instead.
+
+| Deprecated | Replacement | Since | Planned removal |
+|----|----|----|----|
+| `x$elpd_loo`, `x$looic`, etc. | `x$estimates["elpd_loo", "Estimate"]` | 2.x |  |
+| `x["elpd_loo"]`, `x[["elpd_loo"]]` | `x$estimates[...]` | 2.x |  |
+
+The same pattern applies to `waic` objects (`elpd_waic`, `waic`, etc.).
+
+### Argument renames
+
+| Function | Deprecated | Replacement | Since |
+|----|----|----|----|
+| [`psis_approximate_posterior()`](https://mc-stan.org/loo/pr/363/reference/psis_approximate_posterior.md) | `log_q` | `log_g` | 2.x |
+
+------------------------------------------------------------------------
+
+## Planned removals in 3.0.0
+
+The following are targeted for **removal** in loo 3.0.0:
+
+- [`compare()`](https://mc-stan.org/loo/pr/363/reference/compare.md) and
+  `R/compare.R`
+- [`psislw()`](https://mc-stan.org/loo/pr/363/reference/psislw.md) and
+  `R/psislw.R`
+
+The deprecated option `options(loo.cores = ...)` remains for backward
+compatibility until a separate removal decision is made.
