@@ -738,23 +738,23 @@ throw_moment_match_error_warning <- function(failed, stopped, error_msg) {
       "observations are the PSIS results without moment matching.\n"
     ))
   }
-  warning(
+  .warn_diagnostic(
     msg,
     "The cause was an error in 'log_prob_upars', 'log_lik_i_upars' or ",
     "'log_lik_i', or a parallel worker that did not return a result. The ",
     "first error message:\n", error_msg[1],
-    call. = FALSE
+    class = "loo_warning_moment_match_failed"
   )
 }
 
 #' Warning message if max_iters is reached
 #' @noRd
 throw_moment_match_max_iters_warning <- function() {
-  warning(
+  .warn_diagnostic(
     "The maximum number of moment matching iterations ('max_iters' argument)
     was reached.\n",
     "Increasing the value may improve accuracy.",
-    call. = FALSE
+    class = "loo_warning_moment_match_max_iters"
   )
 }
 
@@ -771,10 +771,10 @@ throw_large_kf_warning <- function(kf, k_threshold, split_failed = FALSE) {
     } else {
       advice <- "Setting the argument 'split' to 'TRUE' will likely improve accuracy."
     }
-    warning(
+    .warn_diagnostic(
       "The accuracy of self-normalized importance sampling may be bad.\n",
       advice,
-      call. = FALSE
+      class = "loo_warning_large_kf"
     )
   }
 }

@@ -24,7 +24,10 @@
 psis_approximate_posterior <- function(log_p = NULL, log_g = NULL, log_liks = NULL,
                                        cores, save_psis, ..., log_q = NULL) {
   if (!is.null(log_q)) {
-    .Deprecated(msg = "psis_approximate_posterior() argument log_q has been changed to log_g")
+    .warn(
+      "psis_approximate_posterior() argument log_q has been changed to log_g",
+      class = c("loo_warning_deprecated", "deprecatedWarning")
+    )
     log_g <- log_q
   }
   checkmate::assert_numeric(log_p, any.missing = FALSE, len = length(log_g), null.ok = FALSE)
@@ -137,7 +140,8 @@ ap_psis.matrix <- function(log_ratios, log_p, log_g,
 ap_psis.default <- function(log_ratios, log_p, log_g, ...) {
     stopifnot(is.null(dim(log_ratios)) || length(dim(log_ratios)) == 1)
     dim(log_ratios) <- c(length(log_ratios), 1)
-    warning("llfun values do not return a matrix, coerce to matrix")
+    .warn("llfun values do not return a matrix, coerce to matrix",
+          class = "loo_warning_llfun_not_matrix")
     ap_psis.matrix(as.matrix(log_ratios), log_p, log_g, cores = 1)
   }
 

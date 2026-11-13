@@ -259,8 +259,8 @@ loo_cores <- function(cores) {
   loo_cores_op <- getOption("loo.cores", NA)
   if (!is.na(loo_cores_op) && (loo_cores_op != cores)) {
     cores <- loo_cores_op
-    warning("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
-            call. = FALSE)
+    .warn("'loo.cores' is deprecated, please use 'mc.cores' or pass 'cores' explicitly.",
+          class = "loo_warning_deprecated")
   }
   return(cores)
 }

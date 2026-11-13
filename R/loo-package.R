@@ -39,6 +39,46 @@
 #'   diagnostics and effective sample size and Monte Carlo standard error
 #'   estimates.
 #'
+#' @section Warning classes:
+#'
+#' Every warning signaled by \pkg{loo} has the class `loo_warning` and one
+#' class for its cause. Warnings that question the reliability of a result
+#' also have the class `loo_warning_diagnostic`. Use these classes to handle
+#' or muffle a specific warning, for example with [withCallingHandlers()]
+#' and `invokeRestart("muffleWarning")`.
+#'
+#' Diagnostic warnings:
+#'
+#' * `loo_warning_pareto_k_high`: Some Pareto k values are too high.
+#' * `loo_warning_pareto_tail_not_fitted`: There are not enough tail samples to
+#' fit the generalized Pareto distribution.
+#' * `loo_warning_pareto_tail_constant`: All tail values are the same.
+#' * `loo_warning_p_waic_high`: Some `p_waic` estimates are greater than 0.4.
+#' * `loo_warning_moment_match_failed`: Moment matching failed for some
+#' observations.
+#' * `loo_warning_moment_match_max_iters`: Moment matching reached
+#' `max_iters`.
+#' * `loo_warning_large_kf`: The accuracy of self-normalized importance
+#' sampling may be bad.
+#' * `loo_warning_y_mismatch`: The models do not have the same `y` variable.
+#' * `loo_warning_cv_mismatch`: The models use different types of
+#' cross-validation or different numbers of folds.
+#' * `loo_warning_chance_difference`: The difference in performance is
+#' potentially due to chance.
+#' * `loo_warning_subsample_naive_se`: The difference SE in `loo_compare()`
+#' uses the naive estimator.
+#' * `loo_warning_subsample_negative_se`: The subsampling SE estimate is
+#' negative.
+#'
+#' Other warnings:
+#'
+#' * `loo_warning_multicore_unavailable`: Multicore is not implemented for
+#' the selected method.
+#' * `loo_warning_pareto_k_not_plotted`: Some Pareto k values are `Inf`, `NA`,
+#' or `NaN` and are not plotted.
+#' * `loo_warning_llfun_not_matrix`: The values from `llfun` are not a matrix
+#' and were coerced.
+#' * `loo_warning_deprecated`: A deprecated feature was used.
 #'
 #' @template loo-and-psis-references
 #' @template stacking-references

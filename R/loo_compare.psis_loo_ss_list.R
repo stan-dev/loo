@@ -51,7 +51,10 @@ loo_compare_ss <- function(ref_loo, compare_loo){
 
   # Using HH estimation
   if (ref_loo[[1]]$loo_subsampling$estimator == "hh_pps" | compare_loo[[1]]$loo_subsampling$estimator == "hh_pps"){
-    warning("Hansen-Hurwitz estimator used. Naive diff SE is used.", call. = FALSE)
+    .warn_diagnostic(
+      "Hansen-Hurwitz estimator used. Naive diff SE is used.",
+      class = "loo_warning_subsample_naive_se"
+    )
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 
@@ -70,8 +73,9 @@ loo_compare_ss <- function(ref_loo, compare_loo){
 
   # If different samples
   if (!compare_subset_of_ref & !ref_subset_of_compare){
-    warning("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
-            "'. Naive diff SE is used.", call. = FALSE)
+    .warn_diagnostic("Different subsamples in '", names(ref_loo), "' and '", names(compare_loo),
+                     "'. Naive diff SE is used.",
+                     class = "loo_warning_subsample_naive_se")
     return(loo_compare_ss_naive(ref_loo, compare_loo))
   }
 }
@@ -152,22 +156,22 @@ loo_compare_checks.psis_loo_ss_list <- function(loos) {
     isTRUE(all.equal(x, yhash[[1]]))
   })
   if (!all(yhash_ok)) {
-    warning("Not all models have the same y variable. ('yhash' attributes do not match)",
-            call. = FALSE)
+    .warn_diagnostic("Not all models have the same y variable. ('yhash' attributes do not match)",
+                     class = "loo_warning_y_mismatch")
   }
 
   if (all(sapply(loos, is.kfold))) {
     Ks <- unlist(lapply(loos, attr, which = "K"))
     if (!all(Ks == Ks[1])) {
-      warning("Not all kfold objects have the same K value. ",
-              "For a more accurate comparison use the same number of folds. ",
-              call. = FALSE)
+      .warn_diagnostic("Not all kfold objects have the same K value. ",
+                       "For a more accurate comparison use the same number of folds. ",
+                       class = "loo_warning_cv_mismatch")
     }
   } else if (any(sapply(loos, is.kfold)) && any(sapply(loos, is.psis_loo))) {
-    warning("Comparing LOO-CV to K-fold-CV. ",
-            "For a more accurate comparison use the same number of folds ",
-            "or loo for all models compared.",
-            call. = FALSE)
+    .warn_diagnostic("Comparing LOO-CV to K-fold-CV. ",
+                     "For a more accurate comparison use the same number of folds ",
+                     "or loo for all models compared.",
+                     class = "loo_warning_cv_mismatch")
   }
 }
 

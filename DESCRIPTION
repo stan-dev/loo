@@ -39,6 +39,7 @@ Imports:
     matrixStats (>= 0.52),
     parallel,
     posterior (>= 1.7.0),
+    rlang (>= 1.0.6),
     stats
 Suggests:
     bayesplot (>= 1.7.0),

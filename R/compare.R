@@ -59,7 +59,8 @@
 #' }
 #'
 compare <- function(..., x = list()) {
-  .Deprecated("loo_compare")
+  .warn("'compare' is deprecated.\nUse 'loo_compare' instead.\nSee help(\"Deprecated\")",
+      class = c("loo_warning_deprecated", "deprecatedWarning"))
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {

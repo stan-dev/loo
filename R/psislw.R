@@ -38,7 +38,10 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
                    cores = getOption("mc.cores", 1),
                    llfun = NULL, llargs = NULL,
                    ...) {
-  .Deprecated("psis")
+  .warn(
+    "'psislw' is deprecated.\nUse 'psis' instead.\nSee help(\"Deprecated\")",
+    class = c("loo_warning_deprecated", "deprecatedWarning")
+  )
 
   cores <- loo_cores(cores)
 
@@ -52,16 +55,16 @@ psislw <- function(lw, wcp = 0.2, wtrunc = 3/4,
     tail_len <- length(x_tail)
     if (tail_len < MIN_TAIL_LENGTH || all(x_tail == x_tail[1])) {
       if (all(x_tail == x_tail[1]))
-        warning(
+        .warn_diagnostic(
           "All tail values are the same. ",
           "Weights are truncated but not smoothed.",
-          call. = FALSE
+          class = "loo_warning_pareto_tail_constant"
         )
       else if (tail_len < MIN_TAIL_LENGTH)
-        warning(
+        .warn_diagnostic(
           "Too few tail samples to fit generalized Pareto distribution.\n",
           "Weights are truncated but not smoothed.",
-          call. = FALSE
+          class = "loo_warning_pareto_tail_not_fitted"
         )
 
       x_new <- x
@@ -184,14 +187,16 @@ lw_normalize <- function(y) {
 # warnings about pareto k values ------------------------------------------
 psislw_warnings <- function(k) {
   if (any(k > 0.7)) {
-    .warn(
+    .warn_diagnostic(
       "Some Pareto k diagnostic values are too high. ",
-      .k_help()
+      .k_help(),
+      class = "loo_warning_pareto_k_high"
     )
   } else if (any(k > 0.5)) {
-    .warn(
+    .warn_diagnostic(
       "Some Pareto k diagnostic values are slightly high. ",
-      .k_help()
+      .k_help(),
+      class = "loo_warning_pareto_k_high"
     )
   }
 }

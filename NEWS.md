@@ -11,6 +11,13 @@ comparison-model minus reference-model by @florence-bockting in #391
 * Fix `crps()` and `scrps()` ignoring the `permutations` argument for numeric
 input by @thanasibakis in #398
 * Speed up the Bayesian bootstrap in `pseudobma_weights()` by @VisruthSK in #368
+* All warnings now have the class `loo_warning` and a class for each cause,
+and diagnostic warnings also have the class `loo_warning_diagnostic`. The base
+warning class is now `rlang_warning` instead of `simpleWarning`. By
+@florence-bockting in #417
+* Fix `loo_subsample()` with the Hansen-Hurwitz estimator setting the
+`elpd_loo` SE to `NaN` instead of the `p_loo` SE when the `p_loo` variance
+estimate is negative by @florence-bockting in #417
 * Signal each class of posterior warning once per call in `relative_eff()`,
 `E_loo()`, and `loo_moment_match()` (requires posterior >= 1.7.1) by @florence-bockting in #416
 * Use a tolerance relative to the magnitude of `x` in `is_constant()` by
