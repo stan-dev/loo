@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-11-11</h4>
+            <h4 data-toc-skip class="date">2026-11-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-non-factorized.Rmd</code></div>
@@ -514,16 +514,16 @@ in the upcoming section.</p>
 Computed from 4000 posterior draws and 49 log-likelihood terms.
 
          Estimate   SE
-elpd_loo   -186.8 10.7
-p_loo         7.9  5.1
-looic       373.5 21.4
+elpd_loo   -186.7 10.7
+p_loo         7.9  5.0
+looic       373.4 21.5
 ------
 MCSE of elpd_loo is NA.
 MCSE and ESS estimates assume independent draws (r_eff=1).
 
 Pareto k diagnostic values:
                          Count Pct.    Min. ESS
-(-Inf, 0.7]   (good)     48    98.0%   1051    
+(-Inf, 0.7]   (good)     48    98.0%   602     
    (0.7, 1]   (bad)       1     2.0%   &lt;NA&gt;    
    (1, Inf)   (very bad)  0     0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
@@ -616,7 +616,7 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] -188.6</code></pre>
+<pre><code>[1] -188.8</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate

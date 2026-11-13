@@ -34,6 +34,18 @@
   [`pseudobma_weights()`](https://mc-stan.org/loo/dev/reference/loo_model_weights.md)
   by [@VisruthSK](https://github.com/VisruthSK) in
   [\#368](https://github.com/stan-dev/loo/issues/368)
+- All warnings now have the class `loo_warning` and a class for each
+  cause, and diagnostic warnings also have the class
+  `loo_warning_diagnostic`. The base warning class is now
+  `rlang_warning` instead of `simpleWarning`. By
+  [@florence-bockting](https://github.com/florence-bockting) in
+  [\#417](https://github.com/stan-dev/loo/issues/417)
+- Fix
+  [`loo_subsample()`](https://mc-stan.org/loo/dev/reference/loo_subsample.md)
+  with the Hansen-Hurwitz estimator setting the `elpd_loo` SE to `NaN`
+  instead of the `p_loo` SE when the `p_loo` variance estimate is
+  negative by [@florence-bockting](https://github.com/florence-bockting)
+  in [\#417](https://github.com/stan-dev/loo/issues/417)
 - Signal each class of posterior warning once per call in
   [`relative_eff()`](https://mc-stan.org/loo/dev/reference/relative_eff.md),
   [`E_loo()`](https://mc-stan.org/loo/dev/reference/E_loo.md), and

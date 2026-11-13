@@ -121,6 +121,44 @@ diagnostics and effective sample size and Monte Carlo standard error
 estimates.</p>
     </div>
     <div class="section level2">
+    <h2 id="warning-classes">Warning classes<a class="anchor" aria-label="anchor" href="#warning-classes"></a></h2>
+
+
+
+<p>Every warning signaled by <span class="pkg">loo</span> has the class <code>loo_warning</code> and one
+class for its cause. Warnings that question the reliability of a result
+also have the class <code>loo_warning_diagnostic</code>. Use these classes to handle
+or muffle a specific warning, for example with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>
+and <code>invokeRestart("muffleWarning")</code>.</p>
+<p>Diagnostic warnings:</p><ul><li><p><code>loo_warning_pareto_k_high</code>: Some Pareto k values are too high.</p></li>
+<li><p><code>loo_warning_pareto_tail_not_fitted</code>: There are not enough tail samples to
+fit the generalized Pareto distribution.</p></li>
+<li><p><code>loo_warning_pareto_tail_constant</code>: All tail values are the same.</p></li>
+<li><p><code>loo_warning_p_waic_high</code>: Some <code>p_waic</code> estimates are greater than 0.4.</p></li>
+<li><p><code>loo_warning_moment_match_failed</code>: Moment matching failed for some
+observations.</p></li>
+<li><p><code>loo_warning_moment_match_max_iters</code>: Moment matching reached
+<code>max_iters</code>.</p></li>
+<li><p><code>loo_warning_large_kf</code>: The accuracy of self-normalized importance
+sampling may be bad.</p></li>
+<li><p><code>loo_warning_y_mismatch</code>: The models do not have the same <code>y</code> variable.</p></li>
+<li><p><code>loo_warning_cv_mismatch</code>: The models use different types of
+cross-validation or different numbers of folds.</p></li>
+<li><p><code>loo_warning_chance_difference</code>: The difference in performance is
+potentially due to chance.</p></li>
+<li><p><code>loo_warning_subsample_naive_se</code>: The difference SE in <code><a href="loo_compare.html">loo_compare()</a></code>
+uses the naive estimator.</p></li>
+<li><p><code>loo_warning_subsample_negative_se</code>: The subsampling SE estimate is
+negative.</p></li>
+</ul><p>Other warnings:</p><ul><li><p><code>loo_warning_multicore_unavailable</code>: Multicore is not implemented for
+the selected method.</p></li>
+<li><p><code>loo_warning_pareto_k_not_plotted</code>: Some Pareto k values are <code>Inf</code>, <code>NA</code>,
+or <code>NaN</code> and are not plotted.</p></li>
+<li><p><code>loo_warning_llfun_not_matrix</code>: The values from <code>llfun</code> are not a matrix
+and were coerced.</p></li>
+<li><p><code>loo_warning_deprecated</code>: A deprecated feature was used.</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Vehtari, A., Gelman, A., and Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC.
