@@ -1249,7 +1249,14 @@ loo_subsample_estimation_diff_srs <- function(x) {
 srs_diff_est <- function(y_approx, y, y_idx) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
-  checkmate::assert_integerish(y_idx, len = length(y))
+  checkmate::assert_integerish(
+    y_idx,
+    len = length(y),
+    lower = 1,
+    upper = length(y_approx),
+    unique = TRUE,
+    any.missing = FALSE
+  )
 
   N <- length(y_approx)
   m <- length(y)
