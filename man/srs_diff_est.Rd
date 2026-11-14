@@ -11,14 +11,14 @@ srs_diff_est(y_approx, y, y_idx)
 
 \item{y}{(numeric) \code{m<n} subsampled values.}
 
-\item{y_idx}{(integerish) The index of \code{y} in \code{y_approx}.}
+\item{y_idx}{(integerish) The positions in \code{y_approx} corresponding to the subsampled values in \code{y}.}
 }
 \value{
 A named list containing numeric values:
 \itemize{
-\item \code{y_hat}: estimated mean of \eqn{y} (Eq 7),
-\item \code{v_y_hat}: variance of the mean estimate (Eq 8), and
-\item \code{hat_v_y}: estimated variance of \eqn{y} (Eq 9).
+\item \code{y_hat}: estimated total \eqn{\sum_i y_i}, equivalently \eqn{n E[y]},
+\item \code{v_y_hat}: estimated sampling variance of y_hat due to subsampling, and
+\item \code{hat_v_y}: estimated variance component for the total \eqn{\sum_i y_i} used to compute the standard error sqrt(hat_v_y).
 }
 }
 \description{
@@ -38,9 +38,6 @@ a proportional difference of \eqn{1/n} compared to the paper.
 }
 \examples{
 ## This example predicts wine quality (data from Cortez et al., 2009).
-# The code is commented as ## Not run: because brm() takes a few seconds to fit.
-# Copy the code to your console to execute it.
-# A log_lik_matrix is generated from a fit, then it is used for srs_diff_est().
 \dontrun{
 library(brms)
 options(brms.backend = "cmdstanr")
@@ -67,14 +64,15 @@ Nsub <- 100
 # posterior log-score
 lpd <- elpd(log_lik_matrix)
 sum(lpd$pointwise[,"elpd"])
-# Use PSIS-LOO for subsample of Nsub randomly selected observations
+
+# Use PSIS-LOO for subsample of 100 randomly selected observations
 set.seed(1)
 idx <- sample(1:N, Nsub)
 elpd_loo_sub <- loo(log_lik_matrix[,idx])
 sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
 
 # Use difference estimator to combine fast result and subsampled accurate result
-loo::srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
 
 # Comparison to using PSIS-LOO for all observations
 loo(log_lik_matrix)

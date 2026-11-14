@@ -1186,9 +1186,9 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' @param y_idx (integerish) The positions in `y_approx` corresponding to the subsampled values in `y`.
 #'
 #' @return A named list containing numeric values:
-#' * `y_hat`: estimated mean of \eqn{y} (Eq 7),
-#' * `v_y_hat`: variance of the mean estimate (Eq 8), and
-#' * `hat_v_y`: estimated variance of \eqn{y} (Eq 9).
+#' * `y_hat`: estimated total \eqn{\sum_i y_i}, equivalently \eqn{n E[y]},
+#' * `v_y_hat`: estimated sampling variance of y_hat due to subsampling, and
+#' * `hat_v_y`: estimated variance component for the total \eqn{\sum_i y_i} used to compute the standard error sqrt(hat_v_y).
 #'
 #' @references
 #' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
