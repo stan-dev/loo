@@ -171,13 +171,6 @@ test_that("exp_x_minus_exp_y is stable for nearby values", {
   )
 })
 
-test_that("psis_smooth_tail returns original tail values if k is infinite", {
-  xx <- log(c(2, 2, 2, 2, 3, 4, 5, 6))
-  val <- suppressWarnings(psis_smooth_tail(xx, 0))
-  expect_equal(val$tail, xx)
-  expect_equal(val$k, Inf)
-})
-
 test_that("do_psis_i selects the same tail as a full sort, also with ties", {
   # reference: the tail from a full sort, as in loo 2.10.1
   do_psis_i_full_sort <- function(log_ratios_i, tail_len_i) {
@@ -185,7 +178,7 @@ test_that("do_psis_i selects the same tail as a full sort, also with ties", {
     lw_i <- log_ratios_i - max(log_ratios_i)
     ord <- sort.int(lw_i, index.return = TRUE)
     tail_ids <- seq(S - tail_len_i + 1, S)
-    smoothed <- psis_smooth_tail(ord$x[tail_ids], ord$x[min(tail_ids) - 1])
+    smoothed <- posterior::ps_tail_sorted_log_ratios(ord$x[tail_ids], ord$x[min(tail_ids) - 1])
     lw_i[ord$ix[tail_ids]] <- smoothed$tail
     lw_i[lw_i > 0] <- 0
     list(log_weights = lw_i + max(log_ratios_i), pareto_k = smoothed$k)

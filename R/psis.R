@@ -211,16 +211,18 @@ psis_apply <- function(x, item, fun = c("[[", "attr"), fun_val = numeric(1)) {
 do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   S <- length(log_ratios_i)
   # shift log ratios for safer exponentation
-  lw_i <- log_ratios_i - max(log_ratios_i)
+  max_log_ratio <- max(log_ratios_i)
+  lw_i <- log_ratios_i - max_log_ratio
   khat <- Inf
 
   if (enough_tail_samples(tail_len_i)) {
     # only the tail and the cutoff need sorting: a partial sort finds the
     # cutoff value, and the values at or above it are usually few
     cut_pos <- S - tail_len_i
+    # largest value not in the tail
     cut_val <- sort.int(lw_i, partial = cut_pos)[cut_pos]
     top <- which(lw_i >= cut_val)
-    top <- top[order(lw_i[top])]
+    top <- top[order(lw_i[top], method = "radix")]
     tail_ids <- top[seq(length(top) - tail_len_i + 1, length(top))]
     lw_tail <- lw_i[tail_ids]
     if (abs(max(lw_tail) - min(lw_tail)) < .Machine$double.eps / 100) {
@@ -230,9 +232,8 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
         class = "loo_warning_pareto_tail_constant"
       )
     } else {
-      cutoff <- cut_val # largest value not in the tail
-      smoothed <- psis_smooth_tail(lw_tail, cutoff)
-      khat <- smoothed$k
+      smoothed <- posterior::ps_tail_sorted_log_ratios(lw_tail, cut_val)
+      khat <- if (is.na(smoothed$k)) Inf else smoothed$k
       lw_i[tail_ids] <- smoothed$tail
     }
   }
@@ -240,41 +241,10 @@ do_psis_i <- function(log_ratios_i, tail_len_i, ...) {
   # truncate at max of raw wts (i.e., 0 since max has been subtracted)
   lw_i[lw_i > 0] <- 0
   # shift log weights back so that the smallest log weights remain unchanged
-  lw_i <- lw_i + max(log_ratios_i)
+  lw_i <- lw_i + max_log_ratio
 
   list(log_weights = lw_i, pareto_k = khat)
 }
-
-#' PSIS tail smoothing for a single vector
-#'
-#' @noRd
-#' @param x Vector of tail elements already sorted in ascending order.
-#' @return A named list containing:
-#' * `tail`: vector same size as `x` containing the logs of the
-#'   order statistics of the generalized pareto distribution.
-#' * `k`: scalar shape parameter estimate.
-#'
-psis_smooth_tail <- function(x, cutoff) {
-  len <- length(x)
-  exp_cutoff <- exp(cutoff)
-
-  # save time not sorting since x already sorted
-  fit <- posterior::gpdfit(exp_x_minus_exp_y(x, cutoff), sort_x = FALSE)
-  k <- fit$k
-  sigma <- fit$sigma
-  if (is.na(k)) {
-    k <- Inf
-  }
-  if (is.finite(k)) {
-    p <- (seq_len(len) - 0.5) / len
-    qq <- posterior::qgeneralized_pareto(p, 0, sigma, k) + exp_cutoff
-    tail <- log(qq)
-  } else {
-    tail <- x
-  }
-  list(tail = tail, k = k)
-}
-
 
 #' Calculate tail lengths to use for fitting the GPD
 #'
