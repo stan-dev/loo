@@ -39,10 +39,10 @@ E_loo(x, psis_object, ...)
 \item{probs}{For computing quantiles, a vector of probabilities.}
 
 \item{log_ratios}{Optionally, a vector or matrix (the same dimensions as \code{x})
-of raw (not smoothed) log ratios. If working with log-likelihood values,
-the log ratios are the \strong{negative} of those values. If \code{log_ratios} is
-specified we are able to compute more accurate \link[=pareto-k-diagnostic]{Pareto k}
-diagnostics specific to \code{E_loo()}.}
+of the raw (not smoothed) log ratios from which \code{psis_object} was computed.
+If working with log-likelihood values, the log ratios are the \strong{negative}
+of those values. If \code{log_ratios} is specified we are able to compute more
+accurate \link[=pareto-k-diagnostic]{Pareto k} diagnostics specific to \code{E_loo()}.}
 }
 \value{
 A named list with the following components:
@@ -66,9 +66,7 @@ Function-specific diagnostic.
 For the matrix method it will be a vector of length \code{ncol(x)}
 containing estimates of the shape parameter \eqn{k} of the
 generalized Pareto distribution. For the default/vector method,
-the estimate is a scalar. If \code{log_ratios} is not specified when
-calling \code{E_loo()}, the smoothed log-weights are used to estimate
-Pareto-k's, which may produce optimistic estimates.
+the estimate is a scalar.
 
 For \code{type="mean"}, \code{type="var"}, and \code{type="sd"}, the returned Pareto-k is
 usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
@@ -76,6 +74,11 @@ and the right tail of \eqn{r}, where \eqn{r} is the importance ratio and
 \eqn{h=x} for \code{type="mean"} and \eqn{h=x^2} for \code{type="var"} and \code{type="sd"}.
 If \eqn{h} is binary, constant, or not finite, or if \code{type="quantile"}, the
 returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
+
+The Pareto-k for the right tail of \eqn{r} is the Pareto-k of
+\code{psis_object}. If \code{log_ratios} is not specified when calling \code{E_loo()},
+the smoothed log-weights are used to estimate the Pareto-k's for the tails
+of \eqn{hr}, which may produce optimistic estimates.
 }
 }
 }
@@ -85,10 +88,10 @@ quantiles) using the importance weights obtained from the \link[=psis]{PSIS}
 smoothing procedure. The expectations estimated by the \code{E_loo()} function
 assume that the PSIS approximation is working well.
 \strong{A small \link[=pareto-k-diagnostic]{Pareto k} estimate is necessary,
-but not sufficient, for \code{E_loo()} to give reliable estimates}. If the
-\code{log_ratios} argument is provided, \code{E_loo()} also computes a function
-specific Pareto k diagnostic, which must also be small for a reliable
-estimate. See more details below.
+but not sufficient, for \code{E_loo()} to give reliable estimates}. \code{E_loo()}
+also computes a function specific Pareto k diagnostic, which must also be
+small for a reliable estimate. This diagnostic is more accurate if the
+\code{log_ratios} argument is provided. See more details below.
 }
 \examples{
 \donttest{

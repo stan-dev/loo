@@ -252,8 +252,77 @@ test_that("E_loo pareto_k does not depend on the scale of x", {
   skip_if(posterior:::is_constant(c(1e-20, 2e-20)),
           "posterior::is_constant() has an absolute tolerance")
   k <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
-  for (s in c(1e-20, 1e-200)) {
+  # with 1e-307, h * r underflows unless the scaling includes h
+  for (s in c(1e-20, 1e-200, 1e-307)) {
     k_s <- E_loo(s * x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
     expect_equal(k_s, k, tolerance = 1e-10)
   }
+})
+
+test_that("E_loo pareto_k for the ratios is the psis() pareto_k", {
+  k_psis <- pareto_k_values(psis_mat)
+  # quantiles and a binary x use only the k for the ratios
+  expect_identical(E_test_quant$pareto_k, k_psis)
+  expect_identical(E_test_quant_vec$pareto_k, pareto_k_values(psis_vec))
+  k_bin <- E_loo(0 + (x > 0), psis_mat, log_ratios = log_rats)$pareto_k
+  expect_identical(k_bin, k_psis)
+  # also without log_ratios
+  k_quant <- E_loo(x, psis_mat, type = "quantile", probs = 0.5)$pareto_k
+  expect_identical(k_quant, k_psis)
+  # the k for h * r can only increase the result
+  expect_true(all(E_test_mean$pareto_k >= k_psis))
+  expect_true(any(E_test_mean$pareto_k > k_psis))
+})
+
+test_that("E_loo pareto_k is Inf if the psis() pareto_k is Inf", {
+  S <- 1000
+  set.seed(1)
+  x_cont <- rnorm(S)
+  x_bin <- rbinom(S, 1, 0.5)
+  lrs <- list(
+    # 30 draws have log ratios near the maximum. For the other draws,
+    # exp(log_ratios - max(log_ratios)) underflows to 0, so the generalized
+    # Pareto fit of the tail fails
+    underflow = c(rnorm(30), rnorm(S - 30) - 1e6),
+    constant = rep(0, S)
+  )
+  k_of <- function(...) suppressWarnings(E_loo(...))$pareto_k
+  for (nm in names(lrs)) {
+    lr <- lrs[[nm]]
+    ps <- suppressWarnings(psis(lr, r_eff = 1))
+    expect_identical(pareto_k_values(ps), Inf, info = nm)
+    expect_identical(k_of(x_cont, ps, log_ratios = lr), Inf, info = nm)
+    expect_identical(k_of(x_bin, ps, log_ratios = lr), Inf, info = nm)
+    expect_identical(k_of(x_cont, ps), Inf, info = nm)
+    expect_identical(
+      k_of(x_cont, ps, type = "quantile", probs = 0.5, log_ratios = lr),
+      Inf,
+      info = nm
+    )
+  }
+
+  # matrix method: only the first column has an Inf k
+  lr_mat <- cbind(lrs$underflow, rnorm(S))
+  ps_mat <- suppressWarnings(psis(lr_mat, r_eff = c(1, 1)))
+  k_mat <- k_of(cbind(x_cont, x_cont), ps_mat, log_ratios = lr_mat)
+  expect_identical(is.finite(k_mat), c(FALSE, TRUE))
+  expect_gte(k_mat[2], pareto_k_values(ps_mat)[2])
+
+  # tail too short for the generalized Pareto fit
+  lr_short <- rnorm(20)
+  ps_short <- suppressWarnings(psis(lr_short, r_eff = 1))
+  expect_identical(pareto_k_values(ps_short), Inf)
+  expect_identical(k_of(rnorm(20), ps_short, log_ratios = lr_short), Inf)
+})
+
+test_that("E_loo pareto_k is the psis() pareto_k if h * r is constant", {
+  S <- 1000
+  set.seed(1)
+  lr <- c(rep(-Inf, S / 2), rnorm(S / 2))
+  ps <- suppressWarnings(psis(lr, r_eff = 1))
+  # x is not constant, but x * r is 0 for all draws
+  x_zero <- c(rnorm(S / 2), rep(0, S / 2))
+  k <- suppressWarnings(E_loo(x_zero, ps, log_ratios = lr))$pareto_k
+  expect_true(is.finite(k))
+  expect_identical(k, pareto_k_values(ps))
 })

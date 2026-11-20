@@ -5,19 +5,19 @@
 #' smoothing procedure. The expectations estimated by the `E_loo()` function
 #' assume that the PSIS approximation is working well.
 #' **A small [Pareto k][pareto-k-diagnostic] estimate is necessary,
-#' but not sufficient, for `E_loo()` to give reliable estimates**. If the
-#' `log_ratios` argument is provided, `E_loo()` also computes a function
-#' specific Pareto k diagnostic, which must also be small for a reliable
-#' estimate. See more details below.
+#' but not sufficient, for `E_loo()` to give reliable estimates**. `E_loo()`
+#' also computes a function specific Pareto k diagnostic, which must also be
+#' small for a reliable estimate. This diagnostic is more accurate if the
+#' `log_ratios` argument is provided. See more details below.
 #'
 #' @export
 #' @param x A numeric vector or matrix.
 #' @param psis_object An object returned by [psis()].
 #' @param log_ratios Optionally, a vector or matrix (the same dimensions as `x`)
-#'   of raw (not smoothed) log ratios. If working with log-likelihood values,
-#'   the log ratios are the **negative** of those values. If `log_ratios` is
-#'   specified we are able to compute more accurate [Pareto k][pareto-k-diagnostic]
-#'   diagnostics specific to `E_loo()`.
+#'   of the raw (not smoothed) log ratios from which `psis_object` was computed.
+#'   If working with log-likelihood values, the log ratios are the **negative**
+#'   of those values. If `log_ratios` is specified we are able to compute more
+#'   accurate [Pareto k][pareto-k-diagnostic] diagnostics specific to `E_loo()`.
 #' @param type The type of expectation to compute. The options are
 #'   `"mean"`, `"variance"`, `"sd"`, and `"quantile"`.
 #' @param probs For computing quantiles, a vector of probabilities.
@@ -44,9 +44,7 @@
 #'   For the matrix method it will be a vector of length `ncol(x)`
 #'   containing estimates of the shape parameter \eqn{k} of the
 #'   generalized Pareto distribution. For the default/vector method,
-#'   the estimate is a scalar. If `log_ratios` is not specified when
-#'   calling `E_loo()`, the smoothed log-weights are used to estimate
-#'   Pareto-k's, which may produce optimistic estimates.
+#'   the estimate is a scalar.
 #'
 #'   For `type="mean"`, `type="var"`, and `type="sd"`, the returned Pareto-k is
 #'   usually the maximum of the Pareto-k's for the left and right tail of \eqn{hr}
@@ -54,6 +52,11 @@
 #'   \eqn{h=x} for `type="mean"` and \eqn{h=x^2} for `type="var"` and `type="sd"`.
 #'   If \eqn{h} is binary, constant, or not finite, or if `type="quantile"`, the
 #'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
+#'
+#'   The Pareto-k for the right tail of \eqn{r} is the Pareto-k of
+#'   `psis_object`. If `log_ratios` is not specified when calling `E_loo()`,
+#'   the smoothed log-weights are used to estimate the Pareto-k's for the tails
+#'   of \eqn{hr}, which may produce optimistic estimates.
 #'  }
 #' }
 #'
@@ -121,7 +124,7 @@ E_loo.default <-
 
     if (is.null(log_ratios)) {
       # Use of smoothed ratios gives slightly optimistic
-      # Pareto-k's, but these are still better than nothing
+      # Pareto-k's for h * r, but these are still better than nothing
       log_ratios <- weights(psis_object, log = TRUE)
     }
     h <- switch(
@@ -169,7 +172,7 @@ E_loo.matrix <-
 
     if (is.null(log_ratios)) {
       # Use of smoothed ratios gives slightly optimistic
-      # Pareto-k's, but these are still better than nothing
+      # Pareto-k's for h * r, but these are still better than nothing
       log_ratios <- weights(psis_object, log = TRUE)
     }
     h <- switch(
@@ -256,31 +259,34 @@ E_loo.matrix <-
 #' Compute function-specific k-hat diagnostics
 #'
 #' @noRd
+#' @param psis_object An object returned by `psis()`. It provides the k-hat
+#'   estimates for the ratios and the tail lengths.
 #' @param log_ratios Vector or matrix of raw (not smoothed) log ratios with the
 #'   same dimensions as `x`. If working with log-likelihood values, the log
 #'   ratios are the negative of those values.
-#' @return Vector (of length `NCOL(x)`) of k-hat estimates.
+#' @return Vector (of length `NCOL(log_ratios)`) of k-hat estimates.
 #'
 E_loo_khat <- function(x, psis_object, log_ratios, ...) {
   UseMethod("E_loo_khat")
 }
 #' @export
 E_loo_khat.default <- function(x, psis_object, log_ratios, ...) {
-  .E_loo_khat_i(x, log_ratios, attr(psis_object, "tail_len"))
+  .E_loo_khat_i(
+    x,
+    log_ratios,
+    attr(psis_object, "tail_len"),
+    pareto_k_values(psis_object)
+  )
 }
 #' @export
 E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   tail_lengths <- attr(psis_object, "tail_len")
+  khat_r <- pareto_k_values(psis_object)
   .collect_warnings(
-    if (is.null(x)) {
-      sapply(seq_len(ncol(log_ratios)), function(i) {
-        .E_loo_khat_i(x, log_ratios[, i], tail_lengths[i])
-      })
-    } else {
-      sapply(seq_len(ncol(log_ratios)), function(i) {
-        .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i])
-      })
-    }
+    sapply(seq_len(ncol(log_ratios)), function(i) {
+      # x[, i] is NULL if x is NULL
+      .E_loo_khat_i(x[, i], log_ratios[, i], tail_lengths[i], khat_r[i])
+    })
   )
 }
 
@@ -291,28 +297,21 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
 #' @param log_ratios_i S-vector of log_ratios, log(r(theta)), for a single
 #'   observation.
 #' @param tail_len_i Integer tail length used for fitting GPD.
+#' @param khat_r_i Scalar k-hat estimate for the right tail of r(theta), as
+#'   computed by `psis()`.
 #' @return Scalar h-specific k-hat estimate.
 #'
-.E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i) {
-  h_theta <- x_i
-  r_theta <- exp(log_ratios_i - max(log_ratios_i))
-  khat_r <- posterior::pareto_khat(r_theta, tail = "right", ndraws_tail = tail_len_i)
-  if (is.list(khat_r)) { # retain compatiblity with older posterior that returned a list
-    khat_r <- khat_r$khat
-  }
-  if (is.null(x_i) || is_constant(x_i) || length(unique(x_i))==2 ||
+.E_loo_khat_i <- function(x_i, log_ratios_i, tail_len_i, khat_r_i) {
+  if (is.null(x_i) || is_constant(x_i) || length(unique(x_i)) == 2 ||
         anyNA(x_i) || any(is.infinite(x_i))) {
-    khat_r
-  } else {
-    khat_hr <- posterior::pareto_khat(h_theta * r_theta, tail = "both", ndraws_tail = tail_len_i)
-    if (is.list(khat_hr)) { # retain compatiblity with older posterior that returned a list
-      khat_hr <- khat_hr$khat
-    }
-    if (is.na(khat_hr) && is.na(khat_r)) {
-      k <- NA
-    } else {
-      k <- max(khat_hr, khat_r, na.rm=TRUE)
-    }
-    k
+    return(khat_r_i)
   }
+  # scale so that the largest |h * r| is 1, which avoids underflow for small |h|
+  log_hr <- log(abs(x_i)) + log_ratios_i
+  khat_hr <- posterior::pareto_khat(
+    sign(x_i) * exp(log_hr - max(log_hr)),
+    tail = "both",
+    ndraws_tail = tail_len_i
+  )
+  if (is.na(khat_hr)) khat_r_i else max(khat_hr, khat_r_i)
 }
