@@ -76,10 +76,9 @@ If \eqn{h} is binary, constant, or not finite, or if \code{type="quantile"}, the
 returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 
 The Pareto-k for the right tail of \eqn{r} is the Pareto-k of
-\code{psis_object}, so it is \code{Inf} when \code{\link[=psis]{psis()}} gives \code{Inf}. If \code{log_ratios}
-is not specified when calling \code{E_loo()}, the smoothed log-weights are used
-to estimate the Pareto-k's for the tails of \eqn{hr}, which may produce
-optimistic estimates.
+\code{psis_object}. If \code{log_ratios} is not specified when calling \code{E_loo()},
+the smoothed log-weights are used to estimate the Pareto-k's for the tails
+of \eqn{hr}, which may produce optimistic estimates.
 }
 }
 }

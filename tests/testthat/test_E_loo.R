@@ -252,7 +252,8 @@ test_that("E_loo pareto_k does not depend on the scale of x", {
   skip_if(posterior:::is_constant(c(1e-20, 2e-20)),
           "posterior::is_constant() has an absolute tolerance")
   k <- E_loo(x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
-  for (s in c(1e-20, 1e-200)) {
+  # with 1e-307, h * r underflows unless the scaling includes h
+  for (s in c(1e-20, 1e-200, 1e-307)) {
     k_s <- E_loo(s * x, psis_mat, type = "mean", log_ratios = log_rats)$pareto_k
     expect_equal(k_s, k, tolerance = 1e-10)
   }

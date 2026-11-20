@@ -54,10 +54,9 @@
 #'   returned Pareto-k is the Pareto-k for the right tail of \eqn{r}.
 #'
 #'   The Pareto-k for the right tail of \eqn{r} is the Pareto-k of
-#'   `psis_object`, so it is `Inf` when [psis()] gives `Inf`. If `log_ratios`
-#'   is not specified when calling `E_loo()`, the smoothed log-weights are used
-#'   to estimate the Pareto-k's for the tails of \eqn{hr}, which may produce
-#'   optimistic estimates.
+#'   `psis_object`. If `log_ratios` is not specified when calling `E_loo()`,
+#'   the smoothed log-weights are used to estimate the Pareto-k's for the tails
+#'   of \eqn{hr}, which may produce optimistic estimates.
 #'  }
 #' }
 #'
@@ -307,9 +306,10 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
         anyNA(x_i) || any(is.infinite(x_i))) {
     return(khat_r_i)
   }
-  r_theta <- exp(log_ratios_i - max(log_ratios_i))
+  # scale so that the largest |h * r| is 1, which avoids underflow for small |h|
+  log_hr <- log(abs(x_i)) + log_ratios_i
   khat_hr <- posterior::pareto_khat(
-    x_i * r_theta,
+    sign(x_i) * exp(log_hr - max(log_hr)),
     tail = "both",
     ndraws_tail = tail_len_i
   )
