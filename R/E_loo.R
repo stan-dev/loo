@@ -308,6 +308,10 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   }
   # scale so that the largest |h * r| is 1, which avoids underflow for small |h|
   log_hr <- log(abs(x_i)) + log_ratios_i
+  # h * r is 0 for all draws, or log_hr has NA, NaN or +Inf
+  if (!is.finite(max(log_hr))) {
+    return(khat_r_i)
+  }
   khat_hr <- posterior::pareto_khat(
     sign(x_i) * exp(log_hr - max(log_hr)),
     tail = "both",

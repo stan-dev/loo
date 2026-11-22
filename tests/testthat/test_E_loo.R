@@ -322,7 +322,29 @@ test_that("E_loo pareto_k is the psis() pareto_k if h * r is constant", {
   ps <- suppressWarnings(psis(lr, r_eff = 1))
   # x is not constant, but x * r is 0 for all draws
   x_zero <- c(rnorm(S / 2), rep(0, S / 2))
-  k <- suppressWarnings(E_loo(x_zero, ps, log_ratios = lr))$pareto_k
+  expect_no_warning(k <- E_loo(x_zero, ps, log_ratios = lr)$pareto_k)
   expect_true(is.finite(k))
   expect_identical(k, pareto_k_values(ps))
+})
+
+test_that("E_loo pareto_k is the psis() k if log_ratios has NA, NaN or +Inf", {
+  S <- 1000
+  set.seed(3)
+  lr <- 2 * rexp(S)
+  x_cont <- rnorm(S)
+  ps <- suppressWarnings(psis(lr, r_eff = 1))
+  for (v in c(NA, NaN, Inf)) {
+    lr_v <- replace(lr, 1, v)
+    expect_no_warning(k <- E_loo(x_cont, ps, log_ratios = lr_v)$pareto_k)
+    expect_identical(k, pareto_k_values(ps), info = format(v))
+  }
+
+  # matrix method: only the first column has an NA log ratio
+  lr_mat <- cbind(replace(lr, 1, NA), rnorm(S))
+  ps_mat <- suppressWarnings(psis(cbind(lr, lr_mat[, 2]), r_eff = c(1, 1)))
+  x_mat <- cbind(x_cont, x_cont)
+  expect_no_warning(k_mat <- E_loo(x_mat, ps_mat, log_ratios = lr_mat)$pareto_k)
+  k_psis <- pareto_k_values(ps_mat)
+  expect_identical(k_mat[1], k_psis[1])
+  expect_gte(k_mat[2], k_psis[2])
 })
