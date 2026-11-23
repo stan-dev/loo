@@ -150,6 +150,13 @@ test_that("model_compare matches estimate columns by measure name", {
   expect_equal(comp3$r2[comp3$model == "m3"], unname(pm3$estimates["r2_loo", "Estimate"]))
 })
 
+test_that("model_compare compares loo and waic objects", {
+  LL <- example_loglik_matrix()
+  comp <- suppressWarnings(model_compare(loo(LL), waic(LL - 1)))
+  expect_s3_class(comp, "compare.loo")
+  expect_equal(nrow(comp), 2L)
+})
+
 test_that("model_compare names unnamed models by input position", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
   unnamed <- function(x) {

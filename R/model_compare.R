@@ -516,10 +516,13 @@ find_model_names <- function(x) {
 #' @noRd
 .model_compare_estimates_table <- function(loos, bare_names = FALSE,
                                           subsampling = FALSE) {
-  shared <- Reduce(intersect, lapply(loos, function(x) rownames(x$estimates)))
+  shared <- if (bare_names) {
+    Reduce(intersect, lapply(loos, function(x) rownames(x$estimates)))
+  }
   sapply(loos, function(x) {
-    est <- x$estimates[shared, , drop = FALSE]
-    rows <- if (bare_names) .display_name(shared, loos) else shared
+    est <- x$estimates
+    if (bare_names) est <- est[shared, , drop = FALSE]
+    rows <- if (bare_names) .display_name(rownames(est), loos) else rownames(est)
     nms <- c(rows, paste0("se_", rows))
     # A `psis_loo_ss` object carries a third estimate column, the subsampling
     # standard error, so its table needs a third name set.
