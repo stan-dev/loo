@@ -867,6 +867,23 @@ test_that("a wrong aggregation declaration warns for large values", {
   )
 })
 
+test_that("a correct aggregation declaration does not warn for small values", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  tiny <- function(y, mupred) {
+    sqe_i <- (1e-8 * (y - colMeans(mupred)))^2
+    list(estimate = mean(sqe_i) * (1 + 1e-14), se = 1, pointwise = sqe_i)
+  }
+  measure <- custom_measure(tiny, name = "tiny", se_diff_fun = "mean")
+  make <- function(loo, mupred, ylp) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
+    )
+  }
+  pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1)
+  pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2)
+  expect_no_warning(suppressMessages(model_compare(pm1, pm2)))
+})
+
 test_that("custom measures take their se_diff from their declaration", {
   res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
 
