@@ -42,7 +42,9 @@ E_loo(x, psis_object, ...)
 of the raw (not smoothed) log ratios from which \code{psis_object} was computed.
 If working with log-likelihood values, the log ratios are the \strong{negative}
 of those values. If \code{log_ratios} is specified we are able to compute more
-accurate \link[=pareto-k-diagnostic]{Pareto k} diagnostics specific to \code{E_loo()}.}
+accurate \link[=pareto-k-diagnostic]{Pareto k} diagnostics specific to \code{E_loo()}.
+\code{NA}, \code{NaN} and \code{Inf} values give an error. \code{-Inf} values (zero ratios)
+are allowed.}
 }
 \value{
 A named list with the following components:

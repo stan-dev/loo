@@ -18,6 +18,8 @@
 #'   If working with log-likelihood values, the log ratios are the **negative**
 #'   of those values. If `log_ratios` is specified we are able to compute more
 #'   accurate [Pareto k][pareto-k-diagnostic] diagnostics specific to `E_loo()`.
+#'   `NA`, `NaN` and `Inf` values give an error. `-Inf` values (zero ratios)
+#'   are allowed.
 #' @param type The type of expectation to compute. The options are
 #'   `"mean"`, `"variance"`, `"sd"`, and `"quantile"`.
 #' @param probs For computing quantiles, a vector of probabilities.
@@ -116,6 +118,9 @@ E_loo.default <-
       length(x) == dim(psis_object)[1],
       is.null(log_ratios) || (length(x) == length(log_ratios))
     )
+    if (!is.null(log_ratios)) {
+      validate_ll(log_ratios)
+    }
     type <- match.arg(type)
     E_fun <- .E_fun(type)
     w <- as.vector(weights(psis_object, log = FALSE))
@@ -153,6 +158,9 @@ E_loo.matrix <-
       identical(dim(x), dim(psis_object)),
       is.null(log_ratios) || identical(dim(x), dim(log_ratios))
     )
+    if (!is.null(log_ratios)) {
+      validate_ll(log_ratios)
+    }
     type <- match.arg(type)
     E_fun <- .E_fun(type)
     fun_val <- numeric(1)
@@ -308,7 +316,7 @@ E_loo_khat.matrix <- function(x, psis_object, log_ratios, ...) {
   }
   # scale so that the largest |h * r| is 1, which avoids underflow for small |h|
   log_hr <- log(abs(x_i)) + log_ratios_i
-  # h * r is 0 for all draws, or log_hr has NA, NaN or +Inf
+  # h * r is 0 for all draws
   if (!is.finite(max(log_hr))) {
     return(khat_r_i)
   }
