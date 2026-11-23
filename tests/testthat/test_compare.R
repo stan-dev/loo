@@ -109,6 +109,68 @@ test_that("model_compare warns when predictive measures differ across models", {
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2"))
   expect_false("mse_diff" %in% colnames(comp))
   expect_false("mae_diff" %in% colnames(comp))
+  expect_equal(comp$r2[comp$model == "m1"], unname(pm1$estimates["r2_loo", "Estimate"]))
+  expect_equal(comp$r2[comp$model == "m2"], unname(pm2$estimates["r2_loo", "Estimate"]))
+})
+
+test_that("model_compare matches estimate columns by measure name", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  pm1 <- loo_pred_measure(
+    loo = res$loo_p_m1,
+    y = res$y,
+    mupred = res$mupred_m1,
+    ylp = res$ylp_m1,
+    measures = c("elpd", "r2", "mse")
+  )
+  pm2 <- loo_pred_measure(
+    loo = res$loo_p_m2,
+    y = res$y,
+    mupred = res$mupred_m2,
+    ylp = res$ylp_m2,
+    measures = c("mse", "elpd", "r2")
+  )
+  pm3 <- loo_pred_measure(
+    loo = res$loo_p_m2,
+    y = res$y,
+    mupred = res$mupred_m2,
+    ylp = res$ylp_m2,
+    measures = c("elpd", "r2")
+  )
+
+  comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2)))
+  m2 <- comp$model == "m2"
+  expect_equal(comp$r2[m2], unname(pm2$estimates["r2_loo", "Estimate"]))
+  expect_equal(comp$mse[m2], unname(pm2$estimates["mse_loo", "Estimate"]))
+  expect_equal(comp$elpd[m2], unname(pm2$estimates["elpd_loo", "Estimate"]))
+
+  expect_warning(
+    comp3 <- suppressMessages(model_compare(list(m1 = pm1, m3 = pm3))),
+    "Omitted measures: mse \\(m1\\)"
+  )
+  expect_equal(comp3$r2[comp3$model == "m3"], unname(pm3$estimates["r2_loo", "Estimate"]))
+})
+
+test_that("model_compare names unnamed models by input position", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  unnamed <- function(x) {
+    attr(x, "model_name") <- NULL
+    x
+  }
+  pm1 <- unnamed(loo_pred_measure(
+    loo = unnamed(res$loo_p_m1),
+    y = res$y,
+    ylp = res$ylp_m1,
+    measures = "elpd"
+  ))
+  pm2 <- unnamed(loo_pred_measure(
+    loo = unnamed(res$loo_p_m2),
+    y = res$y,
+    ylp = res$ylp_m2,
+    measures = "elpd"
+  ))
+
+  comp <- suppressMessages(model_compare(pm1, pm2))
+  expect_equal(comp$model, c("model2", "model1"))
 })
 
 test_that("model_compare works with three loo_pred_measure models", {
@@ -726,6 +788,76 @@ test_that("bacc reports the difference without an se when the strata are gone", 
   mixed_stale_first <- suppressMessages(model_compare(stale1, fx$pm2))
   expect_true(is.na(mixed_stale_first$bacc_se_diff[1L]))
   expect_false(is.na(mixed_stale_first$bacc_se_diff[2L]))
+})
+
+test_that("model_compare accepts the same se_diff_fun from other environments", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  my_mae <- function(y, mupred) {
+    ae_i <- abs(y - colMeans(mupred))
+    list(estimate = mean(ae_i), se = sd(ae_i) / sqrt(length(ae_i)),
+         pointwise = ae_i)
+  }
+  make_measure <- function(loss = FALSE) {
+    custom_measure(my_mae, name = "my_mae",
+                   se_diff_fun = function(ref, cmp) 0, loss = loss)
+  }
+  make <- function(loo, mupred, ylp, fun) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = fun
+    )
+  }
+  pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1, make_measure())
+  pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2, make_measure())
+  expect_no_error(suppressMessages(model_compare(pm1, pm2)))
+
+  path <- tempfile(fileext = ".rds")
+  saveRDS(pm2, path)
+  expect_no_error(suppressMessages(model_compare(pm1, readRDS(path))))
+
+  pm_loss <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2,
+                  make_measure(loss = TRUE))
+  expect_error(suppressMessages(model_compare(pm1, pm_loss)), "Models disagree")
+})
+
+test_that("a custom measure whose name starts with elpd is not an elpd measure", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  my_mae <- function(y, mupred) {
+    ae_i <- abs(y - colMeans(mupred))
+    list(estimate = mean(ae_i), se = sd(ae_i) / sqrt(length(ae_i)),
+         pointwise = ae_i)
+  }
+  measure <- custom_measure(my_mae, name = "elpd_custom", se_diff_fun = "mean")
+  make <- function(loo, mupred, ylp) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp,
+      measures = list("elpd", measure)
+    )
+  }
+  comp <- suppressMessages(model_compare(
+    make(res$loo_p_m1, res$mupred_m1, res$ylp_m1),
+    make(res$loo_p_m2, res$mupred_m2, res$ylp_m2)
+  ))
+  expect_true(all(c("elpd_custom_diff", "elpd_custom_se_diff") %in% colnames(comp)))
+})
+
+test_that("a wrong aggregation declaration warns for large values", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  big <- function(y, mupred) {
+    sqe_i <- (1e4 * (y - colMeans(mupred)))^2
+    list(estimate = 1.5 * mean(sqe_i), se = 1, pointwise = sqe_i)
+  }
+  measure <- custom_measure(big, name = "big", se_diff_fun = "mean")
+  make <- function(loo, mupred, ylp) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
+    )
+  }
+  pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1)
+  pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2)
+  expect_warning(
+    suppressMessages(model_compare(pm1, pm2)),
+    "does not reproduce its estimate"
+  )
 })
 
 test_that("custom measures take their se_diff from their declaration", {

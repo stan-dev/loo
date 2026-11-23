@@ -328,16 +328,9 @@ model_compare.default <- function(x, ...) {
 }
 
 #' Reference model a measure's differences were computed against
-#'
-#' Each measure has its own best model as reference, recorded in attribute `compare_reference`. Falls back to the first row for objects
-#' created before that attribute existed.
 #' @noRd
 .measure_ref_model <- function(x, measure) {
-  refs <- attr(x, "compare_reference")
-  if (!is.null(refs) && measure %in% names(refs)) {
-    return(refs[[measure]])
-  }
-  x$model[[1L]]
+  attr(x, "compare_reference")[[measure]]
 }
 
 #' Normalize `model_compare()` inputs to a list of model results
@@ -523,9 +516,10 @@ find_model_names <- function(x) {
 #' @noRd
 .model_compare_estimates_table <- function(loos, bare_names = FALSE,
                                           subsampling = FALSE) {
+  shared <- Reduce(intersect, lapply(loos, function(x) rownames(x$estimates)))
   sapply(loos, function(x) {
-    est <- x$estimates
-    rows <- if (bare_names) .display_name(rownames(est), loos) else rownames(est)
+    est <- x$estimates[shared, , drop = FALSE]
+    rows <- if (bare_names) .display_name(shared, loos) else shared
     nms <- c(rows, paste0("se_", rows))
     # A `psis_loo_ss` object carries a third estimate column, the subsampling
     # standard error, so its table needs a third name set.
