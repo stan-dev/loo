@@ -402,7 +402,7 @@ throw_omitted_compare_measures_warning <- function(loos) {
 
   ok <- length(pw) > 0L && is.finite(est) && is.finite(agg)
   if (ok) {
-    ok <- isTRUE(all.equal(est, agg, check.attributes = FALSE))
+    ok <- abs(est - agg) <= sqrt(.Machine$double.eps) * max(abs(est), abs(agg))
   }
   if (!ok) {
     warning(
