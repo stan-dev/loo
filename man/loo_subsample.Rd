@@ -196,5 +196,5 @@ In \emph{Proceedings of the 23rd International Conference on Artificial
 Intelligence and Statistics (AISTATS)}, PMLR 108:341-351.
 }
 \seealso{
-\code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}
+\code{\link[=loo]{loo()}}, \code{\link[=psis]{psis()}}, \code{\link[=loo_compare]{loo_compare()}}, \code{\link[=srs_diff_est]{srs_diff_est()}}
 }

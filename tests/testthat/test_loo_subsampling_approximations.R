@@ -669,6 +669,155 @@ test_that("srs_diff_est works as expected", {
   expect_equal(sqrt(res$hat_v_y), sigma_hat_true, tolerance = 0.1)
 })
 
+test_that("srs_diff_est with equal weights equals srs_diff_est without weights", {
+  set.seed(1234)
+  N <- 200
+  m <- 30
+  y_approx <- rnorm(N)
+  y_idx <- seq(3, N, by = 6)[1:m]
+  y <- y_approx[y_idx] + rnorm(m, sd = 0.2)
+  res <- srs_diff_est(y_approx, y, y_idx)
+  # reference values from the unweighted formulas with var(e_i)
+  expect_equal(res$y_hat, 4.7413161538700166, tolerance = 1e-12)
+  expect_equal(res$v_y_hat, 42.179689783275506, tolerance = 1e-12)
+  expect_equal(res$hat_v_y, 196.57069172888566, tolerance = 1e-12)
+  expect_equal(srs_diff_est(y_approx, y, y_idx, weights = rep(1, N)), res)
+  expect_equal(srs_diff_est(y_approx, y, y_idx, weights = rep(3, N)), res)
+})
+
+# Monte Carlo summaries of srs_diff_est() with weights
+srs_diff_est_weighted_mc <- function(weights, S = 10000, m = 100) {
+  N <- length(weights)
+  y_true <- seq_len(N)
+  y_approx <- rnorm(N, y_true, 0.1)
+  w <- N * weights / sum(weights)
+  sum_y_true <- sum(w * y_true)
+  v_y_true <- sum(w * y_true^2) - sum_y_true^2 / N
+  hat_v_y <- y_hat <- se_y_hat <- numeric(S)
+  for (i in seq_len(S)) {
+    y_idx <- sample.int(N, size = m)
+    res <- srs_diff_est(y_approx, y_true[y_idx], y_idx, weights = weights)
+    y_hat[i] <- res$y_hat
+    se_y_hat[i] <- sqrt(res$v_y_hat)
+    hat_v_y[i] <- res$hat_v_y
+  }
+  q <- qnorm(0.975)
+  list(
+    y_hat = mean(y_hat), sum_y_true = sum_y_true,
+    hat_v_y = mean(hat_v_y), v_y_true = v_y_true,
+    coverage = mean(y_hat - q * se_y_hat < sum_y_true &
+                      sum_y_true < y_hat + q * se_y_hat)
+  )
+}
+
+test_that("srs_diff_est works as expected with weights", {
+  set.seed(1234)
+  mc <- srs_diff_est_weighted_mc(sample(2:7, size = 1000, replace = TRUE))
+  expect_equal(mc$y_hat, mc$sum_y_true, tolerance = 0.001)
+  expect_equal(mc$coverage, 0.95, tolerance = 0.01)
+  expect_equal(mc$hat_v_y, mc$v_y_true, tolerance = 0.01)
+
+  # heavy-tailed weights: the variance of the weighted differences is needed
+  set.seed(1234)
+  mc <- srs_diff_est_weighted_mc(rlnorm(1000), S = 2000)
+  expect_equal(mc$y_hat, mc$sum_y_true, tolerance = 0.001)
+  expect_gt(mc$coverage, 0.9)
+})
+
+test_that("srs_diff_est with weights is exact if all observations are sampled", {
+  set.seed(1234)
+  N <- 100
+  y_true <- rnorm(N)
+  y_approx <- y_true + rnorm(N, sd = 0.1)
+  weights <- runif(N, 0.5, 2)
+  w <- N * weights / sum(weights)
+  y_idx <- sample.int(N)
+  res <- srs_diff_est(y_approx, y_true[y_idx], y_idx, weights = weights)
+  expect_equal(res$y_hat, sum(w * y_true), tolerance = 1e-10)
+  expect_equal(res$v_y_hat, 0)
+  expect_equal(res$hat_v_y, sum(w * y_true^2) - sum(w * y_true)^2 / N,
+               tolerance = 1e-8)
+})
+
+test_that("srs_diff_est with weights propagates NA values", {
+  N <- 50L
+  y_idx <- seq(1, N, by = 5)
+  m <- length(y_idx)
+  res_na <- list(m = m, N = N, y_hat = NA_real_, v_y_hat = NA_real_,
+                 hat_v_y = NA_real_)
+  w <- rep_len(c(2, 3), N)
+  expect_identical(
+    srs_diff_est(rep(-0.8, N), c(rep(-0.7, m - 1), NA), y_idx, weights = w),
+    res_na
+  )
+  expect_identical(
+    srs_diff_est(rep(-0.8, N), rep(-0.7, m), y_idx, weights = rep(NA, N)),
+    res_na
+  )
+})
+
+test_that("srs_diff_est is accurate for values with a large common offset", {
+  set.seed(1234)
+  N <- 10000
+  m <- 500
+  y_approx <- rnorm(N, 0, 0.3)
+  y_idx <- seq(7, N, by = 20)[1:m]
+  y <- y_approx[y_idx] + rnorm(m, 0, 0.05)
+  offset <- 1e6
+  weights_zero <- rlnorm(N)
+  weights_zero[y_idx[1:5]] <- 0
+  for (weights in list(NULL, rlnorm(N), weights_zero)) {
+    res <- srs_diff_est(y_approx, y, y_idx, weights = weights)
+    res_offset <- srs_diff_est(y_approx + offset, y + offset, y_idx,
+                               weights = weights)
+    expect_equal(res_offset$y_hat, res$y_hat + N * offset, tolerance = 1e-12)
+    # the errors of v_y_hat and hat_v_y come from the rounding of
+    # y + offset and y_approx + offset
+    expect_equal(res_offset$v_y_hat, res$v_y_hat, tolerance = 1e-9)
+    expect_equal(res_offset$hat_v_y, res$hat_v_y, tolerance = 1e-9)
+  }
+  # all observations sampled: the shift is added back once
+  y_all <- y_approx + rnorm(N, 0, 0.05)
+  res <- srs_diff_est(y_approx, y_all, seq_len(N))
+  res_offset <- srs_diff_est(y_approx + offset, y_all + offset, seq_len(N))
+  expect_equal(res_offset$y_hat, res$y_hat + N * offset, tolerance = 1e-12)
+  expect_equal(res_offset$v_y_hat, 0)
+  expect_equal(res_offset$hat_v_y, res$hat_v_y, tolerance = 1e-9)
+})
+
+test_that("srs_diff_est keeps -Inf in y_approx outside the subsample", {
+  set.seed(1234)
+  N <- 100
+  y_approx <- rnorm(N)
+  y_idx <- 11:30
+  y <- y_approx[y_idx] + rnorm(20, 0, 0.1)
+  res <- srs_diff_est(y_approx, y, y_idx)
+  y_approx[1] <- -Inf
+  res_inf <- srs_diff_est(y_approx, y, y_idx)
+  expect_identical(res_inf$y_hat, -Inf)
+  expect_equal(res_inf$v_y_hat, res$v_y_hat)
+})
+
+test_that("srs_diff_est checks the weights", {
+  y_approx <- rnorm(10)
+  expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3, weights = rep(1, 9)),
+               "weights")
+  expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3,
+                            weights = c(-1, rep(1, 9))),
+               "weights")
+  expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3,
+                            weights = c(Inf, rep(1, 9))),
+               "weights")
+  expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3, weights = rep(0, 10)),
+               "must not all be 0")
+  expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3,
+                            weights = c(0, 0, 0, rep(1, 7))),
+               "must not all be 0")
+  # one subsampled observation
+  res <- srs_diff_est(y_approx, y_approx[2], 2, weights = rep(1, 10))
+  expect_identical(res$v_y_hat, NA_real_)
+})
+
 test_that("srs_est works as expected", {
   set.seed(1234)
   # Cochran 1976 example Table 2.2

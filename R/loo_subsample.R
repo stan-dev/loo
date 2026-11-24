@@ -24,7 +24,7 @@
 #'   same length containing the posterior density and the approximation density
 #'   for the individual draws.
 #'
-#' @seealso [loo()], [psis()], [loo_compare()]
+#' @seealso [loo()], [psis()], [loo_compare()], [srs_diff_est()]
 #' @template loo-large-data-references
 #'
 #' @export loo_subsample loo_subsample.function
@@ -1172,38 +1172,166 @@ loo_subsample_estimation_diff_srs <- function(x) {
   update_psis_loo_ss_estimates(x)
 }
 
-#' Difference estimation using SRS-WOR sampling (Magnusson et al., 2020)
-#' @noRd
-#' @param y_approx Approximated values of all observations.
-#' @param y The values observed.
-#' @param y_idx The index of `y` in `y_approx`.
-#' @return A list with estimates.
-srs_diff_est <- function(y_approx, y, y_idx) {
+#' Difference estimator with simple random sampling without replacement.
+#'
+#' The difference estimator `srs_diff_est()` estimates
+#' the expectation \eqn{n E[y]} when we have \eqn{n} approximate values \eqn{\tilde{y}_i},
+#' \eqn{i = 1, \ldots, n} and \eqn{m < n} accurate values \eqn{y_j}, \eqn{j \in \mathcal{S}},
+#' where \eqn{m} is the subsample size and \eqn{\mathcal{S}} is
+#' a simple random subsample without replacement.  The original
+#' approach is by Cochran (1977) and we follow the equations 7--9 by
+#' Magnusson et al. (2020).
+#'
+#' @details In Magnusson et al. (2020) Eq (9) first row, the second `+` should
+#'   be a `-`; Supplementary Material Eq (6) has this correct.
+#'   As `srs_diff_est()` in the `loo` package is used for \eqn{n E[y]}, there is
+#'   a proportional difference of \eqn{1/n} compared to the paper.
+#'
+#' @param y_approx (numeric) `n` approximated values.
+#' @param y (numeric) `m<n` subsampled values.
+#' @param y_idx (integerish) The positions in `y_approx` corresponding to the subsampled values in `y`.
+#' @param weights (numeric) Optional `n` non-negative finite observation
+#'   weights. If `NULL` (the default), all observations have weight 1. If
+#'   given, the estimated total is \eqn{\sum_i w_i y_i}, where the weights
+#'   \eqn{w_i} are scaled to have mean 1 over all `n` observations. The
+#'   difference term is then a ratio estimator (the weights of the subsampled
+#'   observations are scaled to have mean 1 over the `m` subsampled
+#'   observations), and it is approximately unbiased. `v_y_hat` is
+#'   the linearization variance of the ratio estimator, and `hat_v_y`
+#'   estimates \eqn{\sum_i w_i y_i^2 - (\sum_i w_i y_i)^2 / n}.
+#'
+#' @return A named list containing numeric values:
+#' * `y_hat`: estimated total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with
+#'   `weights`), equivalently \eqn{n E[y]},
+#' * `v_y_hat`: estimated sampling variance of y_hat due to subsampling, and
+#' * `hat_v_y`: estimated variance component for the total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with `weights`) used to compute the standard error sqrt(hat_v_y).
+#'
+#' @references
+#' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
+#' Leave-One-Out Cross-Validation for Model Comparison in Large Data.
+#' In _Proceedings of the 23rd International Conference on Artificial
+#' Intelligence and Statistics (AISTATS)_, PMLR 108:341-351.
+#'
+#' Cochran, W. G. (1977). _Sampling Techniques, 3rd Edition_. John Wiley.
+#'
+#' Cortez, P., Cerdeira, A.L., Almeida, F., Matos, T., & Reis, J. (2009).
+#' Modeling wine preferences by data mining from physicochemical properties.
+#' _Decis. Support Syst._, _47_, 547-553.
+#'
+#' @seealso [loo_subsample()]
+#'
+#' @examples
+#' ## This example predicts wine quality (data from Cortez et al., 2009).
+#' \dontrun{
+#' library(brms)
+#' options(brms.backend = "cmdstanr")
+#' options(mc.cores = 4)
+#'
+#' wine_scaled <- read.delim(
+#'   "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
+#'   sep = ";"
+#' ) |> unique() |> scale() |> as.data.frame()
+#'
+#' fitos <- brm(ordered(quality) ~ .,
+#'              family = cumulative("logit"),
+#'              prior = prior(R2D2(mean_R2 = 1/3, prec_R2 = 3)),
+#'              data = wine_scaled,
+#'              seed = 1,
+#'              silent = 2,
+#'              refresh = 0)
+#'
+#' log_lik_matrix <- log_lik(fitos)
+#'
+#' N <- nrow(wine_scaled)
+#' Nsub <- 100
+#'
+#' # posterior log-score
+#' lpd <- elpd(log_lik_matrix)
+#' sum(lpd$pointwise[,"elpd"])
+#'
+#' # Use PSIS-LOO for subsample of 100 randomly selected observations
+#' set.seed(1)
+#' idx <- sample(1:N, Nsub)
+#' elpd_loo_sub <- loo(log_lik_matrix[,idx])
+#' sum(elpd_loo_sub$pointwise[,"elpd_loo"]) / Nsub * N
+#'
+#' # Use difference estimator to combine fast result and subsampled accurate result
+#' srs_diff_est(lpd$pointwise[,"elpd"], elpd_loo_sub$pointwise[,"elpd_loo"], idx)
+#'
+#' # Comparison to using PSIS-LOO for all observations
+#' loo(log_lik_matrix)
+#' }
+#' @export
+srs_diff_est <- function(y_approx, y, y_idx, weights = NULL) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
-  checkmate::assert_integerish(y_idx, len = length(y))
+  checkmate::assert_integerish(
+    y_idx,
+    len = length(y),
+    lower = 1,
+    upper = length(y_approx),
+    unique = TRUE,
+    any.missing = FALSE
+  )
+  checkmate::assert_numeric(
+    weights,
+    lower = 0,
+    finite = TRUE,
+    len = length(y_approx),
+    null.ok = TRUE
+  )
+  if (!is.null(weights) && isTRUE(sum(weights[y_idx]) == 0)) {
+    stop("The weights of the subsampled observations must not all be 0.",
+         call. = FALSE)
+  }
 
   N <- length(y_approx)
   m <- length(y)
+  # weights with mean 1 over all observations and over the subsample
+  if (is.null(weights)) {
+    w <- 1
+    w_m <- 1
+  } else {
+    w <- N * weights / sum(weights)
+    w_m <- m * weights[y_idx] / sum(weights[y_idx])
+  }
+  # Subtract the (weighted) mean of y_approx from all values, so that the
+  # sums of squares in eq (9) do not cancel when the values have a large
+  # common offset. In exact arithmetic, v_y_hat and hat_v_y do not depend on
+  # the shift; N * shift is added to y_hat at the end. A non-finite mean
+  # (NA or infinite values) gives no shift.
+  shift <- sum(w * y_approx) / N
+  if (!is.finite(shift)) {
+    shift <- 0
+  }
+  y_approx <- y_approx - shift
+  y <- y - shift
   y_approx_m <- y_approx[y_idx]
 
   e_i <- y - y_approx_m
-  t_pi_tilde <- sum(y_approx)
-  t_pi2_tilde <- sum(y_approx^2)
-  t_e <- N * mean(e_i)
-  t_hat_epsilon <- N * mean(difference_of_squares(y, y_approx_m))
+  t_pi_tilde <- sum(w * y_approx)
+  t_pi2_tilde <- sum(w * y_approx^2)
+  t_e <- N * mean(w_m * e_i)
+  t_hat_epsilon <- N * mean(w_m * difference_of_squares(y, y_approx_m))
 
-  est_list <- list(m = length(y), N = N)
+  est_list <- list(m = m, N = N)
   # eq (7)
   est_list$y_hat <- t_pi_tilde + t_e
-  # eq (8)
-  est_list$v_y_hat <- N^2 * (1 - m / N) * var(e_i) / m
+  # eq (8); with weights, the difference term is a ratio estimator, and its
+  # linearization variance is the sample variance of w_m * (e_i - e_mean_w)
+  e_mean_w <- t_e / N
+  est_list$v_y_hat <- if (m < 2) {
+    NA_real_
+  } else {
+    N^2 * (1 - m / N) * sum((w_m * (e_i - e_mean_w))^2) / ((m - 1) * m)
+  }
   # eq (9) first row second `+` should be `-`
   # Supplementary material eq (6) has this correct
   # Here the variance is for sum, while in the paper the variance is for mean
   # which explains the proportional difference of 1/N
   est_list$hat_v_y <- (t_pi2_tilde + t_hat_epsilon) - # a (has been checked)
     (1/N) * (t_e^2 - est_list$v_y_hat + 2 * t_pi_tilde * est_list$y_hat - t_pi_tilde^2) # b
+  est_list$y_hat <- est_list$y_hat + N * shift
   est_list
 }
 
