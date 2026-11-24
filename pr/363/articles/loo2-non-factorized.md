@@ -428,16 +428,16 @@ in the upcoming section.
     Computed from 4000 posterior draws and 49 log-likelihood terms.
 
              Estimate   SE
-    elpd_loo   -186.8 10.7
-    p_loo         7.9  5.1
-    looic       373.5 21.4
+    elpd_loo   -186.7 10.7
+    p_loo         7.9  5.0
+    looic       373.4 21.5
     ------
     MCSE of elpd_loo is NA.
     MCSE and ESS estimates assume independent draws (r_eff=1).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     48    98.0%   1051    
+    (-Inf, 0.7]   (good)     48    98.0%   602     
        (0.7, 1]   (bad)       1     2.0%   <NA>    
        (1, Inf)   (very bad)  0     0.0%   <NA>    
     See help('pareto-k-diagnostic') for details.
@@ -547,7 +547,7 @@ exact_elpd <- sum(exact_elpds)
 round(exact_elpd, 1)
 ```
 
-    [1] -188.6
+    [1] -188.8
 
 The results of the approximate and exact LOO-CV are similar but not as
 close as we would expect if there were no problematic observations. We

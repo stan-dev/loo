@@ -186,9 +186,9 @@ is now the preferred function:
 loo_compare(loos)
 #> Warning: 'loo_compare' is deprecated. Use 'model_compare' instead.
 #>  model elpd_diff se_diff p_worse diag_diff       diag_elpd
-#>     m3       0.0     0.0      NA           2 k_psis > 0.62
-#>     m2    -211.0   226.1    0.82           2 k_psis > 0.62
-#>     m1   -2752.6   637.6    1.00           8 k_psis > 0.62
+#>     m3       0.0     0.0      NA           3 k_psis > 0.62
+#>     m2    -211.2   226.1    0.82           4 k_psis > 0.62
+#>     m1   -2752.9   637.7    1.00           3 k_psis > 0.62
 #> 
 #> Diagnostic flags present.
 #> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
@@ -202,9 +202,9 @@ objects:
 
 model_compare(loos)
 #>  model elpd_diff se_diff p_worse diag_diff       diag_elpd
-#>     m3       0.0     0.0      NA           2 k_psis > 0.62
-#>     m2    -211.0   226.1    0.82           2 k_psis > 0.62
-#>     m1   -2752.6   637.6    1.00           8 k_psis > 0.62
+#>     m3       0.0     0.0      NA           3 k_psis > 0.62
+#>     m2    -211.2   226.1    0.82           4 k_psis > 0.62
+#>     m1   -2752.9   637.7    1.00           3 k_psis > 0.62
 #> 
 #> Diagnostic flags present.
 #> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
@@ -217,13 +217,13 @@ It also supports the `simplify` argument in the print method:
 
 print(model_compare(loos), simplify = FALSE)
 #>  model elpd_diff se_diff p_worse diag_diff       diag_elpd elpd_loo se_elpd_loo
-#>     m3       0.0     0.0      NA           2 k_psis > 0.62  -5465.3       669.8
-#>     m2    -211.0   226.1    0.82           2 k_psis > 0.62  -5676.3       772.3
-#>     m1   -2752.6   637.6    1.00           8 k_psis > 0.62  -8218.0       876.3
+#>     m3       0.0     0.0      NA           3 k_psis > 0.62  -5465.3       669.8
+#>     m2    -211.2   226.1    0.82           4 k_psis > 0.62  -5676.5       772.3
+#>     m1   -2752.9   637.7    1.00           3 k_psis > 0.62  -8218.2       876.3
 #>  p_loo se_p_loo   looic se_looic
-#>  216.4     55.4 10930.7   1339.5
-#>  181.1     41.8 11352.6   1544.5
-#>  271.1     56.4 16436.0   1752.6
+#>  216.4     55.4 10930.6   1339.5
+#>  181.3     41.8 11352.9   1544.6
+#>  271.3     56.3 16436.3   1752.6
 #> 
 #> Diagnostic flags present.
 #> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
@@ -272,14 +272,14 @@ m3 <- fit_measure(fit_m3, measures)
 #> Each measure compared against its own best model (elpd: m3, ...).
 #> PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
-#>     m2     2
+#>     m2     4
+#>     m3     3
+#>     m1     3
 #> 
 #>  model elpd_diff se_diff p_worse diag_diff
 #>     m3       0.0     0.0      NA          
-#>     m2    -211.0   226.1    0.82          
-#>     m1   -2752.6   637.6    1.00
+#>     m2    -211.2   226.1    0.82          
+#>     m1   -2752.9   637.7    1.00
 #> 
 #> Diagnostic flags present.
 #> See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)
@@ -297,14 +297,14 @@ print(comp, measures = "r2")
 #> Each measure compared against its own best model (elpd: m3, ...).
 #> PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
-#>     m2     2
+#>     m2     4
+#>     m3     3
+#>     m1     3
 #> 
 #> -- r2 (vs m2) --
 #>  model r2_diff r2_se_diff
 #>     m2   0.000      0.000
-#>     m3  -0.005      0.071
+#>     m3  -0.006      0.071
 #>     m1  -0.219      0.092
 ```
 
@@ -317,14 +317,14 @@ print(comp, measures = "r2", simplify = FALSE)
 #> Each measure compared against its own best model (elpd: m3, ...).
 #> PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
-#>     m2     2
+#>     m2     4
+#>     m3     3
+#>     m1     3
 #> 
 #> -- r2 (vs m2) --
 #>  model r2_diff r2_se_diff    r2 se_r2
 #>     m2   0.000      0.000 0.249 0.094
-#>     m3  -0.005      0.071 0.243 0.131
+#>     m3  -0.006      0.071 0.243 0.131
 #>     m1  -0.219      0.092 0.030 0.024
 ```
 
@@ -337,45 +337,45 @@ print(comp, measures = "all")
 #> Each measure compared against its own best model (elpd: m3, ...).
 #> PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
-#>     m2     2
+#>     m2     4
+#>     m3     3
+#>     m1     3
 #> 
 #> -- elpd (vs m3) --
 #>  model elpd_diff se_diff p_worse diag_diff
 #>     m3       0.0     0.0      NA          
-#>     m2    -211.0   226.1    0.82          
-#>     m1   -2752.6   637.6    1.00          
+#>     m2    -211.2   226.1    0.82          
+#>     m1   -2752.9   637.7    1.00          
 #> 
 #> -- mae (vs m3, sign flipped) --
 #>  model mae_diff mae_se_diff
 #>     m3     0.00        0.00
-#>     m2    -0.12        0.70
-#>     m1    -7.71        1.67
+#>     m2    -0.11        0.70
+#>     m1    -7.70        1.66
 #> 
 #> -- mse (vs m2, sign flipped) --
 #>  model mse_diff mse_se_diff
 #>     m2      0.0         0.0
-#>     m3    -13.5       180.6
-#>     m1   -563.4       289.6
+#>     m3    -15.4       180.8
+#>     m1   -562.9       289.3
 #> 
 #> -- r2 (vs m2) --
 #>  model r2_diff r2_se_diff
 #>     m2   0.000      0.000
-#>     m3  -0.005      0.071
+#>     m3  -0.006      0.071
 #>     m1  -0.219      0.092
 #> 
 #> -- rmse (vs m2, sign flipped) --
 #>  model rmse_diff rmse_se_diff
 #>     m2       0.0          0.0
-#>     m3      -0.2          2.0
+#>     m3      -0.2          2.1
 #>     m1      -6.0          2.9
 #> 
 #> -- rps (vs m3, sign flipped) --
 #>  model rps_diff rps_se_diff
 #>     m3     0.00        0.00
 #>     m2    -0.12        0.69
-#>     m1    -7.34        1.65
+#>     m1    -7.33        1.65
 #> 
 #> All differences: 0 = best model, negative = worse.
 #> Signs flipped for loss measures: mae, mse, rmse, rps.
@@ -505,11 +505,11 @@ data.frame(
   })
 )
 #>      reference       by_hand      reported
-#> elpd        m3 -2752.6484331 -2752.6484331
-#> mse         m2   563.4409737  -563.4409737
-#> mae         m3     7.7100076    -7.7100076
-#> rmse        m2     5.9957668    -5.9957668
-#> r2          m2    -0.2187693    -0.2187693
+#> elpd        m3 -2752.8932190 -2752.8932190
+#> mse         m2   562.9254389  -562.9254389
+#> mae         m3     7.6961610    -7.6961610
+#> rmse        m2     5.9905401    -5.9905401
+#> r2          m2    -0.2185692    -0.2185692
 ```
 
 Note that in the above output, the sign for some measures is flipped
@@ -535,21 +535,21 @@ print(comp, measures = c("r2", "mae"))
 #> Each measure compared against its own best model (elpd: m3, ...).
 #> PSIS-LOO unreliable for all 3 models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
-#>     m2     2
+#>     m2     4
+#>     m3     3
+#>     m1     3
 #> 
 #> -- r2 (vs m2) --
 #>  model r2_diff r2_se_diff
 #>     m2   0.000      0.000
-#>     m3  -0.005      0.071
+#>     m3  -0.006      0.071
 #>     m1  -0.219      0.092
 #> 
 #> -- mae (vs m3, sign flipped) --
 #>  model mae_diff mae_se_diff
 #>     m3     0.00        0.00
-#>     m2    -0.12        0.70
-#>     m1    -7.71        1.67
+#>     m2    -0.11        0.70
+#>     m1    -7.70        1.66
 #> 
 #> All differences: 0 = best model, negative = worse.
 #> Signs flipped for loss measures: mae.
@@ -729,8 +729,8 @@ print(comp_h, measures = "huber")
 #> Each measure compared against its own best model (huber: m3, rmse: m3).
 #> PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
+#>     m3     3
+#>     m1     3
 #> 
 #> -- huber (vs m3, sign flipped) --
 #>  model huber_diff huber_se_diff
@@ -819,8 +819,8 @@ print(comp_n, measures = "all")
 #> m3).
 #> PSIS-LOO unreliable for both models (k_psis > 0.62); measures may be biased.
 #>  model bad_k
-#>     m1     8
-#>     m3     2
+#>     m3     3
+#>     m1     3
 #> 
 #> -- huber (vs m3, sign flipped) --
 #>  model huber_diff huber_se_diff
@@ -872,10 +872,10 @@ kfold_measure <- function(fit, measure) {
 }
 
 k1 <- kfold_measure(fit_m1, measures)
-#> Warning: Found 21 observations with a pareto_k > 0.61568910657988 in model
+#> Warning: Found 20 observations with a pareto_k > 0.61568910657988 in model
 #> 'fit'.
 k2 <- kfold_measure(fit_m2, measures)
-#> Warning: Found 13 observations with a pareto_k > 0.61568910657988 in model
+#> Warning: Found 14 observations with a pareto_k > 0.61568910657988 in model
 #> 'fit'.
 k3 <- kfold_measure(fit_m3, measures)
 #> Warning: Found 21 observations with a pareto_k > 0.61568910657988 in model

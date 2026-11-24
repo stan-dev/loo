@@ -13,8 +13,8 @@
 <!-- mathjax math --><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js" integrity="sha256-qoRlVrS5NAnXSSSiMfFXwK8C9obG11Iybe4h2+bQYR4=" crossorigin="anonymous">
   </script><script src="../../lightswitch.js"></script><script src="../../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
-<link href="../../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
+<script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../../deps/Source_Code_Pro-0.5.0/font.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- Font Awesome 7.0.1 for Bluesky icon --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" referrerpolicy="no-referrer">
@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">Florence
 Bockting</h4>
             
-            <h4 data-toc-skip class="date">2026-11-11</h4>
+            <h4 data-toc-skip class="date">2026-11-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/pred_measure/vignettes/articles-online-only/model-comparison.Rmd" class="external-link"><code>vignettes/articles-online-only/model-comparison.Rmd</code></a></small>
       <div class="d-none name"><code>model-comparison.Rmd</code></div>
@@ -275,9 +275,9 @@ preferred function:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loos</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: 'loo_compare' is deprecated. Use 'model_compare' instead.</span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff       diag_elpd</span></span>
-<span><span class="co">#&gt;     m3       0.0     0.0      NA           2 k_psis &gt; 0.62</span></span>
-<span><span class="co">#&gt;     m2    -211.0   226.1    0.82           2 k_psis &gt; 0.62</span></span>
-<span><span class="co">#&gt;     m1   -2752.6   637.6    1.00           8 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m3       0.0     0.0      NA           3 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m2    -211.2   226.1    0.82           4 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m1   -2752.9   637.7    1.00           3 k_psis &gt; 0.62</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Diagnostic flags present.</span></span>
 <span><span class="co">#&gt; See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span></span>
@@ -287,9 +287,9 @@ output for <code>loo</code> objects:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/model_compare.html">model_compare</a></span><span class="op">(</span><span class="va">loos</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff       diag_elpd</span></span>
-<span><span class="co">#&gt;     m3       0.0     0.0      NA           2 k_psis &gt; 0.62</span></span>
-<span><span class="co">#&gt;     m2    -211.0   226.1    0.82           2 k_psis &gt; 0.62</span></span>
-<span><span class="co">#&gt;     m1   -2752.6   637.6    1.00           8 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m3       0.0     0.0      NA           3 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m2    -211.2   226.1    0.82           4 k_psis &gt; 0.62</span></span>
+<span><span class="co">#&gt;     m1   -2752.9   637.7    1.00           3 k_psis &gt; 0.62</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Diagnostic flags present.</span></span>
 <span><span class="co">#&gt; See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span></span>
@@ -299,13 +299,13 @@ method:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../../reference/model_compare.html">model_compare</a></span><span class="op">(</span><span class="va">loos</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff       diag_elpd elpd_loo se_elpd_loo</span></span>
-<span><span class="co">#&gt;     m3       0.0     0.0      NA           2 k_psis &gt; 0.62  -5465.3       669.8</span></span>
-<span><span class="co">#&gt;     m2    -211.0   226.1    0.82           2 k_psis &gt; 0.62  -5676.3       772.3</span></span>
-<span><span class="co">#&gt;     m1   -2752.6   637.6    1.00           8 k_psis &gt; 0.62  -8218.0       876.3</span></span>
+<span><span class="co">#&gt;     m3       0.0     0.0      NA           3 k_psis &gt; 0.62  -5465.3       669.8</span></span>
+<span><span class="co">#&gt;     m2    -211.2   226.1    0.82           4 k_psis &gt; 0.62  -5676.5       772.3</span></span>
+<span><span class="co">#&gt;     m1   -2752.9   637.7    1.00           3 k_psis &gt; 0.62  -8218.2       876.3</span></span>
 <span><span class="co">#&gt;  p_loo se_p_loo   looic se_looic</span></span>
-<span><span class="co">#&gt;  216.4     55.4 10930.7   1339.5</span></span>
-<span><span class="co">#&gt;  181.1     41.8 11352.6   1544.5</span></span>
-<span><span class="co">#&gt;  271.1     56.4 16436.0   1752.6</span></span>
+<span><span class="co">#&gt;  216.4     55.4 10930.6   1339.5</span></span>
+<span><span class="co">#&gt;  181.3     41.8 11352.9   1544.6</span></span>
+<span><span class="co">#&gt;  271.3     56.3 16436.3   1752.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Diagnostic flags present.</span></span>
 <span><span class="co">#&gt; See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span></span>
@@ -350,14 +350,14 @@ it. Otherwise, it is the first shared measure in alphabetical order.</p>
 <span><span class="co">#&gt; Each measure compared against its own best model (elpd: m3, ...).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for all 3 models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
-<span><span class="co">#&gt;     m2     2</span></span>
+<span><span class="co">#&gt;     m2     4</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff</span></span>
 <span><span class="co">#&gt;     m3       0.0     0.0      NA          </span></span>
-<span><span class="co">#&gt;     m2    -211.0   226.1    0.82          </span></span>
-<span><span class="co">#&gt;     m1   -2752.6   637.6    1.00</span></span>
+<span><span class="co">#&gt;     m2    -211.2   226.1    0.82          </span></span>
+<span><span class="co">#&gt;     m1   -2752.9   637.7    1.00</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Diagnostic flags present.</span></span>
 <span><span class="co">#&gt; See ?`loo-glossary` (sections `diag_diff` and `diag_elpd`)</span></span>
@@ -372,14 +372,14 @@ method:</p>
 <span><span class="co">#&gt; Each measure compared against its own best model (elpd: m3, ...).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for all 3 models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
-<span><span class="co">#&gt;     m2     2</span></span>
+<span><span class="co">#&gt;     m2     4</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- r2 (vs m2) --</span></span>
 <span><span class="co">#&gt;  model r2_diff r2_se_diff</span></span>
 <span><span class="co">#&gt;     m2   0.000      0.000</span></span>
-<span><span class="co">#&gt;     m3  -0.005      0.071</span></span>
+<span><span class="co">#&gt;     m3  -0.006      0.071</span></span>
 <span><span class="co">#&gt;     m1  -0.219      0.092</span></span></code></pre></div>
 <p>If you want to see <strong>all columns related to a measure</strong>
 specified in <code>measures</code> use
@@ -389,14 +389,14 @@ specified in <code>measures</code> use
 <span><span class="co">#&gt; Each measure compared against its own best model (elpd: m3, ...).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for all 3 models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
-<span><span class="co">#&gt;     m2     2</span></span>
+<span><span class="co">#&gt;     m2     4</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- r2 (vs m2) --</span></span>
 <span><span class="co">#&gt;  model r2_diff r2_se_diff    r2 se_r2</span></span>
 <span><span class="co">#&gt;     m2   0.000      0.000 0.249 0.094</span></span>
-<span><span class="co">#&gt;     m3  -0.005      0.071 0.243 0.131</span></span>
+<span><span class="co">#&gt;     m3  -0.006      0.071 0.243 0.131</span></span>
 <span><span class="co">#&gt;     m1  -0.219      0.092 0.030 0.024</span></span></code></pre></div>
 <p>If you want to see <strong>all measures</strong> use
 <code>measures = "all"</code>:</p>
@@ -406,45 +406,45 @@ specified in <code>measures</code> use
 <span><span class="co">#&gt; Each measure compared against its own best model (elpd: m3, ...).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for all 3 models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
-<span><span class="co">#&gt;     m2     2</span></span>
+<span><span class="co">#&gt;     m2     4</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- elpd (vs m3) --</span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff</span></span>
 <span><span class="co">#&gt;     m3       0.0     0.0      NA          </span></span>
-<span><span class="co">#&gt;     m2    -211.0   226.1    0.82          </span></span>
-<span><span class="co">#&gt;     m1   -2752.6   637.6    1.00          </span></span>
+<span><span class="co">#&gt;     m2    -211.2   226.1    0.82          </span></span>
+<span><span class="co">#&gt;     m1   -2752.9   637.7    1.00          </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- mae (vs m3, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model mae_diff mae_se_diff</span></span>
 <span><span class="co">#&gt;     m3     0.00        0.00</span></span>
-<span><span class="co">#&gt;     m2    -0.12        0.70</span></span>
-<span><span class="co">#&gt;     m1    -7.71        1.67</span></span>
+<span><span class="co">#&gt;     m2    -0.11        0.70</span></span>
+<span><span class="co">#&gt;     m1    -7.70        1.66</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- mse (vs m2, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model mse_diff mse_se_diff</span></span>
 <span><span class="co">#&gt;     m2      0.0         0.0</span></span>
-<span><span class="co">#&gt;     m3    -13.5       180.6</span></span>
-<span><span class="co">#&gt;     m1   -563.4       289.6</span></span>
+<span><span class="co">#&gt;     m3    -15.4       180.8</span></span>
+<span><span class="co">#&gt;     m1   -562.9       289.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- r2 (vs m2) --</span></span>
 <span><span class="co">#&gt;  model r2_diff r2_se_diff</span></span>
 <span><span class="co">#&gt;     m2   0.000      0.000</span></span>
-<span><span class="co">#&gt;     m3  -0.005      0.071</span></span>
+<span><span class="co">#&gt;     m3  -0.006      0.071</span></span>
 <span><span class="co">#&gt;     m1  -0.219      0.092</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- rmse (vs m2, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model rmse_diff rmse_se_diff</span></span>
 <span><span class="co">#&gt;     m2       0.0          0.0</span></span>
-<span><span class="co">#&gt;     m3      -0.2          2.0</span></span>
+<span><span class="co">#&gt;     m3      -0.2          2.1</span></span>
 <span><span class="co">#&gt;     m1      -6.0          2.9</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- rps (vs m3, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model rps_diff rps_se_diff</span></span>
 <span><span class="co">#&gt;     m3     0.00        0.00</span></span>
 <span><span class="co">#&gt;     m2    -0.12        0.69</span></span>
-<span><span class="co">#&gt;     m1    -7.34        1.65</span></span>
+<span><span class="co">#&gt;     m1    -7.33        1.65</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All differences: 0 = best model, negative = worse.</span></span>
 <span><span class="co">#&gt; Signs flipped for loss measures: mae, mse, rmse, rps.</span></span>
@@ -619,11 +619,11 @@ the differences reported in the <code>comp</code> object:</p>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      reference       by_hand      reported</span></span>
-<span><span class="co">#&gt; elpd        m3 -2752.6484331 -2752.6484331</span></span>
-<span><span class="co">#&gt; mse         m2   563.4409737  -563.4409737</span></span>
-<span><span class="co">#&gt; mae         m3     7.7100076    -7.7100076</span></span>
-<span><span class="co">#&gt; rmse        m2     5.9957668    -5.9957668</span></span>
-<span><span class="co">#&gt; r2          m2    -0.2187693    -0.2187693</span></span></code></pre></div>
+<span><span class="co">#&gt; elpd        m3 -2752.8932190 -2752.8932190</span></span>
+<span><span class="co">#&gt; mse         m2   562.9254389  -562.9254389</span></span>
+<span><span class="co">#&gt; mae         m3     7.6961610    -7.6961610</span></span>
+<span><span class="co">#&gt; rmse        m2     5.9905401    -5.9905401</span></span>
+<span><span class="co">#&gt; r2          m2    -0.2185692    -0.2185692</span></span></code></pre></div>
 <p>Note that in the above output, the sign for some measures is flipped
 between the <code>by_hand</code> and <code>reported</code> column,
 specifically for <code>mse</code>, <code>mae</code>, and
@@ -645,21 +645,21 @@ It also names it below the tables:</p>
 <span><span class="co">#&gt; Each measure compared against its own best model (elpd: m3, ...).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for all 3 models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
-<span><span class="co">#&gt;     m2     2</span></span>
+<span><span class="co">#&gt;     m2     4</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- r2 (vs m2) --</span></span>
 <span><span class="co">#&gt;  model r2_diff r2_se_diff</span></span>
 <span><span class="co">#&gt;     m2   0.000      0.000</span></span>
-<span><span class="co">#&gt;     m3  -0.005      0.071</span></span>
+<span><span class="co">#&gt;     m3  -0.006      0.071</span></span>
 <span><span class="co">#&gt;     m1  -0.219      0.092</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- mae (vs m3, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model mae_diff mae_se_diff</span></span>
 <span><span class="co">#&gt;     m3     0.00        0.00</span></span>
-<span><span class="co">#&gt;     m2    -0.12        0.70</span></span>
-<span><span class="co">#&gt;     m1    -7.71        1.67</span></span>
+<span><span class="co">#&gt;     m2    -0.11        0.70</span></span>
+<span><span class="co">#&gt;     m1    -7.70        1.66</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All differences: 0 = best model, negative = worse.</span></span>
 <span><span class="co">#&gt; Signs flipped for loss measures: mae.</span></span></code></pre></div>
@@ -915,8 +915,8 @@ so the comparison needs no further argument:</p>
 <span><span class="co">#&gt; Each measure compared against its own best model (huber: m3, rmse: m3).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for both models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- huber (vs m3, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model huber_diff huber_se_diff</span></span>
@@ -998,8 +998,8 @@ is needed:</p>
 <span><span class="co">#&gt; m3).</span></span>
 <span><span class="co">#&gt; PSIS-LOO unreliable for both models (k_psis &gt; 0.62); measures may be biased.</span></span>
 <span><span class="co">#&gt;  model bad_k</span></span>
-<span><span class="co">#&gt;     m1     8</span></span>
-<span><span class="co">#&gt;     m3     2</span></span>
+<span><span class="co">#&gt;     m3     3</span></span>
+<span><span class="co">#&gt;     m1     3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; -- huber (vs m3, sign flipped) --</span></span>
 <span><span class="co">#&gt;  model huber_diff huber_se_diff</span></span>
@@ -1049,10 +1049,10 @@ this is the most expensive step in this article.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">k1</span> <span class="op">&lt;-</span> <span class="fu">kfold_measure</span><span class="op">(</span><span class="va">fit_m1</span>, <span class="va">measures</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Found 21 observations with a pareto_k &gt; 0.61568910657988 in model</span></span>
+<span><span class="co">#&gt; Warning: Found 20 observations with a pareto_k &gt; 0.61568910657988 in model</span></span>
 <span><span class="co">#&gt; 'fit'.</span></span>
 <span><span class="va">k2</span> <span class="op">&lt;-</span> <span class="fu">kfold_measure</span><span class="op">(</span><span class="va">fit_m2</span>, <span class="va">measures</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Found 13 observations with a pareto_k &gt; 0.61568910657988 in model</span></span>
+<span><span class="co">#&gt; Warning: Found 14 observations with a pareto_k &gt; 0.61568910657988 in model</span></span>
 <span><span class="co">#&gt; 'fit'.</span></span>
 <span><span class="va">k3</span> <span class="op">&lt;-</span> <span class="fu">kfold_measure</span><span class="op">(</span><span class="va">fit_m3</span>, <span class="va">measures</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Found 21 observations with a pareto_k &gt; 0.61568910657988 in model</span></span>
