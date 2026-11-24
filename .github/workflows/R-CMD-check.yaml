@@ -21,9 +21,9 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', extra-repositories: https://cran.r-universe.dev/bin/linux/resolute-x86_64/4.7/}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,  r: 'release'}
+          - {os: ubuntu-latest,  r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -39,7 +39,16 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          extra-repositories: ${{ matrix.config.extra-repositories }}
+
+      - name: Configure R-devel repository
+        if: matrix.config.r == 'devel'
+        shell: Rscript {0}
+        run: |
+          cat(
+            'options(repos = c(RUNIVERSE = sprintf("https://cran.r-universe.dev/bin/linux/resolute-x86_64/%s/", getRversion()[, 1:2]), getOption("repos")))\n',
+            file = "~/.Rprofile",
+            append = TRUE
+          )
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
