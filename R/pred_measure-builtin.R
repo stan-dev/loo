@@ -764,13 +764,18 @@ measure_rps <- function(y, ypred, log_weights = NULL, pointwise = NULL,
       # distribution leaves the score undefined.
       degenerate <- which(EXX == 0)
       if (length(degenerate) > 0L) {
+        hint <- if (is.null(w)) {
+          "Use the unscaled score {.code scaled = FALSE}."
+        } else {
+          "Check the PSIS diagnostics, or use the unscaled score
+           {.code scaled = FALSE}."
+        }
         cli::cli_abort(c(
           "The scaled rps score is undefined for {cli::qty(length(degenerate))}
            observation{?s} {.val {degenerate}}.",
-          "i" = "{.code E|X - X'|} is 0 there: all the weight sits on a single
-                 draw, so the predictive distribution is a point mass.",
-          "i" = "Check the PSIS diagnostics, or use the unscaled score
-                 {.code scaled = FALSE}."
+          "i" = "{.code E|X - X'|} is 0 there: the predictive distribution is a
+                 point mass (all draws equal, or all weight on one draw).",
+          "i" = hint
         ))
       }
       -EXy / EXX - 0.5 * log(EXX)
@@ -930,9 +935,7 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   mse_ref <- mean(sqe_ref)
   mse_cmp <- mean(sqe_cmp)
 
-  # a perfect predictor leaves the ratios below undefined; `measure_rmse()`
-  # reports a zero standard error in that case, so do the same here
-  if (n <= 1L || mse_ref <= 0 || mse_cmp <= 0) {
+  if (n <= 1L || (mse_ref <= 0 && mse_cmp <= 0)) {
     return(0)
   }
 
@@ -944,7 +947,9 @@ measure_srps <- function(y, ypred, log_weights = NULL, pointwise = NULL) {
   # (no correlation above one to clamp) and makes two models with the same
   # squared errors cancel bit-for-bit rather than leave rounding noise that
   # `sqrt()` then amplifies to ~1e-7.
-  z <- sqe_cmp / sqrt(mse_cmp) - sqe_ref / sqrt(mse_ref)
+  z_cmp <- if (mse_cmp > 0) sqe_cmp / sqrt(mse_cmp) else 0
+  z_ref <- if (mse_ref > 0) sqe_ref / sqrt(mse_ref) else 0
+  z <- z_cmp - z_ref
 
   0.5 * sqrt(stats::var(z) / n)
 }
