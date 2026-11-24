@@ -1184,11 +1184,21 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' @param y_approx (numeric) `n` approximated values.
 #' @param y (numeric) `m<n` subsampled values.
 #' @param y_idx (integerish) The positions in `y_approx` corresponding to the subsampled values in `y`.
+#' @param weights (numeric) Optional `n` non-negative finite observation
+#'   weights. If `NULL` (the default), all observations have weight 1. If
+#'   given, the estimated total is \eqn{\sum_i w_i y_i}, where the weights
+#'   \eqn{w_i} are scaled to have mean 1 over all `n` observations. The
+#'   difference term is then a ratio estimator (the weights of the subsampled
+#'   observations are scaled to have mean 1 over the `m` subsampled
+#'   observations), and it is approximately unbiased. `v_y_hat` is
+#'   the linearization variance of the ratio estimator, and `hat_v_y`
+#'   estimates \eqn{\sum_i w_i y_i^2 - (\sum_i w_i y_i)^2 / n}.
 #'
 #' @return A named list containing numeric values:
-#' * `y_hat`: estimated total \eqn{\sum_i y_i}, equivalently \eqn{n E[y]},
+#' * `y_hat`: estimated total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with
+#'   `weights`), equivalently \eqn{n E[y]},
 #' * `v_y_hat`: estimated sampling variance of y_hat due to subsampling, and
-#' * `hat_v_y`: estimated variance component for the total \eqn{\sum_i y_i} used to compute the standard error sqrt(hat_v_y).
+#' * `hat_v_y`: estimated variance component for the total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with `weights`) used to compute the standard error sqrt(hat_v_y).
 #'
 #' @references
 #' Magnusson, M., Riis Andersen, M., Jonasson, J. and Vehtari, A. (2020).
@@ -1246,7 +1256,7 @@ loo_subsample_estimation_diff_srs <- function(x) {
 #' loo(log_lik_matrix)
 #' }
 #' @export
-srs_diff_est <- function(y_approx, y, y_idx) {
+srs_diff_est <- function(y_approx, y, y_idx, weights = NULL) {
   checkmate::assert_numeric(y_approx)
   checkmate::assert_numeric(y, max.len = length(y_approx))
   checkmate::assert_integerish(
@@ -1257,22 +1267,47 @@ srs_diff_est <- function(y_approx, y, y_idx) {
     unique = TRUE,
     any.missing = FALSE
   )
+  checkmate::assert_numeric(
+    weights,
+    lower = 0,
+    finite = TRUE,
+    len = length(y_approx),
+    null.ok = TRUE
+  )
+  if (!is.null(weights) && isTRUE(sum(weights[y_idx]) == 0)) {
+    stop("The weights of the subsampled observations must not all be 0.",
+         call. = FALSE)
+  }
 
   N <- length(y_approx)
   m <- length(y)
   y_approx_m <- y_approx[y_idx]
+  # weights with mean 1 over all observations and over the subsample
+  if (is.null(weights)) {
+    w <- 1
+    w_m <- 1
+  } else {
+    w <- N * weights / sum(weights)
+    w_m <- m * weights[y_idx] / sum(weights[y_idx])
+  }
 
   e_i <- y - y_approx_m
-  t_pi_tilde <- sum(y_approx)
-  t_pi2_tilde <- sum(y_approx^2)
-  t_e <- N * mean(e_i)
-  t_hat_epsilon <- N * mean(difference_of_squares(y, y_approx_m))
+  t_pi_tilde <- sum(w * y_approx)
+  t_pi2_tilde <- sum(w * y_approx^2)
+  t_e <- N * mean(w_m * e_i)
+  t_hat_epsilon <- N * mean(w_m * difference_of_squares(y, y_approx_m))
 
-  est_list <- list(m = length(y), N = N)
+  est_list <- list(m = m, N = N)
   # eq (7)
   est_list$y_hat <- t_pi_tilde + t_e
-  # eq (8)
-  est_list$v_y_hat <- N^2 * (1 - m / N) * var(e_i) / m
+  # eq (8); with weights, the difference term is a ratio estimator, and its
+  # linearization variance is the sample variance of w_m * (e_i - e_mean_w)
+  e_mean_w <- t_e / N
+  est_list$v_y_hat <- if (m < 2) {
+    NA_real_
+  } else {
+    N^2 * (1 - m / N) * sum((w_m * (e_i - e_mean_w))^2) / ((m - 1) * m)
+  }
   # eq (9) first row second `+` should be `-`
   # Supplementary material eq (6) has this correct
   # Here the variance is for sum, while in the paper the variance is for mean

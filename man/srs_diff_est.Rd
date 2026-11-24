@@ -4,7 +4,7 @@
 \alias{srs_diff_est}
 \title{Difference estimator with simple random sampling without replacement.}
 \usage{
-srs_diff_est(y_approx, y, y_idx)
+srs_diff_est(y_approx, y, y_idx, weights = NULL)
 }
 \arguments{
 \item{y_approx}{(numeric) \code{n} approximated values.}
@@ -12,13 +12,24 @@ srs_diff_est(y_approx, y, y_idx)
 \item{y}{(numeric) \code{m<n} subsampled values.}
 
 \item{y_idx}{(integerish) The positions in \code{y_approx} corresponding to the subsampled values in \code{y}.}
+
+\item{weights}{(numeric) Optional \code{n} non-negative finite observation
+weights. If \code{NULL} (the default), all observations have weight 1. If
+given, the estimated total is \eqn{\sum_i w_i y_i}, where the weights
+\eqn{w_i} are scaled to have mean 1 over all \code{n} observations. The
+difference term is then a ratio estimator (the weights of the subsampled
+observations are scaled to have mean 1 over the \code{m} subsampled
+observations), and it is approximately unbiased. \code{v_y_hat} is
+the linearization variance of the ratio estimator, and \code{hat_v_y}
+estimates \eqn{\sum_i w_i y_i^2 - (\sum_i w_i y_i)^2 / n}.}
 }
 \value{
 A named list containing numeric values:
 \itemize{
-\item \code{y_hat}: estimated total \eqn{\sum_i y_i}, equivalently \eqn{n E[y]},
+\item \code{y_hat}: estimated total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with
+\code{weights}), equivalently \eqn{n E[y]},
 \item \code{v_y_hat}: estimated sampling variance of y_hat due to subsampling, and
-\item \code{hat_v_y}: estimated variance component for the total \eqn{\sum_i y_i} used to compute the standard error sqrt(hat_v_y).
+\item \code{hat_v_y}: estimated variance component for the total \eqn{\sum_i y_i} (\eqn{\sum_i w_i y_i} with \code{weights}) used to compute the standard error sqrt(hat_v_y).
 }
 }
 \description{
