@@ -35,14 +35,13 @@
 #' model_compare(loo1, loo2)
 #'
 loo_compare <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "loo_compare()", "model_compare()")
   UseMethod("loo_compare")
 }
 
 #' @rdname loo_compare
 #' @export
 loo_compare.default <- function(x, ...) {
-  .deprecate_once("loo_compare", new = "model_compare")
-
   loos <- .model_compare_inputs(x, ...)
   if (any(vapply(loos, is.pred_measure, logical(1)))) {
     stop(
@@ -58,6 +57,5 @@ loo_compare.default <- function(x, ...) {
 #' @rdname loo_compare
 #' @export
 loo_compare.psis_loo_ss_list <- function(x, ...) {
-  .deprecate_once("loo_compare", new = "model_compare")
   model_compare.psis_loo_ss_list(x, ...)
 }

@@ -1698,21 +1698,9 @@ test_that("printed comparison output stays within 80 columns", {
 
 # Tests for deprecated loo_compare() --------------------------------------
 
-test_that("loo_compare throws a deprecation warning once per session", {
-  # forget that the warning was already issued earlier in this session
-  forget_warning <- function() {
-    assign("loo_compare", FALSE, envir = environment(loo:::.deprecate_once)$state)
-  }
-  forget_warning()
-  on.exit(forget_warning(), add = TRUE)
-
-  expect_warning(loo_compare(w1, w2), "deprecated")
-  # already warned in this session, so these are silent
-  expect_no_warning(loo_compare(w1, w2))
-  expect_no_warning(loo_compare(x = list(w1, w2)))
-
-  forget_warning()
-  expect_warning(loo_compare(x = list(w1, w2)), "deprecated")
+test_that("loo_compare() is soft-deprecated", {
+  lifecycle::expect_deprecated(loo_compare(w1, w2))
+  lifecycle::expect_deprecated(loo_compare(x = list(w1, w2)))
 })
 
 test_that("loo_compare still returns what model_compare returns", {
@@ -1742,7 +1730,10 @@ test_that("loo_compare is still a generic", {
   # methods registered elsewhere (e.g. brms, rstanarm) keep dispatching
   assign("loo_compare.fake_fit", function(x, ...) "dispatched", envir = globalenv())
   on.exit(rm("loo_compare.fake_fit", envir = globalenv()), add = TRUE)
-  expect_identical(loo_compare(structure(list(), class = "fake_fit")), "dispatched")
+  expect_identical(
+    suppressWarnings(loo_compare(structure(list(), class = "fake_fit"))),
+    "dispatched"
+  )
 })
 
 test_that("print.compare.loo names the source for non-loo comparisons", {

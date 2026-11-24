@@ -249,7 +249,7 @@ test_that("elpd.array and elpd.matrix give same result", {
 test_that("loo, waic, and elpd error with vector input", {
   expect_error(loo(LLvec), regexp = "no applicable method")
   expect_error(waic(LLvec), regexp = "no applicable method")
-  expect_error(elpd(LLvec), regexp = "no applicable method")
+  expect_error(suppressWarnings(elpd(LLvec)), regexp = "no applicable method")
 })
 
 
