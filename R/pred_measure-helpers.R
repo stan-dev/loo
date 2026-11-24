@@ -650,8 +650,11 @@
   )
 }
 
-
 #' Estimate E|X - X'| from the gaps between sorted draws
+#'
+#' `2 * sum_k gap_k * C_k * (1 - C_k) / (1 - sum(w^2))`, where `gap_k` is the
+#' gap between sorted draws k and k + 1, and `C_k` is the sum of the first k
+#' sorted weights. If `w` is `NULL`, all weights are `1/S`.
 #' @noRd
 .exx_pwm <- function(ypred, w = NULL) {
   S <- nrow(ypred)
