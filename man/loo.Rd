@@ -18,7 +18,8 @@ loo(x, ...)
   r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
-  is_method = c("psis", "tis", "sis")
+  is_method = c("psis", "tis", "sis"),
+  psis_object = NULL
 )
 
 \method{loo}{matrix}(
@@ -27,7 +28,8 @@ loo(x, ...)
   r_eff = 1,
   save_psis = FALSE,
   cores = getOption("mc.cores", 1),
-  is_method = c("psis", "tis", "sis")
+  is_method = c("psis", "tis", "sis"),
+  psis_object = NULL
 )
 
 \method{loo}{`function`}(
@@ -96,6 +98,23 @@ are implemented:
 \item \code{\link[=sis]{"sis"}}: Standard Importance Sampling (SIS).
 }}
 
+\item{psis_object}{For the array and matrix methods, an optional object of
+class \code{"psis"}, \code{"sis"} or \code{"tis"}, as returned by \code{\link[=psis]{psis()}}, \code{\link[=sis]{sis()}} or
+\code{\link[=tis]{tis()}}, with the same number of draws and observations as \code{x}. For an
+array \code{x}, the draws of \code{psis_object} must be in the order that \code{psis()}
+gives for an array of the same shape: all draws of chain 1, then all
+draws of chain 2, and so on. If it is
+given, \code{loo()} uses its importance weights and does not compute importance
+ratios from \code{x}. Use it when the log importance ratios are not \code{-x}, or
+to use one \code{psis()} result for several log-likelihoods. \code{is_method} is
+taken from \code{psis_object}, and \code{cores} is not used. If \code{r_eff} is \code{NULL}
+or not given, the \code{r_eff} of \code{psis_object} is used (1 if \code{psis_object}
+has no \code{r_eff}). Otherwise \code{r_eff}
+replaces the \code{r_eff} of \code{psis_object} for the effective sample sizes and
+the Monte Carlo standard errors (\code{NA} values become 1). The Pareto
+smoothing is not done again, so the tail length stays that of
+\code{psis_object}; the result can then differ from \code{loo(x, r_eff = r_eff)}.}
+
 \item{data, draws, ...}{For the \code{loo.function()} method and the \code{loo_i()}
 function, these are the data, posterior draws, and other arguments to pass
 to the log-likelihood function. See the \strong{Methods (by class)} section
@@ -148,7 +167,10 @@ modify these diagnostics. See the \link{pareto-k-diagnostic} page for details.
 This component will be \code{NULL} unless the \code{save_psis} argument is set to
 \code{TRUE} when calling \code{loo()}. In that case \code{psis_object} will be the object
 of class \code{"psis"} that is created when the \code{loo()} function calls \code{\link[=psis]{psis()}}
-internally to do the PSIS procedure.
+internally to do the PSIS procedure. If \code{save_psis = TRUE} and the
+\code{psis_object} argument is given, this component is that object, with the
+\code{r_eff} and \code{n_eff} that \code{loo()} used (for a \code{"sis"} or \code{"tis"} object, the
+component is \code{sis_object} or \code{tis_object}).
 }
 }
 
@@ -174,6 +196,15 @@ The \code{loo()} function is an S3 generic and methods are provided for
 log-likelihood functions. The array and matrix methods are the most
 convenient, but for models fit to very large datasets the \code{loo.function()}
 method is more memory efficient and may be preferable.
+
+With the \code{psis_object} argument, the importance ratios can differ from
+\code{-x}. For example, \code{x} can be the log-likelihood of draws from another
+distribution (for example, projected draws) that correspond one to one to
+the posterior draws used for \code{psis_object}. The returned estimates are
+then those of importance sampling with the weights of \code{psis_object}. The
+Pareto \eqn{k} diagnostics are those of \code{psis_object}: they diagnose the
+importance ratios, not the product of the ratios and \code{exp(x)}. \code{loo()}
+does not repeat the Pareto \eqn{k} warnings of \code{psis()}.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -222,7 +253,8 @@ are recycled for each observation.
 method in the \strong{Examples} section below for an example of defining a
 method that calls \code{loo.array()}. The \code{loo.stanreg()} method in the
 \strong{rstanarm} package is an example of defining a method that calls
-\code{loo.function()}.
+\code{loo.function()}. A method that passes \code{psis_object} should pass
+\code{r_eff = NULL} unless it wants to replace the \code{r_eff} of \code{psis_object}.
 }
 
 \examples{

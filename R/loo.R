@@ -31,6 +31,22 @@
 #'   \pkg{bayesplot} package also accept `psis` objects.
 #' @template cores
 #' @template is_method
+#' @param psis_object For the array and matrix methods, an optional object of
+#'   class `"psis"`, `"sis"` or `"tis"`, as returned by [psis()], [sis()] or
+#'   [tis()], with the same number of draws and observations as `x`. For an
+#'   array `x`, the draws of `psis_object` must be in the order that `psis()`
+#'   gives for an array of the same shape: all draws of chain 1, then all
+#'   draws of chain 2, and so on. If it is
+#'   given, `loo()` uses its importance weights and does not compute importance
+#'   ratios from `x`. Use it when the log importance ratios are not `-x`, or
+#'   to use one `psis()` result for several log-likelihoods. `is_method` is
+#'   taken from `psis_object`, and `cores` is not used. If `r_eff` is `NULL`
+#'   or not given, the `r_eff` of `psis_object` is used (1 if `psis_object`
+#'   has no `r_eff`). Otherwise `r_eff`
+#'   replaces the `r_eff` of `psis_object` for the effective sample sizes and
+#'   the Monte Carlo standard errors (`NA` values become 1). The Pareto
+#'   smoothing is not done again, so the tail length stays that of
+#'   `psis_object`; the result can then differ from `loo(x, r_eff = r_eff)`.
 #'
 #' @details The `loo()` function is an S3 generic and methods are provided for
 #'   3-D pointwise log-likelihood arrays, pointwise log-likelihood matrices, and
@@ -38,12 +54,22 @@
 #'   convenient, but for models fit to very large datasets the `loo.function()`
 #'   method is more memory efficient and may be preferable.
 #'
+#'   With the `psis_object` argument, the importance ratios can differ from
+#'   `-x`. For example, `x` can be the log-likelihood of draws from another
+#'   distribution (for example, projected draws) that correspond one to one to
+#'   the posterior draws used for `psis_object`. The returned estimates are
+#'   then those of importance sampling with the weights of `psis_object`. The
+#'   Pareto \eqn{k} diagnostics are those of `psis_object`: they diagnose the
+#'   importance ratios, not the product of the ratios and `exp(x)`. `loo()`
+#'   does not repeat the Pareto \eqn{k} warnings of `psis()`.
+#'
 #' @section Defining `loo()` methods in a package: Package developers can define
 #'   `loo()` methods for fitted models objects. See the example `loo.stanfit()`
 #'   method in the **Examples** section below for an example of defining a
 #'   method that calls `loo.array()`. The `loo.stanreg()` method in the
 #'   **rstanarm** package is an example of defining a method that calls
-#'   `loo.function()`.
+#'   `loo.function()`. A method that passes `psis_object` should pass
+#'   `r_eff = NULL` unless it wants to replace the `r_eff` of `psis_object`.
 #'
 #' @return The `loo()` methods return a named list with class
 #'   `c("psis_loo", "loo")` and components:
@@ -83,7 +109,10 @@
 #'  This component will be `NULL` unless the `save_psis` argument is set to
 #'  `TRUE` when calling `loo()`. In that case `psis_object` will be the object
 #'  of class `"psis"` that is created when the `loo()` function calls [psis()]
-#'  internally to do the PSIS procedure.
+#'  internally to do the PSIS procedure. If `save_psis = TRUE` and the
+#'  `psis_object` argument is given, this component is that object, with the
+#'  `r_eff` and `n_eff` that `loo()` used (for a `"sis"` or `"tis"` object, the
+#'  component is `sis_object` or `tis_object`).
 #'  }
 #' }
 #'
@@ -196,11 +225,24 @@ loo.array <-
            r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
-           is_method = c("psis", "tis", "sis")) {
-    is_method <- match.arg(is_method)
+           is_method = c("psis", "tis", "sis"),
+           psis_object = NULL) {
     validate_log_lik(x)
-    psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
     ll <- llarray_to_matrix(x)
+    if (is.null(psis_object)) {
+      is_method <- match.arg(is_method)
+      psis_out <- importance_sampling.array(log_ratios = -x, r_eff = r_eff, cores = cores, method = is_method)
+    } else {
+      r_eff_given <- if (!missing(r_eff)) r_eff
+      # a wrapper method can pass on the full default vector
+      is_method_given <-
+        if (!missing(is_method) && length(is_method) == 1) match.arg(is_method)
+      psis_out <- prepare_given_psis_object(
+        psis_object, dims = dim(ll),
+        r_eff = r_eff_given, is_method = is_method_given
+      )
+      is_method <- attr(psis_out, "method")
+    }
     pointwise <- pointwise_loo_calcs(ll, psis_out)
     importance_sampling_loo_object(
       pointwise = pointwise,
@@ -221,16 +263,29 @@ loo.matrix <-
            r_eff = 1,
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
-           is_method = c("psis", "tis", "sis")) {
-    is_method <- match.arg(is_method)
+           is_method = c("psis", "tis", "sis"),
+           psis_object = NULL) {
     validate_log_lik(x)
-    psis_out <-
-      importance_sampling.matrix(
-        log_ratios = -x,
-        r_eff = r_eff,
-        cores = cores,
-        method = is_method
+    if (is.null(psis_object)) {
+      is_method <- match.arg(is_method)
+      psis_out <-
+        importance_sampling.matrix(
+          log_ratios = -x,
+          r_eff = r_eff,
+          cores = cores,
+          method = is_method
+        )
+    } else {
+      r_eff_given <- if (!missing(r_eff)) r_eff
+      # a wrapper method can pass on the full default vector
+      is_method_given <-
+        if (!missing(is_method) && length(is_method) == 1) match.arg(is_method)
+      psis_out <- prepare_given_psis_object(
+        psis_object, dims = dim(x),
+        r_eff = r_eff_given, is_method = is_method_given
       )
+      is_method <- attr(psis_out, "method")
+    }
     pointwise <- pointwise_loo_calcs(x, psis_out)
     importance_sampling_loo_object(
       pointwise = pointwise,
@@ -258,6 +313,10 @@ loo.function <-
            save_psis = FALSE,
            cores = getOption("mc.cores", 1),
            is_method = c("psis", "tis", "sis")) {
+    if ("psis_object" %in% names(match.call(expand.dots = FALSE)$...)) {
+      stop("'psis_object' is supported only by the array and matrix ",
+           "methods of loo().", call. = FALSE)
+    }
     is_method <- match.arg(is_method)
     cores <- loo_cores(cores)
     stopifnot(is.data.frame(data) || is.matrix(data), !is.null(draws))
@@ -480,6 +539,49 @@ importance_sampling_loo_object <- function(pointwise, diagnostics, dims,
   )
 }
 
+
+#' Check an importance sampling object given to `loo()` and set its `r_eff`
+#'
+#' @noRd
+#' @param psis_object The `psis_object` argument of `loo()`.
+#' @param dims Dimensions (draws, observations) of the log-likelihood matrix.
+#' @param r_eff `NULL` to keep the `r_eff` of `psis_object`, or the `r_eff`
+#'   to use for the effective sample sizes and the MCSE.
+#' @param is_method `NULL`, or the `is_method` that the user gave.
+#' @return `psis_object`, with `r_eff` and `n_eff` replaced if `r_eff` is
+#'   not `NULL`.
+#'
+prepare_given_psis_object <- function(psis_object, dims, r_eff = NULL,
+                                      is_method = NULL) {
+  if (!inherits(psis_object, "importance_sampling")) {
+    stop("'psis_object' must be an object of class 'psis', 'sis' or 'tis'.",
+         call. = FALSE)
+  }
+  if (!identical(as.integer(dim(psis_object)), as.integer(dims))) {
+    stop("'psis_object' must have the same number of draws and ",
+         "observations as 'x'.", call. = FALSE)
+  }
+  method <- attr(psis_object, "method")
+  if (length(method) != 1) {
+    stop("'psis_object' must use one importance sampling method for all ",
+         "observations.", call. = FALSE)
+  }
+  if (!is.null(is_method) && is_method != method) {
+    stop("'is_method' is '", is_method, "', but 'psis_object' uses '",
+         method, "'.", call. = FALSE)
+  }
+  if (is.null(r_eff) && is.null(attr(psis_object, "r_eff"))) {
+    r_eff <- 1
+  }
+  if (!is.null(r_eff)) {
+    r_eff <- prepare_psis_r_eff(r_eff, len = dims[2])
+    attr(psis_object, "r_eff") <- r_eff
+    psis_object$diagnostics$r_eff <- r_eff
+    w <- weights(psis_object, normalize = TRUE, log = FALSE)
+    psis_object$diagnostics$n_eff <- psis_n_eff(w, r_eff)
+  }
+  psis_object
+}
 
 #' Compute Monte Carlo standard error for ELPD
 #'
