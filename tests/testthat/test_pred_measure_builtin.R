@@ -326,8 +326,8 @@ testthat::test_that("uniform log-weights reproduce the unweighted measure_rps()"
 })
 
 testthat::test_that("measure_rps() and measure_srps() handle constant draws", {
-  ypred <- matrix(3, nrow = 100, ncol = 2)
-  log_weights <- matrix(0, nrow = 100, ncol = 2)
+  ypred <- matrix(3, nrow = 4000, ncol = 2)
+  log_weights <- matrix(0, nrow = 4000, ncol = 2)
 
   expect_identical(as.vector(measure_rps(c(0, 1), ypred)$pointwise), c(3, 2))
   expect_equal(
@@ -504,10 +504,10 @@ testthat::test_that(".se_diff_rmse() uses the other model's SE when one MSE is 0
   other <- sqe(mupred)
 
   expect_equal(
-    loo:::.se_diff_rmse(perfect, other),
+    .se_diff_rmse(perfect, other),
     unname(measure_rmse(y, mupred)$estimates[2])
   )
-  expect_equal(loo:::.se_diff_rmse(perfect, perfect), 0)
+  expect_equal(.se_diff_rmse(perfect, perfect), 0)
 })
 
 # measure_r2() ---------------------------------------------------
