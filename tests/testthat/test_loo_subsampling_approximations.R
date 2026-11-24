@@ -756,6 +756,48 @@ test_that("srs_diff_est with weights propagates NA values", {
   )
 })
 
+test_that("srs_diff_est is accurate for values with a large common offset", {
+  set.seed(1234)
+  N <- 10000
+  m <- 500
+  y_approx <- rnorm(N, 0, 0.3)
+  y_idx <- seq(7, N, by = 20)[1:m]
+  y <- y_approx[y_idx] + rnorm(m, 0, 0.05)
+  offset <- 1e6
+  weights_zero <- rlnorm(N)
+  weights_zero[y_idx[1:5]] <- 0
+  for (weights in list(NULL, rlnorm(N), weights_zero)) {
+    res <- srs_diff_est(y_approx, y, y_idx, weights = weights)
+    res_offset <- srs_diff_est(y_approx + offset, y + offset, y_idx,
+                               weights = weights)
+    expect_equal(res_offset$y_hat, res$y_hat + N * offset, tolerance = 1e-12)
+    # the errors of v_y_hat and hat_v_y come from the rounding of
+    # y + offset and y_approx + offset
+    expect_equal(res_offset$v_y_hat, res$v_y_hat, tolerance = 1e-9)
+    expect_equal(res_offset$hat_v_y, res$hat_v_y, tolerance = 1e-9)
+  }
+  # all observations sampled: the shift is added back once
+  y_all <- y_approx + rnorm(N, 0, 0.05)
+  res <- srs_diff_est(y_approx, y_all, seq_len(N))
+  res_offset <- srs_diff_est(y_approx + offset, y_all + offset, seq_len(N))
+  expect_equal(res_offset$y_hat, res$y_hat + N * offset, tolerance = 1e-12)
+  expect_equal(res_offset$v_y_hat, 0)
+  expect_equal(res_offset$hat_v_y, res$hat_v_y, tolerance = 1e-9)
+})
+
+test_that("srs_diff_est keeps -Inf in y_approx outside the subsample", {
+  set.seed(1234)
+  N <- 100
+  y_approx <- rnorm(N)
+  y_idx <- 11:30
+  y <- y_approx[y_idx] + rnorm(20, 0, 0.1)
+  res <- srs_diff_est(y_approx, y, y_idx)
+  y_approx[1] <- -Inf
+  res_inf <- srs_diff_est(y_approx, y, y_idx)
+  expect_identical(res_inf$y_hat, -Inf)
+  expect_equal(res_inf$v_y_hat, res$v_y_hat)
+})
+
 test_that("srs_diff_est checks the weights", {
   y_approx <- rnorm(10)
   expect_error(srs_diff_est(y_approx, y_approx[1:3], 1:3, weights = rep(1, 9)),

@@ -1281,7 +1281,6 @@ srs_diff_est <- function(y_approx, y, y_idx, weights = NULL) {
 
   N <- length(y_approx)
   m <- length(y)
-  y_approx_m <- y_approx[y_idx]
   # weights with mean 1 over all observations and over the subsample
   if (is.null(weights)) {
     w <- 1
@@ -1290,6 +1289,18 @@ srs_diff_est <- function(y_approx, y, y_idx, weights = NULL) {
     w <- N * weights / sum(weights)
     w_m <- m * weights[y_idx] / sum(weights[y_idx])
   }
+  # Subtract the (weighted) mean of y_approx from all values, so that the
+  # sums of squares in eq (9) do not cancel when the values have a large
+  # common offset. In exact arithmetic, v_y_hat and hat_v_y do not depend on
+  # the shift; N * shift is added to y_hat at the end. A non-finite mean
+  # (NA or infinite values) gives no shift.
+  shift <- sum(w * y_approx) / N
+  if (!is.finite(shift)) {
+    shift <- 0
+  }
+  y_approx <- y_approx - shift
+  y <- y - shift
+  y_approx_m <- y_approx[y_idx]
 
   e_i <- y - y_approx_m
   t_pi_tilde <- sum(w * y_approx)
@@ -1314,6 +1325,7 @@ srs_diff_est <- function(y_approx, y, y_idx, weights = NULL) {
   # which explains the proportional difference of 1/N
   est_list$hat_v_y <- (t_pi2_tilde + t_hat_epsilon) - # a (has been checked)
     (1/N) * (t_e^2 - est_list$v_y_hat + 2 * t_pi_tilde * est_list$y_hat - t_pi_tilde^2) # b
+  est_list$y_hat <- est_list$y_hat + N * shift
   est_list
 }
 
