@@ -107,8 +107,7 @@ test_that("model_compare warns when predictive measures differ across models", {
     "Omitted measures: mae \\(m2\\), mse \\(m1\\)"
   )
   expect_equal(attr(comp, "compare_measures"), c("elpd", "r2"))
-  expect_false("mse_diff" %in% colnames(comp))
-  expect_false("mae_diff" %in% colnames(comp))
+  expect_false(any(c("mse", "mae", "mse_diff", "mae_diff") %in% colnames(comp)))
   expect_equal(comp$r2[comp$model == "m1"], unname(pm1$estimates["r2_loo", "Estimate"]))
   expect_equal(comp$r2[comp$model == "m2"], unname(pm2$estimates["r2_loo", "Estimate"]))
 })
@@ -138,16 +137,16 @@ test_that("model_compare matches estimate columns by measure name", {
   )
 
   comp <- suppressMessages(model_compare(list(m1 = pm1, m2 = pm2)))
-  m2 <- comp$model == "m2"
-  expect_equal(comp$r2[m2], unname(pm2$estimates["r2_loo", "Estimate"]))
-  expect_equal(comp$mse[m2], unname(pm2$estimates["mse_loo", "Estimate"]))
-  expect_equal(comp$elpd[m2], unname(pm2$estimates["elpd_loo", "Estimate"]))
+  m1 <- comp$model == "m1"
+  expect_equal(comp$r2[m1], unname(pm1$estimates["r2_loo", "Estimate"]))
+  expect_equal(comp$mse[m1], unname(pm1$estimates["mse_loo", "Estimate"]))
+  expect_equal(comp$elpd[m1], unname(pm1$estimates["elpd_loo", "Estimate"]))
 
   expect_warning(
     comp3 <- suppressMessages(model_compare(list(m1 = pm1, m3 = pm3))),
     "Omitted measures: mse \\(m1\\)"
   )
-  expect_equal(comp3$r2[comp3$model == "m3"], unname(pm3$estimates["r2_loo", "Estimate"]))
+  expect_equal(comp3$r2[comp3$model == "m1"], unname(pm1$estimates["r2_loo", "Estimate"]))
 })
 
 test_that("model_compare compares loo and waic objects", {
@@ -854,6 +853,26 @@ test_that("a wrong aggregation declaration warns for large values", {
     list(estimate = 1.5 * mean(sqe_i), se = 1, pointwise = sqe_i)
   }
   measure <- custom_measure(big, name = "big", se_diff_fun = "mean")
+  make <- function(loo, mupred, ylp) {
+    loo_pred_measure(
+      loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
+    )
+  }
+  pm1 <- make(res$loo_p_m1, res$mupred_m1, res$ylp_m1)
+  pm2 <- make(res$loo_p_m2, res$mupred_m2, res$ylp_m2)
+  expect_warning(
+    suppressMessages(model_compare(pm1, pm2)),
+    "does not reproduce its estimate"
+  )
+})
+
+test_that("a wrong aggregation declaration warns for small values", {
+  res <- readRDS("data-for-tests/test_data_roaches_compare.Rds")
+  tiny <- function(y, mupred) {
+    sqe_i <- (1e-8 * (y - colMeans(mupred)))^2
+    list(estimate = 1.5 * mean(sqe_i), se = 1, pointwise = sqe_i)
+  }
+  measure <- custom_measure(tiny, name = "tiny", se_diff_fun = "mean")
   make <- function(loo, mupred, ylp) {
     loo_pred_measure(
       loo = loo, y = res$y, mupred = mupred, ylp = ylp, measures = measure
