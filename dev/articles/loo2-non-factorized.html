@@ -13,8 +13,8 @@
 <!-- mathjax math --><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js" integrity="sha256-qoRlVrS5NAnXSSSiMfFXwK8C9obG11Iybe4h2+bQYR4=" crossorigin="anonymous">
   </script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.4.10/font.css" rel="stylesheet">
-<link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Code_Pro-0.5.0/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- Font Awesome 7.0.1 for Bluesky icon --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" referrerpolicy="no-referrer">
@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">Aki Vehtari,
 Paul Bürkner and Jonah Gabry</h4>
             
-            <h4 data-toc-skip class="date">2026-11-13</h4>
+            <h4 data-toc-skip class="date">2026-11-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/master/vignettes/loo2-non-factorized.Rmd" class="external-link"><code>vignettes/loo2-non-factorized.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-non-factorized.Rmd</code></div>
@@ -514,16 +514,16 @@ in the upcoming section.</p>
 Computed from 4000 posterior draws and 49 log-likelihood terms.
 
          Estimate   SE
-elpd_loo   -186.7 10.7
-p_loo         7.9  5.0
-looic       373.4 21.5
+elpd_loo   -186.8 10.7
+p_loo         7.9  5.1
+looic       373.5 21.4
 ------
 MCSE of elpd_loo is NA.
 MCSE and ESS estimates assume independent draws (r_eff=1).
 
 Pareto k diagnostic values:
                          Count Pct.    Min. ESS
-(-Inf, 0.7]   (good)     48    98.0%   602     
+(-Inf, 0.7]   (good)     48    98.0%   1051    
    (0.7, 1]   (bad)       1     2.0%   &lt;NA&gt;    
    (1, Inf)   (very bad)  0     0.0%   &lt;NA&gt;    
 See help('pareto-k-diagnostic') for details.</code></pre>
@@ -616,7 +616,7 @@ compare it to the approximate PSIS-LOO result computed earlier.</p>
 <span><span class="va">exact_elpds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="fl">2</span>, <span class="va">log_mean_exp</span><span class="op">)</span></span>
 <span><span class="va">exact_elpd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">exact_elpds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">exact_elpd</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] -188.8</code></pre>
+<pre><code>[1] -188.6</code></pre>
 <p>The results of the approximate and exact LOO-CV are similar but not
 as close as we would expect if there were no problematic observations.
 We can investigate this issue more closely by plotting the approximate

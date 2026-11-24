@@ -155,7 +155,7 @@ print(fit, pars = "beta")
     beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2460    1
     beta[3] -0.31       0 0.03 -0.38 -0.34 -0.31 -0.29 -0.25  2483    1
 
-    Samples were drawn using NUTS(diag_e) at Fri Nov 13 09:46:57 2026.
+    Samples were drawn using NUTS(diag_e) at Tue Nov 24 18:59:00 2026.
     For each parameter, n_eff is a crude measure of effective sample size,
     and Rhat is the potential scale reduction factor on split chains (at 
     convergence, Rhat=1).
@@ -168,8 +168,6 @@ Let us now evaluate the predictive performance of the model using
 loo1 <- loo(fit)
 ```
 
-    Replacing NAs in `r_eff` with 1s
-
     Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.
 
 ``` r
@@ -181,16 +179,16 @@ loo1
     Computed from 4000 posterior draws and 262 log-likelihood terms.
 
              Estimate     SE
-    elpd_loo  -5453.4  692.3
+    elpd_loo  -5453.5  692.3
     p_loo       248.6   53.0
-    looic     10906.8 1384.5
+    looic     10906.9 1384.6
     ------
     MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.3, 1.0]).
 
     Pareto k diagnostic values:
                              Count Pct.    Min. ESS
-    (-Inf, 0.7]   (good)     246   93.9%   79      
+    (-Inf, 0.7]   (good)     246   93.9%   55      
        (0.7, 1]   (bad)        9    3.4%   <NA>    
        (1, Inf)   (very bad)   7    2.7%   <NA>    
     See help('pareto-k-diagnostic') for details.
@@ -237,12 +235,6 @@ value is larger than the sample size (\\S\\) specific threshold
 
 # available in rstan >= 2.21
 loo2 <- loo(fit, moment_match = TRUE)
-```
-
-    Replacing NAs in `r_eff` with 1s
-
-``` r
-
 loo2
 ```
 
@@ -251,11 +243,11 @@ loo2
 
              Estimate     SE
     elpd_loo  -5477.3  699.9
-    p_loo       272.4   62.1
-    looic     10954.5 1399.9
+    p_loo       272.5   62.1
+    looic     10954.6 1399.9
     ------
-    MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
+    MCSE of elpd_loo is 0.4.
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.3, 1.0]).
 
     All Pareto k estimates are good (k < 0.7).
     See help('pareto-k-diagnostic') for details.
@@ -419,11 +411,11 @@ loo3
 
              Estimate     SE
     elpd_loo  -5477.3  699.9
-    p_loo       272.4   62.1
-    looic     10954.5 1399.9
+    p_loo       272.5   62.1
+    looic     10954.6 1399.9
     ------
-    MCSE of elpd_loo is NA.
-    MCSE and ESS estimates assume MCMC draws (r_eff in [0.5, 1.0]).
+    MCSE of elpd_loo is 0.4.
+    MCSE and ESS estimates assume MCMC draws (r_eff in [0.3, 1.0]).
 
     All Pareto k estimates are good (k < 0.7).
     See help('pareto-k-diagnostic') for details.

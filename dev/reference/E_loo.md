@@ -7,9 +7,10 @@ procedure. The expectations estimated by the `E_loo()` function assume
 that the PSIS approximation is working well. **A small [Pareto
 k](https://mc-stan.org/loo/dev/reference/pareto-k-diagnostic.md)
 estimate is necessary, but not sufficient, for `E_loo()` to give
-reliable estimates**. If the `log_ratios` argument is provided,
-`E_loo()` also computes a function specific Pareto k diagnostic, which
-must also be small for a reliable estimate. See more details below.
+reliable estimates**. `E_loo()` also computes a function specific Pareto
+k diagnostic, which must also be small for a reliable estimate. This
+diagnostic is more accurate if the `log_ratios` argument is provided.
+See more details below.
 
 ## Usage
 
@@ -63,12 +64,14 @@ E_loo(
 
 - log_ratios:
 
-  Optionally, a vector or matrix (the same dimensions as `x`) of raw
-  (not smoothed) log ratios. If working with log-likelihood values, the
-  log ratios are the **negative** of those values. If `log_ratios` is
-  specified we are able to compute more accurate [Pareto
+  Optionally, a vector or matrix (the same dimensions as `x`) of the raw
+  (not smoothed) log ratios from which `psis_object` was computed. If
+  working with log-likelihood values, the log ratios are the
+  **negative** of those values. If `log_ratios` is specified we are able
+  to compute more accurate [Pareto
   k](https://mc-stan.org/loo/dev/reference/pareto-k-diagnostic.md)
-  diagnostics specific to `E_loo()`.
+  diagnostics specific to `E_loo()`. `NA`, `NaN` and `Inf` values give
+  an error. `-Inf` values (zero ratios) are allowed.
 
 ## Value
 
@@ -95,9 +98,7 @@ A named list with the following components:
   For the matrix method it will be a vector of length `ncol(x)`
   containing estimates of the shape parameter \\k\\ of the generalized
   Pareto distribution. For the default/vector method, the estimate is a
-  scalar. If `log_ratios` is not specified when calling `E_loo()`, the
-  smoothed log-weights are used to estimate Pareto-k's, which may
-  produce optimistic estimates.
+  scalar.
 
   For `type="mean"`, `type="var"`, and `type="sd"`, the returned
   Pareto-k is usually the maximum of the Pareto-k's for the left and
@@ -106,6 +107,12 @@ A named list with the following components:
   `type="var"` and `type="sd"`. If \\h\\ is binary, constant, or not
   finite, or if `type="quantile"`, the returned Pareto-k is the Pareto-k
   for the right tail of \\r\\.
+
+  The Pareto-k for the right tail of \\r\\ is the Pareto-k of
+  `psis_object`. If `log_ratios` is not specified when calling
+  `E_loo()`, the smoothed log-weights are used to estimate the
+  Pareto-k's for the tails of \\hr\\, which may produce optimistic
+  estimates.
 
 ## Examples
 
