@@ -336,13 +336,12 @@ convert_old_object <- function(x, digits = 1, ...) {
 #' @export
 print.pred_measure <- function(x, digits = NULL, ...) {
   dims <- attr(x, "dims")
-  if (is.null(dims) && !is.null(x$log_weights)) {
-    dims <- dim(x$log_weights)
-  }
   source <- .pred_measure_source_label(x)
 
   cat("\n")
-  if (!is.null(dims) && length(dims) == 2) {
+  if (length(dims) == 2 && is.na(dims[1])) {
+    cat(sprintf("Computed from %s observations.\n", dims[2]))
+  } else if (length(dims) == 2) {
     cat(
       sprintf(
         "Computed from %s posterior draws and %s observations.\n",

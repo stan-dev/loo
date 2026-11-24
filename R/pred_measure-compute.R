@@ -111,6 +111,11 @@ do_pred_measure <- function(
   if (length(dim(ylp_test)) == 3) {
     ylp_test <- llarray_to_matrix(ylp_test)
   }
+  dims <- .pred_measure_dims(
+    source = source, y = y, ypred = ypred, mupred = mupred, ylp = ylp,
+    ylp_test = ylp_test, psis_object = psis_object, loo = loo,
+    kfold = kfold, predperf = predperf
+  )
 
   measures <- .prepare_measures(
     measures, predperf, supported_measures_list, source
@@ -119,13 +124,12 @@ do_pred_measure <- function(
   needs_elpd <- .any_needs_elpd(measures)
   if (source == "loo") {
     if (is.null(predperf)) {
-      if (!is.null(loo) && is.null(loo$psis_object)) {
+      if (!is.null(loo) && is.null(loo$psis_object) && is.null(psis_object)) {
         cli::cli_abort(c(
           "No {.field psis_object} found in {.arg loo}.",
           "i" = "Did you run {.code loo(..., save_psis = TRUE)}?"
         ))
       }
-      .warn_posthoc(loo, measures)
     } else {
       if (is.null(psis_object) && !is.null(predperf$psis_object)) {
         cli::cli_inform("Using psis_object for LOO CV from `predperf`")
@@ -157,6 +161,12 @@ do_pred_measure <- function(
       ylp = ylp,
       r_eff = 1
     )
+    posthoc <- if (is.null(predperf)) {
+      .detect_posthoc(loo, psis_object)
+    } else {
+      attr(predperf, "posthoc")
+    }
+    .warn_posthoc(posthoc, measures)
   }
 
   log_weights <- if (!is.null(psis_object)) psis_object$log_weights else NULL
@@ -249,19 +259,19 @@ do_pred_measure <- function(
     save_psis = save_psis
   )
 
-  .add_attributes(
+  predperf_res <- .add_attributes(
     save_psis,
     predperf_res,
-    y,
-    ypred,
-    mupred,
-    ylp,
-    ylp_test,
+    dims,
     kfold,
     loo,
     predperf,
     source
   )
+  if (source == "loo") {
+    attr(predperf_res, "posthoc") <- posthoc
+  }
+  predperf_res
 }
 
 # internal helper functions ---------------------------------------------------
@@ -272,14 +282,15 @@ do_pred_measure <- function(
 #' `diagnostics$pareto_k` to 0 for the refitted observations but does not
 #' change `psis_object`, so the two sets of Pareto k values differ.
 #'
-#' @param loo A [loo::loo()] result with a `psis_object`.
+#' @param loo A [loo::loo()] result, or `NULL`.
+#' @param psis_object The `psis` object used for the measures.
 #'
 #' @return A character vector of method names, or `NULL`.
 #' @noRd
-.detect_posthoc <- function(loo) {
+.detect_posthoc <- function(loo, psis_object) {
   method <- attr(loo, "posthoc")
   k_loo <- loo$diagnostics$pareto_k
-  k_psis <- loo$psis_object$diagnostics$pareto_k
+  k_psis <- psis_object$diagnostics$pareto_k
   if (!is.null(k_loo) && !is.null(k_psis) && !isTRUE(all.equal(k_loo, k_psis))) {
     method <- union(method, "reloo")
   }
@@ -292,13 +303,12 @@ do_pred_measure <- function(
 #' measures use `psis_object$log_weights` with the original draws in `ypred`
 #' and `mupred`, so their values are not corrected.
 #'
-#' @param loo A [loo::loo()] result with a `psis_object`.
+#' @param method Method names from `.detect_posthoc()`, or `NULL`.
 #' @param measures Measure entries from `.prepare_measures()`.
 #'
 #' @return `NULL`, invisibly. Called for the warning.
 #' @noRd
-.warn_posthoc <- function(loo, measures) {
-  method <- .detect_posthoc(loo)
+.warn_posthoc <- function(method, measures) {
   if (is.null(method)) {
     return(invisible(NULL))
   }
@@ -325,9 +335,11 @@ do_pred_measure <- function(
 #' Resolution order:
 #' \enumerate{
 #'   \item If both `psis_object` and `loo` are provided, return `psis_object`
-#'     after verifying it matches `loo$psis_object`.
+#'     after verifying it matches `loo$psis_object`, or the Pareto k values
+#'     of `loo` when `loo` has no `psis_object`.
 #'   \item Extract from `loo$psis_object` when `loo` is provided.
-#'   \item Use the supplied `psis_object`.
+#'   \item Use the supplied `psis_object` after verifying it matches the
+#'     weights stored in `predperf`.
 #'   \item Reuse `predperf$psis_object` when accumulating measures.
 #'   \item Reuse `predperf$log_weights` when only the weights were stored
 #'     (`save_psis = FALSE`); the result carries no `diagnostics`.
@@ -354,21 +366,21 @@ do_pred_measure <- function(
 ) {
   # psis_object + loo are both provided -> return psis_object
   if (!is.null(psis_object) && !is.null(loo)) {
-    psis_equal_loo <- isTRUE(all.equal(
-      psis_object$log_weights,
-      loo$psis_object$log_weights
-    ))
-    if (!psis_equal_loo) {
-      cli::cli_abort(
-        "Provided `psis_object` and `loo$psis_object` are not identical."
-      )
-    } 
+    pareto_k <- if (is.null(attr(loo, "posthoc"))) loo$diagnostics$pareto_k
+    .check_psis_match(
+      psis_object, loo$psis_object$log_weights, pareto_k, "loo"
+    )
     return(psis_object)
   # loo is provided
   } else if (!is.null(loo)) {
     return(loo$psis_object)
   # psis_object is provided
   } else if (!is.null(psis_object)) {
+    log_weights <- predperf$log_weights
+    if (is.null(log_weights)) {
+      log_weights <- predperf$psis_object$log_weights
+    }
+    .check_psis_match(psis_object, log_weights, NULL, "predperf")
     return(psis_object)
   # predperf with psis_object is provided
   } else if (!is.null(predperf$psis_object)) {
@@ -390,6 +402,38 @@ do_pred_measure <- function(
       "`ylp` needs to be provided."
     ))
   }}
+
+#' Check that a `psis_object` matches the stored PSIS results
+#'
+#' Compares the log weights when they are stored. Otherwise compares the
+#' Pareto k values. `brms::reloo()` sets k to 0 for the refitted
+#' observations, so those observations are not compared.
+#'
+#' @param psis_object The supplied `psis` object.
+#' @param log_weights Stored log weights, or `NULL`.
+#' @param pareto_k Stored Pareto k values, or `NULL`.
+#' @param arg Name of the argument that holds the stored results.
+#'
+#' @return `NULL`, invisibly. Called for the error.
+#' @noRd
+.check_psis_match <- function(psis_object, log_weights, pareto_k, arg) {
+  if (!is.null(log_weights)) {
+    same <- isTRUE(all.equal(psis_object$log_weights, log_weights))
+  } else if (!is.null(pareto_k)) {
+    keep <- pareto_k != 0
+    same <- isTRUE(all.equal(
+      psis_object$diagnostics$pareto_k[keep], pareto_k[keep]
+    ))
+  } else {
+    return(invisible(NULL))
+  }
+  if (!same) {
+    cli::cli_abort(
+      "{.arg psis_object} does not match the PSIS results in {.arg {arg}}."
+    )
+  }
+  invisible(NULL)
+}
 
 #' Extract estimate and SE from a measure result
 #'
@@ -756,7 +800,7 @@ do_pred_measure <- function(
 #' measure object.
 #'
 #' When updating an existing result (`predperf` is not `NULL`), copies attributes
-#' from `predperf` and refreshes `dims` from newly supplied input matrices.
+#' from `predperf`.
 #' Merges `measure_info` from the prior result with any new entries supplied on
 #' `predperf_res` (from \code{.build_pred_measure()}).
 #' When `save_psis = FALSE`, clears any stored `psis_object` from the prior
@@ -770,12 +814,7 @@ do_pred_measure <- function(
 #' @param save_psis Logical; when `FALSE` and accumulating, clears stored
 #'   `psis_object` from the prior result.
 #' @param predperf_res List returned by \code{.build_pred_measure()}.
-#' @param y Vector of observed values; used indirectly via matrix `dims`.
-#' @param ypred Matrix of posterior predictive draws; used to set `dims`.
-#' @param mupred Matrix of posterior expected values; used to set `dims`.
-#' @param ylp Matrix of pointwise log predictive densities; used to set `dims`.
-#' @param ylp_test Matrix of holdout log predictive densities; sets `dims` for
-#'   `source = "test"`.
+#' @param dims Number of draws and observations from `.pred_measure_dims()`.
 #' @param kfold Optional `kfold` object whose attributes are inherited.
 #' @param loo Optional [loo::loo()] object whose attributes are inherited.
 #' @param predperf Existing object when accumulating measures, or `NULL`.
@@ -788,11 +827,7 @@ do_pred_measure <- function(
 .add_attributes <- function(
   save_psis,
   predperf_res,
-  y,
-  ypred,
-  mupred,
-  ylp,
-  ylp_test,
+  dims,
   kfold,
   loo,
   predperf,
@@ -809,16 +844,6 @@ do_pred_measure <- function(
       predperf,
       setdiff(names(attributes(predperf)), "names")
     )
-
-    dims <- if (!is.null(ypred)) {
-      dim(ypred)
-    } else if (!is.null(mupred)) {
-      dim(mupred)
-    } else if (!is.null(ylp)) {
-      dim(ylp)
-    } else {
-      attr(predperf, "dims")
-    }
     attr(predperf_res, "dims") <- dims
     measure_info <- attr(predperf, "measure_info")
     if (is.null(measure_info)) {
@@ -850,17 +875,8 @@ do_pred_measure <- function(
     test = , # fall through (same as insample)
     insample = predperf_res
   )
-  
-  if (source %in% c("insample", "test") || 
-    (is.null(attr(predperf_res, "dims")) && !is.null(ylp))){
-    # make attribute names consistent between pred_measure classes
-    if (source == "test") {
-      attr(predperf_res, "dims") <- attr(ylp_test, "dim")
-    } else {
-      attr(predperf_res, "dims") <- attr(ylp, "dim")  
-    } 
-  }
-  
+  attr(predperf_res, "dims") <- dims
+
   classes <- c(
     switch(
       source,
