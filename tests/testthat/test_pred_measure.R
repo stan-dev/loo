@@ -130,17 +130,6 @@ test_that(".get_psis_object() errors if psis_object does not match loo", {
     ),
     regexp = "does not match"
   )
-
-  loo_nosave <- res$loo
-  loo_nosave$psis_object <- NULL
-  other <- res$loo$psis_object
-  other$diagnostics$pareto_k <- other$diagnostics$pareto_k + 0.1
-  expect_error(
-    .get_psis_object(
-      ylp = NULL, loo = loo_nosave, predperf = NULL, psis_object = other
-    ),
-    regexp = "does not match"
-  )
 })
 
 ## .merge_matrix() ---------------------------
@@ -416,23 +405,15 @@ test_that("pred_measure() errors if psis_object does not match the stored weight
   expect_true("mae_loo" %in% rownames(updated$estimates))
 })
 
-test_that("loo_pred_measure() accepts a loo without psis_object and a psis_object", {
+test_that("loo_pred_measure() errors for a loo without psis_object and a psis_object", {
   loo_nosave <- res$loo
   loo_nosave$psis_object <- NULL
-  out <- loo_pred_measure(
-    loo = loo_nosave, psis_object = res$loo$psis_object,
-    y = res$y, mupred = res$mupred, measures = c("elpd", "r2")
-  )
-  expect_true(all(c("elpd_loo", "r2_loo") %in% rownames(out$estimates)))
-
-  # reloo sets k to 0; those observations are not compared
-  loo_nosave$diagnostics$pareto_k[which.max(loo_nosave$diagnostics$pareto_k)] <- 0
-  expect_warning(
+  expect_error(
     loo_pred_measure(
       loo = loo_nosave, psis_object = res$loo$psis_object,
-      y = res$y, mupred = res$mupred, measures = "r2"
+      y = res$y, mupred = res$mupred, measures = c("elpd", "r2")
     ),
-    regexp = "reloo"
+    regexp = "No psis_object found"
   )
 })
 

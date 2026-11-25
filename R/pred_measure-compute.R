@@ -124,7 +124,7 @@ do_pred_measure <- function(
   needs_elpd <- .any_needs_elpd(measures)
   if (source == "loo") {
     if (is.null(predperf)) {
-      if (!is.null(loo) && is.null(loo$psis_object) && is.null(psis_object)) {
+      if (!is.null(loo) && is.null(loo$psis_object)) {
         cli::cli_abort(c(
           "No {.field psis_object} found in {.arg loo}.",
           "i" = "Did you run {.code loo(..., save_psis = TRUE)}?"
@@ -162,7 +162,7 @@ do_pred_measure <- function(
       r_eff = 1
     )
     posthoc <- if (is.null(predperf)) {
-      .detect_posthoc(loo, psis_object)
+      .detect_posthoc(loo)
     } else {
       attr(predperf, "posthoc")
     }
@@ -282,15 +282,14 @@ do_pred_measure <- function(
 #' `diagnostics$pareto_k` to 0 for the refitted observations but does not
 #' change `psis_object`, so the two sets of Pareto k values differ.
 #'
-#' @param loo A [loo::loo()] result, or `NULL`.
-#' @param psis_object The `psis` object used for the measures.
+#' @param loo A [loo::loo()] result with a `psis_object`.
 #'
 #' @return A character vector of method names, or `NULL`.
 #' @noRd
-.detect_posthoc <- function(loo, psis_object) {
+.detect_posthoc <- function(loo) {
   method <- attr(loo, "posthoc")
   k_loo <- loo$diagnostics$pareto_k
-  k_psis <- psis_object$diagnostics$pareto_k
+  k_psis <- loo$psis_object$diagnostics$pareto_k
   if (!is.null(k_loo) && !is.null(k_psis) && !isTRUE(all.equal(k_loo, k_psis))) {
     method <- union(method, "reloo")
   }
@@ -366,10 +365,7 @@ do_pred_measure <- function(
 ) {
   # psis_object + loo are both provided -> return psis_object
   if (!is.null(psis_object) && !is.null(loo)) {
-    pareto_k <- if (is.null(attr(loo, "posthoc"))) loo$diagnostics$pareto_k
-    .check_psis_match(
-      psis_object, loo$psis_object$log_weights, pareto_k, "loo"
-    )
+    .check_psis_match(psis_object, loo$psis_object$log_weights, "loo")
     return(psis_object)
   # loo is provided
   } else if (!is.null(loo)) {
@@ -380,7 +376,7 @@ do_pred_measure <- function(
     if (is.null(log_weights)) {
       log_weights <- predperf$psis_object$log_weights
     }
-    .check_psis_match(psis_object, log_weights, NULL, "predperf")
+    .check_psis_match(psis_object, log_weights, "predperf")
     return(psis_object)
   # predperf with psis_object is provided
   } else if (!is.null(predperf$psis_object)) {
@@ -405,29 +401,19 @@ do_pred_measure <- function(
 
 #' Check that a `psis_object` matches the stored PSIS results
 #'
-#' Compares the log weights when they are stored. Otherwise compares the
-#' Pareto k values. `brms::reloo()` sets k to 0 for the refitted
-#' observations, so those observations are not compared.
+#' Compares the log weights. Without stored log weights there is no check.
 #'
 #' @param psis_object The supplied `psis` object.
 #' @param log_weights Stored log weights, or `NULL`.
-#' @param pareto_k Stored Pareto k values, or `NULL`.
 #' @param arg Name of the argument that holds the stored results.
 #'
 #' @return `NULL`, invisibly. Called for the error.
 #' @noRd
-.check_psis_match <- function(psis_object, log_weights, pareto_k, arg) {
-  if (!is.null(log_weights)) {
-    same <- isTRUE(all.equal(psis_object$log_weights, log_weights))
-  } else if (!is.null(pareto_k)) {
-    keep <- pareto_k != 0
-    same <- isTRUE(all.equal(
-      psis_object$diagnostics$pareto_k[keep], pareto_k[keep]
-    ))
-  } else {
+.check_psis_match <- function(psis_object, log_weights, arg) {
+  if (is.null(log_weights)) {
     return(invisible(NULL))
   }
-  if (!same) {
+  if (!isTRUE(all.equal(psis_object$log_weights, log_weights))) {
     cli::cli_abort(
       "{.arg psis_object} does not match the PSIS results in {.arg {arg}}."
     )
