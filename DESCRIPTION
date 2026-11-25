@@ -37,6 +37,7 @@ Depends:
 Imports:
     checkmate,
     cli (>= 3.4.0),
+    lifecycle (>= 1.0.0),
     matrixStats (>= 0.52),
     parallel,
     posterior (>= 1.7.0),

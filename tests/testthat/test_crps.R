@@ -211,10 +211,10 @@ test_that("loo_scrps() and loo_pred_measure(..., measures = 'srps') differ like 
 })
 
 test_that("methods for single data point pass permutations to matrix methods", {
-  set.seed(1); a <- crps(x1[,1], x2[,1], y[1], permutations = 5)
-  set.seed(1); b <- crps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5)
+  set.seed(1); a <- suppressWarnings(crps(x1[,1], x2[,1], y[1], permutations = 5))
+  set.seed(1); b <- suppressWarnings(crps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5))
   expect_equal(a, b)
-  set.seed(1); a <- scrps(x1[,1], x2[,1], y[1], permutations = 5)
-  set.seed(1); b <- scrps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5)
+  set.seed(1); a <- suppressWarnings(scrps(x1[,1], x2[,1], y[1], permutations = 5))
+  set.seed(1); b <- suppressWarnings(scrps(x1[,1, drop = FALSE], x2[,1, drop = FALSE], y[1], permutations = 5))
   expect_equal(a, b)
 })

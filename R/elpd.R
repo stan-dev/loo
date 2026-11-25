@@ -34,6 +34,7 @@
 #' }
 #'
 elpd <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "elpd()", "measure_elpd()")
   UseMethod("elpd")
 }
 
@@ -42,7 +43,6 @@ elpd <- function(x, ...) {
 #' @template array
 #'
 elpd.array <- function(x, ...) {
-  .Deprecated("measure_elpd")
   ll <- llarray_to_matrix(x)
   .elpd_matrix_impl(ll)
 }
@@ -52,7 +52,6 @@ elpd.array <- function(x, ...) {
 #' @template matrix
 #'
 elpd.matrix <- function(x, ...) {
-  .Deprecated("measure_elpd")
   .elpd_matrix_impl(x)
 }
 

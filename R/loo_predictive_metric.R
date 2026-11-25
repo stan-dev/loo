@@ -92,6 +92,9 @@
 #' }
 #' }
 loo_predictive_metric <- function(x, ...) {
+  lifecycle::deprecate_soft(
+    "3.0.0", "loo_predictive_metric()", "loo_pred_measure()"
+  )
   UseMethod("loo_predictive_metric")
 }
 
@@ -105,7 +108,6 @@ loo_predictive_metric.matrix <-
            metric = c("mae", "rmse", "mse", "acc", "balanced_acc"),
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-    .Deprecated("loo_pred_measure")
     stopifnot(
       is.numeric(x),
       is.numeric(y),

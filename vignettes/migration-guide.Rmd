@@ -87,6 +87,11 @@ measure_elpd(log_lik_matrix)
 and use a permutation-based estimator. The replacement uses **one** draw
 matrix (`ypred`) and a PWM estimator. Results are not identical.
 
+**Sign change:** `crps()` and `loo_crps()` return the negated CRPS
+(higher is better). `measure_rps()` and `loo_pred_measure(measures = "rps")`
+return the CRPS (lower is better). `scrps()`, `loo_scrps()`, and
+`measure_srps()` all use higher is better.
+
 ```r
 # Deprecated
 crps(ypred1, ypred2, y = y)

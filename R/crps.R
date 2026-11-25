@@ -68,6 +68,7 @@
 #' Prediction, and Estimation. Journal of the American Statistical Association,
 #' 102(477), 359–378.
 crps <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "crps()", "measure_rps()")
   UseMethod("crps")
 }
 
@@ -75,18 +76,21 @@ crps <- function(x, ...) {
 #' @rdname crps
 #' @export
 scrps <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "scrps()", "measure_srps()")
   UseMethod("scrps")
 }
 
 #' @rdname crps
 #' @export
 loo_crps <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "loo_crps()", "loo_pred_measure()")
   UseMethod("loo_crps")
 }
 
 #' @rdname crps
 #' @export
 loo_scrps <- function(x, ...) {
+  lifecycle::deprecate_soft("3.0.0", "loo_scrps()", "loo_pred_measure()")
   UseMethod("loo_scrps")
 }
 
@@ -94,7 +98,6 @@ loo_scrps <- function(x, ...) {
 #' @rdname crps
 #' @export
 crps.matrix <- function(x, x2, y, ..., permutations = 1) {
-  .Deprecated("measure_rps")
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -129,7 +132,6 @@ loo_crps.matrix <-
            permutations = 1,
            r_eff = 1,
            cores = getOption("mc.cores", 1)) {
-  .Deprecated("loo_pred_measure")
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),
@@ -144,7 +146,6 @@ loo_crps.matrix <-
 #' @rdname crps
 #' @export
 scrps.matrix <- function(x, x2, y, ..., permutations = 1) {
-  .Deprecated("measure_srps")
   validate_crps_input(x, x2, y)
   repeats <- replicate(permutations, EXX_compute(x, x2), simplify = F)
   EXX <- Reduce(`+`, repeats) / permutations
@@ -173,7 +174,6 @@ loo_scrps.matrix <-
     permutations = 1,
     r_eff = 1,
     cores = getOption("mc.cores", 1)) {
-  .Deprecated("loo_pred_measure")
   validate_crps_input(x, x2, y, log_lik)
   repeats <- replicate(permutations,
                        EXX_loo_compute(x, x2, log_lik, r_eff = r_eff, ...),

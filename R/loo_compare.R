@@ -5,7 +5,8 @@
 #' instead. See `vignette("migration-guide", package = "loo")` for details.
 #'
 #' `loo_compare()` remains an exported generic so that `loo_compare` methods
-#' registered by other packages keep dispatching as before, but it is frozen at
+#' registered by other packages keep dispatching as before without a deprecation
+#' warning. It is frozen at
 #' its previous behavior: it compares `"loo"`, `"waic"`, and `"kfold"` objects on
 #' [ELPD][loo-glossary] only. Comparing
 #' [`pred_measure`][pred_measure] results requires [model_compare()].
@@ -41,8 +42,7 @@ loo_compare <- function(x, ...) {
 #' @rdname loo_compare
 #' @export
 loo_compare.default <- function(x, ...) {
-  .deprecate_once("loo_compare", new = "model_compare")
-
+  lifecycle::deprecate_soft("3.0.0", "loo_compare()", "model_compare()")
   loos <- .model_compare_inputs(x, ...)
   if (any(vapply(loos, is.pred_measure, logical(1)))) {
     stop(
@@ -58,6 +58,6 @@ loo_compare.default <- function(x, ...) {
 #' @rdname loo_compare
 #' @export
 loo_compare.psis_loo_ss_list <- function(x, ...) {
-  .deprecate_once("loo_compare", new = "model_compare")
+  lifecycle::deprecate_soft("3.0.0", "loo_compare()", "model_compare()")
   model_compare.psis_loo_ss_list(x, ...)
 }
