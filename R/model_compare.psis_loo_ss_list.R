@@ -32,6 +32,7 @@ model_compare.psis_loo_ss_list <- function(x, ...) {
   )
   rownames(comp) <- NULL
 
+  attr(comp, "compare_reference") <- c(elpd = rnms[[1L]])
   class(comp) <- c("compare.loo", "data.frame")
   return(comp)
 }
