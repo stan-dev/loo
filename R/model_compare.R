@@ -328,16 +328,9 @@ model_compare.default <- function(x, ...) {
 }
 
 #' Reference model a measure's differences were computed against
-#'
-#' Each measure has its own best model as reference, recorded in attribute `compare_reference`. Falls back to the first row for objects
-#' created before that attribute existed.
 #' @noRd
 .measure_ref_model <- function(x, measure) {
-  refs <- attr(x, "compare_reference")
-  if (!is.null(refs) && measure %in% names(refs)) {
-    return(refs[[measure]])
-  }
-  x$model[[1L]]
+  attr(x, "compare_reference")[[measure]]
 }
 
 #' Normalize `model_compare()` inputs to a list of model results
@@ -523,8 +516,12 @@ find_model_names <- function(x) {
 #' @noRd
 .model_compare_estimates_table <- function(loos, bare_names = FALSE,
                                           subsampling = FALSE) {
+  shared <- if (bare_names) {
+    Reduce(intersect, lapply(loos, function(x) rownames(x$estimates)))
+  }
   sapply(loos, function(x) {
     est <- x$estimates
+    if (bare_names) est <- est[shared, , drop = FALSE]
     rows <- if (bare_names) .display_name(rownames(est), loos) else rownames(est)
     nms <- c(rows, paste0("se_", rows))
     # A `psis_loo_ss` object carries a third estimate column, the subsampling

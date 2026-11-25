@@ -86,6 +86,7 @@ compare_pred_measure <- function(loos) {
   rank_measure <- .resolve_rank_measure(loos)
   compare_cols <- .compare_pointwise_cols(loos)
   custom_se_diffs <- .resolve_custom_se_diffs(loos, compare_cols)
+  names(loos) <- find_model_names(loos)
   ord <- model_compare_order(loos, rank_measure$internal)
   loos_ord <- loos[ord]
 
@@ -215,7 +216,7 @@ compare_pred_measure <- function(loos) {
       ref <- non_null[[1L]]
       inconsistent <- vapply(
         non_null[-1L],
-        function(info) !identical(info, ref),
+        function(info) !identical(info, ref, ignore.environment = TRUE),
         logical(1)
       )
       if (any(inconsistent)) {
@@ -302,13 +303,9 @@ throw_omitted_compare_measures_warning <- function(loos) {
 }
 
 #' Is a measure an ELPD-family measure (for `p_worse` / `diag_diff`)?
-#'
-#' Matches on the raw column name: every source suffix (`elpd_loo`,
-#' `elpd_kfold`, `elpd_test`, bare `elpd`) shares the `elpd` prefix, so no
-#' suffix stripping is needed here.
 #' @noRd
 .is_elpd_measure <- function(name) {
-  grepl("^elpd", name)
+  name %in% c("elpd", "elpd_loo", "elpd_kfold", "elpd_test")
 }
 
 #' Look up the per-measure information recorded on a result object
@@ -405,8 +402,7 @@ throw_omitted_compare_measures_warning <- function(loos) {
 
   ok <- length(pw) > 0L && is.finite(est) && is.finite(agg)
   if (ok) {
-    tol <- sqrt(.Machine$double.eps) * max(abs(c(est, pw)), na.rm = TRUE)
-    ok <- isTRUE(all.equal(est, agg, tolerance = tol, check.attributes = FALSE))
+    ok <- abs(est - agg) <= sqrt(.Machine$double.eps) * max(abs(est), abs(agg))
   }
   if (!ok) {
     warning(
@@ -431,9 +427,6 @@ throw_omitted_compare_measures_warning <- function(loos) {
   info <- .get_measure_info(loos, bare)
 
   fun <- info$se_diff_fun
-  if (is.null(fun)) {
-    fun <- .measure_spec[[bare]]$se_diff_fun
-  }
   if (is.character(fun)) {
     fun <- .se_diff_funs[[fun]]
   }

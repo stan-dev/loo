@@ -325,6 +325,22 @@ testthat::test_that("uniform log-weights reproduce the unweighted measure_rps()"
   }
 })
 
+testthat::test_that("measure_rps() and measure_srps() handle constant draws", {
+  ypred <- matrix(3, nrow = 4000, ncol = 2)
+  log_weights <- matrix(0, nrow = 4000, ncol = 2)
+
+  expect_identical(as.vector(measure_rps(c(0, 1), ypred)$pointwise), c(3, 2))
+  expect_equal(
+    as.vector(measure_rps(c(0, 1), ypred, log_weights = log_weights)$pointwise),
+    c(3, 2)
+  )
+  expect_error(measure_srps(c(0, 1), ypred), "point mass")
+  expect_error(
+    measure_srps(c(0, 1), ypred, log_weights = log_weights),
+    "PSIS diagnostics"
+  )
+})
+
 testthat::test_that("measure_srps() passes precomputed pointwise values through", {
   pw <- c(-1.5, -2.5, -3.5)
   res <- measure_srps(pointwise = pw)
@@ -478,6 +494,22 @@ testthat::test_that("measure_rmse() works with se=0", {
   expect_equal(unname(res_rmse$estimates[2]), 0)
 })
 
+testthat::test_that(".se_diff_rmse() uses the other model's SE when one MSE is 0", {
+  y <- c(1, 2, 3, 4)
+  mupred <- matrix(c(1.5, 1.8, 3.4, 3.7, 0.9, 2.3, 2.6, 4.2), nrow = 2)
+  sqe <- function(pred) {
+    list(pointwise = as.vector(measure_mse(y, pred)$pointwise))
+  }
+  perfect <- sqe(matrix(y, nrow = 1))
+  other <- sqe(mupred)
+
+  expect_equal(
+    .se_diff_rmse(perfect, other),
+    unname(measure_rmse(y, mupred)$estimates[2])
+  )
+  expect_equal(.se_diff_rmse(perfect, perfect), 0)
+})
+
 # measure_r2() ---------------------------------------------------
 testthat::test_that("measure_r2() works as expected", {
   res <- measure_r2(y = res_roaches$y, mupred = res_roaches$mupred, log_weights = NULL)
@@ -501,6 +533,12 @@ testthat::test_that("measure_r2() with log_weights works as expected", {
 })
 
 # measure_acc() / measure_bacc() -----------------------------------------------------
+testthat::test_that("measure_acc() and measure_bacc() reject y of the wrong length", {
+  mupred <- matrix(c(0.8, 0.3, 0.6, 0.2), nrow = 1)
+  expect_error(measure_acc(c(1, 0, 1), mupred), "must have 3 columns")
+  expect_error(measure_bacc(c(1, 0, 1), mupred), "must have 3 columns")
+})
+
 testthat::skip_if_not_installed("brms")
 
 testthat::test_that("measure_acc() works as expected", {
