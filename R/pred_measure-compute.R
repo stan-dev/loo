@@ -333,8 +333,7 @@ do_pred_measure <- function(
 #' Resolution order:
 #' \enumerate{
 #'   \item If both `psis_object` and `loo` are provided, return `psis_object`
-#'     after verifying it matches `loo$psis_object`, or the Pareto k values
-#'     of `loo` when `loo` has no `psis_object`.
+#'     after verifying it matches `loo$psis_object`.
 #'   \item Extract from `loo$psis_object` when `loo` is provided.
 #'   \item Use the supplied `psis_object` after verifying it matches the
 #'     weights stored in `predperf`.
