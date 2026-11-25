@@ -347,6 +347,19 @@ test_that("dims is c(S, N) for every source", {
   expect_equal(attr(updated, "dims"), c(S, N))
 })
 
+test_that("a vector mupred or ypred passes the dims check", {
+  expect_message(
+    insample_pred_measure(
+      y = res$y, mupred = colMeans(res$mupred), measures = "mae"
+    ),
+    "Coercing"
+  )
+  expect_error(
+    insample_pred_measure(y = res$y, ypred = res$ypred[1, ], measures = "rps"),
+    "`ypred` must be a numeric matrix or array"
+  )
+})
+
 test_that("pred_measure inputs must agree on the number of draws and observations", {
   expect_error(
     insample_pred_measure(y = res$y, ylp = t(res$ylp)),

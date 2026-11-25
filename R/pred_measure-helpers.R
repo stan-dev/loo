@@ -352,7 +352,7 @@
     ylp_test = ylp_test,
     psis_object = psis_object$log_weights
   )
-  draws <- draws[!vapply(draws, is.null, logical(1L))]
+  draws <- Filter(function(x) length(dim(x)) >= 2L, draws)
   stored <- attr(predperf, "dims")
   sizes <- list(
     draws = c(
