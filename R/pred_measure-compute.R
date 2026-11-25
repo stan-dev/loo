@@ -123,17 +123,11 @@ do_pred_measure <- function(
   .validate_control(control, measures)
   needs_elpd <- .any_needs_elpd(measures)
   if (source == "loo") {
-    if (is.null(predperf)) {
-      if (!is.null(loo) && is.null(loo$psis_object)) {
-        cli::cli_abort(c(
-          "No {.field psis_object} found in {.arg loo}.",
-          "i" = "Did you run {.code loo(..., save_psis = TRUE)}?"
-        ))
-      }
-    } else {
-      if (is.null(psis_object) && !is.null(predperf$psis_object)) {
-        cli::cli_inform("Using psis_object for LOO CV from `predperf`")
-      }
+    if (is.null(predperf) && !is.null(loo) && is.null(loo$psis_object)) {
+      cli::cli_abort(c(
+        "No {.field psis_object} found in {.arg loo}.",
+        "i" = "Did you run {.code loo(..., save_psis = TRUE)}?"
+      ))
     }
     checkmate::assert_null(ylp_test)
   } else if (source == "insample") {
