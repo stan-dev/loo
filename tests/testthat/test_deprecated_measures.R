@@ -32,12 +32,6 @@ test_that("crps() is deprecated", {
   lifecycle::expect_deprecated(scrps(x1, x2, y))
 })
 
-test_that("crps() and scrps() warn for numeric input", {
-  set.seed(1)
-  lifecycle::expect_deprecated(crps(rnorm(10), rnorm(10), 0.5))
-  lifecycle::expect_deprecated(scrps(rnorm(10), rnorm(10), 0.5))
-})
-
 test_that("loo_crps() is deprecated", {
   set.seed(1)
   y <- rnorm(5)

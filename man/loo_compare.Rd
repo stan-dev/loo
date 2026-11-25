@@ -28,7 +28,8 @@ the result is identical to what \code{\link[=model_compare]{model_compare()}} re
 instead. See \code{vignette("migration-guide", package = "loo")} for details.
 
 \code{loo_compare()} remains an exported generic so that \code{loo_compare} methods
-registered by other packages keep dispatching as before, but it is frozen at
+registered by other packages keep dispatching as before without a deprecation
+warning. It is frozen at
 its previous behavior: it compares \code{"loo"}, \code{"waic"}, and \code{"kfold"} objects on
 \link[=loo-glossary]{ELPD} only. Comparing
 \code{\link{pred_measure}} results requires \code{\link[=model_compare]{model_compare()}}.
