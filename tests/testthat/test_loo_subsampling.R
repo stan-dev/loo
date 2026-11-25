@@ -1021,6 +1021,7 @@ test_that("model_compare_subsample", {
   expect_snapshot(
     lcss <- loo:::model_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3))
   )
+  expect_equal(attr(lcss, "compare_reference"), c(elpd = lcss$model[[1L]]))
   expect_warning(
     lcss2 <- loo:::model_compare.psis_loo_ss_list(x = list(lss1, lss2, lss3o1))
   )
