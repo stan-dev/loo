@@ -405,6 +405,19 @@ test_that("pred_measure() errors if psis_object does not match the stored weight
   expect_true("mae_loo" %in% rownames(updated$estimates))
 })
 
+test_that("pred_measure() checks psis_object only when the user passes one", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2",
+    save_psis = TRUE
+  )
+  local_mocked_bindings(.check_psis_match = function(...) stop("checked"))
+  expect_no_error(suppressMessages(
+    pred_measure(
+      predperf = predperf_loo, y = res$y, mupred = res$mupred, measures = "mae"
+    )
+  ))
+})
+
 test_that("loo_pred_measure() errors for a loo without psis_object and a psis_object", {
   loo_nosave <- res$loo
   loo_nosave$psis_object <- NULL

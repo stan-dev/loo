@@ -133,7 +133,6 @@ do_pred_measure <- function(
     } else {
       if (is.null(psis_object) && !is.null(predperf$psis_object)) {
         cli::cli_inform("Using psis_object for LOO CV from `predperf`")
-        psis_object <- predperf$psis_object
       }
     }
     checkmate::assert_null(ylp_test)
