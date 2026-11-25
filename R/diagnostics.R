@@ -430,11 +430,10 @@ min_n_eff_by_k <- function(n_eff, kcut) {
 #' probability of large error, it is difficult to get accurate MCSE
 #' estimates as the bias starts to dominate when k > 0.7 (see Section 3.2.3).
 #' Thus the sample size dependent k-hat threshold is capped at 0.7.
-#' An unknown sample size (`NA`) gives the cap.
 #' @param S sample size
 #' @param ... unused
 #' @return threshold
 #' @noRd
 ps_khat_threshold <- function(S, ...) {
-  min(1 - 1 / log10(S), 0.7, na.rm = TRUE)
+  min(1 - 1 / log10(S), 0.7)
 }

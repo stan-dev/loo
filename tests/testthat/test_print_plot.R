@@ -136,10 +136,6 @@ test_that("pareto_k_table gives correct output", {
   )
 })
 
-test_that("ps_khat_threshold gives the cap for an unknown sample size", {
-  expect_equal(ps_khat_threshold(NA), 0.7)
-})
-
 
 # psis_neff and mcse_loo --------------------------------------------------
 test_that("psis_n_eff_values extractor works", {
