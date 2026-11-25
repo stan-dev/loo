@@ -1,0 +1,182 @@
+---
+title: "Migration guide"
+author: "loo package developers"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: true
+    toc_depth: 3
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Migration guide}
+-->
+```{r, child="children/SETTINGS-knitr.txt"}
+```
+
+```{r, child="children/SEE-ONLINE.txt", eval = if (isTRUE(exists("params"))) !params$EVAL else TRUE}
+```
+
+# Introduction
+
+This vignette documents API changes for **loo 3.0.0**. It lists deprecated
+functions, their replacements, and what is planned for removal in the major
+release.
+
+| Status | Meaning |
+|--------|---------|
+| **Deprecated** | Still works but emits a warning (via `.Deprecated()`). Use the replacement for new code. |
+| **Current** | Supported API; use for new code. |
+| **Planned removal** | Scheduled to be deleted in loo 3.0.0. |
+
+Release notes appear in `NEWS.md`. Deprecated functions are listed under
+**Deprecated functions** on the package website.
+
+## Scope of this guide (loo 3.0.0 branch)
+
+This version of the guide covers deprecations whose **replacements already exist**
+in the package. Work on a unified predictive performance API (`pred_measure`,
+`measure_*()`, and related deprecations) is developed on a separate feature
+branch and will extend this guide when merged into `loo-v3.0.0`.
+
+---
+
+# Deprecated source files
+
+| File | Status | Replacement / notes |
+|------|--------|---------------------|
+| `R/compare.R` | Deprecated (removal in 3.0.0) | `loo_compare()` in `R/loo_compare.R` |
+| `R/psislw.R` | Deprecated (removal in 3.0.0) | `psis()` in `R/psis.R` (since 2.0.0) |
+| `R/loo_compare.R` | **Current** | Model comparison |
+| `R/loo.R`, `R/psis.R`, `R/waic.R` | **Current** | Core LOO / PSIS / WAIC |
+
+---
+
+# Function migration tables
+
+## Model comparison
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `compare()` | `loo_compare()` | 2.0.0 | 3.0.0 |
+
+`compare()` returns a vector or matrix with class `"compare.loo"`.
+`loo_compare()` returns a `data.frame` with additional diagnostic columns.
+See `?loo_compare` for the current output format.
+
+```r
+# Deprecated
+compare(loo1, loo2)
+
+# Current
+loo_compare(loo1, loo2)
+```
+
+## PSIS importance sampling
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `psislw()` | `psis()` | 2.0.0 | 3.0.0 |
+| `options(loo.cores = ...)` | `options(mc.cores = ...)` or `cores` argument | 2.0.0 | |
+
+```r
+# Deprecated
+psislw(-log_lik_matrix)
+
+# Current
+psis(-log_lik_matrix)
+```
+
+## Accessing estimates from loo and waic objects
+
+Direct extraction of summary estimates via `$`, `[`, or `[[` on loo objects
+has been deprecated since loo 2.x. Use the `estimates` component instead.
+
+| Deprecated | Replacement | Since | Planned removal |
+|------------|-------------|-------|-----------------|
+| `x$elpd_loo`, `x$looic`, etc. | `x$estimates["elpd_loo", "Estimate"]` | 2.x | |
+| `x["elpd_loo"]`, `x[["elpd_loo"]]` | `x$estimates[...]` | 2.x | |
+
+The same pattern applies to `waic` objects (`elpd_waic`, `waic`, etc.).
+
+## Argument renames
+
+| Function | Deprecated | Replacement | Since |
+|----------|------------|-------------|-------|
+| `psis_approximate_posterior()` | `log_q` | `log_g` | 2.x |
+
+---
+
+# Planned removals in 3.0.0
+
+The following are targeted for **removal** in loo 3.0.0:
+
+- `compare()` and `R/compare.R`
+- `psislw()` and `R/psislw.R`
+
+The deprecated option `options(loo.cores = ...)` remains for backward
+compatibility until a separate removal decision is made.
+
+---
+
+# Upcoming (not yet in this branch)
+
+The following deprecations and migrations are **not** covered by this version
+of the guide. They will be added when the predictive performance feature branch
+is merged into `loo-v3.0.0`:
+
+- `elpd()` → `measure_elpd()`
+- `crps()`, `scrps()`, `loo_crps()`, `loo_scrps()` → `measure_rps()`, `measure_srps()`, `loo_pred_measure()`
+- `loo_predictive_metric()` → `loo_pred_measure()` and `measure_*()`
+- New workflow entry points: `insample_pred_measure()`, `loo_pred_measure()`,
+  `kfold_pred_measure()`, `test_pred_measure()`, `pred_measure()`
+
+Until that merge, do **not** add `.Deprecated("measure_*")` or
+`.Deprecated("loo_pred_measure")` warnings on this branch, because those
+replacements are not yet exported here.
+
+---
+
+# Maintainer checklist
+
+When deprecating or removing a function:
+
+1. Add `.Deprecated("replacement")` in each exported method (only if the
+   replacement exists in the same branch).
+2. Document deprecation in roxygen (`**deprecated**`, links to replacement).
+3. Add a bullet to `NEWS.md`.
+4. Update this migration guide.
+5. Add or update tests in `tests/testthat/test_deprecated_*.R`.
+6. List the topic under **Deprecated functions** in `_pkgdown.yml`.
+7. Keep the old implementation until the planned removal release.
+8. On removal: delete the source file, remove from `NAMESPACE`, update this guide.
+
+When merging feature branches that introduce new replacements, extend the
+**Function migration tables** and remove items from **Upcoming**.
+
+---
+
+# `_pkgdown.yml` reference (this branch)
+
+Suggested `_pkgdown.yml` entries for this branch:
+
+```yaml
+articles:
+  - title: Migration
+    desc: |
+      Guides for updating code when APIs change.
+    contents:
+      - migration-guide
+
+reference:
+  - title: Deprecated functions
+    contents:
+      - compare
+      - psislw
+```
+
+After the predictive performance feature merges, add `elpd`, `crps`, and
+`loo_predictive_metric` to **Deprecated functions**, and add a **Predictive
+performance measures** reference section for the new API.
