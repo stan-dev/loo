@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">loo package
 developers</h4>
             
-            <h4 data-toc-skip class="date">2026-11-24</h4>
+            <h4 data-toc-skip class="date">2026-11-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/pred_measure/vignettes/migration-guide.Rmd" class="external-link"><code>vignettes/migration-guide.Rmd</code></a></small>
       <div class="d-none name"><code>migration-guide.Rmd</code></div>
@@ -321,6 +321,12 @@ class <code>"elpd_generic"</code> with <code>elpd</code> and
 use a permutation-based estimator. The replacement uses
 <strong>one</strong> draw matrix (<code>ypred</code>) and a PWM
 estimator. Results are not identical.</p>
+<p><strong>Sign change:</strong> <code><a href="../reference/crps.html">crps()</a></code> and
+<code><a href="../reference/crps.html">loo_crps()</a></code> return the negated CRPS (higher is better).
+<code><a href="../reference/measure_rps.html">measure_rps()</a></code> and
+<code>loo_pred_measure(measures = "rps")</code> return the CRPS (lower
+is better). <code><a href="../reference/crps.html">scrps()</a></code>, <code><a href="../reference/crps.html">loo_scrps()</a></code>, and
+<code><a href="../reference/measure_srps.html">measure_srps()</a></code> all use higher is better.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Deprecated</span></span>
 <span><span class="fu"><a href="../reference/crps.html">crps</a></span><span class="op">(</span><span class="va">ypred1</span>, <span class="va">ypred2</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>

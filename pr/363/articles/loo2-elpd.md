@@ -148,7 +148,7 @@ gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
 ```
 
 
-     Elapsed Time: 0.017 seconds (Generated Quantities)
+     Elapsed Time: 0.016 seconds (Generated Quantities)
 
 ``` r
 
@@ -165,9 +165,11 @@ using [`elpd()`](https://mc-stan.org/loo/pr/363/reference/elpd.md).
 (elpd_holdout <- elpd(log_pd))
 ```
 
-    Warning in elpd.matrix(log_pd): 'elpd.matrix' is deprecated.
-    Use 'measure_elpd' instead.
-    See help("Deprecated")
+    Warning: `elpd()` was deprecated in loo 3.0.0.
+    ℹ Please use `measure_elpd()` instead.
+    This warning is displayed once per session.
+    Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    generated.
 
 
     Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
@@ -238,7 +240,7 @@ for(k in 1:10){
 ```
 
 
-     Elapsed Time: 0.009 seconds (Generated Quantities)
+     Elapsed Time: 0.008 seconds (Generated Quantities)
 
 
      Elapsed Time: 0.008 seconds (Generated Quantities)
@@ -276,10 +278,6 @@ using [`elpd()`](https://mc-stan.org/loo/pr/363/reference/elpd.md).
 
 (elpd_kfold <- elpd(log_pd_kfold))
 ```
-
-    Warning in elpd.matrix(log_pd_kfold): 'elpd.matrix' is deprecated.
-    Use 'measure_elpd' instead.
-    See help("Deprecated")
 
 
     Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.

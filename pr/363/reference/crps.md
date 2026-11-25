@@ -165,8 +165,8 @@ fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 #> 
 #> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 #> Chain 1: 
-#> Chain 1: Gradient evaluation took 2.7e-05 seconds
-#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.27 seconds.
+#> Chain 1: Gradient evaluation took 2.6e-05 seconds
+#> Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.
 #> Chain 1: Adjust your expectations accordingly!
 #> Chain 1: 
 #> Chain 1: 
@@ -184,14 +184,14 @@ fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 #> Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 #> Chain 1: 
 #> Chain 1:  Elapsed Time: 0.031 seconds (Warm-up)
-#> Chain 1:                0.052 seconds (Sampling)
-#> Chain 1:                0.083 seconds (Total)
+#> Chain 1:                0.053 seconds (Sampling)
+#> Chain 1:                0.084 seconds (Total)
 #> Chain 1: 
 #> 
 #> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
 #> Chain 2: 
-#> Chain 2: Gradient evaluation took 1.1e-05 seconds
-#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+#> Chain 2: Gradient evaluation took 1.2e-05 seconds
+#> Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 #> Chain 2: Adjust your expectations accordingly!
 #> Chain 2: 
 #> Chain 2: 
@@ -208,15 +208,15 @@ fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 #> Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #> Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 #> Chain 2: 
-#> Chain 2:  Elapsed Time: 0.032 seconds (Warm-up)
-#> Chain 2:                0.054 seconds (Sampling)
-#> Chain 2:                0.086 seconds (Total)
+#> Chain 2:  Elapsed Time: 0.033 seconds (Warm-up)
+#> Chain 2:                0.061 seconds (Sampling)
+#> Chain 2:                0.094 seconds (Total)
 #> Chain 2: 
 #> 
 #> SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 #> Chain 3: 
-#> Chain 3: Gradient evaluation took 1.1e-05 seconds
-#> Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+#> Chain 3: Gradient evaluation took 1.2e-05 seconds
+#> Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 #> Chain 3: Adjust your expectations accordingly!
 #> Chain 3: 
 #> Chain 3: 
@@ -258,16 +258,15 @@ fit <- stan_glm(kid_score ~ mom_hs + mom_iq, data = kidiq)
 #> Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 #> Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 #> Chain 4: 
-#> Chain 4:  Elapsed Time: 0.036 seconds (Warm-up)
+#> Chain 4:  Elapsed Time: 0.037 seconds (Warm-up)
 #> Chain 4:                0.053 seconds (Sampling)
-#> Chain 4:                0.089 seconds (Total)
+#> Chain 4:                0.09 seconds (Total)
 #> Chain 4: 
 ypred1 <- posterior_predict(fit)
 ypred2 <- posterior_predict(fit)
 crps(ypred1, ypred2, y = fit$y)
-#> Warning: 'crps.matrix' is deprecated.
-#> Use 'measure_rps' instead.
-#> See help("Deprecated")
+#> Warning: `crps()` was deprecated in loo 3.0.0.
+#> ℹ Please use `measure_rps()` instead.
 #> $estimates
 #>    Estimate          SE 
 #> -10.2201033   0.3462796 

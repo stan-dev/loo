@@ -154,11 +154,7 @@ mae_90q <- loo_predictive_metric(x = mu_pred, y = d$weight, log_lik = ll,
                                 pred_error = 'mae', r_eff = r_eff,
                                 type = 'quantile', probs = 0.9)
 }
-#> Warning: 'loo_predictive_metric.matrix' is deprecated.
-#> Use 'loo_pred_measure' instead.
-#> See help("Deprecated")
-#> Warning: 'loo_predictive_metric.matrix' is deprecated.
-#> Use 'loo_pred_measure' instead.
-#> See help("Deprecated")
+#> Warning: `loo_predictive_metric()` was deprecated in loo 3.0.0.
+#> ℹ Please use `loo_pred_measure()` instead.
 # }
 ```

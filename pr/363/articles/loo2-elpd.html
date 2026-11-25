@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">Bruno
 Nicenboim</h4>
             
-            <h4 data-toc-skip class="date">2026-11-24</h4>
+            <h4 data-toc-skip class="date">2026-11-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/pred_measure/vignettes/loo2-elpd.Rmd" class="external-link"><code>vignettes/loo2-elpd.Rmd</code></a></small>
       <div class="d-none name"><code>loo2-elpd.Rmd</code></div>
@@ -241,7 +241,7 @@ log likelihood of the test data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gen_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-gqs.html" class="external-link">gqs</a></span><span class="op">(</span><span class="va">stanmodel</span>, draws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, data<span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.017 seconds (Generated Quantities)</code></pre>
+ Elapsed Time: 0.016 seconds (Generated Quantities)</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -252,9 +252,11 @@ log likelihood of the test data.</p>
 data using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_holdout</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Warning in elpd.matrix(log_pd): 'elpd.matrix' is deprecated.
-Use 'measure_elpd' instead.
-See help("Deprecated")</code></pre>
+<pre><code>Warning: `elpd()` was deprecated in loo 3.0.0.
+ℹ Please use `measure_elpd()` instead.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
 <pre><code>
 Computed from 4000 posterior draws and 52 log-likelihood terms using the generic elpd function.
 
@@ -320,7 +322,7 @@ predictive densities of all the observations.</p>
 <span>  <span class="va">log_pd_kfold</span><span class="op">[</span>, <span class="va">roaches</span><span class="op">$</span><span class="va">fold</span> <span class="op">==</span> <span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_log_lik.html">extract_log_lik</a></span><span class="op">(</span><span class="va">gen_test</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code>
- Elapsed Time: 0.009 seconds (Generated Quantities)
+ Elapsed Time: 0.008 seconds (Generated Quantities)
 
 
  Elapsed Time: 0.008 seconds (Generated Quantities)
@@ -356,9 +358,6 @@ predictive densities of all the observations.</p>
 folds using <code><a href="../reference/elpd.html">elpd()</a></code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">elpd_kfold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/elpd.html">elpd</a></span><span class="op">(</span><span class="va">log_pd_kfold</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code>Warning in elpd.matrix(log_pd_kfold): 'elpd.matrix' is deprecated.
-Use 'measure_elpd' instead.
-See help("Deprecated")</code></pre>
 <pre><code>
 Computed from 4000 posterior draws and 262 log-likelihood terms using the generic elpd function.
 

@@ -761,7 +761,7 @@ sessionInfo()
     [37] pkgdown_2.2.1        jquerylib_0.1.4      cachem_1.1.0        
     [40] StanHeaders_2.39.1.1 bridgesampling_1.2-1 abind_1.4-8         
     [43] nlme_3.1-171         posterior_1.8.0      rstan_2.32.7        
-    [46] tidyselect_1.2.1     digest_0.6.39        mvtnorm_1.4-2       
+    [46] tidyselect_1.2.1     digest_0.6.39        mvtnorm_1.5-0       
     [49] stringi_1.8.9        dplyr_1.2.1          labeling_0.4.3      
     [52] fastmap_1.2.0        grid_4.6.2           cli_3.6.6           
     [55] magrittr_2.0.5       pkgbuild_1.4.8       withr_3.0.3         

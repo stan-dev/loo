@@ -73,6 +73,17 @@ measure_elpd(log_lik_matrix)
 **one** draw matrix (`ypred`) and a PWM estimator. Results are not
 identical.
 
+**Sign change:**
+[`crps()`](https://mc-stan.org/loo/pr/363/reference/crps.md) and
+[`loo_crps()`](https://mc-stan.org/loo/pr/363/reference/crps.md) return
+the negated CRPS (higher is better).
+[`measure_rps()`](https://mc-stan.org/loo/pr/363/reference/measure_rps.md)
+and `loo_pred_measure(measures = "rps")` return the CRPS (lower is
+better). [`scrps()`](https://mc-stan.org/loo/pr/363/reference/crps.md),
+[`loo_scrps()`](https://mc-stan.org/loo/pr/363/reference/crps.md), and
+[`measure_srps()`](https://mc-stan.org/loo/pr/363/reference/measure_srps.md)
+all use higher is better.
+
 ``` r
 
 # Deprecated

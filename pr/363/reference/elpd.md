@@ -71,9 +71,8 @@ and the vignette *Holdout validation and K-fold cross-validation*.
 # Deprecated:
 LLarr <- example_loglik_array()
 elpd(LLarr)
-#> Warning: 'elpd.array' is deprecated.
-#> Use 'measure_elpd' instead.
-#> See help("Deprecated")
+#> Warning: `elpd()` was deprecated in loo 3.0.0.
+#> ℹ Please use `measure_elpd()` instead.
 #> 
 #> Computed from 1000 posterior draws and 32 log-likelihood terms using the generic elpd function.
 #> 

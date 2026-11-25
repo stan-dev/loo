@@ -97,7 +97,7 @@
                         <h4 data-toc-skip class="author">Florence
 Bockting</h4>
             
-            <h4 data-toc-skip class="date">2026-11-24</h4>
+            <h4 data-toc-skip class="date">2026-11-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stan-dev/loo/blob/pred_measure/vignettes/articles-online-only/model-comparison.Rmd" class="external-link"><code>vignettes/articles-online-only/model-comparison.Rmd</code></a></small>
       <div class="d-none name"><code>model-comparison.Rmd</code></div>
@@ -273,7 +273,11 @@ and warns once per session that <code><a href="../../reference/model_compare.htm
 preferred function:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/loo_compare.html">loo_compare</a></span><span class="op">(</span><span class="va">loos</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: 'loo_compare' is deprecated. Use 'model_compare' instead.</span></span>
+<span><span class="co">#&gt; Warning: `loo_compare()` was deprecated in loo 3.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `model_compare()` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="co">#&gt;  model elpd_diff se_diff p_worse diag_diff       diag_elpd</span></span>
 <span><span class="co">#&gt;     m3       0.0     0.0      NA           3 k_psis &gt; 0.62</span></span>
 <span><span class="co">#&gt;     m2    -211.2   226.1    0.82           4 k_psis &gt; 0.62</span></span>

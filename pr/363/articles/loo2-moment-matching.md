@@ -154,7 +154,7 @@ print(fit, pars = "beta")
     beta[2] -0.57       0 0.02 -0.62 -0.59 -0.57 -0.55 -0.52  2460    1
     beta[3] -0.31       0 0.03 -0.38 -0.34 -0.31 -0.29 -0.25  2483    1
 
-    Samples were drawn using NUTS(diag_e) at Tue Nov 24 19:28:05 2026.
+    Samples were drawn using NUTS(diag_e) at Wed Nov 25 22:21:55 2026.
     For each parameter, n_eff is a crude measure of effective sample size,
     and Rhat is the potential scale reduction factor on split chains (at 
     convergence, Rhat=1).

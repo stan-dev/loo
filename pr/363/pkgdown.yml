@@ -15,7 +15,7 @@ articles:
   articles-online-only/model-comparison: articles-online-only/model-comparison.html
   articles-online-only/overview-measures: articles-online-only/overview-measures.html
   articles-online-only/pred-measure-workflow: articles-online-only/pred-measure-workflow.html
-last_built: 2026-11-24T18:33Z
+last_built: 2026-11-25T21:26Z
 urls:
   reference: https://mc-stan.org/loo/pr/363/reference
   article: https://mc-stan.org/loo/pr/363/articles

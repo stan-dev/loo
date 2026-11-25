@@ -14,7 +14,7 @@
     [`pred_measure()`](https://mc-stan.org/loo/pr/363/reference/pred_measure.md)
   - new built-in measures `measure_*()`, listed in
     `supported_measures_list`
-- Deprecate
+- Soft-deprecate
   [`elpd()`](https://mc-stan.org/loo/pr/363/reference/elpd.md),
   [`crps()`](https://mc-stan.org/loo/pr/363/reference/crps.md),
   [`scrps()`](https://mc-stan.org/loo/pr/363/reference/crps.md),
@@ -36,7 +36,7 @@
     (alphabetical)
   - new [`print()`](https://rdrr.io/r/base/print.html) argument
     `measures`
-- Deprecate
+- Soft-deprecate
   [`loo_compare()`](https://mc-stan.org/loo/pr/363/reference/loo_compare.md).
   Use
   [`model_compare()`](https://mc-stan.org/loo/pr/363/reference/model_compare.md).

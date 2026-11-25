@@ -7,9 +7,9 @@ function instead. See
 for details.
 
 `loo_compare()` remains an exported generic so that `loo_compare`
-methods registered by other packages keep dispatching as before, but it
-is frozen at its previous behavior: it compares `"loo"`, `"waic"`, and
-`"kfold"` objects on
+methods registered by other packages keep dispatching as before without
+a deprecation warning. It is frozen at its previous behavior: it
+compares `"loo"`, `"waic"`, and `"kfold"` objects on
 [ELPD](https://mc-stan.org/loo/pr/363/reference/loo-glossary.md) only.
 Comparing
 [`pred_measure`](https://mc-stan.org/loo/pr/363/reference/pred_measure.md)

@@ -184,7 +184,11 @@ is now the preferred function:
 ``` r
 
 loo_compare(loos)
-#> Warning: 'loo_compare' is deprecated. Use 'model_compare' instead.
+#> Warning: `loo_compare()` was deprecated in loo 3.0.0.
+#> ℹ Please use `model_compare()` instead.
+#> This warning is displayed once per session.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 #>  model elpd_diff se_diff p_worse diag_diff       diag_elpd
 #>     m3       0.0     0.0      NA           3 k_psis > 0.62
 #>     m2    -211.2   226.1    0.82           4 k_psis > 0.62
