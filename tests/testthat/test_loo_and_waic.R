@@ -68,7 +68,7 @@ test_that("mcse_elpd returns NA for an all-zero likelihood column", {
 
 test_that("elpd handles negative infinite log likelihoods", {
   log_lik <- cbind(c(-Inf, 0), c(-Inf, -Inf))
-  out <- elpd(log_lik)
+  out <- suppressWarnings(elpd(log_lik))
 
   expect_equal(out$pointwise[, "elpd"], c(-log(2), -Inf))
 })
@@ -249,7 +249,7 @@ test_that("elpd.array and elpd.matrix give same result", {
 test_that("loo, waic, and elpd error with vector input", {
   expect_error(loo(LLvec), regexp = "no applicable method")
   expect_error(waic(LLvec), regexp = "no applicable method")
-  expect_error(elpd(LLvec), regexp = "no applicable method")
+  expect_error(suppressWarnings(elpd(LLvec)), regexp = "no applicable method")
 })
 
 

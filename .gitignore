@@ -19,6 +19,7 @@ vignettes/loo2-non-factorizable_cache/*
 vignettes/*.html
 vignettes/*.pdf
 inst/doc
+*.html
 
 revdep/*
 tests/testthat/Rplots.pdf
@@ -26,4 +27,9 @@ tests/testthat/Rplots.pdf
 cran-comments.md
 CRAN-RELEASE
 release-prep.R
+
+# personal maintainer scratch (not shared)
+internal-notes/
+notes/loo_se.pdf
+notes/loo-compare-se-diff.md
 CRAN-SUBMISSION

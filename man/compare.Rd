@@ -21,8 +21,9 @@ standard error of the difference are returned. If more than two objects are
 provided then a matrix of summary information is returned (see \strong{Details}).
 }
 \description{
-\strong{This function is deprecated}. Please use the new \code{\link[=loo_compare]{loo_compare()}} function
-instead.
+\strong{This function is deprecated}. Please use the new \code{\link[=model_compare]{model_compare()}} function
+instead. See \code{vignette("migration-guide", package = "loo")} for details.
+\code{compare()} and \code{R/compare.R} are scheduled for removal in a future release.
 }
 \details{
 When comparing two fitted models, we can estimate the difference in their

@@ -1,7 +1,8 @@
 #' Model comparison (deprecated, old version)
 #'
-#' **This function is deprecated**. Please use the new [loo_compare()] function
-#' instead.
+#' **This function is deprecated**. Please use the new [model_compare()] function
+#' instead. See `vignette("migration-guide", package = "loo")` for details.
+#' `compare()` and `R/compare.R` are scheduled for removal in a future release.
 #'
 #' @export
 #' @param ... At least two objects returned by [loo()] (or [waic()]).
@@ -59,7 +60,7 @@
 #' }
 #'
 compare <- function(..., x = list()) {
-  .Deprecated("loo_compare")
+  .Deprecated("model_compare")
   dots <- list(...)
   if (length(dots)) {
     if (length(x)) {

@@ -54,7 +54,7 @@ library("loo")
 The Poisson and negative binomial regression models used below in our example, 
 as well as the `stan_glm` function used to fit the models,
 are covered in more depth in the __rstanarm__ vignette 
-[_Estimating Generalized Linear Models for Count Data with rstanarm_](http://mc-stan.org/rstanarm/articles/count.html). In the rest of 
+[_Estimating Generalized Linear Models for Count Data with rstanarm_](https://mc-stan.org/rstanarm/articles/count.html). In the rest of 
 this vignette we will assume the reader is already familiar with these kinds of
 models.
 
@@ -105,7 +105,7 @@ fit1 <-
 
 Usually we would also run posterior predictive checks as shown in the 
 __rstanarm__ vignette 
-[Estimating Generalized Linear Models for Count Data with rstanarm](http://mc-stan.org/rstanarm/articles/count.html), but 
+[Estimating Generalized Linear Models for Count Data with rstanarm](https://mc-stan.org/rstanarm/articles/count.html), but 
 here we focus only on methods provided by the __loo__ package.
 
 <br>
@@ -263,11 +263,11 @@ the data.
 
 ## Comparing the models on expected log predictive density
 
-We can use the `loo_compare` function to compare our two models on 
+We can use the `model_compare` function to compare our two models on 
 expected log predictive density (ELPD) for new data:
 
-```{r loo_compare}
-loo_compare(loo1, loo2)
+```{r model_compare}
+model_compare(loo1, loo2)
 ```
 
 The difference in ELPD is much larger than several times the estimated standard

@@ -27,10 +27,11 @@
 #' }
 #'
 #' @seealso
-#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/) and
+#' * The __loo__ package [vignettes](https://mc-stan.org/loo/articles/index.html) and
 #'   Vehtari, Gelman, and Gabry (2017) and Vehtari, Simpson, Gelman, Yao,
 #'   and Gabry (2024) for more details on why we prefer `loo()` to `waic()`.
-#' * [loo_compare()] for comparing models on approximate LOO-CV or WAIC.
+#' * [loo_compare()] and [model_compare()] for comparing models on approximate
+#'   LOO-CV or WAIC.
 #'
 #' @references
 #' Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and
