@@ -121,6 +121,17 @@ test_that(".get_psis_object() accepts loo and psis_object together", {
   )
 })
 
+test_that(".get_psis_object() errors if psis_object does not match loo", {
+  other <- res$loo$psis_object
+  other$log_weights <- other$log_weights[rev(seq_len(nrow(other$log_weights))), ]
+  expect_error(
+    .get_psis_object(
+      ylp = NULL, loo = res$loo, predperf = NULL, psis_object = other
+    ),
+    regexp = "does not match"
+  )
+})
+
 ## .merge_matrix() ---------------------------
 
 test_that(".merge_matrix() works as expected", {
@@ -301,6 +312,137 @@ test_that("pred_measure() keeps dims when the update has no matrix input", {
 
   expect_false(is.null(attr(updated, "dims")))
   expect_equal(attr(updated, "dims"), attr(predperf_loo, "dims"))
+})
+
+test_that("dims is c(S, N) for every source", {
+  S <- nrow(res$ylp)
+  N <- length(res$y)
+  insample <- insample_pred_measure(
+    y = res$y, mupred = res$mupred, measures = "rmse"
+  )
+  expect_equal(attr(insample, "dims"), c(S, N))
+  from_psis <- loo_pred_measure(
+    psis_object = res$loo$psis_object, y = res$y, mupred = res$mupred,
+    measures = "rmse"
+  )
+  expect_equal(attr(from_psis, "dims"), c(S, N))
+
+  kfold_only <- kfold_pred_measure(kfold = res$kfold)
+  expect_equal(attr(kfold_only, "dims"), c(NA, N))
+  expect_output(print(kfold_only), "Computed from 53 observations")
+  updated <- pred_measure(
+    y = res$y, mupred = res$mupred, predperf = kfold_only, measures = "rmse"
+  )
+  expect_equal(attr(updated, "dims"), c(S, N))
+})
+
+test_that("a vector mupred or ypred passes the dims check", {
+  expect_message(
+    insample_pred_measure(
+      y = res$y, mupred = colMeans(res$mupred), measures = "mae"
+    ),
+    "Coercing"
+  )
+  expect_error(
+    insample_pred_measure(y = res$y, ypred = res$ypred[1, ], measures = "rps"),
+    "`ypred` must be a numeric matrix or array"
+  )
+})
+
+test_that("pred_measure inputs must agree on the number of draws and observations", {
+  expect_error(
+    insample_pred_measure(y = res$y, ylp = t(res$ylp)),
+    regexp = "number of observations"
+  )
+  expect_error(
+    insample_pred_measure(
+      y = res$y, ypred = res$ypred[1:100, ], mupred = res$mupred,
+      measures = c("rmse", "rps")
+    ),
+    regexp = "number of draws"
+  )
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2"
+  )
+  expect_error(
+    pred_measure(
+      y = res$y, ypred = res$ypred[1:100, ], predperf = predperf_loo,
+      measures = "rps"
+    ),
+    regexp = "number of draws"
+  )
+})
+
+test_that("loo_pred_measure() and pred_measure() error if psis_object is not a psis object", {
+  expect_error(
+    loo_pred_measure(ylp = res$ylp, psis_object = res$loo),
+    regexp = "must be a <psis> object.*loo_pred_measure"
+  )
+  predperf_loo <- loo_pred_measure(loo = res$loo)
+  expect_error(
+    pred_measure(predperf = predperf_loo, psis_object = list()),
+    regexp = "must be a <psis> object"
+  )
+})
+
+test_that("pred_measure() errors if psis_object does not match the stored weights", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2"
+  )
+  other <- res$loo$psis_object
+  other$log_weights <- other$log_weights[rev(seq_len(nrow(other$log_weights))), ]
+  expect_error(
+    pred_measure(
+      y = res$y, mupred = res$mupred, predperf = predperf_loo,
+      psis_object = other, measures = "mae"
+    ),
+    regexp = "does not match"
+  )
+  updated <- pred_measure(
+    y = res$y, mupred = res$mupred, predperf = predperf_loo,
+    psis_object = res$loo$psis_object, measures = "mae"
+  )
+  expect_true("mae_loo" %in% rownames(updated$estimates))
+})
+
+test_that("pred_measure() checks psis_object only when the user passes one", {
+  predperf_loo <- loo_pred_measure(
+    loo = res$loo, y = res$y, mupred = res$mupred, measures = "r2",
+    save_psis = TRUE
+  )
+  local_mocked_bindings(.check_psis_match = function(...) stop("checked"))
+  expect_no_error(
+    pred_measure(
+      predperf = predperf_loo, y = res$y, mupred = res$mupred, measures = "mae"
+    )
+  )
+})
+
+test_that("loo_pred_measure() errors for a loo without psis_object and a psis_object", {
+  loo_nosave <- res$loo
+  loo_nosave$psis_object <- NULL
+  expect_error(
+    loo_pred_measure(
+      loo = loo_nosave, psis_object = res$loo$psis_object,
+      y = res$y, mupred = res$mupred, measures = c("elpd", "r2")
+    ),
+    regexp = "No psis_object found"
+  )
+})
+
+test_that("pred_measure() warns for non-elpd measures after moment matching", {
+  loo_mm <- res$loo
+  attr(loo_mm, "posthoc") <- "moment_match"
+  expect_no_warning(
+    predperf_mm <- loo_pred_measure(loo = loo_mm, measures = "elpd")
+  )
+  expect_equal(attr(predperf_mm, "posthoc"), "moment_match")
+  expect_warning(
+    pred_measure(
+      y = res$y, mupred = res$mupred, predperf = predperf_mm, measures = "mae"
+    ),
+    regexp = "moment_match"
+  )
 })
 
 test_that("pred_measure() reuses stored log_weights when save_psis = FALSE", {

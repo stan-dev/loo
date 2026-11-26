@@ -226,6 +226,7 @@ loo_pred_measure <- function(
   save_psis = FALSE,
   control = list()
 ) {
+  .validate_psis_object(psis_object)
   do_pred_measure(
     y = y,
     ypred = ypred,
@@ -494,6 +495,7 @@ pred_measure <- function(
       "i" = "Got an object of class {.cls {class(predperf)[1]}}."
     ))
   }
+  .validate_psis_object(psis_object)
 
   do_pred_measure(
     y = y,
@@ -553,7 +555,7 @@ custom_measure <- function(
   fun, name, se_diff_fun = NULL, loss = FALSE
 ) {
   if (!is.function(fun)) {
-    stop("'fun' must be a function.", call. = FALSE)
+    cli::cli_abort("{.arg fun} must be a function.")
   }
   attr(fun, "measure_name") <- name
   attr(fun, "measure_loss") <- loss

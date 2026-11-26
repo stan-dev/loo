@@ -84,12 +84,23 @@ test_that("custom_measure() sets the attributes", {
 })
 
 test_that("custom_measure() errors on invalid input", {
-  expect_error(custom_measure("x", name = "m"), regexp = "'fun' must be a function")
+  expect_error(custom_measure("x", name = "m"), regexp = "must be a function")
   expect_error(custom_measure(function(y) NULL, name = "m", loss = NA), regexp = "declare loss")
   expect_error(custom_measure(function(y) NULL, name = "m", se_diff_fun = "median"), regexp = "Invalid")
-  for (bad in list("", NULL, c("a", "b"))) {
+  for (bad in list("", NULL, c("a", "b"), 1, NA_character_)) {
     expect_error(custom_measure(function(y) NULL, name = bad), regexp = "needs a name")
   }
+})
+
+test_that("custom_measure() errors on a reserved name", {
+  for (reserved in c("elpd", "rmse", "srps", "p")) {
+    expect_error(
+      custom_measure(function(y) NULL, name = reserved),
+      regexp = "is reserved"
+    )
+  }
+  f <- function(y, mupred) list(estimate = 1, se = 0, pointwise = y)
+  expect_error(.normalize_measure(list(elpd = f)), regexp = "is reserved")
 })
 
 # .prepare_measures() -----------------------------------------------

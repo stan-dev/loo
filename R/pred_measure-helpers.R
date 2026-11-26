@@ -76,12 +76,11 @@
 .measure_entry_custom <- function(fun, name = NULL) {
   if (is.null(name)) {
     name <- attr(fun, "measure_name", exact = TRUE)
-    if (is.null(name) || length(name) != 1L || !nzchar(name)) {
-      stop(
-        "A custom measure needs a name. Create it with ",
-        "custom_measure(fun, name = \"my_metric\").",
-        call. = FALSE
-      )
+    if (!checkmate::test_string(name, min.chars = 1L)) {
+      cli::cli_abort(c(
+        "A custom measure needs a name: a single non-empty string.",
+        "i" = "Create it with {.code custom_measure(fun, name = \"my_metric\")}."
+      ))
     }
   } else {
     attr_name <- attr(fun, "measure_name", exact = TRUE)
@@ -93,6 +92,12 @@
         "i" = "Using the list name {.val {name}}; the {.fn custom_measure} name is ignored here."
       ))
     }
+  }
+  if (name %in% c(supported_measures_list, "p")) {
+    cli::cli_abort(c(
+      "Custom measure name {.val {name}} is reserved.",
+      "i" = "Built-in measure names and {.val p} cannot name a custom measure."
+    ))
   }
 
   loss <- attr(fun, "measure_loss", exact = TRUE)
@@ -307,6 +312,74 @@
   }
 
   invisible(res)
+}
+
+#' Validate the `psis_object` argument
+#'
+#' @param psis_object Object to validate, or `NULL`.
+#'
+#' @return `NULL`, invisibly, on success.
+#' @noRd
+.validate_psis_object <- function(psis_object) {
+  if (is.null(psis_object) || is.psis(psis_object)) {
+    return(invisible(NULL))
+  }
+  cli::cli_abort(c(
+    "{.arg psis_object} must be a {.cls psis} object, not {.obj_type_friendly {psis_object}}.",
+    "i" = if (is.loo(psis_object)) {
+      "Pass a {.cls loo} object to {.arg loo} in {.fn loo_pred_measure}."
+    }
+  ))
+}
+
+#' Number of draws and observations of the inputs
+#'
+#' Reads `S` and `N` from every input and from the stored `dims` of
+#' `predperf`. For `source = "test"`, the training `ylp` has another `N` and
+#' is not read.
+#'
+#' @inheritParams pred_measure_params
+#'
+#' @return Integer vector `c(S, N)`. `S` is `NA` when no input has draws.
+#' @noRd
+.pred_measure_dims <- function(
+  source, y, ypred, mupred, ylp, ylp_test, psis_object, loo, kfold, predperf
+) {
+  draws <- list(
+    ypred = ypred,
+    mupred = mupred,
+    ylp = if (source != "test") ylp,
+    ylp_test = ylp_test,
+    psis_object = psis_object$log_weights
+  )
+  draws <- Filter(function(x) length(dim(x)) >= 2L, draws)
+  stored <- attr(predperf, "dims")
+  sizes <- list(
+    draws = c(
+      predperf = stored[1],
+      loo = dim(loo)[1],
+      vapply(draws, nrow, integer(1L))
+    ),
+    observations = c(
+      predperf = stored[2],
+      loo = dim(loo)[2],
+      kfold = nrow(kfold$pointwise),
+      y = if (!is.null(y)) length(y),
+      vapply(draws, ncol, integer(1L))
+    )
+  )
+  sizes <- lapply(sizes, function(n) n[!is.na(n)])
+  for (what in names(sizes)) {
+    n <- sizes[[what]]
+    if (length(unique(n)) > 1L) {
+      inputs <- paste0("{.arg ", names(n), "}: ", n)
+      cli::cli_abort(c(
+        "The inputs do not agree on the number of {what}.",
+        stats::setNames(inputs, rep("x", length(n)))
+      ))
+    }
+  }
+  unname(c(sizes$draws[1], sizes$observations[1]))
 }
 
 #' Validate a numeric matrix argument

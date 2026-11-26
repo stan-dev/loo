@@ -1740,6 +1740,23 @@ test_that("model_compare compares kfold_pred_measure objects", {
                     colnames(comp)))
 })
 
+test_that("model_compare compares loo_pred_measure objects made from a psis_object", {
+  res <- .compare_src_res()
+  set.seed(4321)
+  p1 <- loo_pred_measure(
+    psis_object = res$loo$psis_object, y = res$y, mupred = res$mupred,
+    measures = "rmse"
+  )
+  p2 <- loo_pred_measure(
+    psis_object = res$loo$psis_object, y = res$y,
+    mupred = .jitter_mupred(res$mupred, 3), measures = "rmse"
+  )
+  expect_no_error(
+    comp <- suppressMessages(model_compare(list(m1 = p1, m2 = p2)))
+  )
+  expect_s3_class(comp, "compare.loo")
+})
+
 test_that("model_compare compares test_pred_measure objects", {
   res_cv <- readRDS("data-for-tests/test_data_sleep_cv.Rds")
   set.seed(4321)
