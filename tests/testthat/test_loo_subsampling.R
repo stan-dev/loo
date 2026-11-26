@@ -1269,6 +1269,6 @@ l1ss <- loo:::as.psis_loo_ss.psis_loo(l1)
 l2ss <- loo:::as.psis_loo_ss.psis_loo(l2)
 l3ss <- loo:::as.psis_loo_ss.psis_loo(l3)
 expect_equal(
-  unname(loo_compare(l1ss, l2ss, l3ss)[, "elpd_diff"]),
-  loo_compare(l1, l2, l3)$elpd_diff
+  unname(suppressWarnings(loo_compare(l1ss, l2ss, l3ss))[, "elpd_diff"]),
+  suppressWarnings(loo_compare(l1, l2, l3))$elpd_diff
 )
