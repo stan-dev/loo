@@ -597,6 +597,7 @@ insample_pred_measure(
   measures = list("rps", cover90 = cover90)
 )
 #> 
+#> Computed from 4000 posterior draws and 144 observations.
 #> Data source: in-sample
 #> 
 #>         Estimate    SE

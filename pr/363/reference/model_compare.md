@@ -403,19 +403,19 @@ if (requireNamespace("brms", quietly = TRUE)) {
 #> Each measure compared against its own best model (r2: fit1, rmse: fit1).
 #>  model r2_diff r2_se_diff
 #>   fit1   0.000      0.000
-#>   fit2  -0.008      0.007
+#>   fit2  -0.005      0.006
 #> Use print(x, measures = "all") to see all measures.
 #> Each measure compared against its own best model (r2: fit1, rmse: fit1).
 #> 
 #> -- r2 (vs fit1) --
 #>  model r2_diff r2_se_diff
 #>   fit1   0.000      0.000
-#>   fit2  -0.008      0.007
+#>   fit2  -0.005      0.006
 #> 
 #> -- rmse (vs fit1, sign flipped) --
 #>  model rmse_diff rmse_se_diff
 #>   fit1      0.00         0.00
-#>   fit2     -0.26         0.21
+#>   fit2     -0.16         0.20
 #> 
 #> All differences: 0 = best model, negative = worse.
 #> Signs flipped for loss measures: rmse.

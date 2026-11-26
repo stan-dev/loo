@@ -148,7 +148,7 @@ gen_test <- gqs(stanmodel, draws = as.matrix(fit), data= data_test)
 ```
 
 
-     Elapsed Time: 0.016 seconds (Generated Quantities)
+     Elapsed Time: 0.008 seconds (Generated Quantities)
 
 ``` r
 
@@ -240,34 +240,34 @@ for(k in 1:10){
 ```
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.008 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 
-     Elapsed Time: 0.009 seconds (Generated Quantities)
+     Elapsed Time: 0.004 seconds (Generated Quantities)
 
 ### Computing K-fold elpd:
 
