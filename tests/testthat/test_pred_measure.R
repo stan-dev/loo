@@ -411,11 +411,11 @@ test_that("pred_measure() checks psis_object only when the user passes one", {
     save_psis = TRUE
   )
   local_mocked_bindings(.check_psis_match = function(...) stop("checked"))
-  expect_no_error(suppressMessages(
+  expect_no_error(
     pred_measure(
       predperf = predperf_loo, y = res$y, mupred = res$mupred, measures = "mae"
     )
-  ))
+  )
 })
 
 test_that("loo_pred_measure() errors for a loo without psis_object and a psis_object", {
